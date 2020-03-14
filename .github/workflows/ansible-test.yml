@@ -10,7 +10,7 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v2
         with:
-          path: ansible_collections/community/zabbix
+          path: ansible_collections/community/community.zabbix
 
       - name: Set up Python 3.6
         uses: actions/setup-python@v1
