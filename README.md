@@ -4,6 +4,14 @@ This repo hosts the `community.zabbix` Ansible Collection.
 
 The collection includes a variety of Ansible content to help automate the management of resources in Zabbix.
 
+## Supported Zabbix versions
+
+As a main priority, this collection aims to cover all of the currently supported Zabbix releases, which are noted on the [Zabbix Life Cycle & Release Policy](https://www.zabbix.com/life_cycle_and_release_policy) page.
+Other versions are supported too, but not as strictly (e.g. we won't be testing new changes against them).
+
+If you find any inconsistencies with the version of Zabbix you are using, feel free to open a pull request or an issue and we will try to address it as soon as possible.
+In case of pull requests, please make sure that your changes won't break any existing functionality for currently supported Zabbix releases.
+
 ## Included content
 
 Click on the name of a plugin or module to view that content's documentation:
@@ -33,8 +41,6 @@ Click on the name of a plugin or module to view that content's documentation:
     - zabbix\_user\_info
     - zabbix\_user
     - zabbix\_valuemap
-
-## Supported Zabbix versions
 
 ## Installation and Usage
 
@@ -94,11 +100,43 @@ For documentation on how to use individual modules and other content included in
 
 ## Testing and Development
 
-Coming soon
+If you want to develop new content for this collection or improve what's already here, the easiest way to work on the collection is to clone it into one of the configured [`COLLECTIONS_PATHS`](https://docs.ansible.com/ansible/latest/reference_appendices/config.html#collections-paths), and work on it there.
+
+### Testing with `ansible-test`
+
+The `tests` directory contains configuration for running sanity and integration tests using [`ansible-test`](https://docs.ansible.com/ansible/latest/dev_guide/testing_integration.html).
+
+You can run the collection's test suites with the commands:
+
+    ansible-test sanity --docker -v --color
+    ansible-test integration --docker -v --color
+
+### Developing new Zabbix modules
+
+New modules must adhere to these rules:
+
+* Features and modules must be compatible with [currently supported Zabbix releases](https://www.zabbix.com/life_cycle_and_release_policy).
+* New logic for existing modules or new modules are submitted with integration tests included.
+* Must include the same set of general options as other zabbix modules both in `DOCUMENTATION` block (via document fragment) and `argument_spec`.
+* Must implement proper logout mechanism.
+* Use the same version of `zabbix-api` library as the other modules.
+* Comply with [Ansible module best practices](https://docs.ansible.com/ansible/devel/dev_guide/developing_modules_best_practices.html).
 
 ## Publishing New Versions
 
-Coming soon
+The current process for publishing new collection versions is manual, and requires a user who has access to the `community.zabbix` namespace on Ansible Galaxy to publish the build artifact.
+
+  1. Ensure `CHANGELOG.md` contains all the latest changes.
+  2. Update `galaxy.yml` and this README's `requirements.yml` example with the new `version` for the collection.
+  3. Tag the version in Git and push to GitHub.
+  4. Run the following commands to build and release the new version on Galaxy:
+
+     ```
+     ansible-galaxy collection build
+     ansible-galaxy collection publish ./community-zabbix-$VERSION_HERE.tar.gz
+     ```
+
+After the version is published, verify it exists on the [Zabbix Collection Galaxy page](https://galaxy.ansible.com/community/zabbix).
 
 ## License
 
@@ -108,4 +146,9 @@ See LICENCE to see the full text.
 
 ## Contributing
 
-Coming soon
+Any contribution is welcome and we only ask contributors to:
+
+* Provide at least integration tests for any contribution.
+* Create an issues for any significant contribution that would change a large portion of the code base.
+
+If you are interested in joining us as a maintainer, either open an issue or contact @D3DeFi or @sky-joker directly :)
