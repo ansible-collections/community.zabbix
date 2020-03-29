@@ -1,3 +1,40 @@
 ---
-- include: setup.yml
-  when: ansible_os_family == 'Debian'
+- name: check login to zabbix
+  uri:
+    url: "{{ zabbix_server_url }}/api_jsonrpc.php"
+    method: POST
+    body:
+      jsonrpc: "2.0"
+      method: "user.login"
+      params:
+        user: "{{ zabbix_login_user }}"
+        password: "{{ zabbix_login_password }}"
+      id: "1"
+    body_format: json
+    status_code: 200
+  retries: 60
+  delay: 5
+  until: check_login_result is defined and 'json' in check_login_result and 'result' in check_login_result.json
+  register: check_login_result
+
+- name: get zabbix version
+  uri:
+    url: "{{ zabbix_server_url }}/api_jsonrpc.php"
+    method: POST
+    body:
+      jsonrpc: "2.0"
+      method: "apiinfo.version"
+      params: []
+      id: "1"
+    body_format: json
+    status_code: 200
+  register: zabbix_version_result
+
+- name: set zabbix_version variable
+  set_fact:
+    zabbix_version: >-
+      {{ [0,1]
+        | map('extract', zabbix_version_result.json.result.split('.'))
+        | list
+        | join('.')
+      }}

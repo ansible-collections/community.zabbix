@@ -1,0 +1,40 @@
+---
+version: '3.7'
+services:
+  zabbix-db:
+    image: mysql:5.7
+    environment:
+      MYSQL_DATABASE: "zabbix"
+      MYSQL_USER: "zabbix"
+      MYSQL_PASSWORD: "zabbix"
+      MYSQL_ROOT_PASSWORD: "zabbix"
+  zabbix-server:
+    image: zabbix/zabbix-server-mysql:ubuntu-${zabbix_version}-latest
+    environment:
+      DB_SERVER_HOST: "zabbix-db"
+      MYSQL_USER: "zabbix"
+      MYSQL_PASSWORD: "zabbix"
+      MYSQL_DATABASE: "zabbix"
+      MYSQL_ROOT_PASSWORD: "zabbix"
+    depends_on:
+      - "zabbix-db"
+    links:
+      - "zabbix-db"
+  zabbix-web:
+    image: zabbix/zabbix-web-nginx-mysql:ubuntu-${zabbix_version}-latest
+    environment:
+      DB_SERVER_HOST: "zabbix-db"
+      MYSQL_USER: "zabbix"
+      MYSQL_PASSWORD: "zabbix"
+      MYSQL_DATABASE: "zabbix"
+      MYSQL_ROOT_PASSWORD: "zabbix"
+      ZBX_SERVER_HOST: "zabbix-server"
+      PHP_TZ: "Asia/Tokyo"
+    depends_on:
+      - "zabbix-db"
+      - "zabbix-server"
+    links:
+      - "zabbix-db"
+      - "zabbix-server"
+    ports:
+      - "8080:80"
