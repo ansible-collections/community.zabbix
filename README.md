@@ -1,5 +1,7 @@
 # Zabbix collection for Ansible
 
+![](https://github.com/ansible-collections/community.zabbix/workflows/CI/badge.svg)
+
 This repo hosts the `community.zabbix` Ansible Collection.
 
 The collection includes a variety of Ansible content to help automate the management of resources in Zabbix.
