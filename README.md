@@ -102,16 +102,26 @@ For documentation on how to use individual modules and other content included in
 
 ## Testing and Development
 
-If you want to develop new content for this collection or improve what's already here, the easiest way to work on the collection is to clone it into one of the configured [`COLLECTIONS_PATHS`](https://docs.ansible.com/ansible/latest/reference_appendices/config.html#collections-paths), and work on it there.
-
 ### Testing with `ansible-test`
+
+As of right now, `ansible-test` will fail unless executed in a path containing a specific component. Easiest way to start working on this collection is to clone it to the `~/ansible_collections/community/zabbix` directory. To use this modified version of the collection in playbooks, set [`COLLECTIONS_PATHS`](https://docs.ansible.com/ansible/latest/reference_appendices/config.html#collections-paths) to the `~/ansible_collections` directory.
+
+Running test suites locally requires few dependencies (use virtualenv):
+
+    pip install docker-compose zabbix-api
 
 The `tests` directory contains configuration for running sanity and integration tests using [`ansible-test`](https://docs.ansible.com/ansible/latest/dev_guide/testing_integration.html).
 
-You can run the collection's test suites with the commands:
+Collection's integration test suite can be run with the commands (`zabbix_version=X.Y` will be expanded to `X.Y-latest`):
 
-    ansible-test sanity --docker -v --color
-    ansible-test integration --docker -v --color
+    export zabbix_version=X.Y
+    docker-compose up -d
+    ansible-test integration -v --color --retry-on-error --continue-on-error --diff
+    docker-compose down
+
+Collection's sanity test suite can be run with the commands:
+
+    ansible-test sanity -v --color --docker --python 3.6
 
 ### Developing new Zabbix modules
 
