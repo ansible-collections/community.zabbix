@@ -1,0 +1,62 @@
+---
+- name: test - create new Zabbix group
+  zabbix_group:
+    server_url: "{{ zabbix_server_url }}"
+    login_user: "{{ zabbix_login_user }}"
+    login_password: "{{ zabbix_login_password }}"
+    host_groups:
+      - zbxgrp_example_group01
+      - zbxgrp_example_group02
+    state: present
+  register: zbxgrp_new
+
+- name: assert that group was created
+  assert:
+    that: zbxgrp_new is changed
+
+- name: test - get one hostgroup info
+  zabbix_group_info:
+    server_url: "{{ zabbix_server_url }}"
+    login_user: "{{ zabbix_login_user }}"
+    login_password: "{{ zabbix_login_password }}"
+    hostgroup_name:
+      - zbxgrp_example_group01
+  register: get_hostgorup_info_result
+
+- name: assert that one group was get
+  assert:
+    that:
+      - get_hostgorup_info_result.host_groups | length == 1
+      - get_hostgorup_info_result.host_groups.0.name == 'zbxgrp_example_group01'
+
+- name: test - get two hostgroup info
+  zabbix_group_info:
+    server_url: "{{ zabbix_server_url }}"
+    login_user: "{{ zabbix_login_user }}"
+    login_password: "{{ zabbix_login_password }}"
+    hostgroup_name:
+      - zbxgrp_example_group01
+      - zbxgrp_example_group02
+  register: get_hostgorup_info_result
+
+- name: assert that two group was get
+  assert:
+    that:
+      - get_hostgorup_info_result.host_groups | length == 2
+      - get_hostgorup_info_result.host_groups.0.name == 'zbxgrp_example_group01'
+      - get_hostgorup_info_result.host_groups.1.name == 'zbxgrp_example_group02'
+
+- name: test - delete Zabbix group
+  zabbix_group:
+    server_url: "{{ zabbix_server_url }}"
+    login_user: "{{ zabbix_login_user }}"
+    login_password: "{{ zabbix_login_password }}"
+    host_groups:
+      - zbxgrp_example_group01
+      - zbxgrp_example_group02
+    state: absent
+  register: delete_zbxgrp
+
+- name: assert that group was deleted
+  assert:
+    that: delete_zbxgrp is changed
