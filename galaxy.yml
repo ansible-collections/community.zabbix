@@ -10,7 +10,6 @@ license_file: LICENSE
 tags:
   - monitoring
   - zabbix
-dependencies: {}
 repository: https://github.com/ansible-collections/community.zabbix.git
 documentation: https://github.com/ansible-collections/community.zabbix.git
 homepage: https://github.com/ansible-collections/community.zabbix
