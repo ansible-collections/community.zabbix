@@ -1,0 +1,32 @@
+---
+
+- name: "Create volume mount string"
+  set_fact:
+    volume_mount: "{{ zabbix_agent_tlspskfile }}:/var/lib/zabbix/enc/tlspskfile"
+    tls_key:
+      ZBX_TLSPSKFILE: tlspskfile
+  when:
+    - zabbix_agent_tlspskfile is defined
+
+- name: "Add zabbix_agent_tlspskfile to volume mount"
+  set_fact:
+    zabbix_agent_docker_volumes: "{{ zabbix_agent_docker_volumes + [ volume_mount ] }}"
+    zabbix_agent_docker_env: "{{ zabbix_agent_docker_env | combine(tls_key) }}"
+  when:
+    - zabbix_agent_tlspskfile is defined
+
+- name: "Ensure Zabbix Docker container is running"
+  docker_container:
+    name: "{{ zabbix_agent_docker_name }}"
+    image: "{{ zabbix_agent_docker_image }}:{{ zabbix_agent_docker_image_tag }}"
+    state: "{{ zabbix_agent_docker_state }}"
+    restart_policy: "{{ zabbix_agent_docker_restart_policy }}"
+    network_mode: "{{ zabbix_agent_docker_network_mode }}"
+    published_ports: "{{ zabbix_agent_docker_ports }}"
+    privileged: "{{ zabbix_agent_docker_privileged }}"
+    security_opts: "{{ zabbix_agent_docker_security_opts }}"
+    volumes: "{{ zabbix_agent_docker_volumes }}"
+    env: "{{ zabbix_agent_docker_env }}"
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"

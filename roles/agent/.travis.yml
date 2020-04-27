@@ -1,0 +1,29 @@
+---
+sudo: required
+language: python
+python:
+  - "2.7"
+services:
+  - docker
+
+env:
+  matrix:
+    - MOLECULE_SCENARIO: default
+    - MOLECULE_SCENARIO: with-server
+    - MOLECULE_SCENARIO: before-last-version
+
+addons:
+  hosts:
+    - zabbix-server-centos
+
+install:
+  - curl -sSlo requirements.txt https://raw.githubusercontent.com/dj-wasabi/ansible-ci-base/master/requirements.txt
+  - pip install -r requirements.txt
+
+script:
+  - molecule --version
+  - ansible --version
+  - molecule test -s ${MOLECULE_SCENARIO}
+
+notifications:
+  webhooks: https://galaxy.ansible.com/api/v1/notifications/
