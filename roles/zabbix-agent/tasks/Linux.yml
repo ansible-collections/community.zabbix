@@ -1,0 +1,246 @@
+---
+
+- name: "Set default ip address for zabbix_agent_ip"
+  set_fact:
+    zabbix_agent_ip: "{{ hostvars[inventory_hostname]['ansible_default_ipv4'].address }}"
+  when:
+    - zabbix_agent_ip is not defined
+    - "'ansible_default_ipv4' in hostvars[inventory_hostname]"
+
+- name: "Get Total Private IP Addresses"
+  set_fact:
+    total_private_ip_addresses: "{{ ansible_all_ipv4_addresses | ipaddr('private') | length }}"
+  when:
+    - ansible_all_ipv4_addresses is defined
+
+- name: "Set first public ip address for zabbix_agent_ip"
+  set_fact:
+    zabbix_agent_ip: "{{ ansible_all_ipv4_addresses | ipaddr('public') | first }}"
+    zabbix_agent_server: "{{ zabbix_agent_server_public_ip | default(zabbix_agent_server) }}"
+    zabbix_agent_serveractive: "{{ zabbix_agent_serveractive_public_ip | default(zabbix_agent_serveractive) }}"
+  when:
+    - zabbix_agent_ip is not defined
+    - total_private_ip_addresses is defined
+    - total_private_ip_addresses == '0'
+
+- name: "Set first private ip address for zabbix_agent_ip"
+  set_fact:
+    zabbix_agent_ip: "{{ ansible_all_ipv4_addresses | ipaddr('private') | first }}"
+  when:
+    - zabbix_agent_ip is not defined
+    - total_private_ip_addresses is defined
+    - total_private_ip_addresses != '0'
+
+- name: "Fail invalid specified agent_listeninterface"
+  fail:
+    msg: "The specified network interface does not exist"
+  when:
+    - zabbix_agent_listeninterface | bool
+    - (zabbix_agent_listeninterface not in ansible_all_ipv4_addresses)
+  tags:
+    - zabbix-agent
+    - config
+
+- name: "Set network interface"
+  set_fact:
+    network_interface: ansible_{{ zabbix_agent_listeninterface }}
+  when:
+    - zabbix_agent_listeninterface | bool
+    - not zabbix_agent_listenip
+
+- name: "Get IP of agent_listeninterface when no agent_listenip specified"
+  set_fact:
+    zabbix_agent_listenip: "{{ hostvars[inventory_hostname][network_interface]['ipv4'].address | default('0.0.0.0') }}"
+    zabbix_agent_ip: "{{ hostvars[inventory_hostname][network_interface]['ipv4'].address | default('0.0.0.0') }}"
+  when:
+    - zabbix_agent_listeninterface | bool
+    - not zabbix_agent_listenip
+  tags:
+    - zabbix-agent
+    - config
+    - api
+
+- name: "Default agent_listenip to all when not specified"
+  set_fact:
+    zabbix_agent_listenip: '0.0.0.0'
+  when:
+    - not zabbix_agent_listenip
+  tags:
+    - zabbix-agent
+    - config
+
+- name: "Fail invalid specified agent_listenip"
+  fail:
+    msg: "The agent_listenip does not exist"
+  when:
+    - zabbix_agent_listenip != '0.0.0.0'
+    - zabbix_agent_listenip != '127.0.0.1'
+    - (zabbix_agent_listenip not in ansible_all_ipv4_addresses)
+  tags:
+    - zabbix-agent
+    - config
+
+# straight to getenforce binary , workaround for missing python_selinux library
+- name: "Get getenforce binary"
+  stat:
+    path: /usr/sbin/getenforce
+  register: getenforce_bin
+  become: yes
+
+- name: "Collect getenforce output"
+  command: getenforce
+  register: sestatus
+  when: 'getenforce_bin.stat.exists'
+  changed_when: false
+  become: yes
+  check_mode: no
+
+- name: "Set zabbix_selinux to true if getenforce returns Enforcing or Permissive"
+  set_fact:
+    zabbix_selinux: "{{ true }}"
+  when: 'getenforce_bin.stat.exists and ("Enforcing" in sestatus.stdout or "Permissive" in sestatus.stdout)'
+
+- name: "Allow zabbix_agent to start (SELinux)"
+  selinux_permissive:
+    name: zabbix_agent_t
+    permissive: true
+  become: yes
+  when:
+    - zabbix_selinux | bool
+
+- name: "Adding zabbix group"
+  group:
+    name: zabbix
+    state: present
+    gid: "{{ zabbix_agent_docker_user_gid | default(omit) }}"
+  become: yes
+  when:
+    - zabbix_agent_docker | bool
+
+- name: "Adding zabbix user"
+  user:
+    name: zabbix
+    group: zabbix
+    state: present
+    create_home: False
+    home: /etc/zabbix
+    uid: "{{ zabbix_agent_docker_user_uid | default(omit) }}"
+    system: True
+  become: yes
+  when:
+    - zabbix_agent_docker | bool
+
+- name: "Configure zabbix-agent"
+  template:
+    src: zabbix_agentd.conf.j2
+    dest: "/etc/zabbix/{{ zabbix_agent_conf }}"
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart zabbix-agent
+  become: yes
+  when:
+    - not (zabbix_agent_docker | bool)
+  tags:
+    - zabbix-agent
+    - config
+    - init
+
+- name: "Create directory for PSK file if not exist."
+  file:
+    path: "{{ zabbix_agent_tlspskfile | dirname }}"
+    mode: 0755
+    state: directory
+  become: yes
+  when:
+    - zabbix_agent_tlspskfile is defined
+
+- name: "Place TLS PSK File"
+  copy:
+    dest: "{{ zabbix_agent_tlspskfile }}"
+    content: "{{ zabbix_agent_tlspsk_secret }}"
+    owner: zabbix
+    group: zabbix
+    mode: 0400
+  become: yes
+  when:
+    - zabbix_agent_tlspskfile is defined
+    - zabbix_agent_tlspsk_secret is defined
+  notify:
+    - restart zabbix-agent
+
+- name: "Create include dir zabbix-agent"
+  file:
+    path: "{{ zabbix_agent_include }}"
+    owner: root
+    group: zabbix
+    mode: 0750
+    state: directory
+  become: yes
+  tags:
+    - config
+    - include
+
+- name: "Install the Docker container"
+  include: Docker.yml
+  when:
+    - zabbix_agent_docker | bool
+
+- name: "Configure IPTables (zabbix_agent_listenport)"
+  iptables:
+    action: "{{ zabbix_agent_firewall_action }}"
+    destination_port: "{{ zabbix_agent_listenport | string }}"
+    source: "{{ zabbix_agent_firewall_source | default(omit) }}"
+    protocol: tcp
+    chain: "{{ zabbix_agent_firewall_chain }}"
+    jump: ACCEPT
+  become: yes
+  when: zabbix_agent_firewall_enable | bool
+
+- name: "Configure IPTables (zabbix_agent_jmx_listenport)"
+  iptables:
+    action: "{{ zabbix_agent_firewall_action }}"
+    destination_port: "{{ zabbix_agent_listenport | string }}"
+    source: "{{ zabbix_agent_firewall_source | default(omit) }}"
+    protocol: tcp
+    chain: "{{ zabbix_agent_firewall_chain }}"
+    jump: ACCEPT
+  become: yes
+  when: (zabbix_agent_firewall_enable  | bool) and (zabbix_agent_jmx_listenport | bool)
+
+- name: "Configure firewalld (zabbix_agent_listenport)"
+  firewalld:
+    rich_rule: 'rule family="ipv4" source address="{{ zabbix_agent_firewalld_source }}" port protocol="tcp" port="{{ zabbix_agent_listenport }}" accept'
+    zone: "{{ zabbix_agent_firewalld_zone }}"
+    permanent: true
+    state: enabled
+  become: yes
+  when: zabbix_agent_firewalld_enable | bool
+  notify:
+    - firewalld-reload
+  tags: zabbix_agent_firewalld_enable
+
+- name: "Configure firewalld (zabbix_agent_jmx_listenport)"
+  firewalld:
+    rich_rule: 'rule family="ipv4" source address="{{ zabbix_agent_firewalld_source }}" port protocol="tcp" port="{{ zabbix_agent_jmx_listenport }}" accept'
+    zone: "{{ zabbix_agent_firewalld_zone }}"
+    permanent: true
+    state: enabled
+  become: yes
+  when: (zabbix_agent_firewalld_enable | bool) and (zabbix_agent_jmx_listenport | bool)
+  notify:
+    - firewalld-reload
+  tags: zabbix_agent_firewalld_enable
+
+- name: "Make sure the zabbix-agent service is running"
+  service:
+    name: "{{ zabbix_agent_service }}"
+    state: started
+    enabled: yes
+  become: yes
+  when:
+    - not (zabbix_agent_docker | bool)
+  tags:
+    - init
+    - service
