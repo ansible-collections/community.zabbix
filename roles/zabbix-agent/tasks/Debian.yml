@@ -1,0 +1,197 @@
+---
+# Tasks specific for Debian/Ubuntu Systems
+
+- name: "Include Zabbix gpg ids"
+  include_vars: zabbix.yml
+
+- name: "Set short version name"
+  set_fact:
+    zabbix_short_version: "{{ zabbix_version | regex_replace('\\.', '') }}"
+    zabbix_underscore_version: "{{ zabbix_version | regex_replace('\\.', '_') }}"
+
+- name: "Debian | Install gpg key"
+  apt_key:
+    id: "{{ sign_keys[zabbix_short_version][zabbix_agent_distribution_release]['sign_key'] }}"
+    url: http://repo.zabbix.com/zabbix-official-repo.key
+  when:
+    - zabbix_repo == "zabbix"
+  become: yes
+  tags:
+    - zabbix-agent
+    - init
+
+- name: "Debian | Check for zabbix repositories"
+  find:
+    paths: /etc/apt/sources.list.d
+    patterns: repo_zabbix_com_zabbix*.list
+    excludes: "repo_zabbix_com_zabbix_{{ zabbix_underscore_version }}_ubuntu.list"
+  register: repositories
+  become: yes
+  when:
+    - ansible_distribution in ['Ubuntu', 'Debian']
+    - zabbix_repo == "zabbix"
+  tags:
+    - zabbix-agent
+    - init
+
+- name: "Debian | Remove unecessary zabbix repositories"
+  file:
+    path: "{{ item.path }}"
+    state: absent
+  loop: "{{ repositories.files }}"
+  when:
+    - ansible_distribution in ['Ubuntu', 'Debian']
+    - zabbix_repo == "zabbix"
+    - zabbix_agent_src_reinstall
+  become: yes
+  tags:
+    - zabbix-agent
+    - init
+
+- name: "Debian | Installing deb-src repository Debian"
+  apt_repository:
+    repo: "deb-src http://repo.zabbix.com/zabbix/{{ zabbix_version }}/debian/ {{ zabbix_agent_distribution_release }} main"
+    state: present
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
+  when:
+    - ansible_distribution == "Debian"
+    - zabbix_repo == "zabbix"
+  become: yes
+  tags:
+    - zabbix-agent
+    - init
+
+- name: "Debian | Installing deb repository Debian"
+  apt_repository:
+    repo: "deb http://repo.zabbix.com/zabbix/{{ zabbix_version }}/debian/ {{ zabbix_agent_distribution_release }} main"
+    state: present
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
+  when:
+    - ansible_distribution == "Debian"
+    - zabbix_repo == "zabbix"
+  become: yes
+  tags:
+    - zabbix-agent
+    - init
+
+- name: "Debian | Installing deb-src repository Ubuntu"
+  apt_repository:
+    repo: "deb-src http://repo.zabbix.com/zabbix/{{ zabbix_version }}/ubuntu/ {{ zabbix_agent_distribution_release }} main"
+    state: present
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
+  when:
+    - ansible_distribution == "Ubuntu"
+    - zabbix_repo == "zabbix"
+  become: yes
+  tags:
+    - zabbix-agent
+    - init
+
+- name: "Debian | Installing deb repository Ubuntu"
+  apt_repository:
+    repo: "deb http://repo.zabbix.com/zabbix/{{ zabbix_version }}/ubuntu/ {{ zabbix_agent_distribution_release }} main"
+    state: present
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
+  when:
+    - ansible_distribution == "Ubuntu"
+    - zabbix_repo == "zabbix"
+  become: yes
+  tags:
+    - zabbix-agent
+    - init
+
+- name: "Debian | Create /etc/apt/preferences.d/"
+  file:
+    path: /etc/apt/preferences.d/
+    state: directory
+  when:
+    - zabbix_agent_apt_priority | int
+
+- name: "Debian | Configuring the weight for APT"
+  copy:
+    dest: "/etc/apt/preferences.d/zabbix-agent-{{ zabbix_underscore_version }}"
+    content: |
+      Package: zabbix-agent
+      Pin: origin repo.zabbix.com
+      Pin-Priority: {{ zabbix_agent_apt_priority | int }}
+    owner: root
+  when:
+    - zabbix_agent_apt_priority | int
+
+# Note: set cache_valid_time=0 to ensure that an apt-get update after the added repo-key
+# else you often get 'WARNING: The following packages cannot be authenticated!
+# See also:
+# http://askubuntu.com/questions/75565/why-am-i-getting-authentication-errors-for-packages-from-an-ubuntu-repository
+- name: "Debian | Installing zabbix-agent"
+  apt:
+    pkg: "{{ zabbix_agent_packages }}"
+    state: "{{ zabbix_agent_package_state }}"
+    update_cache: yes
+    cache_valid_time: 0
+    force_apt_get: "{{ zabbix_apt_force_apt_get }}"
+    install_recommends: "{{ zabbix_apt_install_recommends }}"
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
+  when: ansible_distribution in ['Ubuntu', 'Debian']
+  register: zabbix_agent_package_installed
+  until: zabbix_agent_package_installed is succeeded
+  become: yes
+  check_mode: no
+  tags:
+    - zabbix-agent
+    - init
+
+- name: "Mint | Installing zabbix-agent"
+  apt:
+    pkg: "zabbix-agent"
+    state: "{{ zabbix_agent_package_state }}"
+    update_cache: yes
+    cache_valid_time: 0
+    force_apt_get: "{{ zabbix_apt_force_apt_get }}"
+    install_recommends: "{{ zabbix_apt_install_recommends }}"
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
+  when: ansible_distribution not in ['Ubuntu', 'Debian']
+  register: zabbix_agent_package_installed
+  until: zabbix_agent_package_installed is succeeded
+  become: yes
+  tags:
+    - zabbix-agent
+    - init
+
+- name: "Install policycoreutils-python"
+  apt:
+    pkg: policycoreutils-python-utils
+    state: present
+    update_cache: yes
+    cache_valid_time: 0
+    force_apt_get: "{{ zabbix_apt_force_apt_get }}"
+    install_recommends: "{{ zabbix_apt_install_recommends }}"
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
+  register: zabbix_agent_policycoreutils_installed
+  until: zabbix_agent_package_installed is succeeded
+  become: yes
+  when: zabbix_selinux | bool
+
+- name: "Debian | Enable the service"
+  service:
+    name: "{{ zabbix_agent_service }}"
+    enabled: yes
+    use: service
+  become: yes
+  tags:
+    - zabbix-agent
+    - init
+    - service

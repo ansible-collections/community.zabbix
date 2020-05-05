@@ -1,0 +1,24 @@
+---
+# Tasks specific for macOS
+- name: "macOS | Check installed package version"
+  shell: |
+    set -o pipefail
+    pkgutil --pkg-info 'com.zabbix.pkg.ZabbixAgent' | grep 'version:' | cut -d ' ' -f 2
+  register: pkgutil_version
+  check_mode: no
+  changed_when: false
+  failed_when: pkgutil_version.rc == 2
+
+- name: "macOS | Download the Zabbix package"
+  get_url:
+    url: "{{ zabbix_mac_download_link }}"
+    dest: "/tmp/{{ zabbix_mac_package }}"
+    mode: 0644
+  when: pkgutil_version.stdout != zabbix_version_long
+
+- name: "macOS | Install the Zabbix package"
+  command: installer -pkg "/tmp/{{ zabbix_mac_package }}" -target /
+  become: true
+  when: pkgutil_version.stdout != zabbix_version_long
+  tags:
+    - zabbix-agent

@@ -1,0 +1,174 @@
+---
+# tasks file for dj-wasabi.zabbix-agent
+
+- name: "Fix facts for linuxmint - distribution release"
+  set_fact:
+    zabbix_agent_distribution_release: xenial
+  when:
+    - ansible_os_family == "Linuxmint"
+    - ansible_distribution_release == "sonya" or ansible_distribution_release == "serena"
+
+- name: "Fix facts for linuxmint - family"
+  set_fact:
+    zabbix_agent_os_family: Debian
+  when:
+    - ansible_os_family == "Linuxmint"
+
+- name: "Fix facts for XCP-ng - family"
+  set_fact:
+    zabbix_agent_os_family: RedHat
+  when:
+    - ansible_os_family == "XCP-ng"
+
+- name: "Include OS-specific variables"
+  include_vars: "{{ zabbix_agent_os_family }}.yml"
+  tags:
+    - vars
+    - zabbix-agent
+
+- name: "Install the correct repository"
+  include_tasks: "{{ zabbix_agent_os_family if (zabbix_agent_os_family not in ['Sangoma']) else 'RedHat' }}.yml"
+  when:
+    - not (zabbix_agent_docker | bool)
+  tags:
+    - zabbix-agent
+    - init
+    - config
+    - service
+
+- name: "Install local python-netaddr package"
+  pip:
+    name: netaddr
+    state: present
+  register: zabbix_python_netaddr_package_installed
+  until: zabbix_python_netaddr_package_installed is succeeded
+  delegate_to: localhost
+  run_once: True
+  become: "{{ zabbix_agent_become_on_localhost }}"
+  when:
+    - zabbix_install_pip_packages | bool
+    - ansible_all_ipv4_addresses is defined or (zabbix_agent_ip is not defined and total_private_ip_addresses is defined)
+
+- name: "Encrypt with TLS PSK auto management"
+  include_tasks: tlspsk_auto.yml
+  when:
+    - zabbix_agent_tlspsk_auto | bool
+    - (zabbix_agent_tlspskfile is undefined) or (zabbix_agent_tlspskfile | length == '0')
+    - (zabbix_agent_tlspsk_secret is undefined) or (zabbix_agent_tlspsk_secret | length == '0')
+
+- name: "Install the correct repository"
+  include_tasks: Windows.yml
+  when:
+    - zabbix_agent_os_family == "Windows"
+
+- name: "Install the correct repository"
+  include_tasks: Linux.yml
+  when:
+    - (zabbix_agent_os_family != "Windows" and zabbix_agent_os_family != "Darwin") or (zabbix_agent_docker | bool)
+
+- name: "Install the correct repository"
+  include_tasks: macOS.yml
+  when:
+    - zabbix_agent_os_family == "Darwin"
+
+- name: "Installing the Zabbix-api package on localhost"
+  pip:
+    name: zabbix-api
+    state: present
+  register: zabbix_api_package_installed
+  until: zabbix_api_package_installed is succeeded
+  delegate_to: localhost
+  run_once: True
+  become: "{{ zabbix_agent_become_on_localhost }}"
+  when:
+    - zabbix_install_pip_packages | bool
+    - (zabbix_api_create_hostgroup | bool) or (zabbix_api_create_hosts | bool)
+
+- name: "Create hostgroups"
+  zabbix_group:
+    server_url: "{{ zabbix_url }}"
+    http_login_user: "{{ zabbix_api_http_user | default(omit) }}"
+    http_login_password: "{{ zabbix_api_http_password | default(omit) }}"
+    login_user: "{{ zabbix_api_user }}"
+    login_password: "{{ zabbix_api_pass }}"
+    host_group: "{{ zabbix_host_groups }}"
+    state: "{{ zabbix_create_hostgroup }}"
+    validate_certs: "{{ zabbix_validate_certs|default(omit) }}"
+  when:
+    - zabbix_api_create_hostgroup | bool
+  register: zabbix_api_hostgroup_created
+  until: zabbix_api_hostgroup_created is succeeded
+  delegate_to: localhost
+  become: no
+  tags:
+    - api
+
+- name: "Create a new host or update an existing host's info"
+  zabbix_host:
+    server_url: "{{ zabbix_url }}"
+    http_login_user: "{{ zabbix_api_http_user | default(omit) }}"
+    http_login_password: "{{ zabbix_api_http_password | default(omit) }}"
+    login_user: "{{ zabbix_api_user }}"
+    login_password: "{{ zabbix_api_pass }}"
+    host_name: "{{ zabbix_agent_hostname }}"
+    host_groups: "{{ zabbix_host_groups }}"
+    link_templates: "{{ zabbix_link_templates }}"
+    status: "{{ zabbix_host_status }}"
+    state: "{{ zabbix_create_host }}"
+    force: "{{ zabbix_update_host }}"
+    proxy: "{{ zabbix_proxy }}"
+    inventory_mode: "{{ zabbix_inventory_mode }}"
+    interfaces: "{{ zabbix_agent_interfaces }}"
+    visible_name: "{{ zabbix_visible_hostname | default(zabbix_agent_hostname) }}"
+    tls_psk: "{{ zabbix_agent_tlspsk_secret | default(omit) }}"
+    tls_psk_identity: "{{ zabbix_agent_tlspskidentity | default(omit) }}"
+    tls_issuer: "{{ zabbix_agent_tlsservercertissuer | default(omit) }}"
+    tls_subject: "{{ zabbix_agent_tlsservercertsubject | default(omit) }}"
+    tls_accept: "{{ zabbix_agent_tls_config[zabbix_agent_tlsaccept if zabbix_agent_tlsaccept else 'unencrypted'] }}"
+    tls_connect: "{{ zabbix_agent_tls_config[zabbix_agent_tlsconnect if zabbix_agent_tlsconnect else 'unencrypted'] }}"
+    validate_certs: "{{ zabbix_validate_certs | default(omit) }}"
+    description: "{{ zabbix_agent_description | default(omit) }}"
+    inventory_zabbix: "{{ zabbix_agent_inventory_zabbix | default({}) }}"
+    ipmi_authtype: "{{ zabbix_agent_ipmi_authtype | default(omit) }}"
+    ipmi_password: "{{ zabbix_agent_ipmi_password| default(omit) }}"
+    ipmi_privilege: "{{ zabbix_agent_ipmi_privilege | default(omit) }}"
+    ipmi_username: "{{ zabbix_agent_ipmi_username | default(omit) }}"
+  when:
+    - zabbix_api_create_hosts | bool
+  register: zabbix_api_host_created
+  until: zabbix_api_host_created is succeeded
+  delegate_to: localhost
+  become: no
+  changed_when: false
+  tags:
+    - api
+
+- name: "Updating host configuration with macros"
+  zabbix_hostmacro:
+    server_url: "{{ zabbix_url }}"
+    http_login_user: "{{ zabbix_api_http_user | default(omit) }}"
+    http_login_password: "{{ zabbix_api_http_password | default(omit) }}"
+    login_user: "{{ zabbix_api_user }}"
+    login_password: "{{ zabbix_api_pass }}"
+    host_name: "{{ zabbix_agent_hostname }}"
+    macro_name: "{{ item.macro_key }}"
+    macro_value: "{{ item.macro_value }}"
+    validate_certs: "{{ zabbix_validate_certs | default(omit) }}"
+  with_items: "{{ zabbix_macros | default([]) }}"
+  when:
+    - zabbix_api_create_hosts | bool
+    - zabbix_macros is defined
+    - item.macro_key is defined
+  register: zabbix_api_hostmarcro_created
+  until: zabbix_api_hostmarcro_created is succeeded
+  delegate_to: localhost
+  become: no
+  tags:
+    - api
+
+- name: "Including userparameters"
+  include_tasks: "userparameter.yml"
+  when: zabbix_agent_userparameters|length > 0
+  tags:
+    - zabbix-agent
+    - userparameter

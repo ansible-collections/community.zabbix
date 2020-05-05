@@ -1,0 +1,24 @@
+---
+- name: Converge
+  hosts: all:!zabbix_server
+  pre_tasks:
+    - name: "Get IP Server"
+      shell: grep $(hostname) /etc/hosts | awk '{ print $1 }' | tail -n 1
+      register: ip_address
+      delegate_to: zabbix-server-centos
+      changed_when: False
+      tags:
+        - skip_ansible_lint
+
+    - name: "Get IP hosts"
+      shell: grep $(hostname) /etc/hosts | awk '{ print $1 }' | tail -n 1
+      register: ip_address_host
+      changed_when: False
+      tags:
+        - skip_ansible_lint
+
+  roles:
+    - role: ansible-zabbix-agent
+      zabbix_agent_ip: "{{ ip_address_host.stdout }}"
+      zabbix_agent_server: "{{ ip_address.stdout }}"
+      zabbix_agent_serveractive: "{{ ip_address.stdout }}"

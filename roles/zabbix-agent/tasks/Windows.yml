@@ -1,0 +1,164 @@
+---
+
+- name: "Set default ip address for zabbix_agent_ip"
+  set_fact:
+    zabbix_agent_ip: "{{ hostvars[inventory_hostname]['ansible_ip_addresses'][0] }}"
+  when:
+    - zabbix_agent_ip is not defined
+    - "'ansible_ip_addresses' in hostvars[inventory_hostname]"
+
+- name: "Windows | Set default architecture"
+  set_fact:
+    windows_arch: 32
+
+- name: "Windows | Override architecture if 64-bit"
+  set_fact:
+    windows_arch: 64
+  when:
+    - ansible_architecture == "64-bit"
+
+- name: "Windows | Set path to zabbix.exe"
+  set_fact:
+    zabbix_win_exe_path: '{{ zabbix_win_install_dir }}\bin\win{{ windows_arch }}\zabbix_agentd.exe'
+
+- name: "Windows | Set variables specific to Zabbix 4.0"
+  set_fact:
+    zabbix_win_package: zabbix_agent-{{ zabbix_version_long }}-windows-amd64.zip
+    zabbix_win_exe_path: '{{ zabbix_win_install_dir }}\bin\zabbix_agentd.exe'
+  when:
+    - zabbix_version_long is version('4.0.0', '>=')
+
+- name: "Windows | Check if Zabbix agent is present"
+  win_stat:
+    path: '{{ zabbix_win_exe_path }}'
+  register: agent_file_info
+
+- name: "Windows | Get Installed Zabbix Agent Version"
+  win_file_version:
+    path: "{{ zabbix_win_exe_path }}"
+  register: zabbix_win_exe_info
+  when:
+    - agent_file_info.stat.exists
+
+- name: "Windows | Checking Update (Set default)"
+  set_fact:
+    update_zabbix_agent: False
+  when:
+    - agent_file_info.stat.exists
+
+- name: "Windows | Checking Update"
+  set_fact:
+    update_zabbix_agent: True
+  when:
+    - agent_file_info.stat.exists
+    - zabbix_win_exe_info.win_file_version.product_version is version(zabbix_version_long, '<')
+    - zabbix_agent_package_state == 'latest'
+
+- name: "Windows | Create directory structure"
+  win_file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - "{{ zabbix_win_install_dir }}"
+    - "{{ zabbix_agent_win_include }}"
+
+- name: "Windows | Place TLS-PSK file"
+  win_copy:
+    content: "{{ zabbix_agent_tlspsk_secret }}"
+    dest: "{{ zabbix_agent_tlspskfile }}"
+  when:
+    - zabbix_agent_tlspskfile is defined
+    - zabbix_agent_tlspsk_secret is defined
+  notify: restart win zabbix agent
+
+- name: "Windows | Stop Zabbix (Update)"
+  win_service:
+    name: Zabbix Agent
+    start_mode: auto
+    state: stopped
+  when:
+    - update_zabbix_agent | default(false)
+    - agent_file_info.stat.exists
+
+- name: "Windows | Uninstall Zabbix (Update)"
+  win_command: '{{ zabbix_win_exe_path }} --config {{ zabbix_win_install_dir }}\zabbix_agentd.conf --uninstall'
+  register: zabbix_windows_install
+  when:
+    - update_zabbix_agent | default(false)
+    - agent_file_info.stat.exists
+
+- name: "Windows | Removing Zabbix Directory (Update)"
+  win_file:
+    path: '{{ zabbix_win_install_dir }}'
+    state: absent
+  when:
+    - update_zabbix_agent | default(false)
+    - agent_file_info.stat.exists
+
+- name: "Windows | Check if file is already downloaded"
+  win_stat:
+    path: '{{ zabbix_win_install_dir }}\{{ zabbix_win_package }}'
+  register: file_info
+
+- name: "Windows | Download Zabbix Agent Zip file"
+  win_get_url:
+    url: "{{ zabbix_win_download_link }}"
+    dest: '{{ zabbix_win_install_dir }}\{{ zabbix_win_package }}'
+    force: False
+    follow_redirects: all
+    proxy_url: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
+  register: zabbix_agent_win_download_zip
+  until: zabbix_agent_win_download_zip is succeeded
+
+- name: "Windows | Unzip file"
+  win_unzip:
+    src: '{{ zabbix_win_install_dir }}\{{ zabbix_win_package }}'
+    dest: "{{ zabbix_win_install_dir }}"
+    creates: '{{ zabbix_win_exe_path }}'
+
+- name: "Windows | Configure zabbix-agent"
+  win_template:
+    src: zabbix_agentd.conf.j2
+    dest: '{{ zabbix_win_install_dir }}\zabbix_agentd.conf'
+  notify: restart win zabbix agent
+
+- name: "Windows | Register Service"
+  win_command: '{{ zabbix_win_exe_path }} --config {{ zabbix_win_install_dir }}\zabbix_agentd.conf --install'
+  register: zabbix_windows_install
+  args:
+    creates: '{{ zabbix_win_install_dir }}\.installed'
+
+- name: "Windows | Create done file so it won't register itself again"
+  win_file:
+    path: '{{ zabbix_win_install_dir }}\.installed'
+    state: touch
+  when: zabbix_windows_install is changed
+
+- name: "Windows | Set service startup mode to auto and ensure it is started"
+  win_service:
+    name: Zabbix Agent
+    start_mode: auto
+    state: started
+
+- name: "Windows | Getting Zabbix Service Recovery Settings"
+  win_shell: sc.exe qfailure "Zabbix Agent" 1100
+  register: svc_recovery
+  changed_when: false
+  check_mode: false
+  when: zabbix_agent_win_svc_recovery
+
+- name: "Windows | Setting Zabbix Service Recovery"
+  win_shell: sc.exe failure "Zabbix Agent" actions= restart/5000/restart/10000/restart/20000 reset= 86400
+  when:
+    - "'RESTART -- Delay' not in svc_recovery.stdout"
+    - zabbix_agent_win_svc_recovery
+
+- name: "Windows | Firewall rule"
+  win_firewall_rule:
+    name: Zabbix Agent
+    localport: "{{ zabbix_agent_listenport }}"
+    action: allow
+    direction: in
+    protocol: tcp
+    state: present
+    enabled: yes

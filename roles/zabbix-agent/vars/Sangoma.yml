@@ -1,0 +1,6 @@
+---
+# vars file for zabbix-agent (Sangola)
+
+zabbix_agent: zabbix-agent
+zabbix_agent_service: zabbix-agent
+zabbix_agent_conf: zabbix_agentd.conf

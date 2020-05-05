@@ -1,0 +1,114 @@
+---
+- name: Prepare
+  hosts: zabbix_server
+  pre_tasks:
+    - name: "Installing EPEL"
+      yum:
+        name:
+          - epel-release
+        state: present
+      when: ansible_distribution == 'CentOS'
+
+    - name: "Installing packages"
+      yum:
+        name:
+          - net-tools
+          - which
+          - libselinux-python
+          - python-pip
+        state: present
+      register: installation_dependencies
+      when: ansible_distribution == 'CentOS'
+
+    - name: "Installing which on NON-CentOS"
+      apt:
+        name:
+          - net-tools
+          - python-pip
+          - curl
+        state: present
+      when: ansible_distribution != 'CentOS'
+
+    - name: "Configure SUDO."
+      lineinfile:
+        dest: /etc/sudoers
+        line: "Defaults    !requiretty"
+        state: present
+
+    - name: "Make sure the docs are installed."
+      lineinfile:
+        dest: /etc/yum.conf
+        line: "tsflags=nodocs"
+        state: absent
+
+    - name: "Installing some python dependencies"
+      pip:
+        name: py-zabbix
+        state: present
+
+  roles:
+    - role: geerlingguy.mysql
+    - role: dj-wasabi.zabbix-server
+    - role: dj-wasabi.zabbix-web
+
+- name: Prepare
+  hosts: all:!zabbix_server:!docker
+  tasks:
+    - name: "Installing packages on CentOS family"
+      yum:
+        name:
+          - net-tools
+          - which
+        state: present
+      when:
+        - ansible_os_family == 'RedHat'
+
+    - name: "Installing packages on Debian family"
+      apt:
+        name:
+          - net-tools
+        state: present
+      when:
+        - ansible_os_family == 'Debian'
+
+- name: Converge
+  hosts: docker
+  tasks:
+    - name: "Download Docker CE repo file"
+      get_url:
+        url: https://download.docker.com/linux/centos/docker-ce.repo
+        dest: /etc/yum.repos.d/docker-ce.repo
+        mode: 0644
+      register: zabbix_agent_prepare_docker_repo
+      until: zabbix_agent_prepare_docker_repo is succeeded
+
+    - name: "Installing Epel"
+      package:
+        pkg:
+          - epel-release
+        state: present
+      register: zabbix_agent_prepare_docker_install
+      until: zabbix_agent_prepare_docker_install is succeeded
+
+    - name: "Installing Docker"
+      package:
+        pkg:
+          - docker-ce
+          - python-pip
+          - python-setuptools
+        state: present
+      register: zabbix_agent_prepare_docker_install
+      until: zabbix_agent_prepare_docker_install is succeeded
+
+    - name: "Installing Docker Python"
+      pip:
+        name:
+          - docker
+        state: present
+      register: zabbix_agent_prepare_docker_install
+      until: zabbix_agent_prepare_docker_install is succeeded
+
+    - name: "Starting Docker service"
+      service:
+        name: docker
+        state: started
