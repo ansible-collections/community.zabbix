@@ -1,0 +1,42 @@
+---
+galaxy_info:
+  author: Werner Dijkerman
+  description: Installing and maintaining zabbix-agent for RedHat/Debian/Ubuntu/Windows/Suse.
+  company: myCompany.Dotcom
+  license: MIT
+  min_ansible_version: 2.7
+  platforms:
+    - name: EL
+      versions:
+        - 5
+        - 6
+        - 7
+    - name: Ubuntu
+      versions:
+        - lucid
+        - precise
+        - trusty
+        - xenial
+        - bionic
+    - name: Debian
+      versions:
+        - squeeze
+        - wheezy
+        - jessie
+        - stretch
+        - buster
+    - name: opensuse
+      versions:
+        - 12.1
+        - 12.2
+        - 12.3
+        - 13.1
+        - 13.2
+    - name: Windows
+      versions:
+        - all
+
+  galaxy_tags:
+    - zabbix
+    - monitoring
+dependencies: []

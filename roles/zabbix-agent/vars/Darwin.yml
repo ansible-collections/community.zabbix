@@ -1,0 +1,6 @@
+---
+# vars file for zabbix-agent (Debian)
+
+zabbix_agent: zabbix-agent
+zabbix_agent_service: com.zabbix.zabbix_agentd
+zabbix_agent_conf: zabbix_agentd.conf

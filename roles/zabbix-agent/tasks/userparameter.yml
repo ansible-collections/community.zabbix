@@ -1,0 +1,51 @@
+---
+- block:
+  - name: "Windows | Installing user-defined userparameters"
+    win_template:
+      src: "{{ zabbix_agent_userparameters_templates_src }}/{{ item.name }}.j2"
+      dest: '{{ zabbix_agent_win_include }}\{{ item.name }}.conf'
+    notify:
+      - restart win zabbix agent
+    with_items: "{{ zabbix_agent_userparameters }}"
+  
+  - name: "Windows | Installing user-defined scripts"
+    win_copy:
+      src: "{{ zabbix_agent_userparameters_scripts_src }}/{{ item.scripts_dir }}"
+      dest: '{{ zabbix_win_install_dir }}\scripts\'
+    notify:
+      - restart win zabbix agent
+    with_items: "{{ zabbix_agent_userparameters }}"
+    when: item.scripts_dir is defined
+
+  when: zabbix_agent_os_family == "Windows"
+
+
+- block:
+  - name: "Installing user-defined userparameters"
+    template:
+      src: "{{ zabbix_agent_userparameters_templates_src }}/{{ item.name }}.j2"
+      dest: "{{ zabbix_agent_include }}/userparameter_{{ item.name }}.conf"
+      owner: zabbix
+      group: zabbix
+      mode: 0644
+    notify:
+      - restart zabbix-agent
+      - restart mac zabbix agent
+    become: yes
+    with_items: "{{ zabbix_agent_userparameters }}"
+  
+  - name: "Installing user-defined scripts"
+    copy:
+      src: "{{ zabbix_agent_userparameters_scripts_src }}/{{ item.scripts_dir }}"
+      dest: "/etc/zabbix/scripts/"
+      owner: zabbix
+      group: zabbix
+      mode: 0755
+    notify:
+      - restart zabbix-agent
+      - restart mac zabbix agent
+    become: yes
+    with_items: "{{ zabbix_agent_userparameters }}"
+    when: item.scripts_dir is defined
+
+  when: zabbix_agent_os_family != "Windows"
