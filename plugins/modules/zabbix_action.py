@@ -138,6 +138,10 @@ options:
                     - Irrespective of user-visible names being changed in Zabbix. Defaults to C(not classified) if omitted.
                     - Besides the above options, this is usually either the name
                       of the object or a string to compare with.
+            value2:
+                description:
+                    - Secondary value to compare with.
+                    - Required for trigger actions when condition I(type=event_tag_value).
             operator:
                 description:
                     - Condition operator.
