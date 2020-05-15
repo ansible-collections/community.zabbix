@@ -174,13 +174,6 @@ EXAMPLES = r'''
   run_once: yes
 '''
 
-ANSIBLE_METADATA = {
-    'metadata_version': '1.1',
-    'supported_by': 'community',
-    'status': ['preview']
-}
-
-
 import atexit
 import base64
 import traceback
