@@ -653,7 +653,7 @@ class Host(object):
             if interface['type'] == 1:
                 ip = interface.get('ip', '')
 
-            if 'port' not in interface:
+            if 'port' not in interface or interface['port'] is None:
                 interface['port'] = type_to_port.get(interface['type'], '')
 
             if LooseVersion(self._zbx_api_version) >= LooseVersion('5.0.0'):
