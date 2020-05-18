@@ -84,8 +84,10 @@ options:
             - List of interfaces to be created for the host (see example below).
             - For more information, review host interface documentation at
             - U(https://www.zabbix.com/documentation/4.0/manual/api/reference/hostinterface/object)
+        default: []
         suboptions:
             type:
+                type: str
                 description:
                     - Interface type to add
                     - Numerical values are also accepted for interface type
@@ -93,7 +95,7 @@ options:
                     - 2 = snmp
                     - 3 = ipmi
                     - 4 = jmx
-                choices: ['agent', 'snmp', 'ipmi', 'jmx']
+                choices: ['agent', '1', 'snmp', '2', 'ipmi', '3', 'jmx', '4']
                 required: true
             main:
                 type: int
@@ -135,10 +137,84 @@ options:
                 type: int
                 description:
                     - Whether to use bulk SNMP requests.
+                    - Only valid when interface I(type='snmp').
                     - 0 (don't use bulk requests), 1 (use bulk requests)
+                    - Works only with Zabbix <= 4.4 and is silently ignored in higher versions.
+                    - Use I(details) with Zabbix >= 5.0.
                 choices: [0, 1]
                 default: 1
-        default: []
+            details:
+                type: dict
+                description:
+                    - Additional details for SNMP host interfaces.
+                    - Required when I(type='snmp').
+                    - Works only with Zabbix >= 5.0.
+                default: {}
+                suboptions:
+                    version:
+                        type: int
+                        description:
+                            - SNMP version.
+                            - 1 (SNMPv1), 2 (SNMPv2c), 3 (SNMPv3)
+                        choices: [1, 2, 3]
+                        default: 2
+                    bulk:
+                        type: int
+                        description:
+                            - Whether to use bulk SNMP requests.
+                            - 0 (don't use bulk requests), 1 (use bulk requests)
+                        choices: [0, 1]
+                        default: 1
+                    community:
+                        type: str
+                        description:
+                            - SNMPv1 and SNMPv2 community string.
+                            - Required when I(version=1) or I(version=2).
+                    securityname:
+                        type: str
+                        description:
+                            - SNMPv3 security name.
+                        default: ''
+                    contextname:
+                        type: str
+                        description:
+                            - SNMPv3 context name.
+                        default: ''
+                    securitylevel:
+                        type: int
+                        description:
+                            - SNMPv3 security level.
+                            - 0 (noAuthNoPriv), 1 (authNoPriv), 2 (authPriv).
+                        choices: [0, 1, 2]
+                        default: 0
+                    authprotocol:
+                        type: int
+                        description:
+                            - SNMPv3 authentication protocol.
+                            - Used when I(securitylevel=1)(authNoPriv) or I(securitylevel=2)(AuthPriv).
+                            - 0 (MD5), 1 (SHA)
+                        default: 0
+                        choices: [0, 1]
+                    authpassphrase:
+                        type: str
+                        description:
+                            - SNMPv3 authentication passphrase.
+                            - Used when I(securitylevel=1)(authNoPriv) or I(securitylevel=2)(AuthPriv).
+                        default: ''
+                    privprotocol:
+                        type: int
+                        description:
+                            - SNMPv3 privacy protocol.
+                            - Used when I(securitylevel=2)(authPriv).
+                            - 0 (DES), 1 (AES)
+                        default: 0
+                        choices: [0, 1]
+                    privpassphrase:
+                        type: str
+                        description:
+                            - SNMPv3 privacy passphrase.
+                            - Used when I(securitylevel=2)(AuthPriv).
+                        default: ''
     tls_connect:
         description:
             - Specifies what encryption to use for outgoing connections.
@@ -238,6 +314,18 @@ options:
                 type: str
                 required: false
                 default: ''
+            type:
+                description:
+                    - Type of the macro.
+                    - Works only with >= Zabbix 5.0.
+                    - Since value is not returned by API for secret macros, there is no reliable way to
+                      detect changes in the content of secret macro value.
+                    - To update secret macro value, please update description alongside it so it passes
+                      the check.
+                choices: [text, secret]
+                type: str
+                required: false
+                default: text
         aliases: [ user_macros ]
     tags:
         description:
@@ -542,30 +630,104 @@ class Host(object):
             template_ids.append(template['templateid'])
         return template_ids
 
+    def construct_host_interfaces(self, interfaces):
+        """Ensures interfaces object is properly formatted before submitting it to API.
+
+        Args:
+            interfaces (list): list of dictionaries for each interface present on the host.
+
+        Returns:
+            (interfaces, ip) - where interfaces is original list reformated into a valid format
+                and ip is any IP address found on interface of type agent (printing purposes only).
+        """
+        ip = ""
+        interface_types = {'agent': 1, 'snmp': 2, 'ipmi': 3, 'jmx': 4}
+        type_to_port = {1: '10050', 2: '161', 3: '623', 4: '12345'}
+
+        for interface in interfaces:
+            if interface['type'] in list(interface_types.keys()):
+                interface['type'] = interface_types[interface['type']]
+            else:
+                interface['type'] = int(interface['type'])
+
+            if interface['type'] == 1:
+                ip = interface.get('ip', '')
+
+            if 'port' not in interface:
+                interface['port'] = type_to_port.get(interface['type'], '')
+
+            if LooseVersion(self._zbx_api_version) >= LooseVersion('5.0.0'):
+                if 'bulk' in interface:
+                    del interface['bulk']
+
+                # Not handled in argument_spec with required_if since only SNMP interfaces are using details
+                if interface['type'] == 2:
+                    if not interface['details']:
+                        self._module.fail_json(msg='Option "details" required for SNMP interface {0}'.format(interface))
+
+                    i_details = interface['details']
+                    if i_details['version'] < 3 and not i_details.get('community', False):
+                        self._module.fail_json(
+                            msg='Option "community" is required in "details" for SNMP interface {0}'.format(interface))
+
+                else:
+                    interface['details'] = {}
+
+            else:
+                if 'details' in interface:
+                    del interface['details']
+
+        return (interfaces, ip)
+
     # check the exist_interfaces whether it equals the interfaces or not
-    def check_interface_properties(self, exist_interface_list, interfaces):
-        interfaces_port_list = []
+    def check_interface_properties(self, exist_interfaces, interfaces):
+        # hostinterface.details looks different based on the version of SNMP currently configured
+        snmp_ver_keys = {
+            1: ['version', 'bulk', 'community'],
+            2: ['version', 'bulk', 'community'],
+            3: [
+                'version', 'bulk', 'securityname', 'securitylevel', 'authprotocol',
+                'authpassphrase', 'privprotocol', 'privpassphrase', 'contextname'
+            ]
+        }
 
-        if interfaces is not None:
-            if len(interfaces) >= 1:
-                for interface in interfaces:
-                    interfaces_port_list.append(str(interface['port']))
+        i_ports = []
+        for interface in interfaces:
+            i_ports.append(interface['port'])
 
-        exist_interface_ports = []
-        if len(exist_interface_list) >= 1:
-            for exist_interface in exist_interface_list:
-                exist_interface_ports.append(str(exist_interface['port']))
+        exist_i_ports = []
+        for interface in exist_interfaces:
+            exist_i_ports.append(interface['port'])
 
-        if set(interfaces_port_list) != set(exist_interface_ports):
+        if sorted(i_ports) != sorted(exist_i_ports):
             return True
 
-        for exist_interface in exist_interface_list:
-            exit_interface_port = str(exist_interface['port'])
+        for exist_interface in exist_interfaces:
+            exist_interface_port = str(exist_interface['port'])
+
+            # Zabbix API should return empty dictionary instead of list, workaround:
+            if 'details' in exist_interface and not exist_interface['details']:
+                exist_interface['details'] = {}
+
             for interface in interfaces:
-                interface_port = str(interface['port'])
-                if interface_port == exit_interface_port:
+                if str(interface['port']) == exist_interface_port:
                     for key in interface.keys():
-                        if str(exist_interface[key]) != str(interface[key]):
+                        # since 5.0, zabbix API returns details for each host interface, but only SNMP is not empty
+                        if key == 'details':
+                            if interface['details']:
+                                # only data relevant to a particular version are returned and rest should be filtered
+                                snmp_ver = int(interface['details']['version'])
+                                for dkey in list(interface['details'].keys()):
+                                    if dkey not in snmp_ver_keys[snmp_ver]:
+                                        interface['details'].pop(dkey)
+                                    else:
+                                        interface['details'][dkey] = str(interface['details'][dkey])
+
+                            # either compare empty or filtered dictionaries
+                            if interface['details'] != exist_interface['details']:
+                                return True
+
+                        elif str(exist_interface[key]) != str(interface[key]):
                             return True
 
         return False
@@ -667,12 +829,21 @@ class Host(object):
 
         # hostmacroid and hostid are present in every item of host['macros'] and need to be removed
         if macros is not None and 'macros' in host:
+            t_macros = copy.deepcopy(macros)  # make copy to prevent change in original data
             existing_macros = sorted(host['macros'], key=lambda k: k['macro'])
             for macro in existing_macros:
                 macro.pop('hostid', False)
                 macro.pop('hostmacroid', False)
+                if 'type' in macro:
+                    macro['type'] = int(macro['type'])
 
-            if sorted(macros, key=lambda k: k['macro']) != existing_macros:
+            # 'secret' type macros don't return 'value' from API
+            if LooseVersion(self._zbx_api_version) >= LooseVersion('5.0'):
+                for macro in t_macros:
+                    if macro['type'] == 1:
+                        macro.pop('value', False)
+
+            if sorted(t_macros, key=lambda k: k['macro']) != existing_macros:
                 return True
 
         if tags is not None and 'tags' in host:
@@ -780,7 +951,40 @@ def main():
             tls_subject=dict(type='str', required=False),
             inventory_zabbix=dict(type='dict', required=False),
             timeout=dict(type='int', default=10),
-            interfaces=dict(type='list', required=False),
+            interfaces=dict(
+                type='list',
+                elements='dict',
+                default=[],
+                options=dict(
+                    type=dict(type='str', required=True, choices=['agent', '1', 'snmp', '2', 'ipmi', '3', 'jmx', '4']),
+                    main=dict(type='int', choices=[0, 1], default=0),
+                    useip=dict(type='int', choices=[0, 1], default=0),
+                    ip=dict(type='str', default=''),
+                    dns=dict(type='str', default=''),
+                    port=dict(type='str'),
+                    bulk=dict(type='int', choices=[0, 1], default=1),
+                    details=dict(
+                        type='dict',
+                        default={},
+                        options=dict(
+                            version=dict(type='int', choices=[1, 2, 3], default=2),
+                            bulk=dict(type='int', choices=[0, 1], default=1),
+                            community=dict(type='str'),
+                            securityname=dict(type='str', default=''),
+                            contextname=dict(type='str', default=''),
+                            securitylevel=dict(type='int', choices=[0, 1, 2], default=0),
+                            authprotocol=dict(type='int', choices=[0, 1], default=0),
+                            authpassphrase=dict(type='str', default=''),
+                            privprotocol=dict(type='int', choices=[0, 1], default=0),
+                            privpassphrase=dict(type='str', default='')
+                        )
+                    )
+                ),
+                required_if=[
+                    ['useip', 0, ['dns']],
+                    ['useip', 1, ['ip']]
+                ]
+            ),
             force=dict(type='bool', default=True),
             proxy=dict(type='str', required=False),
             visible_name=dict(type='str', required=False),
@@ -792,7 +996,8 @@ def main():
                 options=dict(
                     macro=dict(type='str', required=True),
                     value=dict(type='str', required=True),
-                    description=dict(type='str', required=False, default='')
+                    description=dict(type='str', default=''),
+                    type=dict(type='str', default='text', choices=['text', 'secret'])
                 )
             ),
             tags=dict(
@@ -867,46 +1072,7 @@ def main():
     if host_groups:
         group_ids = host.get_group_ids_by_group_names(host_groups)
 
-    ip = ""
-    if interfaces:
-        # ensure interfaces are well-formed
-        for interface in interfaces:
-            if 'type' not in interface:
-                module.fail_json(msg="(interface) type needs to be specified for interface '%s'." % interface)
-            interfacetypes = {'agent': 1, 'snmp': 2, 'ipmi': 3, 'jmx': 4}
-            if interface['type'] in interfacetypes.keys():
-                interface['type'] = interfacetypes[interface['type']]
-            if interface['type'] < 1 or interface['type'] > 4:
-                module.fail_json(msg="Interface type can only be 1-4 for interface '%s'." % interface)
-            if 'useip' not in interface:
-                interface['useip'] = 0
-            if 'dns' not in interface:
-                if interface['useip'] == 0:
-                    module.fail_json(msg="dns needs to be set if useip is 0 on interface '%s'." % interface)
-                interface['dns'] = ''
-            if 'ip' not in interface:
-                if interface['useip'] == 1:
-                    module.fail_json(msg="ip needs to be set if useip is 1 on interface '%s'." % interface)
-                interface['ip'] = ''
-            if 'main' not in interface:
-                interface['main'] = 0
-            if 'port' in interface and not isinstance(interface['port'], str):
-                try:
-                    interface['port'] = str(interface['port'])
-                except ValueError:
-                    module.fail_json(msg="port should be convertable to string on interface '%s'." % interface)
-            if 'port' not in interface:
-                if interface['type'] == 1:
-                    interface['port'] = "10050"
-                elif interface['type'] == 2:
-                    interface['port'] = "161"
-                elif interface['type'] == 3:
-                    interface['port'] = "623"
-                elif interface['type'] == 4:
-                    interface['port'] = "12345"
-
-            if interface['type'] == 1:
-                ip = interface['ip']
+    interfaces, ip = host.construct_host_interfaces(interfaces)
 
     if macros:
         # convert macros to zabbix native format - {$MACRO}
@@ -919,6 +1085,15 @@ def main():
             if LooseVersion(zbx.api_version()[:5]) <= LooseVersion('4.4.0'):
                 if 'description' in macro:
                     macro.pop('description', False)
+
+            if 'type' in macro:
+                if LooseVersion(zbx.api_version()[:5]) < LooseVersion('5.0.0'):
+                    macro.pop('type')
+                else:
+                    if macro['type'] == 'text':
+                        macro['type'] = 0
+                    elif macro['type'] == 'secret':
+                        macro['type'] = 1
 
     # Use proxy specified, or set to 0
     if proxy:
@@ -951,10 +1126,6 @@ def main():
             # get existing host's interfaces
             exist_interfaces = host._zapi.hostinterface.get({'output': 'extend', 'hostids': host_id})
 
-            # if no interfaces were specified with the module, start with an empty list
-            if not interfaces:
-                interfaces = []
-
             # When force=no is specified, append existing interfaces to interfaces to update. When
             # no interfaces have been specified, copy existing interfaces as specified from the API.
             # Do the same with templates and host groups.
@@ -962,12 +1133,14 @@ def main():
                 for interface in copy.deepcopy(exist_interfaces):
                     # remove values not used during hostinterface.add/update calls
                     for key in tuple(interface.keys()):
-                        if key in ['interfaceid', 'hostid', 'bulk']:
+                        if key in ['interfaceid', 'hostid']:
                             interface.pop(key, None)
 
                     for index in interface.keys():
-                        if index in ['useip', 'main', 'type']:
+                        if index in ['useip', 'main', 'type', 'bulk']:
                             interface[index] = int(interface[index])
+                        elif index == 'details' and not interface[index]:
+                            interface[index] = {}
 
                     if interface not in interfaces:
                         interfaces.append(interface)
