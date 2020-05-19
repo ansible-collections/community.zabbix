@@ -115,7 +115,7 @@ The `tests` directory contains configuration for running sanity and integration 
 Collection's integration test suite can be run with the commands.  
 `zabbix_version=X.Y` will be expanded to X.Y-latest and `zabbix_port=XY` is the mapping port for the container.  
 The port number that can be specified for `zabbix_port` depends on the version of Zabbix.  
-Check the [docker-compose](https://github.com/ansible-collections/community.zabbix/blob/master/docker-compose.yml) for details on the port numbers that can be specified for `zabbix_port`.
+Check the [ansible-test](https://github.com/ansible-collections/community.zabbix/blob/master/.github/workflows/ansible-test.yml) for details on the port numbers that can be specified for `zabbix_port`.
 
     export zabbix_version=X.Y
     export zabbix_port=XY
