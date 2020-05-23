@@ -1,0 +1,35 @@
+<?php
+// Zabbix GUI configuration file
+{% if zabbix_server_history_url is defined %}
+global $DB, $HISTORY;
+{% else %}
+global $DB;
+{% endif %}
+
+$DB['TYPE']     = '{{ zabbix_server_database_long|upper() }}';
+$DB['SERVER']   = '{{ zabbix_server_dbhost }}';
+$DB['PORT']     = '{{ zabbix_server_dbport }}';
+$DB['DATABASE'] = '{{ zabbix_server_dbname }}';
+$DB['USER']     = '{{ zabbix_server_dbuser }}';
+$DB['PASSWORD'] = '{{ zabbix_server_dbpassword }}';
+
+// Schema name. Used for IBM DB2 and PostgreSQL.
+$DB['SCHEMA'] = '{{ zabbix_server_dbschema }}';
+
+$ZBX_SERVER      = '{{ zabbix_server_hostname }}';
+$ZBX_SERVER_PORT = '{{ zabbix_server_listenport }}';
+$ZBX_SERVER_NAME = '{{ zabbix_server_name }}';
+
+$IMAGE_FORMAT_DEFAULT = IMAGE_FORMAT_PNG;
+
+{% if zabbix_server_history_url is defined %}
+$HISTORY['url']		= {{ zabbix_server_history_url }};
+$HISTORY['types']	= {{ zabbix_server_history_types | to_json }};
+{% endif %}
+
+{% if zabbix_web_env is defined %}
+{% for env,val in zabbix_web_env.iteritems() %}
+putenv("{{env}}={{val}}");
+{% endfor %}
+{% endif %}
+?>

@@ -1,0 +1,66 @@
+---
+
+- name: "Include Zabbix gpg ids"
+  include_vars: zabbix.yml
+
+- name: "Set short version name"
+  set_fact:
+    zabbix_short_version: "{{ zabbix_version | regex_replace('\\.', '') }}"
+
+- name: "Debian | Install gpg key"
+  apt_key:
+    id: "{{ sign_keys[zabbix_short_version][ansible_distribution_release]['sign_key'] }}"
+    url: http://repo.zabbix.com/zabbix-official-repo.key
+  when:
+    - zabbix_repo == "zabbix"
+  become: yes
+  tags:
+    - zabbix-web
+    - init
+    - config
+
+- name: "Debian | Installing repository {{ ansible_distribution }}"
+  apt_repository:
+    repo: "{{ item }} http://repo.zabbix.com/zabbix/{{ zabbix_version }}/{{ ansible_distribution.lower() }}/ {{ ansible_distribution_release }} main"
+    state: present
+  when:
+    - zabbix_repo == "zabbix"
+  with_items:
+    - deb-src
+    - deb
+  tags:
+    - zabbix-web
+    - init
+    - config
+
+- name: "Debian | Install PHP apart from zabbix-frontend-php deps"
+  include_tasks: "php_Debian.yml"
+  when: zabbix_php_install
+
+- name: "Debian | Install zabbix-web"
+  apt:
+    pkg: zabbix-frontend-php
+    state: "{{ zabbix_web_package_state }}"
+    update_cache: yes
+    cache_valid_time: 0
+  register: zabbix_web_package_install
+  until: zabbix_web_package_install is succeeded
+  tags:
+    - zabbix-web
+    - init
+    - config
+
+- name: "Debian | Link graphfont.ttf (workaround ZBX-10467)"
+  file:
+    src: '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf'
+    path: '/usr/share/zabbix/fonts/graphfont.ttf'
+    state: link
+  tags:
+    - zabbix-web
+    - init
+    - config
+
+- include_tasks: apache_Debian.yml
+  vars:
+    zabbix_apache_servername: "{{ zabbix_websrv_servername }}"
+  when: zabbix_websrv == 'apache'

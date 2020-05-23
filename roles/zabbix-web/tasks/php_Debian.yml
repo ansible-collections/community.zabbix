@@ -1,0 +1,42 @@
+---
+- name: "Debian | Install legacy php5 packages on old distros"
+  apt:
+    state: present
+    update_cache: yes
+    cache_valid_time: 3600
+    name:
+      - php5-{{ zabbix_server_database }}
+      - php5-bcmath
+      - php5-mbstring
+      - php5-ldap
+      - php5-xml
+      - php5-gd
+  register: zabbix_web_php_dependency_install
+  until: zabbix_web_php_dependency_install is succeeded
+  when: >
+    ( ansible_distribution == 'Ubuntu' and (ansible_distribution_version is version_compare('16.04', '<')))
+    or ( ansible_distribution == 'Debian' and (ansible_distribution_version is version_compare('9', '<')) )
+  tags:
+    - zabbix-web
+    - init
+
+- name: "Debian | Install modern php packages on current distros"
+  apt:
+    state: present
+    update_cache: yes
+    cache_valid_time: 3600
+    name:
+      - php-{{ zabbix_server_database }}
+      - php-bcmath
+      - php-mbstring
+      - php-ldap
+      - php-xml
+      - php-gd
+  register: zabbix_web_php_dependency_install
+  until: zabbix_web_php_dependency_install is succeeded
+  when: >
+    ( ansible_distribution == 'Ubuntu' and (ansible_distribution_version is version_compare('16.04', '>=')))
+    or ( ansible_distribution == 'Debian' and (ansible_distribution_version is version_compare('9', '>=')) )
+  tags:
+    - zabbix-server
+    - init
