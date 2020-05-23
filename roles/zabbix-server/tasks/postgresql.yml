@@ -1,0 +1,163 @@
+---
+# task file for postgresql
+
+- name: "Set the correct delegated_dbhost (to support postgres db deployment on a remote dbhost)"
+  set_fact:
+    delegated_dbhost: "{{ zabbix_server_dbhost if (zabbix_server_dbhost != 'localhost') else inventory_hostname }}"
+
+- name: "PostgreSQL | Delegated"
+  block:
+    - name: "PostgreSQL | Delegated | Create database"
+      postgresql_db:
+        name: "{{ zabbix_server_dbname }}"
+        port: "{{ zabbix_server_dbport }}"
+        state: present
+    - name: "PostgreSQL | Delegated | Create database user"
+      postgresql_user:
+        db: "{{ zabbix_server_dbname }}"
+        name: "{{ zabbix_server_dbuser }}"
+        password: "md5{{ (zabbix_server_dbpassword + zabbix_server_dbuser)|hash('md5') }}"
+        port: "{{ zabbix_server_dbport }}"
+        priv: ALL
+        state: present
+        encrypted: yes
+  become: yes
+  become_user: postgres
+  delegate_to: "{{ delegated_dbhost }}"
+  when:
+    - zabbix_database_creation
+    - zabbix_server_pgsql_login_host is not defined
+  tags:
+    - zabbix-server
+    - database
+
+- name: "PostgreSQL | Remote"
+  block:
+    - name: "PostgreSQL | Remote | Create database"
+      postgresql_db:
+        login_host: "{{ zabbix_server_pgsql_login_host | default(omit) }}"
+        login_user: "{{ zabbix_server_pgsql_login_user | default(omit) }}"
+        login_password: "{{ zabbix_server_pgsql_login_password | default(omit) }}"
+        login_unix_socket: "{{ zabbix_server_pgsql_login_unix_socket | default(omit) }}"
+        name: "{{ zabbix_server_dbname }}"
+        port: "{{ zabbix_server_dbport }}"
+        state: present
+    - name: "PostgreSQL | Remote | Create database user"
+      postgresql_user:
+        login_host: "{{ zabbix_server_pgsql_login_host | default(omit) }}"
+        login_user: "{{ zabbix_server_pgsql_login_user | default(omit) }}"
+        login_password: "{{ zabbix_server_pgsql_login_password | default(omit) }}"
+        db: "{{ zabbix_server_dbname }}"
+        name: "{{ zabbix_server_dbuser }}"
+        password: "md5{{ (zabbix_server_dbpassword + zabbix_server_dbuser)|hash('md5') }}"
+        port: "{{ zabbix_server_dbport }}"
+        priv: ALL
+        state: present
+        encrypted: yes
+  when:
+    - zabbix_database_creation
+    - zabbix_server_pgsql_login_host is defined
+  tags:
+    - zabbix-server
+    - database
+
+- name: "PostgreSQL | Create schema"
+  shell: >
+    cd {{ datafiles_path }} &&
+    if [ -f create.sql.gz ]; then gunzip create.sql.gz ; fi &&
+    psql -h '{{ zabbix_server_dbhost }}'
+    -U '{{ zabbix_server_dbuser }}'
+    -d '{{ zabbix_server_dbname }}'
+    -p '{{ zabbix_server_dbport }}'
+    -f create.sql && touch /etc/zabbix/schema.done
+  args:
+    creates: /etc/zabbix/schema.done
+    warn: no
+  environment:
+    PGPASSWORD: '{{ zabbix_server_dbpassword }}'
+  when:
+    - zabbix_version is version('3.0', '>=')
+    - zabbix_database_sqlload
+  tags:
+    - zabbix-server
+    - database
+
+- name: "Get complete path"
+  shell: ls -d {{ datafiles_path }}
+  register: datafiles_path_full
+  changed_when: False
+  when:
+    - (zabbix_version is version('3.0', '<') and zabbix_database_sqlload) or (zabbix_repo == "epel" and zabbix_database_sqlload)
+  tags:
+    - skip_ansible_lint
+
+- name: "Check if we have a create dir"
+  stat:
+    path: "{{ datafiles_path_full.stdout }}/create"
+  register: create_dir_or_not
+  when:
+    - (zabbix_version is version('3.0', '<') and zabbix_database_sqlload) or (zabbix_repo == "epel" and zabbix_database_sqlload)
+
+- name: "Set fact"
+  set_fact:
+    datafiles_path: "{{ datafiles_path }}/create"
+  when:
+    - (zabbix_version is version('3.0', '<') and zabbix_database_sqlload) or (zabbix_repo == "epel" and zabbix_database_sqlload)
+    - create_dir_or_not.stat.isdir is defined and create_dir_or_not.stat.isdir
+    - create_dir_or_not.stat.exists
+
+- name: "PostgreSQL | Importing schema file"
+  shell: >
+    cd {{ datafiles_path }} &&
+    if [ -f schema.sql.gz ]; then gunzip schema.sql.gz ; fi &&
+    psql -h '{{ zabbix_server_dbhost }}'
+    -U '{{ zabbix_server_dbuser }}'
+    -d '{{ zabbix_server_dbname }}'
+    -p '{{ zabbix_server_dbport }}'
+    -f schema.sql && touch /etc/zabbix/schema.done
+  args:
+    creates: /etc/zabbix/schema.done
+    warn: no
+  environment:
+    PGPASSWORD: '{{ zabbix_server_dbpassword }}'
+  when:
+    - (zabbix_version is version('3.0', '<') and zabbix_database_sqlload) or (zabbix_repo == "epel" and zabbix_database_sqlload)
+  tags:
+    - zabbix-server
+    - database
+
+- name: "PostgreSQL | Importing images file"
+  shell: >
+    cd {{ datafiles_path }} &&
+    psql -h '{{ zabbix_server_dbhost }}'
+    -U '{{ zabbix_server_dbuser }}'
+    -d '{{ zabbix_server_dbname }}'
+    -p '{{ zabbix_server_dbport }}'
+    -f images.sql && touch /etc/zabbix/images.done
+  args:
+    creates: /etc/zabbix/images.done
+    warn: no
+  environment:
+    PGPASSWORD: '{{ zabbix_server_dbpassword }}'
+  when: (zabbix_version is version('3.0', '<') and zabbix_database_sqlload) or (zabbix_repo == "epel" and zabbix_database_sqlload)
+  tags:
+    - zabbix-server
+    - database
+
+- name: "PostgreSQL | Importing data file"
+  shell: >
+    cd {{ datafiles_path }} &&
+    psql -h '{{ zabbix_server_dbhost }}'
+    -U '{{ zabbix_server_dbuser }}'
+    -d '{{ zabbix_server_dbname }}'
+    -p '{{ zabbix_server_dbport }}'
+    -f data.sql && touch /etc/zabbix/data.done
+  args:
+    creates: /etc/zabbix/data.done
+    warn: no
+  environment:
+    PGPASSWORD: '{{ zabbix_server_dbpassword }}'
+  when: (zabbix_version is version('3.0', '<') and zabbix_database_sqlload) or (zabbix_repo == "epel" and zabbix_database_sqlload)
+  tags:
+    - zabbix-server
+    - database
