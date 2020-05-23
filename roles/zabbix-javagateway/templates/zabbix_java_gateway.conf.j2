@@ -1,0 +1,23 @@
+# This is a configuration file for Zabbix Java Gateway.
+# It is sourced by startup.sh and shutdown.sh scripts.
+
+### Option: zabbix.listenIP
+#       IP address to listen on.
+#
+LISTEN_IP={{ javagateway_listenip }}
+
+### Option: zabbix.listenPort
+#       Port to listen on.
+#
+LISTEN_PORT={{ javagateway_listenport }}
+
+### Option: zabbix.pidFile
+#       Name of PID file.
+#       If omitted, Zabbix Java Gateway is started as a console application.
+#
+PID_FILE={{ javagateway_pidfile }}
+
+### Option: zabbix.startPollers
+#       Number of worker threads to start.
+#
+START_POLLERS={{ javagateway_startpollers }}
