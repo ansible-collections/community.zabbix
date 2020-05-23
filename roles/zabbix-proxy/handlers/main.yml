@@ -1,0 +1,10 @@
+---
+# handlers file for zabbix-proxy
+
+- name: restart zabbix-proxy
+  service:
+    name: zabbix-proxy
+    state: restarted
+    enabled: yes
+  become: yes
+  when: zabbix_proxy_manage_service | bool

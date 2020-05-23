@@ -1,0 +1,66 @@
+---
+dependency:
+  name: galaxy
+driver:
+  name: docker
+lint:
+  name: yamllint
+  options:
+    config-file: molecule/default/yaml-lint.yml
+
+platforms:
+  - name: zabbix-proxy-mysql-centos
+    image: milcom/centos7-systemd
+    privileged: True
+    groups:
+      - mysql
+  - name: zabbix-proxy-pgsql-centos
+    image: milcom/centos7-systemd
+    privileged: True
+    groups:
+      - postgresql
+  - name: zabbix-proxy-mysql-debian
+    image: minimum2scp/systemd-stretch
+    privileged: True
+    command: /sbin/init
+    groups:
+      - mysql
+  - name: zabbix-proxy-pgsql-debian
+    image: minimum2scp/systemd-stretch
+    privileged: True
+    command: /sbin/init
+    groups:
+      - postgresql
+  - name: zabbix-proxy-mysql-ubuntu
+    image: solita/ubuntu-systemd:latest
+    privileged: True
+    command: /sbin/init
+    groups:
+      - mysql
+  - name: zabbix-proxy-pgsql-ubuntu
+    image: solita/ubuntu-systemd:latest
+    privileged: True
+    command: /sbin/init
+    groups:
+      - postgresql
+
+provisioner:
+  name: ansible
+  lint:
+    name: ansible-lint
+  inventory:
+    group_vars:
+      mysql:
+        zabbix_proxy_database: mysql
+        zabbix_proxy_database_long: mysql
+        zabbix_proxy_dbport: 3306
+      postgresql:
+        zabbix_proxy_database: pgsql
+        zabbix_proxy_database_long: postgresql
+
+scenario:
+  name: default
+verifier:
+  name: testinfra
+  lint:
+    name: flake8
