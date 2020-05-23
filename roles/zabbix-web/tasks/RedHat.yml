@@ -1,0 +1,67 @@
+---
+# Tasks specific for RedHat systems
+
+- name: "RedHat | Install basic repo file"
+  yum_repository:
+    name: "{{ item.name }}"
+    description: "{{ item.description }}"
+    baseurl: "{{ item.baseurl }}"
+    gpgcheck: "{{ item.gpgcheck }}"
+    gpgkey: "{{ item.gpgkey }}"
+    state: "{{ item.state | default('present') }}"
+  with_items: "{{ zabbix_repo_yum }}"
+  when:
+    - zabbix_repo == "zabbix"
+  tags:
+    - zabbix-web
+
+- name: "RedHat | Install zabbix-web-{{ zabbix_server_database }}"
+  yum:
+    pkg: zabbix-web-{{ zabbix_server_database }}
+    state: "{{ zabbix_web_package_state }}"
+    update_cache: yes
+  register: zabbix_web_package_install
+  until: zabbix_web_package_install is succeeded
+  tags:
+    - zabbix-web
+
+- include_tasks: apache_RedHat.yml
+  vars:
+    zabbix_apache_servername: "{{ zabbix_websrv_servername }}"
+  when: zabbix_websrv == 'apache'
+
+- name: "RedHat | Install related SELinux package"
+  yum:
+    name:
+      - libsemanage-python
+    state: present
+  register: zabbix_web_dependencies_installed
+  until: zabbix_web_dependencies_installed is succeeded
+  when:
+    - selinux_allow_zabbix_can_network
+    - ansible_distribution_major_version == "7" or ansible_distribution_major_version == "6"
+  tags:
+    - zabbix-web
+
+- name: "RedHat | Install related SELinux package on RHEL8"
+  yum:
+    name:
+      - python3-libsemanage
+    state: present
+  register: zabbix_web_dependencies_installed
+  until: zabbix_web_dependencies_installed is succeeded
+  when:
+    - selinux_allow_zabbix_can_network
+    - ansible_distribution_major_version == "8"
+  tags:
+    - zabbix-web
+
+- name: "RedHat | Enable zabbix_can_network SELinux boolean"
+  seboolean:
+    name: zabbix_can_network
+    state: yes
+    persistent: yes
+  when:
+    - selinux_allow_zabbix_can_network
+  tags:
+    - zabbix-web

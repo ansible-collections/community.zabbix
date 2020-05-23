@@ -1,0 +1,13 @@
+---
+- name: "RedHat | Install apache vhost"
+  template:
+    src: apache_vhost.conf.j2
+    dest: /etc/httpd/conf.d/zabbix.conf
+    owner: "{{ apache_user }}"
+    group: "{{ apache_group }}"
+    mode: 0644
+  when: zabbix_vhost
+  notify:
+    - restart apache
+  tags:
+    - zabbix-server
