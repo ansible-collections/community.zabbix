@@ -1,0 +1,15 @@
+[Unit]
+Description=Zabbix Java Gateway
+After=syslog.target
+After=network.target
+
+[Service]
+Type=forking
+KillMode=process
+ExecStart=/usr/sbin/zabbix_java_gateway
+SuccessExitStatus=143
+User=zabbix
+Group=zabbix
+
+[Install]
+WantedBy=multi-user.target

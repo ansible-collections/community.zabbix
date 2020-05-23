@@ -1,0 +1,26 @@
+---
+# defaults file for dj-wasabi.zabbix-javagateway
+
+zabbix_version: 4.2
+zabbix_repo: zabbix
+zabbix_package_state: present
+zabbix_selinux: False
+
+zabbix_repo_yum:
+  - name: zabbix
+    description: Zabbix Official Repository - $basearch
+    baseurl: http://repo.zabbix.com/zabbix/{{ zabbix_version }}/rhel/{{ ansible_distribution_major_version }}/$basearch/
+    gpgcheck: 0
+    gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-ZABBIX
+    state: present
+  - name: zabbix-supported
+    description: Zabbix Official Repository non-supported - $basearch
+    baseurl: http://repo.zabbix.com/non-supported/rhel/{{ ansible_distribution_major_version }}/$basearch/
+    gpgcheck: 0
+    gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-ZABBIX
+    state: present
+
+javagateway_pidfile: /run/zabbix/zabbix_java_gateway.pid
+javagateway_listenip: 0.0.0.0
+javagateway_listenport: 10052
+javagateway_startpollers: 5
