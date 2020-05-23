@@ -1,0 +1,61 @@
+---
+- name: Prepare
+  hosts: all
+  pre_tasks:
+    - name: "Installing EPEL"
+      yum:
+        name: epel-release
+        state: present
+      when: ansible_distribution == 'CentOS'
+
+    - name: "Installing packages"
+      yum:
+        name:
+          - net-tools
+          - which
+          - libselinux-python
+          - python-pip
+        state: present
+      register: installation_dependencies
+      when: ansible_distribution == 'CentOS'
+
+    - name: "Installing which on NON-CentOS"
+      apt:
+        name:
+          - net-tools
+          - python-pip
+          - curl
+        state: present
+      when: ansible_distribution != 'CentOS'
+
+    - name: "Configure SUDO."
+      lineinfile:
+        dest: /etc/sudoers
+        line: "Defaults    !requiretty"
+        state: present
+
+    - name: "Make sure the docs are installed."
+      lineinfile:
+        dest: /etc/yum.conf
+        line: "tsflags=nodocs"
+        state: absent
+
+    - name: "Installing some python dependencies"
+      pip:
+        name: py-zabbix
+        state: present
+
+    - name: "Create group for imaginary host"
+      add_host:
+        name: imaginary-host
+        groups:
+          - mysql
+          - postgresql
+      changed_when: False
+
+  roles:
+    - role: geerlingguy.postgresql
+      when: inventory_hostname in groups['postgresql']
+    - role: geerlingguy.mysql
+      when: inventory_hostname in groups['mysql']
+    - role: dj-wasabi.zabbix-server

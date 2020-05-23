@@ -1,0 +1,84 @@
+---
+# tasks file for wdijkerman.zabbix-web
+
+- name: "Include OS-specific variables"
+  include_vars: "{{ ansible_os_family }}.yml"
+  tags:
+    - always
+
+- name: "Set short version name"
+  set_fact:
+    zabbix_short_version: "{{ zabbix_version | regex_replace('\\.', '') }}"
+  tags:
+    - always
+
+- include_tasks: apache.yml
+  when: zabbix_websrv == 'apache'
+
+- name: "Install the correct repository"
+  include: "RedHat.yml"
+  when: ansible_os_family == "RedHat"
+  tags:
+    - zabbix-web
+
+- name: "Install the correct repository"
+  include: "Debian.yml"
+  when: ansible_os_family == "Debian"
+  tags:
+    - zabbix-web
+
+- name: "Create zabbix-web directory"
+  file:
+    path: /etc/zabbix/web
+    owner: "{{ apache_user }}"
+    group: "{{ apache_group }}"
+    state: directory
+    mode: 0755
+  tags:
+    - zabbix-web
+    - init
+    - config
+
+- name: "Configure zabbix-web"
+  template:
+    src: zabbix.conf.php.j2
+    dest: /etc/zabbix/web/zabbix.conf.php
+    owner: "{{ apache_user }}"
+    group: "{{ apache_group }}"
+    mode: 0640
+  notify:
+    - restart apache
+  tags:
+    - zabbix-web
+    - init
+    - config
+
+- name: "Allow httpd to connect to db (SELinux)"
+  seboolean:
+    name: httpd_can_network_connect_db
+    persistent: yes
+    state: yes
+  when:
+    - ansible_selinux.status == "enabled"
+    - selinux_allow_zabbix_can_network
+  tags: selinux
+
+- name: "Allow httpd to connect to zabbix (SELinux)"
+  seboolean:
+    name: httpd_can_connect_zabbix
+    persistent: yes
+    state: yes
+  when:
+    - ansible_selinux.status == "enabled"
+    - selinux_allow_zabbix_can_network
+  tags: selinux
+
+- name: "Allow httpd to connect to ldap (SELinux)"
+  seboolean:
+    name: httpd_can_connect_ldap
+    persistent: yes
+    state: yes
+  when:
+    - ansible_selinux.status == "enabled"
+    - zabbix_apache_can_connect_ldap|bool
+  tags: selinux
