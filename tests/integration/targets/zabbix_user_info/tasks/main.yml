@@ -1,0 +1,125 @@
+---
+# New user create test from here
+- name: test - Create a new Zabbix user
+  zabbix_user:
+    server_url: "{{ zabbix_server_url }}"
+    login_user: "{{ zabbix_login_user }}"
+    login_password: "{{ zabbix_login_password }}"
+    alias: example
+    name: user name
+    surname: user surname
+    usrgrps:
+      - Guests
+      - Disabled
+    passwd: password
+    lang: en_GB
+    theme: blue-theme
+    autologin: no
+    autologout: '0'
+    refresh: '30'
+    rows_per_page: '200'
+    after_login_url: ''
+    user_medias:
+      - mediatype: Email
+        sendto: example@example.com
+        period: 1-7,00:00-24:00
+        severity:
+          not_classified: no
+          information: yes
+          warning: yes
+          average: yes
+          high: yes
+          disaster: yes
+        active: no
+    type: Zabbix super admin
+    state: present
+  register: create_zabbix_user_result
+
+- assert:
+    that:
+      - create_zabbix_user_result.changed is sameas true
+
+- name: "test - Get a zabbix user information"
+  zabbix_user_info:
+    server_url: "{{ zabbix_server_url }}"
+    login_user: "{{ zabbix_login_user }}"
+    login_password: "{{ zabbix_login_password }}"
+    alias: example
+  register: get_user_info_result
+
+- name: "test - Set key to user_info_key variable(This deals with the key being masked)"
+  set_fact:
+    user_info_key: "{{ item }}"
+  loop: "{{ get_user_info_result.keys() | list }}"
+  when:
+    - item | regex_search('_user')
+
+- assert:
+    that:
+      - get_user_info_result[user_info_key].alias == "example"
+      - get_user_info_result[user_info_key].autologin is defined
+      - get_user_info_result[user_info_key].autologout is defined
+      - get_user_info_result[user_info_key].lang is defined
+      - get_user_info_result[user_info_key].medias.0.active is defined
+      - get_user_info_result[user_info_key].medias.0.mediaid is defined
+      - get_user_info_result[user_info_key].medias.0.period is defined
+      - get_user_info_result[user_info_key].medias.0.sendto is defined
+      - get_user_info_result[user_info_key].medias.0.severity is defined
+      - get_user_info_result[user_info_key].medias.0.userid is defined
+      - get_user_info_result[user_info_key].name is defined
+      - get_user_info_result[user_info_key].refresh is defined
+      - get_user_info_result[user_info_key].rows_per_page is defined
+      - get_user_info_result[user_info_key].surname is defined
+      - get_user_info_result[user_info_key].theme is defined
+      - get_user_info_result[user_info_key].type is defined
+      - get_user_info_result[user_info_key].url is defined
+      - get_user_info_result[user_info_key].userid is defined
+      - get_user_info_result[user_info_key].users_status is defined
+      - get_user_info_result[user_info_key].usrgrps | length == 2
+      - get_user_info_result[user_info_key].usrgrps.0.debug_mode is defined
+      - get_user_info_result[user_info_key].usrgrps.0.gui_access is defined
+      - get_user_info_result[user_info_key].usrgrps.0.name is defined
+      - get_user_info_result[user_info_key].usrgrps.0.users_status is defined
+      - get_user_info_result[user_info_key].usrgrps.0.usrgrpid is defined
+      - get_user_info_result[user_info_key].usrgrps.1.debug_mode is defined
+      - get_user_info_result[user_info_key].usrgrps.1.gui_access is defined
+      - get_user_info_result[user_info_key].usrgrps.1.name is defined
+      - get_user_info_result[user_info_key].usrgrps.1.users_status is defined
+      - get_user_info_result[user_info_key].usrgrps.1.usrgrpid is defined
+
+- name: test - Create a new Zabbix user
+  zabbix_user:
+    server_url: "{{ zabbix_server_url }}"
+    login_user: "{{ zabbix_login_user }}"
+    login_password: "{{ zabbix_login_password }}"
+    alias: example2
+    usrgrps:
+      - Guests
+      - Disabled
+    passwd: password
+    type: Zabbix super admin
+    state: present
+  register: create_zabbix_user_result2
+
+- assert:
+    that:
+      - create_zabbix_user_result2.changed is sameas true
+
+- name: "test - Get a zabbix user information"
+  zabbix_user_info:
+    server_url: "{{ zabbix_server_url }}"
+    login_user: "{{ zabbix_login_user }}"
+    login_password: "{{ zabbix_login_password }}"
+    alias: example2
+  register: get_user_info_result2
+
+- name: "test - Set key to user_info_key variable(This deals with the key being masked)"
+  set_fact:
+    user_info_key: "{{ item }}"
+  loop: "{{ get_user_info_result2.keys() | list }}"
+  when:
+    - item | regex_search('_user')
+
+- assert:
+    that:
+      - get_user_info_result2[user_info_key].alias == "example2"
