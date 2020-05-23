@@ -1,0 +1,41 @@
+---
+# tasks file for dj-wasabi.zabbix-proxy
+
+- name: "Install the correct repository"
+  include: "RedHat.yml"
+  when:
+    - ansible_os_family == "RedHat"
+
+- name: "Install the correct repository"
+  include: "Debian.yml"
+  when:
+    - ansible_os_family == "Debian"
+
+- name: "Place systemd unit file"
+  copy:
+    src: systemd.service
+    dest: /etc/systemd/system/zabbix-java-gateway.service
+  register: systemd_state
+
+- name: "Reload systemd"
+  shell: systemctl daemon-reload
+  when:
+    - systemd_state.changed
+  tags:
+    - skip_ansible_lint
+
+- name: "Configure zabbix-proxy"
+  template:
+    src: zabbix_java_gateway.conf.j2
+    dest: /etc/zabbix/zabbix_java_gateway.conf
+    owner: zabbix
+    group: zabbix
+    mode: 0644
+  notify:
+    - zabbix-java-gateway restarted
+
+- name: "Make sure Zabbix Java Gateway is running"
+  service:
+    name: zabbix-java-gateway
+    state: started
+    enabled: yes

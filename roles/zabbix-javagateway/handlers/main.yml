@@ -1,0 +1,8 @@
+---
+# handlers file for zabbix-javagateway
+
+- name: zabbix-java-gateway restarted
+  service:
+    name: zabbix-java-gateway
+    state: restarted
+    enabled: yes
