@@ -1,0 +1,22 @@
+---
+- name: Prepare
+  hosts: all
+  pre_tasks:
+    - name: "Installing which"
+      yum:
+        name:
+          - net-tools
+          - which
+          - libselinux-python
+        state: installed
+      register: installation_dependencies
+      until: installation_dependencies is succeeded
+      when: ansible_distribution == 'CentOS'
+
+    - name: "Installing which on NON-CentOS"
+      apt:
+        name: net-tools
+        state: installed
+      register: installation_dependencies
+      until: installation_dependencies is succeeded
+      when: ansible_distribution != 'CentOS'
