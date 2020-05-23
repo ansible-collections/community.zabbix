@@ -1,0 +1,149 @@
+<VirtualHost {{ zabbix_apache_vhost_listen_ip }}:{{ zabbix_apache_vhost_port }}>
+  ServerName {{ zabbix_apache_servername }}
+  {% for alias in zabbix_url_aliases %}
+  ServerAlias {{ alias }}
+  {% endfor %}
+
+  ## Vhost docroot
+  DocumentRoot "/usr/share/zabbix"
+
+{% if zabbix_apache_redirect and zabbix_apache_tls %}
+  RewriteEngine On
+  RewriteCond %{HTTPS} !=on
+  RewriteRule ^/?(.*) https://%{SERVER_NAME}/$1 [R,L]
+{% endif %}
+
+{% set directory_paths = ['/usr/share/zabbix/conf', '/usr/share/zabbix/app', '/usr/share/zabbix/include', '/usr/share/zabbix/include/classes'] %}
+
+  <Directory "/usr/share/zabbix">
+  {% if apache_version|string() == '2.4' %}
+    Options FollowSymLinks
+    AllowOverride None
+    Require all granted
+  {% else %}
+    AllowOverride None
+    Order Allow,Deny
+    Allow from all
+  {% endif %}
+  </Directory>
+
+{% for my_path in directory_paths %}
+  <Directory "{{ my_path }}">
+  {% if apache_version|string() == '2.4' %}
+    Require all denied
+  {% else %}
+    AllowOverride None
+    Order Deny,Allow
+    Deny from all
+  {% endif %}
+  </Directory>
+
+{% endfor %}
+  ## Logging
+  ErrorLog "/var/log/{{ apache_log }}/{{ zabbix_apache_servername }}_error.log"
+  ServerSignature Off
+  CustomLog "/var/log/{{ apache_log }}/{{ zabbix_apache_servername }}_access.log" combined
+
+  ## Rewrite rules
+  RewriteEngine On
+  RewriteRule ^$ /index.php [L]
+
+{% if zabbix_apache_include_custom_fragment | default(true) %}
+  ## Custom fragment
+  {% if zabbix_php_fpm %}
+  ProxyPassMatch ^/(.*\.php(/.*)?)$ fcgi://127.0.0.1:9000/usr/share/zabbix/$1
+  ProxyTimeout 1800
+  {% else %}
+  php_value max_execution_time {{ zabbix_web_max_execution_time | default('300') }}
+  php_value memory_limit {{ zabbix_web_memory_limit | default('128M') }}
+  php_value post_max_size {{ zabbix_web_post_max_size | default('16M') }}
+  php_value upload_max_filesize {{ zabbix_web_upload_max_filesize | default('2M') }}
+  php_value max_input_time {{ zabbix_web_max_input_time | default('300') }}
+  # Set correct timezone.
+  php_value date.timezone {{ zabbix_timezone }}
+{% endif %}
+</VirtualHost>
+
+{# Set up TLS vhosts #}
+{% if zabbix_apache_tls and zabbix_apache_vhost_tls_port %}
+
+SSLPassPhraseDialog {{ zabbix_apache_SSLPassPhraseDialog }}
+SSLSessionCache         {{ zabbix_apache_SSLSessionCache }}
+SSLSessionCacheTimeout  {{ zabbix_apache_SSLSessionCacheTimeout }}
+SSLRandomSeed startup file:/dev/urandom  256
+SSLRandomSeed connect builtin
+SSLCryptoDevice {{ zabbix_apache_SSLCryptoDevice }}
+
+<VirtualHost _default_:{{ zabbix_apache_vhost_tls_port }}>
+  ServerName {{ zabbix_apache_servername }}
+  {% for alias in zabbix_url_aliases %}
+  ServerAlias {{ alias }}
+  {% endfor %}
+
+  ## Vhost docroot
+  DocumentRoot "/usr/share/zabbix"
+
+  SSLEngine on
+  SSLCipherSuite {{ apache_ssl_cipher_suite }}
+  SSLProtocol {{ apache_ssl_protocol }}
+  SSLHonorCipherOrder On
+{% if apache_vhosts_version == "2.4" %}
+  SSLCompression off
+{% endif %}
+  SSLCertificateFile {{ zabbix_apache_tls_crt }}
+  SSLCertificateKeyFile {{ zabbix_apache_tls_key }}
+{% if zabbix_apache_tls_chain %}
+  SSLCertificateChainFile {{ zabbix_apache_tls_chain }}
+{% endif %}
+
+{% set directory_paths = ['/usr/share/zabbix/conf', '/usr/share/zabbix/app', '/usr/share/zabbix/include', '/usr/share/zabbix/include/classes'] %}
+
+  <Directory "/usr/share/zabbix">
+  {% if apache_version|string() == '2.4' %}
+    Options FollowSymLinks
+    AllowOverride None
+    Require all granted
+  {% else %}
+    AllowOverride None
+    Order Allow,Deny
+    Allow from all
+  {% endif %}
+  </Directory>
+
+{% for my_path in directory_paths %}
+  <Directory "{{ my_path }}">
+  {% if apache_version|string() == '2.4' %}
+    Require all granted
+  {% else %}
+    AllowOverride None
+    Order Deny,Allow
+    Deny from all
+  {% endif %}
+  </Directory>
+
+{% endfor %}
+  ## Logging
+  ErrorLog "/var/log/{{ apache_log }}/{{ zabbix_apache_servername }}_tls_error.log"
+  ServerSignature Off
+  CustomLog "/var/log/{{ apache_log }}/{{ zabbix_apache_servername }}_tls_access.log" combined
+
+  ## Rewrite rules
+  RewriteEngine On
+  RewriteRule ^$ /index.php [L]
+
+{% if zabbix_apache_include_custom_fragment | default(true) %}
+  ## Custom fragment
+  {% if zabbix_php_fpm %}
+  ProxyPassMatch ^/(.*\.php(/.*)?)$ fcgi://127.0.0.1:9000/usr/share/zabbix/$1
+  ProxyTimeout 1800
+  {% else %}
+  php_value max_execution_time {{ zabbix_web_max_execution_time | default('300') }}
+  php_value memory_limit {{ zabbix_web_memory_limit | default('128M') }}
+  php_value post_max_size {{ zabbix_web_post_max_size | default('16M') }}
+  php_value upload_max_filesize {{ zabbix_web_upload_max_filesize | default('2M') }}
+  php_value max_input_time {{ zabbix_web_max_input_time | default('300') }}
+  # Set correct timezone.
+  php_value date.timezone {{ zabbix_timezone }}
+{% endif %}
+</VirtualHost>
+{% endif %}
