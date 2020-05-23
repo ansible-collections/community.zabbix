@@ -1,0 +1,20 @@
+---
+- name: "Configure zabbix-server alertscripts"
+  template:
+    src: "{{ item.path }}"
+    dest: "{{ zabbix_server_alertscriptspath }}/{{ item.name }}"
+    owner: zabbix
+    group: zabbix
+    mode: 0755
+  with_items: "{{ zabbix_server_alertscripts }}"
+  when: zabbix_server_alertscripts is defined
+
+- name: "Configure zabbix-server externalscripts"
+  template:
+    src: "{{ item.path }}"
+    dest: "{{ zabbix_server_externalscriptspath }}/{{ item.name }}"
+    owner: zabbix
+    group: zabbix
+    mode: 0755
+  with_items: "{{ zabbix_server_externalscripts }}"
+  when: zabbix_server_externalscripts is defined

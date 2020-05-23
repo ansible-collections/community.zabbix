@@ -1,0 +1,71 @@
+---
+# tasks file for wdijkerman.zabbix
+
+# straight to getenforce binary , workaround for missing python_selinux library
+- name: "Get getenforce binary"
+  stat:
+    path: /usr/sbin/getenforce
+  register: getenforce_bin
+  become: yes
+
+- name: "Collect getenforce output"
+  command: getenforce
+  register: sestatus
+  when: 'getenforce_bin.stat.exists'
+  changed_when: false
+  become: yes
+  check_mode: no
+
+- name: "Set zabbix_selinux to true if getenforce returns Enforcing or Permissive"
+  set_fact:
+    zabbix_selinux: "{{ true }}"
+  when: 'getenforce_bin.stat.exists and ("Enforcing" in sestatus.stdout or "Permissive" in sestatus.stdout)'
+
+- name: "Include OS-specific variables"
+  include_vars: "{{ ansible_os_family }}.yml"
+
+- name: "Install the correct repository"
+  include_tasks: "{{ ansible_os_family }}.yml"
+
+- name: "Installing the postgresql database"
+  include_tasks: "{{ zabbix_server_database_long }}.yml"
+
+- name: "Configure zabbix-server"
+  template:
+    src: zabbix_server.conf.j2
+    dest: /etc/zabbix/zabbix_server.conf
+    owner: zabbix
+    group: zabbix
+    mode: 0640
+  notify:
+    - zabbix-server restarted
+  tags:
+    - zabbix-server
+    - init
+    - config
+
+- name: "Create include dir zabbix-server"
+  file:
+    path: "{{ zabbix_server_include }}"
+    owner: zabbix
+    group: zabbix
+    state: directory
+    mode: 0755
+  tags:
+    - zabbix-server
+    - init
+    - config
+
+- name: "Add zabbix-server scripts"
+  include: "scripts.yml"
+  when: ( zabbix_server_alertscripts is defined ) or
+        ( zabbix_server_externalscripts is defined )
+
+- name: "Zabbix-server started"
+  service:
+    name: zabbix-server
+    state: "{{ zabbix_service_state }}"
+    enabled: "{{ zabbix_service_enabled }}"
+  tags:
+    - zabbix-server
+  when: zabbix_server_manage_service | bool
