@@ -1,0 +1,52 @@
+---
+# task file for postgresql
+
+- name: "Set the correct delegated_dbhost (to support postgres db deployment on a remote dbhost)"
+  set_fact:
+    delegated_dbhost: "{{ zabbix_proxy_dbhost if (zabbix_proxy_dbhost != 'localhost') else inventory_hostname }}"
+
+- name: "PostgreSQL | Create database"
+  postgresql_db:
+    name: "{{ zabbix_proxy_dbname }}"
+    port: "{{ zabbix_proxy_dbport }}"
+    state: present
+  become: yes
+  become_user: postgres
+  delegate_to: "{{ delegated_dbhost }}"
+  when:
+    - zabbix_database_creation
+  tags:
+    - zabbix-proxy
+    - database
+
+- name: "PostgreSQL | Create database user"
+  postgresql_user:
+    db: "{{ zabbix_proxy_dbname }}"
+    name: "{{ zabbix_proxy_dbuser }}"
+    password: "{{ zabbix_proxy_dbpassword }}"
+    port: "{{ zabbix_proxy_dbport }}"
+    priv: ALL
+    state: present
+  become: yes
+  become_user: postgres
+  delegate_to: "{{ delegated_dbhost }}"
+  when:
+    - zabbix_database_creation
+  tags:
+    - zabbix-proxy
+    - database
+
+- name: "PostgreSQL | Importing schema file"
+  shell: |
+    cd {{ datafiles_path }}
+    if [ -f schema.sql.gz ]
+      then gunzip schema.sql.gz
+    fi
+    psql -h '{{ zabbix_proxy_dbhost }}' -U '{{ zabbix_proxy_dbuser }}' \
+    -d '{{ zabbix_proxy_dbname }}' -f schema.sql && touch /etc/zabbix/schema.done
+  args:
+    creates: /etc/zabbix/schema.done
+  environment:
+    PGPASSWORD: '{{ zabbix_proxy_dbpassword }}'
+  when:
+    - zabbix_database_creation

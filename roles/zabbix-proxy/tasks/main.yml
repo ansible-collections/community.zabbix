@@ -1,0 +1,134 @@
+---
+# tasks file for dj-wasabi.zabbix-proxy
+
+- name: "Set OS dependent variables"
+  include_vars: "{{ item }}"
+  with_first_found:
+    - "../vars/{{ ansible_distribution }}.yml"
+    - "../vars/main.yml"
+
+- name: "Install the correct repository"
+  include: "RedHat.yml"
+  when:
+    - ansible_os_family == "RedHat"
+
+- name: "Install the correct repository"
+  include: "Debian.yml"
+  when:
+    - ansible_os_family == "Debian"
+
+- name: "Installing the database"
+  include: "{{ zabbix_proxy_database_long }}.yml"
+
+- name: "Create include dir zabbix-proxy"
+  file:
+    path: "{{ zabbix_proxy_include }}"
+    owner: zabbix
+    group: zabbix
+    mode: 0755
+    state: directory
+  become: yes
+
+- name: "Create module dir zabbix-proxy"
+  file:
+    path: "{{ zabbix_proxy_loadmodulepath }}"
+    owner: zabbix
+    group: zabbix
+    state: directory
+  become: yes
+
+- name: "Create directory for PSK file if not exist."
+  file:
+    path: "{{ zabbix_proxy_tlspskfile | dirname }}"
+    mode: 0755
+    state: directory
+  become: yes
+  when:
+    - zabbix_proxy_tlspskfile is defined
+
+- name: "Place TLS PSK File"
+  copy:
+    dest: "{{ zabbix_proxy_tlspskfile }}"
+    content: "{{ zabbix_proxy_tlspsk_secret }}"
+    owner: zabbix
+    group: zabbix
+    mode: 0400
+  become: yes
+  when:
+    - zabbix_proxy_tlspskfile is defined
+    - zabbix_proxy_tlspsk_secret is defined
+  notify:
+    - restart zabbix-proxy
+
+- name: "Allow zabbix-proxy to open connections (SELinux)"
+  seboolean:
+    name: zabbix_can_network
+    persistent: yes
+    state: yes
+  become: yes
+  when: ansible_selinux.status == "enabled"
+  tags: selinux
+
+- name: "Allow zabbix-proxy to connect to zabbix_proxy_preprocessing.sock (SELinux)"
+  seboolean:
+    name: daemons_enable_cluster_mode
+    persistent: yes
+    state: yes
+  become: yes
+  when: ansible_selinux.status == "enabled"
+  tags: selinux
+
+- name: "Configure zabbix-proxy"
+  template:
+    src: zabbix_proxy.conf.j2
+    dest: /etc/zabbix/zabbix_proxy.conf
+    owner: zabbix
+    group: zabbix
+    mode: 0644
+  notify: restart zabbix-proxy
+
+- name: "Installing the Zabbix-api package on localhost"
+  pip:
+    name: zabbix-api
+    state: present
+  register: zabbix_api_package_installed
+  until: zabbix_api_package_installed is succeeded
+  delegate_to: localhost
+  become: "{{ zabbix_proxy_become_on_localhost }}"
+  when:
+    - zabbix_install_pip_packages | bool
+    - zabbix_api_create_proxy | bool
+  tags:
+    - api
+
+- name: "Create proxy"
+  zabbix_proxy:
+    server_url: "{{ zabbix_url }}"
+    http_login_user: "{{ zabbix_api_http_user | default(omit) }}"
+    http_login_password: "{{ zabbix_api_http_password | default(omit) }}"
+    login_user: "{{ zabbix_api_user }}"
+    login_password: "{{ zabbix_api_pass }}"
+    state: "{{ zabbix_create_proxy }}"
+    status: "{{ zabbix_proxy_status }}"
+    proxy_name: "{{ zabbix_proxy_name }}"
+    description: "{{ zabbix_proxy_description | default(omit) }}"
+    tls_psk: "{{ zabbix_proxy_tlspsk_secret | default(omit) }}"
+    tls_psk_identity: "{{ zabbix_proxy_tlspskidentity | default(omit) }}"
+    tls_subject: "{{ zabbix_proxy_tlsservercertsubject | default(omit) }}"
+    tls_accept: "{{ zabbix_proxy_tls_config[zabbix_proxy_tlsaccept if zabbix_proxy_tlsaccept else 'no_encryption'] }}"
+    tls_connect: "{{ zabbix_proxy_tls_config[zabbix_proxy_tlsconnect if zabbix_proxy_tlsconnect else 'no_encryption'] }}"
+    validate_certs: "{{ zabbix_validate_certs | default(omit) }}"
+  when:
+    - zabbix_api_create_proxy | bool
+  delegate_to: localhost
+  become: no
+  tags:
+    - api
+
+- name: "zabbix-proxy started"
+  service:
+    name: zabbix-proxy
+    state: started
+    enabled: yes
+  become: yes
+  when: zabbix_proxy_manage_service | bool
