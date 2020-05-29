@@ -353,7 +353,8 @@ def main():
             sorted(host_ids) != sorted(maintenance["hostids"]) or
             str(maintenance_type) != maintenance["maintenance_type"] or
             str(int(start_time)) != maintenance["active_since"] or
-            str(int(start_time + period)) != maintenance["active_till"]
+            str(int(start_time + period)) != maintenance["active_till"] or
+            str(desc) != maintenance['description']
         ):
             if module.check_mode:
                 changed = True
