@@ -35,6 +35,37 @@
     that:
       - create_maintenance_host_name_result.changed is sameas true
 
+- name: "test - Create maintenance with a host_name param(again - expectations: no change will occur)"
+  zabbix_maintenance:
+    server_url: "{{ zabbix_server_url }}"
+    login_user: "{{ zabbix_login_user }}"
+    login_password: "{{ zabbix_login_password }}"
+    name: maintenance
+    host_name: example
+    state: present
+  register: create_maintenance_host_name_again_result
+
+- assert:
+    that:
+      - create_maintenance_host_name_again_result.changed is sameas false
+
+- name: "test - Update maintenance with a desc param"
+  zabbix_maintenance:
+    server_url: "{{ zabbix_server_url }}"
+    login_user: "{{ zabbix_login_user }}"
+    login_password: "{{ zabbix_login_password }}"
+    name: maintenance
+    host_name: example
+    desc: "test description"
+    state: present
+  register: update_maintenance_desc_result
+
+- debug: msg="{{ update_maintenance_desc_result }}"
+
+- assert:
+    that:
+      - update_maintenance_desc_result.changed is sameas true
+
 - name: "test - Update maintenance with a desc param(again - expectations: no change will occur)"
   zabbix_maintenance:
     server_url: "{{ zabbix_server_url }}"
