@@ -32,9 +32,9 @@ jobs:
           - version: "3.0"
             port: "80"
           - version: "4.0"
-            port: "80"
+            port: "8080"
           - version: "4.4"
-            port: "80"
+            port: "8080"
           - version: "5.0"
             port: "8080"
 
