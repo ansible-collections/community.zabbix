@@ -740,6 +740,255 @@
       that:
           - "not zabbix_host1 is changed"
 
+- name: "test: configure interface to useip=1 but provide no ip"
+  zabbix_host:
+    server_url: "{{ zabbix_server_url }}"
+    login_user: "{{ zabbix_login_user }}"
+    login_password: "{{ zabbix_login_password }}"
+    host_name: ExampleHost
+    interfaces:
+      - type: 1
+        main: 1
+        useip: 1
+        port: "10050"
+      - type: 4
+        main: 1
+        useip: 1
+        ip: 10.1.1.1
+        port: "12345"
+  register: zabbix_host1
+  ignore_errors: yes
+
+- name: expect to fail
+  assert:
+      that:
+          - "zabbix_host1 is failed"
+
+- name: "test: configure interface to useip=0 but provide no dns"
+  zabbix_host:
+    server_url: "{{ zabbix_server_url }}"
+    login_user: "{{ zabbix_login_user }}"
+    login_password: "{{ zabbix_login_password }}"
+    host_name: ExampleHost
+    interfaces:
+      - type: 1
+        main: 1
+        useip: 0
+        ip: 10.1.1.1
+        port: "10050"
+      - type: 4
+        main: 1
+        useip: 1
+        ip: 10.1.1.1
+        port: "12345"
+  register: zabbix_host1
+  ignore_errors: yes
+
+- name: expect to fail
+  assert:
+      that:
+          - "zabbix_host1 is failed"
+
+- when: zabbix_version is version("5.0", ">=")
+  block:
+    - name: "test: configure SNMPv2 interface without details (fail)"
+      zabbix_host:
+        server_url: "{{ zabbix_server_url }}"
+        login_user: "{{ zabbix_login_user }}"
+        login_password: "{{ zabbix_login_password }}"
+        host_name: ExampleHost
+        interfaces:
+          - type: 1
+            main: 1
+            useip: 1
+            ip: 10.1.1.1
+            port: "10050"
+          - type: 2
+            main: 1
+            useip: 1
+            ip: 10.1.1.1
+            port: "161"
+      register: zabbix_host1
+      ignore_errors: True
+
+    - name: expect to fail
+      assert:
+          that:
+              - "zabbix_host1 is failed"
+
+    - name: "test: configure details for SNMPv2 interface"
+      zabbix_host:
+        server_url: "{{ zabbix_server_url }}"
+        login_user: "{{ zabbix_login_user }}"
+        login_password: "{{ zabbix_login_password }}"
+        host_name: ExampleHost
+        interfaces:
+          - type: 1
+            main: 1
+            useip: 1
+            ip: 10.1.1.1
+            port: "10050"
+          - type: 2
+            main: 1
+            useip: 1
+            ip: 10.1.1.1
+            port: "161"
+            details:
+              version: 2
+              community: Community String
+      register: zabbix_host1
+
+    - name: expect to succeed and that things have changed
+      assert:
+          that:
+              - "zabbix_host1 is changed"
+
+    - name: "test: configure details for SNMPv2 interface (again)"
+      zabbix_host:
+        server_url: "{{ zabbix_server_url }}"
+        login_user: "{{ zabbix_login_user }}"
+        login_password: "{{ zabbix_login_password }}"
+        host_name: ExampleHost
+        interfaces:
+          - type: 1
+            main: 1
+            useip: 1
+            ip: 10.1.1.1
+            port: "10050"
+          - type: 2
+            main: 1
+            useip: 1
+            ip: 10.1.1.1
+            port: "161"
+            details:
+              version: 2
+              community: Community String
+      register: zabbix_host1
+
+    - name: expect to succeed and that things have not changed
+      assert:
+          that:
+              - "zabbix_host1 is not changed"
+
+    - name: "test: update details for SNMPv2 interface with bulk sub option"
+      zabbix_host:
+        server_url: "{{ zabbix_server_url }}"
+        login_user: "{{ zabbix_login_user }}"
+        login_password: "{{ zabbix_login_password }}"
+        host_name: ExampleHost
+        interfaces:
+          - type: 1
+            main: 1
+            useip: 1
+            ip: 10.1.1.1
+            port: "10050"
+          - type: 2
+            main: 1
+            useip: 1
+            ip: 10.1.1.1
+            port: "161"
+            details:
+              version: 2
+              community: Community String
+              bulk: 0
+      register: zabbix_host1
+
+    - name: expect to succeed and that things have changed
+      assert:
+          that:
+              - "zabbix_host1 is changed"
+
+    - name: "test: configure details for SNMPv3 interface"
+      zabbix_host:
+        server_url: "{{ zabbix_server_url }}"
+        login_user: "{{ zabbix_login_user }}"
+        login_password: "{{ zabbix_login_password }}"
+        host_name: ExampleHost
+        interfaces:
+          - type: 1
+            main: 1
+            useip: 1
+            ip: 10.1.1.1
+            port: "10050"
+          - type: 2
+            main: 1
+            useip: 1
+            ip: 10.1.1.1
+            port: "161"
+            details:
+              version: 3
+              contextname: snmp_context
+              securityname: SNMP3 sec name
+              securitylevel: 0
+      register: zabbix_host1
+
+    - name: expect to succeed and that things have changed
+      assert:
+          that:
+              - "zabbix_host1 is changed"
+
+    - name: "test: configure details for SNMPv3 interface (again)"
+      zabbix_host:
+        server_url: "{{ zabbix_server_url }}"
+        login_user: "{{ zabbix_login_user }}"
+        login_password: "{{ zabbix_login_password }}"
+        host_name: ExampleHost
+        interfaces:
+          - type: 1
+            main: 1
+            useip: 1
+            ip: 10.1.1.1
+            port: "10050"
+          - type: 2
+            main: 1
+            useip: 1
+            ip: 10.1.1.1
+            port: "161"
+            details:
+              version: 3
+              contextname: snmp_context
+              securityname: SNMP3 sec name
+              securitylevel: 0
+      register: zabbix_host1
+
+    - name: expect to succeed and that things have not changed
+      assert:
+          that:
+              - "zabbix_host1 is not changed"
+
+    - name: "test: update details for SNMPv3 interface"
+      zabbix_host:
+        server_url: "{{ zabbix_server_url }}"
+        login_user: "{{ zabbix_login_user }}"
+        login_password: "{{ zabbix_login_password }}"
+        host_name: ExampleHost
+        interfaces:
+          - type: 1
+            main: 1
+            useip: 1
+            ip: 10.1.1.1
+            port: "10050"
+          - type: 2
+            main: 1
+            useip: 1
+            ip: 10.1.1.1
+            port: "161"
+            details:
+              version: 3
+              contextname: snmp_context
+              securityname: SNMP3 sec name
+              securitylevel: 2
+              authprotocol: 0
+              authpassphrase: secret_auth_passphrase
+              privprotocol: 0
+              privpassphrase: secret_priv_passphrase
+      register: zabbix_host1
+
+    - name: expect to succeed and that things have changed
+      assert:
+          that:
+              - "zabbix_host1 is changed"
+
 - name: "test: add IPMI settings"
   zabbix_host:
     server_url: "{{ zabbix_server_url }}"
@@ -904,9 +1153,7 @@
           - "zabbix_host1 is changed"
 
 # The description of tag is available since  Zabbix version 4.4
-- when:
-    - zabbix_version != "3.0"
-    - zabbix_version != "4.0"
+- when: zabbix_version is version("4.4", ">=")
   block:
     - name: "test: update one of the user macros with description"
       zabbix_host:
@@ -1001,6 +1248,43 @@
       that:
           - "zabbix_host1 is not changed"
 
+# type for macros added in 5.0
+- when: zabbix_version is version("5.0", ">=")
+  block:
+    - name: "test: add new user macro with type secret"
+      zabbix_host:
+        server_url: "{{ zabbix_server_url }}"
+        login_user: "{{ zabbix_login_user }}"
+        login_password: "{{ zabbix_login_password }}"
+        host_name: ExampleHost
+        macros:
+          - macro: '{$NEWMACROSECRET}'
+            value: secretvalue
+            type: secret
+      register: zabbix_host1
+
+    - name: expect to succeed and that things have changed
+      assert:
+          that:
+              - "zabbix_host1 is changed"
+
+    - name: "test: add new user macro with type secret (again)"
+      zabbix_host:
+        server_url: "{{ zabbix_server_url }}"
+        login_user: "{{ zabbix_login_user }}"
+        login_password: "{{ zabbix_login_password }}"
+        host_name: ExampleHost
+        macros:
+          - macro: '{$NEWMACROSECRET}'
+            value: secretvalue
+            type: secret
+      register: zabbix_host1
+
+    - name: expect to succeed and that things have not changed
+      assert:
+          that:
+              - "zabbix_host1 is not changed"
+
 - name: "test: wipe out all of the user macros"
   zabbix_host:
     server_url: "{{ zabbix_server_url }}"
@@ -1030,9 +1314,7 @@
           - "zabbix_host1 is not changed"
 
 # The tag function is available since  Zabbix version 4.4
-- when:
-    - zabbix_version != "3.0"
-    - zabbix_version != "4.0"
+- when: zabbix_version is version("4.4", ">=")
   block:
     - name: "test: add new set of tags to the host"
       zabbix_host:

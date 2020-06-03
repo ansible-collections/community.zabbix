@@ -1,0 +1,51 @@
+{
+  "zabbix_export": {
+    "date": "2020-05-29T15:22:11Z",
+    "templates": [
+      {
+        "template": "ExampleHost",
+        "name": "ExampleHost",
+        "description": "",
+        "groups": [
+          {
+            "name": "Linux servers"
+          },
+          {
+            "name": "Templates"
+          }
+        ],
+        "macros": [
+          {
+            "macro": "{$EXAMPLE_MACRO1}",
+            "value": "1000"
+          },
+          {
+            "macro": "{$EXAMPLE_MACRO2}",
+            "value": "text"
+          },
+          {
+            "macro": "{$EXAMPLE_MACRO3}",
+            "value": "text2"
+          }
+        ],
+        "templates": [
+          {
+            "name": "Template App FTP Service"
+          },
+          {
+            "name": "Template App Zabbix Proxy"
+          }
+        ]
+      }
+    ],
+    "version": "3.0",
+    "groups": [
+      {
+        "name": "Linux servers"
+      },
+      {
+        "name": "Templates"
+      }
+    ]
+  }
+}
