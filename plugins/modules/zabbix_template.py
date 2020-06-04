@@ -472,9 +472,6 @@ class Template(object):
             return obj
 
     def dump_template(self, template_ids, template_type='json', omit_date=False):
-        if self._module.check_mode:
-            self._module.exit_json(changed=True)
-
         try:
             dump = self._zapi.configuration.export({'format': template_type, 'options': {'templates': template_ids}})
             if template_type == 'xml':
