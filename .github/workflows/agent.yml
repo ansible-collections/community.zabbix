@@ -46,7 +46,7 @@ jobs:
           sudo apt install docker
           python -m pip install --upgrade pip
           pip install git+https://github.com/ansible-community/molecule.git@master
-          pip install molecule yamllint ansible-lint docker
+          pip install molecule yamllint ansible-lint docker netaddr
 
       - name: Build the collection
         run: |
