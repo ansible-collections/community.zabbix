@@ -5,11 +5,17 @@ readme: README.md
 authors:
 - Dusan Matejka (@D3DeFi)
 - sky-joker (@sky-joker)
+- Eric Anderson (@ericsysmin)
 description: Collection allowing to configure resources in Zabbix monitoring system
 license_file: LICENSE
 tags:
   - monitoring
   - zabbix
+  - agent
+  - proxy
+  - javagateway
+  - web
+  - server
 repository: https://github.com/ansible-collections/community.zabbix.git
 documentation: https://github.com/ansible-collections/community.zabbix.git
 homepage: https://github.com/ansible-collections/community.zabbix
