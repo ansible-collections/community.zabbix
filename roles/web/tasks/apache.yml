@@ -1,5 +1,5 @@
 ---
-- name: "Apache | Get Apache version"
+- name: "Apache | Get Apache version"  # noqa 306
   shell: |
     PATH=/usr/sbin:$PATH
     set -o pipefail

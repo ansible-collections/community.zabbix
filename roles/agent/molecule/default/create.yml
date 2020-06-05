@@ -32,7 +32,7 @@
       with_items: "{{ platforms.results }}"
       register: docker_images
 
-    - name: Build an Ansible compatible image
+    - name: Build an Ansible compatible image  # noqa 503
       docker_image:
         path: "{{ molecule_ephemeral_directory }}"
         name: "molecule_local/{{ item.item.image }}"
