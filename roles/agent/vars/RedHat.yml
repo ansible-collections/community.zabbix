@@ -1,5 +1,5 @@
 ---
-# vars file for zabbix-agent (RedHat)
+# vars file for zabbix_agent (RedHat)
 
 zabbix_agent: zabbix-agent
 zabbix_agent_service: zabbix-agent

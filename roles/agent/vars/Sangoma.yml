@@ -1,5 +1,5 @@
 ---
-# vars file for zabbix-agent (Sangola)
+# vars file for zabbix_agent (Sangola)
 
 zabbix_agent: zabbix-agent
 zabbix_agent_service: zabbix-agent

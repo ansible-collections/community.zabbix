@@ -29,7 +29,7 @@ Dependencies
 
 The java gateway can be installed on either the zabbix-server or the zabbix-proxy machine. So one of these should be installed. You'll need to provide an parameter in your playbook for using the javagateway.
 
-When using the zabbix-server:
+When using the zabbix_server:
 ```
   roles:
      - { role: dj-wasabi.zabbix-server, zabbix_server_javagateway: 192.168.1.2}
@@ -62,7 +62,7 @@ GPLv3
 Author Information
 ------------------
 
-This is my first attempt to create an ansible role, so please send suggestion or pull requests to make this role better. 
+This is my first attempt to create an ansible role, so please send suggestion or pull requests to make this role better.
 
 Github: https://github.com/dj-wasabi/ansible-zabbix-proxy
 

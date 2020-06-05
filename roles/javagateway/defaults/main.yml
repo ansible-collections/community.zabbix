@@ -1,5 +1,5 @@
 ---
-# defaults file for dj-wasabi.zabbix-javagateway
+# defaults file for community.zabbix.javagateway
 
 zabbix_version: 4.2
 zabbix_repo: zabbix

@@ -1,5 +1,5 @@
 ---
-# handlers file for zabbix-javagateway
+# handlers file for community.zabbix.javagateway
 
 - name: zabbix-java-gateway restarted
   service:

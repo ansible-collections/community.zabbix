@@ -1,5 +1,5 @@
 ---
-# tasks file for dj-wasabi.zabbix-agent
+# tasks file for community.zabbix.agent
 
 - name: "Fix facts for linuxmint - distribution release"
   set_fact:

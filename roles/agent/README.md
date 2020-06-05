@@ -160,7 +160,7 @@ See the following list of supported Operating systems with the Zabbix releases:
 
 ## Installation
 
-Installing this role is very simple: `ansible-galaxy install dj-wasabi.zabbix-agent`
+Installing this role is very simple: `ansible-galaxy install community.zabbix.agent`
 
 This will install the zabbix-agent role into your `roles` directory.
 
@@ -470,7 +470,7 @@ Including an example of how to use your role (for instance, with variables passe
 
     - hosts: all
       roles:
-         - role: dj-wasabi.zabbix-agent
+         - role: community.zabbix.agent
            zabbix_agent_server: 192.168.33.30
            zabbix_agent_serveractive: 192.168.33.30
            zabbix_url: http://zabbix.example.com
@@ -510,7 +510,7 @@ and in the playbook only specifying:
 
     - hosts: all
       roles:
-         - role: dj-wasabi.zabbix-agent
+         - role: community.zabbix.agent
 
 ## Example for TLS PSK encrypted agent communication
 
@@ -575,7 +575,7 @@ Example:
 - hosts: mysql_servers
   tasks:
     - include_role:
-        name: dj-wasabi.zabbix-agent
+        name: community.zabbix.agent
       vars:
         zabbix_agent_server: zabbix.mydomain.com
         zabbix_agent_userparameters:

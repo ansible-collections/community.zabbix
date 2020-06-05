@@ -1,5 +1,5 @@
 ---
-# defaults file for zabbix-agent
+# defaults file for zabbix_agent
 
 zabbix_agent_version: 4.4
 zabbix_version: "{{ zabbix_agent_version }}"
@@ -15,7 +15,7 @@ zabbix_selinux: False
 zabbix_agent_src_reinstall: True
 zabbix_agent_apt_priority:
 
-# Selinux related vars 
+# Selinux related vars
 selinux_allow_zabbix_run_sudo: False
 
 zabbix_agent_packages:
