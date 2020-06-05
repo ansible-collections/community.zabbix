@@ -9,6 +9,13 @@
     zabbix_short_version: "{{ zabbix_version | regex_replace('\\.', '') }}"
     zabbix_underscore_version: "{{ zabbix_version | regex_replace('\\.', '_') }}"
 
+- name: Debian | Ensure gpg is installed
+  apt: name=gnupg
+  register: task_result
+  until: task_result is success
+  retries: 10
+  delay: 2
+
 - name: "Debian | Install gpg key"
   apt_key:
     id: "{{ sign_keys[zabbix_short_version][zabbix_agent_distribution_release]['sign_key'] }}"
