@@ -1,0 +1,80 @@
+---
+# task file for mysql
+- name: "Set the correct delegated_dbhost (to support MySQL db deployment on a remote dbhost)"
+  set_fact:
+    delegated_dbhost: "{{ zabbix_proxy_dbhost if (zabbix_proxy_dbhost != 'localhost') else inventory_hostname }}"
+
+- name: "MySQL | Create database"
+  mysql_db:
+    name: "{{ zabbix_proxy_dbname }}"
+    encoding: "{{ zabbix_proxy_dbencoding }}"
+    collation: "{{ zabbix_proxy_dbcollation }}"
+    login_host: "{{ zabbix_proxy_mysql_login_host | default(omit) }}"
+    login_user: "{{ zabbix_proxy_mysql_login_user | default(omit) }}"
+    login_password: "{{ zabbix_proxy_mysql_login_password | default(omit) }}"
+    state: present
+  when: zabbix_database_creation
+  register: zabbix_database_created
+  delegate_to: "{{ delegated_dbhost }}"
+  tags:
+    - zabbix-proxy
+    - database
+    - skip_ansible_lint
+
+- name: "MySQL | Create database user"
+  mysql_user:
+    name: "{{ zabbix_proxy_dbuser }}"
+    password: "{{ zabbix_proxy_dbpassword }}"
+    priv: "{{ zabbix_proxy_dbname }}.*:ALL"
+    login_host: "{{ zabbix_proxy_mysql_login_host | default(omit) }}"
+    login_user: "{{ zabbix_proxy_mysql_login_user | default(omit) }}"
+    login_password: "{{ zabbix_proxy_mysql_login_password | default(omit) }}"
+    state: present
+  when: zabbix_database_creation
+  delegate_to: "{{ delegated_dbhost }}"
+  tags:
+    - zabbix-proxy
+    - database
+
+- name: "Get the file for schema.sql"
+  shell: ls -1 {{ datafiles_path }}/schema.sq*
+  changed_when: False
+  when:
+    - zabbix_database_sqlload
+  register: ls_output_create
+  tags:
+    - zabbix-proxy
+    - database
+
+- name: "Check if we have done files"
+  stat:
+    path: /etc/zabbix/schema.done
+  register: done_file
+  when:
+    - zabbix_database_sqlload
+
+- name: "MySQL | Create database and import file"
+  mysql_db:
+    name: "{{ zabbix_proxy_dbname }}"
+    encoding: "{{ zabbix_proxy_dbencoding }}"
+    collation: "{{ zabbix_proxy_dbcollation }}"
+    login_host: "{{ zabbix_proxy_mysql_login_host | default(omit) }}"
+    login_user: "{{ zabbix_proxy_mysql_login_user | default(omit) }}"
+    login_password: "{{ zabbix_proxy_mysql_login_password | default(omit) }}"
+    state: import
+    target: "{{ ls_output_create.stdout }}"
+  when:
+    - zabbix_database_sqlload
+    - not done_file.stat.exists
+  delegate_to: "{{ delegated_dbhost }}"
+  tags:
+    - zabbix-proxy
+    - database
+
+- name: "Create done file"
+  file:
+    path: /etc/zabbix/schema.done
+    state: touch
+  when:
+    - zabbix_database_sqlload
+    - not done_file.stat.exists

@@ -112,9 +112,13 @@ Running test suites locally requires few dependencies (use virtualenv):
 
 The `tests` directory contains configuration for running sanity and integration tests using [`ansible-test`](https://docs.ansible.com/ansible/latest/dev_guide/testing_integration.html).
 
-Collection's integration test suite can be run with the commands (`zabbix_version=X.Y` will be expanded to `X.Y-latest`):
+Collection's integration test suite can be run with the commands.  
+`zabbix_version=X.Y` will be expanded to X.Y-latest and `zabbix_port=XY` is the mapping port for the container.  
+The port number that can be specified for `zabbix_port` depends on the version of Zabbix.  
+Check the [ansible-test](https://github.com/ansible-collections/community.zabbix/blob/master/.github/workflows/ansible-test.yml) for details on the port numbers that can be specified for `zabbix_port`.
 
     export zabbix_version=X.Y
+    export zabbix_port=XY
     docker-compose up -d
     ansible-test integration -v --color --retry-on-error --continue-on-error --diff
     docker-compose down

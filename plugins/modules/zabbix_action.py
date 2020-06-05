@@ -8,12 +8,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {
-    'metadata_version': '1.1',
-    'status': ['preview'],
-    'supported_by': 'community'
-}
-
 DOCUMENTATION = '''
 ---
 module: zabbix_action
@@ -86,7 +80,7 @@ options:
                     - ' - C(time_period)'
                     - ' - C(host_template)'
                     - ' - C(application)'
-                    - ' - C(maintenance_status)'
+                    - ' - C(maintenance_status) known in Zabbix 4.0 and above as "Problem is suppressed"'
                     - ' - C(event_tag)'
                     - ' - C(event_tag_value)'
                     - 'Possible values when I(event_source=discovery):'
@@ -138,6 +132,10 @@ options:
                     - Irrespective of user-visible names being changed in Zabbix. Defaults to C(not classified) if omitted.
                     - Besides the above options, this is usually either the name
                       of the object or a string to compare with.
+            value2:
+                description:
+                    - Secondary value to compare with.
+                    - Required for trigger actions when condition I(type=event_tag_value).
             operator:
                 description:
                     - Condition operator.
@@ -211,6 +209,11 @@ options:
             type:
                 description:
                     - Type of operation.
+                    - 'Valid choices when setting type for I(recovery_operations) and I(acknowledge_operations):'
+                    - ' - C(send_message)'
+                    - ' - C(remote_command)'
+                    - ' - C(notify_all_involved)'
+                    - Choice C(notify_all_involved) only supported in I(recovery_operations) and I(acknowledge_operations).
                 choices:
                     - send_message
                     - remote_command
@@ -223,6 +226,7 @@ options:
                     - enable_host
                     - disable_host
                     - set_host_inventory_mode
+                    - notify_all_involved
             esc_period:
                 description:
                     - Duration of an escalation step in seconds.
@@ -353,8 +357,10 @@ options:
         type: list
         description:
             - List of acknowledge operations.
+            - Action acknowledge operations are known as update operations since Zabbix 4.0.
             - C(Suboptions) are the same as for I(operations).
             - Works only with >= Zabbix 3.4
+        aliases: [ update_operations ]
 
 notes:
     - Only Zabbix >= 3.0 is supported.
@@ -1714,7 +1720,10 @@ def main():
                     type=dict(type='str', required=True),
                     value=dict(type='str', required=True),
                     value2=dict(type='str', required=False)
-                )
+                ),
+                required_if=[
+                    ['type', 'event_tag_value', ['value2']],
+                ]
             ),
             formula=dict(type='str', required=False, default=None),
             eval_type=dict(type='str', required=False, default=None, choices=['andor', 'and', 'or', 'custom_expression']),
@@ -1916,6 +1925,7 @@ def main():
                 required=False,
                 default=[],
                 elements='dict',
+                aliases=['update_operations'],
                 options=dict(
                     type=dict(
                         type='str',

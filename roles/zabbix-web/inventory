@@ -1,0 +1,9 @@
+[postgresql]
+zabbix-web-pgsql-centos ansible_connection=docker
+zabbix-web-pgsql-debian ansible_connection=docker
+zabbix-web-pgsql-ubuntu ansible_connection=docker
+
+[mysql]
+zabbix-web-mysql-centos ansible_connection=docker
+zabbix-web-mysql-debian ansible_connection=docker
+zabbix-web-mysql-ubuntu ansible_connection=docker

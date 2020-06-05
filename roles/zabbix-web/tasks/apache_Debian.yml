@@ -1,0 +1,48 @@
+---
+- name: "Debian | Install legacy PHP integration for Apache"
+  apt:
+    state: present
+    update_cache: yes
+    cache_valid_time: 3600
+    name:
+      - libapache2-mod-php
+
+- name: "Debian | install apache vhost"
+  template:
+    src: apache_vhost.conf.j2
+    dest: /etc/apache2/sites-available/zabbix.conf
+    owner: "{{ apache_user }}"
+    group: "{{ apache_group }}"
+    mode: 0644
+  when: zabbix_vhost
+  notify:
+    - restart apache
+  tags:
+    - zabbix-web
+    - init
+    - config
+    - apache
+
+- name: "Debian | Remove provided zabbix.conf files"
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+    - /etc/apache2/conf-available/zabbix.conf
+    - /etc/apache2/conf-enabled/zabbix.conf
+
+- name: "Debian | enable apache vhost"
+  file:
+    src: /etc/apache2/sites-available/zabbix.conf
+    dest: /etc/apache2/sites-enabled/zabbix.conf
+    owner: "{{ apache_user }}"
+    group: "{{ apache_group }}"
+    state: link
+  when: zabbix_vhost
+  notify:
+    - restart apache
+  tags:
+    - zabbix-server
+    - init
+    - config
+    - apache

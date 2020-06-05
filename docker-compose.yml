@@ -2,32 +2,29 @@
 version: '3.7'
 services:
   zabbix-db:
-    image: mysql:5.7
+    image: postgres:latest
     environment:
-      MYSQL_DATABASE: "zabbix"
-      MYSQL_USER: "zabbix"
-      MYSQL_PASSWORD: "zabbix"
-      MYSQL_ROOT_PASSWORD: "zabbix"
+      POSTGRES_DB: "zabbix"
+      POSTGRES_USER: "zabbix"
+      POSTGRES_PASSWORD: "zabbix"
   zabbix-server:
-    image: zabbix/zabbix-server-mysql:ubuntu-${zabbix_version}-latest
+    image: zabbix/zabbix-server-pgsql:ubuntu-${zabbix_version}-latest
     environment:
       DB_SERVER_HOST: "zabbix-db"
-      MYSQL_USER: "zabbix"
-      MYSQL_PASSWORD: "zabbix"
-      MYSQL_DATABASE: "zabbix"
-      MYSQL_ROOT_PASSWORD: "zabbix"
+      POSTGRES_USER: "zabbix"
+      POSTGRES_PASSWORD: "zabbix"
+      POSTGRES_DB: "zabbix"
     depends_on:
       - "zabbix-db"
     links:
       - "zabbix-db"
   zabbix-web:
-    image: zabbix/zabbix-web-nginx-mysql:ubuntu-${zabbix_version}-latest
+    image: zabbix/zabbix-web-nginx-pgsql:ubuntu-${zabbix_version}-latest
     environment:
       DB_SERVER_HOST: "zabbix-db"
-      MYSQL_USER: "zabbix"
-      MYSQL_PASSWORD: "zabbix"
-      MYSQL_DATABASE: "zabbix"
-      MYSQL_ROOT_PASSWORD: "zabbix"
+      POSTGRES_USER: "zabbix"
+      POSTGRES_PASSWORD: "zabbix"
+      POSTGRES_DB: "zabbix"
       ZBX_SERVER_HOST: "zabbix-server"
       PHP_TZ: "Asia/Tokyo"
     depends_on:
@@ -37,4 +34,4 @@ services:
       - "zabbix-db"
       - "zabbix-server"
     ports:
-      - "8080:80"
+      - "8080:${zabbix_port}"

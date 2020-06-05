@@ -8,11 +8,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = r'''
 
 module: zabbix_maintenance
@@ -358,7 +353,8 @@ def main():
             sorted(host_ids) != sorted(maintenance["hostids"]) or
             str(maintenance_type) != maintenance["maintenance_type"] or
             str(int(start_time)) != maintenance["active_since"] or
-            str(int(start_time + period)) != maintenance["active_till"]
+            str(int(start_time + period)) != maintenance["active_till"] or
+            str(desc) != maintenance['description']
         ):
             if module.check_mode:
                 changed = True

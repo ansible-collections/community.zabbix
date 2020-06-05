@@ -26,11 +26,17 @@ jobs:
   integration:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
-        zabbix_version:
-          - "3.0"
-          - "4.0"
-          - "4.4"
+        zabbix_container:
+          - version: "3.0"
+            port: "80"
+          - version: "4.0"
+            port: "8080"
+          - version: "4.4"
+            port: "8080"
+          - version: "5.0"
+            port: "8080"
 
     steps:
       - name: Check out code
@@ -52,7 +58,8 @@ jobs:
       - name: Zabbix container server provisioning
         run: docker-compose up -d
         env:
-          zabbix_version: ${{ matrix.zabbix_version }}
+          zabbix_version: ${{ matrix.zabbix_container.version }}
+          zabbix_port: ${{ matrix.zabbix_container.port }}
 
       - name: Run integration test
         run: ansible-test integration -v --color --retry-on-error --continue-on-error --diff

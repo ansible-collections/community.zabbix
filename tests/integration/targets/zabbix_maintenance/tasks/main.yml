@@ -1,0 +1,260 @@
+---
+# New host create test from here
+- name: "test - Create a new host"
+  zabbix_host:
+    server_url: "{{ zabbix_server_url }}"
+    login_user: "{{ zabbix_login_user }}"
+    login_password: "{{ zabbix_login_password }}"
+    host_name: example
+    host_groups:
+      - Linux servers
+    interfaces:
+      - type: 1
+        main: 1
+        useip: 1
+        ip: 10.1.1.1
+        dns: ""
+        port: 10050
+  register: create_host_result
+
+- assert:
+    that:
+      - create_host_result.changed is sameas true
+
+- name: "test - Create maintenance with a host_name param"
+  zabbix_maintenance:
+    server_url: "{{ zabbix_server_url }}"
+    login_user: "{{ zabbix_login_user }}"
+    login_password: "{{ zabbix_login_password }}"
+    name: maintenance
+    host_name: example
+    state: present
+  register: create_maintenance_host_name_result
+
+- assert:
+    that:
+      - create_maintenance_host_name_result.changed is sameas true
+
+- name: "test - Create maintenance with a host_name param(again - expectations: no change will occur)"
+  zabbix_maintenance:
+    server_url: "{{ zabbix_server_url }}"
+    login_user: "{{ zabbix_login_user }}"
+    login_password: "{{ zabbix_login_password }}"
+    name: maintenance
+    host_name: example
+    state: present
+  register: create_maintenance_host_name_again_result
+
+- assert:
+    that:
+      - create_maintenance_host_name_again_result.changed is sameas false
+
+- name: "test - Update maintenance with a desc param"
+  zabbix_maintenance:
+    server_url: "{{ zabbix_server_url }}"
+    login_user: "{{ zabbix_login_user }}"
+    login_password: "{{ zabbix_login_password }}"
+    name: maintenance
+    host_name: example
+    desc: "test description"
+    state: present
+  register: update_maintenance_desc_result
+
+- debug: msg="{{ update_maintenance_desc_result }}"
+
+- assert:
+    that:
+      - update_maintenance_desc_result.changed is sameas true
+
+- name: "test - Update maintenance with a desc param(again - expectations: no change will occur)"
+  zabbix_maintenance:
+    server_url: "{{ zabbix_server_url }}"
+    login_user: "{{ zabbix_login_user }}"
+    login_password: "{{ zabbix_login_password }}"
+    name: maintenance
+    host_name: example
+    desc: "test description"
+    state: present
+  register: update_maintenance_desc_again_result
+
+- assert:
+    that:
+      - update_maintenance_desc_again_result.changed is sameas false
+
+- name: "test - Update maintenance with a collect_data"
+  zabbix_maintenance:
+    server_url: "{{ zabbix_server_url }}"
+    login_user: "{{ zabbix_login_user }}"
+    login_password: "{{ zabbix_login_password }}"
+    name: maintenance
+    host_name: example
+    desc: "test description"
+    collect_data: no
+    state: present
+  register: update_maintenance_collect_data_result
+
+- assert:
+    that:
+      - update_maintenance_collect_data_result.changed is sameas true
+
+- name: "test - Update maintenance with a collect_data(again - expectations: no change will occur)"
+  zabbix_maintenance:
+    server_url: "{{ zabbix_server_url }}"
+    login_user: "{{ zabbix_login_user }}"
+    login_password: "{{ zabbix_login_password }}"
+    name: maintenance
+    host_name: example
+    desc: "test description"
+    collect_data: no
+    state: present
+  register: update_maintenance_collect_data_again_result
+
+- assert:
+    that:
+      - update_maintenance_collect_data_again_result.changed is sameas false
+
+- name: "test - Update maintenance with a minutes param"
+  zabbix_maintenance:
+    server_url: "{{ zabbix_server_url }}"
+    login_user: "{{ zabbix_login_user }}"
+    login_password: "{{ zabbix_login_password }}"
+    name: maintenance
+    host_name: example
+    desc: "test description"
+    collect_data: no
+    minutes: 90
+    state: present
+  register: update_maintenance_minutes_result
+
+- assert:
+    that:
+      - update_maintenance_minutes_result.changed is sameas true
+
+- name: "test - Update maintenance with a minutes param(again - expectations: no change will occur)"
+  zabbix_maintenance:
+    server_url: "{{ zabbix_server_url }}"
+    login_user: "{{ zabbix_login_user }}"
+    login_password: "{{ zabbix_login_password }}"
+    name: maintenance
+    host_name: example
+    desc: "test description"
+    collect_data: no
+    minutes: 90
+    state: present
+  register: update_maintenance_minutes_again_result
+
+- assert:
+    that:
+      - update_maintenance_minutes_again_result.changed is sameas false
+
+- name: "test - Update maintenance with a host_groups param"
+  zabbix_maintenance:
+    server_url: "{{ zabbix_server_url }}"
+    login_user: "{{ zabbix_login_user }}"
+    login_password: "{{ zabbix_login_password }}"
+    name: maintenance
+    host_name: example
+    host_groups:
+      - Linux servers
+      - Hypervisors
+    desc: "test description"
+    collect_data: no
+    minutes: 90
+    state: present
+  register: update_maintenance_host_groups_result
+
+- assert:
+    that:
+      - update_maintenance_host_groups_result.changed is sameas true
+
+- name: "test - Update maintenance with a host_groups param(again - expectations: no change will occur)"
+  zabbix_maintenance:
+    server_url: "{{ zabbix_server_url }}"
+    login_user: "{{ zabbix_login_user }}"
+    login_password: "{{ zabbix_login_password }}"
+    name: maintenance
+    host_name: example
+    host_groups:
+      - Linux servers
+      - Hypervisors
+    desc: "test description"
+    collect_data: no
+    minutes: 90
+    state: present
+  register: update_maintenance_host_groups_again_result
+
+- assert:
+    that:
+      - update_maintenance_host_groups_again_result.changed is sameas false
+
+- name: "test - Update maintenance with change host_name to host_names param"
+  zabbix_maintenance:
+    server_url: "{{ zabbix_server_url }}"
+    login_user: "{{ zabbix_login_user }}"
+    login_password: "{{ zabbix_login_password }}"
+    name: maintenance
+    host_names:
+      - example
+      - Zabbix server
+    host_groups:
+      - Linux servers
+      - Hypervisors
+    desc: "test description"
+    collect_data: no
+    minutes: 90
+    state: present
+  register: update_maintenance_host_names_result
+
+- assert:
+    that:
+      - update_maintenance_host_names_result.changed is sameas true
+
+- name: "test - Update maintenance with change host_name to host_names param(again - expectations: no change will occur)"
+  zabbix_maintenance:
+    server_url: "{{ zabbix_server_url }}"
+    login_user: "{{ zabbix_login_user }}"
+    login_password: "{{ zabbix_login_password }}"
+    name: maintenance
+    host_names:
+      - example
+      - Zabbix server
+    host_groups:
+      - Linux servers
+      - Hypervisors
+    desc: "test description"
+    collect_data: no
+    minutes: 90
+    state: present
+  register: update_maintenance_host_names_again_result
+
+- assert:
+    that:
+      - update_maintenance_host_names_again_result.changed is sameas false
+
+- name: "test - Delete maintenance"
+  zabbix_maintenance:
+    server_url: "{{ zabbix_server_url }}"
+    login_user: "{{ zabbix_login_user }}"
+    login_password: "{{ zabbix_login_password }}"
+    name: maintenance
+    host_name: example
+    state: absent
+  register: delete_maintenance_result
+
+- assert:
+    that:
+      - delete_maintenance_result.changed is sameas true
+
+- name: "test - Delete maintenance(again - expectations: no change will occur)"
+  zabbix_maintenance:
+    server_url: "{{ zabbix_server_url }}"
+    login_user: "{{ zabbix_login_user }}"
+    login_password: "{{ zabbix_login_password }}"
+    name: maintenance
+    host_name: example
+    state: absent
+  register: delete_maintenance_again_result
+
+- assert:
+    that:
+      - delete_maintenance_again_result.changed is sameas false

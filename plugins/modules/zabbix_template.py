@@ -8,11 +8,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = r'''
 ---
 module: zabbix_template
@@ -564,6 +559,9 @@ class Template(object):
             self._module.fail_json(msg='Invalid XML provided', details=to_native(e), exception=traceback.format_exc())
 
     def import_template(self, template_content, template_type='json'):
+        if self._module.check_mode:
+            self._module.exit_json(changed=True)
+
         # rules schema latest version
         update_rules = {
             'applications': {
