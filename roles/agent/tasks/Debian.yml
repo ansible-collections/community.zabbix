@@ -12,6 +12,7 @@
 - name: Debian | Ensure gpg is installed
   apt: name=gnupg
   register: task_result
+  update_cache: true
   until: task_result is success
   retries: 10
   delay: 2
