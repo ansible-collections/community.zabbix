@@ -10,9 +10,8 @@
     zabbix_underscore_version: "{{ zabbix_version | regex_replace('\\.', '_') }}"
 
 - name: Debian | Ensure gpg is installed
-  apt: name=gnupg
+  apt: name=gnupg update_cache=true
   register: task_result
-  update_cache: true
   until: task_result is success
   retries: 10
   delay: 2
