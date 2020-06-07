@@ -3,3 +3,4 @@
   hosts: all
   roles:
     - role: community.zabbix.agent
+      zabbix_agent_src_reinstall: false
