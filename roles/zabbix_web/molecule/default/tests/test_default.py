@@ -8,8 +8,8 @@ testinfra_hosts = testinfra.utils.ansible_runner.AnsibleRunner(
 
 
 @pytest.mark.parametrize("server, redhat, debian", [
-        ("zabbix-server-pgsql", "zabbix-web-pgsql", "zabbix-frontend-php"),
-        ("zabbix-server-mysql", "zabbix-web-mysql", "zabbix-frontend-php"),
+    ("zabbix-server-pgsql", "zabbix-web-pgsql", "zabbix-frontend-php"),
+    ("zabbix-server-mysql", "zabbix-web-mysql", "zabbix-frontend-php"),
 ])
 def test_zabbix_package(host, server, redhat, debian):
     host = host.backend.get_hostname()
