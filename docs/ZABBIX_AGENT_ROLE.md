@@ -1,3 +1,5 @@
+# community.zabbix.zabbix_agent role
+
 Table of Contents
 
 - [Overview](#overview)
@@ -14,7 +16,6 @@ Table of Contents
     + [Zabbix 2.4](#zabbix-24)
     + [Zabbix 2.2](#zabbix-22)
 - [Getting started](#getting-started)
-  * [Installation](#installation)
   * [Minimal Configuration](#minimal-configuration)
   * [Issues](#issues)
 - [Role Variables](#role-variables)
@@ -39,11 +40,6 @@ Table of Contents
 - [Deploying Userparameters](#deploying-userparameters)
 - [License](#license)
 - [Author Information](#author-information)
-
-# Introduction
-
-This role is migrated to: https://github.com/ansible-collections/community.zabbix/
-In this repository, a read only version is/will be available for those who can not make use of collections (yet). Changes/updates will only be applied to the collection and not in this repository.
 
 # Requirements
 ## Operating systems
@@ -157,12 +153,6 @@ See the following list of supported Operating systems with the Zabbix releases:
   * xenserver 6
 
 # Getting started
-
-## Installation
-
-Installing this role is very simple: `ansible-galaxy install dj-wasabi.zabbix-agent`
-
-This will install the zabbix-agent role into your `roles` directory.
 
 ## Minimal Configuration
 
@@ -470,7 +460,7 @@ Including an example of how to use your role (for instance, with variables passe
 
     - hosts: all
       roles:
-         - role: dj-wasabi.zabbix-agent
+         - role: community.zabbix.zabbix_agent
            zabbix_agent_server: 192.168.33.30
            zabbix_agent_serveractive: 192.168.33.30
            zabbix_url: http://zabbix.example.com
@@ -510,7 +500,7 @@ and in the playbook only specifying:
 
     - hosts: all
       roles:
-         - role: dj-wasabi.zabbix-agent
+         - role: community.zabbix.zabbix_agent
 
 ## Example for TLS PSK encrypted agent communication
 
@@ -575,7 +565,7 @@ Example:
 - hosts: mysql_servers
   tasks:
     - include_role:
-        name: dj-wasabi.zabbix-agent
+        name: community.zabbix.zabbix_agent
       vars:
         zabbix_agent_server: zabbix.mydomain.com
         zabbix_agent_userparameters:

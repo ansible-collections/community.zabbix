@@ -1,3 +1,5 @@
+# community.zabbix.zabbix_proxy role
+
 Table of Content
 
 - [Overview](#overview)
@@ -22,9 +24,6 @@ Table of Content
 [![Build Status](https://travis-ci.org/dj-wasabi/ansible-zabbix-proxy.svg?branch=master)](https://travis-ci.org/dj-wasabi/ansible-zabbix-proxy)
 
 # Overview
-
-This role is migrated to: https://github.com/ansible-collections/community.zabbix/
-In this repository, a read only version is/will be available for those who can not make use of collections (yet). Changes/updates will only be applied to the collection and not in this repository.
 
 # Upgrades
 
@@ -179,15 +178,15 @@ These variables are specific for Zabbix 3.0 and higher:
 * `*zabbix_proxy_tlsconnect`: How the proxy should connect to server or proxy. Used for active checks.
 
      Possible values:
-     
+
      * no_encryption
      * PSK
      * certificate
-     
+
 * `*zabbix_proxy_tlsaccept`: What incoming connections to accept.
 
      Possible values:
-     
+
      * no_encryption
      * PSK
      * certificate
@@ -242,7 +241,7 @@ Including an example of how to use your role (for instance, with variables passe
     - hosts: zabbix-proxy
       sudo: yes
       roles:
-         - { role: dj-wasabi.zabbix-proxy, zabbix_server_host: 192.168.1.1, database_type: pgsql, database_type_long: postgresql }
+         - { role: community.zabbix.zabbix_proxy, zabbix_server_host: 192.168.1.1, database_type: pgsql, database_type_long: postgresql }
 
 # License
 
@@ -250,7 +249,7 @@ GPLv3
 
 # Author Information
 
-This is my first attempt to create an ansible role, so please send suggestion or pull requests to make this role better. 
+This is my first attempt to create an ansible role, so please send suggestion or pull requests to make this role better.
 
 Github: https://github.com/dj-wasabi/ansible-zabbix-proxy
 
