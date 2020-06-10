@@ -1,8 +1,4 @@
-dj-wasabi.zabbix-javagateway
-=========
-
-This role is migrated to: https://github.com/ansible-collections/community.zabbix/
-In this repository, a read only version is/will be available for those who can not make use of collections (yet). Changes/updates will only be applied to the collection and not in this repository.
+# community.zabbix.zabbix_javagateway role
 
 Requirements
 ------------
@@ -32,13 +28,13 @@ The java gateway can be installed on either the zabbix-server or the zabbix-prox
 When using the zabbix-server:
 ```
   roles:
-     - { role: dj-wasabi.zabbix-server, zabbix_server_javagateway: 192.168.1.2}
+     - { role: community.zabbix.zabbix_server, zabbix_server_javagateway: 192.168.1.2}
 ```
 
 or when using the zabbix-proxy:
 ```
   roles:
-     - { role: dj-wasabi.zabbix-proxy, zabbix_server_host: 192.168.1.1, zabbix_proxy_javagateway: 192.168.1.2}
+     - { role: community.zabbix.zabbix_proxy, zabbix_server_host: 192.168.1.1, zabbix_proxy_javagateway: 192.168.1.2}
 ```
 
 The above is assumed you'll using the 'dj-wasabi' zabbix roles. Don't know how to do this with other zabbix-server (or zabbix-proxy) roles from other members.
@@ -51,8 +47,8 @@ Including an example of how to use your role (for instance, with variables passe
     - hosts: zabbix-server
       sudo: yes
       roles:
-         - { role: dj-wasabi.zabbix-server, zabbix_server_javagateway: 192.168.1.2}
-         - { role: dj-wasabi.zabbix-javagateway }
+         - { role: community.zabbix.zabbix_server, zabbix_server_javagateway: 192.168.1.2}
+         - { role: community.zabbix.zabbix_javagateway }
 
 License
 -------
@@ -62,7 +58,7 @@ GPLv3
 Author Information
 ------------------
 
-This is my first attempt to create an ansible role, so please send suggestion or pull requests to make this role better. 
+This is my first attempt to create an ansible role, so please send suggestion or pull requests to make this role better.
 
 Github: https://github.com/dj-wasabi/ansible-zabbix-proxy
 

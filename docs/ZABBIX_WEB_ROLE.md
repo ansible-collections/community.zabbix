@@ -1,3 +1,5 @@
+# community.zabbix.zabbix_web role
+
 Table of Contents
 
 - [Overview](#overview)
@@ -30,9 +32,6 @@ Table of Contents
 - [Author Information](#author-information)
 
 # Overview
-
-This role is migrated to: https://github.com/ansible-collections/community.zabbix/
-In this repository, a read only version is/will be available for those who can not make use of collections (yet). Changes/updates will only be applied to the collection and not in this repository.
 
 # Requirements
 ## Operating Systems
@@ -130,9 +129,9 @@ See the following list of supported Operating Systems with the Zabbix releases.
 
 # Installation
 
-Installing this role is very simple: `ansible-galaxy install dj-wasabi.zabbix-web`
+Installing this role is very simple: `ansible-galaxy install community.zabbix.zabbix_web`
 
-When the Zabbix Web needs to be running on the same host as the Zabbix Server, please also install the Zabbix Server by executing the following command: `ansible-galaxy install dj-wasabi.zabbix-server`
+When the Zabbix Web needs to be running on the same host as the Zabbix Server, please also install the Zabbix Server by executing the following command: `ansible-galaxy install community.zabbix.zabbix_server`
 
  Default username/password for the Zabbix Web interface is the default.
 
@@ -253,8 +252,8 @@ When there is one host running both Zabbix Server and the Zabbix Web (Running My
   become: yes
   roles:
      - { role: geerlingguy.apache }
-     - { role: dj-wasabi.zabbix-server, zabbix_server_database: mysql, zabbix_server_database_long: mysql, zabbix_server_dbport: 3306 }
-     - { role: dj-wasabi.zabbix-web, zabbix_url: zabbix.dj-wasabi.nl, zabbix_server_database: mysql, zabbix_server_database_long: mysql, zabbix_server_dbport: 3306}
+     - { role: community.zabbix.zabbix_server, zabbix_server_database: mysql, zabbix_server_database_long: mysql, zabbix_server_dbport: 3306 }
+     - { role: community.zabbix.zabbix_web, zabbix_url: zabbix.dj-wasabi.nl, zabbix_server_database: mysql, zabbix_server_database_long: mysql, zabbix_server_dbport: 3306}
 ```
 
 ## Multi host setup
@@ -265,13 +264,13 @@ This is a two host setup. On one host (Named: "zabbix-server") the Zabbix Server
 - hosts: zabbix-server
   become: yes
   roles:
-     - { role: dj-wasabi.zabbix-server, zabbix_server_database: mysql, zabbix_server_database_long: mysql, zabbix_server_dbport: 3306 }
+     - { role: community.zabbix.zabbix_server, zabbix_server_database: mysql, zabbix_server_database_long: mysql, zabbix_server_dbport: 3306 }
 
 - hosts: zabbix-web
   become: yes
   roles:
      - { role: geerlingguy.apache }
-     - { role: dj-wasabi.zabbix-web, zabbix_server_hostname: zabbix-server, zabbix_url: zabbix.dj-wasabi.nl, zabbix_server_database: mysql, zabbix_server_database_long: mysql, zabbix_server_dbport: 3306 }
+     - { role: community.zabbix.zabbix_web, zabbix_server_hostname: zabbix-server, zabbix_url: zabbix.dj-wasabi.nl, zabbix_server_database: mysql, zabbix_server_database_long: mysql, zabbix_server_dbport: 3306 }
 ```
 
 ## Adding Environment Variables for zabbix_web
@@ -280,13 +279,13 @@ Sometimes you need to add environment variables to your
 zabbix.conf.php, for example to add LDAP CA certificates. To do this add a `zabbix_web_env` dictionary:
 
 ```
-- { role: dj-wasabi.zabbix-web, zabbix_url: zabbix.dj-wasabi.nl, zabbix_server_database: mysql, zabbix_server_database_long: mysql, zabbix_server_dbport: 3306, zabbix_web_env: {LDAPTLS_CACERT: /etc/ssl/certs/ourcert.pem}
+- { role: community.zabbix.zabbix_web, zabbix_url: zabbix.dj-wasabi.nl, zabbix_server_database: mysql, zabbix_server_database_long: mysql, zabbix_server_dbport: 3306, zabbix_web_env: {LDAPTLS_CACERT: /etc/ssl/certs/ourcert.pem}
 ```
 
 ## Using Elasticsearch for history storage
 
 To use Elasticsearch for history storage you need to configure the `zabbix_server_history_url` and `zabbix_server_history_types`. You will also need to configure Elasticsearch
-in the zabbix-server (https://galaxy.ansible.com/dj-wasabi/zabbix-server/) role.
+in the zabbix_server role.
 
 Zabbix can store the following history types
 in Elasticsearch:
