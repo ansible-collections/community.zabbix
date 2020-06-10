@@ -1,3 +1,5 @@
+# community.zabbix.zabbix_server role
+
 Table of Contents
 
 - [Overview](#overview)
@@ -37,21 +39,13 @@ Badges:
 
 This is a role for installing and maintaining the zabbix-server.
 
-This is one of the 'dj-wasabi' roles which configures your whole zabbix environment. See below for the complete list:
-
- * zabbix-web (https://galaxy.ansible.com/dj-wasabi/zabbix-web/)
- * zabbix-server (https://galaxy.ansible.com/dj-wasabi/zabbix-server/)
- * zabbix-proxy (https://galaxy.ansible.com/dj-wasabi/zabbix-proxy/)
- * zabbix-javagateway (https://galaxy.ansible.com/dj-wasabi/zabbix-javagateway/)
- * zabbix-agent (https://galaxy.ansible.com/dj-wasabi/zabbix-agent/)
-
 # Upgrades
 
 ## 1.0.0
 
 With this 1.0.0 release, the following is changed:
 
-* This repository will only contain all the actions that are needed for correctly configuring a Zabbix Server. All tasks regarding the frontend/webui of Zabbix has been transferred to the `dj-wasabi.zabbix-web` role.
+* This repository will only contain all the actions that are needed for correctly configuring a Zabbix Server. All tasks regarding the frontend/webui of Zabbix has been transferred to the `community.zabbix.zabbix_web` role.
 * All properties start with `zabbix_` now. Example, property named `server_dbuser` is now `zabbix_server_dbuser`.
 
 # Requirements
@@ -154,9 +148,9 @@ See the following list of supported Operating systems with the Zabbix releases:
 
 # Installation
 
-Installing this role is very simple: `ansible-galaxy install dj-wasabi.zabbix-server`
+Installing this role is very simple: `ansible-galaxy install community.zabbix.zabbix_server`
 
-Please be aware that this role only installs the Zabbix Server and not the Zabbix Web. If you do want to have a Zabbix Web, please execute the following command: `ansible-galaxy install dj-wasabi.zabbix-web`
+Please be aware that this role only installs the Zabbix Server and not the Zabbix Web. If you do want to have a Zabbix Web, please execute the following command: `ansible-galaxy install community.zabbix.zabbix_web`
 
 Default username/password for the Zabbix Web interface is the default one installed by Zabbix.
 
@@ -284,7 +278,7 @@ Including an example of how to use your role (for instance, with variables passe
     - hosts: zabbix-server
       become: yes
       roles:
-         - { role: dj-wasabi.zabbix-server, zabbix_server_database: mysql, zabbix_server_database_long: mysql }
+         - { role: community.zabbix.zabbix_server, zabbix_server_database: mysql, zabbix_server_database_long: mysql }
 
 
 # Molecule
