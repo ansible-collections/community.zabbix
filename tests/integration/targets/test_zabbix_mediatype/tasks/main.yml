@@ -1,0 +1,405 @@
+---
+- name: test - email mediatypes
+  module_defaults:
+    zabbix_mediatype:
+      server_url: "{{ zabbix_server_url }}"
+      login_user: "{{ zabbix_login_user }}"
+      login_password: "{{ zabbix_login_password }}"
+      state: present
+      name: Example email
+      type: email
+      smtp_email: zabbix@example.com
+
+  block:
+  - name: test - create new email mediatype type without authentication
+    zabbix_mediatype:
+    register: zbxmediatype_new
+
+  - assert:
+      that: zbxmediatype_new.changed is sameas True
+
+  - name: test - create new email mediatype without authentication (again)
+    zabbix_mediatype:
+    register: zbxmediatype_new
+
+  - assert:
+      that: zbxmediatype_new.changed is sameas False
+
+  - name: test - update email mediatype smtp information
+    zabbix_mediatype:
+      smtp_helo: example.com
+      smtp_server: mail.example.com
+      smtp_server_port: 465
+    register: zbxmediatype_smtp
+
+  - assert:
+      that: zbxmediatype_smtp.changed is sameas True
+
+  - name: test - update email mediatype smtp information (again)
+    zabbix_mediatype:
+      smtp_helo: example.com
+      smtp_server: mail.example.com
+      smtp_server_port: 465
+    register: zbxmediatype_smtp
+
+  - assert:
+      that: zbxmediatype_smtp.changed is sameas False
+
+  - name: test - reset email mediatype smtp information to default
+    zabbix_mediatype:
+    register: zbxmediatype_reset
+
+  - assert:
+      that: zbxmediatype_reset.changed is sameas True
+
+  - name: test - update email mediatype with authentication without credentials (fail)
+    zabbix_mediatype:
+      smtp_authentication: yes
+      smtp_security: STARTTLS
+    register: zbxmediatype_auth_fail
+    ignore_errors: True
+
+  - assert:
+      that: zbxmediatype_auth_fail.failed is sameas True
+
+  - name: test - update email mediatype with authentication
+    zabbix_mediatype:
+      smtp_authentication: yes
+      smtp_security: STARTTLS
+      username: zabbix
+      password: Ex4mP!3
+    register: zbxmediatype_auth
+
+  - assert:
+      that: zbxmediatype_auth.changed is sameas True
+
+  - name: test - update email mediatype with authentication (again)
+    zabbix_mediatype:
+      smtp_authentication: yes
+      smtp_security: STARTTLS
+      username: zabbix
+      password: Ex4mP!3
+    register: zbxmediatype_auth
+
+  - assert:
+      that: zbxmediatype_auth.changed is sameas False
+
+  - name: test - update email mediatype with SSL/TLS and host/peer verification
+    zabbix_mediatype:
+      smtp_authentication: yes
+      smtp_security: SSL/TLS
+      smtp_verify_host: yes
+      smtp_verify_peer: yes
+      username: zabbix
+      password: Ex4mP!3
+    register: zbxmediatype_verif
+
+  - assert:
+      that: zbxmediatype_verif.changed is sameas True
+
+  - name: test - update email mediatype with SSL/TLS and host/peer verification (again)
+    zabbix_mediatype:
+      smtp_authentication: yes
+      smtp_security: SSL/TLS
+      smtp_verify_host: yes
+      smtp_verify_peer: yes
+      username: zabbix
+      password: Ex4mP!3
+    register: zbxmediatype_verif
+
+  - assert:
+      that: zbxmediatype_verif.changed is sameas False
+
+  - name: test - reset email mediatype smtp information to default
+    zabbix_mediatype:
+    register: zbxmediatype_reset
+
+  - assert:
+      that: zbxmediatype_reset.changed is sameas True
+
+  - when: zabbix_version is version('3.4', '>=')
+    block:
+    - name: test - update email mediatype concurrent settings
+      zabbix_mediatype:
+        max_sessions: 99
+        max_attempts: 10
+        attempt_interval: 30
+      register: zbxmediatype_concur
+
+    - assert:
+        that: zbxmediatype_concur.changed is sameas True
+
+    - name: test - update email mediatype concurrent settings (again)
+      zabbix_mediatype:
+        max_sessions: 99
+        max_attempts: 10
+        attempt_interval: 30
+      register: zbxmediatype_concur
+
+    - assert:
+        that: zbxmediatype_concur.changed is sameas False
+
+    - name: test - update email mediatype concurrent settings above range (fail)
+      zabbix_mediatype:
+        max_sessions: 102
+        max_attempts: 11
+        attempt_interval: 61
+      register: zbxmediatype_concur_fail
+      ignore_errors: True
+
+    - assert:
+        that: zbxmediatype_concur_fail.failed is sameas True
+
+  - name: test - disable email mediatype
+    zabbix_mediatype:
+      status: disabled
+    register: zbxmediatype_disable
+
+  - assert:
+      that: zbxmediatype_disable.changed is sameas True
+
+  - name: test - disable email mediatype (again)
+    zabbix_mediatype:
+      status: disabled
+    register: zbxmediatype_disable
+
+  - assert:
+      that: zbxmediatype_disable.changed is sameas False
+
+  - name: test - delete email mediatype
+    zabbix_mediatype:
+      state: absent
+    register: zbxmediatype_delete
+
+  - assert:
+      that: zbxmediatype_delete.changed is sameas True
+
+  - name: test - delete email mediatype (again)
+    zabbix_mediatype:
+      state: absent
+    register: zbxmediatype_delete
+
+  - assert:
+      that: zbxmediatype_delete.changed is sameas False
+
+- name: test - script mediatypes
+  module_defaults:
+    zabbix_mediatype:
+      server_url: "{{ zabbix_server_url }}"
+      login_user: "{{ zabbix_login_user }}"
+      login_password: "{{ zabbix_login_password }}"
+      state: present
+      name: Example script
+      type: script
+
+  block:
+  - name: test - create new script mediatype
+    zabbix_mediatype:
+      script_name: /usr/local/bin/script.sh
+    register: zbxmediatype_script_new
+
+  - assert:
+      that: zbxmediatype_script_new.changed is sameas True
+
+  - name: test - create new script mediatype (again)
+    zabbix_mediatype:
+      script_name: /usr/local/bin/script.sh
+    register: zbxmediatype_script_new
+
+  - assert:
+      that: zbxmediatype_script_new.changed is sameas False
+
+  - name: test - update script mediatype with script parameters
+    zabbix_mediatype:
+      script_name: /usr/local/bin/script.sh
+      script_params:
+        - '-p test'
+        - '-q'
+    register: zbxmediatype_script_params
+
+  - assert:
+      that: zbxmediatype_script_params.changed is sameas True
+
+  - name: test - update script mediatype with script parameters (again)
+    zabbix_mediatype:
+      script_name: /usr/local/bin/script.sh
+      script_params:
+        - '-p test'
+        - '-q'
+    register: zbxmediatype_script_params
+
+  - assert:
+      that: zbxmediatype_script_params.changed is sameas False
+
+  - name: test - remove script mediatype parameters
+    zabbix_mediatype:
+      script_name: /usr/local/bin/script.sh
+    register: zbxmediatype_script_params_rev
+
+  - assert:
+      that: zbxmediatype_script_params_rev.changed is sameas True
+
+  - name: test - delete script mediatype
+    zabbix_mediatype:
+      state: absent
+    register: zbxmediatype_delete
+
+  - assert:
+      that: zbxmediatype_delete.changed is sameas True
+
+- name: test - sms mediatypes
+  module_defaults:
+    zabbix_mediatype:
+      server_url: "{{ zabbix_server_url }}"
+      login_user: "{{ zabbix_login_user }}"
+      login_password: "{{ zabbix_login_password }}"
+      state: present
+      name: Example sms
+      type: sms
+
+  block:
+  - name: test - create new sms mediatype
+    zabbix_mediatype:
+      gsm_modem: /dev/ttyS0
+    register: zbxmediatype_sms_new
+
+  - assert:
+      that: zbxmediatype_sms_new.changed is sameas True
+
+  - name: test - create new sms mediatype (again)
+    zabbix_mediatype:
+      gsm_modem: /dev/ttyS0
+    register: zbxmediatype_sms_new
+
+  - assert:
+      that: zbxmediatype_sms_new.changed is sameas False
+
+  - when: zabbix_version is version('3.4', '>=')
+    block:
+    - name: test - update sms mediatype with concurrent settings
+      zabbix_mediatype:
+        gsm_modem: /dev/ttyS0
+        max_sessions: 1
+        max_attempts: 3
+        attempt_interval: 30
+      register: zbxmediatype_sms_concur
+
+    - assert:
+        that: zbxmediatype_sms_concur.changed is sameas True
+
+    - name: test - update sms mediatype with concurrent settings (again)
+      zabbix_mediatype:
+        gsm_modem: /dev/ttyS0
+        max_sessions: 1
+        max_attempts: 3
+        attempt_interval: 30
+      register: zbxmediatype_sms_concur
+
+    - assert:
+        that: zbxmediatype_sms_concur.changed is sameas False
+
+    - name: test - update sms mediatype with invalid max sessions (fail)
+      zabbix_mediatype:
+        gsm_modem: /dev/ttyS0
+        max_sessions: 2
+      register: zbxmediatype_sms_fail
+      ignore_errors: True
+
+    - assert:
+        that: zbxmediatype_sms_fail.failed is sameas True
+
+  - name: test - delete sms mediatype
+    zabbix_mediatype:
+      state: absent
+    register: zbxmediatype_delete
+
+  - assert:
+      that: zbxmediatype_delete.changed is sameas True
+
+- name: test - jabber mediatypes
+  when: zabbix_version is version('4.2', '<=')
+  module_defaults:
+    zabbix_mediatype:
+      server_url: "{{ zabbix_server_url }}"
+      login_user: "{{ zabbix_login_user }}"
+      login_password: "{{ zabbix_login_password }}"
+      state: present
+      name: Example jabber
+      type: jabber
+
+  block:
+  - name: test - create new jabber mediatype
+    zabbix_mediatype:
+      username: zabbix
+      password: Ex4mP!3
+    register: zbxmediatype_jabber_new
+
+  - assert:
+      that: zbxmediatype_jabber_new.changed is sameas True
+
+  - name: test - create new jabber mediatype (again)
+    zabbix_mediatype:
+      username: zabbix
+      password: Ex4mP!3
+    register: zbxmediatype_jabber_new
+
+  - assert:
+      that: zbxmediatype_jabber_new.changed is sameas False
+
+  - name: test - delete jabber mediatype
+    zabbix_mediatype:
+      state: absent
+    register: zbxmediatype_delete
+
+  - assert:
+      that: zbxmediatype_delete.changed is sameas True
+
+- name: test - ez_texting mediatypes
+  when: zabbix_version is version('4.2', '<=')
+  module_defaults:
+    zabbix_mediatype:
+      server_url: "{{ zabbix_server_url }}"
+      login_user: "{{ zabbix_login_user }}"
+      login_password: "{{ zabbix_login_password }}"
+      state: present
+      name: Example ez_texting
+      type: ez_texting
+
+  block:
+  - name: test - create new ez_texting mediatype
+    zabbix_mediatype:
+      username: zabbix
+      password: Ex4mP!3
+      message_text_limit: USA
+    register: zbxmediatype_ez_texting_new
+
+  - assert:
+      that: zbxmediatype_ez_texting_new.changed is sameas True
+
+  - name: test - create new ez_texting mediatype (again)
+    zabbix_mediatype:
+      username: zabbix
+      password: Ex4mP!3
+      message_text_limit: USA
+    register: zbxmediatype_ez_texting_new
+
+  - assert:
+      that: zbxmediatype_ez_texting_new.changed is sameas False
+
+  - name: test - update ez_texting mediatype with text limit
+    zabbix_mediatype:
+      username: zabbix
+      password: Ex4mP!3
+      message_text_limit: Canada
+    register: zbxmediatype_ez_texting_update
+
+  - assert:
+      that: zbxmediatype_ez_texting_update.changed is sameas True
+
+  - name: test - delete ez_texting mediatype
+    zabbix_mediatype:
+      state: absent
+    register: zbxmediatype_delete
+
+  - assert:
+      that: zbxmediatype_delete.changed is sameas True
