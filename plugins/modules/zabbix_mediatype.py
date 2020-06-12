@@ -59,18 +59,21 @@ options:
         description:
             - The maximum number of alerts that can be processed in parallel.
             - Possible value is 1 when I(type=sms) and 0-100 otherwise.
+            - Works only with Zabbix versions 3.4 and above.
         default: 1
     max_attempts:
         type: 'int'
         description:
             - The maximum number of attempts to send an alert.
-            - Possible range is 0-10
+            - Possible range is 0-10.
+            - Works only with Zabbix versions 3.4 and above.
         default: 3
     attempt_interval:
         type: 'int'
         description:
             - The interval between retry attempts.
-            - Possible range is 0-60
+            - Possible range is 0-60.
+            - Works only with Zabbix versions 3.4 and above.
         default: 10
     script_name:
         type: 'str'
@@ -625,6 +628,11 @@ def main():
     if LooseVersion(zbx_api_version) >= LooseVersion('4.4'):
         # description key changed to name key from zabbix 4.4
         parameters['name'] = parameters.pop('description')
+
+    if LooseVersion(zbx_api_version) <= LooseVersion('3.2'):
+        # remove settings not supported till 3.4
+        for key in ['maxsessions', 'maxattempts', 'attempt_interval']:
+            del parameters[key]
 
     if mediatype_exists:
         if state == 'absent':
