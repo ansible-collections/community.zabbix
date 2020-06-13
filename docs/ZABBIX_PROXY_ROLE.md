@@ -3,35 +3,19 @@
 Table of Content
 
 - [Overview](#overview)
-- [Upgrades](#upgrades)
-  * [1.0.0](#100)
   * [Operating systems](#operating-systems)
   * [Zabbix Versions](#zabbix-versions)
-    + [Zabbix 4.2](#zabbix-42)
-    + [Zabbix 4.0](#zabbix-40)
-    + [Zabbix 3.4](#zabbix-34)
-    + [Zabbix 3.2](#zabbix-32)
-    + [Zabbix 3.0](#zabbix-30)
-    + [Zabbix 2.4](#zabbix-24)
-    + [Zabbix 2.2](#zabbix-22)
 - [Role Variables](#role-variables)
+  * [Main variables](#main-variables)
+  * [TLS Specific configuration](#tls-specific-configuration)
+  * [Zabbix API variables](#zabbix-api-variables)
 - [Dependencies](#dependencies)
 - [Example Playbook](#example-playbook)
+- [Molecule](#molecule)
 - [License](#license)
 - [Author Information](#author-information)
 
-
-[![Build Status](https://travis-ci.org/dj-wasabi/ansible-zabbix-proxy.svg?branch=master)](https://travis-ci.org/dj-wasabi/ansible-zabbix-proxy)
-
 # Overview
-
-# Upgrades
-
-## 1.0.0
-
-With this 1.0.0 release, the following is changed:
-
-* All properties starts with `zabbix_` now. Example, property named `proxy_dbhost` is now `zabbix_proxy_dbhost`.
 
 ## Operating systems
 
@@ -48,84 +32,20 @@ Please sent Pull Requests or suggestions when you want to use this role for othe
 
 See the following list of supported Operating systems with the Zabbix releases.
 
-### Zabbix 4.4
-
-  * CentOS 7.x, 8.x
-  * Amazon 7.x
-  * RedHat 7.x, 8.x
-  * OracleLinux 7.x, 8.x
-  * Scientific Linux 7.x, 8.x
-  * Ubuntu 14.04, 16.04, 18.04
-  * Debian 8, 9
-
-### Zabbix 4.2
-
-  * CentOS 7.x
-  * Amazon 7.x
-  * RedHat 7.x
-  * OracleLinux 7.x
-  * Scientific Linux 7.x
-  * Ubuntu 14.04, 16.04, 18.04
-  * Debian 8, 9
-
-### Zabbix 4.0
-
-  * CentOS 7.x
-  * Amazon 7.x
-  * RedHat 7.x
-  * OracleLinux 7.x
-  * Scientific Linux 7.x
-  * Ubuntu 14.04, 16.04, 18.04
-  * Debian 8, 9
-
-### Zabbix 3.4
-
-  * CentOS 7.x
-  * Amazon 7.x
-  * RedHat 7.x
-  * OracleLinux 7.x
-  * Scientific Linux 7.x
-  * Ubuntu 14.04, 16.04
-  * Debian 7, 8, 9
-
-### Zabbix 3.2
-
-  * CentOS 7.x
-  * Amazon 7.x
-  * RedHat 7.x
-  * OracleLinux 7.x
-  * Scientific Linux 7.x
-  * Ubuntu 14.04, 16.04
-  * Debian 7, 8
-
-### Zabbix 3.0
-
-  * CentOS 5.x, 6.x, 7.x
-  * Amazon 5.x, 6.x, 7.x
-  * RedHat 5.x, 6.x, 7.x
-  * OracleLinux 5.x, 6.x, 7.x
-  * Scientific Linux 5.x, 6.x, 7.x
-  * Ubuntu 14.04
-  * Debian 7, 8
-
-### Zabbix 2.4
-
-  * CentOS 6.x, 7.x
-  * Amazon 6.x, 7.x
-  * RedHat 6.x, 7.x
-  * OracleLinux 6.x, 7.x
-  * Scientific Linux 6.x, 7.x
-  * Ubuntu 12.04 14.04
-  * Debian 7
-
-### Zabbix 2.2
-
-  * CentOS 5.x, 6.x
-  * RedHat 5.x, 6.x
-  * OracleLinux 5.x, 6.x
-  * Scientific Linux 5.x, 6.x
-  * Ubuntu 12.04
-  * Debian 7
+| Zabbix  | 4.4 | 4.0 (LTS) | 3.0 (LTS)|
+|---|---|---|---|
+|Red Hat Fam 8| V |   |   |
+|Red Hat Fam 7| V  | V  | V |
+|Red Hat Fam 6|   |   | V |
+|Red Hat Fam 5|   |   | V |
+|Fedora| V  |  V |   |
+|Ubuntu 18.04| V  | V  |   |
+|Ubuntu 16.04| V  | V |   |
+|Ubuntu 14.04| V  | V | V |
+|Debian 10| V  |   |   |
+|Debian 9|  V | V |   |
+|Debian 8| V  | V | V |
+|Debian 7|    | V | V  |
 
 # Role Variables
 
@@ -155,7 +75,7 @@ There are some variables in de default/main.yml which can (Or needs to) be chang
 
 There are some zabbix-proxy specific variables which will be used for the zabbix-proxy configuration file, these can be found in the default/main.yml file. There are 2 which needs some explanation:
 
-```bash
+```yaml
   #zabbix_proxy_database: mysql
   #zabbix_proxy_database_long: mysql
   #zabbix_proxy_database: sqlite3
@@ -167,9 +87,12 @@ There are some zabbix-proxy specific variables which will be used for the zabbix
 There are 3 database_types which will be supported: mysql/postgresql and sqlite. You'll need to comment or uncomment the database you would like to use. In example from above, the postgresql database is used. If you want to use mysql, uncomment the 2 lines from mysql and comment the 2 lines for postgresql.
 
 If you use mysql, then you should define mysql username, password and host to prepare zabbix database, otherwise they will be considered as their default value (and therefor, connecting to database will be considered as connecting to localhost with no password). the keys are belows:
+
+```yaml
    zabbix_proxy_mysql_login_host
    zabbix_proxy_mysql_login_user
    zabbix_proxy_mysql_login_password
+```
 
 ## TLS Specific configuration
 
@@ -230,27 +153,43 @@ When `zabbix_api_create_proxy` is set to `True`, it will install on the host exe
 
 # Dependencies
 
-```text
-You'll need to find the correct database role by yourself. I only want to use roles which supports the 3 main operating systems as well and for now I can't find one. If there is an role which supports these 3 operating systems, please let me know and I'll use it as dependency.
-```
+For the databases you should find a role that suits your needs, as I don't want to force you for using a specific role. Before applying this Zabbix Server role, the database service should already be installed and running, and should be able to handle the modules in Ansible that belong to that database.
+
+This role will **not** install a MySQL or PostgreSQL service.
+
+This role will create a Zabbix user and a Zabbix database in the configured database type.
 
 # Example Playbook
 
 Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
 
-    - hosts: zabbix-proxy
-      sudo: yes
-      roles:
-         - { role: community.zabbix.zabbix_proxy, zabbix_server_host: 192.168.1.1, database_type: pgsql, database_type_long: postgresql }
+```yaml
+  - hosts: zabbix-proxy
+    roles:
+      - role: community.zabbix.zabbix_proxy
+        zabbix_server_host: 192.168.1.1
+        zabbix_server_database: mysql
+        zabbix_server_database_long: mysql
+```
+
+# Molecule
+
+This role is configured to be tested with Molecule. You can find on this page some more information regarding Molecule: 
+
+* http://werner-dijkerman.nl/2016/07/10/testing-ansible-roles-with-molecule-testinfra-and-docker/
+* http://werner-dijkerman.nl/2016/07/27/extending-ansible-role-testing-with-molecule-by-adding-group_vars-dependencies-and-using-travis-ci/
+* http://werner-dijkerman.nl/2016/07/31/testing-ansible-roles-in-a-cluster-setup-with-docker-and-molecule/
+
+With each Pull Request, Molecule will be executed via travis.ci. Pull Requests will only be merged once these tests run successfully.
 
 # License
 
-GPLv3
+GNU General Public License v3.0 or later
+
+See LICENCE to see the full text.
 
 # Author Information
 
-This is my first attempt to create an ansible role, so please send suggestion or pull requests to make this role better.
+Please send suggestion or pull requests to make this role better. Also let us know if you encounter any issues installing or using this role.
 
-Github: https://github.com/dj-wasabi/ansible-zabbix-proxy
-
-mail: ikben [ at ] werner-dijkerman . nl
+Github: https://github.com/ansible-collections/community.zabbix
