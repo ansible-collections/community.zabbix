@@ -2,19 +2,10 @@
 
 Table of Contents
 
-- [Overview](#overview)
 - [Requirements](#requirements)
   * [Operating systems](#operating-systems)
   * [Local system access](#local-system-access)
   * [Zabbix Versions](#zabbix-versions)
-    + [Zabbix 4.4](#zabbix-44)
-    + [Zabbix 4.2](#zabbix-42)
-    + [Zabbix 4.0](#zabbix-40)
-    + [Zabbix 3.4](#zabbix-34)
-    + [Zabbix 3.2](#zabbix-32)
-    + [Zabbix 3.0](#zabbix-30)
-    + [Zabbix 2.4](#zabbix-24)
-    + [Zabbix 2.2](#zabbix-22)
 - [Getting started](#getting-started)
   * [Minimal Configuration](#minimal-configuration)
   * [Issues](#issues)
@@ -23,8 +14,10 @@ Table of Contents
   * [TLS Specific configuration](#tls-specific-configuration)
   * [Zabbix API variables](#zabbix-api-variables)
   * [Windows Variables](#windows-variables)
+  * [macOS Variables](#macos-variables)
   * [Docker Variables](#docker-variables)
   * [Other variables](#other-variables)
+  * [IPMI variables](#ipmi-variables)
   * [proxy](#proxy)
 - [Dependencies](#dependencies)
 - [Example Playbook](#example-playbook)
@@ -34,9 +27,6 @@ Table of Contents
   * [Combination of group_vars and playbook](#combination-of-group-vars-and-playbook)
   * [Example for TLS PSK encrypted agent communication](#example-for-tls-psk-encrypted-agent-communication)
 - [Molecule](#molecule)
-  * [default](#default)
-  * [with-server](#with-server)
-  * [before-last-version](#before-last-version)
 - [Deploying Userparameters](#deploying-userparameters)
 - [License](#license)
 - [Author Information](#author-information)
@@ -64,93 +54,22 @@ To successfully complete the install the role requires `python-netaddr` on the c
 
 See the following list of supported Operating systems with the Zabbix releases:
 
-### Zabbix 4.4
-
-  * CentOS 7.x, 8.x
-  * Amazon 7.x
-  * RedHat 7.x, 8.x
-  * Fedora 27, 29
-  * OracleLinux 7.x, 8.x
-  * Scientific Linux 7.x, 8.x
-  * Ubuntu 14.04, 16.04, 18.04
-  * Debian 8, 9, 10
-  * macOS 10.14, 10.15
-
-### Zabbix 4.2
-
-  * CentOS 7.x
-  * Amazon 7.x
-  * RedHat 7.x
-  * Fedora 27, 29
-  * OracleLinux 7.x
-  * Scientific Linux 7.x
-  * Ubuntu 14.04, 16.04, 18.04
-  * Debian 8, 9, 10
-  * macOS 10.14, 10.15
-
-### Zabbix 4.0
-
-  * CentOS 7.x
-  * Amazon 7.x
-  * RedHat 7.x
-  * Fedora 27, 29
-  * OracleLinux 7.x
-  * Scientific Linux 7.x
-  * Ubuntu 14.04, 16.04, 18.04
-  * Debian 8, 9, 10
-  * macOS 10.14, 10.15
-
-### Zabbix 3.4
-
-  * CentOS 7.x
-  * Amazon 7.x
-  * RedHat 7.x
-  * Fedora 27, 29
-  * OracleLinux 7.x
-  * Scientific Linux 7.x
-  * Ubuntu 14.04, 16.04, 18.04
-  * Debian 7, 8, 9
-
-### Zabbix 3.2
-
-  * CentOS 7.x
-  * Amazon 7.x
-  * RedHat 7.x
-  * Fedora 27, 29
-  * OracleLinux 7.x
-  * Scientific Linux 7.x
-  * Ubuntu 14.04, 16.04
-  * Debian 7, 8
-
-### Zabbix 3.0
-
-  * CentOS 5.x, 6.x, 7.x
-  * Amazon 5.x, 6.x, 7.x
-  * RedHat 5.x, 6.x, 7.x
-  * OracleLinux 5.x, 6.x, 7.x
-  * Scientific Linux 5.x, 6.x, 7.x
-  * Ubuntu 14.04
-  * Debian 7, 8
-
-### Zabbix 2.4
-
-  * CentOS 6.x, 7.x
-  * Amazon 6.x, 7.x
-  * RedHat 6.x, 7.x
-  * OracleLinux 6.x, 7.x
-  * Scientific Linux 6.x, 7.x
-  * Ubuntu 12.04 14.04
-  * Debian 7
-
-### Zabbix 2.2
-
-  * CentOS 5.x, 6.x
-  * RedHat 5.x, 6.x
-  * OracleLinux 5.x, 6.x
-  * Scientific Linux 5.x, 6.x
-  * Ubuntu 12.04
-  * Debian 7
-  * xenserver 6
+| Zabbix  | 4.4 | 4.0 (LTS) | 3.0 (LTS)|
+|---|---|---|---|
+|Red Hat Fam 8| V |   |   |
+|Red Hat Fam 7| V  | V  | V |
+|Red Hat Fam 6|   |   | V |
+|Red Hat Fam 5|   |   | V |
+|Fedora| V  |  V |   |
+|Ubuntu 18.04| V  | V  |   |
+|Ubuntu 16.04| V  | V |   |
+|Ubuntu 14.04| V  | V | V |
+|Debian 10| V  |   |   |
+|Debian 9|  V | V |   |
+|Debian 8| V  | V | V |
+|Debian 7|    | V | V  |
+|macOS 10.15|  V | V |   |
+|macOS 10.14|  V | V |   |
 
 # Getting started
 
@@ -458,6 +377,7 @@ zabbix_agent_interfaces:
 ## Vars in role configuration
 Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
 
+```yaml
     - hosts: all
       roles:
          - role: community.zabbix.zabbix_agent
@@ -476,80 +396,58 @@ Including an example of how to use your role (for instance, with variables passe
            zabbix_macros:
              - macro_key: apache_type
                macro_value: reverse_proxy
+```
 
 ## Combination of group_vars and playbook
 You can also use the group_vars or the host_vars files for setting the variables needed for this role. File you should change: `group_vars/all` or `host_vars/<zabbix_server>` (Where <zabbix_server> is the hostname of the machine running Zabbix Server)
 
+```yaml
 		zabbix_agent_server: 192.168.33.30
-        zabbix_agent_serveractive: 192.168.33.30
-        zabbix_url: http://zabbix.example.com
-        zabbix_api_use: true # use zabbix_api_create_hosts and/or zabbix_api_create_hostgroup from 0.8.0
-        zabbix_api_user: Admin
-        zabbix_api_pass: zabbix
-        zabbix_create_host: present
-        zabbix_host_groups:
-          - Linux Servers
-        zabbix_link_templates:
-          - Template OS Linux
-          - Apache APP Template
-        zabbix_macros:
-          - macro_key: apache_type
-            macro_value: reverse_proxy
+    zabbix_agent_serveractive: 192.168.33.30
+    zabbix_url: http://zabbix.example.com
+    zabbix_api_use: true # use zabbix_api_create_hosts and/or zabbix_api_create_hostgroup from 0.8.0
+    zabbix_api_user: Admin
+    zabbix_api_pass: zabbix
+    zabbix_create_host: present
+    zabbix_host_groups:
+      - Linux Servers
+    zabbix_link_templates:
+      - Template OS Linux
+      - Apache APP Template
+    zabbix_macros:
+      - macro_key: apache_type
+        macro_value: reverse_proxy
+```
 
 and in the playbook only specifying:
 
+```yaml
     - hosts: all
       roles:
          - role: community.zabbix.zabbix_agent
+```
 
 ## Example for TLS PSK encrypted agent communication
 
 Variables e.g. in the playbook or in `host_vars/myhost`:
 
+```yaml
     zabbix_agent_tlsaccept: psk
     zabbix_agent_tlsconnect: psk
     zabbix_agent_tlspskidentity: "myhost PSK"
     zabbix_agent_tlspsk_secret: b7e3d380b9d400676d47198ecf3592ccd4795a59668aa2ade29f0003abbbd40d
     zabbix_agent_tlspskfile: /etc/zabbix/zabbix_agent_pskfile.psk
+```
 
 # Molecule
 
-This role is configured to be tested with Molecule. You can find on this page some more information regarding Molecule: https://werner-dijkerman.nl/2016/07/10/testing-ansible-roles-with-molecule-testinfra-and-docker/
+This role is configured to be tested with Molecule. You can find on this page some more information regarding Molecule: 
+
+* http://werner-dijkerman.nl/2016/07/10/testing-ansible-roles-with-molecule-testinfra-and-docker/
+* http://werner-dijkerman.nl/2016/07/27/extending-ansible-role-testing-with-molecule-by-adding-group_vars-dependencies-and-using-travis-ci/
+* http://werner-dijkerman.nl/2016/07/31/testing-ansible-roles-in-a-cluster-setup-with-docker-and-molecule/
 
 With each Pull Request, Molecule will be executed via travis.ci. Pull Requests will only be merged once these tests run successfully.
-
-There are 2 scenarios that are executed with Travis.
-
-## default
-
-With the first scenario, Molecule will boot 5 Docker containers with the following OS'es:
-
-* Debian 8
-* CentOS 7
-* Ubuntu 16.04
-* Ubuntu 18.04
-* Mint
-
-This scenario will be doing a basic installation/configuration, without registering the host via the Zabbix API to the server.
-
-## with-server
-
-The 2nd scenario will boot 4 Docker containers with the following OS'es:
-
-* CentOS 7 (Zabbix Server)
-* Debian 8
-* CentOS 7
-* Ubuntu 18.04
-
-First, a Zabbix Server will be installed on a container. This installation make uses of other dj-wasabi roles to install/configure a Zabbix Server. Once this instance is running, the 3 other agents are installed.
-
-Each host will register itself on the Zabbix Server and the status should be 0 (This means the Zabbix Server and Zabbix Agent are connected).
-
-The Ubuntu agent will register itself via a PSK, so that communication between the Zabbix Server and Zabbix Agent is encrypted with e Pre-Shared Key.
-
-## before-last-version
-
-The 3rd and last scenario is the `before-last-version`. This is the same scenario like the `default`, but uses the previous Zabbix version.
 
 # Deploying Userparameters
 
@@ -561,7 +459,7 @@ The following steps are required to install custom userparameters and/or scripts
 
 Example:
 
-```
+```yaml
 - hosts: mysql_servers
   tasks:
     - include_role:
@@ -583,12 +481,12 @@ UserParameter=mysql.ping_to,mysqladmin -uroot ping | grep -c alive
 
 # License
 
-MIT
+GNU General Public License v3.0 or later
+
+See LICENCE to see the full text.
 
 # Author Information
 
-Please send suggestion or pull requests to make this role better. Also let me know if you encounter any issues installing or using this role.
+Please send suggestion or pull requests to make this role better. Also let us know if you encounter any issues installing or using this role.
 
-Github: https://github.com/dj-wasabi/ansible-zabbix-agent
-
-mail: ikben [ at ] werner-dijkerman . nl
+Github: https://github.com/ansible-collections/community.zabbix
