@@ -6,14 +6,6 @@ Table of Contents
 - [Requirements](#requirements)
   * [Operating Systems](#operating-systems)
   * [Zabbix Versions](#zabbix-versions)
-    + [Zabbix 4.4](#zabbix-44)
-    + [Zabbix 4.2](#zabbix-42)
-    + [Zabbix 4.0](#zabbix-40)
-    + [Zabbix 3.4](#zabbix-34)
-    + [Zabbix 3.2](#zabbix-32)
-    + [Zabbix 3.0](#zabbix-30)
-    + [Zabbix 2.4](#zabbix-24)
-    + [Zabbix 2.2](#zabbix-22)
 - [Installation](#installation)
 - [Role Variables](#role-variables)
   * [Main variables](#main-variables)
@@ -27,6 +19,7 @@ Table of Contents
   * [Single instance](#single-instance)
   * [Multi host setup](#multi-host-setup)
   * [Adding Environment Variables for zabbix_web](#adding-environment-variables-for-zabbix-web)
+  * [Using Elasticsearch for history storage](#using-elasticsearch-for-history-storage)
 - [Molecule](#molecule)
 - [License](#license)
 - [Author Information](#author-information)
@@ -49,83 +42,20 @@ Please sent Pull Requests or suggestions when you want to use this role for othe
 
 See the following list of supported Operating Systems with the Zabbix releases.
 
-### Zabbix 4.4
-  * CentOS 7.x, 8.x
-  * Amazon 7.x
-  * RedHat 7.x, 8.x
-  * OracleLinux 7.x, 8.x
-  * Scientific Linux 7.x, 8.x
-  * Ubuntu 14.04, 16.04, 18.04
-  * Debian 8, 9
-
-### Zabbix 4.2
-  * CentOS 7.x
-  * Amazon 7.x
-  * RedHat 7.x
-  * OracleLinux 7.x
-  * Scientific Linux 7.x
-  * Ubuntu 14.04, 16.04, 18.04
-  * Debian 8, 9
-
-### Zabbix 4.0
-
-  * CentOS 7.x
-  * Amazon 7.x
-  * RedHat 7.x
-  * OracleLinux 7.x
-  * Scientific Linux 7.x
-  * Ubuntu 14.04, 16.04, 18.04
-  * Debian 8, 9
-
-### Zabbix 3.4
-
-  * CentOS 7.x
-  * Amazon 7.x
-  * RedHat 7.x
-  * OracleLinux 7.x
-  * Scientific Linux 7.x
-  * Ubuntu 14.04, 16.04
-  * Debian 7, 8, 9
-
-### Zabbix 3.2
-
-  * CentOS 7.x
-  * Amazon 7.x
-  * RedHat 7.x
-  * OracleLinux 7.x
-  * Scientific Linux 7.x
-  * Ubuntu 14.04, 16.04
-  * Debian 7, 8
-
-### Zabbix 3.0
-
-  * CentOS 5.x, 6.x, 7.x
-  * Amazon 5.x, 6.x, 7.x
-  * RedHat 5.x, 6.x, 7.x
-  * OracleLinux 5.x, 6.x, 7.x
-  * Scientific Linux 5.x, 6.x, 7.x
-  * Ubuntu 14.04
-  * Debian 7, 8
-
-### Zabbix 2.4
-
-  * CentOS 6.x, 7.x
-  * Amazon 6.x, 7.x
-  * RedHat 6.x, 7.x
-  * OracleLinux 6.x, 7.x
-  * Scientific Linux 6.x, 7.x
-  * Ubuntu 12.04 14.04
-  * Debian 7
-
-### Zabbix 2.2
-
-  * CentOS 5.x, 6.x
-  * RedHat 5.x, 6.x
-  * OracleLinux 5.x, 6.x
-  * Scientific Linux 5.x, 6.x
-  * Ubuntu 12.04
-  * Debian 7
-  * xenserver 6
+| Zabbix  | 4.4 | 4.0 (LTS) | 3.0 (LTS)|
+|---|---|---|---|
+|Red Hat Fam 8| V |   |   |
+|Red Hat Fam 7| V  | V  | V |
+|Red Hat Fam 6|   |   | V |
+|Red Hat Fam 5|   |   | V |
+|Fedora| V  |  V |   |
+|Ubuntu 18.04| V  | V  |   |
+|Ubuntu 16.04| V  | V |   |
+|Ubuntu 14.04| V  | V | V |
+|Debian 10| V  |   |   |
+|Debian 9|  V | V |   |
+|Debian 8| V  | V | V |
+|Debian 7|    | V | V  |
 
 # Installation
 
@@ -214,7 +144,7 @@ https://www.zabbix.com/documentation/4.0/manual/appendix/install/elastic_search_
 
 Current default configuration and example for specifying a yum repository:
 
-````
+```yaml
 zabbix_repo_yum:
   - name: zabbix
     description: Zabbix Official Repository - $basearch
@@ -228,7 +158,7 @@ zabbix_repo_yum:
     gpgcheck: 0
     gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-ZABBIX
     state: present
-````
+```
 
 # Dependencies
 
@@ -247,30 +177,45 @@ There are two ways of using the zabbix-web:
 
 When there is one host running both Zabbix Server and the Zabbix Web (Running MySQL as database):
 
-```
+```yaml
 - hosts: zabbix-server
   become: yes
   roles:
-     - { role: geerlingguy.apache }
-     - { role: community.zabbix.zabbix_server, zabbix_server_database: mysql, zabbix_server_database_long: mysql, zabbix_server_dbport: 3306 }
-     - { role: community.zabbix.zabbix_web, zabbix_url: zabbix.dj-wasabi.nl, zabbix_server_database: mysql, zabbix_server_database_long: mysql, zabbix_server_dbport: 3306}
+    - role: geerlingguy.apache
+    - role: community.zabbix.zabbix_server
+      zabbix_server_database: mysql
+      zabbix_server_database_long: mysql
+      zabbix_server_dbport: 3306
+    - role: community.zabbix.zabbix_web
+      zabbix_url: zabbix.mydomain.com
+      zabbix_server_database: mysql
+      zabbix_server_database_long: mysql
+      zabbix_server_dbport: 3306
 ```
 
 ## Multi host setup
 
 This is a two host setup. On one host (Named: "zabbix-server") the Zabbix Server is running, and the other host (Named: zabbix-web) runs Zabbix Web (with MySQL as database):
 
-```
+```yaml
 - hosts: zabbix-server
   become: yes
   roles:
-     - { role: community.zabbix.zabbix_server, zabbix_server_database: mysql, zabbix_server_database_long: mysql, zabbix_server_dbport: 3306 }
+    - role: community.zabbix.zabbix_server
+      zabbix_server_database: mysql
+      zabbix_server_database_long: mysql
+      zabbix_server_dbport: 3306
 
 - hosts: zabbix-web
   become: yes
   roles:
-     - { role: geerlingguy.apache }
-     - { role: community.zabbix.zabbix_web, zabbix_server_hostname: zabbix-server, zabbix_url: zabbix.dj-wasabi.nl, zabbix_server_database: mysql, zabbix_server_database_long: mysql, zabbix_server_dbport: 3306 }
+    - role: geerlingguy.apache
+    - role: community.zabbix.zabbix_web
+      zabbix_url: zabbix.mydomain.com
+      zabbix_server_hostname: zabbix-server
+      zabbix_server_database: mysql
+      zabbix_server_database_long: mysql
+      zabbix_server_dbport: 3306
 ```
 
 ## Adding Environment Variables for zabbix_web
@@ -278,8 +223,19 @@ This is a two host setup. On one host (Named: "zabbix-server") the Zabbix Server
 Sometimes you need to add environment variables to your
 zabbix.conf.php, for example to add LDAP CA certificates. To do this add a `zabbix_web_env` dictionary:
 
-```
-- { role: community.zabbix.zabbix_web, zabbix_url: zabbix.dj-wasabi.nl, zabbix_server_database: mysql, zabbix_server_database_long: mysql, zabbix_server_dbport: 3306, zabbix_web_env: {LDAPTLS_CACERT: /etc/ssl/certs/ourcert.pem}
+```yaml
+- hosts: zabbix-web
+  become: yes
+  roles:
+    - role: geerlingguy.apache
+    - role: community.zabbix.zabbix_web
+      zabbix_url: zabbix.mydomain.com
+      zabbix_server_hostname: zabbix-server
+      zabbix_server_database: mysql
+      zabbix_server_database_long: mysql
+      zabbix_server_dbport: 3306
+      zabbix_web_env:
+        LDAPTLS_CACERT: /etc/ssl/certs/ourcert.pem
 ```
 
 ## Using Elasticsearch for history storage
@@ -309,17 +265,22 @@ zabbix_server_history_types:
 
 # Molecule
 
-This role is configured to be tested with Molecule. Molecule will boot at least 3 different kinds of containers, one for each supported Operating System (Debian, Ubuntu and RedHat).
-Pull Requests are only merged when the tests are successful.
+This role is configured to be tested with Molecule. You can find on this page some more information regarding Molecule: 
 
-For more information, please check the following page: https://www.werner-dijkerman.nl/2016/07/10/testing-ansible-roles-with-molecule-testinfra-and-docker
+* http://werner-dijkerman.nl/2016/07/10/testing-ansible-roles-with-molecule-testinfra-and-docker/
+* http://werner-dijkerman.nl/2016/07/27/extending-ansible-role-testing-with-molecule-by-adding-group_vars-dependencies-and-using-travis-ci/
+* http://werner-dijkerman.nl/2016/07/31/testing-ansible-roles-in-a-cluster-setup-with-docker-and-molecule/
+
+With each Pull Request, Molecule will be executed via travis.ci. Pull Requests will only be merged once these tests run successfully.
 
 # License
 
-MIT
+GNU General Public License v3.0 or later
+
+See LICENCE to see the full text.
 
 # Author Information
 
-Github: https://github.com/dj-wasabi/ansible-zabbix-web
+Please send suggestion or pull requests to make this role better. Also let us know if you encounter any issues installing or using this role.
 
-mail: ikben [ at ] werner-dijkerman . nl
+Github: https://github.com/ansible-collections/community.zabbix

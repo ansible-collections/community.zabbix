@@ -3,19 +3,9 @@
 Table of Contents
 
 - [Overview](#overview)
-- [Upgrades](#upgrades)
-  * [1.0.0](#100)
 - [Requirements](#requirements)
   * [Operating systems](#operating-systems)
   * [Zabbix Versions](#zabbix-versions)
-    + [Zabbix 4.4](#zabbix-44)
-    + [Zabbix 4.2](#zabbix-42)
-    + [Zabbix 4.0](#zabbix-40)
-    + [Zabbix 3.4](#zabbix-34)
-    + [Zabbix 3.2](#zabbix-32)
-    + [Zabbix 3.0](#zabbix-30)
-    + [Zabbix 2.4](#zabbix-24)
-    + [Zabbix 2.2](#zabbix-22)
 - [Installation](#installation)
 - [Role Variables](#role-variables)
   * [Main variables](#main-variables)
@@ -27,26 +17,12 @@ Table of Contents
 - [Dependencies](#dependencies)
 - [Example Playbook](#example-playbook)
 - [Molecule](#molecule)
-- [Contributors](#contributors)
 - [License](#license)
 - [Author Information](#author-information)
 
 # Overview
 
-Badges:
-
-[![Build Status](https://travis-ci.org/dj-wasabi/ansible-zabbix-server.svg?branch=master)](https://travis-ci.org/dj-wasabi/ansible-zabbix-server) <img src="https://img.shields.io/ansible/role/d/2070"/> <img src="https://img.shields.io/ansible/quality/2070"/>
-
 This is a role for installing and maintaining the zabbix-server.
-
-# Upgrades
-
-## 1.0.0
-
-With this 1.0.0 release, the following is changed:
-
-* This repository will only contain all the actions that are needed for correctly configuring a Zabbix Server. All tasks regarding the frontend/webui of Zabbix has been transferred to the `community.zabbix.zabbix_web` role.
-* All properties start with `zabbix_` now. Example, property named `server_dbuser` is now `zabbix_server_dbuser`.
 
 # Requirements
 
@@ -65,86 +41,20 @@ Please send Pull Requests or suggestions when you want to use this role for othe
 
 See the following list of supported Operating systems with the Zabbix releases:
 
-### Zabbix 4.4
-
-  * CentOS 7.x, 8.x
-  * Amazon 7.x
-  * RedHat 7.x, 8.x
-  * OracleLinux 7.x, 8.x
-  * Scientific Linux 7.x, 8.x
-  * Ubuntu 14.04, 16.04, 18.04
-  * Debian 8, 9
-
-### Zabbix 4.2
-
-  * CentOS 7.x
-  * Amazon 7.x
-  * RedHat 7.x
-  * OracleLinux 7.x
-  * Scientific Linux 7.x
-  * Ubuntu 14.04, 16.04, 18.04
-  * Debian 8, 9
-
-### Zabbix 4.0
-
-  * CentOS 7.x
-  * Amazon 7.x
-  * RedHat 7.x
-  * OracleLinux 7.x
-  * Scientific Linux 7.x
-  * Ubuntu 14.04, 16.04, 18.04
-  * Debian 8, 9
-
-### Zabbix 3.4
-
-  * CentOS 7.x
-  * Amazon 7.x
-  * RedHat 7.x
-  * OracleLinux 7.x
-  * Scientific Linux 7.x
-  * Ubuntu 14.04, 16.04
-  * Debian 7, 8, 9
-
-
-### Zabbix 3.2
-
-  * CentOS 7.x
-  * Amazon 7.x
-  * RedHat 7.x
-  * OracleLinux 7.x
-  * Scientific Linux 7.x
-  * Ubuntu 14.04, 16.04
-  * Debian 7, 8
-
-### Zabbix 3.0
-
-  * CentOS 5.x, 6.x, 7.x
-  * Amazon 5.x, 6.x, 7.x
-  * RedHat 5.x, 6.x, 7.x
-  * OracleLinux 5.x, 6.x, 7.x
-  * Scientific Linux 5.x, 6.x, 7.x
-  * Ubuntu 14.04
-  * Debian 7, 8
-
-### Zabbix 2.4
-
-  * CentOS 6.x, 7.x
-  * Amazon 6.x, 7.x
-  * RedHat 6.x, 7.x
-  * OracleLinux 6.x, 7.x
-  * Scientific Linux 6.x, 7.x
-  * Ubuntu 12.04 14.04
-  * Debian 7
-
-### Zabbix 2.2
-
-  * CentOS 5.x, 6.x
-  * RedHat 5.x, 6.x
-  * OracleLinux 5.x, 6.x
-  * Scientific Linux 5.x, 6.x
-  * Ubuntu 12.04
-  * Debian 7
-  * xenserver 6
+| Zabbix  | 4.4 | 4.0 (LTS) | 3.0 (LTS)|
+|---|---|---|---|
+|Red Hat Fam 8| V |   |   |
+|Red Hat Fam 7| V  | V  | V |
+|Red Hat Fam 6|   |   | V |
+|Red Hat Fam 5|   |   | V |
+|Fedora| V  |  V |   |
+|Ubuntu 18.04| V  | V  |   |
+|Ubuntu 16.04| V  | V |   |
+|Ubuntu 14.04| V  | V | V |
+|Debian 10| V  |   |   |
+|Debian 9|  V | V |   |
+|Debian 8| V  | V | V |
+|Debian 7|    | V | V  |
 
 # Installation
 
@@ -206,7 +116,7 @@ Define these variables to copy scripts to your respective scripts path.
 
 Example:
 
-```bash
+```yaml
    zabbix_server_alertscripts:
     - path: "{{ lookup('first_found', 'zabbix-scripts/somescript.php') }}"
       name: "somescript.php"
@@ -236,7 +146,7 @@ These variables are specific for Zabbix 3.0 and higher:
 ## Database
 
 There are some zabbix-server specific variables which will be used for the zabbix-server configuration file. These can be found in the defaults/main.yml file. There are 3 which need some explanation:
-```bash
+```yaml
   #zabbix_server_database: mysql
   #zabbix_server_database_long: mysql
   zabbix_server_database: pgsql
@@ -249,19 +159,18 @@ There are 2 database_types which will be supported: mysql and postgresql. You'll
 
 If you use mysql, then you should define mysql username, password and host to prepare zabbix database, otherwise they will be considered as their default value (and therefore, connecting to database will be considered as connecting to localhost with no password). The keys are below:
 
-```bash
+```yaml
    zabbix_server_mysql_login_host
    zabbix_server_mysql_login_user
    zabbix_server_mysql_login_password
 ```
 If you use pgsql, then you should define pgsql username, password and host to prepare zabbix database, otherwise they will be considered as their default value (and therefore, connecting to database will be considered as connecting to localhost with no password). The keys are below:
 
-```bash
+```yaml
    zabbix_server_pgsql_login_host
    zabbix_server_pgsql_login_user
    zabbix_server_pgsql_login_password
 ```
-
 
 # Dependencies
 
@@ -275,40 +184,32 @@ This role will create a Zabbix user and a Zabbix database in the configured data
 
 Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
 
-    - hosts: zabbix-server
-      become: yes
-      roles:
-         - { role: community.zabbix.zabbix_server, zabbix_server_database: mysql, zabbix_server_database_long: mysql }
-
+```yaml
+  - hosts: zabbix-server
+    roles:
+      - role: community.zabbix.zabbix_server
+        zabbix_server_database: mysql
+        zabbix_server_database_long: mysql
+```
 
 # Molecule
 
-This role is configured to be tested with Molecule. You can find on these pages some more information regarding Molecule:
+This role is configured to be tested with Molecule. You can find on this page some more information regarding Molecule: 
 
 * http://werner-dijkerman.nl/2016/07/10/testing-ansible-roles-with-molecule-testinfra-and-docker/
 * http://werner-dijkerman.nl/2016/07/27/extending-ansible-role-testing-with-molecule-by-adding-group_vars-dependencies-and-using-travis-ci/
 * http://werner-dijkerman.nl/2016/07/31/testing-ansible-roles-in-a-cluster-setup-with-docker-and-molecule/
 
-# Contributors
-
-The following have contributed to this Ansible role (List of Fame):
-
-  * drmikecrowe
-  * srvg
-  * kostyrevaa
-  * clopnis
-  * SAL-e
-  * lhoss
-  * mescanef
+With each Pull Request, Molecule will be executed via travis.ci. Pull Requests will only be merged once these tests run successfully.
 
 # License
 
-MIT
+GNU General Public License v3.0 or later
+
+See LICENCE to see the full text.
 
 # Author Information
 
-This is my first attempt to create an ansible role, so please send suggestion or pull requests to make this role better.
+Please send suggestion or pull requests to make this role better. Also let us know if you encounter any issues installing or using this role.
 
-Github: https://github.com/dj-wasabi/ansible-zabbix-server
-
-mail: ikben [ at ] werner-dijkerman . nl
+Github: https://github.com/ansible-collections/community.zabbix
