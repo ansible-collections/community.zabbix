@@ -402,7 +402,7 @@ Including an example of how to use your role (for instance, with variables passe
 You can also use the group_vars or the host_vars files for setting the variables needed for this role. File you should change: `group_vars/all` or `host_vars/<zabbix_server>` (Where <zabbix_server> is the hostname of the machine running Zabbix Server)
 
 ```yaml
-		zabbix_agent_server: 192.168.33.30
+    zabbix_agent_server: 192.168.33.30
     zabbix_agent_serveractive: 192.168.33.30
     zabbix_url: http://zabbix.example.com
     zabbix_api_use: true # use zabbix_api_create_hosts and/or zabbix_api_create_hostgroup from 0.8.0
