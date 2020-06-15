@@ -66,7 +66,7 @@ You can also include it in a `requirements.yml` file and install it via `ansible
 ---
 collections:
   - name: community.zabbix
-    version: v0.1.0
+    version: v0.2.0
 ```
 
 ## Usage

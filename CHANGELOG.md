@@ -2,6 +2,8 @@
 
 ## devel
 
+## 0.2.0
+
 ### New roles:
   - `zabbix_agent` previously known as [dj-wasabi/zabbix-agent](https://galaxy.ansible.com/dj-wasabi/zabbix-agent)
   - `zabbix_javagateway` previously known as [dj-wasabi/zabbix-javagateway](https://galaxy.ansible.com/dj-wasabi/zabbix-javagateway)
