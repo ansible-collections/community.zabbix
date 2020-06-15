@@ -1,0 +1,71 @@
+name: "community.zabbix.zabbix_server"
+on:
+  push:
+    paths:
+      - 'roles/zabbix_server/**'
+      - 'molecule/zabbix_server/**'
+      - '.github/workflows/server.yml'
+  pull_request:
+    paths:
+      - 'roles/zabbix_server/**'
+      - 'molecule/zabbix_server/**'
+      - '.github/workflows/server.yml'
+jobs:
+  molecule:
+    runs-on: ubuntu-18.04
+    env:
+      PY_COLORS: 1
+      ANSIBLE_FORCE_COLOR: 1
+    strategy:
+      fail-fast: true
+      matrix:
+        molecule_distro:
+          - container: mysql-centos
+            image: milcom/centos7-systemd
+            group: mysql
+          - container: pgsql-centos
+            image: milcom/centos7-systemd
+            group: postgresql
+          - container: mysql-ubuntu
+            image: solita/ubuntu-systemd:xenial
+            group: mysql
+          - container: pgsql-ubuntu
+            image: solita/ubuntu-systemd:xenial
+            group: postgresql
+          - container: mysql-debian
+            image: minimum2scp/systemd-stretch
+            group: mysql
+          - container: pgsql-debian
+            image: minimum2scp/systemd-stretch
+            group: postgresql
+        collection_role:
+          - zabbix_server
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v1
+
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.8
+
+      - name: Install dependencies
+        run: |
+          sudo apt install docker
+          python -m pip install --upgrade pip
+          pip install -r molecule/requirements.txt
+
+      - name: Build the collection
+        run: |
+          collection_file=$( basename $(ansible-galaxy collection build -f | awk -F" " '{print $NF}'))
+          echo "::set-env name=COLLECTION_FILE::$collection_file"
+
+      - name: Install the collection
+        run: ansible-galaxy collection install $COLLECTION_FILE
+
+      - name: Run role tests
+        run: >-
+          MY_MOLECULE_CONTAINER=${{ matrix.molecule_distro.container }}
+          MY_MOLECULE_IMAGE=${{ matrix.molecule_distro.image }}
+          MY_MOLECULE_GROUP=${{ matrix.molecule_distro.group }}
+          molecule --debug test -s ${{ matrix.collection_role }}

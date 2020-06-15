@@ -1,0 +1,4 @@
+---
+- hosts: all
+  roles:
+    - role: community.zabbix.zabbix_server
