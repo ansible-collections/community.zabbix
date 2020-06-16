@@ -125,7 +125,7 @@ EXAMPLES = r'''
 ---
 - name: Create a new Zabbix template linked to groups, macros and templates
   local_action:
-    module: zabbix_template
+    module: community.zabbix.zabbix_template
     server_url: http://127.0.0.1
     login_user: username
     login_password: password
@@ -147,7 +147,7 @@ EXAMPLES = r'''
 
 - name: Unlink and clear templates from the existing Zabbix template
   local_action:
-    module: zabbix_template
+    module: community.zabbix.zabbix_template
     server_url: http://127.0.0.1
     login_user: username
     login_password: password
@@ -159,7 +159,7 @@ EXAMPLES = r'''
 
 - name: Import Zabbix templates from JSON
   local_action:
-    module: zabbix_template
+    module: community.zabbix.zabbix_template
     server_url: http://127.0.0.1
     login_user: username
     login_password: password
@@ -168,7 +168,7 @@ EXAMPLES = r'''
 
 - name: Import Zabbix templates from XML
   local_action:
-    module: zabbix_template
+    module: community.zabbix.zabbix_template
     server_url: http://127.0.0.1
     login_user: username
     login_password: password
@@ -176,7 +176,7 @@ EXAMPLES = r'''
     state: present
 
 - name: Import Zabbix template from Ansible dict variable
-  zabbix_template:
+  community.zabbix.zabbix_template:
     login_user: username
     login_password: password
     server_url: http://127.0.0.1
@@ -195,7 +195,7 @@ EXAMPLES = r'''
 
 - name: Configure macros on the existing Zabbix template
   local_action:
-    module: zabbix_template
+    module: community.zabbix.zabbix_template
     server_url: http://127.0.0.1
     login_user: username
     login_password: password
@@ -207,7 +207,7 @@ EXAMPLES = r'''
 
 - name: Delete Zabbix template
   local_action:
-    module: zabbix_template
+    module: community.zabbix.zabbix_template
     server_url: http://127.0.0.1
     login_user: username
     login_password: password
@@ -216,7 +216,7 @@ EXAMPLES = r'''
 
 - name: Dump Zabbix template as JSON
   local_action:
-    module: zabbix_template
+    module: community.zabbix.zabbix_template
     server_url: http://127.0.0.1
     login_user: username
     login_password: password
@@ -227,7 +227,7 @@ EXAMPLES = r'''
 
 - name: Dump Zabbix template as XML
   local_action:
-    module: zabbix_template
+    module: community.zabbix.zabbix_template
     server_url: http://127.0.0.1
     login_user: username
     login_password: password

@@ -78,7 +78,7 @@ EXAMPLES = '''
 # Creates a new Zabbix service
 - name: Manage services
   local_action:
-        module: zabbix_service
+        module: community.zabbix.zabbix_service
         server_url: "https://192.168.1.1"
         login_user: username
         login_password: password

@@ -374,7 +374,7 @@ extends_documentation_fragment:
 EXAMPLES = '''
 # Trigger action with only one condition
 - name: Deploy trigger action
-  zabbix_action:
+  community.zabbix.zabbix_action:
     server_url: "http://zabbix.example.com/zabbix/"
     login_user: Admin
     login_password: secret
@@ -397,7 +397,7 @@ EXAMPLES = '''
 
 # Trigger action with multiple conditions and operations
 - name: Deploy trigger action
-  zabbix_action:
+  community.zabbix.zabbix_action:
     server_url: "http://zabbix.example.com/zabbix/"
     login_user: Admin
     login_password: secret
@@ -430,7 +430,7 @@ EXAMPLES = '''
 
 # Trigger action with recovery and acknowledge operations
 - name: Deploy trigger action
-  zabbix_action:
+  community.zabbix.zabbix_action:
     server_url: "http://zabbix.example.com/zabbix/"
     login_user: Admin
     login_password: secret

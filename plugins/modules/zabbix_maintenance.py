@@ -75,7 +75,7 @@ notes:
 
 EXAMPLES = r'''
 - name: Create a named maintenance window for host www1 for 90 minutes
-  zabbix_maintenance:
+  community.zabbix.zabbix_maintenance:
     name: Update of www1
     host_name: www1.example.com
     state: present
@@ -85,7 +85,7 @@ EXAMPLES = r'''
     login_password: pAsSwOrD
 
 - name: Create a named maintenance window for host www1 and host groups Office and Dev
-  zabbix_maintenance:
+  community.zabbix.zabbix_maintenance:
     name: Update of www1
     host_name: www1.example.com
     host_groups:
@@ -97,7 +97,7 @@ EXAMPLES = r'''
     login_password: pAsSwOrD
 
 - name: Create a named maintenance window for hosts www1 and db1, without data collection.
-  zabbix_maintenance:
+  community.zabbix.zabbix_maintenance:
     name: update
     host_names:
       - www1.example.com
@@ -109,7 +109,7 @@ EXAMPLES = r'''
     login_password: pAsSwOrD
 
 - name: Remove maintenance window by name
-  zabbix_maintenance:
+  community.zabbix.zabbix_maintenance:
     name: Test1
     state: absent
     server_url: https://monitoring.example.com

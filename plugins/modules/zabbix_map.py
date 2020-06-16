@@ -159,7 +159,7 @@ EXAMPLES = r'''
 ###
 ### Create Zabbix map "Demo Map" made of template 'map.j2'
 - name: Create Zabbix map
-  zabbix_map:
+  community.zabbix.zabbix_map:
     server_url: http://zabbix.example.com
     login_user: username
     login_password: password
