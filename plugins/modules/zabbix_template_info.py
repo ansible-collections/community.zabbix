@@ -42,7 +42,7 @@ extends_documentation_fragment:
 
 EXAMPLES = '''
 - name: Get Zabbix template as JSON
-  zabbix_template_info:
+  community.zabbix.zabbix_template_info:
     server_url: "http://zabbix.example.com/zabbix/"
     login_user: admin
     login_password: secret
@@ -52,7 +52,7 @@ EXAMPLES = '''
   register: template_json
 
 - name: Get Zabbix template as XML
-  zabbix_template_info:
+  community.zabbix.zabbix_template_info:
     server_url: "http://zabbix.example.com/zabbix/"
     login_user: admin
     login_password: secret

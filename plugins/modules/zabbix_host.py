@@ -355,7 +355,7 @@ extends_documentation_fragment:
 EXAMPLES = r'''
 - name: Create a new host or update an existing host's info
   local_action:
-    module: zabbix_host
+    module: community.zabbix.zabbix_host
     server_url: http://monitor.example.com
     login_user: username
     login_password: password
@@ -410,7 +410,7 @@ EXAMPLES = r'''
 
 - name: Update an existing host's TLS settings
   local_action:
-    module: zabbix_host
+    module: community.zabbix.zabbix_host
     server_url: http://monitor.example.com
     login_user: username
     login_password: password

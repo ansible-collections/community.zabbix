@@ -50,7 +50,7 @@ EXAMPLES = r'''
 # Base create host groups example
 - name: Create host groups
   local_action:
-    module: zabbix_group
+    module: community.zabbix.zabbix_group
     server_url: http://monitor.example.com
     login_user: username
     login_password: password
@@ -62,7 +62,7 @@ EXAMPLES = r'''
 # Limit the Zabbix group creations to one host since Zabbix can return an error when doing concurrent updates
 - name: Create host groups
   local_action:
-    module: zabbix_group
+    module: community.zabbix.zabbix_group
     server_url: http://monitor.example.com
     login_user: username
     login_password: password

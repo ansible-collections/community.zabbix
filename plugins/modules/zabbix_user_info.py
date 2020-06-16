@@ -31,7 +31,7 @@ extends_documentation_fragment:
 
 EXAMPLES = '''
 - name: Get zabbix user info
-  zabbix_user_info:
+  community.zabbix.zabbix_user_info:
     server_url: "http://zabbix.example.com/zabbix/"
     login_user: admin
     login_password: secret

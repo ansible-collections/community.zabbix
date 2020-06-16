@@ -185,7 +185,7 @@ extends_documentation_fragment:
 
 EXAMPLES = '''
 - name: exclude machine if alert active on it
-  zabbix_host_events_info:
+  community.zabbix.zabbix_host_events_info:
       server_url: "{{ zabbix_url }}"
       login_user: "{{ lookup('env','ZABBIX_USER') }}"
       login_password: "{{ lookup('env','ZABBIX_PASSWORD') }}"
