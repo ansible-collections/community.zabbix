@@ -35,7 +35,7 @@ roles/zabbix_agent/molecule/with-server/tests/test_agent.py future-import-boiler
 roles/zabbix_agent/molecule/with-server/tests/test_default.py future-import-boilerplate
 roles/zabbix_javagateway/molecule/default/tests/test_default.py future-import-boilerplate
 roles/zabbix_proxy/molecule/default/tests/test_default.py future-import-boilerplate
-roles/zabbix_server/molecule/default/tests/test_default.py future-import-boilerplate
+molecule/default/tests/test_default.py future-import-boilerplate
 roles/zabbix_web/molecule/default/tests/test_default.py future-import-boilerplate
 roles/zabbix_agent/molecule/before-last-version/tests/test_default.py metaclass-boilerplate
 roles/zabbix_agent/molecule/default/tests/test_agent.py metaclass-boilerplate
@@ -44,5 +44,5 @@ roles/zabbix_agent/molecule/with-server/tests/test_agent.py metaclass-boilerplat
 roles/zabbix_agent/molecule/with-server/tests/test_default.py metaclass-boilerplate
 roles/zabbix_javagateway/molecule/default/tests/test_default.py metaclass-boilerplate
 roles/zabbix_proxy/molecule/default/tests/test_default.py metaclass-boilerplate
-roles/zabbix_server/molecule/default/tests/test_default.py metaclass-boilerplate
+molecule/default/tests/test_default.py metaclass-boilerplate
 roles/zabbix_web/molecule/default/tests/test_default.py metaclass-boilerplate

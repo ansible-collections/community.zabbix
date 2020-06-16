@@ -20,6 +20,9 @@ provisioner:
   name: ansible
   lint:
     name: ansible-lint
+  env:
+    ANSIBLE_COLLECTIONS_PATHS: $HOME/.ansible/collections/ansible_collections/community/zabbix
+    ANSIBLE_ROLES_PATH: $HOME/.ansible/collections/ansible_collections/community/zabbix/roles
   inventory:
     group_vars:
       mysql:
@@ -30,13 +33,13 @@ provisioner:
         zabbix_server_database: pgsql
         zabbix_server_database_long: postgresql
 
-scenario:
-  name: zabbix_server
-  converge_sequence:
-    - dependency
-    - create
-    - prepare
-    - converge
+# scenario:
+#   name: zabbix_server
+#   converge_sequence:
+#     - dependency
+#     - create
+#     - prepare
+#     - converge
 
 verifier:
   name: testinfra
