@@ -33,14 +33,6 @@ provisioner:
         zabbix_server_database: pgsql
         zabbix_server_database_long: postgresql
 
-# scenario:
-#   name: zabbix_server
-#   converge_sequence:
-#     - dependency
-#     - create
-#     - prepare
-#     - converge
-
 verifier:
   name: testinfra
   lint:

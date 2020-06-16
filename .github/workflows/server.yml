@@ -32,9 +32,9 @@ jobs:
           - container: pgsql-ubuntu
             image: solita/ubuntu-systemd:xenial
             group: postgresql
-          - container: mysql-debian
-            image: minimum2scp/systemd-stretch
-            group: mysql
+          # - container: mysql-debian
+          #   image: minimum2scp/systemd-stretch
+          #   group: mysql
           - container: pgsql-debian
             image: minimum2scp/systemd-stretch
             group: postgresql
