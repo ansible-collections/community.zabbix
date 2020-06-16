@@ -171,7 +171,7 @@ RETURN = r''' # '''
 
 EXAMPLES = r'''
 - name: 'Create an email mediatype with SMTP authentication'
-  zabbix_mediatype:
+  community.zabbix.zabbix_mediatype:
     name: "Ops email"
     server_url: "http://example.com/zabbix/"
     login_user: Admin
@@ -185,7 +185,7 @@ EXAMPLES = r'''
     password: 'smtp_pass'
 
 - name: 'Create a script mediatype'
-  zabbix_mediatype:
+  community.zabbix.zabbix_mediatype:
     name: "my script"
     server_url: "http://example.com/zabbix/"
     login_user: Admin
@@ -197,7 +197,7 @@ EXAMPLES = r'''
       - 'arg2'
 
 - name: 'Create a jabber mediatype'
-  zabbix_mediatype:
+  community.zabbix.zabbix_mediatype:
     name: "My jabber"
     server_url: "http://example.com/zabbix/"
     login_user: Admin
@@ -207,7 +207,7 @@ EXAMPLES = r'''
     password: 'jabber_pass'
 
 - name: 'Create an SMS mediatype'
-  zabbix_mediatype:
+  community.zabbix.zabbix_mediatype:
     name: "My SMS Mediatype"
     server_url: "http://example.com/zabbix/"
     login_user: Admin

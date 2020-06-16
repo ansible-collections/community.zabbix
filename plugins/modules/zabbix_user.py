@@ -205,7 +205,7 @@ extends_documentation_fragment:
 
 EXAMPLES = r'''
 - name: create of zabbix user.
-  zabbix_user:
+  community.zabbix.zabbix_user:
     server_url: "http://zabbix.example.com/zabbix/"
     login_user: Admin
     login_password: secret
@@ -239,7 +239,7 @@ EXAMPLES = r'''
     state: present
 
 - name: delete of zabbix user.
-  zabbix_user:
+  community.zabbix.zabbix_user:
     server_url: "http://zabbix.example.com/zabbix/"
     login_user: admin
     login_password: secret

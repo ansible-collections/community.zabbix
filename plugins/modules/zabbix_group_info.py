@@ -45,7 +45,7 @@ extends_documentation_fragment:
 EXAMPLES = r'''
 - name: Get hostgroup info
   local_action:
-    module: zabbix_group_info
+    module: community.zabbix.zabbix_group_info
     server_url: http://monitor.example.com
     login_user: username
     login_password: password
