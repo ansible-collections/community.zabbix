@@ -182,25 +182,33 @@ options:
     default_message:
         description:
             - Problem message default text.
+            - With >= Zabbix 5.0 this field is removed from the API and is dropped silently by module.
+            - Works only with < Zabbix 5.0
     default_subject:
         description:
             - Problem message default subject.
+            - With >= Zabbix 5.0 this field is removed from the API and is dropped silently by module.
+            - Works only with < Zabbix 5.0
     recovery_default_message:
         description:
             - Recovery message text.
+            - With >= Zabbix 5.0 this field is removed from the API and is dropped silently by module.
             - Works only with >= Zabbix 3.2
     recovery_default_subject:
         description:
             - Recovery message subject.
-            - Works only with >= Zabbix 3.2
+            - With >= Zabbix 5.0 this field is removed from the API and is dropped silently by module.
+            - Works only with >= Zabbix 3.2 and < Zabbix 5.0
     acknowledge_default_message:
         description:
             - Update operation (known as "Acknowledge operation" before Zabbix 4.0) message text.
-            - Works only with >= Zabbix 3.4
+            - With >= Zabbix 5.0 this field is removed from the API and is dropped silently by module.
+            - Works only with >= Zabbix 3.4 and < Zabbix 5.0
     acknowledge_default_subject:
         description:
             - Update operation (known as "Acknowledge operation" before Zabbix 4.0) message subject.
-            - Works only with >= Zabbix 3.4
+            - With >= Zabbix 5.0 this field is removed from the API and is dropped silently by module.
+            - Works only with >= Zabbix 3.4 and < Zabbix 5.0
     operations:
         type: list
         description:
@@ -843,11 +851,22 @@ class Action(object):
                 'enabled',
                 'disabled'], kwargs['status'])
         }
+
         if kwargs['event_source'] == 'trigger':
             if float(self._zapi.api_version().rsplit('.', 1)[0]) >= 4.0:
                 _params['pause_suppressed'] = '1' if kwargs['pause_in_maintenance'] else '0'
             else:
                 _params['maintenance_mode'] = '1' if kwargs['pause_in_maintenance'] else '0'
+
+        if float(self._zapi.api_version().rsplit('.', 1)[0]) >= 5.0:
+            # remove some fields regarding
+            # https://www.zabbix.com/documentation/5.0/manual/api/reference/action/object
+            _params.pop('def_longdata', None)
+            _params.pop('def_shortdata', None)
+            _params.pop('r_longdata', None)
+            _params.pop('r_shortdata', None)
+            _params.pop('ack_longdata', None)
+            _params.pop('ack_shortdata', None)
 
         return _params
 
