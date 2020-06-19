@@ -1,0 +1,86 @@
+---
+- name: "test - Prepare integration tests for zabbix_template_info module"
+  zabbix_template:
+    server_url: "{{ zabbix_server_url }} "
+    login_user: "{{ zabbix_login_user }}"
+    login_password: "{{ zabbix_login_password }}"
+    template_name: ExampleTemplateForTempleteInfoModule
+    template_groups:
+      - Templates
+    state: present
+  register: prepare_result
+
+- assert:
+    that:
+      - prepare_result.changed is sameas true
+
+- name: "test - Fetch template info as a JSON format from Zabbix Server"
+  zabbix_template_info:
+    server_url: "{{ zabbix_server_url }} "
+    login_user: "{{ zabbix_login_user }}"
+    login_password: "{{ zabbix_login_password }}"
+    template_name: ExampleTemplateForTempleteInfoModule
+    format: json
+  register: fetch_template_json_format_result
+
+- name: "test - Set key to template_export_key variable(This deals with the key being masked)"
+  set_fact:
+    template_export_key: "{{ item }}"
+  loop: "{{ fetch_template_json_format_result.template_json.keys() | list }}"
+  when:
+    - item | regex_search('_export')
+
+- assert:
+    that:
+      - fetch_template_json_format_result.template_json[template_export_key].date is defined
+      - fetch_template_json_format_result.template_json[template_export_key].groups.0.name == "Templates"
+      - fetch_template_json_format_result.template_json[template_export_key].templates.0.name == "ExampleTemplateForTempleteInfoModule"
+      - fetch_template_json_format_result.template_json[template_export_key].templates.0.template == "ExampleTemplateForTempleteInfoModule"
+
+- name: "test - Fetch template info as a JSON format with omit_date parameter from Zabbix Server"
+  zabbix_template_info:
+    server_url: "{{ zabbix_server_url }} "
+    login_user: "{{ zabbix_login_user }}"
+    login_password: "{{ zabbix_login_password }}"
+    template_name: ExampleTemplateForTempleteInfoModule
+    format: json
+    omit_date: yes
+  register: fetch_template_json_format_omit_date_result
+
+- assert:
+    that:
+      - fetch_template_json_format_omit_date_result.template_json[template_export_key].date is not defined
+      - fetch_template_json_format_omit_date_result.template_json[template_export_key].groups.0.name == "Templates"
+      - fetch_template_json_format_omit_date_result.template_json[template_export_key].templates.0.name == "ExampleTemplateForTempleteInfoModule"
+      - fetch_template_json_format_omit_date_result.template_json[template_export_key].templates.0.template == "ExampleTemplateForTempleteInfoModule"
+
+- name: "test - Fetch template info as a XML format from Zabbix Server"
+  zabbix_template_info:
+    server_url: "{{ zabbix_server_url }} "
+    login_user: "{{ zabbix_login_user }}"
+    login_password: "{{ zabbix_login_password }}"
+    template_name: ExampleTemplateForTempleteInfoModule
+    format: xml
+  register: fetch_template_xml_format_result
+
+- assert:
+    that:
+      - fetch_template_xml_format_result.template_xml | regex_search('<date>.*</date>') is defined
+      - fetch_template_xml_format_result.template_xml | regex_search('</date><groups><group><name>Templates</name></group></groups><templates>') is defined
+      - fetch_template_xml_format_result.template_xml | regex_search('<templates><template><template>ExampleTemplateForTempleteInfoModule</template><name>ExampleTemplateForTempleteInfoModule</name><groups><group><name>Templates</name></group></groups></template></templates>') is defined
+
+- name: "test - Fetch template info as a XML format with omit_date parameter from Zabbix Server"
+  zabbix_template_info:
+    server_url: "{{ zabbix_server_url }} "
+    login_user: "{{ zabbix_login_user }}"
+    login_password: "{{ zabbix_login_password }}"
+    template_name: ExampleTemplateForTempleteInfoModule
+    format: xml
+    omit_date: yes
+  register: fetch_template_xml_format_omit_date_result
+
+- assert:
+    that:
+      - fetch_template_xml_format_omit_date_result.template_xml | regex_search('<date>.*</date>') is none
+      - fetch_template_xml_format_omit_date_result.template_xml | regex_search('</date><groups><group><name>Templates</name></group></groups><templates>') is defined
+      - fetch_template_xml_format_omit_date_result.template_xml | regex_search('<templates><template><template>ExampleTemplateForTempleteInfoModule</template><name>ExampleTemplateForTempleteInfoModule</name><groups><group><name>Templates</name></group></groups></template></templates>') is defined
