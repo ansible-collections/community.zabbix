@@ -29,15 +29,15 @@ jobs:
           # - container: mysql-ubuntu
           #   image: solita/ubuntu-systemd:xenial
           #   group: mysql
-          # - container: pgsql-ubuntu
-          #   image: solita/ubuntu-systemd:xenial
-          #   group: postgresql
+          - container: pgsql-ubuntu
+            image: solita/ubuntu-systemd:xenial
+            group: postgresql
           # - container: mysql-debian
           #   image: minimum2scp/systemd-stretch
           #   group: mysql
-          # - container: pgsql-debian
-          #   image: minimum2scp/systemd-stretch
-          #   group: postgresql
+          - container: pgsql-debian
+            image: minimum2scp/systemd-stretch
+            group: postgresql
         collection_role:
           - zabbix_server
     steps:
