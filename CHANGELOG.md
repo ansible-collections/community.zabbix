@@ -4,7 +4,7 @@
 
 ### Improvements
 #### Modules:
-  - zabbix_action - fixed error on changed API fields for Zabbix 5.0
+  - zabbix_action - fixed error on changed API fields for Zabbix 5.0 [GitHub Issue](https://github.com/rockaut/community.zabbix/edit/fix_92)
 
 ## 0.2.0
 
