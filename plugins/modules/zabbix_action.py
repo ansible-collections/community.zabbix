@@ -193,7 +193,7 @@ options:
         description:
             - Recovery message text.
             - With >= Zabbix 5.0 this field is removed from the API and is dropped silently by module.
-            - Works only with >= Zabbix 3.2
+            - Works only with >= Zabbix 3.2 and < Zabbix 5.0
     recovery_default_subject:
         description:
             - Recovery message subject.
