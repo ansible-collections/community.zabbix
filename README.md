@@ -1,6 +1,6 @@
 # Zabbix collection for Ansible
 
-![CI](https://github.com/ansible-collections/community.zabbix/workflows/CI/badge.svg)
+![plugins](https://github.com/ansible-collections/community.zabbix/workflows/plugins/badge.svg)
 
 This repo hosts the `community.zabbix` Ansible Collection.
 

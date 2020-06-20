@@ -1,6 +1,19 @@
-name: CI
+name: plugins
 on:
-- pull_request
+  push:
+    paths:
+      - 'plugins/**'
+      - 'tests/**'
+      - 'scripts/**'
+      - '.github/workflows/plugins.yml'
+      - 'docker-compose.yml'
+  pull_request:
+    paths:
+      - 'plugins/**'
+      - 'tests/**'
+      - 'scripts/**'
+      - '.github/workflows/plugins.yml'
+      - 'docker-compose.yml'
 
 jobs:
   sanity:
