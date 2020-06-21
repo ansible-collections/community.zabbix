@@ -1,6 +1,7 @@
 ---
 - name: Prepare
   hosts: all
+  become: True
   pre_tasks:
     - name: "Installing packages"
       yum:
