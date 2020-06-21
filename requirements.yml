@@ -1,5 +1,5 @@
 ---
 roles:
-    - src: geerlingguy.apache
-    - src: geerlingguy.mysql
-    - src: geerlingguy.postgresql
+- src: geerlingguy.apache
+- src: geerlingguy.mysql
+- src: geerlingguy.postgresql

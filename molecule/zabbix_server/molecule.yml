@@ -12,7 +12,9 @@ platforms:
   - name: zabbix-server-${MY_MOLECULE_CONTAINER:-mysql-centos}
     image: ${MY_MOLECULE_IMAGE:-"milcom/centos7-systemd"}
     privileged: True
-    command: /sbin/init
+    pre_build_image: true
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
     groups:
       - ${MY_MOLECULE_GROUP:-mysql}
 

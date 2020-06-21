@@ -8,10 +8,12 @@ testinfra_hosts = testinfra.utils.ansible_runner.AnsibleRunner(
 
 
 def test_zabbiserver_running_and_enabled(host):
-    # if host.system_info.distribution == 'centos':
     zabbix = host.service("zabbix-server")
-    assert zabbix.is_enabled
-    assert zabbix.is_running
+    if host.system_info.distribution == 'centos':
+        assert zabbix.is_enabled
+        assert zabbix.is_running
+    else:
+        assert zabbix.is_running
 
 
 @pytest.mark.parametrize("server", [("zabbix-server-pgsql"), ("zabbix-server-mysql")])

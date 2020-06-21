@@ -18,9 +18,18 @@
         name:
           - net-tools
           - apt-utils
+          - gpg-agent
+          - python3-pip
+        update_cache: True
         state: present
       when:
         - ansible_os_family != 'RedHat'
+
+    - name: PyMySQL
+      pip:
+        name: PyMySQL
+      when:
+        - ansible_distribution == 'Ubuntu'
 
     - name: "Configure SUDO."
       lineinfile:
