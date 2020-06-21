@@ -6,6 +6,10 @@
 #### Modules:
   - zabbix_action - fixed error on changed API fields for Zabbix 5.0 [GitHub Issue](https://github.com/rockaut/community.zabbix/edit/fix_92)
 
+### Bug Fixes:
+#### Modules:
+  - zabbix_action - now correctly selects mediatype for the (normal|recovery|update) operations with Zabbix 4.4 and newer. (PR [#90](https://github.com/ansible-collections/community.zabbix/pull/90))
+
 ## 0.2.0
 
 ### New roles:
