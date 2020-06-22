@@ -1063,6 +1063,7 @@ def main():
         module.fail_json(msg="Failed to connect to Zabbix server: %s" % e)
 
     host = Host(module, zbx)
+    zbx_api_version = zbx.api_version()[:5]
 
     template_ids = []
     if link_templates:
@@ -1083,12 +1084,12 @@ def main():
                 macro['macro'] = '{$' + macro['macro']
             if not macro['macro'].endswith('}'):
                 macro['macro'] = macro['macro'] + '}'
-            if LooseVersion(zbx.api_version()[:5]) <= LooseVersion('4.4.0'):
+            if LooseVersion(zbx_api_version) <= LooseVersion('4.4.0'):
                 if 'description' in macro:
                     macro.pop('description', False)
 
             if 'type' in macro:
-                if LooseVersion(zbx.api_version()[:5]) < LooseVersion('5.0.0'):
+                if LooseVersion(zbx_api_version) < LooseVersion('5.0.0'):
                     macro.pop('type')
                 else:
                     if macro['type'] == 'text':
