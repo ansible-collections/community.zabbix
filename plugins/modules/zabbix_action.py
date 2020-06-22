@@ -486,11 +486,13 @@ import traceback
 
 try:
     from zabbix_api import ZabbixAPI
+
     HAS_ZABBIX_API = True
 except ImportError:
     ZBX_IMP_ERR = traceback.format_exc()
     HAS_ZABBIX_API = False
 
+from distutils.version import LooseVersion
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from distutils.version import LooseVersion
 
@@ -991,7 +993,7 @@ class Operations(object):
         """
         try:
             return {
-                'default_msg': '0' if operation.get('message') is not None or operation.get('subject')is not None else '1',
+                'default_msg': '0' if operation.get('message') is not None or operation.get('subject') is not None else '1',
                 'mediatypeid': self._zapi_wrapper.get_mediatype_by_mediatype_name(
                     operation.get('media_type')
                 ) if operation.get('media_type') is not None else '0',

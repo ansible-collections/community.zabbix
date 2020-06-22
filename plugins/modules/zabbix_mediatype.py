@@ -220,17 +220,16 @@ EXAMPLES = r'''
 import atexit
 import traceback
 
-
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from distutils.version import LooseVersion
-
-
 try:
     from zabbix_api import ZabbixAPI
+
     HAS_ZABBIX_API = True
 except ImportError:
     ZBX_IMP_ERR = traceback.format_exc()
     HAS_ZABBIX_API = False
+
+from distutils.version import LooseVersion
+from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 
 
 def to_numeric_value(value, strs):

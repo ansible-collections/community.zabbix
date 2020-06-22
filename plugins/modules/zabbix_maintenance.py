@@ -125,11 +125,13 @@ import traceback
 
 try:
     from zabbix_api import ZabbixAPI
+
     HAS_ZABBIX_API = True
 except ImportError:
     ZBX_IMP_ERR = traceback.format_exc()
     HAS_ZABBIX_API = False
 
+from distutils.version import LooseVersion
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 
 

@@ -173,15 +173,14 @@ import atexit
 import traceback
 
 try:
-    from zabbix_api import ZabbixAPI
-    from zabbix_api import ZabbixAPIException
-    from zabbix_api import Already_Exists
+    from zabbix_api import ZabbixAPI, ZabbixAPIException, Already_Exists
 
     HAS_ZABBIX_API = True
 except ImportError:
     ZBX_IMP_ERR = traceback.format_exc()
     HAS_ZABBIX_API = False
 
+from distutils.version import LooseVersion
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 
 

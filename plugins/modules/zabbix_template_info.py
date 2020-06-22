@@ -147,15 +147,14 @@ import json
 import xml.etree.ElementTree as ET
 
 try:
-    from zabbix_api import ZabbixAPI
-    from zabbix_api import Already_Exists
-    from zabbix_api import ZabbixAPIException
+    from zabbix_api import ZabbixAPI, Already_Exists, ZabbixAPIException
 
     HAS_ZABBIX_API = True
 except ImportError:
     ZBX_IMP_ERR = traceback.format_exc()
     HAS_ZABBIX_API = False
 
+from distutils.version import LooseVersion
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils._text import to_native
 

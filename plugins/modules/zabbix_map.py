@@ -174,14 +174,23 @@ EXAMPLES = r'''
   run_once: yes
 '''
 
+
 import atexit
 import base64
 import traceback
+
+try:
+    from zabbix_api import ZabbixAPI
+    HAS_ZABBIX_API = True
+except ImportError:
+    ZBX_IMP_ERR = traceback.format_exc()
+    HAS_ZABBIX_API = False
 
 from io import BytesIO
 from operator import itemgetter
 from distutils.version import StrictVersion
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+
 
 try:
     import pydotplus
@@ -196,13 +205,6 @@ try:
 except ImportError:
     WEBCOLORS_IMP_ERR = traceback.format_exc()
     HAS_WEBCOLORS = False
-
-try:
-    from zabbix_api import ZabbixAPI
-    HAS_ZABBIX_API = True
-except ImportError:
-    ZBX_IMP_ERR = traceback.format_exc()
-    HAS_ZABBIX_API = False
 
 try:
     from PIL import Image
