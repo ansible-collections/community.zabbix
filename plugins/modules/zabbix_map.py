@@ -230,7 +230,7 @@ class Map():
         self.expand_problem = module.params['expand_problem']
         self.highlight = module.params['highlight']
         self.label_type = module.params['label_type']
-        self.api_version = self._zapi.api_version()
+        self._zbx_api_version = zbx.api_version()[:5]
         self.selements_sort_keys = self._get_selements_sort_keys()
 
     def _build_graph(self):
@@ -329,7 +329,7 @@ class Map():
         element_type = {
             'elementtype': types['image'],
         }
-        if StrictVersion(self.api_version) < StrictVersion('3.4'):
+        if LooseVersion(self._zbx_api_version) < LooseVersion('3.4'):
             element_type.update({
                 'elementid': "0",
             })
@@ -346,7 +346,7 @@ class Map():
                             'elementtype': type_id,
                             'label': element_name
                         })
-                        if StrictVersion(self.api_version) < StrictVersion('3.4'):
+                        if LooseVersion(self._zbx_api_version) < LooseVersion('3.4'):
                             element_type.update({
                                 'elementid': elementid,
                             })
@@ -534,7 +534,7 @@ class Map():
 
     def _get_selements_sort_keys(self):
         keys_to_sort = ['label']
-        if StrictVersion(self.api_version) < StrictVersion('3.4'):
+        if LooseVersion(self._zbx_api_version) < LooseVersion('3.4'):
             keys_to_sort.insert(0, 'elementid')
         return keys_to_sort
 
@@ -544,7 +544,7 @@ class Map():
         generated_selements_sorted = sorted(generated_selements, key=itemgetter(*self.selements_sort_keys))
         exist_selements_sorted = sorted(exist_selements, key=itemgetter(*self.selements_sort_keys))
         for (generated_selement, exist_selement) in zip(generated_selements_sorted, exist_selements_sorted):
-            if StrictVersion(self.api_version) >= StrictVersion("3.4"):
+            if LooseVersion(self._zbx_api_version) >= LooseVersion('3.4'):
                 if not self._is_elements_equal(generated_selement.get('elements', []), exist_selement.get('elements', [])):
                     return False
             if not self._is_dicts_equal(generated_selement, exist_selement, ['selementid']):
