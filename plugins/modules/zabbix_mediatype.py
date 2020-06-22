@@ -220,17 +220,276 @@ EXAMPLES = r'''
 import atexit
 import traceback
 
-
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from distutils.version import LooseVersion
-
-
 try:
     from zabbix_api import ZabbixAPI
+
     HAS_ZABBIX_API = True
 except ImportError:
     ZBX_IMP_ERR = traceback.format_exc()
     HAS_ZABBIX_API = False
+
+from distutils.version import LooseVersion
+from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+
+
+class Zapi(object):
+    """
+    A simple wrapper over the Zabbix API
+    """
+    def __init__(self, module, zbx):
+        self._module = module
+        self._zapi = zbx
+        self._zbx_api_version = zbx.api_version()[:5]
+
+    def construct_parameters(self, **kwargs):
+        """Translates data to a format suitable for Zabbix API and filters
+        the ones that are related to the specified mediatype type.
+
+        Args:
+            **kwargs: Arguments passed to the module.
+
+        Returns:
+            A dictionary of arguments that are related to kwargs['transport_type'],
+            and are in a format that is understandable by Zabbix API.
+        """
+        parameters={}
+        if kwargs['transport_type'] == 'email':
+            parameters=dict(
+                description=kwargs['name'],
+                status=to_numeric_value(kwargs['status'],
+                                        {'enabled': '0',
+                                        'disabled': '1'}),
+                type=to_numeric_value(kwargs['transport_type'],
+                                    {'email': '0',
+                                    'script': '1',
+                                    'sms': '2',
+                                    'jabber': '3',
+                                    'ez_texting': '100'}),
+                maxsessions=str(kwargs['max_sessions']),
+                maxattempts=str(kwargs['max_attempts']),
+                attempt_interval=str(kwargs['attempt_interval']),
+                smtp_server=kwargs['smtp_server'],
+                smtp_port=str(kwargs['smtp_server_port']),
+                smtp_helo=kwargs['smtp_helo'],
+                smtp_email=kwargs['smtp_email'],
+                smtp_security=to_numeric_value(str(kwargs['smtp_security']),
+                                            {'None': '0',
+                                                'STARTTLS': '1',
+                                                'SSL/TLS': '2'}),
+                smtp_authentication=to_numeric_value(str(kwargs['smtp_authentication']),
+                                                    {'False': '0',
+                                                    'True': '1'}),
+                smtp_verify_host=to_numeric_value(str(kwargs['smtp_verify_host']),
+                                                {'False': '0',
+                                                'True': '1'}),
+                smtp_verify_peer=to_numeric_value(str(kwargs['smtp_verify_peer']),
+                                                {'False': '0',
+                                                'True': '1'}),
+                username=kwargs['username'],
+                passwd=kwargs['password']
+            )
+
+        elif kwargs['transport_type'] == 'script':
+            if kwargs['script_params'] is None:
+                _script_params = ''  # ZBX-15706
+            else:
+                _script_params = '\n'.join(str(i) for i in kwargs['script_params']) + '\n'
+            parameters=dict(
+                description=kwargs['name'],
+                status=to_numeric_value(kwargs['status'],
+                                        {'enabled': '0',
+                                        'disabled': '1'}),
+                type=to_numeric_value(kwargs['transport_type'],
+                                    {'email': '0',
+                                    'script': '1',
+                                    'sms': '2',
+                                    'jabber': '3',
+                                    'ez_texting': '100'}),
+                maxsessions=str(kwargs['max_sessions']),
+                maxattempts=str(kwargs['max_attempts']),
+                attempt_interval=str(kwargs['attempt_interval']),
+                exec_path=kwargs['script_name'],
+                exec_params=_script_params
+            )
+        elif kwargs['transport_type'] == 'sms':
+            parameters=dict(
+                description=kwargs['name'],
+                status=to_numeric_value(kwargs['status'],
+                                        {'enabled': '0',
+                                        'disabled': '1'}),
+                type=to_numeric_value(kwargs['transport_type'],
+                                    {'email': '0',
+                                    'script': '1',
+                                    'sms': '2',
+                                    'jabber': '3',
+                                    'ez_texting': '100'}),
+                maxsessions=str(kwargs['max_sessions']),
+                maxattempts=str(kwargs['max_attempts']),
+                attempt_interval=str(kwargs['attempt_interval']),
+                gsm_modem=kwargs['gsm_modem']
+            )
+        elif kwargs['transport_type'] == 'jabber' and LooseVersion(self._zbx_api_version) <= LooseVersion('4.2'):
+            parameters=dict(
+                description=kwargs['name'],
+                status=to_numeric_value(kwargs['status'],
+                                        {'enabled': '0',
+                                        'disabled': '1'}),
+                type=to_numeric_value(kwargs['transport_type'],
+                                    {'email': '0',
+                                    'script': '1',
+                                    'sms': '2',
+                                    'jabber': '3',
+                                    'ez_texting': '100'}),
+                maxsessions=str(kwargs['max_sessions']),
+                maxattempts=str(kwargs['max_attempts']),
+                attempt_interval=str(kwargs['attempt_interval']),
+                username=kwargs['username'],
+                passwd=kwargs['password']
+            )
+        elif kwargs['transport_type'] == 'ez_texting' and LooseVersion(self._zbx_api_version) <= LooseVersion('4.2'):
+            parameters=dict(
+                description=kwargs['name'],
+                status=to_numeric_value(kwargs['status'],
+                                        {'enabled': '0',
+                                        'disabled': '1'}),
+                type=to_numeric_value(kwargs['transport_type'],
+                                    {'email': '0',
+                                    'script': '1',
+                                    'sms': '2',
+                                    'jabber': '3',
+                                    'ez_texting': '100'}),
+                maxsessions=str(kwargs['max_sessions']),
+                maxattempts=str(kwargs['max_attempts']),
+                attempt_interval=str(kwargs['attempt_interval']),
+                username=kwargs['username'],
+                passwd=kwargs['password'],
+                exec_path=to_numeric_value(kwargs['message_text_limit'],
+                                        {'USA': '0',
+                                        'Canada': '1'}),
+            )
+        else:
+            self._module.fail_json(msg="%s is unsupported for Zabbix version %s" % (kwargs['transport_type'], self._zbx_api_version))
+
+        if LooseVersion(self._zbx_api_version) >= LooseVersion('4.4'):
+            # description key changed to name key from zabbix 4.4
+            parameters['name'] = parameters.pop('description')
+
+        if LooseVersion(self._zbx_api_version) <= LooseVersion('3.2'):
+            # remove settings not supported till 3.4
+            for key in ['maxsessions', 'maxattempts', 'attempt_interval']:
+                del parameters[key]
+
+        return parameters
+
+    def get_mediatype_by_name(self, name):
+        """Get mediatype by name.
+
+        Args:
+            name: Zabbix mediatype name
+
+        Returns:
+            dict: Zabbix mediatype
+
+        """
+        filter_key_name = 'description'
+        if LooseVersion(self._zbx_api_version) >= LooseVersion('4.4'):
+            # description key changed to name key from zabbix 4.4
+            filter_key_name = 'name'
+
+        try:
+            mediatype_list = self._zapi.mediatype.get({
+                'output': 'extend',
+                'filter': {filter_key_name: [name]}
+            })
+            if len(mediatype_list) < 1:
+                self._module.fail_json(msg="Mediatype not found: " % name)
+            else:
+                return mediatype_list[0]
+        except Exception as e:
+            self._module.fail_json(msg="Failed to get ID of the mediatype '{name}': {e}".format(name=name, e=e))
+
+    def check_if_mediatype_exists(self, name):
+        """Checks if mediatype exists.
+
+        Args:
+            name: Zabbix mediatype name
+
+        Returns:
+            The return value. True if mediatype exists, False otherwise
+
+        """
+        filter_key_name = 'description'
+        if LooseVersion(self._zbx_api_version) >= LooseVersion('4.4'):
+            # description key changed to name key from zabbix 4.4
+            filter_key_name = 'name'
+
+        try:
+            _mediatype = self._zapi.mediatype.get({
+                'output': 'extend',
+                'filter': {filter_key_name: [name]}
+            })
+            return _mediatype
+        except Exception as e:
+            self._module.fail_json(msg="Failed to check if mediatype '{name}' exists: {e}".format(name=name, e=e))
+
+class Mediatype(object):
+    def __init__(self, module, zbx, zapi_wrapper):
+        self._module = module
+        self._zapi = zbx
+        self._zapi_wrapper = zapi_wrapper
+        self._zbx_api_version = zbx.api_version()[:5]
+
+    def get_update_params(self, mediatype_id, **kwargs):
+        """Filters only the parameters that are different and need to be updated.
+
+        Args:
+            mediatype_id (int): ID of the mediatype to be updated.
+            **kwargs: Parameters for the new mediatype.
+
+        Returns:
+            A tuple where the first element is a dictionary of parameters
+            that need to be updated and the second one is a dictionary
+            returned by diff() function with
+            existing mediatype data and new params passed to it.
+        """
+        existing_mediatype = self._zapi.mediatype.get({
+            'output': 'extend',
+            'mediatypeids': [mediatype_id]
+        })[0]
+
+        if existing_mediatype['type'] != kwargs['type']:
+            return kwargs, diff(existing_mediatype, kwargs)
+        else:
+            params_to_update = {}
+            for key in kwargs:
+                if (not (kwargs[key] is None and existing_mediatype[key] == '')) and kwargs[key] != existing_mediatype[key]:
+                    params_to_update[key] = kwargs[key]
+            return params_to_update, diff(existing_mediatype, kwargs)
+
+    def delete_mediatype(self, mediatype_id):
+        try:
+            if self._module.check_mode:
+                self._module.exit_json(changed=True, msg="Mediatype would have been deleted if check mode was not specified.")
+            return self._zapi.mediatype.delete([mediatype_id])
+        except Exception as e:
+            self._module.fail_json(msg="Failed to delete mediatype '{_id}': {e}".format(_id=mediatype_id, e=e))
+
+    def update_mediatype(self, **kwargs):
+        try:
+            if self._module.check_mode:
+                self._module.exit_json(msg="Mediatype would be updated if check mode was not specified: %s" % kwargs, changed=True)
+            mediatype_id = self._zapi.mediatype.update(kwargs)
+        except Exception as e:
+            self._module.fail_json(msg="Failed to update mediatype '{_id}': {e}".format(_id=kwargs['mediatypeid'], e=e))
+
+    def create_mediatype(self, **kwargs):
+        try:
+            if self._module.check_mode:
+                self._module.exit_json(changed=True, msg="Mediatype would have been added if check mode was not specified.")
+            mediatype_list = self._zapi.mediatype.create(kwargs)
+            return mediatype_list['mediatypeids'][0]
+        except Exception as e:
+            self._module.fail_json(msg="Failed to create mediatype '{name}': {e}".format(name=kwargs['description'], e=e))
 
 
 def to_numeric_value(value, strs):
@@ -263,164 +522,6 @@ def validate_params(module, params):
                 )
 
 
-def construct_parameters(**kwargs):
-    """Translates data to a format suitable for Zabbix API and filters
-    the ones that are related to the specified mediatype type.
-
-    Args:
-        **kwargs: Arguments passed to the module.
-
-    Returns:
-        A dictionary of arguments that are related to kwargs['transport_type'],
-        and are in a format that is understandable by Zabbix API.
-    """
-    if kwargs['transport_type'] == 'email':
-        return dict(
-            description=kwargs['name'],
-            status=to_numeric_value(kwargs['status'],
-                                    {'enabled': '0',
-                                     'disabled': '1'}),
-            type=to_numeric_value(kwargs['transport_type'],
-                                  {'email': '0',
-                                   'script': '1',
-                                   'sms': '2',
-                                   'jabber': '3',
-                                   'ez_texting': '100'}),
-            maxsessions=str(kwargs['max_sessions']),
-            maxattempts=str(kwargs['max_attempts']),
-            attempt_interval=str(kwargs['attempt_interval']),
-            smtp_server=kwargs['smtp_server'],
-            smtp_port=str(kwargs['smtp_server_port']),
-            smtp_helo=kwargs['smtp_helo'],
-            smtp_email=kwargs['smtp_email'],
-            smtp_security=to_numeric_value(str(kwargs['smtp_security']),
-                                           {'None': '0',
-                                            'STARTTLS': '1',
-                                            'SSL/TLS': '2'}),
-            smtp_authentication=to_numeric_value(str(kwargs['smtp_authentication']),
-                                                 {'False': '0',
-                                                  'True': '1'}),
-            smtp_verify_host=to_numeric_value(str(kwargs['smtp_verify_host']),
-                                              {'False': '0',
-                                               'True': '1'}),
-            smtp_verify_peer=to_numeric_value(str(kwargs['smtp_verify_peer']),
-                                              {'False': '0',
-                                               'True': '1'}),
-            username=kwargs['username'],
-            passwd=kwargs['password']
-        )
-
-    elif kwargs['transport_type'] == 'script':
-        if kwargs['script_params'] is None:
-            _script_params = ''  # ZBX-15706
-        else:
-            _script_params = '\n'.join(str(i) for i in kwargs['script_params']) + '\n'
-        return dict(
-            description=kwargs['name'],
-            status=to_numeric_value(kwargs['status'],
-                                    {'enabled': '0',
-                                     'disabled': '1'}),
-            type=to_numeric_value(kwargs['transport_type'],
-                                  {'email': '0',
-                                   'script': '1',
-                                   'sms': '2',
-                                   'jabber': '3',
-                                   'ez_texting': '100'}),
-            maxsessions=str(kwargs['max_sessions']),
-            maxattempts=str(kwargs['max_attempts']),
-            attempt_interval=str(kwargs['attempt_interval']),
-            exec_path=kwargs['script_name'],
-            exec_params=_script_params
-        )
-    elif kwargs['transport_type'] == 'sms':
-        return dict(
-            description=kwargs['name'],
-            status=to_numeric_value(kwargs['status'],
-                                    {'enabled': '0',
-                                     'disabled': '1'}),
-            type=to_numeric_value(kwargs['transport_type'],
-                                  {'email': '0',
-                                   'script': '1',
-                                   'sms': '2',
-                                   'jabber': '3',
-                                   'ez_texting': '100'}),
-            maxsessions=str(kwargs['max_sessions']),
-            maxattempts=str(kwargs['max_attempts']),
-            attempt_interval=str(kwargs['attempt_interval']),
-            gsm_modem=kwargs['gsm_modem']
-        )
-    elif kwargs['transport_type'] == 'jabber' and LooseVersion(kwargs['zbx_api_version']) <= LooseVersion('4.2'):
-        return dict(
-            description=kwargs['name'],
-            status=to_numeric_value(kwargs['status'],
-                                    {'enabled': '0',
-                                     'disabled': '1'}),
-            type=to_numeric_value(kwargs['transport_type'],
-                                  {'email': '0',
-                                   'script': '1',
-                                   'sms': '2',
-                                   'jabber': '3',
-                                   'ez_texting': '100'}),
-            maxsessions=str(kwargs['max_sessions']),
-            maxattempts=str(kwargs['max_attempts']),
-            attempt_interval=str(kwargs['attempt_interval']),
-            username=kwargs['username'],
-            passwd=kwargs['password']
-        )
-    elif kwargs['transport_type'] == 'ez_texting' and LooseVersion(kwargs['zbx_api_version']) <= LooseVersion('4.2'):
-        return dict(
-            description=kwargs['name'],
-            status=to_numeric_value(kwargs['status'],
-                                    {'enabled': '0',
-                                     'disabled': '1'}),
-            type=to_numeric_value(kwargs['transport_type'],
-                                  {'email': '0',
-                                   'script': '1',
-                                   'sms': '2',
-                                   'jabber': '3',
-                                   'ez_texting': '100'}),
-            maxsessions=str(kwargs['max_sessions']),
-            maxattempts=str(kwargs['max_attempts']),
-            attempt_interval=str(kwargs['attempt_interval']),
-            username=kwargs['username'],
-            passwd=kwargs['password'],
-            exec_path=to_numeric_value(kwargs['message_text_limit'],
-                                       {'USA': '0',
-                                        'Canada': '1'}),
-        )
-
-    return {'unsupported_parameter': kwargs['transport_type'], 'zbx_api_version': kwargs['zbx_api_version']}
-
-
-def check_if_mediatype_exists(module, zbx, name, zbx_api_version):
-    """Checks if mediatype exists.
-
-    Args:
-        module: AnsibleModule object
-        zbx: ZabbixAPI object
-        name: Zabbix mediatype name
-
-    Returns:
-        Tuple of (True, `id of the mediatype`) if mediatype exists, (False, None) otherwise
-    """
-    filter_key_name = 'description'
-    if LooseVersion(zbx_api_version) >= LooseVersion('4.4'):
-        # description key changed to name key from zabbix 4.4
-        filter_key_name = 'name'
-
-    try:
-        mediatype_list = zbx.mediatype.get({
-            'output': 'extend',
-            'filter': {filter_key_name: [name]}
-        })
-        if len(mediatype_list) < 1:
-            return False, None
-        else:
-            return True, mediatype_list[0]['mediatypeid']
-    except Exception as e:
-        module.fail_json(msg="Failed to get ID of the mediatype '{name}': {e}".format(name=name, e=e))
-
-
 def diff(existing, new):
     """Constructs the diff for Ansible's --diff option.
 
@@ -443,93 +544,8 @@ def diff(existing, new):
     return {'before': before, 'after': after}
 
 
-def get_update_params(module, zbx, mediatype_id, **kwargs):
-    """Filters only the parameters that are different and need to be updated.
-
-    Args:
-        module: AnsibleModule object.
-        zbx: ZabbixAPI object.
-        mediatype_id (int): ID of the mediatype to be updated.
-        **kwargs: Parameters for the new mediatype.
-
-    Returns:
-        A tuple where the first element is a dictionary of parameters
-        that need to be updated and the second one is a dictionary
-        returned by diff() function with
-        existing mediatype data and new params passed to it.
-    """
-    existing_mediatype = zbx.mediatype.get({
-        'output': 'extend',
-        'mediatypeids': [mediatype_id]
-    })[0]
-
-    if existing_mediatype['type'] != kwargs['type']:
-        return kwargs, diff(existing_mediatype, kwargs)
-    else:
-        params_to_update = {}
-        for key in kwargs:
-            if (not (kwargs[key] is None and existing_mediatype[key] == '')) and kwargs[key] != existing_mediatype[key]:
-                params_to_update[key] = kwargs[key]
-        return params_to_update, diff(existing_mediatype, kwargs)
-
-
-def delete_mediatype(module, zbx, mediatype_id):
-    try:
-        return zbx.mediatype.delete([mediatype_id])
-    except Exception as e:
-        module.fail_json(msg="Failed to delete mediatype '{_id}': {e}".format(_id=mediatype_id, e=e))
-
-
-def update_mediatype(module, zbx, **kwargs):
-    try:
-        mediatype_id = zbx.mediatype.update(kwargs)
-    except Exception as e:
-        module.fail_json(msg="Failed to update mediatype '{_id}': {e}".format(_id=kwargs['mediatypeid'], e=e))
-
-
-def create_mediatype(module, zbx, **kwargs):
-    try:
-        mediatype_id = zbx.mediatype.create(kwargs)
-    except Exception as e:
-        module.fail_json(msg="Failed to create mediatype '{name}': {e}".format(name=kwargs['description'], e=e))
-
 
 def main():
-    argument_spec = dict(
-        server_url=dict(type='str', required=True, aliases=['url']),
-        login_user=dict(type='str', required=True),
-        login_password=dict(type='str', required=True, no_log=True),
-        http_login_user=dict(type='str', required=False, default=None),
-        http_login_password=dict(type='str', required=False, default=None, no_log=True),
-        validate_certs=dict(type='bool', required=False, default=True), timeout=dict(type='int', default=10),
-        name=dict(type='str', required=True),
-        state=dict(type='str', default='present', choices=['present', 'absent']),
-        type=dict(type='str', choices=['email', 'script', 'sms', 'jabber', 'ez_texting'], required=True),
-        status=dict(type='str', default='enabled', choices=['enabled', 'disabled'], required=False),
-        max_sessions=dict(type='int', default=1, required=False),
-        max_attempts=dict(type='int', default=3, required=False),
-        attempt_interval=dict(type='int', default=10, required=False),
-        # Script
-        script_name=dict(type='str', required=False),
-        script_params=dict(type='list', required=False),
-        # SMS
-        gsm_modem=dict(type='str', required=False),
-        # Jabber
-        username=dict(type='str', required=False),
-        password=dict(type='str', required=False, no_log=True),
-        # Email
-        smtp_server=dict(type='str', default='localhost', required=False),
-        smtp_server_port=dict(type='int', default=25, required=False),
-        smtp_helo=dict(type='str', default='localhost', required=False),
-        smtp_email=dict(type='str', required=False),
-        smtp_security=dict(type='str', required=False, choices=['None', 'STARTTLS', 'SSL/TLS']),
-        smtp_authentication=dict(type='bool', default=False, required=False),
-        smtp_verify_host=dict(type='bool', default=False, required=False),
-        smtp_verify_peer=dict(type='bool', default=False, required=False),
-        # EZ Text
-        message_text_limit=dict(type='str', required=False, choices=['USA', 'Canada'])
-    )
-
     required_params = [
         ['type', 'email', ['smtp_email']],
         ['type', 'script', ['script_name']],
@@ -540,7 +556,40 @@ def main():
     ]
 
     module = AnsibleModule(
-        argument_spec=argument_spec,
+        argument_spec=dict(
+            server_url=dict(type='str', required=True, aliases=['url']),
+            login_user=dict(type='str', required=True),
+            login_password=dict(type='str', required=True, no_log=True),
+            http_login_user=dict(type='str', required=False, default=None),
+            http_login_password=dict(type='str', required=False, default=None, no_log=True),
+            validate_certs=dict(type='bool', required=False, default=True), timeout=dict(type='int', default=10),
+            name=dict(type='str', required=True),
+            state=dict(type='str', default='present', choices=['present', 'absent']),
+            type=dict(type='str', choices=['email', 'script', 'sms', 'jabber', 'ez_texting'], required=True),
+            status=dict(type='str', default='enabled', choices=['enabled', 'disabled'], required=False),
+            max_sessions=dict(type='int', default=1, required=False),
+            max_attempts=dict(type='int', default=3, required=False),
+            attempt_interval=dict(type='int', default=10, required=False),
+            # Script
+            script_name=dict(type='str', required=False),
+            script_params=dict(type='list', required=False),
+            # SMS
+            gsm_modem=dict(type='str', required=False),
+            # Jabber
+            username=dict(type='str', required=False),
+            password=dict(type='str', required=False, no_log=True),
+            # Email
+            smtp_server=dict(type='str', default='localhost', required=False),
+            smtp_server_port=dict(type='int', default=25, required=False),
+            smtp_helo=dict(type='str', default='localhost', required=False),
+            smtp_email=dict(type='str', required=False),
+            smtp_security=dict(type='str', required=False, choices=['None', 'STARTTLS', 'SSL/TLS']),
+            smtp_authentication=dict(type='bool', default=False, required=False),
+            smtp_verify_host=dict(type='bool', default=False, required=False),
+            smtp_verify_peer=dict(type='bool', default=False, required=False),
+            # EZ Text
+            message_text_limit=dict(type='str', required=False, choices=['USA', 'Canada'])
+        ),
         supports_check_mode=True
     )
 
@@ -595,10 +644,12 @@ def main():
     except Exception as e:
         module.fail_json(msg="Failed to connect to Zabbix server: %s" % e)
 
-    zbx_api_version = zbx.api_version()[:3]
-    mediatype_exists, mediatype_id = check_if_mediatype_exists(module, zbx, name, zbx_api_version)
+    zapi_wrapper = Zapi(module, zbx)
+    mediatype = Mediatype(module, zbx, zapi_wrapper)
 
-    parameters = construct_parameters(
+    mediatype_exists = zapi_wrapper.check_if_mediatype_exists(name)
+
+    parameters = zapi_wrapper.construct_parameters(
         name=name,
         transport_type=transport_type,
         status=status,
@@ -618,33 +669,13 @@ def main():
         smtp_authentication=smtp_authentication,
         smtp_verify_host=smtp_verify_host,
         smtp_verify_peer=smtp_verify_peer,
-        message_text_limit=message_text_limit,
-        zbx_api_version=zbx_api_version
+        message_text_limit=message_text_limit
     )
 
-    if 'unsupported_parameter' in parameters:
-        module.fail_json(msg="%s is unsupported for Zabbix version %s" % (parameters['unsupported_parameter'], parameters['zbx_api_version']))
-
-    if LooseVersion(zbx_api_version) >= LooseVersion('4.4'):
-        # description key changed to name key from zabbix 4.4
-        parameters['name'] = parameters.pop('description')
-
-    if LooseVersion(zbx_api_version) <= LooseVersion('3.2'):
-        # remove settings not supported till 3.4
-        for key in ['maxsessions', 'maxattempts', 'attempt_interval']:
-            del parameters[key]
-
     if mediatype_exists:
+        mediatype_id = zapi_wrapper.get_mediatype_by_name(name)['mediatypeid']
         if state == 'absent':
-            if module.check_mode:
-                module.exit_json(
-                    changed=True,
-                    msg="Mediatype would have been deleted. Name: {name}, ID: {_id}".format(
-                        name=name,
-                        _id=mediatype_id
-                    )
-                )
-            mediatype_id = delete_mediatype(module, zbx, mediatype_id)
+            mediatype_id = mediatype.delete_mediatype(mediatype_id)
             module.exit_json(
                 changed=True,
                 msg="Mediatype deleted. Name: {name}, ID: {_id}".format(
@@ -653,7 +684,7 @@ def main():
                 )
             )
         else:
-            params_to_update, diff = get_update_params(module, zbx, mediatype_id, **parameters)
+            params_to_update, diff = mediatype.get_update_params(mediatype_id, **parameters)
             if params_to_update == {}:
                 module.exit_json(
                     changed=False,
@@ -669,11 +700,9 @@ def main():
                             _id=mediatype_id
                         )
                     )
-                mediatype_id = update_mediatype(
-                    module, zbx,
-                    mediatypeid=mediatype_id,
-                    **params_to_update
-                )
+
+                params_to_update["mediatypeid"] = mediatype_id
+                mediatype_id = mediatype.update_mediatype(**params_to_update)
                 module.exit_json(
                     changed=True,
                     diff=diff,
@@ -689,12 +718,10 @@ def main():
             if module.check_mode:
                 module.exit_json(
                     changed=True,
-                    msg="Mediatype would have been created. Name: {name}, ID: {_id}".format(
-                        name=name,
-                        _id=mediatype_id
-                    )
+                    msg="Mediatype would have been created. Name: {name}".format(name=name)
                 )
-            mediatype_id = create_mediatype(module, zbx, **parameters)
+
+            mediatype_id = mediatype.create_mediatype(**parameters)
             module.exit_json(
                 changed=True,
                 msg="Mediatype created: {name}, ID: {_id}".format(
