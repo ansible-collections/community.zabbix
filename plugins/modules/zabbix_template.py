@@ -326,6 +326,7 @@ class Template(object):
     def __init__(self, module, zbx):
         self._module = module
         self._zapi = zbx
+        self._zbx_api_version = zbx.api_version()[:5]
 
     # check if host group exists
     def check_host_group_exist(self, group_names):
@@ -505,7 +506,7 @@ class Template(object):
 
         # Versions older than 2.4 do not support description field within template
         desc_not_supported = False
-        if LooseVersion(self._zapi.api_version()).version[:2] < LooseVersion('2.4').version:
+        if LooseVersion(self._zbx_api_version) < LooseVersion('2.4'):
             desc_not_supported = True
 
         # Filter empty attributes from template object to allow accurate comparison
@@ -612,18 +613,16 @@ class Template(object):
         }
 
         try:
-            # old api version support here
-            api_version = self._zapi.api_version()
             # updateExisting for application removed from zabbix api after 3.2
-            if LooseVersion(api_version).version[:2] <= LooseVersion('3.2').version:
+            if LooseVersion(self._zbx_api_version) <= LooseVersion('3.2'):
                 update_rules['applications']['updateExisting'] = True
 
             # templateLinkage.deleteMissing only available in 4.0 branch higher .16 and higher 4.4.4
             # it's not available in 4.2 branches or lower 4.0.16
-            if LooseVersion(api_version).version[:2] == LooseVersion('4.0').version and \
-               LooseVersion(api_version).version[:3] >= LooseVersion('4.0.16').version:
+            if LooseVersion(self._zbx_api_version).version[:2] == LooseVersion('4.0').version and \
+               LooseVersion(self._zbx_api_version).version[:3] >= LooseVersion('4.0.16').version:
                 update_rules['templateLinkage']['deleteMissing'] = True
-            if LooseVersion(api_version).version[:3] >= LooseVersion('4.4.4').version:
+            if LooseVersion(self._zbx_api_version) >= LooseVersion('4.4.4'):
                 update_rules['templateLinkage']['deleteMissing'] = True
 
             import_data = {'format': template_type, 'source': template_content, 'rules': update_rules}
