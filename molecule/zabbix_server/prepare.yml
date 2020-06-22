@@ -1,7 +1,6 @@
 ---
 - name: Prepare
   hosts: all
-  become: True
   pre_tasks:
     - name: "Installing packages"
       yum:
@@ -59,5 +58,7 @@
   roles:
     - role: geerlingguy.postgresql
       when: inventory_hostname in groups['postgresql']
+      become: True
     - role: geerlingguy.mysql
       when: inventory_hostname in groups['mysql']
+      become: True
