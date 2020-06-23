@@ -10,7 +10,6 @@ __metaclass__ = type
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from distutils.version import LooseVersion
 
-
 from ansible_collections.community.zabbix.plugins.module_utils.wrappers import ZapiWrapper
 
 
@@ -18,11 +17,12 @@ class ZabbixBase(object):
     """
     The base class for deriving off module classes
     """
-    def __init__(self, module, zbx, zapi_wrapper = None):
+    def __init__(self, module, zbx = None, zapi_wrapper = None):
         self._module = module
-        self._zapi = zbx
-        self._zbx_api_version = zbx.api_version()[:5]
+
         if zapi_wrapper is None :
             self._zapi_wrapper = ZapiWrapper(module, zbx)
         else: 
             self._zapi_wrapper = zapi_wrapper
+
+        self._zapi = self._zapi_wrapper._zapi
