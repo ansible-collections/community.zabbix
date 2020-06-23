@@ -17,6 +17,12 @@ on:
 
 jobs:
   sanity:
+    name: Sanity (${{ matrix.env.ansible }})
+    strategy:
+      matrix:
+        ansible:
+        - stable-2.10
+        - devel
     runs-on: ubuntu-latest
     steps:
 
@@ -30,8 +36,8 @@ jobs:
         with:
           python-version: 3.6
 
-      - name: Install ansible-base
-        run: pip install git+https://github.com/ansible-collection-migration/ansible-base.git --disable-pip-version-check
+      - name: Install ansible-base (${{ matrix.env.ansible }})
+        run: pip install https://github.com/ansible/ansible/archive/devel.tar.gz --disable-pip-version-check
 
       - name: Run sanity tests
         run: ansible-test sanity --docker -v --color --python 3.6
@@ -65,8 +71,8 @@ jobs:
       - name: Install dependencies
         run: pip install docker-compose zabbix-api
 
-      - name: Install ansible-base
-        run: pip install git+https://github.com/ansible-collection-migration/ansible-base.git --disable-pip-version-check
+      - name: Install ansible-base 2.10
+        run: pip install https://github.com/ansible/ansible/archive/stable-2.10.tar.gz --disable-pip-version-check
 
       - name: Zabbix container server provisioning
         run: docker-compose up -d
