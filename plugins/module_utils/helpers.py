@@ -21,9 +21,9 @@ def helper_cleanup_data(obj):
        object: cleaned object
     """
     if isinstance(obj, (list, tuple, set)):
-        return type(obj)(cleanup_data(x) for x in obj if x is not None)
+        return type(obj)(helper_cleanup_data(x) for x in obj if x is not None)
     elif isinstance(obj, dict):
-        return type(obj)((cleanup_data(k), cleanup_data(v))
+        return type(obj)((helper_cleanup_data(k), helper_cleanup_data(v))
                          for k, v in obj.items() if k is not None and v is not None)
     else:
         return obj
