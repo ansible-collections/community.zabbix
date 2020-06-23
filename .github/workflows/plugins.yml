@@ -17,7 +17,7 @@ on:
 
 jobs:
   sanity:
-    name: Sanity (${{ matrix.env.ansible }})
+    name: Sanity (${{ matrix.ansible }})
     strategy:
       matrix:
         ansible:
@@ -36,8 +36,8 @@ jobs:
         with:
           python-version: 3.6
 
-      - name: Install ansible-base (${{ matrix.env.ansible }})
-        run: pip install https://github.com/ansible/ansible/archive/devel.tar.gz --disable-pip-version-check
+      - name: Install ansible-base (${{ matrix.ansible }})
+        run: pip install https://github.com/ansible/ansible/archive/${{ matrix.ansible }}.tar.gz --disable-pip-version-check
 
       - name: Run sanity tests
         run: ansible-test sanity --docker -v --color --python 3.6
