@@ -47,7 +47,7 @@ class ZapiWrapper(object):
 
     def login(self):
         # check if api already logged in
-        if not self._zapi.test_login():
+        if not self._zapi.auth != '':
             try:
                 login_user = self._module.params['login_user']
                 login_password = self._module.params['login_password']

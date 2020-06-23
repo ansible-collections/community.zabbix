@@ -25,4 +25,6 @@ class ZabbixBase(object):
         else:
             self._zapi_wrapper = zapi_wrapper
 
+        # include some backward compat properties for now
         self._zapi = self._zapi_wrapper._zapi
+        self._zbx_api_version = self._zapi_wrapper._zbx_api_version
