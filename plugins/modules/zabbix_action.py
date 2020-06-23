@@ -991,7 +991,7 @@ class Operations(object):
         """
         try:
             return {
-                'default_msg': '0' if operation.get('message') is not None or operation.get('subject')is not None else '1',
+                'default_msg': '0' if operation.get('message') is not None or operation.get('subject') is not None else '1',
                 'mediatypeid': self._zapi_wrapper.get_mediatype_by_mediatype_name(
                     operation.get('media_type')
                 ) if operation.get('media_type') is not None else '0',

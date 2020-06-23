@@ -95,7 +95,8 @@ def main():
         supports_check_mode=True
     )
     if module._name == 'zabbix_group_facts':
-        module.deprecate("The 'zabbix_group_facts' module has been renamed to 'zabbix_group_info'", version='2.13')
+        module.deprecate("The 'zabbix_group_facts' module has been renamed to 'zabbix_group_info'",
+                         collection_name="community.zabbix", version='2.0.0')  # was 2.13
 
     if not HAS_ZABBIX_API:
         module.fail_json(msg=missing_required_lib('zabbix-api', url='https://pypi.org/project/zabbix-api/'), exception=ZBX_IMP_ERR)

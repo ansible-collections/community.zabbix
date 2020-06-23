@@ -365,8 +365,8 @@ def main():
                     ip=dict(type='str', default=''),
                     dns=dict(type='str', default=''),
                     port=dict(type='str', default='10051'),
-                    type=dict(type='int', default=0, removed_in_version='2.14'),
-                    main=dict(type='int', default=0, removed_in_version='2.14')
+                    type=dict(type='int', default=0, removed_in_version="3.0.0", removed_from_collection='community.zabbix'),  # was Ansible 2.14
+                    main=dict(type='int', default=0, removed_in_version="3.0.0", removed_from_collection='community.zabbix'),  # was Ansible 2.14
                 ),
             )
         ),
