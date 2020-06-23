@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
@@ -18,20 +18,20 @@ class ZapiWrapper(object):
     """
     A simple wrapper over the Zabbix API
     """
-    def __init__(self, module, zbx = None):
+    def __init__(self, module, zbx=None):
         self._module = module
 
         # check if zbx is already instantiated or not
-        if zbx != None and isinstance(zbx, ZabbixAPI):
+        if zbx is not None and isinstance(zbx, ZabbixAPI):
             self._zapi = zbx
         else:
-            server_url          = module.params['server_url']
-            http_login_user     = module.params['http_login_user']
+            server_url = module.params['server_url']
+            http_login_user = module.params['http_login_user']
             http_login_password = module.params['http_login_password']
-            validate_certs      = module.params['validate_certs']
-            timeout             = module.params['timeout']
-            self._zapi = ZabbixAPI(server_url, timeout=timeout, user=http_login_user,
-                            passwd=http_login_password, validate_certs=validate_certs)
+            validate_certs = module.params['validate_certs']
+            timeout = module.params['timeout']
+            self._zapi = ZabbixAPI(server_url, timeout=timeout, user=http_login_user, passwd=http_login_password,
+                                   validate_certs=validate_certs)
 
         self.login()
 

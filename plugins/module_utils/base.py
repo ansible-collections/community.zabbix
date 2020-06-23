@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
@@ -17,12 +17,12 @@ class ZabbixBase(object):
     """
     The base class for deriving off module classes
     """
-    def __init__(self, module, zbx = None, zapi_wrapper = None):
+    def __init__(self, module, zbx=None, zapi_wrapper=None):
         self._module = module
 
-        if zapi_wrapper is None :
+        if zapi_wrapper is None:
             self._zapi_wrapper = ZapiWrapper(module, zbx)
-        else: 
+        else:
             self._zapi_wrapper = zapi_wrapper
 
         self._zapi = self._zapi_wrapper._zapi
