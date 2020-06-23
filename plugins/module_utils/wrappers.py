@@ -11,7 +11,12 @@ import atexit
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from distutils.version import LooseVersion
 
-from zabbix_api import ZabbixAPI
+try:
+    from zabbix_api import ZabbixAPI
+    HAS_ZABBIX_API = True
+except ImportError:
+    ZBX_IMP_ERR = traceback.format_exc()
+    HAS_ZABBIX_API = False
 
 
 class ZapiWrapper(object):
@@ -20,6 +25,9 @@ class ZapiWrapper(object):
     """
     def __init__(self, module, zbx=None):
         self._module = module
+
+        if not HAS_ZABBIX_API:
+            module.fail_json(msg=missing_required_lib('zabbix-api', url='https://pypi.org/project/zabbix-api/'), exception=ZBX_IMP_ERR)
 
         # check if zbx is already instantiated or not
         if zbx is not None and isinstance(zbx, ZabbixAPI):
