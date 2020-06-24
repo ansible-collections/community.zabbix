@@ -11,7 +11,7 @@
       smtp_email: zabbix@example.com
 
   block:
-  - name: test - create new email mediatype type without authentication
+  - name: test - create new email mediatype without authentication
     zabbix_mediatype:
     register: zbxmediatype_new
 
@@ -110,15 +110,15 @@
   - assert:
       that: zbxmediatype_verif.changed is sameas False
 
-  - name: test - reset email mediatype smtp information to default
-    zabbix_mediatype:
-    register: zbxmediatype_reset
-
-  - assert:
-      that: zbxmediatype_reset.changed is sameas True
-
   - when: zabbix_version is version('3.4', '>=')
     block:
+    - name: test - reset email mediatype smtp information to default
+      zabbix_mediatype:
+      register: zbxmediatype_reset
+
+    - assert:
+        that: zbxmediatype_reset.changed is sameas True
+
     - name: test - update email mediatype concurrent settings
       zabbix_mediatype:
         max_sessions: 99
@@ -149,6 +149,135 @@
 
     - assert:
         that: zbxmediatype_concur_fail.failed is sameas True
+
+  - when: zabbix_version is version('5.0', '>=')
+    block:
+    - name: test - reset email mediatype smtp information to default
+      zabbix_mediatype:
+      register: zbxmediatype_reset
+
+    - assert:
+        that: zbxmediatype_reset.changed is sameas True
+
+    - name: test - update email mediatype with message templates
+      zabbix_mediatype:
+        message_templates:
+          - eventsource: triggers
+            recovery: operations
+            subject: "Problem: {EVENT.NAME}"
+            body: "Problem started at {EVENT.TIME} on {EVENT.DATE}\r\nProblem name: {EVENT.NAME}\r\n"
+          - eventsource: discovery
+            recovery: operations
+            subject: "Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}"
+            body: "Discovery rule: {DISCOVERY.RULE.NAME}\r\n\r\nDevice IP: {DISCOVERY.DEVICE.IPADDRESS}"
+          - eventsource: autoregistration
+            recovery: operations
+            subject: "Autoregistration: {HOST.HOST}"
+            body: "Host name: {HOST.HOST}\r\nHost IP: {HOST.IP}\r\nAgent port: {HOST.PORT}"
+          - eventsource: internal
+            recovery: operations
+            subject: "Internal: {EVENT.NAME}"
+            body: "Internal event started at {EVEN.TIME} on {EVENT.DATE}\r\nEvent name: {EVENT.NAME}\r\n"
+      register: zbxmediatype_msg_templates
+
+    - assert:
+        that: zbxmediatype_msg_templates.changed is sameas True
+
+    - name: test - update email mediatype with message templates (again)
+      zabbix_mediatype:
+        message_templates:
+          - eventsource: triggers
+            recovery: operations
+            subject: "Problem: {EVENT.NAME}"
+            body: "Problem started at {EVENT.TIME} on {EVENT.DATE}\r\nProblem name: {EVENT.NAME}\r\n"
+          - eventsource: discovery
+            recovery: operations
+            subject: "Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}"
+            body: "Discovery rule: {DISCOVERY.RULE.NAME}\r\n\r\nDevice IP: {DISCOVERY.DEVICE.IPADDRESS}"
+          - eventsource: autoregistration
+            recovery: operations
+            subject: "Autoregistration: {HOST.HOST}"
+            body: "Host name: {HOST.HOST}\r\nHost IP: {HOST.IP}\r\nAgent port: {HOST.PORT}"
+          - eventsource: internal
+            recovery: operations
+            subject: "Internal: {EVENT.NAME}"
+            body: "Internal event started at {EVEN.TIME} on {EVENT.DATE}\r\nEvent name: {EVENT.NAME}\r\n"
+      register: zbxmediatype_msg_templates
+
+    - assert:
+        that: zbxmediatype_msg_templates.changed is sameas False
+
+    - name: test - update subject of message template in email mediatype
+      zabbix_mediatype:
+        message_templates:
+          - eventsource: triggers
+            recovery: operations
+            subject: "Problem: {EVENT.NAME} - test change"
+            body: "Problem started at {EVENT.TIME} on {EVENT.DATE}\r\nProblem name: {EVENT.NAME}\r\n"
+          - eventsource: discovery
+            recovery: operations
+            subject: "Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}"
+            body: "Discovery rule: {DISCOVERY.RULE.NAME}\r\n\r\nDevice IP: {DISCOVERY.DEVICE.IPADDRESS}"
+          - eventsource: autoregistration
+            recovery: operations
+            subject: "Autoregistration: {HOST.HOST}"
+            body: "Host name: {HOST.HOST}\r\nHost IP: {HOST.IP}\r\nAgent port: {HOST.PORT}"
+          - eventsource: internal
+            recovery: operations
+            subject: "Internal: {EVENT.NAME}"
+            body: "Internal event started at {EVEN.TIME} on {EVENT.DATE}\r\nEvent name: {EVENT.NAME}\r\n"
+      register: zbxmediatype_msg_templates
+
+    - assert:
+        that: zbxmediatype_msg_templates.changed is sameas True
+
+    - name: test - update message of message template in email mediatype
+      zabbix_mediatype:
+        message_templates:
+          - eventsource: triggers
+            recovery: operations
+            subject: "Problem: {EVENT.NAME} - test change"
+            body: "Problem started at {EVENT.TIME} on {EVENT.DATE}\r\nProblem name: {EVENT.NAME}\r\n"
+          - eventsource: discovery
+            recovery: operations
+            subject: "Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}"
+            body: "Discovery rule: {DISCOVERY.RULE.NAME}\r\n\r\nDevice IP: {DISCOVERY.DEVICE.IPADDRESS} - test"
+          - eventsource: autoregistration
+            recovery: operations
+            subject: "Autoregistration: {HOST.HOST}"
+            body: "Host name: {HOST.HOST}\r\nHost IP: {HOST.IP}\r\nAgent port: {HOST.PORT}"
+          - eventsource: internal
+            recovery: operations
+            subject: "Internal: {EVENT.NAME}"
+            body: "Internal event started at {EVEN.TIME} on {EVENT.DATE}\r\nEvent name: {EVENT.NAME}\r\n"
+      register: zbxmediatype_msg_templates
+
+    - assert:
+        that: zbxmediatype_msg_templates.changed is sameas True
+
+    - name: test - update subject and message of message template in email mediatype (again)
+      zabbix_mediatype:
+        message_templates:
+          - eventsource: triggers
+            recovery: operations
+            subject: "Problem: {EVENT.NAME} - test change"
+            body: "Problem started at {EVENT.TIME} on {EVENT.DATE}\r\nProblem name: {EVENT.NAME}\r\n"
+          - eventsource: discovery
+            recovery: operations
+            subject: "Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}"
+            body: "Discovery rule: {DISCOVERY.RULE.NAME}\r\n\r\nDevice IP: {DISCOVERY.DEVICE.IPADDRESS} - test"
+          - eventsource: autoregistration
+            recovery: operations
+            subject: "Autoregistration: {HOST.HOST}"
+            body: "Host name: {HOST.HOST}\r\nHost IP: {HOST.IP}\r\nAgent port: {HOST.PORT}"
+          - eventsource: internal
+            recovery: operations
+            subject: "Internal: {EVENT.NAME}"
+            body: "Internal event started at {EVEN.TIME} on {EVENT.DATE}\r\nEvent name: {EVENT.NAME}\r\n"
+      register: zbxmediatype_msg_templates
+
+    - assert:
+        that: zbxmediatype_msg_templates.changed is sameas False
 
   - name: test - disable email mediatype
     zabbix_mediatype:
@@ -397,6 +526,168 @@
       that: zbxmediatype_ez_texting_update.changed is sameas True
 
   - name: test - delete ez_texting mediatype
+    zabbix_mediatype:
+      state: absent
+    register: zbxmediatype_delete
+
+  - assert:
+      that: zbxmediatype_delete.changed is sameas True
+
+- name: test - email mediatypes
+  when: zabbix_version is version('4.4', '>=')
+  module_defaults:
+    zabbix_mediatype:
+      server_url: "{{ zabbix_server_url }}"
+      login_user: "{{ zabbix_login_user }}"
+      login_password: "{{ zabbix_login_password }}"
+      state: present
+      name: Example webhook
+      type: webhook
+      webhook_script: "return 'Hello, world!';"
+
+  block:
+  - name: test - create new webhook mediatype
+    zabbix_mediatype:
+    register: zbxmediatype_webhook_new
+
+  - assert:
+      that: zbxmediatype_webhook_new.changed is sameas True
+
+  - name: test - create new webhook mediatype (again)
+    zabbix_mediatype:
+    register: zbxmediatype_webhook_new
+
+  - assert:
+      that: zbxmediatype_webhook_new.changed is sameas False
+
+  - name: test - update webhook mediatype with process_tags
+    zabbix_mediatype:
+      process_tags: True
+    register: zbxmediatype_webhook_tags
+
+  - assert:
+      that: zbxmediatype_webhook_tags.changed is sameas True
+
+  - name: test - update webhook mediatype with process_tags (again)
+    zabbix_mediatype:
+      process_tags: True
+    register: zbxmediatype_webhook_tags
+
+  - assert:
+      that: zbxmediatype_webhook_tags.changed is sameas False
+
+  # supported since 4.4
+  - name: test - update webhook mediatype with description
+    zabbix_mediatype:
+      process_tags: True
+      description: My custom webhook mediatype
+    register: zbxmediatype_webhook_desc
+
+  - assert:
+      that: zbxmediatype_webhook_desc.changed is sameas True
+
+  - name: test - update webhook mediatype with description (again)
+    zabbix_mediatype:
+      process_tags: True
+      description: My custom webhook mediatype
+    register: zbxmediatype_webhook_desc
+
+  - assert:
+      that: zbxmediatype_webhook_desc.changed is sameas False
+
+  - name: test - update webhook mediatype with event_menu without name and url (fail)
+    zabbix_mediatype:
+      process_tags: True
+      description: My custom webhook mediatype
+      event_menu: True
+    register: zbxmediatype_webhook_eventmenu
+    ignore_errors: True
+
+  - assert:
+      that: zbxmediatype_webhook_eventmenu.failed is sameas True
+
+  - name: test - update webhook mediatype with event_menu
+    zabbix_mediatype:
+      process_tags: True
+      description: My custom webhook mediatype
+      event_menu: True
+      event_menu_name: Example entry name
+      event_menu_url: '{EVENT.TAGS.__message_link}'
+    register: zbxmediatype_webhook_eventmenu
+
+  - assert:
+      that: zbxmediatype_webhook_eventmenu.changed is sameas True
+
+  - name: test - update webhook mediatype with event_menu (again)
+    zabbix_mediatype:
+      process_tags: True
+      description: My custom webhook mediatype
+      event_menu: True
+      event_menu_name: Example entry name
+      event_menu_url: '{EVENT.TAGS.__message_link}'
+    register: zbxmediatype_webhook_eventmenu
+
+  - assert:
+      that: zbxmediatype_webhook_eventmenu.changed is sameas False
+
+  - name: test - reset webhook mediatype to default
+    zabbix_mediatype:
+    register: zbxmediatype_reset
+
+  - assert:
+      that: zbxmediatype_reset.changed is sameas True
+
+  - name: test - update webhook mediatype with webhook_params
+    zabbix_mediatype:
+      webhook_params:
+        - name: param1
+          value: value1
+    register: zbxmediatype_webhook_params
+
+  - assert:
+      that: zbxmediatype_webhook_params.changed is sameas True
+
+  - name: test - update webhook mediatype with webhook_params (again)
+    zabbix_mediatype:
+      webhook_params:
+        - name: param1
+          value: value1
+    register: zbxmediatype_webhook_params
+
+  - assert:
+      that: zbxmediatype_webhook_params.changed is sameas False
+
+  - name: test - update webhook mediatype with webhook_params (reorder)
+    zabbix_mediatype:
+      webhook_params:
+        - name: z.param2
+          value: xyz
+        - name: param1
+          value: value1
+        - name: b.param3
+        - name: a.param4
+          value: abc
+    register: zbxmediatype_webhook_params
+
+  - assert:
+      that: zbxmediatype_webhook_params.changed is sameas True
+
+  - name: test - update webhook mediatype with webhook_params (reorder again)
+    zabbix_mediatype:
+      webhook_params:
+        - name: param1
+          value: value1
+        - name: a.param4
+          value: abc
+        - name: b.param3
+        - name: z.param2
+          value: xyz
+    register: zbxmediatype_webhook_params
+
+  - assert:
+      that: zbxmediatype_webhook_params.changed is sameas False
+
+  - name: test - delete webhook mediatype
     zabbix_mediatype:
       state: absent
     register: zbxmediatype_delete
