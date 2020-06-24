@@ -204,8 +204,6 @@ RETURN = r''' # '''
 import traceback
 import atexit
 
-from distutils.version import LooseVersion
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 try:
     from zabbix_api import ZabbixAPI
 
@@ -213,6 +211,9 @@ try:
 except ImportError:
     ZBX_IMP_ERR = traceback.format_exc()
     HAS_ZABBIX_API = False
+
+from distutils.version import LooseVersion
+from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 
 
 class Proxy(object):

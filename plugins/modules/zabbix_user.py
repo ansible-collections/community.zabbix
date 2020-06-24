@@ -260,12 +260,13 @@ user_ids:
     sample: { "userids": [ "5" ] }
 '''
 
+
 import atexit
 import traceback
+import copy
 
 try:
-    from zabbix_api import ZabbixAPI
-    from zabbix_api import Already_Exists
+    from zabbix_api import ZabbixAPI, Already_Exists
 
     HAS_ZABBIX_API = True
 except ImportError:
@@ -274,7 +275,6 @@ except ImportError:
 
 from distutils.version import LooseVersion
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-import copy
 
 
 class User(object):
