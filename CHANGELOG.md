@@ -2,6 +2,9 @@
 
 ## devel
 
+### New roles:
+  - `zabbix_discovery_role` - Create/delete/update Zabbix discovery rules
+
 ### Improvements
 #### Modules:
   - zabbix_action - fixed error on changed API fields `*default_message` and `*default_subject` for Zabbix 5.0 (PR [#92](https://github.com/ansible-collections/community.zabbix/pull/92)).

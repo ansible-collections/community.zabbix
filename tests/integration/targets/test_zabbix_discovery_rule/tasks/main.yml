@@ -1,0 +1,215 @@
+---
+- name: test - create new Zabbix discovery rule
+  zabbix_discovery_rule:
+    server_url: "{{ zabbix_server_url }}"
+    login_user: "{{ zabbix_login_user }}"
+    login_password: "{{ zabbix_login_password }}"
+    name: ACME
+    state: present
+    iprange: 192.168.1.1-255
+    dchecks:
+        - type: 12
+  register: drule_new
+
+- name: assert that drule was created
+  assert:
+    that: drule_new is changed
+
+- name: test - create same Zabbix discovery rule
+  zabbix_discovery_rule:
+    server_url: "{{ zabbix_server_url }}"
+    login_user: "{{ zabbix_login_user }}"
+    login_password: "{{ zabbix_login_password }}"
+    name: ACME
+    state: present
+    iprange: 192.168.1.1-255
+    dchecks:
+        - type: 12
+  register: drule_exists
+
+- name: assert that nothing has been changed
+  assert:
+    that: not drule_exists is changed
+
+- name: test - update Zabbix discovery rule iprange
+  zabbix_discovery_rule:
+    server_url: "{{ zabbix_server_url }}"
+    login_user: "{{ zabbix_login_user }}"
+    login_password: "{{ zabbix_login_password }}"
+    name: ACME
+    state: present
+    iprange:
+      - 192.168.1.1-255
+      - 10.0.0.1-255
+    dchecks:
+        - type: 12
+  register: drule_iprange_update
+
+- name: assert that ipragne has been changed
+  assert:
+    that: drule_iprange_update is changed
+
+- name: test - update Zabbix discovery rule status
+  zabbix_discovery_rule:
+    server_url: "{{ zabbix_server_url }}"
+    login_user: "{{ zabbix_login_user }}"
+    login_password: "{{ zabbix_login_password }}"
+    name: ACME
+    state: present
+    iprange:
+      - 192.168.1.1-255
+      - 10.0.0.1-255
+    dchecks:
+        - type: 12
+    status: 1
+  register: drule_status_update
+
+- name: assert that ipragne has been changed
+  assert:
+    that: drule_status_update is changed
+
+- name: test - update Zabbix discovery rule status (again)
+  zabbix_discovery_rule:
+    server_url: "{{ zabbix_server_url }}"
+    login_user: "{{ zabbix_login_user }}"
+    login_password: "{{ zabbix_login_password }}"
+    name: ACME
+    state: present
+    iprange:
+      - 192.168.1.1-255
+      - 10.0.0.1-255
+    dchecks:
+        - type: 12
+    status: 0
+  register: drule_status_update_again
+
+- name: assert that ipragne has been changed
+  assert:
+    that: drule_status_update_again is changed
+
+- name: test - update Zabbix discovery rule dchecks
+  zabbix_discovery_rule:
+    server_url: "{{ zabbix_server_url }}"
+    login_user: "{{ zabbix_login_user }}"
+    login_password: "{{ zabbix_login_password }}"
+    name: ACME
+    state: present
+    iprange:
+      - 192.168.1.1-255
+      - 10.0.0.1-255
+    dchecks:
+        - type: 12
+        - type: 9
+          key_: "system.hostname"
+          ports: "10050"
+          uniq: 1
+          host_source: 3
+  register: drule_dchecks_update
+
+- name: assert that dcheck has been changed
+  assert:
+    that: drule_dchecks_update is changed
+
+- name: test - update Zabbix discovery rule snmp dcheck
+  zabbix_discovery_rule:
+    server_url: "{{ zabbix_server_url }}"
+    login_user: "{{ zabbix_login_user }}"
+    login_password: "{{ zabbix_login_password }}"
+    name: ACME
+    state: present
+    iprange:
+      - 192.168.1.1-255
+      - 10.0.0.1-255
+    dchecks:
+        - type: 11
+          snmp_community: CUSTOMER@snmp-readonly
+          ports: "161"
+          key_: iso.3.6.1.2.1.1.1.0
+          uniq: 0
+          host_source: 3
+          name_source: 3
+  register: drule_snmp_update
+
+- name: assert that snmp dcheck has been changed
+  assert:
+    that: drule_snmp_update is changed
+
+- block:
+    - name: test - create new active Zabbix proxy server
+      zabbix_proxy:
+        server_url: "{{ zabbix_server_url }}"
+        login_user: "{{ zabbix_login_user }}"
+        login_password: "{{ zabbix_login_password }}"
+        proxy_name: ACME_proxy
+        status: active
+        state: present
+      register: zbxproxy_active
+
+    - name: assert that proxy was created
+      assert:
+        that: zbxproxy_active is changed
+
+    - name: test - update Zabbix discovery rule proxy
+      zabbix_discovery_rule:
+        server_url: "{{ zabbix_server_url }}"
+        login_user: "{{ zabbix_login_user }}"
+        login_password: "{{ zabbix_login_password }}"
+        name: ACME
+        state: present
+        iprange:
+          - 192.168.1.1-255
+          - 10.0.0.1-255
+        dchecks:
+            - type: 11
+              snmp_community: CUSTOMER@snmp-readonly
+              ports: "161"
+              key_: iso.3.6.1.2.1.1.1.0
+              uniq: 0
+              host_source: 3
+              name_source: 3
+        proxy: ACME_proxy
+      register: drule_proxy_update
+
+    - name: assert that proxy has been changed
+      assert:
+        that: drule_proxy_update is changed
+
+- name: test - delete Zabbix discovery rule
+  zabbix_discovery_rule:
+    server_url: "{{ zabbix_server_url }}"
+    login_user: "{{ zabbix_login_user }}"
+    login_password: "{{ zabbix_login_password }}"
+    name: ACME
+    state: absent
+  register: drule_delete
+
+- name: assert that proxy has been deleted
+  assert:
+    that: drule_delete is changed
+
+- name: test - delete Zabbix discovery rule (again)
+  zabbix_discovery_rule:
+    server_url: "{{ zabbix_server_url }}"
+    login_user: "{{ zabbix_login_user }}"
+    login_password: "{{ zabbix_login_password }}"
+    name: ACME
+    state: absent
+  register: drule_delete_again
+
+- name: assert that nothing has been changed
+  assert:
+    that: not drule_delete_again is changed
+
+# Cleanup
+- name: delete active Zabbix proxy server
+  zabbix_proxy:
+    server_url: "{{ zabbix_server_url }}"
+    login_user: "{{ zabbix_login_user }}"
+    login_password: "{{ zabbix_login_password }}"
+    proxy_name: ACME_proxy
+    state: absent
+  register: zbxproxy_delete
+
+- name: assert that proxy has been deleted
+  assert:
+    that: zbxproxy_delete is changed
