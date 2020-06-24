@@ -50,7 +50,7 @@ jobs:
         working-directory: ./ansible_collections/community/zabbix
 
   integration:
-    runs-on: ubuntu-latestDISABLE
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
@@ -63,36 +63,46 @@ jobs:
             port: "8080"
           - version: "5.0"
             port: "8080"
+        ansible:
+          # - stable-2.9 # Only if your collection supports Ansible 2.9
+          - stable-2.10
+          #- devel
+        python:
+          - 2.7
+          - 3.7
+          #- 3.8 blocked by https://github.com/ansible/ansible/pull/70155
 
     steps:
       - name: Check out code
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2
         with:
           path: ansible_collections/community/zabbix
 
-      - name: Set up Python 3.6
+      - name: Set up Python ${{ matrix.ansible }}
         uses: actions/setup-python@v1
         with:
-          python-version: 3.6
+          python-version: ${{ matrix.python }}
+
+      - name: Install ansible-base (${{ matrix.ansible }})
+        run: pip install https://github.com/ansible/ansible/archive/${{ matrix.ansible }}.tar.gz --disable-pip-version-check
 
       - name: Install dependencies
         run: pip install docker-compose zabbix-api
 
-      - name: Install ansible-base (stable-2.10)
-        run: pip install https://github.com/ansible/ansible/archive/stable-2.10.tar.gz --disable-pip-version-check
-
       - name: Zabbix container server provisioning
         run: docker-compose up -d
+        working-directory: ./ansible_collections/community/zabbix
         env:
           zabbix_version: ${{ matrix.zabbix_container.version }}
           zabbix_port: ${{ matrix.zabbix_container.port }}
 
       - name: Run integration test
-        run: ansible-test integration -v --color --retry-on-error --continue-on-error --diff --requirements --coverage
+        run: ansible-test integration -v --color --retry-on-error --continue-on-error --diff --python ${{ matrix.python }} --requirements --coverage
+        working-directory: ./ansible_collections/community/zabbix
 
       - name: Generate coverage report.
         run: ansible-test coverage xml -v --requirements --group-by command --group-by version
-        #working-directory: ./ansible_collections/community/zabbix
+        working-directory: ./ansible_collections/community/zabbix
 
       - uses: codecov/codecov-action@v1
         with:
