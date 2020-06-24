@@ -27,7 +27,7 @@ jobs:
     steps:
 
       - name: Check out code
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2
         with:
           path: ansible_collections/community/zabbix
 
@@ -41,6 +41,7 @@ jobs:
 
       - name: Run sanity tests
         run: ansible-test sanity --docker -v --color --python 3.6
+        working-directory: ./ansible_collections/community/zabbix
 
   integration:
     runs-on: ubuntu-latest
@@ -59,7 +60,7 @@ jobs:
 
     steps:
       - name: Check out code
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2
         with:
           path: ansible_collections/community/zabbix
 
@@ -76,17 +77,20 @@ jobs:
 
       - name: Zabbix container server provisioning
         run: docker-compose up -d
+        working-directory: ./ansible_collections/community/zabbix
         env:
           zabbix_version: ${{ matrix.zabbix_container.version }}
           zabbix_port: ${{ matrix.zabbix_container.port }}
 
       - name: Run integration test
         run: ansible-test integration -v --color --retry-on-error --continue-on-error --diff --requirements --coverage
-        
+        working-directory: ./ansible_collections/community/zabbix
+
       - name: Generate coverage report.
         run: ansible-test coverage xml -v --requirements --group-by command --group-by version
         working-directory: ./ansible_collections/community/zabbix
-        
+
       - uses: codecov/codecov-action@v1
+        working-directory: ./ansible_collections/community/zabbix
         with:
           fail_ci_if_error: false
