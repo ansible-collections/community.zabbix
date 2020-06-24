@@ -1,5 +1,6 @@
 name: plugins
 on:
+# FIXME: Is `push` and `pull_request` right
   push:
     paths:
       - 'plugins/**'
@@ -21,20 +22,24 @@ jobs:
     strategy:
       matrix:
         ansible:
-        - stable-2.10
-        - devel
+          # - stable-2.9 # Only if your collection supports Ansible 2.9
+          - stable-2.10
+          - devel
+        python:
+          - 2.7
+          - 3.8
     runs-on: ubuntu-latest
     steps:
 
       - name: Check out code
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2
         with:
           path: ansible_collections/community/zabbix
 
-      - name: Set up Python 3.6
+      - name: Set up Python ${{ matrix.ansible }}
         uses: actions/setup-python@v1
         with:
-          python-version: 3.6
+          python-version: ${{ matrix.python }}
 
       - name: Install ansible-base (${{ matrix.ansible }})
         run: pip install https://github.com/ansible/ansible/archive/${{ matrix.ansible }}.tar.gz --disable-pip-version-check
@@ -43,7 +48,7 @@ jobs:
         run: ansible-test sanity --docker -v --color --python 3.6
 
   integration:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latestDISABLE
     strategy:
       fail-fast: false
       matrix:
