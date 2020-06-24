@@ -3,7 +3,7 @@
 ## devel
 
 ### New roles:
-  - `zabbix_discovery_role` - Create/delete/update Zabbix discovery rules. (PR [#111](https://github.com/ansible-collections/community.zabbix/pull/111))
+  - `zabbix_discovery_rule` - Create/delete/update Zabbix discovery rules. (PR [#111](https://github.com/ansible-collections/community.zabbix/pull/111))
 
 ### Improvements
 #### Modules:
