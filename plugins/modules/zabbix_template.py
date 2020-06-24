@@ -726,7 +726,8 @@ def main():
         module.exit_json(changed=True, result="Successfully deleted template %s" % template_name)
 
     elif state == "dump":
-        module.deprecate("The 'dump' state has been deprecated and will be removed, use 'zabbix_template_info' module instead.", version='2.14')
+        module.deprecate("The 'dump' state has been deprecated and will be removed, use 'zabbix_template_info' module instead.",
+                         collection_name="community.zabbix", version='3.0.0')  # was 2.14
         if not template_ids:
             module.fail_json(msg='Template not found: %s' % template_name)
 
