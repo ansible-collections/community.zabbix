@@ -173,9 +173,7 @@ import atexit
 import traceback
 
 try:
-    from zabbix_api import ZabbixAPI
-    from zabbix_api import ZabbixAPIException
-    from zabbix_api import Already_Exists
+    from zabbix_api import ZabbixAPI, ZabbixAPIException, Already_Exists
 
     HAS_ZABBIX_API = True
 except ImportError:

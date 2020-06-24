@@ -199,7 +199,7 @@ EXAMPLES = '''
   when: zbx_host['triggers_problem']|length > 0
 '''
 
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+
 import atexit
 import traceback
 
@@ -210,6 +210,8 @@ try:
 except ImportError:
     ZBX_IMP_ERR = traceback.format_exc()
     HAS_ZABBIX_API = False
+
+from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 
 
 class Host(object):

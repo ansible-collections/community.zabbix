@@ -277,7 +277,7 @@
 - assert:
     that:
       - template_dump_result.deprecations is defined
-      - template_dump_result.deprecations.0.version == '2.14'
+      - template_dump_result.deprecations.0.version == '3.0.0'
 
 - name: Dump Zabbix template to JSON format.
   zabbix_template:
@@ -292,7 +292,7 @@
 - assert:
     that:
       - template_dump_result.deprecations is defined
-      - template_dump_result.deprecations.0.version == '2.14'
+      - template_dump_result.deprecations.0.version == '3.0.0'
 
 - name: Delete Zabbix template.
   zabbix_template:

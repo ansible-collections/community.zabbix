@@ -147,9 +147,7 @@ import json
 import xml.etree.ElementTree as ET
 
 try:
-    from zabbix_api import ZabbixAPI
-    from zabbix_api import Already_Exists
-    from zabbix_api import ZabbixAPIException
+    from zabbix_api import ZabbixAPI, Already_Exists, ZabbixAPIException
 
     HAS_ZABBIX_API = True
 except ImportError:
