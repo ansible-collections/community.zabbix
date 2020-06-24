@@ -24,6 +24,12 @@ options:
         description:
             - Name of the media type.
         required: true
+    description:
+        type: 'str'
+        description:
+            - Description of the media type.
+            - Works only with Zabbix versions 4.4 or newer.
+        default: ''
     state:
         type: 'str'
         description:
@@ -38,11 +44,13 @@ options:
         type: 'str'
         description:
             - Type of the media type.
-            - Media types I(jabber) and I(ez_texting) workable only with Zabbix 4.2 or less.
+            - Media types I(jabber) and I(ez_texting) works only with Zabbix versions 4.2 or older.
+            - Media type I(webhook) works only with Zabbix versions 4.4 or newer.
         choices:
             - email
             - script
             - sms
+            - webhook
             - jabber
             - ez_texting
         required: true
@@ -59,21 +67,21 @@ options:
         description:
             - The maximum number of alerts that can be processed in parallel.
             - Possible value is 1 when I(type=sms) and 0-100 otherwise.
-            - Works only with Zabbix versions 3.4 and above.
+            - Works only with Zabbix versions 3.4 or newer.
         default: 1
     max_attempts:
         type: 'int'
         description:
             - The maximum number of attempts to send an alert.
             - Possible range is 0-10.
-            - Works only with Zabbix versions 3.4 and above.
+            - Works only with Zabbix versions 3.4 or newer.
         default: 3
     attempt_interval:
         type: 'int'
         description:
             - The interval between retry attempts.
             - Possible range is 0-60.
-            - Works only with Zabbix versions 3.4 and above.
+            - Works only with Zabbix versions 3.4 or newer.
         default: 10
     script_name:
         type: 'str'
@@ -161,6 +169,105 @@ options:
         choices:
             - USA
             - Canada
+    webhook_script:
+        type: 'str'
+        description:
+            - Required when I(type=webhook).
+            - JavaScript code that will perform webhook operation.
+            - This code has access to all parameters in I(webhook_params).
+            - It may perform HTTP GET, POST, PUT and DELETE requests and has control over HTTP headers and request body.
+            - It may return OK status along with an optional list of tags and tag values or an error string.
+            - Works only with Zabbix versions 4.4 or newer.
+    webhook_timeout:
+        type: 'str'
+        description:
+            - Can be used when I(type=webhook).
+            - Execution timeout for JavaScript code in I(webhook_script).
+            - Possible values are 1-60s.
+        default: 30s
+    process_tags:
+        type: 'bool'
+        description:
+            - Can be used when I(type=webhook).
+            - Process returned JSON property values as tags.
+            - These tags are added to the already existing (if any) problem event tags in Zabbix.
+        default: false
+    event_menu:
+        type: 'bool'
+        description:
+            - Can be used when I(type=webhook).
+            - Includes entry in Event menu with link to created external ticket.
+        default: false
+    event_menu_url:
+        type: 'str'
+        description:
+            - Requred when I(event_menu=True).
+            - Event menu entry underlying URL.
+    event_menu_name:
+        type: 'str'
+        description:
+            - Requred when I(event_menu=True).
+            - Event menu entry name.
+    webhook_params:
+        type: 'list'
+        elements: 'dict'
+        description:
+            - Can be used when I(type=webhook).
+            - Webhook variables that are passed to webhook script when executed.
+        default: []
+        suboptions:
+            name:
+                type: 'str'
+                description:
+                    - Name of the parameter.
+                required: true
+            value:
+                type: 'str'
+                description:
+                    - Value of the parameter.
+                    - All macros that are supported in problem notifications are supported in the parameters.
+                    - Values are URL-encoded automatically. Values from macros are resolved and then URL-encoded automatically.
+                default: ''
+    message_templates:
+        type: 'list'
+        elements: 'dict'
+        description:
+            - Default notification messages for the event types.
+            - Works only with Zabbix versions 5.0 or newer.
+        default: []
+        suboptions:
+            eventsource:
+                type: 'str'
+                description:
+                    - Event source.
+                    - Required when I(recovery) is used.
+                choices:
+                    - triggers
+                    - discovery
+                    - autoregistration
+                    - internal
+            recovery:
+                type: 'str'
+                description:
+                    - Operation mode.
+                    - Required when I(eventsource) is used.
+                choices:
+                    - operations
+                    - recovery_operations
+                    - update_operations
+            subject:
+                type: 'str'
+                description:
+                    - Subject of the default message.
+                    - May contain macros and is limited to 255 characters.
+                default: ''
+            body:
+                type: 'str'
+                description:
+                    - Body of the default message.
+                    - May contain macros.
+                default: ''
+
 extends_documentation_fragment:
 - community.zabbix.zabbix
 
@@ -206,7 +313,7 @@ EXAMPLES = r'''
     username: 'jabber_id'
     password: 'jabber_pass'
 
-- name: 'Create an SMS mediatype'
+- name: 'Create a SMS mediatype'
   community.zabbix.zabbix_mediatype:
     name: "My SMS Mediatype"
     server_url: "http://example.com/zabbix/"
@@ -214,6 +321,56 @@ EXAMPLES = r'''
     login_password: "zabbix"
     type: 'sms'
     gsm_modem: '/dev/ttyS0'
+
+# Supported since Zabbix 4.4
+- name: 'Create a webhook mediatype'
+  community.zabbix.zabbix_mediatype:
+    name: "My webhook Mediatype"
+    server_url: "http://example.com/zabbix/"
+    login_user: Admin
+    login_password: "zabbix"
+    type: 'webhook'
+    webhook_script: "{{ lookup('file', 'slack.js') }}"
+    webhook_params:
+      - name: alert_message
+        value: '{ALERT.MESSAGE}'
+      - name: zabbix_url
+        value: '{$ZABBIX.URL}'
+    process_tags: True
+    event_menu: true
+    event_menu_name: "Open in Slack: '{EVENT.TAGS.__channel_name}'"
+    event_menu_url: '{EVENT.TAGS.__message_link}'
+
+# Supported since Zabbix 5.0
+- name: 'Create an email mediatype with message templates'
+  community.zabbix.zabbix_mediatype:
+    name: "Ops email"
+    server_url: "http://example.com/zabbix/"
+    login_user: Admin
+    login_password: "zabbix"
+    type: 'email'
+    smtp_email: 'ops@example.com'
+    message_templates:
+      - eventsource: triggers
+        recovery: operations
+        subject: "Problem: {EVENT.NAME}"
+        body: "Problem started at {EVENT.TIME} on {EVENT.DATE}\r\nProblem name: {EVENT.NAME}\r\n"
+      - eventsource: triggers
+        recovery: recovery_operations
+        subject: "Resolved: {EVENT.NAME}"
+        body: "Problem resolved at {EVENT.TIME} on {EVENT.DATE}\r\nProblem name: {EVENT.NAME}\r\n"
+      - eventsource: triggers
+        recovery: update_operations
+        subject: "Updated problem: {EVENT.NAME}"
+        body: "{USER.FULLNAME} {EVENT.UPDATE.ACTION} problem at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.\r\n"
+      - eventsource: discovery
+        recovery: operations
+        subject: "Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}"
+        body: "Discovery rule: {DISCOVERY.RULE.NAME}\r\n\r\nDevice IP: {DISCOVERY.DEVICE.IPADDRESS}"
+      - eventsource: autoregistration
+        recovery: operations
+        subject: "Autoregistration: {HOST.HOST}"
+        body: "Host name: {HOST.HOST}\r\nHost IP: {HOST.IP}\r\nAgent port: {HOST.PORT}"
 '''
 
 
@@ -231,10 +388,6 @@ try:
 except ImportError:
     ZBX_IMP_ERR = traceback.format_exc()
     HAS_ZABBIX_API = False
-
-
-def to_numeric_value(value, strs):
-    return strs.get(value)
 
 
 def validate_params(module, params):
@@ -274,120 +427,111 @@ def construct_parameters(**kwargs):
         A dictionary of arguments that are related to kwargs['transport_type'],
         and are in a format that is understandable by Zabbix API.
     """
-    if kwargs['transport_type'] == 'email':
-        return dict(
-            description=kwargs['name'],
-            status=to_numeric_value(kwargs['status'],
-                                    {'enabled': '0',
-                                     'disabled': '1'}),
-            type=to_numeric_value(kwargs['transport_type'],
-                                  {'email': '0',
-                                   'script': '1',
-                                   'sms': '2',
-                                   'jabber': '3',
-                                   'ez_texting': '100'}),
+    truths = {'False': '0', 'True': '1'}
+    parameters = dict(
+        status='0' if kwargs['status'] == 'enabled' else '1',
+        type={
+            'email': '0',
+            'script': '1',
+            'sms': '2',
+            'jabber': '3',
+            'webhook': '4',
+            'ez_texting': '100'
+        }.get(kwargs['transport_type']),
+    )
+
+    if LooseVersion(kwargs['zbx_api_version']) >= LooseVersion('4.4'):
+        parameters.update(dict(
+            name=kwargs['name'],
+            description=kwargs['description'],
+        ))
+    else:
+        parameters.update(dict(description=kwargs['name']))
+
+    if LooseVersion(kwargs['zbx_api_version']) >= LooseVersion('3.4'):
+        parameters.update(dict(
             maxsessions=str(kwargs['max_sessions']),
             maxattempts=str(kwargs['max_attempts']),
-            attempt_interval=str(kwargs['attempt_interval']),
+            attempt_interval=str(kwargs['attempt_interval'])
+        ))
+
+    if kwargs['message_templates'] and LooseVersion(kwargs['zbx_api_version']) >= LooseVersion('5.0'):
+        msg_templates = []
+        for template in kwargs['message_templates']:
+            msg_templates.append(dict(
+                eventsource={
+                    'triggers': '0',
+                    'discovery': '1',
+                    'autoregistration': '2',
+                    'internal': '3'}.get(template['eventsource']),
+                recovery={
+                    'operations': '0',
+                    'recovery_operations': '1',
+                    'update_operations': '2'}.get(template['recovery']),
+                subject=template['subject'],
+                message=template['body']
+            ))
+        parameters.update(dict(message_templates=msg_templates))
+
+    if kwargs['transport_type'] == 'email':
+        parameters.update(dict(
             smtp_server=kwargs['smtp_server'],
             smtp_port=str(kwargs['smtp_server_port']),
             smtp_helo=kwargs['smtp_helo'],
             smtp_email=kwargs['smtp_email'],
-            smtp_security=to_numeric_value(str(kwargs['smtp_security']),
-                                           {'None': '0',
-                                            'STARTTLS': '1',
-                                            'SSL/TLS': '2'}),
-            smtp_authentication=to_numeric_value(str(kwargs['smtp_authentication']),
-                                                 {'False': '0',
-                                                  'True': '1'}),
-            smtp_verify_host=to_numeric_value(str(kwargs['smtp_verify_host']),
-                                              {'False': '0',
-                                               'True': '1'}),
-            smtp_verify_peer=to_numeric_value(str(kwargs['smtp_verify_peer']),
-                                              {'False': '0',
-                                               'True': '1'}),
+            smtp_security={'None': '0', 'STARTTLS': '1', 'SSL/TLS': '2'}.get(str(kwargs['smtp_security'])),
+            smtp_authentication=truths.get(str(kwargs['smtp_authentication'])),
+            smtp_verify_host=truths.get(str(kwargs['smtp_verify_host'])),
+            smtp_verify_peer=truths.get(str(kwargs['smtp_verify_peer'])),
             username=kwargs['username'],
             passwd=kwargs['password']
-        )
+        ))
+        return parameters
 
     elif kwargs['transport_type'] == 'script':
         if kwargs['script_params'] is None:
             _script_params = ''  # ZBX-15706
         else:
             _script_params = '\n'.join(str(i) for i in kwargs['script_params']) + '\n'
-        return dict(
-            description=kwargs['name'],
-            status=to_numeric_value(kwargs['status'],
-                                    {'enabled': '0',
-                                     'disabled': '1'}),
-            type=to_numeric_value(kwargs['transport_type'],
-                                  {'email': '0',
-                                   'script': '1',
-                                   'sms': '2',
-                                   'jabber': '3',
-                                   'ez_texting': '100'}),
-            maxsessions=str(kwargs['max_sessions']),
-            maxattempts=str(kwargs['max_attempts']),
-            attempt_interval=str(kwargs['attempt_interval']),
+        parameters.update(dict(
             exec_path=kwargs['script_name'],
             exec_params=_script_params
-        )
+        ))
+        return parameters
+
     elif kwargs['transport_type'] == 'sms':
-        return dict(
-            description=kwargs['name'],
-            status=to_numeric_value(kwargs['status'],
-                                    {'enabled': '0',
-                                     'disabled': '1'}),
-            type=to_numeric_value(kwargs['transport_type'],
-                                  {'email': '0',
-                                   'script': '1',
-                                   'sms': '2',
-                                   'jabber': '3',
-                                   'ez_texting': '100'}),
-            maxsessions=str(kwargs['max_sessions']),
-            maxattempts=str(kwargs['max_attempts']),
-            attempt_interval=str(kwargs['attempt_interval']),
-            gsm_modem=kwargs['gsm_modem']
-        )
+        parameters.update(dict(gsm_modem=kwargs['gsm_modem']))
+        return parameters
+
+    elif kwargs['transport_type'] == 'webhook' and LooseVersion(kwargs['zbx_api_version']) >= LooseVersion('4.4'):
+        parameters.update(dict(
+            script=kwargs['webhook_script'],
+            timeout=kwargs['webhook_timeout'],
+            process_tags=truths.get(str(kwargs['process_tags'])),
+            show_event_menu=truths.get(str(kwargs['event_menu'])),
+            parameters=kwargs['webhook_params']
+        ))
+        if kwargs['event_menu']:
+            parameters.update(dict(
+                event_menu_url=kwargs['event_menu_url'],
+                event_menu_name=kwargs['event_menu_name']
+            ))
+        return parameters
+
     elif kwargs['transport_type'] == 'jabber' and LooseVersion(kwargs['zbx_api_version']) <= LooseVersion('4.2'):
-        return dict(
-            description=kwargs['name'],
-            status=to_numeric_value(kwargs['status'],
-                                    {'enabled': '0',
-                                     'disabled': '1'}),
-            type=to_numeric_value(kwargs['transport_type'],
-                                  {'email': '0',
-                                   'script': '1',
-                                   'sms': '2',
-                                   'jabber': '3',
-                                   'ez_texting': '100'}),
-            maxsessions=str(kwargs['max_sessions']),
-            maxattempts=str(kwargs['max_attempts']),
-            attempt_interval=str(kwargs['attempt_interval']),
+        parameters.update(dict(
             username=kwargs['username'],
             passwd=kwargs['password']
-        )
+        ))
+        return parameters
+
     elif kwargs['transport_type'] == 'ez_texting' and LooseVersion(kwargs['zbx_api_version']) <= LooseVersion('4.2'):
-        return dict(
-            description=kwargs['name'],
-            status=to_numeric_value(kwargs['status'],
-                                    {'enabled': '0',
-                                     'disabled': '1'}),
-            type=to_numeric_value(kwargs['transport_type'],
-                                  {'email': '0',
-                                   'script': '1',
-                                   'sms': '2',
-                                   'jabber': '3',
-                                   'ez_texting': '100'}),
-            maxsessions=str(kwargs['max_sessions']),
-            maxattempts=str(kwargs['max_attempts']),
-            attempt_interval=str(kwargs['attempt_interval']),
+        parameters.update(dict(
             username=kwargs['username'],
             passwd=kwargs['password'],
-            exec_path=to_numeric_value(kwargs['message_text_limit'],
-                                       {'USA': '0',
-                                        'Canada': '1'}),
-        )
+            exec_path={'USA': '0', 'Canada': '1'}.get(kwargs['message_text_limit']),
+        ))
+        return parameters
 
     return {'unsupported_parameter': kwargs['transport_type'], 'zbx_api_version': kwargs['zbx_api_version']}
 
@@ -458,16 +602,26 @@ def get_update_params(module, zbx, mediatype_id, **kwargs):
         returned by diff() function with
         existing mediatype data and new params passed to it.
     """
-    existing_mediatype = zbx.mediatype.get({
-        'output': 'extend',
-        'mediatypeids': [mediatype_id]
-    })[0]
+    get_params = {'output': 'extend', 'mediatypeids': [mediatype_id]}
+    if LooseVersion(zbx.api_version()[:3]) >= LooseVersion('5.0'):
+        get_params.update({'selectMessageTemplates': 'extend'})
+
+    existing_mediatype = zbx.mediatype.get(get_params)[0]
 
     if existing_mediatype['type'] != kwargs['type']:
         return kwargs, diff(existing_mediatype, kwargs)
     else:
         params_to_update = {}
         for key in kwargs:
+            # sort list of parameters to prevent mismatch due to reordering
+            if key == 'parameters' and (kwargs[key] != [] or existing_mediatype[key] != []):
+                kwargs[key] = sorted(kwargs[key], key=lambda x: x['name'])
+                existing_mediatype[key] = sorted(existing_mediatype[key], key=lambda x: x['name'])
+
+            if key == 'message_templates' and (kwargs[key] != [] or existing_mediatype[key] != []):
+                kwargs[key] = sorted(kwargs[key], key=lambda x: x['subject'])
+                existing_mediatype[key] = sorted(existing_mediatype[key], key=lambda x: x['subject'])
+
             if (not (kwargs[key] is None and existing_mediatype[key] == '')) and kwargs[key] != existing_mediatype[key]:
                 params_to_update[key] = kwargs[key]
         return params_to_update, diff(existing_mediatype, kwargs)
@@ -491,7 +645,7 @@ def create_mediatype(module, zbx, **kwargs):
     try:
         mediatype_id = zbx.mediatype.create(kwargs)
     except Exception as e:
-        module.fail_json(msg="Failed to create mediatype '{name}': {e}".format(name=kwargs['description'], e=e))
+        module.fail_json(msg="Failed to create mediatype '{name}': {e}".format(name=kwargs['name'], e=e))
 
 
 def main():
@@ -503,8 +657,9 @@ def main():
         http_login_password=dict(type='str', required=False, default=None, no_log=True),
         validate_certs=dict(type='bool', required=False, default=True), timeout=dict(type='int', default=10),
         name=dict(type='str', required=True),
+        description=dict(type='str', required=False, default=''),
         state=dict(type='str', default='present', choices=['present', 'absent']),
-        type=dict(type='str', choices=['email', 'script', 'sms', 'jabber', 'ez_texting'], required=True),
+        type=dict(type='str', choices=['email', 'script', 'sms', 'webhook', 'jabber', 'ez_texting'], required=True),
         status=dict(type='str', default='enabled', choices=['enabled', 'disabled'], required=False),
         max_sessions=dict(type='int', default=1, required=False),
         max_attempts=dict(type='int', default=3, required=False),
@@ -527,15 +682,50 @@ def main():
         smtp_verify_host=dict(type='bool', default=False, required=False),
         smtp_verify_peer=dict(type='bool', default=False, required=False),
         # EZ Text
-        message_text_limit=dict(type='str', required=False, choices=['USA', 'Canada'])
+        message_text_limit=dict(type='str', required=False, choices=['USA', 'Canada']),
+        # Webhook
+        webhook_script=dict(type='str'),
+        webhook_timeout=dict(type='str', default='30s'),
+        process_tags=dict(type='bool', default=False),
+        event_menu=dict(type='bool', default=False),
+        event_menu_url=dict(type='str'),
+        event_menu_name=dict(type='str'),
+        webhook_params=dict(
+            type='list',
+            elements='dict',
+            default=[],
+            required=False,
+            options=dict(
+                name=dict(type='str', required=True),
+                value=dict(type='str', default='')
+            )
+        ),
+        message_templates=dict(
+            type='list',
+            elements='dict',
+            default=[],
+            required=False,
+            options=dict(
+                eventsource=dict(type='str', choices=['triggers', 'discovery', 'autoregistration', 'internal']),
+                recovery=dict(type='str', choices=['operations', 'recovery_operations', 'update_operations']),
+                subject=dict(type='str', default=''),
+                body=dict(type='str', default='')
+            ),
+            required_together=[
+                ['eventsource', 'recovery']
+            ],
+        )
     )
 
+    # this is used to simulate `required_if` of `AnsibleModule`, but only when state=present
     required_params = [
         ['type', 'email', ['smtp_email']],
         ['type', 'script', ['script_name']],
         ['type', 'sms', ['gsm_modem']],
         ['type', 'jabber', ['username', 'password']],
         ['type', 'ez_texting', ['username', 'password', 'message_text_limit']],
+        ['type', 'webhook', ['webhook_script']],
+        ['event_menu', True, ['event_menu_url', 'event_menu_name']],
         ['smtp_authentication', True, ['username', 'password']]
     ]
 
@@ -559,6 +749,7 @@ def main():
     state = module.params['state']
     timeout = module.params['timeout']
     name = module.params['name']
+    description = module.params['description']
     transport_type = module.params['type']
     status = module.params['status']
     max_sessions = module.params['max_sessions']
@@ -583,6 +774,16 @@ def main():
     smtp_verify_peer = module.params['smtp_verify_peer']
     # EZ Text
     message_text_limit = module.params['message_text_limit']
+    # Webhook
+    webhook_script = module.params['webhook_script']
+    webhook_timeout = module.params['webhook_timeout']
+    process_tags = module.params['process_tags']
+    event_menu = module.params['event_menu']
+    event_menu_url = module.params['event_menu_url']
+    event_menu_name = module.params['event_menu_name']
+    webhook_params = module.params['webhook_params']
+    # Message template
+    message_templates = module.params['message_templates']
 
     zbx = None
 
@@ -600,6 +801,7 @@ def main():
 
     parameters = construct_parameters(
         name=name,
+        description=description,
         transport_type=transport_type,
         status=status,
         max_sessions=max_sessions,
@@ -619,20 +821,19 @@ def main():
         smtp_verify_host=smtp_verify_host,
         smtp_verify_peer=smtp_verify_peer,
         message_text_limit=message_text_limit,
+        webhook_script=webhook_script,
+        webhook_timeout=webhook_timeout,
+        process_tags=process_tags,
+        event_menu=event_menu,
+        event_menu_url=event_menu_url,
+        event_menu_name=event_menu_name,
+        webhook_params=webhook_params,
+        message_templates=message_templates,
         zbx_api_version=zbx_api_version
     )
 
     if 'unsupported_parameter' in parameters:
         module.fail_json(msg="%s is unsupported for Zabbix version %s" % (parameters['unsupported_parameter'], parameters['zbx_api_version']))
-
-    if LooseVersion(zbx_api_version) >= LooseVersion('4.4'):
-        # description key changed to name key from zabbix 4.4
-        parameters['name'] = parameters.pop('description')
-
-    if LooseVersion(zbx_api_version) <= LooseVersion('3.2'):
-        # remove settings not supported till 3.4
-        for key in ['maxsessions', 'maxattempts', 'attempt_interval']:
-            del parameters[key]
 
     if mediatype_exists:
         if state == 'absent':
