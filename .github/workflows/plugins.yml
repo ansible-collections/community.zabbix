@@ -17,6 +17,12 @@ on:
 
 jobs:
   sanity:
+    name: Sanity (${{ matrix.ansible }})
+    strategy:
+      matrix:
+        ansible:
+        - stable-2.10
+        - devel
     runs-on: ubuntu-latest
     steps:
 
@@ -30,8 +36,8 @@ jobs:
         with:
           python-version: 3.6
 
-      - name: Install ansible-base
-        run: pip install git+https://github.com/ansible-collection-migration/ansible-base.git --disable-pip-version-check
+      - name: Install ansible-base (${{ matrix.ansible }})
+        run: pip install https://github.com/ansible/ansible/archive/${{ matrix.ansible }}.tar.gz --disable-pip-version-check
 
       - name: Run sanity tests
         run: ansible-test sanity --docker -v --color --python 3.6
@@ -65,8 +71,8 @@ jobs:
       - name: Install dependencies
         run: pip install docker-compose zabbix-api
 
-      - name: Install ansible-base
-        run: pip install git+https://github.com/ansible-collection-migration/ansible-base.git --disable-pip-version-check
+      - name: Install ansible-base (stable-2.10)
+        run: pip install https://github.com/ansible/ansible/archive/stable-2.10.tar.gz --disable-pip-version-check
 
       - name: Zabbix container server provisioning
         run: docker-compose up -d
@@ -75,4 +81,12 @@ jobs:
           zabbix_port: ${{ matrix.zabbix_container.port }}
 
       - name: Run integration test
-        run: ansible-test integration -v --color --retry-on-error --continue-on-error --diff
+        run: ansible-test integration -v --color --retry-on-error --continue-on-error --diff --requirements --coverage
+
+      - name: Generate coverage report.
+        run: ansible-test coverage xml -v --requirements --group-by command --group-by version
+        #working-directory: ./ansible_collections/community/zabbix
+
+      - uses: codecov/codecov-action@v1
+        with:
+          fail_ci_if_error: false

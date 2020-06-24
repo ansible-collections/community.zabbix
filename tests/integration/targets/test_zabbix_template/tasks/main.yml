@@ -57,10 +57,17 @@
     format: json
   register: gather_template_result
 
+- name: "test - Set key to template_export_key variable(This deals with the key being masked)"
+  set_fact:
+    template_export_key: "{{ item }}"
+  loop: "{{ gather_template_result.template_json.keys() | list }}"
+  when:
+    - item | regex_search('_export')
+
 - assert:
     that:
-      - gather_template_result.template_json.zabbix_export.groups.0.name == 'Linux servers'
-      - gather_template_result.template_json.zabbix_export.groups.1.name == 'Templates'
+      - gather_template_result.template_json[template_export_key].groups.0.name == 'Linux servers'
+      - gather_template_result.template_json[template_export_key].groups.1.name == 'Templates'
 
 - name: Add link_templates to Zabbix template.
   zabbix_template:
@@ -111,10 +118,10 @@
 
 - assert:
     that:
-      - gather_template_result.template_json.zabbix_export.groups.0.name == 'Linux servers'
-      - gather_template_result.template_json.zabbix_export.groups.1.name == 'Templates'
-      - gather_template_result.template_json.zabbix_export.templates.0.templates.0.name == 'Template App FTP Service'
-      - gather_template_result.template_json.zabbix_export.templates.0.templates.1.name == 'Template App Zabbix Proxy'
+      - gather_template_result.template_json[template_export_key].groups.0.name == 'Linux servers'
+      - gather_template_result.template_json[template_export_key].groups.1.name == 'Templates'
+      - gather_template_result.template_json[template_export_key].templates.0.templates.0.name == 'Template App FTP Service'
+      - gather_template_result.template_json[template_export_key].templates.0.templates.1.name == 'Template App Zabbix Proxy'
 
 - name: Add macros to Zabbix template.
   zabbix_template:
@@ -175,14 +182,14 @@
 
 - assert:
     that:
-      - gather_template_result.template_json.zabbix_export.groups.0.name == 'Linux servers'
-      - gather_template_result.template_json.zabbix_export.groups.1.name == 'Templates'
-      - gather_template_result.template_json.zabbix_export.templates.0.templates.0.name == 'Template App FTP Service'
-      - gather_template_result.template_json.zabbix_export.templates.0.templates.1.name == 'Template App Zabbix Proxy'
-      - gather_template_result.template_json.zabbix_export.templates.0.macros.0.macro == '{$EXAMPLE_MACRO1}'
-      - gather_template_result.template_json.zabbix_export.templates.0.macros.0.value == '1000'
-      - gather_template_result.template_json.zabbix_export.templates.0.macros.1.macro == '{$EXAMPLE_MACRO2}'
-      - gather_template_result.template_json.zabbix_export.templates.0.macros.1.value == 'text'
+      - gather_template_result.template_json[template_export_key].groups.0.name == 'Linux servers'
+      - gather_template_result.template_json[template_export_key].groups.1.name == 'Templates'
+      - gather_template_result.template_json[template_export_key].templates.0.templates.0.name == 'Template App FTP Service'
+      - gather_template_result.template_json[template_export_key].templates.0.templates.1.name == 'Template App Zabbix Proxy'
+      - gather_template_result.template_json[template_export_key].templates.0.macros.0.macro == '{$EXAMPLE_MACRO1}'
+      - gather_template_result.template_json[template_export_key].templates.0.macros.0.value == '1000'
+      - gather_template_result.template_json[template_export_key].templates.0.macros.1.macro == '{$EXAMPLE_MACRO2}'
+      - gather_template_result.template_json[template_export_key].templates.0.macros.1.value == 'text'
 
 - name: Import Zabbix template from JSON file with matching values (idempotency check).
   zabbix_template:
@@ -221,12 +228,12 @@
 
 - assert:
     that:
-      - gather_template_result.template_json.zabbix_export.templates.0.macros.0.macro == '{$EXAMPLE_MACRO1}'
-      - gather_template_result.template_json.zabbix_export.templates.0.macros.0.value == '1000'
-      - gather_template_result.template_json.zabbix_export.templates.0.macros.1.macro == '{$EXAMPLE_MACRO2}'
-      - gather_template_result.template_json.zabbix_export.templates.0.macros.1.value == 'text'
-      - gather_template_result.template_json.zabbix_export.templates.0.macros.2.macro == '{$EXAMPLE_MACRO3}'
-      - gather_template_result.template_json.zabbix_export.templates.0.macros.2.value == 'text2'
+      - gather_template_result.template_json[template_export_key].templates.0.macros.0.macro == '{$EXAMPLE_MACRO1}'
+      - gather_template_result.template_json[template_export_key].templates.0.macros.0.value == '1000'
+      - gather_template_result.template_json[template_export_key].templates.0.macros.1.macro == '{$EXAMPLE_MACRO2}'
+      - gather_template_result.template_json[template_export_key].templates.0.macros.1.value == 'text'
+      - gather_template_result.template_json[template_export_key].templates.0.macros.2.macro == '{$EXAMPLE_MACRO3}'
+      - gather_template_result.template_json[template_export_key].templates.0.macros.2.value == 'text2'
 
 - name: Import Zabbix template from XML file with updated values.
   zabbix_template:
@@ -253,9 +260,9 @@
 # zabbix returns values sorted alphabetically so HTTP Service template comes before Zabbix Proxy template
 - assert:
     that:
-      - gather_template_result.template_json.zabbix_export.templates.0.templates.0.name == 'Template App FTP Service'
-      - gather_template_result.template_json.zabbix_export.templates.0.templates.1.name == 'Template App HTTP Service'
-      - gather_template_result.template_json.zabbix_export.templates.0.templates.2.name == 'Template App Zabbix Proxy'
+      - gather_template_result.template_json[template_export_key].templates.0.templates.0.name == 'Template App FTP Service'
+      - gather_template_result.template_json[template_export_key].templates.0.templates.1.name == 'Template App HTTP Service'
+      - gather_template_result.template_json[template_export_key].templates.0.templates.2.name == 'Template App Zabbix Proxy'
 
 - name: Dump Zabbix template to XML format.
   zabbix_template:
@@ -270,7 +277,7 @@
 - assert:
     that:
       - template_dump_result.deprecations is defined
-      - template_dump_result.deprecations.0.version == '2.14'
+      - template_dump_result.deprecations.0.version == '3.0.0'
 
 - name: Dump Zabbix template to JSON format.
   zabbix_template:
@@ -285,7 +292,7 @@
 - assert:
     that:
       - template_dump_result.deprecations is defined
-      - template_dump_result.deprecations.0.version == '2.14'
+      - template_dump_result.deprecations.0.version == '3.0.0'
 
 - name: Delete Zabbix template.
   zabbix_template:
