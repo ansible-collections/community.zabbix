@@ -71,7 +71,7 @@ jobs:
       - name: Install dependencies
         run: pip install docker-compose zabbix-api
 
-      - name: Install ansible-base 2.10
+      - name: Install ansible-base (stable-2.10)
         run: pip install https://github.com/ansible/ansible/archive/stable-2.10.tar.gz --disable-pip-version-check
 
       - name: Zabbix container server provisioning
@@ -81,4 +81,8 @@ jobs:
           zabbix_port: ${{ matrix.zabbix_container.port }}
 
       - name: Run integration test
-        run: ansible-test integration -v --color --retry-on-error --continue-on-error --diff
+        run: ansible-test integration -v --color --retry-on-error --continue-on-error --diff --requirements --coverage
+
+      - uses: codecov/codecov-action@v1
+        with:
+          fail_ci_if_error: false
