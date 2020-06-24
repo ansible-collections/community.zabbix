@@ -5,6 +5,8 @@
 ### Improvements
 #### Modules:
   - zabbix_action - fixed error on changed API fields for Zabbix 5.0 [GitHub Issue](https://github.com/rockaut/community.zabbix/edit/fix_92)
+  - zabbix_mediatype - now supports new `webhook` media type (PR [#82](https://github.com/ansible-collections/community.zabbix/pull/82)).
+  - zabbix_mediatype - new options `message_templates`, `description` and many more related to `type=webhook` (PR [#82](https://github.com/ansible-collections/community.zabbix/pull/82)).
 
 ### Bug Fixes:
 #### Modules:
