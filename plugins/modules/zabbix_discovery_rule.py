@@ -18,8 +18,9 @@ DOCUMENTATION = r'''
 module: zabbix_discovery_rule
 short_description: Create/delete/update Zabbix discovery rules
 description:
-   - Create discovery rules if they do not exist.
-   - Delete existing discovery rules if they exist.
+   - Create discovery rule.
+   - Delete existing discovery rule.
+   - Update existing discovery rule with new options.
 author:
     - "Tobias Birkefeld (@tcraxs)"
 requirements:
