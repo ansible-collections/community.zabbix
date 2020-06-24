@@ -24,7 +24,7 @@ description:
 author:
     - "Tobias Birkefeld (@tcraxs)"
 requirements:
-    - zabbix-api
+    - "zabbix-api >= 0.5.4"
 options:
     state:
         description:
