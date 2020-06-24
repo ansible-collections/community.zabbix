@@ -82,7 +82,11 @@ jobs:
 
       - name: Run integration test
         run: ansible-test integration -v --color --retry-on-error --continue-on-error --diff --requirements --coverage
-
+        
+      - name: Generate coverage report.
+        run: ansible-test coverage xml -v --requirements --group-by command --group-by version
+        working-directory: ./ansible_collections/community/zabbix
+        
       - uses: codecov/codecov-action@v1
         with:
           fail_ci_if_error: false
