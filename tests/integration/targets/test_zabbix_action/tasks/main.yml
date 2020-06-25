@@ -210,12 +210,12 @@
     - assert:
         that: zbxaction_ack_msgsubj.changed is sameas False
 
-  - name: test - reset action to default
-    zabbix_action:
-    register: zbxaction_reset
+    - name: test - reset action to default
+      zabbix_action:
+      register: zbxaction_reset
 
-  - assert:
-      that: zbxaction_reset.changed is sameas True
+    - assert:
+        that: zbxaction_reset.changed is sameas True
 
   - name: test - disable action
     zabbix_action:

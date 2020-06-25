@@ -873,6 +873,9 @@ class Action(object):
             _params.pop('def_shortdata', None)
             _params.pop('r_longdata', None)
             _params.pop('r_shortdata', None)
+
+        if (LooseVersion(self._zbx_api_version) < LooseVersion('3.4') or
+            LooseVersion(self._zbx_api_version) >= LooseVersion('5.0')):
             _params.pop('ack_longdata', None)
             _params.pop('ack_shortdata', None)
 
