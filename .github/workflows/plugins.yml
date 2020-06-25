@@ -1,24 +1,24 @@
 name: plugins
 on:
-# FIXME: Is `push` and `pull_request` right
+# Run CI against all pushes (direct commits) and Pull Requests
   push:
-    paths:
-      - 'plugins/**'
-      - 'tests/**'
-      - 'scripts/**'
-      - '.github/workflows/plugins.yml'
-      - 'docker-compose.yml'
+#    paths:
+#      - 'plugins/**'
+#      - 'tests/**'
+#      - 'scripts/**'
+#      - '.github/workflows/plugins.yml'
+#      - 'docker-compose.yml'
   pull_request:
-    paths:
-      - 'plugins/**'
-      - 'tests/**'
-      - 'scripts/**'
-      - '.github/workflows/plugins.yml'
-      - 'docker-compose.yml'
+#    paths:
+#      - 'plugins/**'
+#      - 'tests/**'
+#      - 'scripts/**'
+#      - '.github/workflows/plugins.yml'
+#      - 'docker-compose.yml'
 
 jobs:
   sanity:
-    name: Sanity (${{ matrix.ansible }}) py${{ matrix.python }}
+    name: Sanity (Ⓐ${{ matrix.ansible }}+py${{ matrix.python }})
     strategy:
       matrix:
         ansible:
