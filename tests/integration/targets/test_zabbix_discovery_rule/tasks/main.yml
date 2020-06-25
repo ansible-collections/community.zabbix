@@ -8,7 +8,7 @@
     state: present
     iprange: 192.168.1.1-255
     dchecks:
-        - type: 12
+      - type: 12
   register: drule_new
 
 - name: assert that drule was created
@@ -24,7 +24,7 @@
     state: present
     iprange: 192.168.1.1-255
     dchecks:
-        - type: 12
+      - type: 12
   register: drule_exists
 
 - name: assert that nothing has been changed
@@ -42,7 +42,7 @@
       - 192.168.1.1-255
       - 10.0.0.1-255
     dchecks:
-        - type: 12
+      - type: 12
   register: drule_iprange_update
 
 - name: assert that iprange has been changed
@@ -60,7 +60,7 @@
       - 192.168.1.1-255
       - 10.0.0.1-255
     dchecks:
-        - type: 12
+      - type: 12
     status: 1
   register: drule_status_update
 
@@ -79,7 +79,7 @@
       - 192.168.1.1-255
       - 10.0.0.1-255
     dchecks:
-        - type: 12
+      - type: 12
     status: 0
   register: drule_status_update_again
 
@@ -98,12 +98,12 @@
       - 192.168.1.1-255
       - 10.0.0.1-255
     dchecks:
-        - type: 12
-        - type: 9
-          key_: "system.hostname"
-          ports: "10050"
-          uniq: 1
-          host_source: 3
+      - type: 12
+      - type: 9
+        key_: "system.hostname"
+        ports: "10050"
+        uniq: 1
+        host_source: 3
   register: drule_dchecks_update
 
 - name: assert that dcheck has been changed
@@ -121,9 +121,9 @@
       - 192.168.1.1-255
       - 10.0.0.1-255
     dchecks:
-        - type: 12
-        - type: 0
-          ports: "22"
+      - type: 12
+      - type: 0
+        ports: "22"
   register: drule_dchecks_ssh_update
 
 - name: assert that dcheck has been changed
@@ -141,11 +141,11 @@
       - 192.168.1.1-255
       - 10.0.0.1-255
     dchecks:
-        - type: 12
-        - type: 0
-          ports: "22"
-        - type: 1
-          ports: "389"
+      - type: 12
+      - type: 0
+        ports: "22"
+      - type: 1
+        ports: "389"
   register: drule_dchecks_ldap_update
 
 - name: assert that dcheck has been changed
@@ -163,13 +163,13 @@
       - 192.168.1.1-255
       - 10.0.0.1-255
     dchecks:
-        - type: 12
-        - type: 0
-          ports: "22"
-        - type: 1
-          ports: "389"
-        - type: 2
-          ports: 25,465,587
+      - type: 12
+      - type: 0
+        ports: "22"
+      - type: 1
+        ports: "389"
+      - type: 2
+        ports: 25,465,587
   register: drule_dchecks_smtp_update
 
 - name: assert that dcheck has been changed
@@ -187,15 +187,15 @@
       - 192.168.1.1-255
       - 10.0.0.1-255
     dchecks:
-        - type: 12
-        - type: 0
-          ports: "22"
-        - type: 1
-          ports: "389"
-        - type: 2
-          ports: 25,465,587
-        - type: 4
-          ports: 80,8080
+      - type: 12
+      - type: 0
+        ports: "22"
+      - type: 1
+        ports: "389"
+      - type: 2
+        ports: 25,465,587
+      - type: 4
+        ports: 80,8080
   register: drule_dchecks_http_update
 
 - name: assert that dcheck has been changed
@@ -213,7 +213,7 @@
       - 192.168.1.1-255
       - 10.0.0.1-255
     dchecks:
-        - type: 12
+      - type: 12
   register: drule_dchecks_remove_update
 
 - name: assert that dcheck has been changed
@@ -231,20 +231,20 @@
       - 192.168.1.1-255
       - 10.0.0.1-255
     dchecks:
-        - type: 11
-          snmp_community: CUSTOMER@snmp-readonly
-          ports: "161"
-          key_: iso.3.6.1.2.1.1.1.0
-          uniq: 0
-          host_source: 3
-          name_source: 3
+      - type: 11
+        snmp_community: CUSTOMER@snmp-readonly
+        ports: "161"
+        key_: iso.3.6.1.2.1.1.1.0
+        uniq: 0
+        host_source: 3
+        name_source: 3
   register: drule_snmp_update
 
 - name: assert that snmp dcheck has been changed
   assert:
     that: drule_snmp_update is changed
 
-- name: test - update Zabbix discovery rule add snmp3 dcheck
+- name: test - update Zabbix discovery rule snmp3 dcheck
   zabbix_discovery_rule:
     server_url: "{{ zabbix_server_url }}"
     login_user: "{{ zabbix_login_user }}"
@@ -255,30 +255,23 @@
       - 192.168.1.1-255
       - 10.0.0.1-255
     dchecks:
-        - type: 11
-          snmp_community: CUSTOMER@snmp-readonly
-          ports: "161"
-          key_: iso.3.6.1.2.1.1.1.0
-          uniq: 0
-          host_source: 3
-          name_source: 3
-        - type: 13
-          snmp_community: CUSTOMER@snmp3-readonly
-          ports: "161"
-          key_: iso.3.6.1.2.1.1.1.0
-          snmpv3_contextname: "ContextName"
-          snmpv3_securityname: "SecurityName"
-          snmpv3_securitylevel: 2
-          snmpv3_authprotocol: 1
-          snmpv3_authpassphrase: "SeCrEt"
-          snmpv3_privprotocol: 1
-          snmpv3_privpassphrase: "TopSecret"
-          uniq: 0
-          host_source: 3
-          name_source: 3
+      - type: 13
+        snmp_community: CUSTOMER@snmp3-readonly
+        ports: "161"
+        key_: iso.3.6.1.2.1.1.1.0
+        snmpv3_contextname: "ContextName"
+        snmpv3_securityname: "SecurityName"
+        snmpv3_securitylevel: 2
+        snmpv3_authprotocol: 1
+        snmpv3_authpassphrase: "SeCrEt"
+        snmpv3_privprotocol: 1
+        snmpv3_privpassphrase: "TopSecret"
+        uniq: 0
+        host_source: 1
+        name_source: 0
   register: drule_snmp3_update
 
-- name: assert that snmp dcheck has been changed
+- name: assert that snmp3 dcheck has been changed
   assert:
     that: drule_snmp3_update is changed
 
@@ -308,19 +301,58 @@
           - 192.168.1.1-255
           - 10.0.0.1-255
         dchecks:
-            - type: 11
-              snmp_community: CUSTOMER@snmp-readonly
-              ports: "161"
-              key_: iso.3.6.1.2.1.1.1.0
-              uniq: 0
-              host_source: 3
-              name_source: 3
+          - type: 13
+            snmp_community: CUSTOMER@snmp3-readonly
+            ports: "161"
+            key_: iso.3.6.1.2.1.1.1.0
+            snmpv3_contextname: "ContextName"
+            snmpv3_securityname: "SecurityName"
+            snmpv3_securitylevel: 2
+            snmpv3_authprotocol: 1
+            snmpv3_authpassphrase: "SeCrEt"
+            snmpv3_privprotocol: 1
+            snmpv3_privpassphrase: "TopSecret"
+            uniq: 0
+            host_source: 1
+            name_source: 0
         proxy: ACME_proxy
       register: drule_proxy_update
 
     - name: assert that proxy has been changed
       assert:
         that: drule_proxy_update is changed
+
+    - name: test - update Zabbix discovery rule proxy (again)
+      zabbix_discovery_rule:
+        server_url: "{{ zabbix_server_url }}"
+        login_user: "{{ zabbix_login_user }}"
+        login_password: "{{ zabbix_login_password }}"
+        name: ACME
+        state: present
+        iprange:
+          - 192.168.1.1-255
+          - 10.0.0.1-255
+        dchecks:
+          - type: 13
+            snmp_community: CUSTOMER@snmp3-readonly
+            ports: "161"
+            key_: iso.3.6.1.2.1.1.1.0
+            snmpv3_contextname: "ContextName"
+            snmpv3_securityname: "SecurityName"
+            snmpv3_securitylevel: 2
+            snmpv3_authprotocol: 1
+            snmpv3_authpassphrase: "SeCrEt"
+            snmpv3_privprotocol: 1
+            snmpv3_privpassphrase: "TopSecret"
+            uniq: 0
+            host_source: 1
+            name_source: 0
+        proxy: ACME_proxy
+      register: drule_proxy_update_again
+
+    - name: assert that nothing has been changed
+      assert:
+        that: not drule_proxy_update_again is changed
 
 - name: test - delete Zabbix discovery rule
   zabbix_discovery_rule:
