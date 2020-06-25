@@ -225,6 +225,7 @@ except ImportError:
     ZBX_IMP_ERR = traceback.format_exc()
     HAS_ZABBIX_API = False
 
+from distutils.version import LooseVersion
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 
 
@@ -328,10 +329,13 @@ class Dchecks(object):
         for check in _dchecks:
             constructed_check = {
                 'type': check.get('type'),
-                'uniq': check.get('uniq'),
-                'host_source': check.get('host_source'),
-                'name_source': check.get('name_source')
+                'uniq': check.get('uniq')
             }
+            if LooseVersion(self._zbx_api_version) >= LooseVersion('4.4'):
+                constructed_check.update({
+                    'host_source': check.get('host_source'),
+                    'name_source': check.get('name_source')
+                })
             if constructed_check['type'] in (0, 1, 2, 3, 4, 5, 6, 7, 8, 14, 15):
                 constructed_check['ports'] = check.get('ports')
             if constructed_check['type'] == 9:
