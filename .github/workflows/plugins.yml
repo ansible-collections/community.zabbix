@@ -28,7 +28,9 @@ jobs:
         python:
           - 2.7
           - 3.7
-          #- 3.8 blocked by https://github.com/ansible/ansible/pull/70155
+          - 3.8
+          exclude:
+          - python: 3.8  # blocked by https://github.com/ansible/ansible/pull/70155
     runs-on: ubuntu-latest
     steps:
 
