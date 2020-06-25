@@ -45,7 +45,7 @@
         - type: 12
   register: drule_iprange_update
 
-- name: assert that ipragne has been changed
+- name: assert that iprange has been changed
   assert:
     that: drule_iprange_update is changed
 
@@ -64,7 +64,7 @@
     status: 1
   register: drule_status_update
 
-- name: assert that ipragne has been changed
+- name: assert that iprange has been changed
   assert:
     that: drule_status_update is changed
 
@@ -83,7 +83,7 @@
     status: 0
   register: drule_status_update_again
 
-- name: assert that ipragne has been changed
+- name: assert that iprange has been changed
   assert:
     that: drule_status_update_again is changed
 
@@ -110,6 +110,116 @@
   assert:
     that: drule_dchecks_update is changed
 
+- name: test - update Zabbix discovery rule dchecks ssh
+  zabbix_discovery_rule:
+    server_url: "{{ zabbix_server_url }}"
+    login_user: "{{ zabbix_login_user }}"
+    login_password: "{{ zabbix_login_password }}"
+    name: ACME
+    state: present
+    iprange:
+      - 192.168.1.1-255
+      - 10.0.0.1-255
+    dchecks:
+        - type: 12
+        - type: 0
+          ports: "22"
+  register: drule_dchecks_ssh_update
+
+- name: assert that dcheck has been changed
+  assert:
+    that: drule_dchecks_ssh_update is changed
+
+- name: test - update Zabbix discovery rule dchecks ldap
+  zabbix_discovery_rule:
+    server_url: "{{ zabbix_server_url }}"
+    login_user: "{{ zabbix_login_user }}"
+    login_password: "{{ zabbix_login_password }}"
+    name: ACME
+    state: present
+    iprange:
+      - 192.168.1.1-255
+      - 10.0.0.1-255
+    dchecks:
+        - type: 12
+        - type: 0
+          ports: "22"
+        - type: 1
+          ports: "389"
+  register: drule_dchecks_ldap_update
+
+- name: assert that dcheck has been changed
+  assert:
+    that: drule_dchecks_ldap_update is changed
+
+- name: test - update Zabbix discovery rule dchecks smtp
+  zabbix_discovery_rule:
+    server_url: "{{ zabbix_server_url }}"
+    login_user: "{{ zabbix_login_user }}"
+    login_password: "{{ zabbix_login_password }}"
+    name: ACME
+    state: present
+    iprange:
+      - 192.168.1.1-255
+      - 10.0.0.1-255
+    dchecks:
+        - type: 12
+        - type: 0
+          ports: "22"
+        - type: 1
+          ports: "389"
+        - type: 2
+          ports: 25,465,587
+  register: drule_dchecks_smtp_update
+
+- name: assert that dcheck has been changed
+  assert:
+    that: drule_dchecks_smtp_update is changed
+
+- name: test - update Zabbix discovery rule dchecks http
+  zabbix_discovery_rule:
+    server_url: "{{ zabbix_server_url }}"
+    login_user: "{{ zabbix_login_user }}"
+    login_password: "{{ zabbix_login_password }}"
+    name: ACME
+    state: present
+    iprange:
+      - 192.168.1.1-255
+      - 10.0.0.1-255
+    dchecks:
+        - type: 12
+        - type: 0
+          ports: "22"
+        - type: 1
+          ports: "389"
+        - type: 2
+          ports: 25,465,587
+        - type: 4
+          ports: 80,8080
+  register: drule_dchecks_http_update
+
+- name: assert that dcheck has been changed
+  assert:
+    that: drule_dchecks_http_update is changed
+
+- name: test - remove Zabbix discovery rule dchecks
+  zabbix_discovery_rule:
+    server_url: "{{ zabbix_server_url }}"
+    login_user: "{{ zabbix_login_user }}"
+    login_password: "{{ zabbix_login_password }}"
+    name: ACME
+    state: present
+    iprange:
+      - 192.168.1.1-255
+      - 10.0.0.1-255
+    dchecks:
+        - type: 12
+  register: drule_dchecks_remove_update
+
+- name: assert that dcheck has been changed
+  assert:
+    that: drule_dchecks_remove_update is changed
+
 - name: test - update Zabbix discovery rule snmp dcheck
   zabbix_discovery_rule:
     server_url: "{{ zabbix_server_url }}"
@@ -133,6 +243,44 @@
 - name: assert that snmp dcheck has been changed
   assert:
     that: drule_snmp_update is changed
+
+- name: test - update Zabbix discovery rule add snmp3 dcheck
+  zabbix_discovery_rule:
+    server_url: "{{ zabbix_server_url }}"
+    login_user: "{{ zabbix_login_user }}"
+    login_password: "{{ zabbix_login_password }}"
+    name: ACME
+    state: present
+    iprange:
+      - 192.168.1.1-255
+      - 10.0.0.1-255
+    dchecks:
+        - type: 11
+          snmp_community: CUSTOMER@snmp-readonly
+          ports: "161"
+          key_: iso.3.6.1.2.1.1.1.0
+          uniq: 0
+          host_source: 3
+          name_source: 3
+        - type: 13
+          snmp_community: CUSTOMER@snmp3-readonly
+          ports: "161"
+          key_: iso.3.6.1.2.1.1.1.0
+          snmpv3_contextname: "ContextName"
+          snmpv3_securityname: "SecurityName"
+          snmpv3_securitylevel: 2
+          snmpv3_authprotocol: 1
+          snmpv3_authpassphrase: "SeCrEt"
+          snmpv3_privprotocol: 1
+          snmpv3_privpassphrase: "TopSecret"
+          uniq: 0
+          host_source: 3
+          name_source: 3
+  register: drule_snmp3_update
+
+- name: assert that snmp dcheck has been changed
+  assert:
+    that: drule_snmp3_update is changed
 
 - block:
     - name: test - create new active Zabbix proxy server
