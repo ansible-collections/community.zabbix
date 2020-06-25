@@ -29,7 +29,6 @@ options:
     state:
         description:
             - Create or delete user group.
-        required: false
         type: str
         default: "present"
         choices: [ "present", "absent" ]
@@ -41,7 +40,6 @@ options:
     iprange:
         description:
             - One or several IP ranges to check separated by commas.
-        required: true
         type: list
         elements: str
     dchecks:
@@ -49,7 +47,6 @@ options:
             - List of dictionaries of discovery check objects.
             - For more information, review discovery check object documentation at
               U(https://www.zabbix.com/documentation/current/manual/api/reference/dcheck/object)
-        required: true
         suboptions:
             type:
                 description:
@@ -73,7 +70,6 @@ options:
                     - "15 - Telnet"
                 type: int
                 choices: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
-                required: true
             ports:
                 description:
                     - One or several port ranges to check separated by commas. Used for all checks except for ICMP.
@@ -163,17 +159,16 @@ options:
                 default: 0
                 choices: [0, 1, 2, 3]
         type: list
+        elements: dict
         aliases: [ "dcheck" ]
     delay:
         description:
             - Execution interval of the discovery rule.
-        required: false
         type: str
         default: "1h"
     proxy:
         description:
             - Name of the proxy used for discovery.
-        required: false
         type: str
     status:
         description:
@@ -181,7 +176,6 @@ options:
             - "Possible values:"
             - "0 - (default) enabled"
             - "1 - disabled"
-        required: false
         type: int
         default: 0
         choices: [0, 1]
@@ -570,7 +564,7 @@ def main():
             validate_certs=dict(type='bool', required=False, default=True),
             state=dict(type='str', default='present', choices=['present', 'absent']),
             name=dict(type='str', required=True),
-            iprange=dict(type='list', required=False),
+            iprange=dict(type='list', required=False, elements='str'),
             dchecks=dict(
                 type='list',
                 required=False,
@@ -593,10 +587,21 @@ def main():
                     name_source=dict(type='int', choices=[0, 1, 2, 3], default=0)
                 ),
                 required_if=[
-                    ['type', [0, 1, 2, 3, 4, 5, 6, 7, 8, 14, 15], ['ports']],
+                    ['type', 0, ['ports']],
+                    ['type', 1, ['ports']],
+                    ['type', 2, ['ports']],
+                    ['type', 3, ['ports']],
+                    ['type', 4, ['ports']],
+                    ['type', 5, ['ports']],
+                    ['type', 6, ['ports']],
+                    ['type', 7, ['ports']],
+                    ['type', 8, ['ports']],
                     ['type', 9, ['ports', 'key_']],
-                    ['type', [10, 11], ['ports', 'key_', 'snmp_community']],
+                    ['type', 10, ['ports', 'key_', 'snmp_community']],
+                    ['type', 11, ['ports', 'key_', 'snmp_community']],
                     ['type', 13, ['ports', 'key_']],
+                    ['type', 14, ['ports']],
+                    ['type', 15, ['ports']],
                     ['snmpv3_securitylevel', 2, ['snmpv3_privpassphrase']]
                 ]
             ),
