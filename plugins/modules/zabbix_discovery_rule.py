@@ -144,6 +144,7 @@ options:
                     - "1 - (default) DNS"
                     - "2 - IP"
                     - "3 - discovery value of this check"
+                    - Options is available since Zabbix 4.4
                 type: int
                 default: 1
                 choices: [1, 2, 3]
@@ -155,6 +156,7 @@ options:
                     - "1 - DNS"
                     - "2 - IP"
                     - "3 - discovery value of this check"
+                    - Options is available since Zabbix 4.4
                 type: int
                 default: 0
                 choices: [0, 1, 2, 3]
@@ -164,6 +166,8 @@ options:
     delay:
         description:
             - Execution interval of the discovery rule.
+            - Accepts only seconds in int for <= Zabbix 3.2
+            - Accepts seconds, time unit with suffix and user macro since => Zabbix 3.4
         type: str
         default: "1h"
     proxy:
