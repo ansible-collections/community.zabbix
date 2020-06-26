@@ -1,4 +1,8 @@
 ---
+- name: test - do not run tests for Zabbix 3.0
+  meta: end_play
+  when: zabbix_version is version('3.0', '=')
+
 - name: test - prepare example template for zabbix_action module
   zabbix_template:
     server_url: "{{ zabbix_server_url }} "
