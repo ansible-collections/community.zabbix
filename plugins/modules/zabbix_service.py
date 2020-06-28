@@ -182,6 +182,9 @@ class Service(object):
         item_to_check = ['name', 'showsla', 'algorithm', 'triggerid', 'sortorder', 'goodsla']
         change = False
         for item in item_to_check:
+            if item == 'goodsla':
+                live_config[item] = format(float(live_config[item]), '.4f')
+
             if str(generated_config[item]) != str(live_config[item]):
                 change = True
 
