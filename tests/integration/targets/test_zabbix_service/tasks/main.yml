@@ -1,0 +1,397 @@
+---
+- name: "test - Create a new service with check_mode"
+  zabbix_service:
+    server_url: "{{ zabbix_server_url }}"
+    login_user: "{{ zabbix_login_user }}"
+    login_password: "{{ zabbix_login_password }}"
+    name: ExampleServiceForServiceModule
+    sla: 99.99
+    state: present
+  check_mode: yes
+  register: create_service_check_mode_result
+
+- assert:
+    that:
+      - create_service_check_mode_result.changed is sameas true
+
+- name: "test - Create a new service"
+  zabbix_service:
+    server_url: "{{ zabbix_server_url }}"
+    login_user: "{{ zabbix_login_user }}"
+    login_password: "{{ zabbix_login_password }}"
+    name: ExampleServiceForServiceModule
+    sla: 99.99
+    state: present
+  register: create_service_result
+
+- assert:
+    that:
+      - create_service_result.changed is sameas true
+
+- name: "test - Create a new service (idempotency check)"
+  zabbix_service:
+    server_url: "{{ zabbix_server_url }}"
+    login_user: "{{ zabbix_login_user }}"
+    login_password: "{{ zabbix_login_password }}"
+    name: ExampleServiceForServiceModule
+    sla: 99.99
+    state: present
+  register: create_service_idempotency_check_result
+
+- assert:
+    that:
+      - create_service_idempotency_check_result.changed is sameas false
+
+- name: "test - Update a sla with check_mode"
+  zabbix_service:
+    server_url: "{{ zabbix_server_url }}"
+    login_user: "{{ zabbix_login_user }}"
+    login_password: "{{ zabbix_login_password }}"
+    name: ExampleServiceForServiceModule
+    sla: 99.999
+    state: present
+  check_mode: yes
+  register: update_sla_check_mode_result
+
+- assert:
+    that:
+      - update_sla_check_mode_result.changed is sameas true
+
+- name: "test - Update a sla"
+  zabbix_service:
+    server_url: "{{ zabbix_server_url }}"
+    login_user: "{{ zabbix_login_user }}"
+    login_password: "{{ zabbix_login_password }}"
+    name: ExampleServiceForServiceModule
+    sla: 99.999
+    state: present
+  register: update_sla_result
+
+- assert:
+    that:
+      - update_sla_result.changed is sameas true
+
+- name: "test - Update a sla (idempotency check)"
+  zabbix_service:
+    server_url: "{{ zabbix_server_url }}"
+    login_user: "{{ zabbix_login_user }}"
+    login_password: "{{ zabbix_login_password }}"
+    name: ExampleServiceForServiceModule
+    sla: 99.999
+    state: present
+  register: update_sla_idempotency_check_result
+
+- assert:
+    that:
+      - update_sla_idempotency_check_result.changed is sameas false
+
+- name: "test - Update a calculate_sla with check_mode"
+  zabbix_service:
+    server_url: "{{ zabbix_server_url }}"
+    login_user: "{{ zabbix_login_user }}"
+    login_password: "{{ zabbix_login_password }}"
+    name: ExampleServiceForServiceModule
+    sla: 99.999
+    calculate_sla: yes
+    state: present
+  check_mode: yes
+  register: update_calculate_sla_check_mode_result
+
+- assert:
+    that:
+      - update_calculate_sla_check_mode_result.changed is sameas true
+
+- name: "test - Update a calculate_sla"
+  zabbix_service:
+    server_url: "{{ zabbix_server_url }}"
+    login_user: "{{ zabbix_login_user }}"
+    login_password: "{{ zabbix_login_password }}"
+    name: ExampleServiceForServiceModule
+    sla: 99.999
+    calculate_sla: yes
+    state: present
+  register: update_calculate_sla_result
+
+- assert:
+    that:
+      - update_calculate_sla_result.changed is sameas true
+
+- name: "test - Update a calculate_sla (idempotency check)"
+  zabbix_service:
+    server_url: "{{ zabbix_server_url }}"
+    login_user: "{{ zabbix_login_user }}"
+    login_password: "{{ zabbix_login_password }}"
+    name: ExampleServiceForServiceModule
+    sla: 99.999
+    calculate_sla: yes
+    state: present
+  register: update_calculate_sla_idempotency_check_result
+
+- assert:
+    that:
+      - update_calculate_sla_idempotency_check_result.changed is sameas false
+
+- name: "test - Update trigger_host and trigger_name with check_mode"
+  zabbix_service:
+    server_url: "{{ zabbix_server_url }}"
+    login_user: "{{ zabbix_login_user }}"
+    login_password: "{{ zabbix_login_password }}"
+    name: ExampleServiceForServiceModule
+    sla: 99.999
+    calculate_sla: yes
+    trigger_host: "Zabbix server"
+    trigger_name: "Zabbix http poller processes more than 75% busy"
+    state: present
+  check_mode: yes
+  register: update_trigger_name_check_mode_result
+
+- assert:
+    that:
+      - update_trigger_name_check_mode_result.changed is sameas true
+
+- name: "test - Update trigger_host and trigger_name"
+  zabbix_service:
+    server_url: "{{ zabbix_server_url }}"
+    login_user: "{{ zabbix_login_user }}"
+    login_password: "{{ zabbix_login_password }}"
+    name: ExampleServiceForServiceModule
+    sla: 99.999
+    calculate_sla: yes
+    trigger_host: "Zabbix server"
+    trigger_name: "Zabbix http poller processes more than 75% busy"
+    state: present
+  register: update_trigger_name_result
+
+- assert:
+    that:
+      - update_trigger_name_result.changed is sameas true
+
+- name: "test - Update trigger_host and trigger_name (idempotency check)"
+  zabbix_service:
+    server_url: "{{ zabbix_server_url }}"
+    login_user: "{{ zabbix_login_user }}"
+    login_password: "{{ zabbix_login_password }}"
+    name: ExampleServiceForServiceModule
+    sla: 99.999
+    calculate_sla: yes
+    trigger_host: "Zabbix server"
+    trigger_name: "Zabbix http poller processes more than 75% busy"
+    state: present
+  register: update_trigger_name_idempotency_check_result
+
+- assert:
+    that:
+      - update_trigger_name_idempotency_check_result.changed is sameas false
+
+- name: "test - Update a algorithm of service with check_mode"
+  zabbix_service:
+    server_url: "{{ zabbix_server_url }}"
+    login_user: "{{ zabbix_login_user }}"
+    login_password: "{{ zabbix_login_password }}"
+    name: ExampleServiceForServiceModule
+    sla: 99.999
+    calculate_sla: yes
+    trigger_host: "Zabbix server"
+    trigger_name: "Zabbix http poller processes more than 75% busy"
+    algorithm: all_children
+    state: present
+  check_mode: yes
+  register: update_algorithm_check_mode_result
+
+- assert:
+    that:
+      - update_algorithm_check_mode_result.changed is sameas true
+
+- name: "test - Update a algorithm of service"
+  zabbix_service:
+    server_url: "{{ zabbix_server_url }}"
+    login_user: "{{ zabbix_login_user }}"
+    login_password: "{{ zabbix_login_password }}"
+    name: ExampleServiceForServiceModule
+    sla: 99.999
+    calculate_sla: yes
+    trigger_host: "Zabbix server"
+    trigger_name: "Zabbix http poller processes more than 75% busy"
+    algorithm: all_children
+    state: present
+  register: update_algorithm_result
+
+- assert:
+    that:
+      - update_algorithm_result.changed is sameas true
+
+- name: "test - Update a algorithm of service (idempotency check)"
+  zabbix_service:
+    server_url: "{{ zabbix_server_url }}"
+    login_user: "{{ zabbix_login_user }}"
+    login_password: "{{ zabbix_login_password }}"
+    name: ExampleServiceForServiceModule
+    sla: 99.999
+    calculate_sla: yes
+    trigger_host: "Zabbix server"
+    trigger_name: "Zabbix http poller processes more than 75% busy"
+    algorithm: all_children
+    state: present
+  register: update_algorithm_idempotency_check_result
+
+- assert:
+    that:
+      - update_algorithm_idempotency_check_result.changed is sameas false
+
+- name: "test - Create a new root service for parent test"
+  zabbix_service:
+    server_url: "{{ zabbix_server_url }}"
+    login_user: "{{ zabbix_login_user }}"
+    login_password: "{{ zabbix_login_password }}"
+    name: ExampleServiceForServiceModuleRoot
+    sla: 99.99
+    state: present
+  register: create_child_service_result
+
+- assert:
+    that:
+      - create_child_service_result.changed is sameas true
+
+- name: "test - Update a parent of child service with check_mode"
+  zabbix_service:
+    server_url: "{{ zabbix_server_url }}"
+    login_user: "{{ zabbix_login_user }}"
+    login_password: "{{ zabbix_login_password }}"
+    name: ExampleServiceForServiceModule
+    sla: 99.999
+    calculate_sla: yes
+    trigger_host: "Zabbix server"
+    trigger_name: "Zabbix http poller processes more than 75% busy"
+    algorithm: all_children
+    parent: ExampleServiceForServiceModuleRoot
+    state: present
+  check_mode: yes
+  register: create_parent_child_service_check_mode_result
+
+- assert:
+    that:
+      - create_parent_child_service_check_mode_result.changed is sameas true
+
+- name: "test - Update a parent of child service"
+  zabbix_service:
+    server_url: "{{ zabbix_server_url }}"
+    login_user: "{{ zabbix_login_user }}"
+    login_password: "{{ zabbix_login_password }}"
+    name: ExampleServiceForServiceModule
+    sla: 99.999
+    calculate_sla: yes
+    trigger_host: "Zabbix server"
+    trigger_name: "Zabbix http poller processes more than 75% busy"
+    algorithm: all_children
+    parent: ExampleServiceForServiceModuleRoot
+    state: present
+  register: create_parent_child_service_result
+
+- assert:
+    that:
+      - create_parent_child_service_result.changed is sameas true
+
+- name: "test - Update a parent of child service (idempotency check)"
+  zabbix_service:
+    server_url: "{{ zabbix_server_url }}"
+    login_user: "{{ zabbix_login_user }}"
+    login_password: "{{ zabbix_login_password }}"
+    name: ExampleServiceForServiceModule
+    sla: 99.999
+    calculate_sla: yes
+    trigger_host: "Zabbix server"
+    trigger_name: "Zabbix http poller processes more than 75% busy"
+    algorithm: all_children
+    parent: ExampleServiceForServiceModuleRoot
+    state: present
+  register: create_parent_child_service_idempotency_check_result
+
+- assert:
+    that:
+      - create_parent_child_service_idempotency_check_result.changed is sameas false
+
+- name: "test - Remove ExampleServiceForServiceModule service with check_mode"
+  zabbix_service:
+    server_url: "{{ zabbix_server_url }}"
+    login_user: "{{ zabbix_login_user }}"
+    login_password: "{{ zabbix_login_password }}"
+    name: ExampleServiceForServiceModule
+    sla: 99.999
+    state: absent
+  check_mode: yes
+  register: remove_service_with_check_mode_result
+
+- assert:
+    that:
+      - remove_service_with_check_mode_result.changed is sameas true
+
+- name: "test - Remove ExampleServiceForServiceModule service"
+  zabbix_service:
+    server_url: "{{ zabbix_server_url }}"
+    login_user: "{{ zabbix_login_user }}"
+    login_password: "{{ zabbix_login_password }}"
+    name: ExampleServiceForServiceModule
+    sla: 99.999
+    state: absent
+  register: remove_service_result
+
+- assert:
+    that:
+      - remove_service_result.changed is sameas true
+
+- name: "test - Remove ExampleServiceForServiceModule service (idempotency check)"
+  zabbix_service:
+    server_url: "{{ zabbix_server_url }}"
+    login_user: "{{ zabbix_login_user }}"
+    login_password: "{{ zabbix_login_password }}"
+    name: ExampleServiceForServiceModule
+    sla: 99.999
+    state: absent
+  register: remove_service_idempotency_check_result
+
+- assert:
+    that:
+      - remove_service_idempotency_check_result.changed is sameas false
+
+- name: "test - Remove ExampleServiceForServiceModuleRoot service with check_mode"
+  zabbix_service:
+    server_url: "{{ zabbix_server_url }}"
+    login_user: "{{ zabbix_login_user }}"
+    login_password: "{{ zabbix_login_password }}"
+    name: ExampleServiceForServiceModuleRoot
+    sla: 99.999
+    state: absent
+  check_mode: yes
+  register: remove_root_service_with_check_mode_result
+
+- assert:
+    that:
+      - remove_root_service_with_check_mode_result.changed is sameas true
+
+- name: "test - Remove ExampleServiceForServiceModuleRoot service"
+  zabbix_service:
+    server_url: "{{ zabbix_server_url }}"
+    login_user: "{{ zabbix_login_user }}"
+    login_password: "{{ zabbix_login_password }}"
+    name: ExampleServiceForServiceModuleRoot
+    sla: 99.999
+    state: absent
+  register: remove_root_service_result
+
+- assert:
+    that:
+      - remove_root_service_result.changed is sameas true
+
+- name: "test - Remove ExampleServiceForServiceModuleRoot service (idempotency check)"
+  zabbix_service:
+    server_url: "{{ zabbix_server_url }}"
+    login_user: "{{ zabbix_login_user }}"
+    login_password: "{{ zabbix_login_password }}"
+    name: ExampleServiceForServiceModuleRoot
+    sla: 99.999
+    state: absent
+  register: remove_root_service_idempotency_check_result
+
+- assert:
+    that:
+      - remove_root_service_idempotency_check_result.changed is sameas false
