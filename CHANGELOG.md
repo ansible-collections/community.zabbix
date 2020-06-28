@@ -11,6 +11,7 @@
 ### Bug Fixes:
 #### Modules:
   - zabbix_action - now correctly selects mediatype for the (normal|recovery|update) operations with Zabbix 4.4 and newer. (PR [#90](https://github.com/ansible-collections/community.zabbix/pull/90))
+  - zabbix_service - fixed the zabbix_service has no idempotency with Zabbix 5.0 (PR [#116](https://github.com/ansible-collections/community.zabbix/pull/116))
 
 ## 0.2.0
 
