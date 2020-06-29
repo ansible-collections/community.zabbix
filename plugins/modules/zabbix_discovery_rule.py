@@ -377,10 +377,6 @@ class Dchecks(object):
                     'Telnet'], check.get('type')
                 ),
                 'uniq': int(check.get('uniq'))
-                # 'uniq': to_numeric_value([
-                #     'False',
-                #     'True'], check.get('uniq')
-                # )
             }
             if LooseVersion(self._zbx_api_version) >= LooseVersion('4.4'):
                 constructed_check.update({
