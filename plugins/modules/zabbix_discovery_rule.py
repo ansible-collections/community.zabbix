@@ -46,29 +46,44 @@ options:
                 description:
                     - Type of check.
                     - "Possible values:"
-                    - "0 - SSH"
-                    - "1 - LDAP"
-                    - "2 - SMTP"
-                    - "3 - FTP"
-                    - "4 - HTTP"
-                    - "5 - POP"
-                    - "6 - NNTP"
-                    - "7 - IMAP"
-                    - "8 - TCP"
-                    - "9 - Zabbix agent"
-                    - "10 - SNMPv1 agent"
-                    - "11 - SNMPv2 agent"
-                    - "12 - ICMP ping"
-                    - "13 - SNMPv3 agent"
-                    - "14 - HTTPS"
-                    - "15 - Telnet"
-                type: int
-                choices: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
+                    - ICMP
+                    - SSH
+                    - LDAP
+                    - SMTP
+                    - FTP
+                    - HTTP
+                    - POP
+                    - NNTP
+                    - IMAP
+                    - TCP
+                    - Zabbix
+                    - SNMPv1
+                    - SNMPv2
+                    - SNMPv3
+                    - HTTPS
+                    - Telnet
+                type: str
+                choices: ['SSH',
+                          'LDAP',
+                          'SMTP',
+                          'FTP',
+                          'HTTP',
+                          'POP',
+                          'NNTP',
+                          'IMAP',
+                          'TCP',
+                          'Zabbix',
+                          'SNMPv1',
+                          'SNMPv2',
+                          'ICMP',
+                          'SNMPv3',
+                          'HTTPS',
+                          'Telnet']
             ports:
                 description:
                     - One or several port ranges to check separated by commas. Used for all checks except for ICMP.
                 type: str
-            key_:
+            key:
                 description:
                     - "The value of this property differs depending on the type of the check:"
                     - "- key to query for Zabbix agent checks"
@@ -87,10 +102,10 @@ options:
                 description:
                     - Authentication protocol used for SNMPv3 agent checks with security level set to authNoPriv or authPriv.
                     - "Possible values:"
-                    - "0 - (default) MD5"
-                    - "1 - SHA"
-                type: int
-                choices: [0, 1]
+                    - MD5
+                    - SHA
+                type: str
+                choices: ["MD5", "SHA"]
             snmpv3_contextname:
                 description:
                     - SNMPv3 context name. Used only by SNMPv3 checks.
@@ -103,19 +118,19 @@ options:
                 description:
                     - Privacy protocol used for SNMPv3 agent checks with security level set to authPriv.
                     - "Possible values:"
-                    - "0 - (default) DES"
-                    - "1 - AES"
-                type: int
-                choices: [0, 1]
+                    - DES
+                    - AES
+                type: str
+                choices: ["DES", "AES"]
             snmpv3_securitylevel:
                 description:
                     - Security level used for SNMPv3 agent checks.
                     - "Possible values:"
-                    - "0 - noAuthNoPriv"
-                    - "1 - authNoPriv"
-                    - "2 - authPriv"
-                type: int
-                choices: [0, 1, 2]
+                    - noAuthNoPriv
+                    - authNoPriv
+                    - authPriv
+                type: str
+                choices: ["noAuthNoPriv", "authNoPriv", "authPriv"]
             snmpv3_securityname:
                 description:
                     - Security name used for SNMPv3 agent checks.
@@ -126,34 +141,33 @@ options:
                     - Only a single unique check can be configured for a discovery rule.
                     - Used for Zabbix agent, SNMPv1, SNMPv2 and SNMPv3 agent checks.
                     - "Possible values:"
-                    - "0 - (default) do not use this check as a uniqueness criteria"
-                    - "1 - use this check as a uniqueness criteria"
-                type: int
-                default: 0
-                choices: [0, 1]
+                    - "no - (default) do not use this check as a uniqueness criteria"
+                    - "yes - use this check as a uniqueness criteria"
+                type: bool
+                default: no
             host_source:
                 description:
                     - Source for host name.
                     - "Possible values:"
-                    - "1 - (default) DNS"
-                    - "2 - IP"
-                    - "3 - discovery value of this check"
+                    - "DNS (default)"
+                    - "IP"
+                    - "discovery - discovery value of this check"
                     - Options is available since Zabbix 4.4
-                type: int
-                default: 1
-                choices: [1, 2, 3]
+                type: str
+                default: "DNS"
+                choices: ["DNS", "IP", "discovery"]
             name_source:
                 description:
                     - Source for visible name.
                     - "Possible values:"
-                    - "0 - (default) not specified"
-                    - "1 - DNS"
-                    - "2 - IP"
-                    - "3 - discovery value of this check"
+                    - "none - (default) not specified"
+                    - "DNS"
+                    - "IP"
+                    - "discovery - discovery value of this check"
                     - Options is available since Zabbix 4.4
-                type: int
-                default: 0
-                choices: [0, 1, 2, 3]
+                type: str
+                default: "None"
+                choices: ["None", "DNS", "IP", "discovery"]
         type: list
         elements: dict
         aliases: [ "dcheck" ]
@@ -172,11 +186,11 @@ options:
         description:
             - Whether the discovery rule is enabled.
             - "Possible values:"
-            - "0 - (default) enabled"
-            - "1 - disabled"
-        type: int
-        default: 0
-        choices: [0, 1]
+            - enabled (default)
+            - disabled
+        type: str
+        default: "enabled"
+        choices: ["enabled", "disabled"]
 notes:
     - Only Zabbix >= 4.0 is supported.
 extends_documentation_fragment:
@@ -194,12 +208,37 @@ EXAMPLES = r'''
     state: present
     iprange: 192.168.1.1-255
     dchecks:
-        - type: 12
-        - type: 9
-          key_: "system.hostname"
+        - type: ICMP
+        - type: Zabbix
+          key: "system.hostname"
           ports: 10050
-          uniq: 1
-          host_source: 3
+          uniq: yes
+          host_source: "discovery"
+
+# Base update (add new dcheck) discovery rule example
+- name: Create discovery rule with ICMP and zabbix agent checks
+  zabbix_discovery_rule:
+    server_url: "http://zabbix.example.com/zabbix/"
+    login_user: admin
+    login_password: secret
+    name: ACME
+    state: present
+    iprange: 192.168.1.1-255
+    dchecks:
+        - type: SNMPv3
+          snmp_community: CUSTOMER@snmp3-readonly
+          ports: "161"
+          key: iso.3.6.1.2.1.1.1.0
+          snmpv3_contextname: "ContextName"
+          snmpv3_securityname: "SecurityName"
+          snmpv3_securitylevel: 2
+          snmpv3_authprotocol: 1
+          snmpv3_authpassphrase: "SeCrEt"
+          snmpv3_privprotocol: 1
+          snmpv3_privpassphrase: "TopSecret"
+          uniq: no
+          host_source: "DNS"
+          name_source: "None"
 
 # Base delete discovery rule example
 - name: Delete discovery rule
@@ -239,10 +278,8 @@ class Zapi(object):
 
     def check_if_drule_exists(self, name):
         """Check if discovery rule exists.
-
         Args:
             name: Name of the discovery rule.
-
         Returns:
             The return value. True for success, False otherwise.
         """
@@ -260,10 +297,8 @@ class Zapi(object):
 
     def get_drule_by_drule_name(self, name):
         """Get discovery rule by discovery rule name
-
         Args:
             name: discovery rule name.
-
         Returns:
             discovery rule matching discovery rule name
         """
@@ -282,10 +317,8 @@ class Zapi(object):
 
     def get_proxy_by_proxy_name(self, proxy_name):
         """Get proxy by proxy name
-
         Args:
             proxy_name: proxy name.
-
         Returns:
             proxy matching proxy name
         """
@@ -315,10 +348,8 @@ class Dchecks(object):
     def construct_the_data(self, _dchecks):
         """Construct the user defined discovery check to fit the Zabbix API
         requirements
-
         Args:
             _dchecks: discovery checks to construct
-
         Returns:
             dict: user defined discovery checks
         """
@@ -327,34 +358,75 @@ class Dchecks(object):
         constructed_data = []
         for check in _dchecks:
             constructed_check = {
-                'type': check.get('type'),
-                'uniq': check.get('uniq')
+                'type': to_numeric_value([
+                    'SSH',
+                    'LDAP',
+                    'SMTP',
+                    'FTP',
+                    'HTTP',
+                    'POP',
+                    'NNTP',
+                    'IMAP',
+                    'TCP',
+                    'Zabbix',
+                    'SNMPv1',
+                    'SNMPv2',
+                    'ICMP',
+                    'SNMPv3',
+                    'HTTPS',
+                    'Telnet'], check.get('type')
+                ),
+                'uniq': int(check.get('uniq'))
+                # 'uniq': to_numeric_value([
+                #     'False',
+                #     'True'], check.get('uniq')
+                # )
             }
             if LooseVersion(self._zbx_api_version) >= LooseVersion('4.4'):
                 constructed_check.update({
-                    'host_source': check.get('host_source'),
-                    'name_source': check.get('name_source')
+                    'host_source': to_numeric_value([
+                        'None',
+                        'DNS',
+                        'IP',
+                        'discovery'], check.get('host_source')
+                    ),
+                    'name_source': to_numeric_value([
+                        'None',
+                        'DNS',
+                        'IP',
+                        'discovery'], check.get('name_source')
+                    )
                 })
             if constructed_check['type'] in (0, 1, 2, 3, 4, 5, 6, 7, 8, 14, 15):
                 constructed_check['ports'] = check.get('ports')
             if constructed_check['type'] == 9:
                 constructed_check['ports'] = check.get('ports')
-                constructed_check['key_'] = check.get('key_')
+                constructed_check['key_'] = check.get('key')
             if constructed_check['type'] in (10, 11):
                 constructed_check['ports'] = check.get('ports')
                 constructed_check['snmp_community'] = check.get('snmp_community')
-                constructed_check['key_'] = check.get('key_')
+                constructed_check['key_'] = check.get('key')
             if constructed_check['type'] == 13:
                 constructed_check['ports'] = check.get('ports')
-                constructed_check['key_'] = check.get('key_')
+                constructed_check['key_'] = check.get('key')
                 constructed_check['snmpv3_contextname'] = check.get('snmpv3_contextname')
                 constructed_check['snmpv3_securityname'] = check.get('snmpv3_securityname')
-                constructed_check['snmpv3_securitylevel'] = check.get('snmpv3_securitylevel')
-                if check.get('snmpv3_securitylevel') in (1, 2):
-                    constructed_check['snmpv3_authprotocol'] = check.get('snmpv3_authprotocol')
+                constructed_check['snmpv3_securitylevel'] = to_numeric_value([
+                    'noAuthNoPriv',
+                    'authNoPriv',
+                    'authPriv'], check.get('snmpv3_securitylevel')
+                )
+                if constructed_check['snmpv3_securitylevel'] in (1, 2):
+                    constructed_check['snmpv3_authprotocol'] = to_numeric_value([
+                        'MD5',
+                        'SHA'], check.get('snmpv3_authprotocol')
+                    )
                     constructed_check['snmpv3_authpassphrase'] = check.get('snmpv3_authpassphrase')
-                if check.get('snmpv3_securitylevel') == 2:
-                    constructed_check['snmpv3_privprotocol'] = check.get('snmpv3_privprotocol')
+                if constructed_check['snmpv3_securitylevel'] == 2:
+                    constructed_check['snmpv3_privprotocol'] = to_numeric_value([
+                        'DES',
+                        'AES'], check.get('snmpv3_privprotocol')
+                    )
                     constructed_check['snmpv3_privpassphrase'] = check.get('snmpv3_privpassphrase')
             constructed_data.append(constructed_check)
         return cleanup_data(constructed_data)
@@ -368,10 +440,8 @@ class DiscoveryRule(object):
 
     def _construct_parameters(self, **kwargs):
         """Construct parameters.
-
         Args:
             **kwargs: Arbitrary keyword parameters.
-
         Returns:
             dict: dictionary of specified parameters
         """
@@ -379,7 +449,10 @@ class DiscoveryRule(object):
             'name': kwargs['name'],
             'iprange': ','.join(kwargs['iprange']),
             'delay': kwargs['delay'],
-            'status': kwargs['status'],
+            'status': to_numeric_value([
+                'enabled',
+                'disabled'], kwargs['status']
+            ),
             'dchecks': kwargs['dchecks']
         }
         if kwargs['proxy']:
@@ -388,10 +461,8 @@ class DiscoveryRule(object):
 
     def check_difference(self, **kwargs):
         """Check difference between discovery rule and user specified parameters.
-
         Args:
             **kwargs: Arbitrary keyword parameters.
-
         Returns:
             dict: dictionary of differences
         """
@@ -405,10 +476,8 @@ class DiscoveryRule(object):
 
     def update_drule(self, **kwargs):
         """Update discovery rule.
-
         Args:
             **kwargs: Arbitrary keyword parameters.
-
         Returns:
             drule: updated discovery rule
         """
@@ -422,10 +491,8 @@ class DiscoveryRule(object):
 
     def add_drule(self, **kwargs):
         """Add discovery rule
-
         Args:
             **kwargs: Arbitrary keyword parameters
-
         Returns:
             drule: created discovery rule
         """
@@ -440,10 +507,8 @@ class DiscoveryRule(object):
 
     def delete_drule(self, drule_id):
         """Delete discovery rule.
-
         Args:
             drule_id: Discovery rule id
-
         Returns:
             drule: deleted discovery rule
         """
@@ -459,7 +524,6 @@ def convert_unicode_to_str(data):
     """Converts unicode objects to strings in dictionary
     args:
         data: unicode object
-
     Returns:
         dict: strings in dictionary
     """
@@ -482,7 +546,6 @@ def compare_lists(l1, l2, diff_dict):
         l1: first list to compare
         l2: second list to compare
         diff_dict: dictionary to store the difference
-
     Returns:
         dict: items that are different
     """
@@ -510,7 +573,6 @@ def compare_dictionaries(d1, d2, diff_dict):
         d1: first dictionary to compare
         d2: second dictionary to compare
         diff_dict: dictionary to store the difference
-
     Returns:
         dict: items that are different
     """
@@ -542,7 +604,6 @@ def cleanup_data(obj):
     """Removes the None values from the object and returns the object
     Args:
         obj: object to cleanup
-
     Returns:
        object: cleaned object
     """
@@ -553,6 +614,19 @@ def cleanup_data(obj):
                          for k, v in obj.items() if k is not None and v is not None)
     else:
         return obj
+
+
+def to_numeric_value(strs, value):
+    """Converts string values to integers
+    Args:
+        value: string value
+    Returns:
+        int: converted integer
+    """
+    strs = [s.lower() if isinstance(s, str) else s for s in strs]
+    value = value.lower()
+    tmp_dict = dict(zip(strs, list(range(len(strs)))))
+    return tmp_dict[value]
 
 
 def main():
@@ -574,43 +648,60 @@ def main():
                 aliases=['dcheck'],
                 elements='dict',
                 options=dict(
-                    type=dict(type='int', choices=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]),
+                    type=dict(type='str', choices=[
+                        'SSH',
+                        'LDAP',
+                        'SMTP',
+                        'FTP',
+                        'HTTP',
+                        'POP',
+                        'NNTP',
+                        'IMAP',
+                        'TCP',
+                        'Zabbix',
+                        'SNMPv1',
+                        'SNMPv2',
+                        'ICMP',
+                        'SNMPv3',
+                        'HTTPS',
+                        'Telnet']
+                    ),
                     ports=dict(type='str'),
-                    key_=dict(type='str'),
+                    key=dict(type='str'),
                     snmp_community=dict(type='str'),
                     snmpv3_authpassphrase=dict(type='str'),
-                    snmpv3_authprotocol=dict(type='int', choices=[0, 1]),
+                    snmpv3_authprotocol=dict(type='str', choices=['MD5', 'SHA']),
                     snmpv3_contextname=dict(type='str'),
                     snmpv3_privpassphrase=dict(type='str'),
-                    snmpv3_privprotocol=dict(type='int', choices=[0, 1]),
-                    snmpv3_securitylevel=dict(type='int', choices=[0, 1, 2]),
+                    snmpv3_privprotocol=dict(type='str', choices=['DES', 'AES']),
+                    snmpv3_securitylevel=dict(type='str', choices=['noAuthNoPriv', 'authNoPriv', 'authPriv']),
                     snmpv3_securityname=dict(type='str'),
-                    uniq=dict(type='int', choices=[0, 1], default=0),
-                    host_source=dict(type='int', choices=[1, 2, 3], default=1),
-                    name_source=dict(type='int', choices=[0, 1, 2, 3], default=0)
+                    uniq=dict(type='bool', default=False),
+                    host_source=dict(type='str', choices=['DNS', 'IP', 'discovery'], default='DNS'),
+                    name_source=dict(type='str', choices=['None', 'DNS', 'IP', 'discovery'], default='None')
                 ),
                 required_if=[
-                    ['type', 0, ['ports']],
-                    ['type', 1, ['ports']],
-                    ['type', 2, ['ports']],
-                    ['type', 3, ['ports']],
-                    ['type', 4, ['ports']],
-                    ['type', 5, ['ports']],
-                    ['type', 6, ['ports']],
-                    ['type', 7, ['ports']],
-                    ['type', 8, ['ports']],
-                    ['type', 9, ['ports', 'key_']],
-                    ['type', 10, ['ports', 'key_', 'snmp_community']],
-                    ['type', 11, ['ports', 'key_', 'snmp_community']],
-                    ['type', 13, ['ports', 'key_']],
-                    ['type', 14, ['ports']],
-                    ['type', 15, ['ports']],
-                    ['snmpv3_securitylevel', 2, ['snmpv3_privpassphrase']]
+                    ['type', 'SSH', ['ports']],
+                    ['type', 'LDAP', ['ports']],
+                    ['type', 'SMTP', ['ports']],
+                    ['type', 'FTP', ['ports']],
+                    ['type', 'HTTP', ['ports']],
+                    ['type', 'POP', ['ports']],
+                    ['type', 'NNTP', ['ports']],
+                    ['type', 'IMAP', ['ports']],
+                    ['type', 'TCP', ['ports']],
+                    ['type', 'Zabbix', ['ports', 'key']],
+                    ['type', 'SNMPv1', ['ports', 'key', 'snmp_community']],
+                    ['type', 'SNMPv2', ['ports', 'key', 'snmp_community']],
+                    ['type', 'SNMPv3', ['ports', 'key']],
+                    ['type', 'HTTPS', ['ports']],
+                    ['type', 'Telnet', ['ports']],
+                    ['snmpv3_securitylevel', 'authPriv', ['snmpv3_privpassphrase']]
                 ]
             ),
             delay=dict(type='str', required=False, default='1h'),
             proxy=dict(type='str', required=False, default=None),
-            status=dict(type='int', default=0, choices=[0, 1])
+            status=dict(type='str', default="enabled", choices=["enabled", "disabled"])
         ),
         required_if=[
             ['state', 'present', ['name', 'iprange', 'dchecks']],

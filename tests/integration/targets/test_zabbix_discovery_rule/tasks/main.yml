@@ -13,7 +13,7 @@
       state: present
       iprange: 192.168.1.1-255
       dchecks:
-        - type: 12
+        - type: ICMP
       delay: "{{ 3600 if zabbix_version is version('3.4', '<=') else omit }}"
 
   block:
@@ -54,7 +54,7 @@
 
   - name: test - update Zabbix discovery rule status
     zabbix_discovery_rule:
-      status: 1
+      status: disabled
     register: drule_status_update
 
   - name: assert that iprange has been changed
@@ -72,12 +72,12 @@
   - name: test - update Zabbix discovery rule dchecks
     zabbix_discovery_rule:
       dchecks:
-        - type: 12
-        - type: 9
-          key_: "system.hostname"
+        - type: ICMP
+        - type: Zabbix
+          key: "system.hostname"
           ports: "10050"
-          uniq: 1
-          host_source: 3
+          uniq: yes
+          host_source: discovery
     register: drule_dchecks_update
 
   - name: assert that dcheck has been changed
@@ -87,8 +87,8 @@
   - name: test - update Zabbix discovery rule dchecks ssh
     zabbix_discovery_rule:
       dchecks:
-        - type: 12
-        - type: 0
+        - type: ICMP
+        - type: SSH
           ports: "22"
     register: drule_dchecks_ssh_update
 
@@ -99,10 +99,10 @@
   - name: test - update Zabbix discovery rule dchecks ldap
     zabbix_discovery_rule:
       dchecks:
-        - type: 12
-        - type: 0
+        - type: ICMP
+        - type: SSH
           ports: "22"
-        - type: 1
+        - type: LDAP
           ports: "389"
     register: drule_dchecks_ldap_update
 
@@ -113,12 +113,12 @@
   - name: test - update Zabbix discovery rule dchecks smtp
     zabbix_discovery_rule:
       dchecks:
-        - type: 12
-        - type: 0
+        - type: ICMP
+        - type: SSH
           ports: "22"
-        - type: 1
+        - type: LDAP
           ports: "389"
-        - type: 2
+        - type: SMTP
           ports: 25,465,587
     register: drule_dchecks_smtp_update
 
@@ -129,14 +129,14 @@
   - name: test - update Zabbix discovery rule dchecks http
     zabbix_discovery_rule:
       dchecks:
-        - type: 12
-        - type: 0
+        - type: ICMP
+        - type: SSH
           ports: "22"
-        - type: 1
+        - type: LDAP
           ports: "389"
-        - type: 2
+        - type: SMTP
           ports: 25,465,587
-        - type: 4
+        - type: HTTP
           ports: 80,8080
     register: drule_dchecks_http_update
 
@@ -147,7 +147,7 @@
   - name: test - remove Zabbix discovery rule dchecks
     zabbix_discovery_rule:
       dchecks:
-        - type: 12
+        - type: ICMP
     register: drule_dchecks_remove_update
 
   - name: assert that dcheck has been changed
@@ -157,13 +157,13 @@
   - name: test - update Zabbix discovery rule snmp dcheck
     zabbix_discovery_rule:
       dchecks:
-        - type: 11
+        - type: SNMPv2
           snmp_community: CUSTOMER@snmp-readonly
           ports: "161"
-          key_: iso.3.6.1.2.1.1.1.0
-          uniq: 0
-          host_source: 3
-          name_source: 3
+          key: iso.3.6.1.2.1.1.1.0
+          uniq: no
+          host_source: discovery
+          name_source: discovery
     register: drule_snmp_update
 
   - name: assert that snmp dcheck has been changed
@@ -173,20 +173,20 @@
   - name: test - update Zabbix discovery rule snmp3 dcheck
     zabbix_discovery_rule:
       dchecks:
-        - type: 13
+        - type: SNMPv3
           snmp_community: CUSTOMER@snmp3-readonly
           ports: "161"
-          key_: iso.3.6.1.2.1.1.1.0
+          key: iso.3.6.1.2.1.1.1.0
           snmpv3_contextname: "ContextName"
           snmpv3_securityname: "SecurityName"
-          snmpv3_securitylevel: 2
-          snmpv3_authprotocol: 1
+          snmpv3_securitylevel: authPriv
+          snmpv3_authprotocol: SHA
           snmpv3_authpassphrase: "SeCrEt"
-          snmpv3_privprotocol: 1
+          snmpv3_privprotocol: AES
           snmpv3_privpassphrase: "TopSecret"
-          uniq: 0
-          host_source: 1
-          name_source: 0
+          uniq: no
+          host_source: DNS
+          name_source: None
     register: drule_snmp3_update
 
   - name: assert that snmp3 dcheck has been changed
