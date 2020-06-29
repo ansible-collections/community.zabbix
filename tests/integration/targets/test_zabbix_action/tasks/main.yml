@@ -1,0 +1,1169 @@
+---
+- name: test - do not run tests for Zabbix 3.0
+  meta: end_play
+  when: zabbix_version is version('3.0', '=')
+
+- name: test - prepare example template for zabbix_action module
+  zabbix_template:
+    server_url: "{{ zabbix_server_url }} "
+    login_user: "{{ zabbix_login_user }}"
+    login_password: "{{ zabbix_login_password }}"
+    template_name: ExampleTemplateForActionModule
+    template_groups:
+      - Templates
+    state: present
+  register: zbxaction_prep_template
+
+- name: test - prepare example mediatype for zabbix_action module
+  zabbix_mediatype:
+    server_url: "{{ zabbix_server_url }} "
+    login_user: "{{ zabbix_login_user }}"
+    login_password: "{{ zabbix_login_password }}"
+    name: ExampleMediaTypeForActionModule
+    smtp_email: zabbix@example.com
+    type: email
+    state: present
+  register: zbxaction_prep_mediatype
+
+- name: test - simple actions
+  module_defaults:
+    zabbix_action:
+      server_url: "{{ zabbix_server_url }}"
+      login_user: "{{ zabbix_login_user }}"
+      login_password: "{{ zabbix_login_password }}"
+      state: present
+      status: enabled
+      name: ExampleTriggerAction
+      event_source: trigger
+      esc_period: 60
+      conditions:
+        - type: trigger_severity
+          operator: '>='
+          value: Information
+      operations:
+        - type: send_message
+          subject: ExampleSubject
+          message: ExampleMessage
+          media_type: ExampleMediaTypeForActionModule
+          send_to_users:
+            - Admin
+
+  block:
+  - name: test - create new action
+    zabbix_action:
+    register: zbxaction_new
+
+  - assert:
+      that: zbxaction_new.changed is sameas True
+
+  - name: test - create new action (again)
+    zabbix_action:
+    register: zbxaction_new
+
+  - assert:
+      that: zbxaction_new.changed is sameas False
+
+  - when: zabbix_version is version('3.4', '>=')
+    block:
+    - name: test - update action with esc_period as string
+      zabbix_action:
+        esc_period: 2m
+      register: zbxaction_escperiod_str
+
+    - assert:
+        that: zbxaction_escperiod_str.changed is sameas True
+
+    - name: test - update action with esc_period as string (again)
+      zabbix_action:
+        esc_period: 2m
+      register: zbxaction_escperiod_str
+
+    - assert:
+        that: zbxaction_escperiod_str.changed is sameas False
+
+    - name: test - update action with esc_period as macro
+      zabbix_action:
+        esc_period: '{$MYMACRO}'
+      register: zbxaction_escperiod_macro
+
+    - assert:
+        that: zbxaction_escperiod_macro.changed is sameas True
+
+    - name: test - update action with esc_period as macro (again)
+      zabbix_action:
+        esc_period: '{$MYMACRO}'
+      register: zbxaction_escperiod_macro
+
+    - assert:
+        that: zbxaction_escperiod_macro.changed is sameas False
+
+  - name: test - update action with esc_period
+    zabbix_action:
+      esc_period: 120
+    register: zbxaction_escperiod
+
+  - assert:
+      that: zbxaction_escperiod.changed is sameas True
+
+  - name: test - update action with esc_period (again)
+    zabbix_action:
+      esc_period: 120
+    register: zbxaction_escperiod
+
+  - assert:
+      that: zbxaction_escperiod.changed is sameas False
+
+  - name: test - update action with pause_in_maintenance
+    zabbix_action:
+      esc_period: 120
+      pause_in_maintenance: False
+    register: zbxaction_maintpause
+
+  - assert:
+      that: zbxaction_maintpause.changed is sameas True
+
+  - name: test - update action with pause_in_maintenance (again)
+    zabbix_action:
+      esc_period: 120
+      pause_in_maintenance: False
+    register: zbxaction_maintpause
+
+  - assert:
+      that: zbxaction_maintpause.changed is sameas False
+
+  - name: test - reset action to default
+    zabbix_action:
+    register: zbxaction_reset
+
+  - assert:
+      that: zbxaction_reset.changed is sameas True
+
+  - when: zabbix_version is version('5.0', '<')
+    block:
+    - name: test - update action with default_subject and default_message
+      zabbix_action:
+        default_subject: Example default subject
+        default_message: Example default message
+      register: zbxaction_def_msgsubj
+
+    - assert:
+        that: zbxaction_def_msgsubj.changed is sameas True
+
+    - name: test - update action with default_subject and default_message (again)
+      zabbix_action:
+        default_subject: Example default subject
+        default_message: Example default message
+      register: zbxaction_def_msgsubj
+
+    - assert:
+        that: zbxaction_def_msgsubj.changed is sameas False
+
+  - when:
+      - zabbix_version is version('3.2', '>=')
+      - zabbix_version is version('5.0', '<')
+    block:
+    - name: test - update action with recovery_default_subject and recovery_default_message
+      zabbix_action:
+        default_subject: Example default subject
+        default_message: Example default message
+        recovery_default_subject: Example recovery subject
+        recovery_default_message: Example recovery message
+      register: zbxaction_rec_msgsubj
+
+    - assert:
+        that: zbxaction_rec_msgsubj.changed is sameas True
+
+    - name: test - update action with recovery_default_subject and recovery_default_message (again)
+      zabbix_action:
+        default_subject: Example default subject
+        default_message: Example default message
+        recovery_default_subject: Example recovery subject
+        recovery_default_message: Example recovery message
+      register: zbxaction_rec_msgsubj
+
+    - assert:
+        that: zbxaction_rec_msgsubj.changed is sameas False
+
+  - when:
+      - zabbix_version is version('3.4', '>=')
+      - zabbix_version is version('5.0', '<')
+    block:
+    - name: test - update action with acknowledge_default_subject and acknowledge_default_message
+      zabbix_action:
+        default_subject: Example default subject
+        default_message: Example default message
+        recovery_default_subject: Example recovery subject
+        recovery_default_message: Example recovery message
+        acknowledge_default_subject: Example acknowledge subject
+        acknowledge_default_message: Example acknowledge message
+      register: zbxaction_ack_msgsubj
+
+    - assert:
+        that: zbxaction_ack_msgsubj.changed is sameas True
+
+    - name: test - update action with acknowledge_default_subject and acknowledge_default_message (again)
+      zabbix_action:
+        default_subject: Example default subject
+        default_message: Example default message
+        recovery_default_subject: Example recovery subject
+        recovery_default_message: Example recovery message
+        acknowledge_default_subject: Example acknowledge subject
+        acknowledge_default_message: Example acknowledge message
+      register: zbxaction_ack_msgsubj
+
+    - assert:
+        that: zbxaction_ack_msgsubj.changed is sameas False
+
+    - name: test - reset action to default
+      zabbix_action:
+      register: zbxaction_reset
+
+    - assert:
+        that: zbxaction_reset.changed is sameas True
+
+  - name: test - disable action
+    zabbix_action:
+      status: disabled
+    register: zbxaction_disable
+
+  - assert:
+      that: zbxaction_disable.changed is sameas True
+
+  - name: test - disable action (again)
+    zabbix_action:
+      status: disabled
+    register: zbxaction_disable
+
+  - assert:
+      that: zbxaction_disable.changed is sameas False
+
+  - name: test - delete action
+    zabbix_action:
+      state: absent
+    register: zbxaction_delete
+
+  - assert:
+      that: zbxaction_delete.changed is sameas True
+
+  - name: test - delete action (again)
+    zabbix_action:
+      state: absent
+    register: zbxaction_delete
+
+  - assert:
+      that: zbxaction_delete.changed is sameas False
+
+- name: test - trigger actions with conditions
+  module_defaults:
+    zabbix_action:
+      server_url: "{{ zabbix_server_url }}"
+      login_user: "{{ zabbix_login_user }}"
+      login_password: "{{ zabbix_login_password }}"
+      state: present
+      status: enabled
+      name: ExampleTriggerActionConditions
+      event_source: trigger
+      esc_period: 60
+      operations:
+        - type: send_message
+          subject: ExampleSubject
+          message: ExampleMessage
+          media_type: ExampleMediaTypeForActionModule
+          send_to_users:
+            - Admin
+
+  block:
+  - name: test - create new action with multiple conditions
+    zabbix_action:
+      conditions:
+        - type: host_group
+          operator: '='
+          value: Linux servers
+        - type: trigger_severity
+          operator: '>='
+          value: Average
+        - type: application
+          operator: like
+          value: AnsibleTest
+        - type: event_tag_value
+          value: MyTag
+          operator: '='
+          value2: MyTagValue
+        - type: time_period
+          operator: not in
+          value: 6-7,00:00-24:00
+    register: zbxaction_conditions
+
+  - assert:
+      that: zbxaction_conditions.changed is sameas True
+
+  - name: test - create new action with multiple conditions (again)
+    zabbix_action:
+      conditions:
+        - type: host_group
+          operator: '='
+          value: Linux servers
+        - type: trigger_severity
+          operator: '>='
+          value: Average
+        - type: application
+          operator: like
+          value: AnsibleTest
+        - type: event_tag_value
+          value: MyTag
+          operator: '='
+          value2: MyTagValue
+        - type: time_period
+          operator: not in
+          value: 6-7,00:00-24:00
+    register: zbxaction_conditions
+
+  - assert:
+      that: zbxaction_conditions.changed is sameas False
+
+  - name: test - create new action with multiple conditions (reorder)
+    zabbix_action:
+      conditions:
+        - type: host_group
+          operator: '='
+          value: Linux servers
+        - type: application
+          operator: like
+          value: AnsibleTest
+        - type: event_tag_value
+          value: MyTag
+          operator: '='
+          value2: MyTagValue
+        - type: trigger_severity
+          operator: '>='
+          value: Average
+        - type: time_period
+          operator: not in
+          value: 6-7,00:00-24:00
+    register: zbxaction_conditions_reorder
+
+  - assert:
+      that: zbxaction_conditions_reorder.changed is sameas True
+
+  - name: test - update action with multiple conditions by removing one condition
+    zabbix_action:
+      conditions:
+        - type: host_group
+          operator: '='
+          value: Linux servers
+        - type: application
+          operator: like
+          value: AnsibleTest
+        - type: event_tag_value
+          value: MyTag
+          operator: '='
+          value2: MyTagValue
+        - type: trigger_severity
+          operator: '>='
+          value: Average
+    register: zbxaction_conditions_delone
+
+  - assert:
+      that: zbxaction_conditions_delone.changed is sameas True
+
+  - name: test - update action with multiple conditions by changing operators
+    zabbix_action:
+      conditions:
+        - type: host_group
+          operator: '<>'
+          value: Linux servers
+        - type: application
+          operator: not like
+          value: AnsibleTest
+        - type: event_tag_value
+          value: MyTag
+          operator: '<>'
+          value2: MyTagValue
+        - type: trigger_severity
+          operator: '<='
+          value: Average
+    register: zbxaction_conditions_operators
+
+  - assert:
+      that: zbxaction_conditions_operators.changed is sameas True
+
+  - name: test - update action with multiple conditions and evaltype
+    zabbix_action:
+      conditions:
+        - type: host_group
+          operator: '<>'
+          value: Linux servers
+        - type: application
+          operator: not like
+          value: AnsibleTest
+        - type: event_tag_value
+          value: MyTag
+          operator: '<>'
+          value2: MyTagValue
+        - type: trigger_severity
+          operator: '<='
+          value: Average
+      eval_type: and
+    register: zbxaction_conditions_eval
+
+  - assert:
+      that: zbxaction_conditions_eval.changed is sameas True
+
+  - name: test - update action with multiple conditions and evaltype (again)
+    zabbix_action:
+      conditions:
+        - type: host_group
+          operator: '<>'
+          value: Linux servers
+        - type: application
+          operator: not like
+          value: AnsibleTest
+        - type: event_tag_value
+          value: MyTag
+          operator: '<>'
+          value2: MyTagValue
+        - type: trigger_severity
+          operator: '<='
+          value: Average
+      eval_type: and
+    register: zbxaction_conditions_eval
+
+  - assert:
+      that: zbxaction_conditions_eval.changed is sameas False
+
+  - name: test - update action with reduced conditions and formula
+    zabbix_action:
+      conditions:
+        - type: host_group
+          operator: '='
+          value: Linux servers
+          formulaid: A
+        - type: trigger_severity
+          operator: '>='
+          value: Average
+          formulaid: B
+        - type: event_tag_value
+          value: MyTag
+          operator: '<>'
+          value2: MyTagValue
+          formulaid: C
+      formula: A and (B or C)
+    register: zbxaction_conditions_formula
+
+  - assert:
+      that: zbxaction_conditions_formula.changed is sameas True
+
+  - name: test - update formula used in action with reduced conditions
+    zabbix_action:
+      conditions:
+        - type: host_group
+          operator: '='
+          value: Linux servers
+          formulaid: A
+        - type: trigger_severity
+          operator: '>='
+          value: Average
+          formulaid: B
+        - type: event_tag_value
+          value: MyTag
+          operator: '<>'
+          value2: MyTagValue
+          formulaid: C
+      formula: (A or B) or C
+    register: zbxaction_conditions_formula
+
+  - assert:
+      that: zbxaction_conditions_formula.changed is sameas True
+
+  - name: test - update formula used in action with reduced conditions (again)
+    zabbix_action:
+      conditions:
+        - type: host_group
+          operator: '='
+          value: Linux servers
+          formulaid: A
+        - type: trigger_severity
+          operator: '>='
+          value: Average
+          formulaid: B
+        - type: event_tag_value
+          value: MyTag
+          operator: '<>'
+          value2: MyTagValue
+          formulaid: C
+      formula: (A or B) or C
+    register: zbxaction_conditions_formula
+
+  - assert:
+      that: zbxaction_conditions_formula.changed is sameas False
+
+  - name: test - delete action
+    zabbix_action:
+      state: absent
+    register: zbxaction_delete
+
+  - assert:
+      that: zbxaction_delete.changed is sameas True
+
+- name: test - trigger actions with operations
+  module_defaults:
+    zabbix_action:
+      server_url: "{{ zabbix_server_url }}"
+      login_user: "{{ zabbix_login_user }}"
+      login_password: "{{ zabbix_login_password }}"
+      state: present
+      status: enabled
+      name: ExampleTriggerActionOperations
+      event_source: trigger
+      esc_period: 60
+      conditions:
+        - type: trigger_severity
+          operator: '>='
+          value: Average
+
+  block:
+  - name: test - create new action with send_message operations
+    zabbix_action:
+      operations:
+        - type: send_message
+          send_to_users:
+            - Admin
+          subject: test_subject
+          message: test_message
+          media_type: ExampleMediaTypeForActionModule
+          operation_condition: not_acknowledged
+          esc_step_from: 1
+          esc_step_to: 2
+        - type: send_message
+          send_to_users:
+            - Admin
+          subject: test_subject
+          message: test_message
+          media_type: SMS
+          operation_condition: not_acknowledged
+          esc_step_from: 2
+          esc_step_to: 0
+          esc_period: 300
+    register: zbxaction_ops
+
+  - assert:
+      that: zbxaction_ops.changed is sameas True
+
+  - name: test - create new action with send_message operations (again)
+    zabbix_action:
+      operations:
+        - type: send_message
+          send_to_users:
+            - Admin
+          subject: test_subject
+          message: test_message
+          media_type: ExampleMediaTypeForActionModule
+          operation_condition: not_acknowledged
+          esc_step_from: 1
+          esc_step_to: 2
+        - type: send_message
+          send_to_users:
+            - Admin
+          subject: test_subject
+          message: test_message
+          media_type: SMS
+          operation_condition: not_acknowledged
+          esc_step_from: 2
+          esc_step_to: 0
+          esc_period: 300
+    register: zbxaction_ops
+
+  - assert:
+      that: zbxaction_ops.changed is sameas False
+
+  - name: test - create new action with remote_command operations
+    zabbix_action:
+      operations:
+        - type: remote_command
+          command_type: custom_script
+          command: /usr/local/bin/do_something.sh
+          execute_on: agent
+          run_on_hosts: 0
+        - type: remote_command
+          command_type: ssh
+          command: /usr/local/bin/do_something.sh
+          run_on_hosts: 0
+          ssh_auth_type: password
+          username: root
+          password: zabbix
+        - type: remote_command
+          command_type: global_script
+          script_name: Ping
+          run_on_hosts: 0
+    register: zbxaction_rmtcmd
+
+  - assert:
+      that: zbxaction_rmtcmd.changed is sameas True
+
+  - name: test - create new action with remote_command operations (again)
+    zabbix_action:
+      operations:
+        - type: remote_command
+          command_type: custom_script
+          command: /usr/local/bin/do_something.sh
+          execute_on: agent
+          run_on_hosts: 0
+        - type: remote_command
+          command_type: ssh
+          command: /usr/local/bin/do_something.sh
+          run_on_hosts: 0
+          ssh_auth_type: password
+          username: root
+          password: zabbix
+        - type: remote_command
+          command_type: global_script
+          script_name: Ping
+          run_on_hosts: 0
+    register: zbxaction_rmtcmd
+
+  - assert:
+      that: zbxaction_rmtcmd.changed is sameas False
+
+  - name: test - update ssh remote_command auth in action with remote_command operations
+    zabbix_action:
+      operations:
+        - type: remote_command
+          command_type: custom_script
+          command: /usr/local/bin/do_something.sh
+          execute_on: agent
+          run_on_hosts: 0
+        - type: remote_command
+          command_type: ssh
+          command: /usr/local/bin/do_something.sh
+          run_on_hosts: 0
+          ssh_auth_type: public_key
+          username: root
+          ssh_privatekey_file: /etc/zabbix/.ssh/id_test
+          ssh_publickey_file: /etc/zabbix/.ssh/id_test.pub
+        - type: remote_command
+          command_type: global_script
+          script_name: Ping
+          run_on_hosts: 0
+    register: zbxaction_rmtcmd
+
+  - assert:
+      that: zbxaction_rmtcmd.changed is sameas True
+
+  - name: test - delete action
+    zabbix_action:
+      state: absent
+    register: zbxaction_delete
+
+  - assert:
+      that: zbxaction_delete.changed is sameas True
+
+- name: test - discovery actions
+  module_defaults:
+    zabbix_action:
+      server_url: "{{ zabbix_server_url }}"
+      login_user: "{{ zabbix_login_user }}"
+      login_password: "{{ zabbix_login_password }}"
+      state: present
+      status: enabled
+      name: ExampleDiscoveryActionOperations
+      event_source: discovery
+      esc_period: 60
+
+  block:
+  - name: test - create new discovery action
+    zabbix_action:
+      conditions:
+        - type: host_IP
+          operator: '='
+          value: '192.168.0.1-127'
+        - type: discovery_object
+          operator: '='
+          value: host
+        - type: discovery_status
+          operator: '='
+          value: 'discovered'
+        - type: uptime_or_downtime_duration
+          operator: '>='
+          value: 1800
+      operations:
+        - type: add_host
+        - type: add_to_host_group
+          host_groups:
+            - Linux servers
+        - type: link_to_template
+          templates:
+            - ExampleTemplateForActionModule
+        - type: enable_host
+        - type: set_host_inventory_mode
+          inventory: automatic
+    register: zbxaction_discovery
+
+  - assert:
+      that: zbxaction_discovery.changed is sameas True
+
+  - name: test - create new discovery action (again)
+    zabbix_action:
+      conditions:
+        - type: host_IP
+          operator: '='
+          value: '192.168.0.1-127'
+        - type: discovery_object
+          operator: '='
+          value: host
+        - type: discovery_status
+          operator: '='
+          value: 'discovered'
+        - type: uptime_or_downtime_duration
+          operator: '>='
+          value: 1800
+      operations:
+        - type: add_host
+        - type: add_to_host_group
+          host_groups:
+            - Linux servers
+        - type: link_to_template
+          templates:
+            - ExampleTemplateForActionModule
+        - type: enable_host
+        - type: set_host_inventory_mode
+          inventory: automatic
+    register: zbxaction_discovery
+
+  - assert:
+      that: zbxaction_discovery.changed is sameas False
+
+  - name: test - update discovery action conditions and operations
+    zabbix_action:
+      conditions:
+        - type: host_IP
+          operator: '='
+          value: '192.168.1.1-127'
+        - type: discovery_object
+          operator: '='
+          value: host
+        - type: discovery_status
+          operator: '='
+          value: 'discovered'
+        - type: uptime_or_downtime_duration
+          operator: '>='
+          value: 2200
+      operations:
+        - type: add_host
+        - type: add_to_host_group
+          host_groups:
+            - Linux servers
+            - Discovered hosts
+        - type: link_to_template
+          templates:
+            - ExampleTemplateForActionModule
+        - type: enable_host
+        - type: send_message
+          send_to_users:
+            - Admin
+          subject: test_subject
+          message: test_message
+          media_type: ExampleMediaTypeForActionModule
+          operation_condition: not_acknowledged
+          esc_step_from: 1
+          esc_step_to: 2
+    register: zbxaction_discovery_update
+
+  - assert:
+      that: zbxaction_discovery_update.changed is sameas True
+
+  - name: test - update discovery action conditions and operations (again)
+    zabbix_action:
+      conditions:
+        - type: host_IP
+          operator: '='
+          value: '192.168.1.1-127'
+        - type: discovery_object
+          operator: '='
+          value: host
+        - type: discovery_status
+          operator: '='
+          value: 'discovered'
+        - type: uptime_or_downtime_duration
+          operator: '>='
+          value: 2200
+      operations:
+        - type: add_host
+        - type: add_to_host_group
+          host_groups:
+            - Linux servers
+            - Discovered hosts
+        - type: link_to_template
+          templates:
+            - ExampleTemplateForActionModule
+        - type: enable_host
+        - type: send_message
+          send_to_users:
+            - Admin
+          subject: test_subject
+          message: test_message
+          media_type: ExampleMediaTypeForActionModule
+          operation_condition: not_acknowledged
+          esc_step_from: 1
+          esc_step_to: 2
+    register: zbxaction_discovery_update
+
+  - assert:
+      that: zbxaction_discovery_update.changed is sameas False
+
+  - name: test - delete action
+    zabbix_action:
+      state: absent
+    register: zbxaction_delete
+
+  - assert:
+      that: zbxaction_delete.changed is sameas True
+
+- name: test - auto registration actions
+  module_defaults:
+    zabbix_action:
+      server_url: "{{ zabbix_server_url }}"
+      login_user: "{{ zabbix_login_user }}"
+      login_password: "{{ zabbix_login_password }}"
+      state: present
+      status: enabled
+      name: ExampleAutoRegActionOperations
+      event_source: auto_registration
+      esc_period: 60
+
+  block:
+  - name: test - create new auto registration action
+    zabbix_action:
+      conditions:
+        - type: host_name
+          operator: like
+          value: zabbix
+        - type: host_metadata
+          operator: not like
+          value: somemetadata
+      operations:
+        - type: add_host
+    register: zbxaction_autoreg
+
+  - assert:
+      that: zbxaction_autoreg.changed is sameas True
+
+  - name: test - create new auto registration action (again)
+    zabbix_action:
+      conditions:
+        - type: host_name
+          operator: like
+          value: zabbix
+        - type: host_metadata
+          operator: not like
+          value: somemetadata
+      operations:
+        - type: add_host
+    register: zbxaction_autoreg
+
+  - assert:
+      that: zbxaction_autoreg.changed is sameas False
+
+  - name: test - update auto registration action
+    zabbix_action:
+      conditions:
+        - type: host_name
+          operator: like
+          value: zabbix
+        - type: host_metadata
+          operator: not like
+          value: somemetadata
+        - type: host_metadata
+          operator: like
+          value: somemetadata2
+      operations:
+        - type: add_host
+    register: zbxaction_autoreg_update
+
+  - assert:
+      that: zbxaction_autoreg_update.changed is sameas True
+
+  - name: test - update auto registration action (again)
+    zabbix_action:
+      conditions:
+        - type: host_name
+          operator: like
+          value: zabbix
+        - type: host_metadata
+          operator: not like
+          value: somemetadata
+        - type: host_metadata
+          operator: like
+          value: somemetadata2
+      operations:
+        - type: add_host
+    register: zbxaction_autoreg_update
+
+  - assert:
+      that: zbxaction_autoreg_update.changed is sameas False
+
+  - name: test - delete action
+    zabbix_action:
+      state: absent
+    register: zbxaction_delete
+
+  - assert:
+      that: zbxaction_delete.changed is sameas True
+
+- name: test - internal actions
+  module_defaults:
+    zabbix_action:
+      server_url: "{{ zabbix_server_url }}"
+      login_user: "{{ zabbix_login_user }}"
+      login_password: "{{ zabbix_login_password }}"
+      state: present
+      status: enabled
+      name: ExampleInternalActionOperations
+      event_source: internal
+      esc_period: 60
+      operations:
+        - type: send_message
+          send_to_users:
+            - Admin
+          subject: test_subject
+          message: test_message
+          media_type: ExampleMediaTypeForActionModule
+
+  block:
+  - name: test - create new internal action
+    zabbix_action:
+      conditions:
+        - type: application
+          operator: like
+          value: zabbix
+        - type: host_template
+          operator: '='
+          value: ExampleTemplateForActionModule
+        - type: event_type
+          operator: '='
+          value: item in not supported state
+    register: zbxaction_internal
+
+  - assert:
+      that: zbxaction_internal.changed is sameas True
+
+  - name: test - create new internal action (again)
+    zabbix_action:
+      conditions:
+        - type: application
+          operator: like
+          value: zabbix
+        - type: host_template
+          operator: '='
+          value: ExampleTemplateForActionModule
+        - type: event_type
+          operator: '='
+          value: item in not supported state
+    register: zbxaction_internal
+
+  - assert:
+      that: zbxaction_internal.changed is sameas False
+
+  - name: test - update internal action conditions
+    zabbix_action:
+      conditions:
+        - type: application
+          operator: like
+          value: zabbix
+        - type: host_template
+          operator: '='
+          value: ExampleTemplateForActionModule
+        - type: event_type
+          operator: '='
+          value: item in not supported state
+        - type: event_type
+          operator: '='
+          value: trigger in unknown state
+    register: zbxaction_internal_update
+
+  - assert:
+      that: zbxaction_internal_update.changed is sameas True
+
+  - name: test - update internal action conditions (again)
+    zabbix_action:
+      conditions:
+        - type: application
+          operator: like
+          value: zabbix
+        - type: host_template
+          operator: '='
+          value: ExampleTemplateForActionModule
+        - type: event_type
+          operator: '='
+          value: item in not supported state
+        - type: event_type
+          operator: '='
+          value: trigger in unknown state
+    register: zbxaction_internal_update
+
+  - assert:
+      that: zbxaction_internal_update.changed is sameas False
+
+  - name: test - delete action
+    zabbix_action:
+      state: absent
+    register: zbxaction_delete
+
+  - assert:
+      that: zbxaction_delete.changed is sameas True
+
+- name: test - actions with recovery and acknowledge operations
+  when:
+    - zabbix_version is version('3.4', '>=')
+  module_defaults:
+    zabbix_action:
+      server_url: "{{ zabbix_server_url }}"
+      login_user: "{{ zabbix_login_user }}"
+      login_password: "{{ zabbix_login_password }}"
+      state: present
+      status: enabled
+      name: ExampleTriggerActionRecAckOps
+      event_source: trigger
+      esc_period: 60
+      conditions:
+        - type: trigger_severity
+          operator: '>='
+          value: Information
+      operations:
+        - type: send_message
+          subject: ExampleSubject
+          message: ExampleMessage
+          media_type: ExampleMediaTypeForActionModule
+          send_to_users:
+            - Admin
+
+  block:
+  - name: test - create new action with recovery and acknowledge operations
+    zabbix_action:
+      recovery_operations:
+        - type: send_message
+          subject: ExampleSubject
+          message: ExampleMessage
+          media_type: ExampleMediaTypeForActionModule
+          send_to_users:
+            - Admin
+        - type: remote_command
+          command_type: custom_script
+          command: /usr/local/bin/do_something.sh
+          execute_on: agent
+          run_on_hosts: 0
+        - type: remote_command
+          command_type: ssh
+          command: /usr/local/bin/do_something.sh
+          run_on_hosts: 0
+          ssh_auth_type: password
+          username: root
+          password: zabbix
+        - type: notify_all_involved
+          subject: RecoverySubject
+          message: RecoveryMessage
+      acknowledge_operations:
+        - type: send_message
+          subject: ExampleSubject
+          message: ExampleMessage
+          media_type: ExampleMediaTypeForActionModule
+          send_to_users:
+            - Admin
+        - type: remote_command
+          command_type: ssh
+          command: /usr/local/bin/do_something.sh
+          run_on_hosts: 0
+          ssh_auth_type: public_key
+          username: root
+          ssh_privatekey_file: /etc/zabbix/.ssh/id_test
+          ssh_publickey_file: /etc/zabbix/.ssh/id_test.pub
+        - type: remote_command
+          command_type: global_script
+          script_name: Ping
+          run_on_hosts: 0
+        - type: notify_all_involved
+          subject: RecoverySubject
+          message: RecoveryMessage
+          media_type: ExampleMediaTypeForActionModule
+    register: zbxaction_recack_new
+
+  - assert:
+      that: zbxaction_recack_new.changed is sameas True
+
+  - name: test - create new action with recovery and acknowledge operations (again)
+    zabbix_action:
+      recovery_operations:
+        - type: send_message
+          subject: ExampleSubject
+          message: ExampleMessage
+          media_type: ExampleMediaTypeForActionModule
+          send_to_users:
+            - Admin
+        - type: remote_command
+          command_type: custom_script
+          command: /usr/local/bin/do_something.sh
+          execute_on: agent
+          run_on_hosts: 0
+        - type: remote_command
+          command_type: ssh
+          command: /usr/local/bin/do_something.sh
+          run_on_hosts: 0
+          ssh_auth_type: password
+          username: root
+          password: zabbix
+        - type: notify_all_involved
+          subject: RecoverySubject
+          message: RecoveryMessage
+      acknowledge_operations:
+        - type: send_message
+          subject: ExampleSubject
+          message: ExampleMessage
+          media_type: ExampleMediaTypeForActionModule
+          send_to_users:
+            - Admin
+        - type: remote_command
+          command_type: ssh
+          command: /usr/local/bin/do_something.sh
+          run_on_hosts: 0
+          ssh_auth_type: public_key
+          username: root
+          ssh_privatekey_file: /etc/zabbix/.ssh/id_test
+          ssh_publickey_file: /etc/zabbix/.ssh/id_test.pub
+        - type: remote_command
+          command_type: global_script
+          script_name: Ping
+          run_on_hosts: 0
+        - type: notify_all_involved
+          subject: RecoverySubject
+          message: RecoveryMessage
+          media_type: ExampleMediaTypeForActionModule
+    register: zbxaction_recack_new
+
+  - assert:
+      that: zbxaction_recack_new.changed is sameas False
+
+  - name: test - delete action
+    zabbix_action:
+      state: absent
+    register: zbxaction_delete
+
+  - assert:
+      that: zbxaction_delete.changed is sameas True
+
+- name: test - cleanup example template for zabbix_action module
+  zabbix_template:
+    server_url: "{{ zabbix_server_url }} "
+    login_user: "{{ zabbix_login_user }}"
+    login_password: "{{ zabbix_login_password }}"
+    template_name: ExampleTemplateForActionModule
+    state: absent
+  register: zbxaction_prep_template
+
+- name: test - cleanup example mediatype for zabbix_action module
+  zabbix_mediatype:
+    server_url: "{{ zabbix_server_url }} "
+    login_user: "{{ zabbix_login_user }}"
+    login_password: "{{ zabbix_login_password }}"
+    name: ExampleMediaTypeForActionModule
+    type: email
+    state: absent
+  register: zbxaction_prep_mediatype
