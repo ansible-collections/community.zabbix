@@ -231,10 +231,10 @@ EXAMPLES = r'''
           key: iso.3.6.1.2.1.1.1.0
           snmpv3_contextname: "ContextName"
           snmpv3_securityname: "SecurityName"
-          snmpv3_securitylevel: 2
-          snmpv3_authprotocol: 1
+          snmpv3_securitylevel: "authPriv"
+          snmpv3_authprotocol: "SHA"
           snmpv3_authpassphrase: "SeCrEt"
-          snmpv3_privprotocol: 1
+          snmpv3_privprotocol: "AES"
           snmpv3_privpassphrase: "TopSecret"
           uniq: no
           host_source: "DNS"
