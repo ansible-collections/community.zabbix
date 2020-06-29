@@ -29,10 +29,13 @@ jobs:
           - 2.7
           - 3.7
           - 3.8
-          exclude:
+        exclude:
           - python: 3.8  # blocked by https://github.com/ansible/ansible/pull/70155
     runs-on: ubuntu-latest
     steps:
+
+      # ansible-test requires the collection to be in a directory in the form
+      # .../ansible_collections/NAMESPACE/COLLECTION_NAME/
 
       - name: Check out code
         uses: actions/checkout@v2
@@ -40,19 +43,26 @@ jobs:
           path: ansible_collections/community/zabbix
 
       - name: Set up Python ${{ matrix.ansible }}
-        uses: actions/setup-python@v1
+        uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python }}
 
+      # Install the head of the given branch (devel, stable-2.10)
       - name: Install ansible-base (${{ matrix.ansible }})
         run: pip install https://github.com/ansible/ansible/archive/${{ matrix.ansible }}.tar.gz --disable-pip-version-check
 
+      # run ansible-test sanity inside of Docker.
+      # The docker container has all the pinned dependencies that are required.
+      # Explicity specify the version of Python we want to test
       - name: Run sanity tests
         run: ansible-test sanity --docker -v --color --python ${{ matrix.python }}
         working-directory: ./ansible_collections/community/zabbix
 
+# FIXME IN TEMPLATE: UNIT TESTS WOULD GO HERE
+
   integration:
     runs-on: ubuntu-latest
+    name: I (${{ matrix.zabbix_container.version}}:${{ matrix.zabbix_container.port } Ⓐ${{ matrix.ansible }}+py${{ matrix.python }}})
     strategy:
       fail-fast: false
       matrix:
@@ -91,6 +101,9 @@ jobs:
       - name: Install dependencies
         run: pip install docker-compose zabbix-api
 
+      # For Zabbix integration tests we need to test against different versions of
+      # the Zabbix server. To do this we spin up a Docker container using the `matrix`
+      # of version and ports specified earlier.
       - name: Zabbix container server provisioning
         run: docker-compose up -d
         working-directory: ./ansible_collections/community/zabbix
@@ -98,14 +111,19 @@ jobs:
           zabbix_version: ${{ matrix.zabbix_container.version }}
           zabbix_port: ${{ matrix.zabbix_container.port }}
 
+      # Run the integration tests
+      # As we need to connect to an existing docker container we can't use `--docker` here as the VMs would be on different
+      # (non-routing) networks, so we run them locally and ensure any required dependencies are installed via `--requirements`
       - name: Run integration test
         run: ansible-test integration -v --color --retry-on-error --continue-on-error --diff --python ${{ matrix.python }} --requirements --coverage
         working-directory: ./ansible_collections/community/zabbix
 
-      - name: Generate coverage report.
+        # ansible-test support producing code coverage date
+      - name: Generate coverage report
         run: ansible-test coverage xml -v --requirements --group-by command --group-by version
         working-directory: ./ansible_collections/community/zabbix
 
+      # See the repots at https://codecov.io/gh/ansible-collections/community.zabbix
       - uses: codecov/codecov-action@v1
         with:
           fail_ci_if_error: false
