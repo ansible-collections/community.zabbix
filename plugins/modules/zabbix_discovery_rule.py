@@ -183,9 +183,10 @@ options:
         type: int
         default: 0
         choices: [0, 1]
-
+notes:
+    - Only Zabbix >= 4.0 is supported.
 extends_documentation_fragment:
-- community.zabbix.zabbix
+    - community.zabbix.zabbix
 '''
 
 EXAMPLES = r'''
