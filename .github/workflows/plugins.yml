@@ -22,7 +22,9 @@ jobs:
     strategy:
       matrix:
         ansible:
-          # - stable-2.9 # Only if your collection supports Ansible 2.9
+          # It's important that Sanity is tested against all stable-X.Y branches 
+          # Testing against `devel` may fail as new tests are added.
+        # - stable-2.9 # Only if your collection supports Ansible 2.9
           - stable-2.10
           - devel
         python:
@@ -78,7 +80,7 @@ jobs:
         ansible:
           # - stable-2.9 # Only if your collection supports Ansible 2.9
           - stable-2.10
-          #- devel
+          - devel
         python:
           - 2.7
           - 3.7
