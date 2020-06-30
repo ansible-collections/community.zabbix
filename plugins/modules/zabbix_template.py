@@ -110,7 +110,7 @@ options:
             - On C(state=present) template will be created/imported or updated depending if it is already present.
             - On C(state=dump) template content will get dumped into required format specified in I(dump_format).
             - On C(state=absent) template will be deleted.
-            - The C(state=dump) is deprecated and will eventually be removed in 2.14. The M(zabbix_template_info) module should be used instead.
+            - The C(state=dump) is deprecated and will be removed in 2.14. The M(community.zabbix.zabbix_template_info) module should be used instead.
         required: false
         choices: [present, absent, dump]
         default: "present"
