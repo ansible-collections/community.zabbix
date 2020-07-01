@@ -45,23 +45,6 @@ options:
             type:
                 description:
                     - Type of check.
-                    - "Possible values:"
-                    - ICMP
-                    - SSH
-                    - LDAP
-                    - SMTP
-                    - FTP
-                    - HTTP
-                    - POP
-                    - NNTP
-                    - IMAP
-                    - TCP
-                    - Zabbix
-                    - SNMPv1
-                    - SNMPv2
-                    - SNMPv3
-                    - HTTPS
-                    - Telnet
                 type: str
                 choices: ['SSH',
                           'LDAP',
@@ -174,8 +157,7 @@ options:
     delay:
         description:
             - Execution interval of the discovery rule.
-            - Accepts only seconds in int for <= Zabbix 3.2
-            - Accepts seconds, time unit with suffix and user macro since => Zabbix 3.4
+            - Accepts seconds, time unit with suffix and user macro.
         type: str
         default: "1h"
     proxy:
