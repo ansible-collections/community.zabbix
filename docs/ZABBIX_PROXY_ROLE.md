@@ -32,20 +32,24 @@ Please sent Pull Requests or suggestions when you want to use this role for othe
 
 See the following list of supported Operating systems with the Zabbix releases.
 
-| Zabbix  | 4.4 | 4.0 (LTS) | 3.0 (LTS)|
-|---|---|---|---|
-|Red Hat Fam 8| V |   |   |
-|Red Hat Fam 7| V  | V  | V |
-|Red Hat Fam 6|   |   | V |
-|Red Hat Fam 5|   |   | V |
-|Fedora| V  |  V |   |
-|Ubuntu 18.04| V  | V  |   |
-|Ubuntu 16.04| V  | V |   |
-|Ubuntu 14.04| V  | V | V |
-|Debian 10| V  |   |   |
-|Debian 9|  V | V |   |
-|Debian 8| V  | V | V |
-|Debian 7|    | V | V  |
+| Zabbix              | 5.0 | 4.4 | 4.0 (LTS) | 3.0 (LTS) |
+|---------------------|-----|-----|-----------|-----------|
+| Red Hat Fam 8       |     | V   |           |           |
+| Red Hat Fam 7       |     | V   | V         | V         |
+| Red Hat Fam 6       |     |     |           | V         |
+| Red Hat Fam 5       |     |     |           | V         |
+| Fedora              |     | V   | V         |           |
+| Ubuntu 20.04 focal  |     |     |           |           |
+| Ubuntu 19.10 eoan   |     |     |           |           |
+| Ubuntu 18.04 bionic |     | V   | V         |           |
+| Ubuntu 16.04 xenial |     | V   | V         |           |
+| Ubuntu 14.04 trusty |     | V   | V         | V         |
+| Debian 10 buster    |     | V   |           |           |
+| Debian 9 stretch    |     | V   | V         |           |
+| Debian 8 jessie     |     | V   | V         | V         |
+| Debian 7 wheezy     |     |     | V         | V         |
+| macOS 10.15         |     | V   | V         |           |
+| macOS 10.14         |     | V   | V         |           |
 
 # Role Variables
 
