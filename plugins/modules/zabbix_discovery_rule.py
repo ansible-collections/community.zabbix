@@ -182,7 +182,7 @@ extends_documentation_fragment:
 EXAMPLES = r'''
 # Base create discovery rule example
 - name: Create discovery rule with ICMP and zabbix agent checks
-  zabbix_discovery_rule:
+  community.zabbix.zabbix_discovery_rule:
     server_url: "http://zabbix.example.com/zabbix/"
     login_user: admin
     login_password: secret
@@ -199,7 +199,7 @@ EXAMPLES = r'''
 
 # Base update (add new dcheck) discovery rule example
 - name: Create discovery rule with ICMP and zabbix agent checks
-  zabbix_discovery_rule:
+  community.zabbix.zabbix_discovery_rule:
     server_url: "http://zabbix.example.com/zabbix/"
     login_user: admin
     login_password: secret
@@ -224,7 +224,7 @@ EXAMPLES = r'''
 
 # Base delete discovery rule example
 - name: Delete discovery rule
-  zabbix_discovery_rule:
+  community.zabbix.zabbix_discovery_rule:
     server_url: "http://zabbix.example.com/zabbix/"
     login_user: admin
     login_password: secret
