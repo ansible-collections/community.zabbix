@@ -112,7 +112,7 @@ extends_documentation_fragment:
 EXAMPLES = r'''
 # Base create user group example
 - name: Create user group
-  zabbix_usergroup:
+  community.zabbix.zabbix_usergroup:
     server_url: "http://zabbix.example.com/zabbix/"
     login_user: admin
     login_password: secret
@@ -121,7 +121,7 @@ EXAMPLES = r'''
 
 # Base create user group with disabled gui access
 - name: Create user group with disabled gui access
-  zabbix_usergroup:
+  community.zabbix.zabbix_usergroup:
     server_url: "http://zabbix.example.com/zabbix/"
     login_user: admin
     login_password: secret
@@ -130,7 +130,7 @@ EXAMPLES = r'''
 
 # Base create user group with permissions
 - name: Create user group with permissions
-  zabbix_usergroup:
+  community.zabbix.zabbix_usergroup:
     server_url: "http://zabbix.example.com/zabbix/"
     login_user: admin
     login_password: secret
@@ -144,7 +144,7 @@ EXAMPLES = r'''
 
 # Base create user group with tag permissions
 - name: Create user group with tag permissions
-  zabbix_usergroup:
+  community.zabbix.zabbix_usergroup:
     server_url: "http://zabbix.example.com/zabbix/"
     login_user: admin
     login_password: secret
@@ -160,7 +160,7 @@ EXAMPLES = r'''
 
 # Base delete user groups example
 - name: Delete user groups
-  zabbix_usergroup:
+  community.zabbix.zabbix_usergroup:
     server_url: "http://zabbix.example.com/zabbix/"
     login_user: admin
     login_password: secret
