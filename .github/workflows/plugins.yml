@@ -2,15 +2,11 @@ name: plugins
 on:
 # Run CI against all pushes (direct commits) and Pull Requests
 # push: ensure we always run tests
-# pull_requests: only run if the PR contains one of the specified "paths"
+# pull_requests: skip if PR only modifies "./roles/"
   push:
   pull_request:
-    paths:
-      - 'plugins/**'
-      - 'tests/**'
-      - 'scripts/**'
-      - '.github/workflows/plugins.yml'
-      - 'docker-compose.yml'
+    ignore_paths:
+      - 'roles/**'
 
 jobs:
   sanity:
