@@ -1,20 +1,16 @@
 name: plugins
 on:
 # Run CI against all pushes (direct commits) and Pull Requests
+# push: ensure we always run tests
+# pull_requests: only run if the PR contains one of the specified "paths"
   push:
-#    paths:
-#      - 'plugins/**'
-#      - 'tests/**'
-#      - 'scripts/**'
-#      - '.github/workflows/plugins.yml'
-#      - 'docker-compose.yml'
   pull_request:
-#    paths:
-#      - 'plugins/**'
-#      - 'tests/**'
-#      - 'scripts/**'
-#      - '.github/workflows/plugins.yml'
-#      - 'docker-compose.yml'
+    paths:
+      - 'plugins/**'
+      - 'tests/**'
+      - 'scripts/**'
+      - '.github/workflows/plugins.yml'
+      - 'docker-compose.yml'
 
 jobs:
   sanity:
@@ -22,7 +18,7 @@ jobs:
     strategy:
       matrix:
         ansible:
-          # It's important that Sanity is tested against all stable-X.Y branches 
+          # It's important that Sanity is tested against all stable-X.Y branches
           # Testing against `devel` may fail as new tests are added.
         # - stable-2.9 # Only if your collection supports Ansible 2.9
           - stable-2.10
@@ -32,7 +28,7 @@ jobs:
           - 3.7
           - 3.8
         exclude:
-          - python: 3.8  # blocked by https://github.com/ansible/ansible/pull/70155
+          - python: 3.8  # blocked by ansible/ansible#70155
     runs-on: ubuntu-latest
     steps:
 
@@ -84,7 +80,8 @@ jobs:
         python:
           - 2.7
           - 3.7
-          #- 3.8 blocked by https://github.com/ansible/ansible/pull/70155
+        exclude:
+          - python: 3.8  # blocked by ansible/ansible#70155
 
     steps:
       - name: Check out code
