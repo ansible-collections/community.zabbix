@@ -1,7 +1,7 @@
 ---
 # defaults file for zabbix-agent
 
-zabbix_agent_version: 4.4
+zabbix_agent_version: 5.0
 zabbix_version: "{{ zabbix_agent_version }}"
 zabbix_version_patch: 0
 zabbix_repo: zabbix
