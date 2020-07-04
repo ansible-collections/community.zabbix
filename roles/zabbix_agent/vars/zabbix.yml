@@ -1,6 +1,20 @@
 ---
-
 sign_keys:
+  "50":
+    buster:
+      sign_key: E709712C
+    stretch:
+      sign_key: E709712C
+    jessie:
+      sign_key: E709712C
+    focal:
+      sign_key: E709712C
+    bionic:
+      sign_key: E709712C
+    xenial:
+      sign_key: E709712C
+    trusty:
+      sign_key: E709712C
   "44":
     focal:
       sign_key: A14FE591
