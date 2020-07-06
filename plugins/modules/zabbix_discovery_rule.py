@@ -682,8 +682,8 @@ def main():
     if drule_exists:
         drule_id = drule.get_drule_by_drule_name(name)['druleid']
         if state == "absent":
-            result = drule.delete_drule(drule_id)
-            module.exit_json(changed=True, state=state, usergroup=name, druleid=drule_id, msg="Discovery Rule deleted: %s, ID: %s" % (name, drule_id))
+            drule.delete_drule(drule_id)
+            module.exit_json(changed=True, state=state, drule=name, druleid=drule_id, msg="Discovery Rule deleted: %s, ID: %s" % (name, drule_id))
         else:
             difference = drule.check_difference(
                 drule_id=drule_id,
@@ -696,16 +696,16 @@ def main():
             )
 
             if difference == {}:
-                module.exit_json(changed=False, state=state, usergroup=name, druleid=drule_id, msg="Discovery Rule is up to date: %s" % name)
+                module.exit_json(changed=False, state=state, drule=name, druleid=drule_id, msg="Discovery Rule is up to date: %s" % name)
             else:
                 result = drule.update_drule(
                     drule_id=drule_id,
                     **difference
                 )
-                module.exit_json(changed=True, state=state, usergroup=name, druleid=drule_id, msg="Discovery Rule updated: %s, ID: %s" % (name, drule_id))
+                module.exit_json(changed=True, state=state, drule=name, druleid=drule_id, msg="Discovery Rule updated: %s, ID: %s" % (name, drule_id))
     else:
         if state == "absent":
-            module.exit_json(changed=False, state=state, usergroup=name, msg="Discovery rule %s does not exist, nothing to delete" % name)
+            module.exit_json(changed=False, state=state, drule=name, msg="Discovery rule %s does not exist, nothing to delete" % name)
         else:
             drule_id = drule.add_drule(
                 name=name,
@@ -715,7 +715,7 @@ def main():
                 proxy=proxy,
                 status=status
             )
-            module.exit_json(changed=True, state=state, usergroup=name, druleid=drule_id, msg="Discovery Rule created: %s, ID: %s" % (name, drule_id))
+            module.exit_json(changed=True, state=state, drule=name, druleid=drule_id, msg="Discovery Rule created: %s, ID: %s" % (name, drule_id))
 
 
 if __name__ == '__main__':

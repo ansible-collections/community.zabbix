@@ -54,6 +54,8 @@ def helper_to_numeric_value(strs, value):
     Returns:
         int: converted integer
     """
+    if value is None:
+        return None
     strs = [s.lower() if isinstance(s, str) else s for s in strs]
     value = value.lower()
     tmp_dict = dict(zip(strs, list(range(len(strs)))))
