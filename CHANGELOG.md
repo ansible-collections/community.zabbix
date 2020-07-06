@@ -12,6 +12,7 @@
   - zabbix_action - no longer requires `password` and `ssh_*key_file` parameters at the same time for `remote_command` operations of type SSH (PR [#113](https://github.com/ansible-collections/community.zabbix/pull/113)).
   - zabbix_mediatype - now supports new `webhook` media type (PR [#82](https://github.com/ansible-collections/community.zabbix/pull/82)).
   - zabbix_mediatype - new options `message_templates`, `description` and many more related to `type=webhook` (PR [#82](https://github.com/ansible-collections/community.zabbix/pull/82)).
+  - zabbix_discovery_rule - refactoring module to use `module_utils` classes and functions, adjust return values on success, add documentation for return values (PR [#120](https://github.com/ansible-collections/community.zabbix/pull/120)).
 
 ### Bug Fixes:
 #### Modules:
