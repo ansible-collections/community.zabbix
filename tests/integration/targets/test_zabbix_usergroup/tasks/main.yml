@@ -80,6 +80,19 @@
     assert:
       that: usergroup_updated_rights is changed
 
+  - name: test - update Zabbix user group with multiple rights (again)
+    zabbix_usergroup:
+      rights:
+        - host_group: Discovered hosts
+          permission: read-only
+        - host_group: Zabbix servers
+          permission: read-write
+    register: usergroup_updated_rights_again
+
+  - name: assert that user group was not updated
+    assert:
+      that: not usergroup_updated_rights_again is changed
+
   - name: test - reset Zabbix user group to default
     zabbix_usergroup:
     register: usergroup_reset

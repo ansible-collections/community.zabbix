@@ -192,18 +192,9 @@ msg:
 '''
 
 
-import traceback
-
-try:
-    from zabbix_api import ZabbixAPI
-    HAS_ZABBIX_API = True
-except ImportError:
-    ZBX_IMP_ERR = traceback.format_exc()
-    HAS_ZABBIX_API = False
-
 from ansible_collections.community.zabbix.plugins.module_utils.base import ZabbixBase
 import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabbix_utils
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+from ansible.module_utils.basic import AnsibleModule
 
 
 class Rights(object):
@@ -380,7 +371,7 @@ class UserGroup(object):
         existing_usergroup = zabbix_utils.helper_convert_unicode_to_str(self.get_usergroup_by_usergroup_name(kwargs['name']))
         parameters = zabbix_utils.helper_convert_unicode_to_str(self._construct_parameters(**kwargs))
         change_parameters = {}
-        _diff = compare_dictionaries(parameters, existing_usergroup, change_parameters)
+        _diff = zabbix_utils.helper_compare_dictionaries(parameters, existing_usergroup, change_parameters)
         return _diff
 
     def update(self, **kwargs):
@@ -435,73 +426,6 @@ class UserGroup(object):
             self._module.fail_json(msg='Failed to delete user group "%s": %s' % (usrgrpid, e))
 
 
-def compare_lists(l1, l2, diff_dict):
-    """
-    Compares l1 and l2 lists and adds the items that are different
-    to the diff_dict dictionary.
-    Used in recursion with compare_dictionaries() function.
-
-    Parameters:
-        l1: first list to compare
-        l2: second list to compare
-        diff_dict: dictionary to store the difference
-
-    Returns:
-        dict: items that are different
-    """
-    if len(l1) != len(l2):
-        diff_dict.append(l1)
-        return diff_dict
-    for i, item in enumerate(l1):
-        if isinstance(item, dict):
-            diff_dict.insert(i, {})
-            diff_dict[i] = compare_dictionaries(item, l2[i], diff_dict[i])
-        else:
-            if item != l2[i]:
-                diff_dict.append(item)
-    while {} in diff_dict:
-        diff_dict.remove({})
-    return diff_dict
-
-
-def compare_dictionaries(d1, d2, diff_dict):
-    """
-    Compares d1 and d2 dictionaries and adds the items that are different
-    to the diff_dict dictionary.
-    Used in recursion with compare_lists() function.
-
-    Parameters:
-        d1: first dictionary to compare
-        d2: second dictionary to compare
-        diff_dict: dictionary to store the difference
-
-    Returns:
-        dict: items that are different
-    """
-    for k, v in d1.items():
-        if k not in d2:
-            diff_dict[k] = v
-            continue
-        if isinstance(v, dict):
-            diff_dict[k] = {}
-            compare_dictionaries(v, d2[k], diff_dict[k])
-            if diff_dict[k] == {}:
-                del diff_dict[k]
-            else:
-                diff_dict[k] = v
-        elif isinstance(v, list):
-            diff_dict[k] = []
-            compare_lists(v, d2[k], diff_dict[k])
-            if diff_dict[k] == []:
-                del diff_dict[k]
-            else:
-                diff_dict[k] = v
-        else:
-            if v != d2[k]:
-                diff_dict[k] = v
-    return diff_dict
-
-
 def main():
     argument_spec = zabbix_utils.zabbix_common_argument_spec()
     argument_spec.update(
@@ -541,9 +465,6 @@ def main():
     tag_filters = module.params['tag_filters']
     state = module.params['state']
 
-    if not HAS_ZABBIX_API:
-        module.fail_json(msg=missing_required_lib('zabbix-api', url='https://pypi.org/project/zabbix-api/'), exception=ZBX_IMP_ERR)
-
     zbx = None
 
     # login to zabbix
@@ -558,7 +479,7 @@ def main():
     if usergroup_exists:
         usrgrpid = userGroup.get_usergroup_by_usergroup_name(name)['usrgrpid']
         if state == 'absent':
-            result = userGroup.delete(usrgrpid)
+            userGroup.delete(usrgrpid)
             module.exit_json(changed=True, state=state, usergroup=name, usrgrpid=usrgrpid, msg='User group deleted: %s, ID: %s' % (name, usrgrpid))
         else:
             difference = userGroup.check_difference(
@@ -573,7 +494,7 @@ def main():
             if difference == {}:
                 module.exit_json(changed=False, state=state, usergroup=name, usrgrpid=usrgrpid, msg='User group is up to date: %s' % name)
             else:
-                result = userGroup.update(
+                userGroup.update(
                     usrgrpid=usrgrpid,
                     **difference
                 )
