@@ -80,6 +80,7 @@ def helper_convert_unicode_to_str(data):
     else:
         return str(data)
 
+
 def helper_compare_lists(l1, l2, diff_dict):
     """
     Compares l1 and l2 lists and adds the items that are different
