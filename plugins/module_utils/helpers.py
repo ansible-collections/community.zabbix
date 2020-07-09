@@ -26,7 +26,7 @@ def zabbix_common_argument_spec():
         validate_certs=dict(type='bool', required=False, default=True),
     )
     return dict(
-        zabbi_credentials=dict(default=None, type='dict', options=credentials_spec),
+        zabbix_credentials=dict(default=None, type='dict', options=credentials_spec),
         server_url=dict(type='str', required=False, aliases=['url']),
         login_user=dict(type='str', required=False),
         login_password=dict(type='str', required=False, no_log=True),
