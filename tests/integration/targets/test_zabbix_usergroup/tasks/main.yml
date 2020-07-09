@@ -1,0 +1,138 @@
+---
+- name: test - do not run tests for Zabbix 3.0
+  meta: end_play
+  when: zabbix_version is version('3.0', '=')
+
+- name: test - Zabbix user group
+  module_defaults:
+    zabbix_usergroup:
+      server_url: "{{ zabbix_server_url }}"
+      login_user: "{{ zabbix_login_user }}"
+      login_password: "{{ zabbix_login_password }}"
+      name: ACME
+
+  block:
+  - name: test - create new Zabbix user group
+    zabbix_usergroup:
+      state: present
+    register: usergroup_new
+
+  - name: assert that user group was created
+    assert:
+      that: usergroup_new is changed
+
+  - name: test - create new Zabbix user group (again)
+    zabbix_usergroup:
+      state: present
+    register: usergroup_again
+
+  - name: assert that user group was created
+    assert:
+      that: not usergroup_again is changed
+
+  - name: test - update Zabbix user group with disabled gui_access
+    zabbix_usergroup:
+      gui_access: disable
+    register: usergroup_updated
+
+  - name: assert that user group was updated
+    assert:
+      that: usergroup_updated is changed
+
+  - name: test - update Zabbix user group with disabled gui_access (again)
+    zabbix_usergroup:
+      gui_access: disable
+    register: usergroup_updated_again
+
+  - name: assert that user group was updated
+    assert:
+      that: not usergroup_updated_again is changed
+
+  - name: test - reset Zabbix user group to default
+    zabbix_usergroup:
+    register: usergroup_reset
+
+  - name: assert that user group was created
+    assert:
+      that: usergroup_reset is changed
+
+  - name: test - update Zabbix user group with one right
+    zabbix_usergroup:
+      rights:
+        - host_group: Discovered hosts
+          permission: read-only
+    register: usergroup_updated_right
+
+  - name: assert that user group was updated
+    assert:
+      that: usergroup_updated_right is changed
+
+  - name: test - update Zabbix user group with multiple rights
+    zabbix_usergroup:
+      rights:
+        - host_group: Discovered hosts
+          permission: read-only
+        - host_group: Zabbix servers
+          permission: read-write
+    register: usergroup_updated_rights
+
+  - name: assert that user group was updated
+    assert:
+      that: usergroup_updated_rights is changed
+
+  - name: test - update Zabbix user group with multiple rights (again)
+    zabbix_usergroup:
+      rights:
+        - host_group: Discovered hosts
+          permission: read-only
+        - host_group: Zabbix servers
+          permission: read-write
+    register: usergroup_updated_rights_again
+
+  - name: assert that user group was not updated
+    assert:
+      that: not usergroup_updated_rights_again is changed
+
+  - name: test - reset Zabbix user group to default
+    zabbix_usergroup:
+    register: usergroup_reset
+
+  - name: assert that user group was created
+    assert:
+      that: usergroup_reset is changed
+
+  - name: test - update Zabbix user group with one tag_filter
+    zabbix_usergroup:
+      tag_filters:
+        - host_group: Discovered hosts
+          tag: Service
+          value: JIRA
+    register: usergroup_updated_tag_filter
+
+  - name: assert that user group was updated
+    assert:
+      that: usergroup_updated_tag_filter is changed
+
+  - name: test - update Zabbix user group with multiple tag_filters
+    zabbix_usergroup:
+      tag_filters:
+        - host_group: Discovered hosts
+          tag: Service
+          value: JIRA
+        - host_group: Discovered hosts
+          tag: Service
+          value: Zabbix
+    register: usergroup_updated_tag_filters
+
+  - name: assert that user group was updated
+    assert:
+      that: usergroup_updated_tag_filters is changed
+
+  - name: test - delete Zabbix user group
+    zabbix_usergroup:
+      state: absent
+    register: usergroup_delete
+
+  - name: assert that Zabbix user group has been deleted
+    assert:
+      that: usergroup_delete is changed
