@@ -34,25 +34,29 @@ class ZapiWrapper(object):
         if zbx is not None and isinstance(zbx, ZabbixAPI):
             self._zapi = zbx
         else:
-            server_url = module.params['server_url']
-            http_login_user = module.params['http_login_user']
-            http_login_password = module.params['http_login_password']
-            validate_certs = module.params['validate_certs']
-            timeout = module.params['timeout']
-            self._zapi = ZabbixAPI(server_url, timeout=timeout, user=http_login_user, passwd=http_login_password,
-                                   validate_certs=validate_certs)
+            credentials = module.params.get['zabbix_credentials']
+            if not credentials:
+                credentials = {}
+            credentials['server_url'] = module.params['server_url']
+            credentials['http_login_user'] = module.params['http_login_user']
+            credentials['http_login_password'] = module.params['http_login_password']
+            credentials['validate_certs'] = module.params['validate_certs']
+            credentials['timeout'] = module.params['timeout']
+            self._zapi = ZabbixAPI(server_url, timeout=credentials['timeout'],
+                                   user=credentials['http_login_user'], passwd=credentials['http_login_password'],
+                                   validate_certs=credentials['validate_certs'])
 
-        self.login()
+        self.login(credentials)
 
         self._zbx_api_version = self._zapi.api_version()[:5]
 
-    def login(self):
+    def login(self, credentials = {}):
         # check if api already logged in
         if not self._zapi.auth != '':
             try:
-                login_user = self._module.params['login_user']
-                login_password = self._module.params['login_password']
-                self._zapi.login(login_user, login_password)
+                credentials['login_user'] = self._module.params['login_user']
+                credentials['login_password'] = self._module.params['login_password']
+                self._zapi.login(credentials['login_user'], credentials['login_password'])
                 atexit.register(self._zapi.logout)
             except Exception as e:
                 self._module.fail_json(msg="Failed to connect to Zabbix server: %s" % e)

@@ -16,10 +16,20 @@ def zabbix_common_argument_spec():
     Return a dictionary with connection options.
     The options are commonly used by most of Zabbix modules.
     """
-    return dict(
-        server_url=dict(type='str', required=True, aliases=['url']),
+    credentials_spec = dict(
+        server_url=dict(type='str', required=True),
         login_user=dict(type='str', required=True),
         login_password=dict(type='str', required=True, no_log=True),
+        http_login_user=dict(type='str', required=False, default=None),
+        http_login_password=dict(type='str', required=False, default=None, no_log=True),
+        timeout=dict(type='int', default=10),
+        validate_certs=dict(type='bool', required=False, default=True),
+    )
+    return dict(
+        zabbi_credentials=dict(default=None, type='dict', options=credentials_spec),
+        server_url=dict(type='str', required=False, aliases=['url']),
+        login_user=dict(type='str', required=False),
+        login_password=dict(type='str', required=False, no_log=True),
         http_login_user=dict(type='str', required=False, default=None),
         http_login_password=dict(type='str', required=False, default=None, no_log=True),
         timeout=dict(type='int', default=10),
