@@ -41,7 +41,6 @@ options:
 extends_documentation_fragment:
 - community.zabbix.zabbix
 
-
 notes:
     - Too many concurrent updates to the same group may cause Zabbix to return errors, see examples for a workaround if needed.
 '''
@@ -87,12 +86,11 @@ except ImportError:
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 
+from ansible_collections.community.zabbix.plugins.module_utils.base import ZabbixBase
+import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabbix_utils
 
-class HostGroup(object):
-    def __init__(self, module, zbx):
-        self._module = module
-        self._zapi = zbx
 
+class HostGroup(ZabbixBase):
     # create host group(s) if not exists
     def create_host_group(self, group_names):
         try:
@@ -132,46 +130,23 @@ class HostGroup(object):
 
 
 def main():
+    argument_spec = zabbix_utils.zabbix_common_argument_spec()
+    argument_spec.update(dict(
+        host_groups=dict(type='list', required=True, aliases=['host_group']),
+        state=dict(type='str', default="present", choices=['present', 'absent']),
+    ))
     module = AnsibleModule(
-        argument_spec=dict(
-            server_url=dict(type='str', required=True, aliases=['url']),
-            login_user=dict(type='str', required=True),
-            login_password=dict(type='str', required=True, no_log=True),
-            http_login_user=dict(type='str', required=False, default=None),
-            http_login_password=dict(type='str', required=False, default=None, no_log=True),
-            validate_certs=dict(type='bool', required=False, default=True),
-            host_groups=dict(type='list', required=True, aliases=['host_group']),
-            state=dict(type='str', default="present", choices=['present', 'absent']),
-            timeout=dict(type='int', default=10)
-        ),
+        argument_spec=argument_spec,
         supports_check_mode=True
     )
 
     if not HAS_ZABBIX_API:
         module.fail_json(msg=missing_required_lib('zabbix-api', url='https://pypi.org/project/zabbix-api/'), exception=ZBX_IMP_ERR)
 
-    server_url = module.params['server_url']
-    login_user = module.params['login_user']
-    login_password = module.params['login_password']
-    http_login_user = module.params['http_login_user']
-    http_login_password = module.params['http_login_password']
-    validate_certs = module.params['validate_certs']
     host_groups = module.params['host_groups']
     state = module.params['state']
-    timeout = module.params['timeout']
 
-    zbx = None
-
-    # login to zabbix
-    try:
-        zbx = ZabbixAPI(server_url, timeout=timeout, user=http_login_user, passwd=http_login_password,
-                        validate_certs=validate_certs)
-        zbx.login(login_user, login_password)
-        atexit.register(zbx.logout)
-    except Exception as e:
-        module.fail_json(msg="Failed to connect to Zabbix server: %s" % e)
-
-    hostGroup = HostGroup(module, zbx)
+    hostGroup = HostGroup(module)
 
     group_ids = []
     group_list = []
