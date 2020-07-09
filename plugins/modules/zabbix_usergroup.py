@@ -450,13 +450,6 @@ def main():
         supports_check_mode=True
     )
 
-    server_url = module.params['server_url']
-    login_user = module.params['login_user']
-    login_password = module.params['login_password']
-    http_login_user = module.params['http_login_user']
-    http_login_password = module.params['http_login_password']
-    validate_certs = module.params['validate_certs']
-    timeout = module.params['timeout']
     name = module.params['name']
     gui_access = module.params['gui_access']
     debug_mode = module.params['debug_mode']
