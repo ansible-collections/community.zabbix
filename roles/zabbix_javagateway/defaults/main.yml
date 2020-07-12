@@ -1,7 +1,7 @@
 ---
 # defaults file for dj-wasabi.zabbix-javagateway
 
-zabbix_version: 4.2
+zabbix_version: 5.0
 zabbix_repo: zabbix
 zabbix_package_state: present
 zabbix_selinux: False

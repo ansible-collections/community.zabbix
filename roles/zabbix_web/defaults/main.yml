@@ -1,10 +1,11 @@
 ---
 # defaults file for zabbix-web
 
-zabbix_web_version: 4.4
+zabbix_web_version: 5.0
 zabbix_version: "{{ zabbix_web_version }}"
 zabbix_repo: zabbix
 zabbix_web_package_state: present
+zabbix_web_centos_release: true
 zabbix_selinux: False
 
 zabbix_url: zabbix.example.com
@@ -16,6 +17,8 @@ zabbix_apache_vhost_tls_port: 443
 zabbix_timezone: Europe/Amsterdam
 zabbix_vhost: True
 zabbix_php_fpm: False
+zabbix_php_fpm_dir_etc: /etc/opt/rh/rh-php72/
+zabbix_php_fpm_dir_var: /var/opt/rh/rh-php72/
 zabbix_apache_vhost_listen_ip: "*"
 zabbix_apache_tls: False
 zabbix_apache_redirect: False
@@ -31,9 +34,17 @@ zabbix_repo_yum:
     gpgcheck: 0
     gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-ZABBIX
     state: present
-  - name: zabbix-supported
+  - name: zabbix-non-supported
     description: Zabbix Official Repository non-supported - $basearch
     baseurl: http://repo.zabbix.com/non-supported/rhel/{{ ansible_distribution_major_version }}/$basearch/
+    gpgcheck: 0
+    gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-ZABBIX
+    state: present
+
+zabbix_5_repo_yum:
+  - name: zabbix-frontend
+    description: Zabbix Official Repository - $basearch
+    baseurl: http://repo.zabbix.com/zabbix/{{ zabbix_version }}/rhel/{{ ansible_distribution_major_version }}/$basearch/frontend/
     gpgcheck: 0
     gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-ZABBIX
     state: present
@@ -44,6 +55,7 @@ zabbix_web_memory_limit: 128M
 zabbix_web_post_max_size: 16M
 zabbix_web_upload_max_filesize: 2M
 zabbix_web_max_input_time: 300
+zabbix_web_max_input_vars: 10000
 zabbix_apache_include_custom_fragment: true
 
 zabbix_apache_SSLPassPhraseDialog: exec:/usr/libexec/httpd-ssl-pass-dialog

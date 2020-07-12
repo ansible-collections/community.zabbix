@@ -25,6 +25,15 @@
     Order Allow,Deny
     Allow from all
   {% endif %}
+
+    <IfModule dir_module>
+        DirectoryIndex index.php
+    </IfModule>
+
+    <FilesMatch \.(php|phar)$>
+        SetHandler "proxy:unix:/var/opt/rh/rh-php72/run/php-fpm/zabbix.sock|fcgi://localhost"
+    </FilesMatch>
+
   </Directory>
 
 {% for my_path in directory_paths %}
@@ -48,6 +57,7 @@
   RewriteEngine On
   RewriteRule ^$ /index.php [L]
 
+{% if zabbix_version is version('5.0', '<=') %}
 {% if zabbix_apache_include_custom_fragment | default(true) %}
   ## Custom fragment
   {% if zabbix_php_fpm %}
@@ -61,6 +71,7 @@
   php_value max_input_time {{ zabbix_web_max_input_time | default('300') }}
   # Set correct timezone.
   php_value date.timezone {{ zabbix_timezone }}
+{% endif %}
 {% endif %}
 </VirtualHost>
 
@@ -131,6 +142,7 @@ SSLCryptoDevice {{ zabbix_apache_SSLCryptoDevice }}
   RewriteEngine On
   RewriteRule ^$ /index.php [L]
 
+{% if zabbix_version is version('5.0', '<=') %}
 {% if zabbix_apache_include_custom_fragment | default(true) %}
   ## Custom fragment
   {% if zabbix_php_fpm %}
@@ -144,6 +156,7 @@ SSLCryptoDevice {{ zabbix_apache_SSLCryptoDevice }}
   php_value max_input_time {{ zabbix_web_max_input_time | default('300') }}
   # Set correct timezone.
   php_value date.timezone {{ zabbix_timezone }}
+{% endif %}
 {% endif %}
 </VirtualHost>
 {% endif %}
