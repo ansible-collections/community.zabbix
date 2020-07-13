@@ -651,13 +651,6 @@ def main():
         supports_check_mode=True
     )
 
-    server_url = module.params['server_url']
-    login_user = module.params['login_user']
-    login_password = module.params['login_password']
-    http_login_user = module.params['http_login_user']
-    http_login_password = module.params['http_login_password']
-    validate_certs = module.params['validate_certs']
-    timeout = module.params['timeout']
     state = module.params['state']
     name = module.params['name']
     iprange = module.params['iprange']
@@ -698,7 +691,7 @@ def main():
             if difference == {}:
                 module.exit_json(changed=False, state=state, drule=name, druleid=drule_id, msg="Discovery Rule is up to date: %s" % name)
             else:
-                result = drule.update_drule(
+                drule_id = drule.update_drule(
                     drule_id=drule_id,
                     **difference
                 )
