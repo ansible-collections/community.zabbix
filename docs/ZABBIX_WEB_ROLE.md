@@ -105,6 +105,11 @@ The following is an overview of all available configuration defaults for this ro
 * `zabbix_apache_include_custom_fragment`: True / False. Includes php_value vars max_execution_time, memory_limit, post_max_size, upload_max_filesize, max_input_time and date.timezone in vhost file.. place those in php-fpm configuration. Default is true.
 * `zabbix_web_env`: (Optional) A Dictionary of PHP Environments
 
+The following properties are specific to Zabbix 5.0:
+
+* `zabbix_php_fpm_dir_etc`: etc HOME root directory of PHP-FPM
+* `zabbix_php_fpm_dir_var`: Var HOME root directory of PHP-FPM
+
 The following properties are related when TLS/SSL is configured:
 
 * `zabbix_apache_tls`: If the Apache vhost should be configured with TLS encryption or not.

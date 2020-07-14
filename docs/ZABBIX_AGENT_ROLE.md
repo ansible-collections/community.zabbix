@@ -56,10 +56,10 @@ See the following list of supported Operating systems with the Zabbix releases:
 
 | Zabbix              | 5.0 | 4.4 | 4.0 (LTS) | 3.0 (LTS) |
 |---------------------|-----|-----|-----------|-----------|
-| Red Hat Fam 8       |     | V   |           |           |
-| Red Hat Fam 7       |     | V   | V         | V         |
-| Red Hat Fam 6       |     |     |           | V         |
-| Red Hat Fam 5       |     |     |           | V         |
+| Red Hat Fam 8       | V   | V   |           |           |
+| Red Hat Fam 7       | V   | V   | V         | V         |
+| Red Hat Fam 6       | V   |     |           | V         |
+| Red Hat Fam 5       | V   |     |           | V         |
 | Fedora              |     | V   | V         |           |
 | Ubuntu 20.04 focal  | V   |     |           |           |
 | Ubuntu 19.10 eoan   |     |     |           |           |
