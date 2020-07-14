@@ -2,7 +2,7 @@
 user = apache
 group = apache
 
-listen = {{ zabbix_php_fpm_dir_var }}run/php-fpm/zabbix.sock
+listen = {{ zabbix_php_fpm_dir_var }}/run/php-fpm/zabbix.sock
 listen.acl_users = apache
 listen.allowed_clients = 127.0.0.1
 
