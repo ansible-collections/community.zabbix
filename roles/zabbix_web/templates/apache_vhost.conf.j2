@@ -30,7 +30,7 @@
         DirectoryIndex index.php
     </IfModule>
 
-{% if ansible_os_family == "Debian" %}
+{% if ansible_os_family == "RedHat" %}
     <FilesMatch \.(php|phar)$>
         SetHandler "proxy:unix:{{ zabbix_php_fpm_dir_var }}/run/php-fpm/zabbix.sock|fcgi://localhost"
     </FilesMatch>
@@ -127,7 +127,7 @@ SSLCryptoDevice {{ zabbix_apache_SSLCryptoDevice }}
         DirectoryIndex index.php
     </IfModule>
 
-{% if ansible_os_family == "Debian" %}
+{% if ansible_os_family == "RedHat" %}
     <FilesMatch \.(php|phar)$>
         SetHandler "proxy:unix:{{ zabbix_php_fpm_dir_var }}/run/php-fpm/zabbix.sock|fcgi://localhost"
     </FilesMatch>
