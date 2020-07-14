@@ -255,21 +255,9 @@ msg:
     sample: 'Discovery rule created: ACME, ID: 42'
 '''
 
-
-import traceback
-
-try:
-    from zabbix_api import ZabbixAPI
-    from zabbix_api import Already_Exists
-
-    HAS_ZABBIX_API = True
-except ImportError:
-    ZBX_IMP_ERR = traceback.format_exc()
-    HAS_ZABBIX_API = False
-
 from ansible_collections.community.zabbix.plugins.module_utils.base import ZabbixBase
 import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabbix_utils
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+from ansible.module_utils.basic import AnsibleModule
 from distutils.version import LooseVersion
 
 
@@ -651,13 +639,6 @@ def main():
         supports_check_mode=True
     )
 
-    server_url = module.params['server_url']
-    login_user = module.params['login_user']
-    login_password = module.params['login_password']
-    http_login_user = module.params['http_login_user']
-    http_login_password = module.params['http_login_password']
-    validate_certs = module.params['validate_certs']
-    timeout = module.params['timeout']
     state = module.params['state']
     name = module.params['name']
     iprange = module.params['iprange']
@@ -665,9 +646,6 @@ def main():
     delay = module.params['delay']
     proxy = module.params['proxy']
     status = module.params['status']
-
-    if not HAS_ZABBIX_API:
-        module.fail_json(msg=missing_required_lib('zabbix-api', url='https://pypi.org/project/zabbix-api/'), exception=ZBX_IMP_ERR)
 
     zbx = None
 
@@ -698,7 +676,7 @@ def main():
             if difference == {}:
                 module.exit_json(changed=False, state=state, drule=name, druleid=drule_id, msg="Discovery Rule is up to date: %s" % name)
             else:
-                result = drule.update_drule(
+                drule_id = drule.update_drule(
                     drule_id=drule_id,
                     **difference
                 )

@@ -14,6 +14,7 @@
   - zabbix_mediatype - now supports new `webhook` media type (PR [#82](https://github.com/ansible-collections/community.zabbix/pull/82)).
   - zabbix_mediatype - new options `message_templates`, `description` and many more related to `type=webhook` (PR [#82](https://github.com/ansible-collections/community.zabbix/pull/82)).
   - zabbix_discovery_rule - refactoring module to use `module_utils` classes and functions, adjust return values on success, add documentation for return values (PR [#120](https://github.com/ansible-collections/community.zabbix/pull/120)).
+  - zabbix_discovery_rule - refactoring the module to remove unnecessary variables and fix a variable typo (PR [#129](https://github.com/ansible-collections/community.zabbix/pull/129))
 
 ### Bug Fixes:
 #### Modules:
