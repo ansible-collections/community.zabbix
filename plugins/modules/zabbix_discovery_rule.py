@@ -255,21 +255,9 @@ msg:
     sample: 'Discovery rule created: ACME, ID: 42'
 '''
 
-
-import traceback
-
-try:
-    from zabbix_api import ZabbixAPI
-    from zabbix_api import Already_Exists
-
-    HAS_ZABBIX_API = True
-except ImportError:
-    ZBX_IMP_ERR = traceback.format_exc()
-    HAS_ZABBIX_API = False
-
 from ansible_collections.community.zabbix.plugins.module_utils.base import ZabbixBase
 import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabbix_utils
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+from ansible.module_utils.basic import AnsibleModule
 from distutils.version import LooseVersion
 
 
@@ -658,9 +646,6 @@ def main():
     delay = module.params['delay']
     proxy = module.params['proxy']
     status = module.params['status']
-
-    if not HAS_ZABBIX_API:
-        module.fail_json(msg=missing_required_lib('zabbix-api', url='https://pypi.org/project/zabbix-api/'), exception=ZBX_IMP_ERR)
 
     zbx = None
 
