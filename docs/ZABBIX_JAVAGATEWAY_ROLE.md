@@ -52,7 +52,7 @@ See the following list of supported Operating systems with the Zabbix releases.
 
 There are some variables in de default/main.yml which can (Or needs to) be changed/overriden:
 
-* `zabbix_version`: This is the version of zabbix. Default it is 2.4, but can be overriden to 2.2 or 2.0.
+* `zabbix_version`: This is the version of zabbix. Default: 5.0. Can be overridden to 4.4, 4.0, 3.4, 3.2, 3.0, 2.4, or 2.2.
 
 * `zabbix_repo`: True / False. When you already have an repository with the zabbix components, you can set it to False.
 

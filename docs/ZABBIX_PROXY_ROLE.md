@@ -61,7 +61,7 @@ There are some variables in de default/main.yml which can (Or needs to) be chang
 
 * `zabbix_server_port`: The port on which the zabbix-server is running. Default: 10051
 
-* `zabbix_version`: This is the version of zabbix. Default it is 4.2, but can be overriden to 4.0/3.4/3.2/3.0/2.4/2.2.
+* `zabbix_version`: This is the version of zabbix. Default it is 5.0, but can be overriden to 4.4/4.2/4.0/3.4/3.2/3.0/2.4/2.2.
 
 * `zabbix_proxy_{rhel,debian,ubuntu}_version`: This is the version of zabbix proxy. For example 4.4.4/4.2.5/4.2.8
 
