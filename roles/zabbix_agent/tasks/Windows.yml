@@ -123,7 +123,7 @@
   notify: restart win zabbix agent
 
 - name: "Windows | Register Service"
-  win_command: '{{ zabbix_win_exe_path }} --config {{ zabbix_win_install_dir }}\zabbix_agentd.conf --install'
+  win_command: '"{{ zabbix_win_exe_path }}" --config "{{ zabbix_win_install_dir }}\zabbix_agentd.conf" --install'
   register: zabbix_windows_install
   args:
     creates: '{{ zabbix_win_install_dir }}\.installed'
