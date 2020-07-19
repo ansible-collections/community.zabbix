@@ -7,6 +7,7 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
+
 DOCUMENTATION = '''
 module: zabbix_template_info
 short_description: Gather information about Zabbix template
@@ -141,40 +142,24 @@ template_xml:
     </zabbix_export>
 '''
 
-import atexit
+
 import traceback
 import json
 import xml.etree.ElementTree as ET
 
-try:
-    from zabbix_api import ZabbixAPI, Already_Exists, ZabbixAPIException
-
-    HAS_ZABBIX_API = True
-except ImportError:
-    ZBX_IMP_ERR = traceback.format_exc()
-    HAS_ZABBIX_API = False
-
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils._text import to_native
 
+from ansible_collections.community.zabbix.plugins.module_utils.base import ZabbixBase
+import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabbix_utils
 
-class TemplateInfo(object):
-    def __init__(self, module, zbx):
-        self._module = module
-        self._zapi = zbx
-
+class TemplateInfo(ZabbixBase):
     def get_template_id(self, template_name):
         template_id = []
         try:
-            template_list = self._zapi.template.get(
-                {
-                    'output': 'extend',
-                    'filter': {
-                        'host': template_name
-                    }
-                }
-            )
-        except ZabbixAPIException as e:
+            template_list = self._zapi.template.get({'output': 'extend',
+                                                     'filter': {'host': template_name}})
+        except Exception as e:
             self._module.fail_json(msg='Failed to get template: %s' % e)
 
         if template_list:
@@ -205,52 +190,27 @@ class TemplateInfo(object):
                 return str(ET.tostring(xmlroot, encoding='utf-8').decode('utf-8'))
             else:
                 return self.load_json_template(dump, omit_date)
-
-        except ZabbixAPIException as e:
+        except Exception as e:
             self._module.fail_json(msg='Unable to export template: %s' % e)
 
 
 def main():
+    argument_spec = zabbix_utils.zabbix_common_argument_spec()
+    argument_spec.update(dict(
+        template_name=dict(type='str', required=True),
+        omit_date=dict(type='bool', required=False, default=False),
+        format=dict(type='str', choices=['json', 'xml'], default='json')
+    ))
     module = AnsibleModule(
-        argument_spec=dict(
-            server_url=dict(type='str', required=True, aliases=['url']),
-            login_user=dict(type='str', required=True),
-            login_password=dict(type='str', required=True, no_log=True),
-            http_login_user=dict(type='str', required=False, default=None),
-            http_login_password=dict(type='str', required=False, default=None, no_log=True),
-            validate_certs=dict(type='bool', required=False, default=True),
-            timeout=dict(type='int', default=10),
-            template_name=dict(type='str', required=True),
-            omit_date=dict(type='bool', required=False, default=False),
-            format=dict(type='str', choices=['json', 'xml'], default='json')
-        ),
+        argument_spec=argument_spec,
         supports_check_mode=False
     )
 
-    if not HAS_ZABBIX_API:
-        module.fail_json(msg=missing_required_lib('zabbix-api', url='https://pypi.org/project/zabbix-api/'),
-                         exception=ZBX_IMP_ERR)
-
-    server_url = module.params['server_url']
-    login_user = module.params['login_user']
-    login_password = module.params['login_password']
-    http_login_user = module.params['http_login_user']
-    http_login_password = module.params['http_login_password']
-    validate_certs = module.params['validate_certs']
-    timeout = module.params['timeout']
     template_name = module.params['template_name']
     omit_date = module.params['omit_date']
     format = module.params['format']
 
-    try:
-        zbx = ZabbixAPI(server_url, timeout=timeout, user=http_login_user, passwd=http_login_password,
-                        validate_certs=validate_certs)
-        zbx.login(login_user, login_password)
-        atexit.register(zbx.logout)
-    except Exception as e:
-        module.fail_json(msg="Failed to connect to Zabbix server: %s" % e)
-
-    template_info = TemplateInfo(module, zbx)
+    template_info = TemplateInfo(module)
 
     template_id = template_info.get_template_id(template_name)
 
