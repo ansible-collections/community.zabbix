@@ -332,7 +332,7 @@ class Template(ZabbixBase):
         if group_names is None or len(group_names) == 0:
             return group_ids
         if self.check_host_group_exist(group_names):
-            group_list = self._zapi.hostgroup.get({'output': 'extend','filter': {'name': group_names}})
+            group_list = self._zapi.hostgroup.get({'output': 'extend', 'filter': {'name': group_names}})
             for group in group_list:
                 group_id = group['groupid']
                 group_ids.append({'groupid': group_id})
@@ -343,7 +343,7 @@ class Template(ZabbixBase):
         if template_list is None or len(template_list) == 0:
             return template_ids
         for template in template_list:
-            template_list = self._zapi.template.get({'output': 'extend','filter': {'host': template}})
+            template_list = self._zapi.template.get({'output': 'extend', 'filter': {'host': template}})
             if len(template_list) < 1:
                 continue
             else:
