@@ -153,6 +153,7 @@ from ansible.module_utils._text import to_native
 from ansible_collections.community.zabbix.plugins.module_utils.base import ZabbixBase
 import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabbix_utils
 
+
 class TemplateInfo(ZabbixBase):
     def get_template_id(self, template_name):
         template_id = []
