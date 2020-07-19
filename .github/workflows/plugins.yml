@@ -10,7 +10,7 @@ on:
 
 jobs:
   tox-linters:
-    name: Tox-Lint ${{ matrix.python }}
+    name: Tox-Lint (py${{ matrix.python }})
     strategy:
       matrix:
         python:
