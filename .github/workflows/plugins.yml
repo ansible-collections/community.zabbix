@@ -34,6 +34,7 @@ jobs:
 
       - name: Run lint test
         run: tox -elinters -vv
+        working-directory: ./ansible_collections/community/zabbix
 
   sanity:
     name: Sanity (Ⓐ${{ matrix.ansible }}+py${{ matrix.python }})
