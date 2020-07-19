@@ -91,6 +91,7 @@ def construct_parameters(**kwargs):
         return dict(
             name=kwargs['name']
         )
+
     return dict(
         name=kwargs['name'],
         mappings=[
@@ -121,6 +122,7 @@ def diff(existing, new):
             after[key] = ''
         else:
             after[key] = new[key]
+
     return {'before': before, 'after': after}
 
 
