@@ -874,8 +874,8 @@ class Action(object):
             _params.pop('r_longdata', None)
             _params.pop('r_shortdata', None)
 
-        if (LooseVersion(self._zbx_api_version) < LooseVersion('3.4') or
-                LooseVersion(self._zbx_api_version) >= LooseVersion('5.0')):
+        if (LooseVersion(self._zbx_api_version) < LooseVersion('3.4')
+                or LooseVersion(self._zbx_api_version) >= LooseVersion('5.0')):
             _params.pop('ack_longdata', None)
             _params.pop('ack_shortdata', None)
 
@@ -980,7 +980,7 @@ class Operations(object):
                 "disable_host",
                 "set_host_inventory_mode"], operation['type']
             )
-        except Exception as e:
+        except Exception:
             self._module.fail_json(msg="Unsupported value '%s' for operation type." % operation['type'])
 
     def _construct_opmessage(self, operation):
@@ -1243,7 +1243,7 @@ class RecoveryOperations(Operations):
                 None,
                 "notify_all_involved"], operation['type']
             )
-        except Exception as e:
+        except Exception:
             self._module.fail_json(msg="Unsupported value '%s' for recovery operation type." % operation['type'])
 
     def construct_the_data(self, operations):
@@ -1308,7 +1308,7 @@ class AcknowledgeOperations(Operations):
                 None,
                 "notify_all_involved"], operation['type']
             )
-        except Exception as e:
+        except Exception:
             self._module.fail_json(msg="Unsupported value '%s' for acknowledge operation type." % operation['type'])
 
     def construct_the_data(self, operations):
@@ -1440,7 +1440,7 @@ class Filter(object):
                 "event_tag",
                 "event_tag_value"], _condition['type']
             )
-        except Exception as e:
+        except Exception:
             self._module.fail_json(msg="Unsupported value '%s' for condition type." % _condition['type'])
 
     def _construct_operator(self, _condition):
@@ -1467,7 +1467,7 @@ class Filter(object):
                 "Yes",
                 "No"], _condition['operator']
             )
-        except Exception as e:
+        except Exception:
             self._module.fail_json(msg="Unsupported value '%s' for operator." % _condition['operator'])
 
     def _construct_value(self, conditiontype, value):
@@ -1563,7 +1563,7 @@ class Filter(object):
                     "trigger in normal state"], value
                 )
             return value
-        except Exception as e:
+        except Exception:
             self._module.fail_json(
                 msg="""Unsupported value '%s' for specified condition type.
                        Check out Zabbix API documentation for supported values for

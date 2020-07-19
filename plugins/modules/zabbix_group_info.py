@@ -54,11 +54,7 @@ EXAMPLES = r'''
     timeout: 10
 '''
 
-
-import atexit
-import traceback
-
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+from ansible.module_utils.basic import AnsibleModule
 
 from ansible_collections.community.zabbix.plugins.module_utils.base import ZabbixBase
 import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabbix_utils

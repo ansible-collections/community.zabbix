@@ -9,8 +9,7 @@ __metaclass__ = type
 import atexit
 import traceback
 
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from distutils.version import LooseVersion
+from ansible.module_utils.basic import missing_required_lib
 
 try:
     from zabbix_api import ZabbixAPI
