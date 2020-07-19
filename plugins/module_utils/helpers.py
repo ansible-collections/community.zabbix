@@ -7,9 +7,6 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from distutils.version import LooseVersion
-
 
 def zabbix_common_argument_spec():
     """

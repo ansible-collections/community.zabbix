@@ -73,11 +73,10 @@ EXAMPLES = r'''
 '''
 
 
-import atexit
 import traceback
 
 try:
-    from zabbix_api import ZabbixAPI, Already_Exists
+    from zabbix_api import Already_Exists
 
     HAS_ZABBIX_API = True
 except ImportError:

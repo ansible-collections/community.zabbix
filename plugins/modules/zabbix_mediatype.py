@@ -635,14 +635,14 @@ def delete_mediatype(module, zbx, mediatype_id):
 
 def update_mediatype(module, zbx, **kwargs):
     try:
-        mediatype_id = zbx.mediatype.update(kwargs)
+        zbx.mediatype.update(kwargs)
     except Exception as e:
         module.fail_json(msg="Failed to update mediatype '{_id}': {e}".format(_id=kwargs['mediatypeid'], e=e))
 
 
 def create_mediatype(module, zbx, **kwargs):
     try:
-        mediatype_id = zbx.mediatype.create(kwargs)
+        zbx.mediatype.create(kwargs)
     except Exception as e:
         module.fail_json(msg="Failed to create mediatype '{name}': {e}".format(name=kwargs['name'], e=e))
 

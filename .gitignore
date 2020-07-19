@@ -12,3 +12,6 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+
+# unit test
+.tox/
