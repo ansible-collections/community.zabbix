@@ -72,19 +72,10 @@ EXAMPLES = r'''
     state: present
 '''
 
+from ansible.module_utils.basic import AnsibleModule
 
-import atexit
-import traceback
-
-try:
-    from zabbix_api import ZabbixAPI
-
-    HAS_ZABBIX_API = True
-except ImportError:
-    ZBX_IMP_ERR = traceback.format_exc()
-    HAS_ZABBIX_API = False
-
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+from ansible_collections.community.zabbix.plugins.module_utils.base import ZabbixBase
+import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabbix_utils
 
 
 def construct_parameters(**kwargs):
@@ -110,33 +101,6 @@ def construct_parameters(**kwargs):
         ]
     )
 
-
-def check_if_valuemap_exists(module, zbx, name):
-    """Checks if value map exists.
-
-    Args:
-        module: AnsibleModule object
-        zbx: ZabbixAPI object
-        name: Zabbix valuemap name
-
-    Returns:
-        tuple: First element is True if valuemap exists and False otherwise.
-               Second element is a dictionary of valuemap object if it exists.
-    """
-    try:
-        valuemap_list = zbx.valuemap.get({
-            'output': 'extend',
-            'selectMappings': 'extend',
-            'filter': {'name': [name]}
-        })
-        if len(valuemap_list) < 1:
-            return False, None
-        else:
-            return True, valuemap_list[0]
-    except Exception as e:
-        module.fail_json(msg="Failed to get ID of the valuemap '{name}': {e}".format(name=name, e=e))
-
-
 def diff(existing, new):
     """Constructs the diff for Ansible's --diff option.
 
@@ -158,13 +122,10 @@ def diff(existing, new):
             after[key] = new[key]
     return {'before': before, 'after': after}
 
-
-def get_update_params(module, zbx, existing_valuemap, **kwargs):
+def get_update_params(existing_valuemap, **kwargs):
     """Filters only the parameters that are different and need to be updated.
 
     Args:
-        module: AnsibleModule object.
-        zbx: ZabbixAPI object.
         existing_valuemap (dict): Existing valuemap.
         **kwargs: Parameters for the new valuemap.
 
@@ -181,79 +142,78 @@ def get_update_params(module, zbx, existing_valuemap, **kwargs):
     return params_to_update, diff(existing_valuemap, kwargs)
 
 
-def delete_valuemap(module, zbx, valuemap_id):
-    try:
-        return zbx.valuemap.delete([valuemap_id])
-    except Exception as e:
-        module.fail_json(msg="Failed to delete valuemap '{_id}': {e}".format(_id=valuemap_id, e=e))
+class ValuemapModule(ZabbixBase):
+    def check_if_valuemap_exists(self, name):
+        """Checks if value map exists.
 
+        Args:
+            name: Zabbix valuemap name
 
-def update_valuemap(module, zbx, **kwargs):
-    try:
-        valuemap_id = zbx.valuemap.update(kwargs)
-    except Exception as e:
-        module.fail_json(msg="Failed to update valuemap '{_id}': {e}".format(_id=kwargs['valuemapid'], e=e))
+        Returns:
+            tuple: First element is True if valuemap exists and False otherwise.
+                Second element is a dictionary of valuemap object if it exists.
+        """
+        try:
+            valuemap_list = self._zapi.valuemap.get({
+                'output': 'extend',
+                'selectMappings': 'extend',
+                'filter': {'name': [name]}
+            })
+            if len(valuemap_list) < 1:
+                return False, None
+            else:
+                return True, valuemap_list[0]
+        except Exception as e:
+            self._module.fail_json(msg="Failed to get ID of the valuemap '{name}': {e}".format(name=name, e=e))
 
+    def delete(self, valuemap_id):
+        try:
+            return self._zapi.valuemap.delete([valuemap_id])
+        except Exception as e:
+            self._module.fail_json(msg="Failed to delete valuemap '{_id}': {e}".format(_id=valuemap_id, e=e))
 
-def create_valuemap(module, zbx, **kwargs):
-    try:
-        valuemap_id = zbx.valuemap.create(kwargs)
-    except Exception as e:
-        module.fail_json(msg="Failed to create valuemap '{name}': {e}".format(name=kwargs['description'], e=e))
+    def update(self, **kwargs):
+        try:
+            valuemap_id = self._zapi.valuemap.update(kwargs)
+        except Exception as e:
+            self._module.fail_json(msg="Failed to update valuemap '{_id}': {e}".format(_id=kwargs['valuemapid'], e=e))
+
+    def create(self, **kwargs):
+        try:
+            valuemap_id = self._zapi.valuemap.create(kwargs)
+        except Exception as e:
+            self._module.fail_json(msg="Failed to create valuemap '{name}': {e}".format(name=kwargs['description'], e=e))
 
 
 def main():
+    argument_spec = zabbix_utils.zabbix_common_argument_spec()
+    argument_spec.update(dict(
+        name=dict(type='str', required=True),
+        state=dict(type='str', default='present', choices=['present', 'absent']),
+        mappings=dict(
+            type='list',
+            elements='dict',
+            options=dict(
+                value=dict(type='str', required=True),
+                map_to=dict(type='str', required=True)
+            )
+        )
+    ))
     module = AnsibleModule(
-        argument_spec=dict(
-            server_url=dict(type='str', required=True, aliases=['url']),
-            login_user=dict(type='str', required=True),
-            login_password=dict(type='str', required=True, no_log=True),
-            http_login_user=dict(type='str', required=False, default=None),
-            http_login_password=dict(type='str', required=False, default=None, no_log=True),
-            validate_certs=dict(type='bool', required=False, default=True),
-            name=dict(type='str', required=True),
-            state=dict(type='str', default='present', choices=['present', 'absent']),
-            mappings=dict(
-                type='list',
-                elements='dict',
-                options=dict(
-                    value=dict(type='str', required=True),
-                    map_to=dict(type='str', required=True)
-                )
-            ),
-            timeout=dict(type='int', default=10)
-        ),
+        argument_spec=argument_spec,
         supports_check_mode=True,
         required_if=[
             ['state', 'present', ['mappings']],
         ]
     )
 
-    if not HAS_ZABBIX_API:
-        module.fail_json(msg=missing_required_lib('zabbix-api', url='https://pypi.org/project/zabbix-api/'), exception=ZBX_IMP_ERR)
+    vm = ValuemapModule(module)
 
-    server_url = module.params['server_url']
-    login_user = module.params['login_user']
-    login_password = module.params['login_password']
-    http_login_user = module.params['http_login_user']
-    http_login_password = module.params['http_login_password']
-    validate_certs = module.params['validate_certs']
     name = module.params['name']
     state = module.params['state']
     mappings = module.params['mappings']
-    timeout = module.params['timeout']
 
-    zbx = None
-    # login to zabbix
-    try:
-        zbx = ZabbixAPI(server_url, timeout=timeout, user=http_login_user, passwd=http_login_password,
-                        validate_certs=validate_certs)
-        zbx.login(login_user, login_password)
-        atexit.register(zbx.logout)
-    except Exception as e:
-        module.fail_json(msg="Failed to connect to Zabbix server: %s" % e)
-
-    valuemap_exists, valuemap_object = check_if_valuemap_exists(module, zbx, name)
+    valuemap_exists, valuemap_object = vm.check_if_valuemap_exists(name)
 
     parameters = construct_parameters(
         name=name,
@@ -271,7 +231,7 @@ def main():
                         _id=valuemap_id
                     )
                 )
-            valuemap_id = delete_valuemap(module, zbx, valuemap_id)
+            valuemap_id = vm.delete(valuemap_id)
             module.exit_json(
                 changed=True,
                 msg="Value map deleted. Name: {name}, ID: {_id}".format(
@@ -280,7 +240,7 @@ def main():
                 )
             )
         else:
-            params_to_update, diff = get_update_params(module, zbx, valuemap_object, **parameters)
+            params_to_update, diff = get_update_params(valuemap_object, **parameters)
             if params_to_update == {}:
                 module.exit_json(
                     changed=False,
@@ -296,11 +256,7 @@ def main():
                             _id=valuemap_id
                         )
                     )
-                valuemap_id = update_valuemap(
-                    module, zbx,
-                    valuemapid=valuemap_id,
-                    **params_to_update
-                )
+                valuemap_id = vm.update(valuemapid=valuemap_id, **params_to_update)
                 module.exit_json(
                     changed=True,
                     diff=diff,
@@ -321,7 +277,7 @@ def main():
                         _id=valuemap_id
                     )
                 )
-            valuemap_id = create_valuemap(module, zbx, **parameters)
+            valuemap_id = vm.create(**parameters)
             module.exit_json(
                 changed=True,
                 msg="Value map created: {name}, ID: {_id}".format(
