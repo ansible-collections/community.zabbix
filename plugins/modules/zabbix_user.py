@@ -511,27 +511,27 @@ def main():
         rows_per_page=dict(type='str', default='50'),
         after_login_url=dict(type='str', default=''),
         user_medias=dict(type='list', default=[],
-                            elements='dict',
-                            options=dict(
+                         elements='dict',
+                         options=dict(
                                 mediatype=dict(type='str', default='Email'),
                                 sendto=dict(type='str', required=True),
                                 period=dict(type='str', default='1-7,00:00-24:00'),
                                 severity=dict(type='dict',
-                                            options=dict(
+                                              options=dict(
                                                 not_classified=dict(type='bool', default=True),
                                                 information=dict(type='bool', default=True),
                                                 warning=dict(type='bool', default=True),
                                                 average=dict(type='bool', default=True),
                                                 high=dict(type='bool', default=True),
                                                 disaster=dict(type='bool', default=True)),
-                                            default=dict(
+                                              default=dict(
                                                 not_classified=True,
                                                 information=True,
                                                 warning=True,
                                                 average=True,
                                                 high=True,
                                                 disaster=True
-                                            )),
+                                )),
                                 active=dict(type='bool', default=True)
         )),
         type=dict(type='str', default='Zabbix user', choices=['Zabbix user', 'Zabbix admin', 'Zabbix super admin']),
