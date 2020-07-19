@@ -212,7 +212,7 @@ import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabb
 
 class Proxy(ZabbixBase):
     def __init__(self, module, zbx=None, zapi_wrapper=None):
-        super().__init__(module, zbx, zapi_wrapper)
+        super(Proxy, self).__init__(module, zbx, zapi_wrapper)
         self.existing_data = None
 
     def proxy_exists(self, proxy_name):
