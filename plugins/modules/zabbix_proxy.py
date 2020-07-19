@@ -17,8 +17,10 @@
 # You should have received a copy of the GNU General Public License
 # along with Ansible. If not, see <http://www.gnu.org/licenses/>.
 #
+
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
+
 
 DOCUMENTATION = r'''
 ---
@@ -201,32 +203,22 @@ EXAMPLES = r'''
 RETURN = r''' # '''
 
 
-import traceback
-import atexit
-
-try:
-    from zabbix_api import ZabbixAPI
-
-    HAS_ZABBIX_API = True
-except ImportError:
-    ZBX_IMP_ERR = traceback.format_exc()
-    HAS_ZABBIX_API = False
-
 from distutils.version import LooseVersion
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+from ansible.module_utils.basic import AnsibleModule
+
+from ansible_collections.community.zabbix.plugins.module_utils.base import ZabbixBase
+import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabbix_utils
 
 
-class Proxy(object):
-    def __init__(self, module, zbx):
-        self._module = module
-        self._zapi = zbx
-        self._zbx_api_version = zbx.api_version()[:5]
+class Proxy(ZabbixBase):
+    def __init__(self, module, zbx=None, zapi_wrapper=None):
+        super.__init__(module, zbx, zapi_wrapper)
         self.existing_data = None
 
     def proxy_exists(self, proxy_name):
-        result = self._zapi.proxy.get({
-            'output': 'extend', 'selectInterface': 'extend',
-            'filter': {'host': proxy_name}})
+        result = self._zapi.proxy.get({'output': 'extend',
+                                       'selectInterface': 'extend',
+                                       'filter': {'host': proxy_name}})
 
         if len(result) > 0 and 'proxyid' in result[0]:
             self.existing_data = result[0]
@@ -252,25 +244,20 @@ class Proxy(object):
 
             proxy_ids_list = self._zapi.proxy.create(parameters)
             self._module.exit_json(changed=True,
-                                   result="Successfully added proxy %s (%s)" %
-                                          (data['host'], data['status']))
+                                   result="Successfully added proxy %s (%s)" % (data['host'], data['status']))
             if len(proxy_ids_list) >= 1:
                 return proxy_ids_list['proxyids'][0]
         except Exception as e:
-            self._module.fail_json(msg="Failed to create proxy %s: %s" %
-                                   (data['host'], e))
+            self._module.fail_json(msg="Failed to create proxy %s: %s" % (data['host'], e))
 
     def delete_proxy(self, proxy_id, proxy_name):
         try:
             if self._module.check_mode:
                 self._module.exit_json(changed=True)
             self._zapi.proxy.delete([proxy_id])
-            self._module.exit_json(changed=True,
-                                   result="Successfully deleted"
-                                          + " proxy %s" % proxy_name)
+            self._module.exit_json(changed=True, result="Successfully deleted proxy %s" % proxy_name)
         except Exception as e:
-            self._module.fail_json(msg="Failed to delete proxy %s: %s" %
-                                       (proxy_name, str(e)))
+            self._module.fail_json(msg="Failed to delete proxy %s: %s" % (proxy_name, str(e)))
 
     def compile_interface_params(self, new_interface):
         old_interface = {}
@@ -334,55 +321,38 @@ class Proxy(object):
 
 
 def main():
+    argument_spec = zabbix_utils.zabbix_common_argument_spec()
+    argument_spec.update(dict(
+        proxy_name=dict(type='str', required=True),
+        proxy_address=dict(type='str', required=False),
+        status=dict(type='str', default="active", choices=['active', 'passive']),
+        state=dict(type='str', default="present", choices=['present', 'absent']),
+        description=dict(type='str', required=False),
+        tls_connect=dict(type='str', default='no_encryption',choices=['no_encryption', 'PSK', 'certificate']),
+        tls_accept=dict(type='str', default='no_encryption',choices=['no_encryption', 'PSK', 'certificate']),
+        ca_cert=dict(type='str', required=False, default=None, aliases=['tls_issuer']),
+        tls_subject=dict(type='str', required=False, default=None),
+        tls_psk_identity=dict(type='str', required=False, default=None),
+        tls_psk=dict(type='str', required=False, default=None),
+        interface=dict(
+            type='dict',
+            required=False,
+            default={},
+            options=dict(
+                useip=dict(type='int', choices=[0, 1], default=0),
+                ip=dict(type='str', default=''),
+                dns=dict(type='str', default=''),
+                port=dict(type='str', default='10051'),
+                type=dict(type='int', default=0, removed_in_version="3.0.0", removed_from_collection='community.zabbix'),  # was Ansible 2.14
+                main=dict(type='int', default=0, removed_in_version="3.0.0", removed_from_collection='community.zabbix'),  # was Ansible 2.14
+            ),
+        )
+    ))
     module = AnsibleModule(
-        argument_spec=dict(
-            server_url=dict(type='str', required=True, aliases=['url']),
-            login_user=dict(type='str', required=True),
-            login_password=dict(type='str', required=True, no_log=True),
-            proxy_name=dict(type='str', required=True),
-            proxy_address=dict(type='str', required=False),
-            http_login_user=dict(type='str', required=False, default=None),
-            http_login_password=dict(type='str', required=False,
-                                     default=None, no_log=True),
-            validate_certs=dict(type='bool', required=False, default=True),
-            status=dict(type='str', default="active", choices=['active', 'passive']),
-            state=dict(type='str', default="present", choices=['present', 'absent']),
-            description=dict(type='str', required=False),
-            tls_connect=dict(type='str', default='no_encryption',
-                             choices=['no_encryption', 'PSK', 'certificate']),
-            tls_accept=dict(type='str', default='no_encryption',
-                            choices=['no_encryption', 'PSK', 'certificate']),
-            ca_cert=dict(type='str', required=False, default=None, aliases=['tls_issuer']),
-            tls_subject=dict(type='str', required=False, default=None),
-            tls_psk_identity=dict(type='str', required=False, default=None),
-            tls_psk=dict(type='str', required=False, default=None),
-            timeout=dict(type='int', default=10),
-            interface=dict(
-                type='dict',
-                required=False,
-                default={},
-                options=dict(
-                    useip=dict(type='int', choices=[0, 1], default=0),
-                    ip=dict(type='str', default=''),
-                    dns=dict(type='str', default=''),
-                    port=dict(type='str', default='10051'),
-                    type=dict(type='int', default=0, removed_in_version="3.0.0", removed_from_collection='community.zabbix'),  # was Ansible 2.14
-                    main=dict(type='int', default=0, removed_in_version="3.0.0", removed_from_collection='community.zabbix'),  # was Ansible 2.14
-                ),
-            )
-        ),
+        argument_spec=argument_spec,
         supports_check_mode=True
     )
 
-    if not HAS_ZABBIX_API:
-        module.fail_json(msg=missing_required_lib('zabbix-api', url='https://pypi.org/project/zabbix-api/'), exception=ZBX_IMP_ERR)
-
-    server_url = module.params['server_url']
-    login_user = module.params['login_user']
-    login_password = module.params['login_password']
-    http_login_user = module.params['http_login_user']
-    http_login_password = module.params['http_login_password']
-    validate_certs = module.params['validate_certs']
     proxy_name = module.params['proxy_name']
     proxy_address = module.params['proxy_address']
     description = module.params['description']
@@ -394,7 +364,6 @@ def main():
     tls_psk_identity = module.params['tls_psk_identity']
     tls_psk = module.params['tls_psk']
     state = module.params['state']
-    timeout = module.params['timeout']
     interface = module.params['interface']
 
     # convert enabled to 0; disabled to 1
@@ -414,19 +383,7 @@ def main():
     else:
         tls_accept = 1
 
-    zbx = None
-    # login to zabbix
-    try:
-        zbx = ZabbixAPI(server_url, timeout=timeout,
-                        user=http_login_user,
-                        passwd=http_login_password,
-                        validate_certs=validate_certs)
-        zbx.login(login_user, login_password)
-        atexit.register(zbx.logout)
-    except Exception as e:
-        module.fail_json(msg="Failed to connect to Zabbix server: %s" % e)
-
-    proxy = Proxy(module, zbx)
+    proxy = Proxy(module)
 
     # check if proxy already exists
     proxy_id = proxy.proxy_exists(proxy_name)
