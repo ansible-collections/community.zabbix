@@ -96,25 +96,13 @@ RETURN = '''
 '''
 
 
-import atexit
-import traceback
+from ansible.module_utils.basic import AnsibleModule
 
-try:
-    from zabbix_api import ZabbixAPI, ZabbixAPIException
-
-    HAS_ZABBIX_API = True
-except ImportError:
-    ZBX_IMP_ERR = traceback.format_exc()
-    HAS_ZABBIX_API = False
-
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+from ansible_collections.community.zabbix.plugins.module_utils.base import ZabbixBase
+import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabbix_utils
 
 
-class Service(object):
-    def __init__(self, module, zbx):
-        self._module = module
-        self._zapi = zbx
-
+class Service(ZabbixBase):
     def get_service_ids(self, service_name):
         service_ids = []
         services = self._zapi.service.get({'filter': {'name': service_name}})
@@ -211,36 +199,22 @@ class Service(object):
 
 
 def main():
+    argument_spec = zabbix_utils.zabbix_common_argument_spec()
+    argument_spec.update(dict(
+        name=dict(type='str', required=True),
+        parent=dict(type='str', required=False),
+        sla=dict(type='float', required=False),
+        calculate_sla=dict(type='bool', required=False, default=False),
+        algorithm=dict(default='one_child', required=False, choices=['no', 'one_child', 'all_children']),
+        trigger_name=dict(type='str', required=False),
+        trigger_host=dict(type='str', required=False),
+        state=dict(default="present", choices=['present', 'absent']),
+    ))
     module = AnsibleModule(
-        argument_spec=dict(
-            server_url=dict(type='str', required=True, aliases=['url']),
-            login_user=dict(type='str', required=True),
-            login_password=dict(type='str', required=True, no_log=True),
-            http_login_user=dict(type='str', required=False, default=None),
-            http_login_password=dict(type='str', required=False, default=None, no_log=True),
-            validate_certs=dict(type='bool', required=False, default=True),
-            name=dict(type='str', required=True),
-            parent=dict(type='str', required=False),
-            sla=dict(type='float', required=False),
-            calculate_sla=dict(type='bool', required=False, default=False),
-            algorithm=dict(default='one_child', required=False, choices=['no', 'one_child', 'all_children']),
-            trigger_name=dict(type='str', required=False),
-            trigger_host=dict(type='str', required=False),
-            state=dict(default="present", choices=['present', 'absent']),
-            timeout=dict(type='int', default=10)
-        ),
+        argument_spec=argument_spec,
         supports_check_mode=True
     )
 
-    if not HAS_ZABBIX_API:
-        module.fail_json(msg=missing_required_lib('zabbix-api', url='https://pypi.org/project/zabbix-api/'), exception=ZBX_IMP_ERR)
-
-    server_url = module.params['server_url']
-    login_user = module.params['login_user']
-    login_password = module.params['login_password']
-    http_login_user = module.params['http_login_user']
-    http_login_password = module.params['http_login_password']
-    validate_certs = module.params['validate_certs']
     name = module.params['name']
     parent = module.params['parent']
     sla = module.params['sla']
@@ -249,20 +223,9 @@ def main():
     trigger_name = module.params['trigger_name']
     trigger_host = module.params['trigger_host']
     state = module.params['state']
-    timeout = module.params['timeout']
-
-    zbx = None
-
-    # Login to zabbix
-    try:
-        zbx = ZabbixAPI(server_url, timeout=timeout, user=http_login_user, passwd=http_login_password, validate_certs=validate_certs)
-        zbx.login(login_user, login_password)
-        atexit.register(zbx.logout)
-    except ZabbixAPIException as error:
-        module.fail_json(msg="Failed to connect to Zabbix server: %s" % error)
 
     # Load service module
-    service = Service(module, zbx)
+    service = Service(module)
     service_ids = service.get_service_ids(name)
     if service_ids:
         service_json = service.dump_services(service_ids)
