@@ -101,6 +101,7 @@ def construct_parameters(**kwargs):
         ]
     )
 
+
 def diff(existing, new):
     """Constructs the diff for Ansible's --diff option.
 
@@ -121,6 +122,7 @@ def diff(existing, new):
         else:
             after[key] = new[key]
     return {'before': before, 'after': after}
+
 
 def get_update_params(existing_valuemap, **kwargs):
     """Filters only the parameters that are different and need to be updated.
