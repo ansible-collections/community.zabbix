@@ -9,6 +9,32 @@ on:
       - 'roles/**'
 
 jobs:
+  tox-linters:
+    name: Tox-Lint ${{ matrix.python }}
+    strategy:
+      matrix:
+        python:
+          - 2.7
+          - 3.7
+          - 3.8
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+        with:
+          path: ansible_collections/community/zabbix
+
+      - name: Set up Python ${{ matrix.python }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: Install dependencies
+        run: pip install flake8 tox
+
+      - name: Run lint test
+        run: tox -elinters -vv
+
   sanity:
     name: Sanity (Ⓐ${{ matrix.ansible }}+py${{ matrix.python }})
     strategy:

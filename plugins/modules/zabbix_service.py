@@ -228,7 +228,7 @@ def main():
     service = Service(module)
     service_ids = service.get_service_ids(name)
     if service_ids:
-        service_json = service.dump_services(service_ids)
+        service.dump_services(service_ids)
 
     # Delete service
     if state == "absent":

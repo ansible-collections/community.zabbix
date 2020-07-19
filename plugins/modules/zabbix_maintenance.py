@@ -350,12 +350,12 @@ def main():
             module.fail_json(msg="Failed to check maintenance %s existence: %s" % (name, error))
 
         if maintenance and (
-            sorted(group_ids) != sorted(maintenance["groupids"]) or
-            sorted(host_ids) != sorted(maintenance["hostids"]) or
-            str(maintenance_type) != maintenance["maintenance_type"] or
-            str(int(start_time)) != maintenance["active_since"] or
-            str(int(start_time + period)) != maintenance["active_till"] or
-            str(desc) != maintenance['description']
+            sorted(group_ids) != sorted(maintenance["groupids"])
+            or sorted(host_ids) != sorted(maintenance["hostids"])
+            or str(maintenance_type) != maintenance["maintenance_type"]
+            or str(int(start_time)) != maintenance["active_since"]
+            or str(int(start_time + period)) != maintenance["active_till"]
+            or str(desc) != maintenance['description']
         ):
             if module.check_mode:
                 changed = True
