@@ -212,7 +212,7 @@ import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabb
 
 class Proxy(ZabbixBase):
     def __init__(self, module, zbx=None, zapi_wrapper=None):
-        super.__init__(module, zbx, zapi_wrapper)
+        super().__init__(module, zbx, zapi_wrapper)
         self.existing_data = None
 
     def proxy_exists(self, proxy_name):
@@ -328,8 +328,8 @@ def main():
         status=dict(type='str', default="active", choices=['active', 'passive']),
         state=dict(type='str', default="present", choices=['present', 'absent']),
         description=dict(type='str', required=False),
-        tls_connect=dict(type='str', default='no_encryption',choices=['no_encryption', 'PSK', 'certificate']),
-        tls_accept=dict(type='str', default='no_encryption',choices=['no_encryption', 'PSK', 'certificate']),
+        tls_connect=dict(type='str', default='no_encryption', choices=['no_encryption', 'PSK', 'certificate']),
+        tls_accept=dict(type='str', default='no_encryption', choices=['no_encryption', 'PSK', 'certificate']),
         ca_cert=dict(type='str', required=False, default=None, aliases=['tls_issuer']),
         tls_subject=dict(type='str', required=False, default=None),
         tls_psk_identity=dict(type='str', required=False, default=None),
