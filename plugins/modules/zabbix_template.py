@@ -304,30 +304,19 @@ template_xml:
 '''
 
 
-import atexit
 import json
 import traceback
 import xml.etree.ElementTree as ET
 
-try:
-    from zabbix_api import ZabbixAPI, ZabbixAPIException
-
-    HAS_ZABBIX_API = True
-except ImportError:
-    ZBX_IMP_ERR = traceback.format_exc()
-    HAS_ZABBIX_API = False
-
 from distutils.version import LooseVersion
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils._text import to_native
 
+from ansible_collections.community.zabbix.plugins.module_utils.base import ZabbixBase
+import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabbix_utils
 
-class Template(object):
-    def __init__(self, module, zbx):
-        self._module = module
-        self._zapi = zbx
-        self._zbx_api_version = zbx.api_version()[:5]
 
+class Template(ZabbixBase):
     # check if host group exists
     def check_host_group_exist(self, group_names):
         for group_name in group_names:
@@ -343,9 +332,7 @@ class Template(object):
         if group_names is None or len(group_names) == 0:
             return group_ids
         if self.check_host_group_exist(group_names):
-            group_list = self._zapi.hostgroup.get(
-                {'output': 'extend',
-                 'filter': {'name': group_names}})
+            group_list = self._zapi.hostgroup.get({'output': 'extend', 'filter': {'name': group_names}})
             for group in group_list:
                 group_id = group['groupid']
                 group_ids.append({'groupid': group_id})
@@ -356,9 +343,7 @@ class Template(object):
         if template_list is None or len(template_list) == 0:
             return template_ids
         for template in template_list:
-            template_list = self._zapi.template.get(
-                {'output': 'extend',
-                 'filter': {'host': template}})
+            template_list = self._zapi.template.get({'output': 'extend', 'filter': {'host': template}})
             if len(template_list) < 1:
                 continue
             else:
@@ -486,7 +471,7 @@ class Template(object):
             else:
                 return self.load_json_template(dump, omit_date=omit_date)
 
-        except ZabbixAPIException as e:
+        except Exception as e:
             self._module.fail_json(msg='Unable to export template: %s' % e)
 
     def diff_template(self, template_json_a, template_json_b):
@@ -627,32 +612,27 @@ class Template(object):
 
             import_data = {'format': template_type, 'source': template_content, 'rules': update_rules}
             self._zapi.configuration.import_(import_data)
-        except ZabbixAPIException as e:
+        except Exception as e:
             self._module.fail_json(msg='Unable to import template', details=to_native(e),
                                    exception=traceback.format_exc())
 
 
 def main():
+    argument_spec = zabbix_utils.zabbix_common_argument_spec()
+    argument_spec.update(dict(
+        template_name=dict(type='str', required=False),
+        template_json=dict(type='json', required=False),
+        template_xml=dict(type='str', required=False),
+        template_groups=dict(type='list', required=False),
+        link_templates=dict(type='list', required=False),
+        clear_templates=dict(type='list', required=False),
+        macros=dict(type='list', required=False),
+        omit_date=dict(type='bool', required=False, default=False),
+        dump_format=dict(type='str', required=False, default='json', choices=['json', 'xml']),
+        state=dict(type='str', default="present", choices=['present', 'absent', 'dump']),
+    ))
     module = AnsibleModule(
-        argument_spec=dict(
-            server_url=dict(type='str', required=True, aliases=['url']),
-            login_user=dict(type='str', required=True),
-            login_password=dict(type='str', required=True, no_log=True),
-            http_login_user=dict(type='str', required=False, default=None),
-            http_login_password=dict(type='str', required=False, default=None, no_log=True),
-            validate_certs=dict(type='bool', required=False, default=True),
-            template_name=dict(type='str', required=False),
-            template_json=dict(type='json', required=False),
-            template_xml=dict(type='str', required=False),
-            template_groups=dict(type='list', required=False),
-            link_templates=dict(type='list', required=False),
-            clear_templates=dict(type='list', required=False),
-            macros=dict(type='list', required=False),
-            omit_date=dict(type='bool', required=False, default=False),
-            dump_format=dict(type='str', required=False, default='json', choices=['json', 'xml']),
-            state=dict(type='str', default="present", choices=['present', 'absent', 'dump']),
-            timeout=dict(type='int', default=10)
-        ),
+        argument_spec=argument_spec,
         required_one_of=[
             ['template_name', 'template_json', 'template_xml']
         ],
@@ -666,15 +646,6 @@ def main():
         supports_check_mode=True
     )
 
-    if not HAS_ZABBIX_API:
-        module.fail_json(msg=missing_required_lib('zabbix-api', url='https://pypi.org/project/zabbix-api/'), exception=ZBX_IMP_ERR)
-
-    server_url = module.params['server_url']
-    login_user = module.params['login_user']
-    login_password = module.params['login_password']
-    http_login_user = module.params['http_login_user']
-    http_login_password = module.params['http_login_password']
-    validate_certs = module.params['validate_certs']
     template_name = module.params['template_name']
     template_json = module.params['template_json']
     template_xml = module.params['template_xml']
@@ -685,18 +656,8 @@ def main():
     omit_date = module.params['omit_date']
     dump_format = module.params['dump_format']
     state = module.params['state']
-    timeout = module.params['timeout']
 
-    zbx = None
-    try:
-        zbx = ZabbixAPI(server_url, timeout=timeout, user=http_login_user, passwd=http_login_password,
-                        validate_certs=validate_certs)
-        zbx.login(login_user, login_password)
-        atexit.register(zbx.logout)
-    except ZabbixAPIException as e:
-        module.fail_json(msg="Failed to connect to Zabbix server: %s" % e)
-
-    template = Template(module, zbx)
+    template = Template(module)
 
     # Identify template names for IDs retrieval
     # Template names are expected to reside in ['zabbix_export']['templates'][*]['template'] for both data types
