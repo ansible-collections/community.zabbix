@@ -261,28 +261,16 @@ user_ids:
 '''
 
 
-import atexit
-import traceback
 import copy
 
-try:
-    from zabbix_api import ZabbixAPI, Already_Exists
-
-    HAS_ZABBIX_API = True
-except ImportError:
-    ZBX_IMP_ERR = traceback.format_exc()
-    HAS_ZABBIX_API = False
-
 from distutils.version import LooseVersion
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+from ansible.module_utils.basic import AnsibleModule
+
+from ansible_collections.community.zabbix.plugins.module_utils.base import ZabbixBase
+import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabbix_utils
 
 
-class User(object):
-    def __init__(self, module, zbx):
-        self._module = module
-        self._zapi = zbx
-        self._zbx_api_version = zbx.api_version()[:3]
-
+class User(ZabbixBase):
     def get_usergroupid_by_user_group_name(self, usrgrps):
         user_group_ids = []
         for user_group_name in usrgrps:
@@ -297,7 +285,6 @@ class User(object):
         zbx_user = self._zapi.user.get({'output': 'extend', 'filter': {'alias': alias},
                                         'getAccess': True, 'selectMedias': 'extend',
                                         'selectUsrgrps': 'extend'})
-
         return zbx_user
 
     def convert_user_medias_parameter_types(self, user_medias):
@@ -505,71 +492,52 @@ class User(object):
 
 
 def main():
+    argument_spec = zabbix_utils.zabbix_common_argument_spec()
+    argument_spec.update(dict(
+        alias=dict(type='str', required=True),
+        name=dict(type='str', default=''),
+        surname=dict(type='str', default=''),
+        usrgrps=dict(type='list', required=True),
+        passwd=dict(type='str', required=True, no_log=True),
+        override_passwd=dict(type='bool', required=False, default=False),
+        lang=dict(type='str', default='en_GB', choices=['en_GB', 'en_US', 'zh_CN', 'cs_CZ', 'fr_FR',
+                                                        'he_IL', 'it_IT', 'ko_KR', 'ja_JP', 'nb_NO',
+                                                        'pl_PL', 'pt_BR', 'pt_PT', 'ru_RU', 'sk_SK',
+                                                        'tr_TR', 'uk_UA']),
+        theme=dict(type='str', default='default', choices=['default', 'blue-theme', 'dark-theme']),
+        autologin=dict(type='bool', default=False),
+        autologout=dict(type='str', default='0'),
+        refresh=dict(type='str', default='30'),
+        rows_per_page=dict(type='str', default='50'),
+        after_login_url=dict(type='str', default=''),
+        user_medias=dict(type='list', default=[], elements='dict',
+                         options=dict(mediatype=dict(type='str', default='Email'),
+                                      sendto=dict(type='str', required=True),
+                                      period=dict(type='str', default='1-7,00:00-24:00'),
+                                      severity=dict(type='dict',
+                                                    options=dict(
+                                                        not_classified=dict(type='bool', default=True),
+                                                        information=dict(type='bool', default=True),
+                                                        warning=dict(type='bool', default=True),
+                                                        average=dict(type='bool', default=True),
+                                                        high=dict(type='bool', default=True),
+                                                        disaster=dict(type='bool', default=True)),
+                                                    default=dict(
+                                                        not_classified=True,
+                                                        information=True,
+                                                        warning=True,
+                                                        average=True,
+                                                        high=True,
+                                                        disaster=True)),
+                                      active=dict(type='bool', default=True))),
+        type=dict(type='str', default='Zabbix user', choices=['Zabbix user', 'Zabbix admin', 'Zabbix super admin']),
+        state=dict(type='str', default="present", choices=['present', 'absent'])
+    ))
     module = AnsibleModule(
-        argument_spec=dict(
-            server_url=dict(type='str', required=True, aliases=['url']),
-            login_user=dict(type='str', required=True),
-            login_password=dict(type='str', required=True, no_log=True),
-            http_login_user=dict(type='str', required=False, default=None),
-            http_login_password=dict(type='str', required=False, default=None, no_log=True),
-            validate_certs=dict(type='bool', required=False, default=True),
-            alias=dict(type='str', required=True),
-            name=dict(type='str', default=''),
-            surname=dict(type='str', default=''),
-            usrgrps=dict(type='list', required=True),
-            passwd=dict(type='str', required=True, no_log=True),
-            override_passwd=dict(type='bool', required=False, default=False),
-            lang=dict(type='str', default='en_GB', choices=['en_GB', 'en_US', 'zh_CN', 'cs_CZ', 'fr_FR',
-                                                            'he_IL', 'it_IT', 'ko_KR', 'ja_JP', 'nb_NO',
-                                                            'pl_PL', 'pt_BR', 'pt_PT', 'ru_RU', 'sk_SK',
-                                                            'tr_TR', 'uk_UA']),
-            theme=dict(type='str', default='default', choices=['default', 'blue-theme', 'dark-theme']),
-            autologin=dict(type='bool', default=False),
-            autologout=dict(type='str', default='0'),
-            refresh=dict(type='str', default='30'),
-            rows_per_page=dict(type='str', default='50'),
-            after_login_url=dict(type='str', default=''),
-            user_medias=dict(type='list', default=[],
-                             elements='dict',
-                             options=dict(
-                                 mediatype=dict(type='str', default='Email'),
-                                 sendto=dict(type='str', required=True),
-                                 period=dict(type='str', default='1-7,00:00-24:00'),
-                                 severity=dict(type='dict',
-                                               options=dict(
-                                                   not_classified=dict(type='bool', default=True),
-                                                   information=dict(type='bool', default=True),
-                                                   warning=dict(type='bool', default=True),
-                                                   average=dict(type='bool', default=True),
-                                                   high=dict(type='bool', default=True),
-                                                   disaster=dict(type='bool', default=True)),
-                                               default=dict(
-                                                   not_classified=True,
-                                                   information=True,
-                                                   warning=True,
-                                                   average=True,
-                                                   high=True,
-                                                   disaster=True
-                                               )),
-                                 active=dict(type='bool', default=True)
-            )),
-            type=dict(type='str', default='Zabbix user', choices=['Zabbix user', 'Zabbix admin', 'Zabbix super admin']),
-            state=dict(type='str', default="present", choices=['present', 'absent']),
-            timeout=dict(type='int', default=10)
-        ),
+        argument_spec=argument_spec,
         supports_check_mode=True
     )
 
-    if not HAS_ZABBIX_API:
-        module.fail_json(msg=missing_required_lib('zabbix-api', url='https://pypi.org/project/zabbix-api/'),
-                         exception=ZBX_IMP_ERR)
-
-    server_url = module.params['server_url']
-    login_user = module.params['login_user']
-    login_password = module.params['login_password']
-    http_login_user = module.params['http_login_user']
-    http_login_password = module.params['http_login_password']
-    validate_certs = module.params['validate_certs']
     alias = module.params['alias']
     name = module.params['name']
     surname = module.params['surname']
@@ -586,7 +554,6 @@ def main():
     user_medias = module.params['user_medias']
     user_type = module.params['type']
     state = module.params['state']
-    timeout = module.params['timeout']
 
     if autologin:
         autologin = '1'
@@ -600,18 +567,7 @@ def main():
     }
     user_type = user_type_dict[user_type]
 
-    zbx = None
-
-    # login to zabbix
-    try:
-        zbx = ZabbixAPI(server_url, timeout=timeout, user=http_login_user, passwd=http_login_password,
-                        validate_certs=validate_certs)
-        zbx.login(login_user, login_password)
-        atexit.register(zbx.logout)
-    except Exception as e:
-        module.fail_json(msg="Failed to connect to Zabbix server: %s" % e)
-
-    user = User(module, zbx)
+    user = User(module)
 
     user_ids = {}
     zbx_user = user.check_user_exist(alias)
