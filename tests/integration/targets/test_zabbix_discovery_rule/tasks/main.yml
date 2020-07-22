@@ -17,6 +17,15 @@
       delay: "{{ 3600 if zabbix_version is version('3.4', '<=') else omit }}"
 
   block:
+  - name: test - create new Zabbix discovery rule (checkmode)
+    zabbix_discovery_rule:
+    check_mode: True
+    register: drule_new_checkmode
+
+  - name: assert that drule will be created (checkmode)
+    assert:
+      that: drule_new_checkmode is changed
+
   - name: test - create new Zabbix discovery rule
     zabbix_discovery_rule:
     register: drule_new
@@ -32,6 +41,18 @@
   - name: assert that nothing has been changed
     assert:
       that: not drule_exists is changed
+
+  - name: test - update Zabbix discovery rule iprange (checkmode)
+    zabbix_discovery_rule:
+      iprange:
+        - 192.168.1.1-255
+        - 10.0.0.1-255
+    check_mode: True
+    register: drule_iprange_update_checkmode
+
+  - name: assert that iprange will be changed
+    assert:
+      that: drule_iprange_update_checkmode is changed
 
   - name: test - update Zabbix discovery rule iprange
     zabbix_discovery_rule:
