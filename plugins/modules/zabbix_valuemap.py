@@ -178,13 +178,13 @@ class ValuemapModule(ZabbixBase):
 
     def update(self, **kwargs):
         try:
-            valuemap_id = self._zapi.valuemap.update(kwargs)
+            self._zapi.valuemap.update(kwargs)
         except Exception as e:
             self._module.fail_json(msg="Failed to update valuemap '{_id}': {e}".format(_id=kwargs['valuemapid'], e=e))
 
     def create(self, **kwargs):
         try:
-            valuemap_id = self._zapi.valuemap.create(kwargs)
+            self._zapi.valuemap.create(kwargs)
         except Exception as e:
             self._module.fail_json(msg="Failed to create valuemap '{name}': {e}".format(name=kwargs['description'], e=e))
 
