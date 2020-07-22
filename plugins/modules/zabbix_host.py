@@ -924,6 +924,7 @@ class Host(object):
         except Exception as e:
             self._module.fail_json(msg="Failed to set inventory to host: %s" % e)
 
+            
 def normalize_macro_name(macro_name):
     # Zabbix handles macro names in upper case characters
     if ':' in macro_name:
@@ -938,6 +939,7 @@ def normalize_macro_name(macro_name):
         macro_name = macro_name + '}'
 
     return macro_name
+
 
 def main():
     module = AnsibleModule(
