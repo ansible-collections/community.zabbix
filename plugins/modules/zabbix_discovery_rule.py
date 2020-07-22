@@ -462,11 +462,11 @@ class DiscoveryRule(object):
         """
         try:
             if self._module.check_mode:
-                self._module.exit_json(msg="Discovery rule would be updated if check mode was not specified: %s" % kwargs['name'], changed=True)
+                self._module.exit_json(msg="Discovery rule would be updated if check mode was not specified: ID %s" % kwargs['drule_id'], changed=True)
             kwargs['druleid'] = kwargs.pop('drule_id')
             return self._zapi.drule.update(kwargs)
         except Exception as e:
-            self._module.fail_json(msg="Failed to update discovery rule '%s': %s" % (kwargs['druleid'], e))
+            self._module.fail_json(msg="Failed to update discovery rule ID '%s': %s" % (kwargs['drule_id'], e))
 
     def add_drule(self, **kwargs):
         """Add discovery rule
