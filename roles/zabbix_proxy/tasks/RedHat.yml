@@ -19,6 +19,17 @@
   tags:
     - zabbix-proxy
 
+- name: "RedHat | Set facts for Zabbix >= 3.0 and RedHat 8"
+  set_fact:
+    apache_log: httpd
+    datafiles_path: "/usr/share/doc/zabbix-proxy-{{ zabbix_proxy_database }}"
+  when:
+    - zabbix_version is version_compare('3.0', '>=')
+    - ansible_distribution_major_version == '8'
+    - zabbix_proxy_database == 'sqlite3'
+  tags:
+    - zabbix-proxy
+
 - name: "Make sure old file is absent"
   file:
     path: /etc/yum.repos.d/zabbix-supported.repo
@@ -126,6 +137,8 @@
   yum:
     name:
       - policycoreutils-python
+      - libsemanage-python
+      - checkpolicy
     state: present
   register: zabbix_server_dependencies_installed
   until: zabbix_server_dependencies_installed is succeeded
