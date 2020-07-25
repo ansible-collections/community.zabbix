@@ -2,8 +2,8 @@
 user = apache
 group = apache
 
-listen = {{ zabbix_php_fpm_dir_var }}/run/php-fpm/zabbix.sock
-listen.acl_users = apache
+listen = {{ php_fpm_listen }}/zabbix.sock
+listen.acl_users = apache,nginx
 listen.allowed_clients = 127.0.0.1
 
 pm = dynamic
@@ -13,7 +13,7 @@ pm.min_spare_servers = 5
 pm.max_spare_servers = 35
 
 php_value[session.save_handler] = files
-php_value[session.save_path]    = {{ zabbix_php_fpm_dir_var }}/lib/php/session/
+php_value[session.save_path]    = {{ php_fpm_session }}
 
 php_value[max_execution_time] = {{ zabbix_web_max_execution_time | default('300') }}
 php_value[memory_limit] = {{ zabbix_web_memory_limit | default('128M') }}
