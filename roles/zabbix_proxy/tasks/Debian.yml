@@ -29,6 +29,16 @@
     - init
     - config
 
+- name: "Debian | Installing gnupg"
+  apt:
+    pkg: gnupg
+    update_cache: yes
+    cache_valid_time: 3600
+    force: yes
+    state: present
+  register: gnupg_installed
+  until: gnupg_installed is succeeded
+
 - name: "Debian | Install gpg key"
   apt_key:
     id: "{{ sign_keys[zabbix_short_version][ansible_distribution_release]['sign_key'] }}"
