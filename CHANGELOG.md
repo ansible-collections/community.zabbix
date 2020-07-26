@@ -2,13 +2,14 @@
 
 ## devel
 
+## 0.3.0
+
 ### New modules:
   - `zabbix_discovery_rule` - Create/delete/update Zabbix discovery rules. (PR [#111](https://github.com/ansible-collections/community.zabbix/pull/111))
   - `zabbix_usergroup` - Create/update or delete Zabbix user groups. (PR [#119](https://github.com/ansible-collections/community.zabbix/pull/119))
 
 ### Improvements
 #### Modules:
-  - zabbix_action - fixed error on changed API fields `*default_message` and `*default_subject` for Zabbix 5.0 (PR [#92](https://github.com/ansible-collections/community.zabbix/pull/92)).
   - zabbix_action - parameter `ssh_auth_type` for SSH `remote_command` operation now correctly identifies which other parameters are required (PR [#113](https://github.com/ansible-collections/community.zabbix/pull/113)).
   - zabbix_action - no longer requires `password` and `ssh_*key_file` parameters at the same time for `remote_command` operations of type SSH (PR [#113](https://github.com/ansible-collections/community.zabbix/pull/113)).
   - zabbix_mediatype - now supports new `webhook` media type (PR [#82](https://github.com/ansible-collections/community.zabbix/pull/82)).
@@ -16,12 +17,24 @@
   - zabbix_discovery_rule - refactoring module to use `module_utils` classes and functions, adjust return values on success, add documentation for return values (PR [#120](https://github.com/ansible-collections/community.zabbix/pull/120)).
   - zabbix_discovery_rule - refactoring the module to remove unnecessary variables and fix a variable typo (PR [#129](https://github.com/ansible-collections/community.zabbix/pull/129))
 
+#### Roles:
+  - all roles now **support Zabbix 5.0** and by default install this version (PR [#131](https://github.com/ansible-collections/community.zabbix/pull/131) and PR [#121](https://github.com/ansible-collections/community.zabbix/pull/121))
+  - roles will now install gnupg on Debian OS family if not present (PR [#149](https://github.com/ansible-collections/community.zabbix/pull/149))
+
 ### Bug Fixes:
 #### Modules:
+  - zabbix_action - fixed error on changed API fields `*default_message` and `*default_subject` for Zabbix 5.0 (PR [#92](https://github.com/ansible-collections/community.zabbix/pull/92)).
   - zabbix_action - now correctly selects mediatype for the (normal|recovery|update) operations with Zabbix 4.4 and newer. (PR [#90](https://github.com/ansible-collections/community.zabbix/pull/90))
   - zabbix_action - clarified choices for the `inventory` paramters in `*operations` sub option to `manual` and `automatic` (PR [#113](https://github.com/ansible-collections/community.zabbix/pull/113)).
   - zabbix_action - module will no longer fail when searching for global script provided to `script_name` parameter (PR [#113](https://github.com/ansible-collections/community.zabbix/pull/113)).
+  - zabbix_host - no longer converts context part of user macro to upper case (PR [#146](https://github.com/ansible-collections/community.zabbix/pull/146))
   - zabbix_service - fixed the zabbix_service has no idempotency with Zabbix 5.0 (PR [#116](https://github.com/ansible-collections/community.zabbix/pull/116))
+
+#### Roles:
+  - zabbix_agent - role should now be more resilient when looking for _getenforce_ binary (PR [#115](https://github.com/ansible-collections/community.zabbix/pull/115))
+  - zabbix_agent - fixed installation of agent on Windows do directories with spaces (PR [#133](https://github.com/ansible-collections/community.zabbix/pull/133))
+  - zabbix_proxy - will now install python3-libsemanage on RHEL OS family (PR [#149](https://github.com/ansible-collections/community.zabbix/pull/149))
+  - zabbix_web - now no longer fails when rendering apache vhost template (PR [#128](https://github.com/ansible-collections/community.zabbix/pull/128))
 
 ## 0.2.0
 
