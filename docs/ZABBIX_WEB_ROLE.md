@@ -80,9 +80,10 @@ The following is an overview of all available configuration defaults for this ro
 
 ### Overall Zabbix
 
-* `zabbix_web_version`: This is the version of zabbix. Default: 4.4, Can be overridden to 4.0, 3.4, 3.2, 3.0, 2.4, or 2.2. Previously the variable `zabbix_version` was used directly but it could cause [some inconvenience](https://github.com/dj-wasabi/ansible-zabbix-agent/pull/303). That variable is maintained by retrocompativility.
+* `zabbix_web_version`: This is the version of zabbix. Default: 5.0, Can be overridden to 4.4, 4.0, 3.4, 3.2, 3.0, 2.4, or 2.2. Previously the variable `zabbix_version` was used directly but it could cause [some inconvenience](https://github.com/dj-wasabi/ansible-zabbix-agent/pull/303). That variable is maintained by retrocompativility.
 * `zabbix_repo_yum`: A list with Yum repository configuration.
 * `zabbix_web_package_state`: Default: _present_. Can be overridden to "latest" to update packages when needed.
+* `zabbix_web_centos_release`: Default: False. When the `centos-release-scl` repository needs to be enabled. This is required when using Zabbix 5.0 due to installation of a recent version of `PHP`.
 
 ### Zabbix Web specific
 
@@ -103,6 +104,11 @@ The following is an overview of all available configuration defaults for this ro
 * `zabbix_web_max_input_time`:
 * `zabbix_apache_include_custom_fragment`: True / False. Includes php_value vars max_execution_time, memory_limit, post_max_size, upload_max_filesize, max_input_time and date.timezone in vhost file.. place those in php-fpm configuration. Default is true.
 * `zabbix_web_env`: (Optional) A Dictionary of PHP Environments
+
+The following properties are specific to Zabbix 5.0:
+
+* `zabbix_php_fpm_dir_etc`: etc HOME root directory of PHP-FPM
+* `zabbix_php_fpm_dir_var`: Var HOME root directory of PHP-FPM
 
 The following properties are related when TLS/SSL is configured:
 

@@ -1,7 +1,8 @@
 ---
 # defaults file for zabbix-proxy
 
-zabbix_version: 4.4
+zabbix_version: 5.0
+zabbix_selinux: False
 
 # These variables are optional. They specify the version of Zabbix proxy package.
 

@@ -1,0 +1,24 @@
+[zabbix]
+user = apache
+group = apache
+
+listen = {{ php_fpm_listen }}/zabbix.sock
+listen.acl_users = apache,nginx
+listen.allowed_clients = 127.0.0.1
+
+pm = dynamic
+pm.max_children = 50
+pm.start_servers = 5
+pm.min_spare_servers = 5
+pm.max_spare_servers = 35
+
+php_value[session.save_handler] = files
+php_value[session.save_path]    = {{ php_fpm_session }}
+
+php_value[max_execution_time] = {{ zabbix_web_max_execution_time | default('300') }}
+php_value[memory_limit] = {{ zabbix_web_memory_limit | default('128M') }}
+php_value[post_max_size] = {{ zabbix_web_post_max_size | default('16M') }}
+php_value[upload_max_filesize] = {{ zabbix_web_upload_max_filesize | default('2M') }}
+php_value[max_input_time] = {{ zabbix_web_max_input_time | default('300') }}
+php_value[max_input_vars] = {{ zabbix_web_max_input_vars | default('10000') }}
+php_value[date.timezone] = {{ zabbix_timezone }}
