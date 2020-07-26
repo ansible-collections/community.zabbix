@@ -46,3 +46,5 @@ roles/zabbix_javagateway/molecule/default/tests/test_default.py metaclass-boiler
 roles/zabbix_proxy/molecule/default/tests/test_default.py metaclass-boilerplate
 roles/zabbix_server/molecule/default/tests/test_default.py metaclass-boilerplate
 roles/zabbix_web/molecule/default/tests/test_default.py metaclass-boilerplate
+molecule/zabbix_server/tests/test_default.py future-import-boilerplate
+molecule/zabbix_server/tests/test_agent.py metaclass-boilerplate
