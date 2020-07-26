@@ -213,6 +213,7 @@
     name:
       - policycoreutils
       - checkpolicy
+      - python3-libsemanage
     state: present
   register: zabbix_server_dependencies_installed
   until: zabbix_server_dependencies_installed is succeeded
