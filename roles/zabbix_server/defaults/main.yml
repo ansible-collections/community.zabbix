@@ -2,7 +2,7 @@
 # defaults file;
 # zabbix role specific
 
-zabbix_server_version: 4.4
+zabbix_server_version: 5.0
 zabbix_version: "{{ zabbix_server_version }}"
 zabbix_repo: zabbix
 

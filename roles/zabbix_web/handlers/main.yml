@@ -1,0 +1,9 @@
+---
+
+- name: restart rh-php72-php-fpm
+  service:
+    name: rh-php72-php-fpm
+    state: restarted
+    enabled: yes
+  when:
+    - zabbix_version is version('5.0', '>=')

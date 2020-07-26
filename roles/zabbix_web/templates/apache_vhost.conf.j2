@@ -25,6 +25,17 @@
     Order Allow,Deny
     Allow from all
   {% endif %}
+
+    <IfModule dir_module>
+        DirectoryIndex index.php
+    </IfModule>
+
+{% if ansible_os_family == "RedHat" and ansible_distribution_major_version is version('7', '<=') %}
+    <FilesMatch \.(php|phar)$>
+        SetHandler "proxy:unix:{{ zabbix_php_fpm_dir_var }}/run/php-fpm/zabbix.sock|fcgi://localhost"
+    </FilesMatch>
+{% endif %}
+
   </Directory>
 
 {% for my_path in directory_paths %}
@@ -48,6 +59,7 @@
   RewriteEngine On
   RewriteRule ^$ /index.php [L]
 
+{% if zabbix_version is version('4.4', '<=') %}
 {% if zabbix_apache_include_custom_fragment | default(true) %}
   ## Custom fragment
   {% if zabbix_php_fpm %}
@@ -62,6 +74,7 @@
   # Set correct timezone.
   php_value date.timezone {{ zabbix_timezone }}
   {% endif %}
+{% endif %}
 {% endif %}
 </VirtualHost>
 
@@ -109,6 +122,17 @@ SSLCryptoDevice {{ zabbix_apache_SSLCryptoDevice }}
     Order Allow,Deny
     Allow from all
   {% endif %}
+
+    <IfModule dir_module>
+        DirectoryIndex index.php
+    </IfModule>
+
+{% if ansible_os_family == "RedHat" and ansible_distribution_major_version is version('7', '<=') %}
+    <FilesMatch \.(php|phar)$>
+        SetHandler "proxy:unix:{{ zabbix_php_fpm_dir_var }}/run/php-fpm/zabbix.sock|fcgi://localhost"
+    </FilesMatch>
+{% endif %}
+
   </Directory>
 
 {% for my_path in directory_paths %}
@@ -132,6 +156,7 @@ SSLCryptoDevice {{ zabbix_apache_SSLCryptoDevice }}
   RewriteEngine On
   RewriteRule ^$ /index.php [L]
 
+{% if zabbix_version is version('4.4', '<=') %}
 {% if zabbix_apache_include_custom_fragment | default(true) %}
   ## Custom fragment
   {% if zabbix_php_fpm %}
@@ -146,6 +171,7 @@ SSLCryptoDevice {{ zabbix_apache_SSLCryptoDevice }}
   # Set correct timezone.
   php_value date.timezone {{ zabbix_timezone }}
   {% endif %}
+{% endif %}
 {% endif %}
 </VirtualHost>
 {% endif %}

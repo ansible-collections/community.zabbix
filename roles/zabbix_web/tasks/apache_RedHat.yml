@@ -1,4 +1,32 @@
 ---
+
+- name: "Set FPM path"
+  set_fact:
+    php_fpm_dir: "{{ zabbix_php_fpm_dir_etc }}"
+    php_fpm_session: "{{ zabbix_php_fpm_dir_var }}/lib/php/session/"
+    php_fpm_listen: "{{ zabbix_php_fpm_dir_var }}/run/php-fpm"
+
+- name: "Override FPM path CentOS 8"
+  set_fact:
+    php_fpm_dir: /etc
+    php_fpm_session: /var/lib/php/session
+    php_fpm_listen: "/run/php-fpm"
+  when:
+    - ansible_distribution_major_version == '8'
+
+- name: "RedHat | Install PHP"
+  template:
+    src: php-fpm.conf.j2
+    dest: "{{ php_fpm_dir }}/php-fpm.d/zabbix.conf"
+    owner: "{{ apache_user }}"
+    group: "{{ apache_group }}"
+    mode: 0644
+  when:
+    - zabbix_vhost
+    - ansible_distribution_major_version != '8'
+  notify:
+    - restart rh-php72-php-fpm
+
 - name: "RedHat | Install apache vhost"
   template:
     src: apache_vhost.conf.j2

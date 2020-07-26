@@ -15,9 +15,54 @@
   tags:
     - zabbix-web
 
+- name: "RedHat | Install basic repo file (Zabbix 5.x)"
+  yum_repository:
+    name: "{{ item.name }}"
+    description: "{{ item.description }}"
+    baseurl: "{{ item.baseurl }}"
+    gpgcheck: "{{ item.gpgcheck }}"
+    gpgkey: "{{ item.gpgkey }}"
+    state: "{{ item.state | default('present') }}"
+  with_items: "{{ zabbix_5_repo_yum }}"
+  when:
+    - zabbix_repo == "zabbix"
+    - zabbix_version is version('5.0', '>=')
+    - ansible_distribution_major_version != '8'
+  tags:
+    - zabbix-web
+
+- name: "RedHat | Install zabbix-web dependency (Zabbix 5.x)"
+  yum:
+    pkg:
+      - centos-release-scl
+    state: "{{ zabbix_web_package_state }}"
+    update_cache: yes
+  register: zabbix_web_dependency_package_install
+  until: zabbix_web_dependency_package_install is succeeded
+  when:
+    - zabbix_version is version('5.0', '>=')
+    - zabbix_web_centos_release
+    - ansible_distribution_major_version != '8'
+  tags:
+    - zabbix-web
+
+- name: "RedHat | Install zabbix-web (Zabbix 5.x)"
+  yum:
+    pkg:
+      - "{{ 'zabbix-apache-conf-scl' if zabbix_websrv == 'apache' }}"
+    state: "{{ zabbix_web_package_state }}"
+    update_cache: yes
+  register: zabbix_web_package_install
+  until: zabbix_web_package_install is succeeded
+  when:
+    - zabbix_version is version('5.0', '>=')
+    - ansible_distribution_major_version != '8'
+  tags:
+    - zabbix-web
+
 - name: "RedHat | Install zabbix-web-{{ zabbix_server_database }}"
   yum:
-    pkg: zabbix-web-{{ zabbix_server_database }}
+    pkg: zabbix-web-{{ zabbix_server_database }}{{ '-scl' if zabbix_version is version('5.0', '>=') and ansible_distribution_major_version != '8'}}
     state: "{{ zabbix_web_package_state }}"
     update_cache: yes
   register: zabbix_web_package_install
