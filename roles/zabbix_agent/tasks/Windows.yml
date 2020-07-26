@@ -81,7 +81,7 @@
     - agent_file_info.stat.exists
 
 - name: "Windows | Uninstall Zabbix (Update)"
-  win_command: '"{{ zabbix_win_exe_path }}" -config "{{ zabbix_win_install_dir }}\zabbix_agentd.conf" --uninstall'
+  win_command: '"{{ zabbix_win_exe_path }}" --config "{{ zabbix_win_install_dir }}\zabbix_agentd.conf" --uninstall'
   register: zabbix_windows_install
   when:
     - update_zabbix_agent | default(false)
