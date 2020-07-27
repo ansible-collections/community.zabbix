@@ -92,25 +92,13 @@ EXAMPLES = r'''
 '''
 
 
-import atexit
-import traceback
+from ansible.module_utils.basic import AnsibleModule
 
-try:
-    from zabbix_api import ZabbixAPI
-
-    HAS_ZABBIX_API = True
-except ImportError:
-    ZBX_IMP_ERR = traceback.format_exc()
-    HAS_ZABBIX_API = False
-
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+from ansible_collections.community.zabbix.plugins.module_utils.base import ZabbixBase
+import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabbix_utils
 
 
-class HostMacro(object):
-    def __init__(self, module, zbx):
-        self._module = module
-        self._zapi = zbx
-
+class HostMacro(ZabbixBase):
     # get host id by host name
     def get_host_id(self, host_name):
         try:
@@ -186,54 +174,29 @@ def normalize_macro_name(macro_name):
 
 
 def main():
+    argument_spec = zabbix_utils.zabbix_common_argument_spec()
+    argument_spec.update(dict(
+        host_name=dict(type='str', required=True),
+        macro_name=dict(type='str', required=True),
+        macro_value=dict(type='str', required=False),
+        state=dict(type='str', default='present', choices=['present', 'absent']),
+        force=dict(type='bool', default=True)
+    ))
     module = AnsibleModule(
-        argument_spec=dict(
-            server_url=dict(type='str', required=True, aliases=['url']),
-            login_user=dict(type='str', required=True),
-            login_password=dict(type='str', required=True, no_log=True),
-            http_login_user=dict(type='str', required=False, default=None),
-            http_login_password=dict(type='str', required=False, default=None, no_log=True),
-            validate_certs=dict(type='bool', required=False, default=True),
-            host_name=dict(type='str', required=True),
-            macro_name=dict(type='str', required=True),
-            macro_value=dict(type='str', required=False),
-            state=dict(type='str', default='present', choices=['present', 'absent']),
-            timeout=dict(type='int', default=10),
-            force=dict(type='bool', default=True)
-        ),
+        argument_spec=argument_spec,
         required_if=[
             ['state', 'present', ['macro_value']]
         ],
         supports_check_mode=True
     )
 
-    if not HAS_ZABBIX_API:
-        module.fail_json(msg=missing_required_lib('zabbix-api', url='https://pypi.org/project/zabbix-api/'), exception=ZBX_IMP_ERR)
-
-    server_url = module.params['server_url']
-    login_user = module.params['login_user']
-    login_password = module.params['login_password']
-    http_login_user = module.params['http_login_user']
-    http_login_password = module.params['http_login_password']
-    validate_certs = module.params['validate_certs']
     host_name = module.params['host_name']
     macro_name = normalize_macro_name(module.params['macro_name'])
     macro_value = module.params['macro_value']
     state = module.params['state']
-    timeout = module.params['timeout']
     force = module.params['force']
 
-    zbx = None
-    # login to zabbix
-    try:
-        zbx = ZabbixAPI(server_url, timeout=timeout, user=http_login_user, passwd=http_login_password,
-                        validate_certs=validate_certs)
-        zbx.login(login_user, login_password)
-        atexit.register(zbx.logout)
-    except Exception as e:
-        module.fail_json(msg="Failed to connect to Zabbix server: %s" % e)
-
-    host_macro_class_obj = HostMacro(module, zbx)
+    host_macro_class_obj = HostMacro(module)
 
     if host_name:
         host_id = host_macro_class_obj.get_host_id(host_name)
