@@ -424,28 +424,16 @@ EXAMPLES = r'''
 '''
 
 
-import atexit
 import copy
-import traceback
-
-try:
-    from zabbix_api import ZabbixAPI
-
-    HAS_ZABBIX_API = True
-except ImportError:
-    ZBX_IMP_ERR = traceback.format_exc()
-    HAS_ZABBIX_API = False
 
 from distutils.version import LooseVersion
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+from ansible.module_utils.basic import AnsibleModule
+
+from ansible_collections.community.zabbix.plugins.module_utils.base import ZabbixBase
+import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabbix_utils
 
 
-class Host(object):
-    def __init__(self, module, zbx):
-        self._module = module
-        self._zapi = zbx
-        self._zbx_api_version = zbx.api_version()[:5]
-
+class Host(ZabbixBase):
     # exist host
     def is_host_exist(self, host_name):
         result = self._zapi.host.get({'filter': {'host': host_name}})
@@ -942,103 +930,89 @@ def normalize_macro_name(macro_name):
 
 
 def main():
-    module = AnsibleModule(
-        argument_spec=dict(
-            server_url=dict(type='str', required=True, aliases=['url']),
-            login_user=dict(type='str', required=True),
-            login_password=dict(type='str', required=True, no_log=True),
-            host_name=dict(type='str', required=True),
-            http_login_user=dict(type='str', required=False, default=None),
-            http_login_password=dict(type='str', required=False, default=None, no_log=True),
-            validate_certs=dict(type='bool', required=False, default=True),
-            host_groups=dict(type='list', required=False),
-            link_templates=dict(type='list', required=False),
-            status=dict(type='str', default="enabled", choices=['enabled', 'disabled']),
-            state=dict(type='str', default="present", choices=['present', 'absent']),
-            inventory_mode=dict(type='str', required=False, choices=['automatic', 'manual', 'disabled']),
-            ipmi_authtype=dict(type='int', default=None),
-            ipmi_privilege=dict(type='int', default=None),
-            ipmi_username=dict(type='str', required=False, default=None),
-            ipmi_password=dict(type='str', required=False, default=None, no_log=True),
-            tls_connect=dict(type='int', default=1),
-            tls_accept=dict(type='int', default=1),
-            tls_psk_identity=dict(type='str', required=False),
-            tls_psk=dict(type='str', required=False),
-            ca_cert=dict(type='str', required=False, aliases=['tls_issuer']),
-            tls_subject=dict(type='str', required=False),
-            inventory_zabbix=dict(type='dict', required=False),
-            timeout=dict(type='int', default=10),
-            interfaces=dict(
-                type='list',
-                elements='dict',
-                default=[],
-                options=dict(
-                    type=dict(type='str', required=True, choices=['agent', '1', 'snmp', '2', 'ipmi', '3', 'jmx', '4']),
-                    main=dict(type='int', choices=[0, 1], default=0),
-                    useip=dict(type='int', choices=[0, 1], default=0),
-                    ip=dict(type='str', default=''),
-                    dns=dict(type='str', default=''),
-                    port=dict(type='str'),
-                    bulk=dict(type='int', choices=[0, 1], default=1),
-                    details=dict(
-                        type='dict',
-                        default={},
-                        options=dict(
-                            version=dict(type='int', choices=[1, 2, 3], default=2),
-                            bulk=dict(type='int', choices=[0, 1], default=1),
-                            community=dict(type='str'),
-                            securityname=dict(type='str', default=''),
-                            contextname=dict(type='str', default=''),
-                            securitylevel=dict(type='int', choices=[0, 1, 2], default=0),
-                            authprotocol=dict(type='int', choices=[0, 1], default=0),
-                            authpassphrase=dict(type='str', default=''),
-                            privprotocol=dict(type='int', choices=[0, 1], default=0),
-                            privpassphrase=dict(type='str', default='')
-                        )
+    argument_spec = zabbix_utils.zabbix_common_argument_spec()
+    argument_spec.update(dict(
+        host_name=dict(type='str', required=True),
+        host_groups=dict(type='list', required=False),
+        link_templates=dict(type='list', required=False),
+        status=dict(type='str', default="enabled", choices=['enabled', 'disabled']),
+        state=dict(type='str', default="present", choices=['present', 'absent']),
+        inventory_mode=dict(type='str', required=False, choices=['automatic', 'manual', 'disabled']),
+        ipmi_authtype=dict(type='int', default=None),
+        ipmi_privilege=dict(type='int', default=None),
+        ipmi_username=dict(type='str', required=False, default=None),
+        ipmi_password=dict(type='str', required=False, default=None, no_log=True),
+        tls_connect=dict(type='int', default=1),
+        tls_accept=dict(type='int', default=1),
+        tls_psk_identity=dict(type='str', required=False),
+        tls_psk=dict(type='str', required=False),
+        ca_cert=dict(type='str', required=False, aliases=['tls_issuer']),
+        tls_subject=dict(type='str', required=False),
+        inventory_zabbix=dict(type='dict', required=False),
+        interfaces=dict(
+            type='list',
+            elements='dict',
+            default=[],
+            options=dict(
+                type=dict(type='str', required=True, choices=['agent', '1', 'snmp', '2', 'ipmi', '3', 'jmx', '4']),
+                main=dict(type='int', choices=[0, 1], default=0),
+                useip=dict(type='int', choices=[0, 1], default=0),
+                ip=dict(type='str', default=''),
+                dns=dict(type='str', default=''),
+                port=dict(type='str'),
+                bulk=dict(type='int', choices=[0, 1], default=1),
+                details=dict(
+                    type='dict',
+                    default={},
+                    options=dict(
+                        version=dict(type='int', choices=[1, 2, 3], default=2),
+                        bulk=dict(type='int', choices=[0, 1], default=1),
+                        community=dict(type='str'),
+                        securityname=dict(type='str', default=''),
+                        contextname=dict(type='str', default=''),
+                        securitylevel=dict(type='int', choices=[0, 1, 2], default=0),
+                        authprotocol=dict(type='int', choices=[0, 1], default=0),
+                        authpassphrase=dict(type='str', default=''),
+                        privprotocol=dict(type='int', choices=[0, 1], default=0),
+                        privpassphrase=dict(type='str', default='')
                     )
-                ),
-                required_if=[
-                    ['useip', 0, ['dns']],
-                    ['useip', 1, ['ip']]
-                ]
-            ),
-            force=dict(type='bool', default=True),
-            proxy=dict(type='str', required=False),
-            visible_name=dict(type='str', required=False),
-            description=dict(type='str', required=False),
-            macros=dict(
-                type='list',
-                elements='dict',
-                aliases=['user_macros'],
-                options=dict(
-                    macro=dict(type='str', required=True),
-                    value=dict(type='str', required=True),
-                    description=dict(type='str', default=''),
-                    type=dict(type='str', default='text', choices=['text', 'secret'])
                 )
             ),
-            tags=dict(
-                type='list',
-                elements='dict',
-                aliases=['host_tags'],
-                options=dict(
-                    tag=dict(type='str', required=True),
-                    value=dict(type='str', default='')
-                )
+            required_if=[
+                ['useip', 0, ['dns']],
+                ['useip', 1, ['ip']]
+            ]
+        ),
+        force=dict(type='bool', default=True),
+        proxy=dict(type='str', required=False),
+        visible_name=dict(type='str', required=False),
+        description=dict(type='str', required=False),
+        macros=dict(
+            type='list',
+            elements='dict',
+            aliases=['user_macros'],
+            options=dict(
+                macro=dict(type='str', required=True),
+                value=dict(type='str', required=True),
+                description=dict(type='str', default=''),
+                type=dict(type='str', default='text', choices=['text', 'secret'])
             )
         ),
+        tags=dict(
+            type='list',
+            elements='dict',
+            aliases=['host_tags'],
+            options=dict(
+                tag=dict(type='str', required=True),
+                value=dict(type='str', default='')
+            )
+        )
+    ))
+    module = AnsibleModule(
+        argument_spec=argument_spec,
         supports_check_mode=True
     )
 
-    if not HAS_ZABBIX_API:
-        module.fail_json(msg=missing_required_lib('zabbix-api', url='https://pypi.org/project/zabbix-api/'), exception=ZBX_IMP_ERR)
-
-    server_url = module.params['server_url']
-    login_user = module.params['login_user']
-    login_password = module.params['login_password']
-    http_login_user = module.params['http_login_user']
-    http_login_password = module.params['http_login_password']
-    validate_certs = module.params['validate_certs']
     host_name = module.params['host_name']
     visible_name = module.params['visible_name']
     description = module.params['description']
@@ -1058,7 +1032,6 @@ def main():
     inventory_zabbix = module.params['inventory_zabbix']
     status = module.params['status']
     state = module.params['state']
-    timeout = module.params['timeout']
     interfaces = module.params['interfaces']
     force = module.params['force']
     proxy = module.params['proxy']
@@ -1068,18 +1041,7 @@ def main():
     # convert enabled to 0; disabled to 1
     status = 1 if status == "disabled" else 0
 
-    zbx = None
-    # login to zabbix
-    try:
-        zbx = ZabbixAPI(server_url, timeout=timeout, user=http_login_user, passwd=http_login_password,
-                        validate_certs=validate_certs)
-        zbx.login(login_user, login_password)
-        atexit.register(zbx.logout)
-    except Exception as e:
-        module.fail_json(msg="Failed to connect to Zabbix server: %s" % e)
-
-    host = Host(module, zbx)
-    zbx_api_version = zbx.api_version()[:5]
+    host = Host(module)
 
     template_ids = []
     if link_templates:
@@ -1097,12 +1059,12 @@ def main():
         for macro in macros:
             macro['macro'] = normalize_macro_name(macro['macro'])
 
-            if LooseVersion(zbx_api_version) <= LooseVersion('4.4.0'):
+            if LooseVersion(host._zbx_api_version) <= LooseVersion('4.4.0'):
                 if 'description' in macro:
                     macro.pop('description', False)
 
             if 'type' in macro:
-                if LooseVersion(zbx_api_version) < LooseVersion('5.0.0'):
+                if LooseVersion(host._zbx_api_version) < LooseVersion('5.0.0'):
                     macro.pop('type')
                 else:
                     if macro['type'] == 'text':
