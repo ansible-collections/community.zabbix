@@ -374,194 +374,11 @@ EXAMPLES = r'''
 '''
 
 
-import atexit
-import traceback
-
-try:
-    from zabbix_api import ZabbixAPI
-
-    HAS_ZABBIX_API = True
-except ImportError:
-    ZBX_IMP_ERR = traceback.format_exc()
-    HAS_ZABBIX_API = False
-
 from distutils.version import LooseVersion
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+from ansible.module_utils.basic import AnsibleModule
 
-
-def validate_params(module, params):
-    """Validates arguments that are required together.
-
-    Fails the module with the message that shows the missing
-    requirements if there are some.
-
-    Args:
-        module: AnsibleModule object.
-        params (list): Each element of this list
-            is a list like
-            ['argument_key', 'argument_value', ['required_arg_1',
-                                                'required_arg_2']].
-            Format is the same as `required_if` parameter of AnsibleModule.
-    """
-    for param in params:
-        if module.params[param[0]] == param[1]:
-            if None in [module.params[i] for i in param[2]]:
-                module.fail_json(
-                    msg="Following arguments are required when {key} is {value}: {arguments}".format(
-                        key=param[0],
-                        value=param[1],
-                        arguments=', '.join(param[2])
-                    )
-                )
-
-
-def construct_parameters(**kwargs):
-    """Translates data to a format suitable for Zabbix API and filters
-    the ones that are related to the specified mediatype type.
-
-    Args:
-        **kwargs: Arguments passed to the module.
-
-    Returns:
-        A dictionary of arguments that are related to kwargs['transport_type'],
-        and are in a format that is understandable by Zabbix API.
-    """
-    truths = {'False': '0', 'True': '1'}
-    parameters = dict(
-        status='0' if kwargs['status'] == 'enabled' else '1',
-        type={
-            'email': '0',
-            'script': '1',
-            'sms': '2',
-            'jabber': '3',
-            'webhook': '4',
-            'ez_texting': '100'
-        }.get(kwargs['transport_type']),
-    )
-
-    if LooseVersion(kwargs['zbx_api_version']) >= LooseVersion('4.4'):
-        parameters.update(dict(
-            name=kwargs['name'],
-            description=kwargs['description'],
-        ))
-    else:
-        parameters.update(dict(description=kwargs['name']))
-
-    if LooseVersion(kwargs['zbx_api_version']) >= LooseVersion('3.4'):
-        parameters.update(dict(
-            maxsessions=str(kwargs['max_sessions']),
-            maxattempts=str(kwargs['max_attempts']),
-            attempt_interval=str(kwargs['attempt_interval'])
-        ))
-
-    if kwargs['message_templates'] and LooseVersion(kwargs['zbx_api_version']) >= LooseVersion('5.0'):
-        msg_templates = []
-        for template in kwargs['message_templates']:
-            msg_templates.append(dict(
-                eventsource={
-                    'triggers': '0',
-                    'discovery': '1',
-                    'autoregistration': '2',
-                    'internal': '3'}.get(template['eventsource']),
-                recovery={
-                    'operations': '0',
-                    'recovery_operations': '1',
-                    'update_operations': '2'}.get(template['recovery']),
-                subject=template['subject'],
-                message=template['body']
-            ))
-        parameters.update(dict(message_templates=msg_templates))
-
-    if kwargs['transport_type'] == 'email':
-        parameters.update(dict(
-            smtp_server=kwargs['smtp_server'],
-            smtp_port=str(kwargs['smtp_server_port']),
-            smtp_helo=kwargs['smtp_helo'],
-            smtp_email=kwargs['smtp_email'],
-            smtp_security={'None': '0', 'STARTTLS': '1', 'SSL/TLS': '2'}.get(str(kwargs['smtp_security'])),
-            smtp_authentication=truths.get(str(kwargs['smtp_authentication'])),
-            smtp_verify_host=truths.get(str(kwargs['smtp_verify_host'])),
-            smtp_verify_peer=truths.get(str(kwargs['smtp_verify_peer'])),
-            username=kwargs['username'],
-            passwd=kwargs['password']
-        ))
-        return parameters
-
-    elif kwargs['transport_type'] == 'script':
-        if kwargs['script_params'] is None:
-            _script_params = ''  # ZBX-15706
-        else:
-            _script_params = '\n'.join(str(i) for i in kwargs['script_params']) + '\n'
-        parameters.update(dict(
-            exec_path=kwargs['script_name'],
-            exec_params=_script_params
-        ))
-        return parameters
-
-    elif kwargs['transport_type'] == 'sms':
-        parameters.update(dict(gsm_modem=kwargs['gsm_modem']))
-        return parameters
-
-    elif kwargs['transport_type'] == 'webhook' and LooseVersion(kwargs['zbx_api_version']) >= LooseVersion('4.4'):
-        parameters.update(dict(
-            script=kwargs['webhook_script'],
-            timeout=kwargs['webhook_timeout'],
-            process_tags=truths.get(str(kwargs['process_tags'])),
-            show_event_menu=truths.get(str(kwargs['event_menu'])),
-            parameters=kwargs['webhook_params']
-        ))
-        if kwargs['event_menu']:
-            parameters.update(dict(
-                event_menu_url=kwargs['event_menu_url'],
-                event_menu_name=kwargs['event_menu_name']
-            ))
-        return parameters
-
-    elif kwargs['transport_type'] == 'jabber' and LooseVersion(kwargs['zbx_api_version']) <= LooseVersion('4.2'):
-        parameters.update(dict(
-            username=kwargs['username'],
-            passwd=kwargs['password']
-        ))
-        return parameters
-
-    elif kwargs['transport_type'] == 'ez_texting' and LooseVersion(kwargs['zbx_api_version']) <= LooseVersion('4.2'):
-        parameters.update(dict(
-            username=kwargs['username'],
-            passwd=kwargs['password'],
-            exec_path={'USA': '0', 'Canada': '1'}.get(kwargs['message_text_limit']),
-        ))
-        return parameters
-
-    return {'unsupported_parameter': kwargs['transport_type'], 'zbx_api_version': kwargs['zbx_api_version']}
-
-
-def check_if_mediatype_exists(module, zbx, name, zbx_api_version):
-    """Checks if mediatype exists.
-
-    Args:
-        module: AnsibleModule object
-        zbx: ZabbixAPI object
-        name: Zabbix mediatype name
-
-    Returns:
-        Tuple of (True, `id of the mediatype`) if mediatype exists, (False, None) otherwise
-    """
-    filter_key_name = 'description'
-    if LooseVersion(zbx_api_version) >= LooseVersion('4.4'):
-        # description key changed to name key from zabbix 4.4
-        filter_key_name = 'name'
-
-    try:
-        mediatype_list = zbx.mediatype.get({
-            'output': 'extend',
-            'filter': {filter_key_name: [name]}
-        })
-        if len(mediatype_list) < 1:
-            return False, None
-        else:
-            return True, mediatype_list[0]['mediatypeid']
-    except Exception as e:
-        module.fail_json(msg="Failed to get ID of the mediatype '{name}': {e}".format(name=name, e=e))
+from ansible_collections.community.zabbix.plugins.module_utils.base import ZabbixBase
+import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabbix_utils
 
 
 def diff(existing, new):
@@ -586,75 +403,232 @@ def diff(existing, new):
     return {'before': before, 'after': after}
 
 
-def get_update_params(module, zbx, mediatype_id, **kwargs):
-    """Filters only the parameters that are different and need to be updated.
+class MediaTypeModule(ZabbixBase):
+    def check_if_mediatype_exists(self, name):
+        """Checks if mediatype exists.
 
-    Args:
-        module: AnsibleModule object.
-        zbx: ZabbixAPI object.
-        mediatype_id (int): ID of the mediatype to be updated.
-        **kwargs: Parameters for the new mediatype.
+        Args:
+            name: Zabbix mediatype name
 
-    Returns:
-        A tuple where the first element is a dictionary of parameters
-        that need to be updated and the second one is a dictionary
-        returned by diff() function with
-        existing mediatype data and new params passed to it.
-    """
-    get_params = {'output': 'extend', 'mediatypeids': [mediatype_id]}
-    if LooseVersion(zbx.api_version()[:3]) >= LooseVersion('5.0'):
-        get_params.update({'selectMessageTemplates': 'extend'})
+        Returns:
+            Tuple of (True, `id of the mediatype`) if mediatype exists, (False, None) otherwise
+        """
+        filter_key_name = 'description'
+        if LooseVersion(self._zbx_api_version) >= LooseVersion('4.4'):
+            # description key changed to name key from zabbix 4.4
+            filter_key_name = 'name'
 
-    existing_mediatype = zbx.mediatype.get(get_params)[0]
+        try:
+            mediatype_list = self._zapi.mediatype.get({
+                'output': 'extend',
+                'filter': {filter_key_name: [name]}
+            })
+            if len(mediatype_list) < 1:
+                return False, None
+            else:
+                return True, mediatype_list[0]['mediatypeid']
+        except Exception as e:
+            self._module.fail_json(msg="Failed to get ID of the mediatype '{name}': {e}".format(name=name, e=e))
 
-    if existing_mediatype['type'] != kwargs['type']:
-        return kwargs, diff(existing_mediatype, kwargs)
-    else:
-        params_to_update = {}
-        for key in kwargs:
-            # sort list of parameters to prevent mismatch due to reordering
-            if key == 'parameters' and (kwargs[key] != [] or existing_mediatype[key] != []):
-                kwargs[key] = sorted(kwargs[key], key=lambda x: x['name'])
-                existing_mediatype[key] = sorted(existing_mediatype[key], key=lambda x: x['name'])
+    def construct_parameters(self):
+        """Translates data to a format suitable for Zabbix API and filters
+        the ones that are related to the specified mediatype type.
 
-            if key == 'message_templates' and (kwargs[key] != [] or existing_mediatype[key] != []):
-                kwargs[key] = sorted(kwargs[key], key=lambda x: x['subject'])
-                existing_mediatype[key] = sorted(existing_mediatype[key], key=lambda x: x['subject'])
+        Returns:
+            A dictionary of arguments that are related to transport type,
+            and are in a format that is understandable by Zabbix API.
+        """
+        truths = {'False': '0', 'True': '1'}
+        parameters = dict(
+            status='0' if self._module.params['status'] == 'enabled' else '1',
+            type={
+                'email': '0',
+                'script': '1',
+                'sms': '2',
+                'jabber': '3',
+                'webhook': '4',
+                'ez_texting': '100'
+            }.get(self._module.params['type']),
+        )
 
-            if (not (kwargs[key] is None and existing_mediatype[key] == '')) and kwargs[key] != existing_mediatype[key]:
-                params_to_update[key] = kwargs[key]
-        return params_to_update, diff(existing_mediatype, kwargs)
+        if LooseVersion(self._zbx_api_version) >= LooseVersion('4.4'):
+            parameters.update(dict(
+                name=self._module.params['name'],
+                description=self._module.params['description'],
+            ))
+        else:
+            parameters.update(dict(description=self._module.params['name']))
 
+        if LooseVersion(self._zbx_api_version) >= LooseVersion('3.4'):
+            parameters.update(dict(
+                maxsessions=str(self._module.params['max_sessions']),
+                maxattempts=str(self._module.params['max_attempts']),
+                attempt_interval=str(self._module.params['attempt_interval'])
+            ))
 
-def delete_mediatype(module, zbx, mediatype_id):
-    try:
-        return zbx.mediatype.delete([mediatype_id])
-    except Exception as e:
-        module.fail_json(msg="Failed to delete mediatype '{_id}': {e}".format(_id=mediatype_id, e=e))
+        if self._module.params['message_templates'] and LooseVersion(self._zbx_api_version) >= LooseVersion('5.0'):
+            msg_templates = []
+            for template in self._module.params['message_templates']:
+                msg_templates.append(dict(
+                    eventsource={
+                        'triggers': '0',
+                        'discovery': '1',
+                        'autoregistration': '2',
+                        'internal': '3'}.get(template['eventsource']),
+                    recovery={
+                        'operations': '0',
+                        'recovery_operations': '1',
+                        'update_operations': '2'}.get(template['recovery']),
+                    subject=template['subject'],
+                    message=template['body']
+                ))
+            parameters.update(dict(message_templates=msg_templates))
 
+        if self._module.params['type'] == 'email':
+            parameters.update(dict(
+                smtp_server=self._module.params['smtp_server'],
+                smtp_port=str(self._module.params['smtp_server_port']),
+                smtp_helo=self._module.params['smtp_helo'],
+                smtp_email=self._module.params['smtp_email'],
+                smtp_security={'None': '0', 'STARTTLS': '1', 'SSL/TLS': '2'}.get(str(self._module.params['smtp_security'])),
+                smtp_authentication=truths.get(str(self._module.params['smtp_authentication'])),
+                smtp_verify_host=truths.get(str(self._module.params['smtp_verify_host'])),
+                smtp_verify_peer=truths.get(str(self._module.params['smtp_verify_peer'])),
+                username=self._module.params['username'],
+                passwd=self._module.params['password']
+            ))
+            return parameters
 
-def update_mediatype(module, zbx, **kwargs):
-    try:
-        zbx.mediatype.update(kwargs)
-    except Exception as e:
-        module.fail_json(msg="Failed to update mediatype '{_id}': {e}".format(_id=kwargs['mediatypeid'], e=e))
+        elif self._module.params['type'] == 'script':
+            if self._module.params['script_params'] is None:
+                _script_params = ''  # ZBX-15706
+            else:
+                _script_params = '\n'.join(str(i) for i in self._module.params['script_params']) + '\n'
+            parameters.update(dict(
+                exec_path=self._module.params['script_name'],
+                exec_params=_script_params
+            ))
+            return parameters
 
+        elif self._module.params['type'] == 'sms':
+            parameters.update(dict(gsm_modem=self._module.params['gsm_modem']))
+            return parameters
 
-def create_mediatype(module, zbx, **kwargs):
-    try:
-        zbx.mediatype.create(kwargs)
-    except Exception as e:
-        module.fail_json(msg="Failed to create mediatype '{name}': {e}".format(name=kwargs['name'], e=e))
+        elif self._module.params['type'] == 'webhook' and LooseVersion(self._zbx_api_version) >= LooseVersion('4.4'):
+            parameters.update(dict(
+                script=self._module.params['webhook_script'],
+                timeout=self._module.params['webhook_timeout'],
+                process_tags=truths.get(str(self._module.params['process_tags'])),
+                show_event_menu=truths.get(str(self._module.params['event_menu'])),
+                parameters=self._module.params['webhook_params']
+            ))
+            if self._module.params['event_menu']:
+                parameters.update(dict(
+                    event_menu_url=self._module.params['event_menu_url'],
+                    event_menu_name=self._module.params['event_menu_name']
+                ))
+            return parameters
+
+        elif self._module.params['type'] == 'jabber' and LooseVersion(self._zbx_api_version) <= LooseVersion('4.2'):
+            parameters.update(dict(
+                username=self._module.params['username'],
+                passwd=self._module.params['password']
+            ))
+            return parameters
+
+        elif self._module.params['type'] == 'ez_texting' and LooseVersion(self._zbx_api_version) <= LooseVersion('4.2'):
+            parameters.update(dict(
+                username=self._module.params['username'],
+                passwd=self._module.params['password'],
+                exec_path={'USA': '0', 'Canada': '1'}.get(self._module.params['message_text_limit']),
+            ))
+            return parameters
+
+        self._module.fail_json(msg="%s is unsupported for Zabbix version %s" % (parameters['unsupported_parameter'], parameters['zbx_api_version']))
+
+    def validate_params(self, params):
+        """Validates arguments that are required together.
+
+        Fails the module with the message that shows the missing
+        requirements if there are some.
+
+        Args:
+            params (list): Each element of this list
+                is a list like
+                ['argument_key', 'argument_value', ['required_arg_1',
+                                                    'required_arg_2']].
+                Format is the same as `required_if` parameter of AnsibleModule.
+        """
+        for param in params:
+            if self._module.params[param[0]] == param[1]:
+                if None in [self._module.params[i] for i in param[2]]:
+                    self._module.fail_json(
+                        msg="Following arguments are required when {key} is {value}: {arguments}".format(
+                            key=param[0],
+                            value=param[1],
+                            arguments=', '.join(param[2])
+                        )
+                    )
+
+    def get_update_params(self, mediatype_id, **kwargs):
+        """Filters only the parameters that are different and need to be updated.
+
+        Args:
+            mediatype_id (int): ID of the mediatype to be updated.
+            **kwargs: Parameters for the new mediatype.
+
+        Returns:
+            A tuple where the first element is a dictionary of parameters
+            that need to be updated and the second one is a dictionary
+            returned by diff() function with
+            existing mediatype data and new params passed to it.
+        """
+        get_params = {'output': 'extend', 'mediatypeids': [mediatype_id]}
+        if LooseVersion(self._zbx_api_version) >= LooseVersion('5.0'):
+            get_params.update({'selectMessageTemplates': 'extend'})
+
+        existing_mediatype = self._zapi.mediatype.get(get_params)[0]
+
+        if existing_mediatype['type'] != kwargs['type']:
+            return kwargs, diff(existing_mediatype, kwargs)
+        else:
+            params_to_update = {}
+            for key in kwargs:
+                # sort list of parameters to prevent mismatch due to reordering
+                if key == 'parameters' and (kwargs[key] != [] or existing_mediatype[key] != []):
+                    kwargs[key] = sorted(kwargs[key], key=lambda x: x['name'])
+                    existing_mediatype[key] = sorted(existing_mediatype[key], key=lambda x: x['name'])
+
+                if key == 'message_templates' and (kwargs[key] != [] or existing_mediatype[key] != []):
+                    kwargs[key] = sorted(kwargs[key], key=lambda x: x['subject'])
+                    existing_mediatype[key] = sorted(existing_mediatype[key], key=lambda x: x['subject'])
+
+                if (not (kwargs[key] is None and existing_mediatype[key] == '')) and kwargs[key] != existing_mediatype[key]:
+                    params_to_update[key] = kwargs[key]
+            return params_to_update, diff(existing_mediatype, kwargs)
+
+    def delete_mediatype(self, mediatype_id):
+        try:
+            return self._zapi.mediatype.delete([mediatype_id])
+        except Exception as e:
+            self._module.fail_json(msg="Failed to delete mediatype '{_id}': {e}".format(_id=mediatype_id, e=e))
+
+    def update_mediatype(self, **kwargs):
+        try:
+            self._zapi.mediatype.update(kwargs)
+        except Exception as e:
+            self._module.fail_json(msg="Failed to update mediatype '{_id}': {e}".format(_id=kwargs['mediatypeid'], e=e))
+
+    def create_mediatype(self, **kwargs):
+        try:
+            self._zapi.mediatype.create(kwargs)
+        except Exception as e:
+            self._module.fail_json(msg="Failed to create mediatype '{name}': {e}".format(name=kwargs['name'], e=e))
 
 
 def main():
-    argument_spec = dict(
-        server_url=dict(type='str', required=True, aliases=['url']),
-        login_user=dict(type='str', required=True),
-        login_password=dict(type='str', required=True, no_log=True),
-        http_login_user=dict(type='str', required=False, default=None),
-        http_login_password=dict(type='str', required=False, default=None, no_log=True),
-        validate_certs=dict(type='bool', required=False, default=True), timeout=dict(type='int', default=10),
+    argument_spec = zabbix_utils.zabbix_common_argument_spec()
+    argument_spec.update(dict(
         name=dict(type='str', required=True),
         description=dict(type='str', required=False, default=''),
         state=dict(type='str', default='present', choices=['present', 'absent']),
@@ -714,7 +688,7 @@ def main():
                 ['eventsource', 'recovery']
             ],
         )
-    )
+    ))
 
     # this is used to simulate `required_if` of `AnsibleModule`, but only when state=present
     required_params = [
@@ -733,106 +707,15 @@ def main():
         supports_check_mode=True
     )
 
-    if module.params['state'] == 'present':
-        validate_params(module, required_params)
-
-    if not HAS_ZABBIX_API:
-        module.fail_json(msg=missing_required_lib('zabbix-api', url='https://pypi.org/project/zabbix-api/'), exception=ZBX_IMP_ERR)
-
-    server_url = module.params['server_url']
-    login_user = module.params['login_user']
-    login_password = module.params['login_password']
-    http_login_user = module.params['http_login_user']
-    http_login_password = module.params['http_login_password']
-    validate_certs = module.params['validate_certs']
     state = module.params['state']
-    timeout = module.params['timeout']
     name = module.params['name']
-    description = module.params['description']
-    transport_type = module.params['type']
-    status = module.params['status']
-    max_sessions = module.params['max_sessions']
-    max_attempts = module.params['max_attempts']
-    attempt_interval = module.params['attempt_interval']
-    # Script
-    script_name = module.params['script_name']
-    script_params = module.params['script_params']
-    # SMS
-    gsm_modem = module.params['gsm_modem']
-    # Jabber
-    username = module.params['username']
-    password = module.params['password']
-    # Email
-    smtp_server = module.params['smtp_server']
-    smtp_server_port = module.params['smtp_server_port']
-    smtp_helo = module.params['smtp_helo']
-    smtp_email = module.params['smtp_email']
-    smtp_security = module.params['smtp_security']
-    smtp_authentication = module.params['smtp_authentication']
-    smtp_verify_host = module.params['smtp_verify_host']
-    smtp_verify_peer = module.params['smtp_verify_peer']
-    # EZ Text
-    message_text_limit = module.params['message_text_limit']
-    # Webhook
-    webhook_script = module.params['webhook_script']
-    webhook_timeout = module.params['webhook_timeout']
-    process_tags = module.params['process_tags']
-    event_menu = module.params['event_menu']
-    event_menu_url = module.params['event_menu_url']
-    event_menu_name = module.params['event_menu_name']
-    webhook_params = module.params['webhook_params']
-    # Message template
-    message_templates = module.params['message_templates']
 
-    zbx = None
+    mediatype = MediaTypeModule(module)
+    if module.params['state'] == 'present':
+        mediatype.validate_params(required_params)
+    mediatype_exists, mediatype_id = mediatype.check_if_mediatype_exists(name)
 
-    # login to zabbix
-    try:
-        zbx = ZabbixAPI(server_url, timeout=timeout, user=http_login_user, passwd=http_login_password,
-                        validate_certs=validate_certs)
-        zbx.login(login_user, login_password)
-        atexit.register(zbx.logout)
-    except Exception as e:
-        module.fail_json(msg="Failed to connect to Zabbix server: %s" % e)
-
-    zbx_api_version = zbx.api_version()[:3]
-    mediatype_exists, mediatype_id = check_if_mediatype_exists(module, zbx, name, zbx_api_version)
-
-    parameters = construct_parameters(
-        name=name,
-        description=description,
-        transport_type=transport_type,
-        status=status,
-        max_sessions=max_sessions,
-        max_attempts=max_attempts,
-        attempt_interval=attempt_interval,
-        script_name=script_name,
-        script_params=script_params,
-        gsm_modem=gsm_modem,
-        username=username,
-        password=password,
-        smtp_server=smtp_server,
-        smtp_server_port=smtp_server_port,
-        smtp_helo=smtp_helo,
-        smtp_email=smtp_email,
-        smtp_security=smtp_security,
-        smtp_authentication=smtp_authentication,
-        smtp_verify_host=smtp_verify_host,
-        smtp_verify_peer=smtp_verify_peer,
-        message_text_limit=message_text_limit,
-        webhook_script=webhook_script,
-        webhook_timeout=webhook_timeout,
-        process_tags=process_tags,
-        event_menu=event_menu,
-        event_menu_url=event_menu_url,
-        event_menu_name=event_menu_name,
-        webhook_params=webhook_params,
-        message_templates=message_templates,
-        zbx_api_version=zbx_api_version
-    )
-
-    if 'unsupported_parameter' in parameters:
-        module.fail_json(msg="%s is unsupported for Zabbix version %s" % (parameters['unsupported_parameter'], parameters['zbx_api_version']))
+    parameters = mediatype.construct_parameters()
 
     if mediatype_exists:
         if state == 'absent':
@@ -844,7 +727,7 @@ def main():
                         _id=mediatype_id
                     )
                 )
-            mediatype_id = delete_mediatype(module, zbx, mediatype_id)
+            mediatype_id = mediatype.delete_mediatype(mediatype_id)
             module.exit_json(
                 changed=True,
                 msg="Mediatype deleted. Name: {name}, ID: {_id}".format(
@@ -853,7 +736,7 @@ def main():
                 )
             )
         else:
-            params_to_update, diff = get_update_params(module, zbx, mediatype_id, **parameters)
+            params_to_update, diff = mediatype.get_update_params(mediatype_id, **parameters)
             if params_to_update == {}:
                 module.exit_json(
                     changed=False,
@@ -869,11 +752,7 @@ def main():
                             _id=mediatype_id
                         )
                     )
-                mediatype_id = update_mediatype(
-                    module, zbx,
-                    mediatypeid=mediatype_id,
-                    **params_to_update
-                )
+                mediatype_id = mediatype.update_mediatype(mediatypeid=mediatype_id, **params_to_update)
                 module.exit_json(
                     changed=True,
                     diff=diff,
@@ -894,7 +773,7 @@ def main():
                         _id=mediatype_id
                     )
                 )
-            mediatype_id = create_mediatype(module, zbx, **parameters)
+            mediatype_id = mediatype.create_mediatype(**parameters)
             module.exit_json(
                 changed=True,
                 msg="Mediatype created: {name}, ID: {_id}".format(
