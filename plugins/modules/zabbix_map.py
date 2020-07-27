@@ -175,22 +175,16 @@ EXAMPLES = r'''
 '''
 
 
-import atexit
 import base64
 import traceback
-
-try:
-    from zabbix_api import ZabbixAPI
-
-    HAS_ZABBIX_API = True
-except ImportError:
-    ZBX_IMP_ERR = traceback.format_exc()
-    HAS_ZABBIX_API = False
 
 from io import BytesIO
 from operator import itemgetter
 from distutils.version import LooseVersion
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+
+from ansible_collections.community.zabbix.plugins.module_utils.base import ZabbixBase
+import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabbix_utils
 
 
 try:
@@ -215,11 +209,9 @@ except ImportError:
     HAS_PIL = False
 
 
-class Map():
-    def __init__(self, module, zbx):
-        self._module = module
-        self._zapi = zbx
-
+class Map(ZabbixBase):
+    def __init__(self, module, zbx=None, zapi_wrapper=None):
+        super(Map, self).__init__(module, zbx, zapi_wrapper)
         self.map_name = module.params['name']
         self.dot_data = module.params['data']
         self.width = module.params['width']
@@ -231,7 +223,6 @@ class Map():
         self.expand_problem = module.params['expand_problem']
         self.highlight = module.params['highlight']
         self.label_type = module.params['label_type']
-        self._zbx_api_version = zbx.api_version()[:5]
         self.selements_sort_keys = self._get_selements_sort_keys()
 
     def _build_graph(self):
@@ -749,31 +740,24 @@ def remove_quotes(s):
 
 
 def main():
+    argument_spec = zabbix_utils.zabbix_common_argument_spec()
+    argument_spec.update(dict(
+        name=dict(type='str', required=True, aliases=['map_name']),
+        data=dict(type='str', required=False, aliases=['dot_data']),
+        width=dict(type='int', default=800),
+        height=dict(type='int', default=600),
+        state=dict(type='str', default="present", choices=['present', 'absent']),
+        default_image=dict(type='str', required=False, aliases=['image']),
+        margin=dict(type='int', default=40),
+        expand_problem=dict(type='bool', default=True),
+        highlight=dict(type='bool', default=True),
+        label_type=dict(type='str', default='name', choices=['label', 'ip', 'name', 'status', 'nothing', 'custom']),
+    ))
     module = AnsibleModule(
-        argument_spec=dict(
-            server_url=dict(type='str', required=True, aliases=['url']),
-            login_user=dict(type='str', required=True),
-            login_password=dict(type='str', required=True, no_log=True),
-            http_login_user=dict(type='str', required=False, default=None),
-            http_login_password=dict(type='str', required=False, default=None, no_log=True),
-            timeout=dict(type='int', default=10),
-            validate_certs=dict(type='bool', required=False, default=True),
-            name=dict(type='str', required=True, aliases=['map_name']),
-            data=dict(type='str', required=False, aliases=['dot_data']),
-            width=dict(type='int', default=800),
-            height=dict(type='int', default=600),
-            state=dict(type='str', default="present", choices=['present', 'absent']),
-            default_image=dict(type='str', required=False, aliases=['image']),
-            margin=dict(type='int', default=40),
-            expand_problem=dict(type='bool', default=True),
-            highlight=dict(type='bool', default=True),
-            label_type=dict(type='str', default='name', choices=['label', 'ip', 'name', 'status', 'nothing', 'custom']),
-        ),
+        argument_spec=argument_spec,
         supports_check_mode=True
     )
 
-    if not HAS_ZABBIX_API:
-        module.fail_json(msg=missing_required_lib('zabbix-api', url='https://pypi.org/project/zabbix-api/'), exception=ZBX_IMP_ERR)
     if not HAS_PYDOTPLUS:
         module.fail_json(msg=missing_required_lib('pydotplus', url='https://pypi.org/project/pydotplus/'), exception=PYDOT_IMP_ERR)
     if not HAS_WEBCOLORS:
@@ -781,26 +765,7 @@ def main():
     if not HAS_PIL:
         module.fail_json(msg=missing_required_lib('Pillow', url='https://pypi.org/project/Pillow/'), exception=PIL_IMP_ERR)
 
-    server_url = module.params['server_url']
-    login_user = module.params['login_user']
-    login_password = module.params['login_password']
-    http_login_user = module.params['http_login_user']
-    http_login_password = module.params['http_login_password']
-    timeout = module.params['timeout']
-    validate_certs = module.params['validate_certs']
-
-    zbx = None
-
-    # login to zabbix
-    try:
-        zbx = ZabbixAPI(server_url, timeout=timeout, user=http_login_user, passwd=http_login_password,
-                        validate_certs=validate_certs)
-        zbx.login(login_user, login_password)
-        atexit.register(zbx.logout)
-    except Exception as e:
-        module.fail_json(msg="Failed to connect to Zabbix server: %s" % e)
-
-    sysmap = Map(module, zbx)
+    sysmap = Map(module)
 
     if sysmap.state == "absent":
         if sysmap.map_exists():
