@@ -200,25 +200,13 @@ EXAMPLES = '''
 '''
 
 
-import atexit
-import traceback
+from ansible.module_utils.basic import AnsibleModule
 
-try:
-    from zabbix_api import ZabbixAPI
-
-    HAS_ZABBIX_API = True
-except ImportError:
-    ZBX_IMP_ERR = traceback.format_exc()
-    HAS_ZABBIX_API = False
-
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+from ansible_collections.community.zabbix.plugins.module_utils.base import ZabbixBase
+import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabbix_utils
 
 
-class Host(object):
-    def __init__(self, module, zbx):
-        self._module = module
-        self._zapi = zbx
-
+class Host(ZabbixBase):
     def get_host(self, host_identifier, host_inventory, search_key):
         """ Get host by hostname|visible_name|hostid """
         host = self._zapi.host.get(
@@ -248,58 +236,32 @@ class Host(object):
 
 
 def main():
+    argument_spec = zabbix_utils.zabbix_common_argument_spec()
+    argument_spec.update(dict(
+        host_identifier=dict(type='str', required=True),
+        host_id_type=dict(
+            default='hostname',
+            type='str',
+            choices=['hostname', 'visible_name', 'hostid']),
+        trigger_severity=dict(
+            type='str',
+            required=False,
+            default='average',
+            choices=['not_classified', 'information', 'warning', 'average', 'high', 'disaster']),
+    ))
     module = AnsibleModule(
-        argument_spec=dict(
-            server_url=dict(type='str', required=True, aliases=['url']),
-            login_user=dict(type='str', required=True),
-            login_password=dict(type='str', required=True, no_log=True),
-            http_login_user=dict(type='str', required=False, default=None),
-            http_login_password=dict(type='str', required=False, default=None, no_log=True),
-            host_identifier=dict(type='str', required=True),
-            host_id_type=dict(
-                default='hostname',
-                type='str',
-                choices=['hostname', 'visible_name', 'hostid']),
-            trigger_severity=dict(
-                type='str',
-                required=False,
-                default='average',
-                choices=['not_classified', 'information', 'warning', 'average', 'high', 'disaster']),
-            validate_certs=dict(type='bool', required=False, default=True),
-            timeout=dict(type='int', default=10),
-
-        ),
+        argument_spec=argument_spec,
         supports_check_mode=True
     )
 
-    if not HAS_ZABBIX_API:
-        module.fail_json(msg=missing_required_lib('zabbix-api', url='https://pypi.org/project/zabbix-api/'),
-                         exception=ZBX_IMP_ERR)
-
     trigger_severity_map = {'not_classified': 0, 'information': 1, 'warning': 2, 'average': 3, 'high': 4, 'disaster': 5}
-    server_url = module.params['server_url']
-    login_user = module.params['login_user']
-    login_password = module.params['login_password']
-    http_login_user = module.params['http_login_user']
-    http_login_password = module.params['http_login_password']
-    validate_certs = module.params['validate_certs']
     host_id = module.params['host_identifier']
     host_id_type = module.params['host_id_type']
     trigger_severity = trigger_severity_map[module.params['trigger_severity']]
-    timeout = module.params['timeout']
 
     host_inventory = 'hostid'
-    zbx = None
-    # login to zabbix
-    try:
-        zbx = ZabbixAPI(server_url, timeout=timeout, user=http_login_user, passwd=http_login_password,
-                        validate_certs=validate_certs)
-        zbx.login(login_user, login_password)
-        atexit.register(zbx.logout)
-    except Exception as e:
-        module.fail_json(msg="Failed to connect to Zabbix server: %s" % e)
 
-    host = Host(module, zbx)
+    host = Host(module)
 
     if host_id_type == 'hostname':
         zabbix_host = host.get_host(host_id, host_inventory, 'host')
