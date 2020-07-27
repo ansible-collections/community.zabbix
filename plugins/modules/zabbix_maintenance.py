@@ -118,212 +118,178 @@ EXAMPLES = r'''
 '''
 
 
-import atexit
 import datetime
 import time
-import traceback
 
-try:
-    from zabbix_api import ZabbixAPI
+from ansible.module_utils.basic import AnsibleModule
 
-    HAS_ZABBIX_API = True
-except ImportError:
-    ZBX_IMP_ERR = traceback.format_exc()
-    HAS_ZABBIX_API = False
-
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+from ansible_collections.community.zabbix.plugins.module_utils.base import ZabbixBase
+import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabbix_utils
 
 
-def create_maintenance(zbx, group_ids, host_ids, start_time, maintenance_type, period, name, desc):
-    end_time = start_time + period
-    try:
-        zbx.maintenance.create(
-            {
-                "groupids": group_ids,
-                "hostids": host_ids,
-                "name": name,
-                "maintenance_type": maintenance_type,
-                "active_since": str(start_time),
-                "active_till": str(end_time),
-                "description": desc,
-                "timeperiods": [{
-                    "timeperiod_type": "0",
-                    "start_date": str(start_time),
-                    "period": str(period),
-                }]
-            }
-        )
-    # zabbix_api can call sys.exit() so we need to catch SystemExit here
-    except (Exception, SystemExit) as e:
-        return 1, None, str(e)
-    return 0, None, None
-
-
-def update_maintenance(zbx, maintenance_id, group_ids, host_ids, start_time, maintenance_type, period, desc):
-    end_time = start_time + period
-    try:
-        zbx.maintenance.update(
-            {
-                "maintenanceid": maintenance_id,
-                "groupids": group_ids,
-                "hostids": host_ids,
-                "maintenance_type": maintenance_type,
-                "active_since": str(start_time),
-                "active_till": str(end_time),
-                "description": desc,
-                "timeperiods": [{
-                    "timeperiod_type": "0",
-                    "start_date": str(start_time),
-                    "period": str(period),
-                }]
-            }
-        )
-    # zabbix_api can call sys.exit() so we need to catch SystemExit here
-    except (Exception, SystemExit) as e:
-        return 1, None, str(e)
-    return 0, None, None
-
-
-def get_maintenance(zbx, name):
-    try:
-        maintenances = zbx.maintenance.get(
-            {
-                "filter":
+class MaintenanceModule(ZabbixBase):
+    def create_maintenance(self, group_ids, host_ids, start_time, maintenance_type, period, name, desc):
+        end_time = start_time + period
+        try:
+            self._zapi.maintenance.create(
                 {
+                    "groupids": group_ids,
+                    "hostids": host_ids,
                     "name": name,
-                },
-                "selectGroups": "extend",
-                "selectHosts": "extend"
-            }
-        )
-    # zabbix_api can call sys.exit() so we need to catch SystemExit here
-    except (Exception, SystemExit) as e:
-        return 1, None, str(e)
+                    "maintenance_type": maintenance_type,
+                    "active_since": str(start_time),
+                    "active_till": str(end_time),
+                    "description": desc,
+                    "timeperiods": [{
+                        "timeperiod_type": "0",
+                        "start_date": str(start_time),
+                        "period": str(period),
+                    }]
+                }
+            )
+        # zabbix_api can call sys.exit() so we need to catch SystemExit here
+        except (Exception, SystemExit) as e:
+            return 1, None, str(e)
+        return 0, None, None
 
-    for maintenance in maintenances:
-        maintenance["groupids"] = [group["groupid"] for group in maintenance["groups"]] if "groups" in maintenance else []
-        maintenance["hostids"] = [host["hostid"] for host in maintenance["hosts"]] if "hosts" in maintenance else []
-        return 0, maintenance, None
-
-    return 0, None, None
-
-
-def delete_maintenance(zbx, maintenance_id):
-    try:
-        zbx.maintenance.delete([maintenance_id])
-    # zabbix_api can call sys.exit() so we need to catch SystemExit here
-    except (Exception, SystemExit) as e:
-        return 1, None, str(e)
-    return 0, None, None
-
-
-def get_group_ids(zbx, host_groups):
-    group_ids = []
-    for group in host_groups:
+    def update_maintenance(self, maintenance_id, group_ids, host_ids, start_time, maintenance_type, period, desc):
+        end_time = start_time + period
         try:
-            result = zbx.hostgroup.get(
+            self._zapi.maintenance.update(
                 {
-                    "output": "extend",
+                    "maintenanceid": maintenance_id,
+                    "groupids": group_ids,
+                    "hostids": host_ids,
+                    "maintenance_type": maintenance_type,
+                    "active_since": str(start_time),
+                    "active_till": str(end_time),
+                    "description": desc,
+                    "timeperiods": [{
+                        "timeperiod_type": "0",
+                        "start_date": str(start_time),
+                        "period": str(period),
+                    }]
+                }
+            )
+        # zabbix_api can call sys.exit() so we need to catch SystemExit here
+        except (Exception, SystemExit) as e:
+            return 1, None, str(e)
+        return 0, None, None
+
+    def get_maintenance(self, name):
+        try:
+            maintenances = self._zapi.maintenance.get(
+                {
                     "filter":
                     {
-                        "name": group
-                    }
+                        "name": name,
+                    },
+                    "selectGroups": "extend",
+                    "selectHosts": "extend"
                 }
             )
         # zabbix_api can call sys.exit() so we need to catch SystemExit here
         except (Exception, SystemExit) as e:
             return 1, None, str(e)
 
-        if not result:
-            return 1, None, "Group id for group %s not found" % group
+        for maintenance in maintenances:
+            maintenance["groupids"] = [group["groupid"] for group in maintenance["groups"]] if "groups" in maintenance else []
+            maintenance["hostids"] = [host["hostid"] for host in maintenance["hosts"]] if "hosts" in maintenance else []
+            return 0, maintenance, None
 
-        group_ids.append(result[0]["groupid"])
+        return 0, None, None
 
-    return 0, group_ids, None
-
-
-def get_host_ids(zbx, host_names):
-    host_ids = []
-    for host in host_names:
+    def delete_maintenance(self, maintenance_id):
         try:
-            result = zbx.host.get(
-                {
-                    "output": "extend",
-                    "filter":
-                    {
-                        "name": host
-                    }
-                }
-            )
+            self._zapi.maintenance.delete([maintenance_id])
         # zabbix_api can call sys.exit() so we need to catch SystemExit here
         except (Exception, SystemExit) as e:
             return 1, None, str(e)
+        return 0, None, None
 
-        if not result:
-            return 1, None, "Host id for host %s not found" % host
+    def get_group_ids(self, host_groups):
+        group_ids = []
+        for group in host_groups:
+            try:
+                result = self._zapi.hostgroup.get(
+                    {
+                        "output": "extend",
+                        "filter":
+                        {
+                            "name": group
+                        }
+                    }
+                )
+            # zabbix_api can call sys.exit() so we need to catch SystemExit here
+            except (Exception, SystemExit) as e:
+                return 1, None, str(e)
 
-        host_ids.append(result[0]["hostid"])
+            if not result:
+                return 1, None, "Group id for group %s not found" % group
 
-    return 0, host_ids, None
+            group_ids.append(result[0]["groupid"])
+
+        return 0, group_ids, None
+
+    def get_host_ids(self, host_names):
+        host_ids = []
+        for host in host_names:
+            try:
+                result = self._zapi.host.get(
+                    {
+                        "output": "extend",
+                        "filter":
+                        {
+                            "name": host
+                        }
+                    }
+                )
+            # zabbix_api can call sys.exit() so we need to catch SystemExit here
+            except (Exception, SystemExit) as e:
+                return 1, None, str(e)
+
+            if not result:
+                return 1, None, "Host id for host %s not found" % host
+
+            host_ids.append(result[0]["hostid"])
+
+        return 0, host_ids, None
 
 
 def main():
+    argument_spec = zabbix_utils.zabbix_common_argument_spec()
+    argument_spec.update(dict(
+        state=dict(type='str', required=False, default='present', choices=['present', 'absent']),
+        host_names=dict(type='list', required=False, default=None, aliases=['host_name']),
+        minutes=dict(type='int', required=False, default=10),
+        host_groups=dict(type='list', required=False, default=None, aliases=['host_group']),
+        name=dict(type='str', required=True),
+        desc=dict(type='str', required=False, default="Created by Ansible"),
+        collect_data=dict(type='bool', required=False, default=True),
+    ))
     module = AnsibleModule(
-        argument_spec=dict(
-            state=dict(type='str', required=False, default='present', choices=['present', 'absent']),
-            server_url=dict(type='str', required=True, aliases=['url']),
-            host_names=dict(type='list', required=False, default=None, aliases=['host_name']),
-            minutes=dict(type='int', required=False, default=10),
-            host_groups=dict(type='list', required=False, default=None, aliases=['host_group']),
-            login_user=dict(type='str', required=True),
-            login_password=dict(type='str', required=True, no_log=True),
-            validate_certs=dict(type='bool', required=False, default=True),
-            http_login_user=dict(type='str', required=False, default=None),
-            http_login_password=dict(type='str', required=False, default=None, no_log=True),
-            name=dict(type='str', required=True),
-            desc=dict(type='str', required=False, default="Created by Ansible"),
-            collect_data=dict(type='bool', required=False, default=True),
-            timeout=dict(type='int', default=10),
-        ),
-        supports_check_mode=True,
+        argument_spec=argument_spec,
+        supports_check_mode=True
     )
 
-    if not HAS_ZABBIX_API:
-        module.fail_json(msg=missing_required_lib('zabbix-api', url='https://pypi.org/project/zabbix-api/'), exception=ZBX_IMP_ERR)
+    maint = MaintenanceModule(module)
 
     host_names = module.params['host_names']
     host_groups = module.params['host_groups']
     state = module.params['state']
-    login_user = module.params['login_user']
-    login_password = module.params['login_password']
-    http_login_user = module.params['http_login_user']
-    http_login_password = module.params['http_login_password']
-    validate_certs = module.params['validate_certs']
     minutes = module.params['minutes']
     name = module.params['name']
     desc = module.params['desc']
-    server_url = module.params['server_url']
     collect_data = module.params['collect_data']
-    timeout = module.params['timeout']
 
     if collect_data:
         maintenance_type = 0
     else:
         maintenance_type = 1
 
-    try:
-        zbx = ZabbixAPI(server_url, timeout=timeout, user=http_login_user, passwd=http_login_password,
-                        validate_certs=validate_certs)
-        zbx.login(login_user, login_password)
-        atexit.register(zbx.logout)
-    # zabbix_api can call sys.exit() so we need to catch SystemExit here
-    except (Exception, SystemExit) as e:
-        module.fail_json(msg="Failed to connect to Zabbix server: %s" % e)
-
     changed = False
 
     if state == "present":
-
         if not host_names and not host_groups:
             module.fail_json(msg="At least one host_name or host_group must be defined for each created maintenance.")
 
@@ -332,20 +298,20 @@ def main():
         period = 60 * int(minutes)  # N * 60 seconds
 
         if host_groups:
-            (rc, group_ids, error) = get_group_ids(zbx, host_groups)
+            (rc, group_ids, error) = maint.get_group_ids(host_groups)
             if rc != 0:
                 module.fail_json(msg="Failed to get group_ids: %s" % error)
         else:
             group_ids = []
 
         if host_names:
-            (rc, host_ids, error) = get_host_ids(zbx, host_names)
+            (rc, host_ids, error) = maint.get_host_ids(host_names)
             if rc != 0:
                 module.fail_json(msg="Failed to get host_ids: %s" % error)
         else:
             host_ids = []
 
-        (rc, maintenance, error) = get_maintenance(zbx, name)
+        (rc, maintenance, error) = maint.get_maintenance(name)
         if rc != 0:
             module.fail_json(msg="Failed to check maintenance %s existence: %s" % (name, error))
 
@@ -360,7 +326,7 @@ def main():
             if module.check_mode:
                 changed = True
             else:
-                (rc, data, error) = update_maintenance(zbx, maintenance["maintenanceid"], group_ids, host_ids, start_time, maintenance_type, period, desc)
+                (rc, data, error) = maint.update_maintenance(maintenance["maintenanceid"], group_ids, host_ids, start_time, maintenance_type, period, desc)
                 if rc == 0:
                     changed = True
                 else:
@@ -370,7 +336,7 @@ def main():
             if module.check_mode:
                 changed = True
             else:
-                (rc, data, error) = create_maintenance(zbx, group_ids, host_ids, start_time, maintenance_type, period, name, desc)
+                (rc, data, error) = maint.create_maintenance(group_ids, host_ids, start_time, maintenance_type, period, name, desc)
                 if rc == 0:
                     changed = True
                 else:
@@ -378,7 +344,7 @@ def main():
 
     if state == "absent":
 
-        (rc, maintenance, error) = get_maintenance(zbx, name)
+        (rc, maintenance, error) = maint.get_maintenance(name)
         if rc != 0:
             module.fail_json(msg="Failed to check maintenance %s existence: %s" % (name, error))
 
@@ -386,7 +352,7 @@ def main():
             if module.check_mode:
                 changed = True
             else:
-                (rc, data, error) = delete_maintenance(zbx, maintenance["maintenanceid"])
+                (rc, data, error) = maint.delete_maintenance(maintenance["maintenanceid"])
                 if rc == 0:
                     changed = True
                 else:
