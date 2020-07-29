@@ -3,6 +3,14 @@
 - name: "Set the correct delegated_dbhost (to support MySQL db deployment on a remote dbhost)"
   set_fact:
     delegated_dbhost: "{{ zabbix_server_dbhost if (zabbix_server_dbhost != 'localhost') else inventory_hostname }}"
+  when:
+    - zabbix_server_dbhost_run_install
+
+- name: "Set the correct delegated_dbhost (to support MySQL db deployment on a remote dbhost)"
+  set_fact:
+    delegated_dbhost:  "{{ inventory_hostname }}"
+  when:
+    - not zabbix_server_dbhost_run_install
 
 - name: "Override delegated_dbhost with real dbhost when dbhost is behind loadbalancer"
   set_fact:

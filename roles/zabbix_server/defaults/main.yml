@@ -52,6 +52,7 @@ zabbix_server_dbuser: zabbix-server
 zabbix_server_dbpassword: zabbix-server
 zabbix_server_dbsocket:
 zabbix_server_dbport: 5432
+zabbix_server_dbhost_run_install: true
 zabbix_server_privileged_host: localhost
 zabbix_server_historystorageurl:
 zabbix_server_historystoragetypes: uint,dbl,str,log,text
