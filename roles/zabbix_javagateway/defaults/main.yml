@@ -5,7 +5,7 @@ zabbix_version: 5.0
 zabbix_repo: zabbix
 zabbix_package_state: present
 zabbix_selinux: False
-zabbix_repo_yum_schema: http
+zabbix_repo_yum_schema: https
 
 zabbix_repo_yum:
   - name: zabbix

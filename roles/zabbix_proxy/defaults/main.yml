@@ -14,7 +14,7 @@ zabbix_repo: zabbix
 zabbix_proxy_package_state: present
 zabbix_proxy_install_database_client: True
 zabbix_install_pip_packages: true
-zabbix_repo_yum_schema: http
+zabbix_repo_yum_schema: https
 
 zabbix_repo_yum:
   - name: zabbix

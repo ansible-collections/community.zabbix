@@ -26,7 +26,7 @@ zabbix_apache_tls_crt: /etc/pki/server.crt
 zabbix_apache_tls_key: /etc/pki/server.key
 zabbix_apache_tls_chain:
 zabbix_apache_can_connect_ldap: False
-zabbix_repo_yum_schema: http
+zabbix_repo_yum_schema: https
 
 zabbix_repo_yum:
   - name: zabbix

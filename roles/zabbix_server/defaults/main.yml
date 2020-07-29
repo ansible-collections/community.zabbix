@@ -12,7 +12,7 @@ zabbix_server_install_database_client: True
 
 zabbix_service_state: started
 zabbix_service_enabled: True
-zabbix_repo_yum_schema: http
+zabbix_repo_yum_schema: https
 
 zabbix_repo_yum:
   - name: zabbix
