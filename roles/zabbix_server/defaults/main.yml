@@ -32,6 +32,15 @@ zabbix_server_database: pgsql
 zabbix_server_database_long: postgresql
 zabbix_database_creation: True
 zabbix_database_sqlload: True
+zabbix_server_dbtlsconnect:
+zabbix_server_dbtlscafile:
+zabbix_server_dbtlscertfile:
+zabbix_server_dbtlskeyfile:
+zabbix_server_dbtlscipher:
+zabbix_server_dbtlscipher13:
+
+
+
 
 # zabbix-server specific vars
 zabbix_server_listenport: 10051
@@ -66,6 +75,7 @@ zabbix_server_starttrappers: 5
 zabbix_server_startpingers: 1
 zabbix_server_startdiscoverers: 1
 zabbix_server_starthttppollers: 1
+zabbix_server_startpreprocessors: 3
 zabbix_server_starttimers: 1
 zabbix_server_javagateway:
 zabbix_server_javagatewayport: 10052
