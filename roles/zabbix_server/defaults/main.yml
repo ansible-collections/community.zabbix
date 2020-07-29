@@ -40,9 +40,6 @@ zabbix_server_dbtlskeyfile:
 zabbix_server_dbtlscipher:
 zabbix_server_dbtlscipher13:
 
-
-
-
 # zabbix-server specific vars
 zabbix_server_listenport: 10051
 zabbix_server_sourceip:
