@@ -315,6 +315,8 @@ Keep in mind that using the Zabbix Agent in a Container requires changes to the 
 
 * `zabbix_agent_inventory_zabbix`: Adds Facts for a zabbix inventory
 
+* `zabbix_repo_yum_schema`: Option to change the web schema for the yum repository(http/https)
+
 ## IPMI variables
 
 * `zabbix_agent_ipmi_authtype`: IPMI authentication algorithm. Possible values are 1 (callback), 2 (user), 3 (operator), 4 (admin), 5 (OEM), with 2 being the API default.
