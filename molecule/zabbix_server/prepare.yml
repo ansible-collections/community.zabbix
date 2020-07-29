@@ -1,0 +1,116 @@
+---
+- name: Prepare
+  hosts: localhost
+  connection: local
+  pre_tasks:
+
+    - name: "Create MySQL Container"
+      docker_container:
+        name: mysql-host
+        image: mysql:5.7
+        state: started
+        recreate: yes
+        networks:
+          - name: zabbix
+        env:
+          MYSQL_ROOT_PASSWORD: changeme
+      no_log: true
+      with_items: "{{ molecule_yml.platforms }}"
+      when:
+        - '"mysql" in item.groups'
+
+    - name: "Create postgresql Container"
+      docker_container:
+        name: postgresql-host
+        image: postgres
+        state: started
+        recreate: yes
+        networks:
+          - name: zabbix
+        env:
+          POSTGRES_PASSWORD: changeme
+      no_log: true
+      with_items: "{{ molecule_yml.platforms }}"
+      when:
+        - '"postgresql" in item.groups'
+
+- name: Prepare
+  hosts: all
+  tasks:
+
+    - name: "Create group for imaginary host"
+      add_host:
+        name: imaginary-host
+        groups:
+          - mysql
+          - postgresql
+      changed_when: False
+
+    - name: "Installing packages on CentOS"
+      yum:
+        name:
+          - net-tools
+          - which
+          - sudo
+        state: present
+      register: installation_dependencies
+      until: installation_dependencies is succeeded
+      when:
+        - ansible_os_family == 'RedHat'
+
+    - name: "Installing packages on CentOS"
+      yum:
+        name:
+          - mysql
+        state: present
+      register: installation_dependencies
+      until: installation_dependencies is succeeded
+      when:
+        - ansible_os_family == 'RedHat'
+        - inventory_hostname in groups['mysql']
+
+    - name: "Apt update"
+      shell: "apt-get update && echo exit 0 > /usr/sbin/policy-rc.d"
+      args:
+        warn: False
+      register: installation_dependencies
+      until: installation_dependencies is succeeded
+      when:
+        - ansible_os_family != 'RedHat'
+
+    - name: "Installing packages on NON-CentOS"
+      apt:
+        name:
+          - net-tools
+          - apt-utils
+          - python3-pip
+          - gpg-agent
+          - sudo
+        update_cache: True
+        state: present
+      register: installation_dependencies
+      until: installation_dependencies is succeeded
+      when:
+        - ansible_os_family != 'RedHat'
+
+    - name: "Configure SUDO."
+      lineinfile:
+        dest: /etc/sudoers
+        line: "Defaults    !requiretty"
+        state: present
+
+    - name: "Make sure the docs are installed."
+      lineinfile:
+        dest: /etc/yum.conf
+        line: "tsflags=nodocs"
+        state: absent
+      when:
+        - ansible_os_family == 'RedHat'
+
+    - name: PyMySQL
+      pip:
+        name: PyMySQL
+      register: installation_dependencies
+      until: installation_dependencies is succeeded
+      when:
+        - inventory_hostname in groups['mysql']

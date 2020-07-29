@@ -93,6 +93,7 @@ The following is an overview of all available configuration default for this rol
 ### Zabbix Server
 
 * `zabbix_server_name`: The name of the Zabbix Server.
+* `zabbix_server_dbhost_run_install`: When to `true`, sql files will be executed on the host running the database.
 * `zabbix_server_database`: The type of database used. Can be: mysql or pgsql
 * `zabbix_server_database_long`: The type of database used, but long name. Can be: mysql or postgresql
 * `zabbix_server_hostname`: The hostname on which the zabbix-server is running. Default set to: {{ inventory_hostname }}
