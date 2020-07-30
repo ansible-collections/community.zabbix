@@ -82,6 +82,7 @@ The following is an overview of all available configuration defaults for this ro
 
 * `zabbix_web_version`: This is the version of zabbix. Default: 5.0, Can be overridden to 4.4, 4.0, 3.4, 3.2, 3.0, 2.4, or 2.2. Previously the variable `zabbix_version` was used directly but it could cause [some inconvenience](https://github.com/dj-wasabi/ansible-zabbix-agent/pull/303). That variable is maintained by retrocompativility.
 * `zabbix_repo_yum`: A list with Yum repository configuration.
+* `zabbix_repo_yum_schema`: Option to change the web schema for the yum repository(http/https)
 * `zabbix_web_package_state`: Default: _present_. Can be overridden to "latest" to update packages when needed.
 * `zabbix_web_centos_release`: Default: False. When the `centos-release-scl` repository needs to be enabled. This is required when using Zabbix 5.0 due to installation of a recent version of `PHP`.
 

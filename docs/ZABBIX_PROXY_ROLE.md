@@ -77,6 +77,8 @@ There are some variables in de default/main.yml which can (Or needs to) be chang
 
 * `zabbix_install_pip_packages`: Set to `False` if you don't want to install the required pip packages. Useful when you control your environment completely. Default: True
 
+* `zabbix_proxy_startpreprocessors`: Number of pre-forked instances of preprocessing workers. The preprocessing manager process is automatically started when a preprocessor worker is started.This parameter is supported since Zabbix 4.2.0.
+
 There are some zabbix-proxy specific variables which will be used for the zabbix-proxy configuration file, these can be found in the default/main.yml file. There are 2 which needs some explanation:
 
 ```yaml
@@ -131,6 +133,24 @@ These variables are specific for Zabbix 3.0 and higher:
 * `*zabbix_proxy_tlskeyfile`: Full pathname of a file containing the agent private key.
 
 * `*zabbix_proxy_tlspskidentity`: Unique, case sensitive string used to identify the pre-shared key.
+
+* `zabbix_proxy_dbtlsconnect`: Setting this option enforces to use TLS connection to database:
+required - connect using TLS
+verify_ca - connect using TLS and verify certificate
+verify_full - connect using TLS, verify certificate and verify that database identity specified by DBHost matches its certificate
+On MySQL starting from 5.7.11 and PostgreSQL the following values are supported: "required", "verify", "verify_full". On MariaDB starting from version 10.2.6 "required" and "verify_full" values are supported.
+By default not set to any option and the behaviour depends on database configuration.
+This parameter is supported since Zabbix 5.0.0.
+
+* `zabbix_proxy_dbtlscafile`: Full pathname of a file containing the top-level CA(s) certificates for database certificate verification.This parameter is supported since Zabbix 5.0.0.
+
+* `zabbix_proxy_dbtlscertfile`: Full pathname of file containing Zabbix server certificate for authenticating to database.This parameter is supported since Zabbix 5.0.0.
+
+* `zabbix_proxy_dbtlskeyfile`: Full pathname of file containing the private key for authenticating to database.This parameter is supported since Zabbix 5.0.0.
+
+* `zabbix_proxy_dbtlscipher`: The list of encryption ciphers that Zabbix server permits for TLS protocols up through TLSv1.2.Supported only for MySQL.This parameter is supported since Zabbix 5.0.0.
+
+* `zabbix_proxy_dbtlscipher13`: The list of encryption ciphersuites that Zabbix server permits for TLSv1.3 protocol.Supported only for MySQL, starting from version 8.0.16. This parameter is supported since Zabbix 5.0.0.
 
 ## Zabbix API variables
 

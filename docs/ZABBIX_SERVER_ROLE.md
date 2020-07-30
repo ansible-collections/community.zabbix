@@ -111,6 +111,9 @@ The following is an overview of all available configuration default for this rol
 * `zabbix_server_dbencoding`: The encoding for the MySQL database. Default set to `utf8`
 * `zabbix_server_dbcollation`: The collation for the MySQL database. Default set to `utf8_bin`
 * `zabbix_server_manage_service`: True / False. When you run multiple Zabbix servers in a High Available cluster setup (e.g. pacemaker), you don't want Ansible to manage the zabbix-server service, because Pacemaker is in control of zabbix-server service.
+* `zabbix_repo_yum_schema`: Option to change the web schema for the yum repository(http/https)
+* `zabbix_proxy_startpreprocessors`: Number of pre-forked instances of preprocessing workers. The preprocessing manager process is automatically started when a preprocessor worker is started.This parameter is supported since Zabbix 4.2.0.
+
 
 ### Custom Zabbix Scripts
 
@@ -147,6 +150,18 @@ These variables are specific for Zabbix 3.0 and higher:
 * `zabbix_server_tlsservercertsubject`: Allowed server certificate subject.
 * `zabbix_server_tlscertfile`: Full pathname of a file containing the agent certificate or certificate chain.
 * `zabbix_server_tlskeyfile`: Full pathname of a file containing the agent private key.
+* `zabbix_server_dbtlsconnect`: Setting this option enforces to use TLS connection to database:
+required - connect using TLS
+verify_ca - connect using TLS and verify certificate
+verify_full - connect using TLS, verify certificate and verify that database identity specified by DBHost matches its certificate
+On MySQL starting from 5.7.11 and PostgreSQL the following values are supported: "required", "verify", "verify_full". On MariaDB starting from version 10.2.6 "required" and "verify_full" values are supported.
+By default not set to any option and the behaviour depends on database configuration.
+This parameter is supported since Zabbix 5.0.0.
+* `zabbix_server_dbtlscafile`: Full pathname of a file containing the top-level CA(s) certificates for database certificate verification.This parameter is supported since Zabbix 5.0.0.
+* `zabbix_server_dbtlscertfile`: Full pathname of file containing Zabbix server certificate for authenticating to database.This parameter is supported since Zabbix 5.0.0.
+* `zabbix_server_dbtlskeyfile`: Full pathname of file containing the private key for authenticating to database.This parameter is supported since Zabbix 5.0.0.
+* `zabbix_server_dbtlscipher`: The list of encryption ciphers that Zabbix server permits for TLS protocols up through TLSv1.2.Supported only for MySQL.This parameter is supported since Zabbix 5.0.0.
+* `zabbix_server_dbtlscipher13`: The list of encryption ciphersuites that Zabbix server permits for TLSv1.3 protocol.Supported only for MySQL, starting from version 8.0.16. This parameter is supported since Zabbix 5.0.0.
 
 ## Database
 

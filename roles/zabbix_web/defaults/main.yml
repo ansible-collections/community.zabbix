@@ -26,17 +26,18 @@ zabbix_apache_tls_crt: /etc/pki/server.crt
 zabbix_apache_tls_key: /etc/pki/server.key
 zabbix_apache_tls_chain:
 zabbix_apache_can_connect_ldap: False
+zabbix_repo_yum_schema: https
 
 zabbix_repo_yum:
   - name: zabbix
     description: Zabbix Official Repository - $basearch
-    baseurl: http://repo.zabbix.com/zabbix/{{ zabbix_version }}/rhel/{{ ansible_distribution_major_version }}/$basearch/
+    baseurl: "{{ zabbix_repo_yum_schema }}://repo.zabbix.com/zabbix/{{ zabbix_version }}/rhel/{{ ansible_distribution_major_version }}/$basearch/"
     gpgcheck: 0
     gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-ZABBIX
     state: present
   - name: zabbix-non-supported
     description: Zabbix Official Repository non-supported - $basearch
-    baseurl: http://repo.zabbix.com/non-supported/rhel/{{ ansible_distribution_major_version }}/$basearch/
+    baseurl: "{{ zabbix_repo_yum_schema }}://repo.zabbix.com/non-supported/rhel/{{ ansible_distribution_major_version }}/$basearch/"
     gpgcheck: 0
     gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-ZABBIX
     state: present
@@ -44,7 +45,7 @@ zabbix_repo_yum:
 zabbix_5_repo_yum:
   - name: zabbix-frontend
     description: Zabbix Official Repository - $basearch
-    baseurl: http://repo.zabbix.com/zabbix/{{ zabbix_version }}/rhel/{{ ansible_distribution_major_version }}/$basearch/frontend/
+    baseurl: "{{ zabbix_repo_yum_schema }}://repo.zabbix.com/zabbix/{{ zabbix_version }}/rhel/{{ ansible_distribution_major_version }}/$basearch/frontend/"
     gpgcheck: 0
     gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-ZABBIX
     state: present
