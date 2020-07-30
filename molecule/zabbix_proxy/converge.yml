@@ -1,5 +1,5 @@
 ---
 - hosts: all
   roles:
-    - role: ansible-zabbix-proxy
+    - role: zabbix_proxy
       become: yes

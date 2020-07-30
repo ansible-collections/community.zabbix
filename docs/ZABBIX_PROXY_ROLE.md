@@ -77,6 +77,8 @@ There are some variables in de default/main.yml which can (Or needs to) be chang
 
 * `zabbix_install_pip_packages`: Set to `False` if you don't want to install the required pip packages. Useful when you control your environment completely. Default: True
 
+* `zabbix_server_dbhost_run_install`: When to `true`, sql files will be executed on the host running the database.
+
 There are some zabbix-proxy specific variables which will be used for the zabbix-proxy configuration file, these can be found in the default/main.yml file. There are 2 which needs some explanation:
 
 ```yaml
