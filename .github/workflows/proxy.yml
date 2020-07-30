@@ -8,7 +8,7 @@ on:
   pull_request:
     paths:
       - 'roles/zabbix_proxy/**'
-      - 'molecule/zabzabbix_proxybix_server/**'
+      - 'molecule/zabbix_proxy/**'
       - '.github/workflows/proxy.yml'
 jobs:
   molecule:
