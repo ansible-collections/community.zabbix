@@ -14,17 +14,18 @@ zabbix_repo: zabbix
 zabbix_proxy_package_state: present
 zabbix_proxy_install_database_client: True
 zabbix_install_pip_packages: true
+zabbix_repo_yum_schema: https
 
 zabbix_repo_yum:
   - name: zabbix
     description: Zabbix Official Repository - $basearch
-    baseurl: http://repo.zabbix.com/zabbix/{{ zabbix_version }}/rhel/{{ ansible_distribution_major_version }}/$basearch/
+    baseurl: "{{ zabbix_repo_yum_schema }}://repo.zabbix.com/zabbix/{{ zabbix_version }}/rhel/{{ ansible_distribution_major_version }}/$basearch/"
     gpgcheck: 0
     gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-ZABBIX
     state: present
   - name: zabbix-non-supported
     description: Zabbix Official Repository non-supported - $basearch
-    baseurl: http://repo.zabbix.com/non-supported/rhel/{{ ansible_distribution_major_version }}/$basearch/
+    baseurl: "{{ zabbix_repo_yum_schema }}://repo.zabbix.com/non-supported/rhel/{{ ansible_distribution_major_version }}/$basearch/"
     gpgcheck: 0
     gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-ZABBIX
     state: present
@@ -33,6 +34,12 @@ zabbix_server_host: 192.168.1.1
 zabbix_server_port: 10051
 zabbix_database_creation: True
 zabbix_database_sqlload: True
+zabbix_proxy_dbtlsconnect:
+zabbix_proxy_dbtlscafile:
+zabbix_proxy_dbtlscertfile:
+zabbix_proxy_dbtlskeyfile:
+zabbix_proxy_dbtlscipher:
+zabbix_proxy_dbtlscipher13:
 
 # Some role specific vars
 zabbix_proxy_database: mysql
@@ -76,6 +83,7 @@ zabbix_proxy_starttrappers: 5
 zabbix_proxy_startpingers: 1
 zabbix_proxy_startdiscoverers: 1
 zabbix_proxy_starthttppollers: 1
+zabbix_proxy_startpreprocessors: 3
 zabbix_proxy_javagateway:
 zabbix_proxy_javagatewayport: 10052
 zabbix_proxy_startjavapollers: 5

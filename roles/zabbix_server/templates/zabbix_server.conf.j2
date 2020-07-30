@@ -173,6 +173,16 @@ StartPollers={{ zabbix_server_startpollers }}
 #
 StartIPMIPollers={{ zabbix_server_startipmipollers }}
 
+### Option: StartPreprocessors
+#       Number of pre-forked instances of preprocessing workers.
+#               The preprocessing manager process is automatically started when preprocessor worker is started.
+#
+# Mandatory: no
+# Range: 1-1000
+# Default:
+# StartPreprocessors=3
+StartPreprocessors={{ zabbix_server_startpreprocessors }}
+
 ### option: startpollersunreachable
 #	number of pre-forked instances of pollers for unreachable hosts (including ipmi).
 #
@@ -574,4 +584,78 @@ TLSCertFile={{ zabbix_server_tlscertfile }}
 {% if zabbix_server_tlskeyfile is defined and zabbix_server_tlskeyfile is not none %}
 TLSKeyFile={{ zabbix_server_tlskeyfile }}
 {% endif %}
+{% endif %}
+
+### Option: DBTLSConnect
+#	Setting this option enforces to use TLS connection to database.
+#	required    - connect using TLS
+#	verify_ca   - connect using TLS and verify certificate
+#	verify_full - connect using TLS, verify certificate and verify that database identity specified by DBHost
+#	              matches its certificate
+#	On MySQL starting from 5.7.11 and PostgreSQL following values are supported: "required", "verify_ca" and
+#	"verify_full".
+#	On MariaDB starting from version 10.2.6 "required" and "verify_full" values are supported.
+#	Default is not to set any option and behavior depends on database configuration
+#
+# Mandatory: no
+# Default:
+# DBTLSConnect=
+{% if zabbix_server_dbtlsconnect is defined and zabbix_server_dbtlsconnect is not none %}
+DBTLSConnect={{ zabbix_server_dbtlsconnect }}
+{% endif %}
+
+### Option: DBTLSCAFile
+#	Full pathname of a file containing the top-level CA(s) certificates for database certificate verification.
+#	Supported only for MySQL and PostgreSQL
+#
+# Mandatory: no
+#	(yes, if DBTLSConnect set to one of: verify_ca, verify_full)
+# Default:
+# DBTLSCAFile=
+{% if zabbix_server_dbtlscafile is defined and zabbix_server_dbtlscafile is not none %}
+DBTLSCAFile={{ zabbix_server_dbtlscafile }}
+{% endif %}
+
+### Option: DBTLSCertFile
+#	Full pathname of file containing Zabbix proxy certificate for authenticating to database.
+#	Supported only for MySQL and PostgreSQL
+#
+# Mandatory: no
+# Default:
+# DBTLSCertFile=
+{% if zabbix_server_dbtlscertfile is defined and zabbix_server_dbtlscertfile is not none %}
+DBTLSCertFile={{ zabbix_server_dbtlscertfile }}
+{% endif %}
+
+### Option: DBTLSKeyFile
+#	Full pathname of file containing the private key for authenticating to database.
+#	Supported only for MySQL and PostgreSQL
+#
+# Mandatory: no
+# Default:
+# DBTLSKeyFile=
+{% if zabbix_server_dbtlskeyfile is defined and zabbix_server_dbtlskeyfile is not none %}
+DBTLSKeyFile={{ zabbix_server_dbtlskeyfile }}
+{% endif %}
+
+### Option: DBTLSCipher
+#	The list of encryption ciphers that Zabbix proxy permits for TLS protocols up through TLSv1.2
+#	Supported only for MySQL
+#
+# Mandatory no
+# Default:
+# DBTLSCipher=
+{% if zabbix_server_dbtlscipher is defined and zabbix_server_dbtlscipher is not none %}
+DBTLSCipher={{ zabbix_server_dbtlscipher }}
+{% endif %}
+
+### Option: DBTLSCipher13
+#	The list of encryption ciphersuites that Zabbix proxy permits for TLSv1.3 protocol
+#	Supported only for MySQL, starting from version 8.0.16
+#
+# Mandatory no
+# Default:
+# DBTLSCipher13=
+{% if zabbix_server_dbtlscipher13 is defined and zabbix_server_dbtlscipher13 is not none %}
+DBTLSCipher13={{ zabbix_server_dbtlscipher13 }}
 {% endif %}
