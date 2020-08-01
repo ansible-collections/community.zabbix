@@ -26,7 +26,7 @@
   when:
     - zabbix_version is version_compare('3.0', '>=')
     - ansible_distribution_major_version == '8'
-    - zabbix_proxy_database == 'sqlite3'
+    # - zabbix_proxy_database == 'sqlite3'
   tags:
     - zabbix-proxy
 
@@ -81,9 +81,23 @@
   when:
     - zabbix_database_creation or zabbix_database_sqlload
     - zabbix_proxy_database == 'pgsql'
+    - ansible_distribution_major_version == "7" or ansible_distribution_major_version == "6"
   tags:
     - zabbix-proxy
     - init
+
+- name: "RedHat | Install Ansible module dependencies on RHEL8"
+  yum:
+    name: python3-psycopg2
+    state: present
+  register: zabbix_server_dependencies_installed
+  until: zabbix_server_dependencies_installed is succeeded
+  when:
+    - zabbix_database_creation
+    - zabbix_proxy_database == 'pgsql'
+    - ansible_distribution_major_version == "8"
+  tags:
+    - zabbix-server
 
 - name: "RedHat | Install Mysql Client package RHEL7"
   yum:
@@ -110,7 +124,7 @@
   when:
     - zabbix_database_creation or zabbix_database_sqlload
     - zabbix_proxy_database == 'mysql'
-    - ansible_distribution_major_version != '7'
+    - ansible_distribution_major_version == "6" or ansible_distribution_major_version == "5"
     - zabbix_proxy_install_database_client
   tags:
     - zabbix-proxy

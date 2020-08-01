@@ -1,0 +1,56 @@
+---
+# dependency:
+#   name: galaxy
+#   options:
+#     ignore-certs: True
+#     ignore-errors: True
+#     role-file: requirements-roles.yml
+
+platforms:
+  - name: zabbix-proxy-${MY_MOLECULE_CONTAINER:-mysql-centos}
+    image: ${MY_MOLECULE_IMAGE:-"geerlingguy/docker-centos8-ansible"}
+    command: ${MY_MOLECULE_DOCKER_COMMAND:-""}
+    privileged: True
+    pre_build_image: True
+    networks:
+      - name: zabbix
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    groups:
+      - ${MY_MOLECULE_GROUP:-mysql}
+
+provisioner:
+  name: ansible
+  lint:
+    name: ansible-lint
+  env:
+    ANSIBLE_COLLECTIONS_PATHS: $HOME/.ansible/collections/ansible_collections/community/zabbix
+    ANSIBLE_ROLES_PATH: $HOME/.ansible/collections/ansible_collections/community/zabbix/roles
+  inventory:
+    group_vars:
+      mysql:
+        zabbix_proxy_database: mysql
+        zabbix_proxy_database_long: mysql
+        zabbix_proxy_dbport: 3306
+        zabbix_proxy_dbhost: mysql-host
+        zabbix_proxy_dbhost_run_install: false
+        zabbix_proxy_privileged_host: '%'
+        zabbix_proxy_mysql_login_host: mysql-host
+        zabbix_proxy_mysql_login_user: root
+        zabbix_proxy_mysql_login_password: changeme
+        zabbix_proxy_mysql_login_port: 3306
+      postgresql:
+        zabbix_proxy_database: pgsql
+        zabbix_proxy_database_long: postgresql
+        zabbix_proxy_dbport: 5432
+        zabbix_proxy_dbhost: postgresql-host
+        zabbix_proxy_dbhost_run_install: false
+        zabbix_proxy_pgsql_login_host: postgresql-host
+        zabbix_proxy_pgsql_login_user: postgres
+        zabbix_proxy_pgsql_login_password: changeme
+        zabbix_proxy_pgsql_login_port: 5432
+
+verifier:
+  name: testinfra
+  lint:
+    name: flake8

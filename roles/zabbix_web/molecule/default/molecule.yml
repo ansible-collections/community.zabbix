@@ -8,15 +8,18 @@ dependency:
 
 driver:
   name: docker
-lint:
-  name: yamllint
-  options:
-    config-file: molecule/default/yaml-lint.yml
+# lint:
+#   name: yamllint
+#   options:
+#     config-file: molecule/default/yaml-lint.yml
 platforms:
   - name: zabbix-web-${MY_MOLECULE_CONTAINER:-mysql-centos}
     image: ${MY_MOLECULE_IMAGE:-"milcom/centos7-systemd"}
     privileged: True
-    command: /sbin/init
+    pre_build_image: true
+    command: ${MY_MOLECULE_COMMAND:-""}
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
     groups:
       - ${MY_MOLECULE_GROUP:-mysql}
 
@@ -26,6 +29,9 @@ provisioner:
     name: ansible-lint
   inventory:
     group_vars:
+      all:
+        php_fpm_pool_user: apache
+        php_fpm_pool_group: apache
       mysql:
         zabbix_server_database: mysql
         zabbix_server_database_long: mysql

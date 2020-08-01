@@ -2,4 +2,6 @@
 - src: geerlingguy.apache
 - src: geerlingguy.mysql
 - src: geerlingguy.postgresql
-- src: dj-wasabi.zabbix-server
+- src: geerlingguy.php
+- src: geerlingguy.repo-remi
+- src: geerlingguy.php-versions

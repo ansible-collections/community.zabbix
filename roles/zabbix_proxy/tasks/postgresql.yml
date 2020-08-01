@@ -4,36 +4,69 @@
 - name: "Set the correct delegated_dbhost (to support postgres db deployment on a remote dbhost)"
   set_fact:
     delegated_dbhost: "{{ zabbix_proxy_dbhost if (zabbix_proxy_dbhost != 'localhost') else inventory_hostname }}"
+  when:
+    - zabbix_proxy_dbhost_run_install
 
-- name: "PostgreSQL | Create database"
-  postgresql_db:
-    name: "{{ zabbix_proxy_dbname }}"
-    port: "{{ zabbix_proxy_dbport }}"
-    state: present
+- name: "Set the correct delegated_dbhost (to support postgres db deployment on a remote dbhost)"
+  set_fact:
+    delegated_dbhost: "{{ inventory_hostname }}"
+  when:
+    - not zabbix_proxy_dbhost_run_install
+
+- name: "PostgreSQL | Delegated"
+  block:
+    - name: "PostgreSQL | Delegated | Create database"
+      postgresql_db:
+        name: "{{ zabbix_proxy_dbname }}"
+        port: "{{ zabbix_proxy_dbport }}"
+        state: present
+    - name: "PostgreSQL | Delegated | Create database user"
+      postgresql_user:
+        db: "{{ zabbix_proxy_dbname }}"
+        name: "{{ zabbix_proxy_dbuser }}"
+        password: "md5{{ (zabbix_proxy_dbpassword + zabbix_proxy_dbuser)|hash('md5') }}"
+        port: "{{ zabbix_proxy_dbport }}"
+        priv: ALL
+        state: present
+        encrypted: yes
   become: yes
   become_user: postgres
   delegate_to: "{{ delegated_dbhost }}"
   when:
     - zabbix_database_creation
+    - zabbix_proxy_pgsql_login_host is not defined
   tags:
-    - zabbix-proxy
+    - zabbix-server
     - database
 
-- name: "PostgreSQL | Create database user"
-  postgresql_user:
-    db: "{{ zabbix_proxy_dbname }}"
-    name: "{{ zabbix_proxy_dbuser }}"
-    password: "{{ zabbix_proxy_dbpassword }}"
-    port: "{{ zabbix_proxy_dbport }}"
-    priv: ALL
-    state: present
-  become: yes
-  become_user: postgres
-  delegate_to: "{{ delegated_dbhost }}"
+- name: "PostgreSQL | Remote"
+  block:
+    - name: "PostgreSQL | Remote | Create database"
+      postgresql_db:
+        login_host: "{{ zabbix_proxy_pgsql_login_host | default(omit) }}"
+        login_user: "{{ zabbix_proxy_pgsql_login_user | default(omit) }}"
+        login_password: "{{ zabbix_proxy_pgsql_login_password | default(omit) }}"
+        login_unix_socket: "{{ zabbix_proxy_pgsql_login_unix_socket | default(omit) }}"
+        name: "{{ zabbix_proxy_dbname }}"
+        port: "{{ zabbix_proxy_dbport }}"
+        state: present
+    - name: "PostgreSQL | Remote | Create database user"
+      postgresql_user:
+        login_host: "{{ zabbix_proxy_pgsql_login_host | default(omit) }}"
+        login_user: "{{ zabbix_proxy_pgsql_login_user | default(omit) }}"
+        login_password: "{{ zabbix_proxy_pgsql_login_password | default(omit) }}"
+        db: "{{ zabbix_proxy_dbname }}"
+        name: "{{ zabbix_proxy_dbuser }}"
+        password: "md5{{ (zabbix_proxy_dbpassword + zabbix_proxy_dbuser)|hash('md5') }}"
+        port: "{{ zabbix_proxy_dbport }}"
+        priv: ALL
+        state: present
+        encrypted: yes
   when:
     - zabbix_database_creation
+    - zabbix_proxy_pgsql_login_host is defined
   tags:
-    - zabbix-proxy
+    - zabbix-server
     - database
 
 - name: "PostgreSQL | Importing schema file"

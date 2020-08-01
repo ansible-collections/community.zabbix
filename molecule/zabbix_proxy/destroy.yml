@@ -14,3 +14,12 @@
         state: absent
         force_kill: "{{ item.force_kill | default(True) }}"
       with_items: "{{ molecule_yml.platforms }}"
+
+    - name: Destroy 3rd party instance(s)
+      docker_container:
+        name: '{{ item }}'
+        state: absent
+        force_kill: True
+      with_items:
+        - mysql-host
+        - postgresql-host
