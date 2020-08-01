@@ -6,6 +6,7 @@
 - name: "Set short version name"
   set_fact:
     zabbix_short_version: "{{ zabbix_version | regex_replace('\\.', '') }}"
+    zabbix_python_prefix: "python{% if ansible_python_version is version('3', '>=') %}3{% endif %}"
 
 - name: "Debian | Set some facts"
   set_fact:
@@ -104,28 +105,49 @@
   register: is_zabbix_proxy_package_installed
   until: is_zabbix_proxy_package_installed is succeeded
 
-- name: "Debian | Install Ansible PostgreSQL module dependencies"
+- name: "Debian | Install Ansible module dependencies"
   apt:
-    name: python-psycopg2
+    name: "{{ zabbix_python_prefix }}-psycopg2"
     state: present
-  register: are_zabbix_proxy_dependency_packages_installed
-  until: are_zabbix_proxy_dependency_packages_installed is succeeded
+  register: zabbix_proxy_dependencies_installed
+  until: zabbix_proxy_dependencies_installed is succeeded
   when:
-    - zabbix_database_creation or zabbix_database_sqlload
-    - zabbix_proxy_database == 'pgsql'
+    - zabbix_database_creation
+  tags:
+    - zabbix-server
+    - init
 
 - name: "Debian | Install Mysql Client package"
   apt:
-    name: ['mysql-client', 'python-mysqldb']
+    name:
+      - mysql-client
+      - "{{ zabbix_python_prefix }}-mysqldb"
     state: present
-  register: are_zabbix_proxy_dependency_packages_installed
-  until: are_zabbix_proxy_dependency_packages_installed is succeeded
+  register: zabbix_proxy_dependencies_installed
+  until: zabbix_proxy_dependencies_installed is succeeded
   when:
-    - zabbix_database_creation or zabbix_database_sqlload
     - zabbix_proxy_database == 'mysql'
     - zabbix_proxy_install_database_client
+    - ansible_distribution_release != "buster"
   tags:
-    - zabbix-proxy
+    - zabbix-server
+    - init
+    - database
+
+- name: "Debian 10 | Install Mysql Client package"
+  apt:
+    name:
+      - mariadb-client
+      - "{{ zabbix_python_prefix }}-mysqldb"
+    state: present
+  register: zabbix_proxy_dependencies_installed
+  until: zabbix_proxy_dependencies_installed is succeeded
+  when:
+    - zabbix_proxy_database == 'mysql'
+    - zabbix_proxy_install_database_client
+    - ansible_distribution_release == "buster"
+  tags:
+    - zabbix-server
     - init
     - database
 

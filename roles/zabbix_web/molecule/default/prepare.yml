@@ -13,18 +13,30 @@
         name:
           - net-tools
           - which
-          - libselinux-python
-          - python-pip
+          - "{{ 'python3-libselinux' if ansible_distribution_major_version == '8' else 'libselinux-python' }}"
+          - "{{ 'python3-pip' if ansible_distribution_major_version == '8' else 'python-pip' }}"
         state: present
       register: installation_dependencies
       when: ansible_distribution == 'CentOS'
+
+    - name: "Installing packages (CentOS7)"
+      yum:
+        name:
+          - centos-release-scl
+        state: present
+      register: installation_dependencies
+      when:
+        - ansible_distribution == 'CentOS'
+        - ansible_distribution_major_version == '7'
 
     - name: "Installing which on NON-CentOS"
       apt:
         name:
           - net-tools
-          - python-pip
+          - "{{ 'python3-pip' if ansible_distribution == 'Ubuntu' else 'python-pip' }}"
+          - python-setuptools
           - curl
+          - gpg-agent
         state: present
       when: ansible_distribution != 'CentOS'
 
@@ -58,4 +70,8 @@
       when: inventory_hostname in groups['postgresql']
     - role: geerlingguy.mysql
       when: inventory_hostname in groups['mysql']
-    - role: dj-wasabi.zabbix-server
+    - role: zabbix_server
+    - role: geerlingguy.repo-remi
+      when: ansible_os_family == 'RedHat'
+    - role: geerlingguy.php-versions
+    - role: geerlingguy.php

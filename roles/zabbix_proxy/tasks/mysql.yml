@@ -2,7 +2,20 @@
 # task file for mysql
 - name: "Set the correct delegated_dbhost (to support MySQL db deployment on a remote dbhost)"
   set_fact:
-    delegated_dbhost: "{{ zabbix_proxy_dbhost if (zabbix_proxy_dbhost != 'localhost') else inventory_hostname }}"
+    delegated_dbhost: "{{ zabbix_server_dbhost if (zabbix_server_dbhost != 'localhost') else inventory_hostname }}"
+  when:
+    - zabbix_proxy_dbhost_run_install
+
+- name: "Set the correct delegated_dbhost (to support MySQL db deployment on a remote dbhost)"
+  set_fact:
+    delegated_dbhost:  "{{ inventory_hostname }}"
+  when:
+    - not zabbix_proxy_dbhost_run_install
+
+- name: "Override delegated_dbhost with real dbhost when dbhost is behind loadbalancer"
+  set_fact:
+    delegated_dbhost: "{{ zabbix_proxy_real_dbhost }}"
+  when: zabbix_proxy_real_dbhost | default(false)
 
 - name: "MySQL | Create database"
   mysql_db:
@@ -12,6 +25,8 @@
     login_host: "{{ zabbix_proxy_mysql_login_host | default(omit) }}"
     login_user: "{{ zabbix_proxy_mysql_login_user | default(omit) }}"
     login_password: "{{ zabbix_proxy_mysql_login_password | default(omit) }}"
+    login_port: "{{ zabbix_proxy_mysql_login_port | default(omit) }}"
+    login_unix_socket: "{{ zabbix_proxy_mysql_login_unix_socket | default(omit) }}"
     state: present
   when: zabbix_database_creation
   register: zabbix_database_created
@@ -23,12 +38,15 @@
 
 - name: "MySQL | Create database user"
   mysql_user:
-    name: "{{ zabbix_proxy_dbuser }}"
-    password: "{{ zabbix_proxy_dbpassword }}"
-    priv: "{{ zabbix_proxy_dbname }}.*:ALL"
     login_host: "{{ zabbix_proxy_mysql_login_host | default(omit) }}"
     login_user: "{{ zabbix_proxy_mysql_login_user | default(omit) }}"
     login_password: "{{ zabbix_proxy_mysql_login_password | default(omit) }}"
+    login_port: "{{ zabbix_proxy_mysql_login_port | default(omit) }}"
+    login_unix_socket: "{{ zabbix_proxy_mysql_login_unix_socket | default(omit) }}"
+    name: "{{ zabbix_proxy_dbuser }}"
+    password: "{{ zabbix_proxy_dbpassword }}"
+    priv: "{{ zabbix_proxy_dbname }}.*:ALL"
+    host: "{{ zabbix_proxy_privileged_host }}"
     state: present
   when: zabbix_database_creation
   delegate_to: "{{ delegated_dbhost }}"
@@ -55,12 +73,14 @@
 
 - name: "MySQL | Create database and import file"
   mysql_db:
-    name: "{{ zabbix_proxy_dbname }}"
-    encoding: "{{ zabbix_proxy_dbencoding }}"
-    collation: "{{ zabbix_proxy_dbcollation }}"
     login_host: "{{ zabbix_proxy_mysql_login_host | default(omit) }}"
     login_user: "{{ zabbix_proxy_mysql_login_user | default(omit) }}"
     login_password: "{{ zabbix_proxy_mysql_login_password | default(omit) }}"
+    login_port: "{{ zabbix_proxy_mysql_login_port | default(omit) }}"
+    login_unix_socket: "{{ zabbix_proxy_mysql_login_unix_socket | default(omit) }}"
+    name: "{{ zabbix_proxy_dbname }}"
+    encoding: "{{ zabbix_proxy_dbencoding }}"
+    collation: "{{ zabbix_proxy_dbcollation }}"
     state: import
     target: "{{ ls_output_create.stdout }}"
   when:
