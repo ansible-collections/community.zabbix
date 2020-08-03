@@ -191,19 +191,16 @@ msg:
     sample: 'User group created: ACME, ID: 42'
 '''
 
+from ansible.module_utils.basic import AnsibleModule
 
 from ansible_collections.community.zabbix.plugins.module_utils.base import ZabbixBase
 import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabbix_utils
-from ansible.module_utils.basic import AnsibleModule
 
 
-class Rights(object):
+class Rights(ZabbixBase):
     """
     Restructure the user defined rights to fit the Zabbix API requirements
     """
-    def __init__(self, module, zbx):
-        self._module = module
-        self._zapi = zbx._zapi
 
     def get_hostgroup_by_hostgroup_name(self, name):
         """Get host group by host group name.
@@ -256,9 +253,6 @@ class TagFilters(Rights):
     """
     Restructure the user defined tag_filters to fit the Zabbix API requirements
     """
-    def __init__(self, module, zbx):
-        self._module = module
-        self._zapi = zbx._zapi
 
     def construct_the_data(self, _tag_filters):
         """Construct the user defined tag filters to fit the Zabbix API requirements
@@ -282,11 +276,7 @@ class TagFilters(Rights):
         return zabbix_utils.helper_cleanup_data(constructed_data)
 
 
-class UserGroup(object):
-    def __init__(self, module, zbx):
-        self._module = module
-        self._zapi = zbx._zapi
-
+class UserGroup(ZabbixBase):
     def _construct_parameters(self, **kwargs):
         """Construct parameters of UserGroup object
 
@@ -458,12 +448,9 @@ def main():
     tag_filters = module.params['tag_filters']
     state = module.params['state']
 
-    zbx = None
-
-    # login to zabbix
-    zbx = ZabbixBase(module)
-
-    userGroup = UserGroup(module, zbx)
+    userGroup = UserGroup(module)
+    # reuse zabbix-api login
+    zbx = userGroup._zapi
     rgts = Rights(module, zbx)
     tgflts = TagFilters(module, zbx)
 
