@@ -503,6 +503,7 @@ import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabb
 class Zapi(ZapiWrapper):
     def __init__(self, module, zbx=None):
         super(Zapi, self).__init__(module, zbx)
+        self._zapi_wrapper = self
 
     def check_if_action_exists(self, name):
         """Check if action exists.
@@ -970,7 +971,7 @@ class Operations(Zapi):
         try:
             return {
                 'default_msg': '0' if operation.get('message') is not None or operation.get('subject') is not None else '1',
-                'mediatypeid': self._zapi.get_mediatype_by_mediatype_name(
+                'mediatypeid': self._zapi_wrapper.get_mediatype_by_mediatype_name(
                     operation.get('media_type')
                 ) if operation.get('media_type') is not None else '0',
                 'message': operation.get('message'),
@@ -991,7 +992,7 @@ class Operations(Zapi):
         if operation.get('send_to_users') is None:
             return None
         return [{
-            'userid': self._zapi.get_user_by_user_name(_user)['userid']
+            'userid': self._zapi_wrapper.get_user_by_user_name(_user)['userid']
         } for _user in operation.get('send_to_users')]
 
     def _construct_opmessage_grp(self, operation):
@@ -1006,7 +1007,7 @@ class Operations(Zapi):
         if operation.get('send_to_groups') is None:
             return None
         return [{
-            'usrgrpid': self._zapi.get_usergroup_by_usergroup_name(_group)['usrgrpid']
+            'usrgrpid': self._zapi_wrapper.get_usergroup_by_usergroup_name(_group)['usrgrpid']
         } for _group in operation.get('send_to_groups')]
 
     def _construct_opcommand(self, operation):
@@ -1059,7 +1060,7 @@ class Operations(Zapi):
         if operation.get('run_on_hosts') is None:
             return None
         return [{
-            'hostid': self._zapi.get_host_by_host_name(_host)['hostid']
+            'hostid': self._zapi_wrapper.get_host_by_host_name(_host)['hostid']
         } if str(_host) != '0' else {'hostid': '0'} for _host in operation.get('run_on_hosts')]
 
     def _construct_opcommand_grp(self, operation):
@@ -1074,7 +1075,7 @@ class Operations(Zapi):
         if operation.get('run_on_groups') is None:
             return None
         return [{
-            'groupid': self._zapi.get_hostgroup_by_hostgroup_name(_group)['hostid']
+            'groupid': self._zapi_wrapper.get_hostgroup_by_hostgroup_name(_group)['hostid']
         } for _group in operation.get('run_on_groups')]
 
     def _construct_opgroup(self, operation):
@@ -1087,7 +1088,7 @@ class Operations(Zapi):
             list: constructed operation group
         """
         return [{
-            'groupid': self._zapi.get_hostgroup_by_hostgroup_name(_group)['groupid']
+            'groupid': self._zapi_wrapper.get_hostgroup_by_hostgroup_name(_group)['groupid']
         } for _group in operation.get('host_groups', [])]
 
     def _construct_optemplate(self, operation):
@@ -1100,7 +1101,7 @@ class Operations(Zapi):
             list: constructed operation template
         """
         return [{
-            'templateid': self._zapi.get_template_by_template_name(_template)['templateid']
+            'templateid': self._zapi_wrapper.get_template_by_template_name(_template)['templateid']
         } for _template in operation.get('templates', [])]
 
     def _construct_opinventory(self, operation):
@@ -1450,13 +1451,13 @@ class Filter(Zapi):
         try:
             # Host group
             if conditiontype == '0':
-                return self._zapi.get_hostgroup_by_hostgroup_name(value)['groupid']
+                return self._zapi_wrapper.get_hostgroup_by_hostgroup_name(value)['groupid']
             # Host
             if conditiontype == '1':
-                return self._zapi.get_host_by_host_name(value)['hostid']
+                return self._zapi_wrapper.get_host_by_host_name(value)['hostid']
             # Trigger
             if conditiontype == '2':
-                return self._zapi.get_trigger_by_trigger_name(value)['triggerid']
+                return self._zapi_wrapper.get_trigger_by_trigger_name(value)['triggerid']
             # Trigger name: return as is
             # Trigger severity
             if conditiontype == '4':
@@ -1507,13 +1508,13 @@ class Filter(Zapi):
                     "lost"], value
                 )
             if conditiontype == '13':
-                return self._zapi.get_template_by_template_name(value)['templateid']
+                return self._zapi_wrapper.get_template_by_template_name(value)['templateid']
             if conditiontype == '18':
-                return self._zapi.get_discovery_rule_by_discovery_rule_name(value)['druleid']
+                return self._zapi_wrapper.get_discovery_rule_by_discovery_rule_name(value)['druleid']
             if conditiontype == '19':
-                return self._zapi.get_discovery_check_by_discovery_check_name(value)['dcheckid']
+                return self._zapi_wrapper.get_discovery_check_by_discovery_check_name(value)['dcheckid']
             if conditiontype == '20':
-                return self._zapi.get_proxy_by_proxy_name(value)['proxyid']
+                return self._zapi_wrapper.get_proxy_by_proxy_name(value)['proxyid']
             if conditiontype == '21':
                 return to_numeric_value([
                     "pchldrfor0",
