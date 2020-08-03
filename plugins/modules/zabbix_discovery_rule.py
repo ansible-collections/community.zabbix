@@ -255,20 +255,18 @@ msg:
     sample: 'Discovery rule created: ACME, ID: 42'
 '''
 
+
+from distutils.version import LooseVersion
+from ansible.module_utils.basic import AnsibleModule
+
 from ansible_collections.community.zabbix.plugins.module_utils.base import ZabbixBase
 import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabbix_utils
-from ansible.module_utils.basic import AnsibleModule
-from distutils.version import LooseVersion
 
 
-class Dchecks(object):
+class Dchecks(ZabbixBase):
     """
     Restructures the user defined discovery checks to fit the Zabbix API requirements
     """
-    def __init__(self, module, zbx):
-        self._module = module
-        self._zapi = zbx._zapi
-        self._zbx_api_version = zbx._zbx_api_version
 
     def construct_the_data(self, _dchecks):
         """Construct the user defined discovery check to fit the Zabbix API
@@ -353,11 +351,7 @@ class Dchecks(object):
         return zabbix_utils.helper_cleanup_data(constructed_data)
 
 
-class DiscoveryRule(object):
-    def __init__(self, module, zbx):
-        self._module = module
-        self._zapi = zbx._zapi
-
+class DiscoveryRule(ZabbixBase):
     def check_if_drule_exists(self, name):
         """Check if discovery rule exists.
         Args:
@@ -647,12 +641,9 @@ def main():
     proxy = module.params['proxy']
     status = module.params['status']
 
-    zbx = None
-
-    # get zabbix-api connection and login
-    zbx = ZabbixBase(module)
-
-    drule = DiscoveryRule(module, zbx)
+    drule = DiscoveryRule(module)
+    # reuse zabbix-api login
+    zbx = drule._zapi
     dcks = Dchecks(module, zbx)
 
     drule_exists = drule.check_if_drule_exists(name)
