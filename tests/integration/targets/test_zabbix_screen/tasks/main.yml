@@ -1,5 +1,14 @@
 ---
 
+- name: test - delete the screen again
+  community.zabbix.zabbix_screen:
+    server_url: "{{ zabbix_server_url }}"
+    login_user: "{{ zabbix_login_user }}"
+    login_password: "{{ zabbix_login_password }}"
+    screens:
+      - screen_name: TestScreen1
+        state: absent
+
 # #################################################
 # Test screen creation
 # #################################################
@@ -104,7 +113,6 @@
     login_password: "{{ zabbix_login_password }}"
     screens:
       - screen_name: TestScreen1
-        host_group: Zabbix servers
         state: absent
   register: result
 
@@ -119,7 +127,6 @@
     login_password: "{{ zabbix_login_password }}"
     screens:
       - screen_name: TestScreen1
-        host_group: Zabbix servers
         state: absent
   register: result
 

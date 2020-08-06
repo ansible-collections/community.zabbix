@@ -287,7 +287,7 @@ class Screen(ZabbixBase):
         if len(screen_item_list) > 0:
             if self._module.check_mode:
                 self._module.exit_json(changed=True)
-            ScreenItem.delete(self._zapi, screen_item_id_list)
+            ScreenItem.delete(self, screen_item_id_list)
             return True
         return False
 
@@ -324,22 +324,22 @@ class Screen(ZabbixBase):
             graph_id_list = self.get_graphs_by_host_id(graph_name_list, hosts[0])
             for i, graph_id in enumerate(graph_id_list):
                 if graph_id is not None:
-                    ScreenItem.create(self._zapi, ignoreExists=True, data={'screenid': screen_id, 'resourcetype': 0, 'resourceid': graph_id,
-                                                                           'width': width, 'height': height,
-                                                                           'x': i % h_size, 'y': i // h_size, 'colspan': 1, 'rowspan': 1,
-                                                                           'elements': 0, 'valign': 0, 'halign': 0,
-                                                                           'style': 0, 'dynamic': 0, 'sort_triggers': 0})
+                    ScreenItem.create(self, ignoreExists=True, data={'screenid': screen_id, 'resourcetype': 0, 'resourceid': graph_id,
+                                                                     'width': width, 'height': height,
+                                                                     'x': i % h_size, 'y': i // h_size, 'colspan': 1, 'rowspan': 1,
+                                                                     'elements': 0, 'valign': 0, 'halign': 0,
+                                                                     'style': 0, 'dynamic': 0, 'sort_triggers': 0})
         else:
             for i, host in enumerate(hosts):
                 graph_id_list = self.get_graphs_by_host_id(graph_name_list, host)
                 for j, graph_id in enumerate(graph_id_list):
                     if graph_id is not None:
-                        ScreenItem.create(self._zapi, ignoreExists=True, data={'screenid': screen_id, 'resourcetype': 0, 'resourceid': graph_id,
-                                                                               'width': width, 'height': height,
-                                                                               'x': i % graphs_in_row, 'y': len(graph_id_list) * (i // graphs_in_row) + j,
-                                                                               'colspan': 1, 'rowspan': 1,
-                                                                               'elements': 0, 'valign': 0, 'halign': 0,
-                                                                               'style': 0, 'dynamic': 0, 'sort_triggers': 0})
+                        ScreenItem.create(self, ignoreExists=True, data={'screenid': screen_id, 'resourcetype': 0, 'resourceid': graph_id,
+                                                                         'width': width, 'height': height,
+                                                                         'x': i % graphs_in_row, 'y': len(graph_id_list) * (i // graphs_in_row) + j,
+                                                                         'colspan': 1, 'rowspan': 1,
+                                                                         'elements': 0, 'valign': 0, 'halign': 0,
+                                                                         'style': 0, 'dynamic': 0, 'sort_triggers': 0})
 
 
 def main():
