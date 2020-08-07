@@ -1,0 +1,29 @@
+---
+dependency:
+  name: galaxy
+driver:
+  name: docker
+
+platforms:
+  - name: zabbix-javagateway-${MY_MOLECULE_CONTAINER:-centos}
+    image: ${MY_MOLECULE_IMAGE:-"geerlingguy/docker-centos8-ansible"}
+    command: ${MY_MOLECULE_DOCKER_COMMAND:-""}
+    privileged: True
+    pre_build_image: True
+    networks:
+      - name: zabbix
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+
+provisioner:
+  name: ansible
+  lint:
+    name: ansible-lint
+  env:
+    ANSIBLE_COLLECTIONS_PATHS: $HOME/.ansible/collections/ansible_collections/community/zabbix
+    ANSIBLE_ROLES_PATH: $HOME/.ansible/collections/ansible_collections/community/zabbix/roles
+
+verifier:
+  name: testinfra
+  lint:
+    name: flake8
