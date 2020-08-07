@@ -1,16 +1,17 @@
 ---
 # defaults file for dj-wasabi.zabbix-javagateway
 
-zabbix_version: 5.0
-zabbix_repo: zabbix
-zabbix_package_state: present
+zabbix_javagateway_version: 5.0
+zabbix_version: "{{ zabbix_javagateway_version }}"
+zabbix_javagateway_package_state: present
 zabbix_selinux: False
+zabbix_repo: zabbix
 zabbix_repo_yum_schema: https
 
 zabbix_repo_yum:
   - name: zabbix
     description: Zabbix Official Repository - $basearch
-    baseurl: "{{ zabbix_repo_yum_schema }}://repo.zabbix.com/zabbix/{{ zabbix_version }}/rhel/{{ ansible_distribution_major_version }}/$basearch/"
+    baseurl: "{{ zabbix_repo_yum_schema }}://repo.zabbix.com/zabbix/{{ zabbix_javagateway_version }}/rhel/{{ ansible_distribution_major_version }}/$basearch/"
     gpgcheck: 0
     gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-ZABBIX
     state: present
@@ -21,7 +22,7 @@ zabbix_repo_yum:
     gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-ZABBIX
     state: present
 
-javagateway_pidfile: /run/zabbix/zabbix_java_gateway.pid
-javagateway_listenip: 0.0.0.0
-javagateway_listenport: 10052
-javagateway_startpollers: 5
+zabbix_javagateway_pidfile: /run/zabbix/zabbix_java_gateway.pid
+zabbix_javagateway_listenip: 0.0.0.0
+zabbix_javagateway_listenport: 10052
+zabbix_javagateway_startpollers: 5
