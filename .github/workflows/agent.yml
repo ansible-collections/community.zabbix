@@ -1,0 +1,72 @@
+name: "community.zabbix.zabbix_agent"
+on:
+  push:
+    paths:
+      - 'roles/zabbix_agent/**'
+      - 'molecule/zabbix_agent/**'
+      - '.github/workflows/agent.yml'
+  pull_request:
+    paths:
+      - 'roles/zabbix_agent/**'
+      - 'molecule/zabbix_agent/**'
+      - '.github/workflows/agent.yml'
+jobs:
+  molecule:
+    runs-on: ubuntu-18.04
+    strategy:
+      fail-fast: false
+      matrix:
+        molecule_distro:
+          - container: centos
+            image: geerlingguy/docker-centos8-ansible:latest
+            group: agent
+          - container: centos
+            image: geerlingguy/docker-centos7-ansible:latest
+            group: agent
+          - container: ubuntu
+            image: geerlingguy/docker-ubuntu2004-ansible
+            group: agent
+          - container: pgsql-ubuntu
+            image: geerlingguy/docker-ubuntu1804-ansible
+            group: agent
+          - container: debian
+            image: geerlingguy/docker-debian9-ansible
+            group: agent
+          - container: debian
+            image: geerlingguy/docker-debian8-ansible
+            group: agent
+          - container: mint
+            image: wdijkerman/mint19.3-amd64
+            command: /sbin/init
+            group: agent
+        collection_role:
+          - zabbix_agent
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v1
+
+      - name: Set up Python 3.7
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.7
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r molecule/requirements.txt
+
+      - name: Build the collection
+        run: |
+          collection_file=$( basename $(ansible-galaxy collection build -f | awk -F" " '{print $NF}'))
+          echo "::set-env name=COLLECTION_FILE::$collection_file"
+
+      - name: Install the collection
+        run: ansible-galaxy collection install $COLLECTION_FILE
+
+      - name: Run role tests
+        run: >-
+          MY_MOLECULE_CONTAINER=${{ matrix.molecule_distro.container }}
+          MY_MOLECULE_IMAGE=${{ matrix.molecule_distro.image }}
+          MY_MOLECULE_GROUP=${{ matrix.molecule_distro.group }}
+          MY_MOLECULE_DOCKER_COMMAND=${{ matrix.molecule_distro.command }}
+          molecule test -s ${{ matrix.collection_role }}
