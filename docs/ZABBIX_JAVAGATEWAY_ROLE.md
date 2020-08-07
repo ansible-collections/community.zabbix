@@ -67,10 +67,10 @@ The following is an overview of all available configuration default for this rol
 
 ### Java Gatewaty
 
-* `javagateway_pidfile`: Default: `/run/zabbix/zabbix_java_gateway.pid`. The location for the pid file.
-* `javagateway_listenip`: Default: `0.0.0.0`. The IP address to listen on.
-* `javagateway_listenport`: Default: `10052`. The port on which Java Gateway is listening on.
-* `javagateway_startpollers`: Default: `5`. The amount of pollers to start.
+* `zabbix_javagateway_pidfile`: Default: `/run/zabbix/zabbix_java_gateway.pid`. The location for the pid file.
+* `zabbix_javagateway_listenip`: Default: `0.0.0.0`. The IP address to listen on.
+* `zabbix_javagateway_listenport`: Default: `10052`. The port on which Java Gateway is listening on.
+* `zabbix_javagateway_startpollers`: Default: `5`. The amount of pollers to start.
 
 # Dependencies
 
