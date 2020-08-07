@@ -1,0 +1,56 @@
+---
+- name: Prepare
+  hosts: all
+  pre_tasks:
+
+    - name: "Set short version name"
+      set_fact:
+        zabbix_python_prefix: "python{% if ansible_python_version is version('3', '>=') %}3{% endif %}"
+
+    - name: "Installing packages on CentOS"
+      yum:
+        name:
+          - net-tools
+          - which
+          - sudo
+        state: present
+      register: installation_dependencies
+      until: installation_dependencies is succeeded
+      when:
+        - ansible_os_family == 'RedHat'
+
+    - name: "Make sure the docs can be installed. (Debian)"
+      lineinfile:
+        path: /etc/dpkg/dpkg.cfg.d/excludes
+        state: absent
+        regexp: 'path-exclude=/usr/share/doc/*'
+      when:
+        - ansible_os_family != 'RedHat'
+
+    # https://github.com/geerlingguy/ansible-role-java/issues/64
+    - name: "Apt update"
+      shell: "apt-get update && mkdir -p /usr/share/man/man1"
+      args:
+        warn: False
+      register: installation_dependencies
+      until: installation_dependencies is succeeded
+      when:
+        - ansible_os_family != 'RedHat'
+
+    - name: "Installing packages on NON-CentOS"
+      apt:
+        name:
+          - net-tools
+          - apt-utils
+          - "{{ zabbix_python_prefix }}-pip"
+          - gpg-agent
+          - "{{ zabbix_python_prefix }}-apt"
+          - sudo
+          - software-properties-common
+          - openjdk-8-jdk
+        update_cache: True
+        state: present
+      register: installation_dependencies
+      until: installation_dependencies is succeeded
+      when:
+        - ansible_os_family != 'RedHat'
