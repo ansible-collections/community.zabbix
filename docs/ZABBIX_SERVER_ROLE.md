@@ -99,7 +99,7 @@ The following is an overview of all available configuration default for this rol
 
 ### Zabbix Server
 
-* `zabbix_server_package_state`: Default: `present`. Can be overridden to "latest" to update packages when needed.
+* `zabbix_server_package_state`: Default: `present`. Can be overridden to `latest` to update packages when needed.
 * `zabbix_server_listenport`: Default: `10051`. On which port the Zabbix Server is available.
 * `zabbix_server_install_recommends`: Default: `True`. `False` does not install the recommended packages that come with the zabbix-server install.
 * `zabbix_server_manage_service`: Default: `True`. When you run multiple Zabbix servers in a High Available cluster setup (e.g. pacemaker), you don't want Ansible to manage the zabbix-server service, because Pacemaker is in control of zabbix-server service and in this case, it needs to be set to `False`.

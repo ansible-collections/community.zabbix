@@ -85,7 +85,8 @@ The following is an overview of all available configuration default for this rol
 
 * `zabbix_server_host`: The ip or dns name for the zabbix-server machine.
 * `zabbix_server_port`: The port on which the zabbix-server is running. Default: 10051
-* `*zabbix_proxy_package_state`: Default: `present`. Can be overridden to `latest` to update packages * `zabbix_proxy_install_database_client`: Default: `True`. False does not install database client.
+* `*zabbix_proxy_package_state`: Default: `present`. Can be overridden to `latest` to update packages
+* `zabbix_proxy_install_database_client`: Default: `True`. False does not install database client.
 * `zabbix_proxy_become_on_localhost`: Default: `True`. Set to `False` if you don't need to elevate privileges on localhost to install packages locally with pip.
 * `zabbix_proxy_manage_service`: Default: `True`. When you run multiple Zabbix proxies in a High Available cluster setup (e.g. pacemaker), you don't want Ansible to manage the zabbix-proxy service, because Pacemaker is in control of zabbix-proxy service.
 * `zabbix_install_pip_packages`: Default: `True`. Set to `False` if you don't want to install the required pip packages. Useful when you control your environment completely.
