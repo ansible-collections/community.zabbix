@@ -1,6 +1,6 @@
 ---
 
-- name: Converge
+- name: Prepare
   hosts: all
   tasks:
     - name: "Installing packages on CentOS family"
@@ -28,8 +28,7 @@
     - name: "Installing packages on Debian family"
       apt:
         name:
-          - net-tools
-          - gnupg2
+          - "{{ 'net-tools' if ansible_distribution_major_version not in ['18', '20'] else 'iproute2' }}"
         state: present
       register: zabbix_agent_prepare_packages_install
       until: zabbix_agent_prepare_packages_install is succeeded
@@ -44,7 +43,7 @@
       tags:
         - skip_ansible_lint
 
-- name: Converge
+- name: Prepare
   hosts: docker
   tasks:
     - name: "Download Docker CE repo file"
