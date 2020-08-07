@@ -4,7 +4,7 @@ import pytest
 import testinfra.utils.ansible_runner
 
 testinfra_hosts = testinfra.utils.ansible_runner.AnsibleRunner(
-    os.environ['MOLECULE_INVENTORY_FILE']).get_hosts('all')
+    os.environ['MOLECULE_INVENTORY_FILE']).get_hosts('agent')
 
 
 def test_zabbixagent_running_and_enabled(host):
@@ -61,6 +61,6 @@ def test_zabbix_package(host, zabbix_packages):
     assert zabbixagent.is_installed
 
     if host.system_info.distribution == 'debian':
-        assert zabbixagent.version.startswith("1:4.2")
+        assert zabbixagent.version.startswith("1:5.0")
     if host.system_info.distribution == 'centos':
-        assert zabbixagent.version.startswith("4.2")
+        assert zabbixagent.version.startswith("5.0")
