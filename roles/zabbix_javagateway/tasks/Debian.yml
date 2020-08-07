@@ -1,13 +1,20 @@
 ---
 
+- name: "Include Zabbix gpg ids"
+  include_vars: zabbix.yml
+
+- name: "Set some variables"
+  set_fact:
+    zabbix_short_version: "{{ zabbix_javagateway_version | regex_replace('\\.', '') }}"
+
 - name: "Debian | Install gpg key"
   apt_key:
-    id: 79EA5ED4
+    id: "{{ sign_keys[zabbix_short_version][ansible_distribution_release]['sign_key'] }}"
     url: http://repo.zabbix.com/zabbix-official-repo.key
 
 - name: "Debian | Installing repository Debian"
   apt_repository:
-    repo: "deb http://repo.zabbix.com/zabbix/{{ zabbix_version }}/debian/ {{ ansible_distribution_release }} main"
+    repo: "deb http://repo.zabbix.com/zabbix/{{ zabbix_javagateway_version }}/debian/ {{ ansible_distribution_release }} main"
     state: present
   when:
     - ansible_distribution == "Debian"
@@ -15,7 +22,7 @@
 
 - name: "Debian | Installing repository Debian"
   apt_repository:
-    repo: "deb-src http://repo.zabbix.com/zabbix/{{ zabbix_version }}/debian/ {{ ansible_distribution_release }} main"
+    repo: "deb-src http://repo.zabbix.com/zabbix/{{ zabbix_javagateway_version }}/debian/ {{ ansible_distribution_release }} main"
     state: present
   when:
     - ansible_distribution == "Debian"
@@ -23,7 +30,7 @@
 
 - name: "Debian | Installing repository Ubuntu"
   apt_repository:
-    repo: "deb http://repo.zabbix.com/zabbix/{{ zabbix_version }}/ubuntu/ {{ ansible_distribution_release }} main"
+    repo: "deb http://repo.zabbix.com/zabbix/{{ zabbix_javagateway_version }}/ubuntu/ {{ ansible_distribution_release }} main"
     state: present
   when:
     - ansible_distribution == "Ubuntu"
@@ -31,7 +38,7 @@
 
 - name: "Debian | Installing repository Ubuntu"
   apt_repository:
-    repo: "deb-src http://repo.zabbix.com/zabbix/{{ zabbix_version }}/ubuntu/ {{ ansible_distribution_release }} main"
+    repo: "deb-src http://repo.zabbix.com/zabbix/{{ zabbix_javagateway_version }}/ubuntu/ {{ ansible_distribution_release }} main"
     state: present
   when:
     - ansible_distribution == "Ubuntu"
@@ -40,7 +47,7 @@
 - name: "Debian | Installing zabbix-java-gateway"
   apt:
     pkg: zabbix-java-gateway
-    state: present
+    state: "{{ zabbix_javagateway_package_state }}"
     update_cache: yes
     force: yes
     cache_valid_time: 3600
