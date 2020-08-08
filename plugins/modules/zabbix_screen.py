@@ -169,25 +169,14 @@ EXAMPLES = r'''
 '''
 
 
-import atexit
-import traceback
+from ansible.module_utils.basic import AnsibleModule
 
-try:
-    from zabbix_api import ZabbixAPI, ZabbixAPIException, Already_Exists
-
-    HAS_ZABBIX_API = True
-except ImportError:
-    ZBX_IMP_ERR = traceback.format_exc()
-    HAS_ZABBIX_API = False
-
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+from ansible_collections.community.zabbix.plugins.module_utils.base import ZabbixBase
+from ansible_collections.community.zabbix.plugins.module_utils.wrappers import ScreenItem
+import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabbix_utils
 
 
-class Screen(object):
-    def __init__(self, module, zbx):
-        self._module = module
-        self._zapi = zbx
-
+class Screen(ZabbixBase):
     # get list of group ids by list of group names
     def get_host_group_ids(self, group_names):
         if not group_names:
@@ -292,18 +281,15 @@ class Screen(object):
 
     # delete screen items
     def delete_screen_items(self, screen_id, screen_item_id_list):
-        try:
-            if len(screen_item_id_list) == 0:
-                return True
-            screen_item_list = self.get_screen_items(screen_id)
-            if len(screen_item_list) > 0:
-                if self._module.check_mode:
-                    self._module.exit_json(changed=True)
-                self._zapi.screenitem.delete(screen_item_id_list)
-                return True
-            return False
-        except ZabbixAPIException:
-            pass
+        if len(screen_item_id_list) == 0:
+            return True
+        screen_item_list = self.get_screen_items(screen_id)
+        if len(screen_item_list) > 0:
+            if self._module.check_mode:
+                self._module.exit_json(changed=True)
+            ScreenItem.delete(self, screen_item_id_list)
+            return True
+        return False
 
     # get screen's hsize and vsize
     def get_hsize_vsize(self, hosts, v_size, graphs_in_row):
@@ -333,87 +319,59 @@ class Screen(object):
         if height is None or height < 0:
             height = 100
 
-        try:
-            # when there're only one host, only one row is not good.
-            if len(hosts) == 1:
-                graph_id_list = self.get_graphs_by_host_id(graph_name_list, hosts[0])
-                for i, graph_id in enumerate(graph_id_list):
+        # when there're only one host, only one row is not good.
+        if len(hosts) == 1:
+            graph_id_list = self.get_graphs_by_host_id(graph_name_list, hosts[0])
+            for i, graph_id in enumerate(graph_id_list):
+                if graph_id is not None:
+                    ScreenItem.create(self, ignoreExists=True, data={'screenid': screen_id, 'resourcetype': 0, 'resourceid': graph_id,
+                                                                     'width': width, 'height': height,
+                                                                     'x': i % h_size, 'y': i // h_size, 'colspan': 1, 'rowspan': 1,
+                                                                     'elements': 0, 'valign': 0, 'halign': 0,
+                                                                     'style': 0, 'dynamic': 0, 'sort_triggers': 0})
+        else:
+            for i, host in enumerate(hosts):
+                graph_id_list = self.get_graphs_by_host_id(graph_name_list, host)
+                for j, graph_id in enumerate(graph_id_list):
                     if graph_id is not None:
-                        self._zapi.screenitem.create({'screenid': screen_id, 'resourcetype': 0, 'resourceid': graph_id,
-                                                      'width': width, 'height': height,
-                                                      'x': i % h_size, 'y': i // h_size, 'colspan': 1, 'rowspan': 1,
-                                                      'elements': 0, 'valign': 0, 'halign': 0,
-                                                      'style': 0, 'dynamic': 0, 'sort_triggers': 0})
-            else:
-                for i, host in enumerate(hosts):
-                    graph_id_list = self.get_graphs_by_host_id(graph_name_list, host)
-                    for j, graph_id in enumerate(graph_id_list):
-                        if graph_id is not None:
-                            self._zapi.screenitem.create({'screenid': screen_id, 'resourcetype': 0, 'resourceid': graph_id,
-                                                          'width': width, 'height': height,
-                                                          'x': i % graphs_in_row, 'y': len(graph_id_list) * (i // graphs_in_row) + j,
-                                                          'colspan': 1, 'rowspan': 1,
-                                                          'elements': 0, 'valign': 0, 'halign': 0,
-                                                          'style': 0, 'dynamic': 0, 'sort_triggers': 0})
-        except Already_Exists:
-            pass
+                        ScreenItem.create(self, ignoreExists=True, data={'screenid': screen_id, 'resourcetype': 0, 'resourceid': graph_id,
+                                                                         'width': width, 'height': height,
+                                                                         'x': i % graphs_in_row, 'y': len(graph_id_list) * (i // graphs_in_row) + j,
+                                                                         'colspan': 1, 'rowspan': 1,
+                                                                         'elements': 0, 'valign': 0, 'halign': 0,
+                                                                         'style': 0, 'dynamic': 0, 'sort_triggers': 0})
 
 
 def main():
+    argument_spec = zabbix_utils.zabbix_common_argument_spec()
+    argument_spec.update(dict(
+        screens=dict(
+            type='list',
+            elements='dict',
+            required=True,
+            options=dict(
+                screen_name=dict(type='str', required=True),
+                host_group=dict(type='list', aliases=['host_groups'], elements='str'),
+                state=dict(type='str', default='present', choices=['absent', 'present']),
+                graph_names=dict(type='list', elements='str'),
+                graph_width=dict(type='int', default=None),
+                graph_height=dict(type='int', default=None),
+                graphs_in_row=dict(type='int', default=3),
+                sort=dict(default=False, type='bool'),
+            ),
+            required_if=[
+                ['state', 'present', ['host_group']]
+            ]
+        )
+    ))
     module = AnsibleModule(
-        argument_spec=dict(
-            server_url=dict(type='str', required=True, aliases=['url']),
-            login_user=dict(type='str', required=True),
-            login_password=dict(type='str', required=True, no_log=True),
-            http_login_user=dict(type='str', required=False, default=None),
-            http_login_password=dict(type='str', required=False, default=None, no_log=True),
-            validate_certs=dict(type='bool', required=False, default=True),
-            timeout=dict(type='int', default=10),
-            screens=dict(
-                type='list',
-                elements='dict',
-                required=True,
-                options=dict(
-                    screen_name=dict(type='str', required=True),
-                    host_group=dict(type='list', aliases=['host_groups'], elements='str'),
-                    state=dict(type='str', default='present', choices=['absent', 'present']),
-                    graph_names=dict(type='list', elements='str'),
-                    graph_width=dict(type='int', default=None),
-                    graph_height=dict(type='int', default=None),
-                    graphs_in_row=dict(type='int', default=3),
-                    sort=dict(default=False, type='bool'),
-                ),
-                required_if=[
-                    ['state', 'present', ['host_group']]
-                ]
-            )
-        ),
+        argument_spec=argument_spec,
         supports_check_mode=True
     )
 
-    if not HAS_ZABBIX_API:
-        module.fail_json(msg=missing_required_lib('zabbix-api', url='https://pypi.org/project/zabbix-api/'), exception=ZBX_IMP_ERR)
-
-    server_url = module.params['server_url']
-    login_user = module.params['login_user']
-    login_password = module.params['login_password']
-    http_login_user = module.params['http_login_user']
-    http_login_password = module.params['http_login_password']
-    validate_certs = module.params['validate_certs']
-    timeout = module.params['timeout']
     screens = module.params['screens']
 
-    zbx = None
-    # login to zabbix
-    try:
-        zbx = ZabbixAPI(server_url, timeout=timeout, user=http_login_user, passwd=http_login_password,
-                        validate_certs=validate_certs)
-        zbx.login(login_user, login_password)
-        atexit.register(zbx.logout)
-    except Exception as e:
-        module.fail_json(msg="Failed to connect to Zabbix server: %s" % e)
-
-    screen = Screen(module, zbx)
+    screen = Screen(module)
     created_screens = []
     changed_screens = []
     deleted_screens = []
