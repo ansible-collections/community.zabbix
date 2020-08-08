@@ -1,5 +1,13 @@
 ---
 
+- name: ensure zabbix server is being monitored
+  community.zabbix.zabbix_host:
+    server_url: "{{ zabbix_server_url }}"
+    login_user: "{{ zabbix_login_user }}"
+    login_password: "{{ zabbix_login_password }}"
+    host_name: Zabbix server
+    status: enabled
+
 - name: test - delete the screen again
   community.zabbix.zabbix_screen:
     server_url: "{{ zabbix_server_url }}"
@@ -8,6 +16,7 @@
     screens:
       - screen_name: TestScreen1
         state: absent
+
 
 # #################################################
 # Test screen creation
@@ -72,6 +81,8 @@
           - 'Zabbix cache usage, % used'
           - 'Zabbix internal process busy %'
           - 'Zabbix internal queues'
+          - 'Zabbix server performance'
+          - 'Zabbix data gathering process busy %'
         graph_width: 200
         graph_height: 100
         graphs_in_row: 5
