@@ -1,0 +1,146 @@
+---
+
+- name: ensure zabbix server is being monitored
+  community.zabbix.zabbix_host:
+    server_url: "{{ zabbix_server_url }}"
+    login_user: "{{ zabbix_login_user }}"
+    login_password: "{{ zabbix_login_password }}"
+    host_name: Zabbix server
+    status: enabled
+
+- name: test - delete the screen again
+  community.zabbix.zabbix_screen:
+    server_url: "{{ zabbix_server_url }}"
+    login_user: "{{ zabbix_login_user }}"
+    login_password: "{{ zabbix_login_password }}"
+    screens:
+      - screen_name: TestScreen1
+        state: absent
+
+
+# #################################################
+# Test screen creation
+# #################################################
+
+- name: test - Create a new screen
+  community.zabbix.zabbix_screen:
+    server_url: "{{ zabbix_server_url }}"
+    login_user: "{{ zabbix_login_user }}"
+    login_password: "{{ zabbix_login_password }}"
+    screens:
+      - screen_name: TestScreen1
+        host_group: Zabbix servers
+        state: present
+        graph_names:
+          - 'Zabbix cache usage, % used'
+          - 'Zabbix internal process busy %'
+        graph_width: 200
+        graph_height: 100
+        graphs_in_row: 5
+  register: result
+
+- assert:
+    that:
+      - result.changed
+
+- name: test - Create a new screen again
+  community.zabbix.zabbix_screen:
+    server_url: "{{ zabbix_server_url }}"
+    login_user: "{{ zabbix_login_user }}"
+    login_password: "{{ zabbix_login_password }}"
+    screens:
+      - screen_name: TestScreen1
+        host_group: Zabbix servers
+        state: present
+        graph_names:
+          - 'Zabbix cache usage, % used'
+          - 'Zabbix internal process busy %'
+        graph_width: 200
+        graph_height: 100
+        graphs_in_row: 5
+  register: result
+
+- assert:
+    that:
+      - not result.changed
+
+# #################################################
+# Test screen editing
+# #################################################
+
+- name: test - Adding new graph
+  community.zabbix.zabbix_screen:
+    server_url: "{{ zabbix_server_url }}"
+    login_user: "{{ zabbix_login_user }}"
+    login_password: "{{ zabbix_login_password }}"
+    screens:
+      - screen_name: TestScreen1
+        host_group: Zabbix servers
+        state: present
+        graph_names:
+          - 'Zabbix cache usage, % used'
+          - 'Zabbix internal process busy %'
+          - 'Zabbix internal queues'
+          - 'Zabbix server performance'
+          - 'Zabbix data gathering process busy %'
+        graph_width: 200
+        graph_height: 100
+        graphs_in_row: 5
+  register: result
+
+- assert:
+    that:
+      - result.changed
+
+- name: test - Removing graph
+  community.zabbix.zabbix_screen:
+    server_url: "{{ zabbix_server_url }}"
+    login_user: "{{ zabbix_login_user }}"
+    login_password: "{{ zabbix_login_password }}"
+    screens:
+      - screen_name: TestScreen1
+        host_group: Zabbix servers
+        state: present
+        graph_names:
+          - 'Zabbix cache usage, % used'
+          - 'Zabbix internal queues'
+        graph_width: 200
+        graph_height: 100
+        graphs_in_row: 5
+  register: result
+
+- assert:
+    that:
+      - result.changed
+
+# #################################################
+# Test screen deletion
+# #################################################
+
+- name: test - delete the screen
+  community.zabbix.zabbix_screen:
+    server_url: "{{ zabbix_server_url }}"
+    login_user: "{{ zabbix_login_user }}"
+    login_password: "{{ zabbix_login_password }}"
+    screens:
+      - screen_name: TestScreen1
+        state: absent
+  register: result
+
+- assert:
+    that:
+      - result.changed
+
+- name: test - delete the screen again
+  community.zabbix.zabbix_screen:
+    server_url: "{{ zabbix_server_url }}"
+    login_user: "{{ zabbix_login_user }}"
+    login_password: "{{ zabbix_login_password }}"
+    screens:
+      - screen_name: TestScreen1
+        state: absent
+  register: result
+
+- assert:
+    that:
+      - not result.changed

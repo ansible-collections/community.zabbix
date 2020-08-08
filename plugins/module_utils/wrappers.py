@@ -12,7 +12,8 @@ import traceback
 from ansible.module_utils.basic import missing_required_lib
 
 try:
-    from zabbix_api import ZabbixAPI
+    from zabbix_api import ZabbixAPI, Already_Exists, ZabbixAPIException
+
     HAS_ZABBIX_API = True
 except ImportError:
     ZBX_IMP_ERR = traceback.format_exc()
@@ -55,3 +56,22 @@ class ZapiWrapper(object):
                 atexit.register(self._zapi.logout)
             except Exception as e:
                 self._module.fail_json(msg="Failed to connect to Zabbix server: %s" % e)
+
+
+class ScreenItem(object):
+    @staticmethod
+    def create(zapi_wrapper, data, ignoreExists=False):
+        try:
+            zapi_wrapper._zapi.screenitem.create(data)
+        except Already_Exists as ex:
+            if not ignoreExists:
+                raise ex
+
+    @staticmethod
+    def delete(zapi_wrapper, id_list=None):
+        try:
+            if id_list is None:
+                id_list = []
+            zapi_wrapper._zapi.screenitem.delete(id_list)
+        except ZabbixAPIException as ex:
+            raise ex
