@@ -50,11 +50,27 @@ See the following list of supported Operating systems with the Zabbix releases.
 
 # Role Variables
 
-There are some variables in de default/main.yml which can (Or needs to) be changed/overriden:
+## Main variables
 
-* `zabbix_version`: This is the version of zabbix. Default: 5.0. Can be overridden to 4.4, 4.0, 3.4, 3.2, 3.0, 2.4, or 2.2.
+The following is an overview of all available configuration default for this role.
 
-* `zabbix_repo`: True / False. When you already have an repository with the zabbix components, you can set it to False.
+### Overall Zabbix
+
+* `zabbix_javagateway_version`: This is the version of zabbix. Default: 5.0. Can be overridden to 4.4, 4.0, 3.4, 3.2, 3.0, 2.4, or 2.2. Previously the variable `zabbix_version` was used directly but it could cause [some inconvenience](https://github.com/dj-wasabi/ansible-zabbix-agent/pull/303). That variable is maintained by retrocompativility.
+* `zabbix_repo`: Default: `zabbix`
+  * `epel`: install agent from EPEL repo
+  * `zabbix`: (default) install agent from Zabbix repo
+  * `other`: install agent from pre-existing or other repo
+* `zabbix_repo_yum`: A list with Yum repository configuration.
+* `zabbix_repo_yum_schema`: Default: `https`. Option to change the web schema for the yum repository(http/https)
+* `zabbix_javagateway_package_state`: Default: `present`. Can be overridden to `latest` to update packages when needed.
+
+### Java Gatewaty
+
+* `zabbix_javagateway_pidfile`: Default: `/run/zabbix/zabbix_java_gateway.pid`. The location for the pid file.
+* `zabbix_javagateway_listenip`: Default: `0.0.0.0`. The IP address to listen on.
+* `zabbix_javagateway_listenport`: Default: `10052`. The port on which Java Gateway is listening on.
+* `zabbix_javagateway_startpollers`: Default: `5`. The amount of pollers to start.
 
 # Dependencies
 
@@ -74,8 +90,6 @@ or when using the zabbix-proxy:
       zabbix_server_host: 192.168.1.1
       zabbix_proxy_javagateway: 192.168.1.2
 ```
-
-The above is assumed you'll using the 'dj-wasabi' zabbix roles. Don't know how to do this with other zabbix-server (or zabbix-proxy) roles from other members.
 
 # Example Playbook
 

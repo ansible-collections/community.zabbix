@@ -11,10 +11,8 @@ Table of Contents
   * [Main variables](#main-variables)
     + [Overall Zabbix](#overall-zabbix)
     + [Zabbix Web specific](#zabbix-web-specific)
+    + [TLS Specific configuration](#tls-specific-configuration)
     + [Zabbix Server](#zabbix-server)
-  * [Examples of configuration](#examples-of-configuration)
-    + [zabbix_repo_yum](#zabbix-repo-yum)
-- [Dependencies](#dependencies)
 - [Example Playbook](#example-playbook)
   * [Single instance](#single-instance)
   * [Multi host setup](#multi-host-setup)
@@ -67,10 +65,10 @@ Installing this role is very simple: `ansible-galaxy install community.zabbix.za
 
 When the Zabbix Web needs to be running on the same host as the Zabbix Server, please also install the Zabbix Server by executing the following command: `ansible-galaxy install community.zabbix.zabbix_server`
 
- Default username/password for the Zabbix Web interface is the default.
+Default username/password for the Zabbix Web interface is the default.
 
- Username: Admin
- Password: zabbix
+Username: Admin
+Password: zabbix
 
 # Role Variables
 
@@ -80,36 +78,43 @@ The following is an overview of all available configuration defaults for this ro
 
 ### Overall Zabbix
 
-* `zabbix_web_version`: This is the version of zabbix. Default: 5.0, Can be overridden to 4.4, 4.0, 3.4, 3.2, 3.0, 2.4, or 2.2. Previously the variable `zabbix_version` was used directly but it could cause [some inconvenience](https://github.com/dj-wasabi/ansible-zabbix-agent/pull/303). That variable is maintained by retrocompativility.
+* `zabbix_server_version`: This is the version of zabbix. Default: 5.0. Can be overridden to 4.4, 4.0, 3.4, 3.2, 3.0, 2.4, or 2.2. Previously the variable `zabbix_version` was used directly but it could cause [some inconvenience](https://github.com/dj-wasabi/ansible-zabbix-agent/pull/303). That variable is maintained by retrocompativility.
+* `zabbix_repo`: Default: `zabbix`
+  * `epel`: install agent from EPEL repo
+  * `zabbix`: (default) install agent from Zabbix repo
+  * `other`: install agent from pre-existing or other repo
 * `zabbix_repo_yum`: A list with Yum repository configuration.
-* `zabbix_repo_yum_schema`: Option to change the web schema for the yum repository(http/https)
-* `zabbix_web_package_state`: Default: _present_. Can be overridden to "latest" to update packages when needed.
+* `zabbix_repo_yum_schema`: Default: `https`. Option to change the web schema for the yum repository(http/https)
+
+* `zabbix_web_package_state`: Default: `present`. Can be overridden to `latest` to update packages when needed.
 * `zabbix_web_centos_release`: Default: False. When the `centos-release-scl` repository needs to be enabled. This is required when using Zabbix 5.0 due to installation of a recent version of `PHP`.
 
 ### Zabbix Web specific
 
 * `zabbix_url`: This is the url on which the zabbix web interface is available. Default is zabbix.example.com, you should override it. For example, see "Example Playbook"
 * `zabbix_url_aliases`: A list with Aliases for the Apache Virtual Host configuration.
-* `zabbix_timezone`: This is the timezone. The Apache Virtual Host needs this parameter. Default: Europe/Amsterdam
-* `zabbix_vhost`: True / False. When you don't want to create an Apache Virtual Host configuration, you can set it to False.
+* `zabbix_timezone`: Default: `Europe/Amsterdam`. This is the timezone. The Apache Virtual Host needs this parameter.
+* `zabbix_vhost`: Default: `true`. When you don't want to create an Apache Virtual Host configuration, you can set it to False.
 * `zabbix_apache_vhost_port`: The port on which Zabbix HTTP vhost is running.
 * `zabbix_apache_vhost_tls_port`: The port on which Zabbix HTTPS vhost is running.
 * `zabbix_apache_vhost_port`: On which port the Apache Virtual Host is available.
 * `zabbix_apache_vhost_listen_ip`: On which interface the Apache Virtual Host is available.
-* `zabbix_apache_can_connect_ldap`: True / False. Set SELinux boolean to allow httpd to connect to LDAP. Default is False.
-* `zabbix_php_install`: True / False. Switch for extra install of packages for PHP, currently on for Debian/Ubuntu. Default is true.
+* `zabbix_apache_can_connect_ldap`: Default: `false`. Set SELinux boolean to allow httpd to connect to LDAP.
+* `zabbix_php_install`: Default: `true`. True / False. Switch for extra install of packages for PHP, currently on for Debian/Ubuntu.
 * `zabbix_web_max_execution_time`:
 * `zabbix_web_memory_limit`:
 * `zabbix_web_post_max_size`:
 * `zabbix_web_upload_max_filesize`:
 * `zabbix_web_max_input_time`:
-* `zabbix_apache_include_custom_fragment`: True / False. Includes php_value vars max_execution_time, memory_limit, post_max_size, upload_max_filesize, max_input_time and date.timezone in vhost file.. place those in php-fpm configuration. Default is true.
-* `zabbix_web_env`: (Optional) A Dictionary of PHP Environments
+* `zabbix_apache_include_custom_fragment`: Default: `true`. Includes php_value vars max_execution_time, memory_limit, post_max_size, upload_max_filesize, max_input_time and date.timezone in vhost file.. place those in php-fpm configuration.
+* `zabbix_web_env`: (Optional) A Dictionary of PHP Environments settings.
 
 The following properties are specific to Zabbix 5.0:
 
 * `zabbix_php_fpm_dir_etc`: etc HOME root directory of PHP-FPM
 * `zabbix_php_fpm_dir_var`: Var HOME root directory of PHP-FPM
+
+### TLS Specific configuration
 
 The following properties are related when TLS/SSL is configured:
 
@@ -148,34 +153,6 @@ The following properties are related when using Elasticsearch for history storag
 See the following links for more information regarding Zabbix and Elasticsearch
 https://www.zabbix.com/documentation/3.4/manual/appendix/install/elastic_search_setup
 https://www.zabbix.com/documentation/4.0/manual/appendix/install/elastic_search_setup
-
-## Examples of configuration
-
-### zabbix_repo_yum
-
-Current default configuration and example for specifying a yum repository:
-
-```yaml
-zabbix_repo_yum:
-  - name: zabbix
-    description: Zabbix Official Repository - $basearch
-    baseurl: http://repo.zabbix.com/zabbix/{{ zabbix_version }}/rhel/{{ ansible_distribution_major_version }}/$basearch/
-    gpgcheck: 0
-    gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-ZABBIX
-    state: present
-  - name: zabbix
-    description: Zabbix Official Repository non-supported - $basearch
-    baseurl: http://repo.zabbix.com/non-supported/rhel/{{ ansible_distribution_major_version }}/$basearch/
-    gpgcheck: 0
-    gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-ZABBIX
-    state: present
-```
-
-# Dependencies
-
-This role has one dependency for Apache usage: geerlingguy.apache. Via the variable zabbix_websrv != 'apache' this can be skipped.
-
-As it is also possible to run the zabbix-web on a different host than the zabbix-server, the zabbix-server is not configured to be an dependency.
 
 # Example Playbook
 
