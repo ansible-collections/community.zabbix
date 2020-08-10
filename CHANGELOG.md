@@ -69,6 +69,32 @@
   - zabbix_template - is now able to perform `state=dump` when using `ansible-playbook --check`.
 
 ## 0.1.0
+
+### Bug Fixes:
+#### Modules:
+    - zabbix_action - no longer requires `esc_period` and `event_source` arguments when `state=absent`.
+    - zabbix_action - allow str values for `esc_period` options (https://github.com/ansible/ansible/pull/66841).
+    - zabbix_host - now supports configuring user macros and host tags on the managed host (see https://github.com/ansible/ansible/pull/66777)
+    - zabbix_host_info - `host_name` based search results now include host groups.
+    - zabbix_hostmacro - `macro_name` now accepts macros in zabbix native format as well (e.g. `{$MACRO}`)
+    - zabbix_hostmacro - `macro_value` is no longer required when `state=absent`
+    - zabbix_proxy - `interface` sub-options `type` and `main` are now deprecated and will be removed in community.general 3.0.0. Also, the values passed to `interface` are now checked for correct types and unexpected keys.
+    - zabbix_proxy - added option proxy_address for comma-delimited list of IP/CIDR addresses or DNS names to accept active proxy requests from
+    - zabbix_template - add new option omit_date to remove date from exported/dumped template (https://github.com/ansible/ansible/pull/67302)
+    - zabbix_template - adding new update rule templateLinkage.deleteMissing for newer zabbix versions (https://github.com/ansible/ansible/pull/66747).
+    - zabbix_template_info - add new option omit_date to remove date from exported/dumped template (https://github.com/ansible/ansible/pull/67302)
+    - zabbix_proxy - deprecates `interface` sub-options `type` and `main` when proxy type is set to passive via `status=passive`. Make sure these suboptions are removed from your playbook as they were never supported by Zabbix in the first place.
+
+### Minor Changes:
+#### Modules:
+    - zabbix_action - arguments `event_source` and `esc_period` no longer required when `state=absent`
+    - zabbix_host - fixed inventory_mode key error, which occurs with Zabbix 4.4.1 or more (https://github.com/ansible/ansible/issues/65304).
+    - zabbix_host - was not possible to update a host where visible_name was not set in zabbix
+    - zabbix_mediatype - Fixed to support zabbix 4.4 or more and python3 (https://github.com/ansible/ansible/pull/67693)
+    - zabbix_template - fixed error when providing empty `link_templates` to the module (see https://github.com/ansible/ansible/issues/66417)
+    - zabbix_template - fixed invalid (non-importable) output provided by exporting XML (see https://github.com/ansible/ansible/issues/66466)
+    - zabbix_user - Fixed an issue where module failed with zabbix 4.4 or above (see https://github.com/ansible/ansible/pull/67475)
+
   - Initial migration of Zabbix content from Ansible core (2.9 / devel), including content:
     - **Connection Plugins**:
     - **Filter Plugins**:
