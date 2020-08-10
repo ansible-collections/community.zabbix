@@ -51,7 +51,7 @@ NOTE: The `zabbix_version` can still be used, but will be deprecated in later re
 
 #### Agent
 
-A 1-on-1 copy of the Ansible role `dj-wasabi.zabbix-agent` to this collection.
+A 1-on-1 copy of the Ansible role `dj-wasabi.zabbix-agent` to this collection. Due to naming of roles as part of a collection, some characters (Like the `-`) are not allowed anymore. This role is therefore renamed from `zabbix-agent` to `zabbix_agent`.
 
 Example of using the role in this collection:
 ```yaml
@@ -64,7 +64,7 @@ Example of using the role in this collection:
 
 #### Server
 
-A 1-on-1 copy of the Ansible role `dj-wasabi.zabbix-server` to this collection.
+A 1-on-1 copy of the Ansible role `dj-wasabi.zabbix-server` to this collection. Due to naming of roles as part of a collection, some characters (Like the `-`) are not allowed anymore. This role is therefore renamed from `zabbix-server` to `zabbix_server`.
 
 Example of using the role in this collection::
 ```yaml
@@ -78,7 +78,7 @@ Example of using the role in this collection::
 
 #### Proxy
 
-A 1-on-1 copy of the Ansible role `dj-wasabi.zabbix-proxy` to this collection.
+A 1-on-1 copy of the Ansible role `dj-wasabi.zabbix-proxy` to this collection. Due to naming of roles as part of a collection, some characters (Like the `-`) are not allowed anymore. This role is therefore renamed from `zabbix-proxy` to `zabbix_proxy`.
 
 Example of using the role in this collection::
 ```yaml
@@ -93,7 +93,7 @@ Example of using the role in this collection::
 
 #### Web
 
-A 1-on-1 copy of the Ansible role `dj-wasabi.zabbix-web` to this collection.
+A 1-on-1 copy of the Ansible role `dj-wasabi.zabbix-web` to this collection. Due to naming of roles as part of a collection, some characters (Like the `-`) are not allowed anymore. This role is therefore renamed from `zabbix-web` to `zabbix_web`.
 
 Example of using the role in this collection::
 ```yaml
@@ -111,7 +111,7 @@ Example of using the role in this collection::
 
 #### Java Gateway
 
-A 1-on-1 copy of the Ansible role `dj-wasabi.zabbix-javagateway` to this collection.
+A 1-on-1 copy of the Ansible role `dj-wasabi.zabbix-javagateway` to this collection. Due to naming of roles as part of a collection, some characters (Like the `-`) are not allowed anymore. This role is therefore renamed from `zabbix-javagateway` to `zabbix_javagateway`.
 
 Example of using the role in this collection::
 ```yaml
