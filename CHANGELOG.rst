@@ -93,6 +93,11 @@ Minor Changes
 - zabbix_template - fixed invalid (non-importable) output provided by exporting XML (https://github.com/ansible/ansible/issues/66466).
 - zabbix_user - Fixed an issue where module failed with zabbix 4.4 or above (https://github.com/ansible/ansible/pull/67475).
 
+Deprecated Features
+-------------------
+
+- zabbix_proxy (module) - deprecates `interface` sub-options `type` and `main` when proxy type is set to passive via `status=passive`. Make sure these suboptions are removed from your playbook as they were never supported by Zabbix in the first place.
+
 Bugfixes
 --------
 
@@ -102,9 +107,8 @@ Bugfixes
 - zabbix_host_info - `host_name` based search results now include host groups.
 - zabbix_hostmacro - `macro_name` now accepts macros in zabbix native format as well (e.g. `{$MACRO}`).
 - zabbix_hostmacro - `macro_value` is no longer required when `state=absent`.
-- zabbix_proxy - `interface` sub-options `type` and `main` are now deprecated and will be removed in community.general 3.0.0. Also, the values passed to `interface` are now checked for correct types and unexpected keys.
-- zabbix_proxy - added option proxy_address for comma-delimited list of IP/CIDR addresses or DNS names to accept active proxy requests from.
-- zabbix_proxy - deprecates `interface` sub-options `type` and `main` when proxy type is set to passive via `status=passive`. Make sure these suboptions are removed from your playbook as they were never supported by Zabbix in the first place.
+- zabbix_proxy (module) - `interface` sub-options `type` and `main` are now deprecated and will be removed in community.general 3.0.0. Also, the values passed to `interface` are now checked for correct types and unexpected keys.
+- zabbix_proxy (module) - added option proxy_address for comma-delimited list of IP/CIDR addresses or DNS names to accept active proxy requests from.
 - zabbix_template - add new option omit_date to remove date from exported/dumped template (https://github.com/ansible/ansible/pull/67302).
 - zabbix_template - adding new update rule templateLinkage.deleteMissing for newer zabbix versions (https://github.com/ansible/ansible/pull/66747).
 - zabbix_template_info - add new option omit_date to remove date from exported/dumped template (https://github.com/ansible/ansible/pull/67302).
