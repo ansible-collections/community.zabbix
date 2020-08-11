@@ -60,7 +60,7 @@ releases:
         when using ``ansible-playbook --check``.
       minor_changes:
       - Documentation for roles moved to ``docs/`` sub-directory in the collection.
-      - New **role zabbix_agent** - previously known as dj-wasabi/zabbix-agent (also see `UPGRADE.md `<https://github.com/ansible-collections/community.zabbix/blob/main/docs/UPGRADE.md>`_ for each role).
+      - New **role zabbix_agent** - previously known as dj-wasabi/zabbix-agent (also see `UPGRADE.md <https://github.com/ansible-collections/community.zabbix/blob/main/docs/UPGRADE.md>`_ for each role).
       - New **role zabbix_javagateway** - previously known as dj-wasabi/zabbix-javagateway.
       - New **role zabbix_proxy** - previously known as dj-wasabi/zabbix-proxy.
       - New **role zabbix_server** - previously known as dj-wasabi/zabbix-server.
