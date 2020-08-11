@@ -17,7 +17,7 @@ Release Summary
 Minor Changes
 -------------
 
-- All roles now **support Zabbix 5.0** and by default install this version (see https://github.com/ansible-collections/community.zabbix/pull/131 and https://github.com/ansible-collections/community.zabbix/pull/121).
+- All roles now **support Zabbix 5.0** and by default install this version (see `#131 <https://github.com/ansible-collections/community.zabbix/pull/131>` and `#121 <https://github.com/ansible-collections/community.zabbix/pull/121>`).
 - Roles will now install gnupg on Debian OS family if not present.
 - zabbix_action - no longer requires ``password`` and ``ssh_*key_file`` parameters at the same time for ``remote_command`` operations of type SSH.
 - zabbix_action - parameter ``ssh_auth_type`` for SSH ``remote_command`` operation now correctly identifies which other parameters are required.
@@ -30,7 +30,7 @@ Bugfixes
 --------
 
 - zabbix_action - choices for the ``inventory`` paramter sub option in ``*operations`` arguments have been clarified to ``manual`` and ``automatic``.
-- zabbix_action - fixed error on changed API fields ``*default_message`` and ``*default_subject`` for Zabbix 5.0 (see https://github.com/ansible-collections/community.zabbix/pull/92).
+- zabbix_action - fixed error on changed API fields ``*default_message`` and ``*default_subject`` for Zabbix 5.0 (see `#92 <https://github.com/ansible-collections/community.zabbix/pull/92>`).
 - zabbix_action - module will no longer fail when searching for global script provided to ``script_name`` parameter.
 - zabbix_action - now correctly selects mediatype for the (normal|recovery|update) operations with Zabbix 4.4 and newer.
 - zabbix_agent - fixed installation of agent on Windows to directories with spaces.
@@ -92,12 +92,12 @@ Minor Changes
 -------------
 
 - zabbix_action - arguments ``event_source`` and ``esc_period`` no longer required when ``state=absent``.
-- zabbix_host - fixed inventory_mode key error, which occurs with Zabbix 4.4.1 or more (https://github.com/ansible/ansible/issues/65304).
+- zabbix_host - fixed inventory_mode key error, which occurs with Zabbix 4.4.1 or more (see `#65304 <https://github.com/ansible/ansible/issues/65304>`).
 - zabbix_host - was not possible to update a host where visible_name was not set in zabbix.
-- zabbix_mediatype - Fixed to support zabbix 4.4 or more and python3 (https://github.com/ansible/ansible/pull/67693).
-- zabbix_template - fixed error when providing empty ``link_templates`` to the module (https://github.com/ansible/ansible/issues/66417).
-- zabbix_template - fixed invalid (non-importable) output provided by exporting XML (https://github.com/ansible/ansible/issues/66466).
-- zabbix_user - Fixed an issue where module failed with zabbix 4.4 or above (https://github.com/ansible/ansible/pull/67475).
+- zabbix_mediatype - Fixed to support zabbix 4.4 or more and python3 (see `#67693 <https://github.com/ansible/ansible/pull/67693>`).
+- zabbix_template - fixed error when providing empty ``link_templates`` to the module (see `#66417 <https://github.com/ansible/ansible/issues/66417>`).
+- zabbix_template - fixed invalid (non-importable) output provided by exporting XML (see `#66466 <https://github.com/ansible/ansible/issues/66466>`).
+- zabbix_user - Fixed an issue where module failed with zabbix 4.4 or above (see `#67475 <https://github.com/ansible/ansible/pull/67475>`).
 
 Deprecated Features
 -------------------
@@ -107,14 +107,14 @@ Deprecated Features
 Bugfixes
 --------
 
-- zabbix_action - allow str values for ``esc_period`` options (https://github.com/ansible/ansible/pull/66841).
+- zabbix_action - allow str values for ``esc_period`` options (see `#66841 <https://github.com/ansible/ansible/pull/66841>`).
 - zabbix_action - no longer requires ``esc_period`` and ``event_source`` arguments when ``state=absent``.
-- zabbix_host - now supports configuring user macros and host tags on the managed host (https://github.com/ansible/ansible/pull/66777).
+- zabbix_host - now supports configuring user macros and host tags on the managed host (see `#66777 <https://github.com/ansible/ansible/pull/66777>`).
 - zabbix_host_info - ``host_name`` based search results now include host groups.
 - zabbix_hostmacro - ``macro_name`` now accepts macros in zabbix native format as well (e.g. ``{$MACRO}``).
 - zabbix_hostmacro - ``macro_value`` is no longer required when ``state=absent``.
 - zabbix_proxy (module) - ``interface`` sub-options ``type`` and ``main`` are now deprecated and will be removed in community.general 3.0.0. Also, the values passed to ``interface`` are now checked for correct types and unexpected keys.
 - zabbix_proxy (module) - added option proxy_address for comma-delimited list of IP/CIDR addresses or DNS names to accept active proxy requests from.
-- zabbix_template - add new option omit_date to remove date from exported/dumped template (https://github.com/ansible/ansible/pull/67302).
-- zabbix_template - adding new update rule templateLinkage.deleteMissing for newer zabbix versions (https://github.com/ansible/ansible/pull/66747).
-- zabbix_template_info - add new option omit_date to remove date from exported/dumped template (https://github.com/ansible/ansible/pull/67302).
+- zabbix_template - add new option omit_date to remove date from exported/dumped template (see `#67302 <https://github.com/ansible/ansible/pull/67302>`).
+- zabbix_template - adding new update rule templateLinkage.deleteMissing for newer zabbix versions (see `#66747 <https://github.com/ansible/ansible/pull/66747>`).
+- zabbix_template_info - add new option omit_date to remove date from exported/dumped template (see `#67302 <https://github.com/ansible/ansible/pull/67302>`).
