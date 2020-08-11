@@ -3,11 +3,11 @@ releases:
   0.1.0:
     changes:
       bugfixes:
-      - zabbix_action - allow str values for ``esc_period`` options (see `#66841 <https://github.com/ansible/ansible/pull/66841>`).
+      - zabbix_action - allow str values for ``esc_period`` options (see `#66841 <https://github.com/ansible/ansible/pull/66841>`_).
       - zabbix_action - no longer requires ``esc_period`` and ``event_source`` arguments
         when ``state=absent``.
       - zabbix_host - now supports configuring user macros and host tags on the managed
-        host (see `#66777 <https://github.com/ansible/ansible/pull/66777>`).
+        host (see `#66777 <https://github.com/ansible/ansible/pull/66777>`_).
       - zabbix_host_info - ``host_name`` based search results now include host groups.
       - zabbix_hostmacro - ``macro_name`` now accepts macros in zabbix native format
         as well (e.g. ``{$MACRO}``).
@@ -18,11 +18,11 @@ releases:
       - zabbix_proxy (module) - added option proxy_address for comma-delimited list
         of IP/CIDR addresses or DNS names to accept active proxy requests from.
       - zabbix_template - add new option omit_date to remove date from exported/dumped
-        template (see `#67302 <https://github.com/ansible/ansible/pull/67302>`).
+        template (see `#67302 <https://github.com/ansible/ansible/pull/67302>`_).
       - zabbix_template - adding new update rule templateLinkage.deleteMissing for
-        newer zabbix versions (see `#66747 <https://github.com/ansible/ansible/pull/66747>`).
+        newer zabbix versions (see `#66747 <https://github.com/ansible/ansible/pull/66747>`_).
       - zabbix_template_info - add new option omit_date to remove date from exported/dumped
-        template (see `#67302 <https://github.com/ansible/ansible/pull/67302>`).
+        template (see `#67302 <https://github.com/ansible/ansible/pull/67302>`_).
       deprecated_features:
       - zabbix_proxy (module) - deprecates ``interface`` sub-options ``type`` and ``main``
         when proxy type is set to passive via ``status=passive``. Make sure these suboptions
@@ -32,16 +32,16 @@ releases:
       - zabbix_action - arguments ``event_source`` and ``esc_period`` no longer required
         when ``state=absent``.
       - zabbix_host - fixed inventory_mode key error, which occurs with Zabbix 4.4.1
-        or more (see `#65304 <https://github.com/ansible/ansible/issues/65304>`).
+        or more (see `#65304 <https://github.com/ansible/ansible/issues/65304>`_).
       - zabbix_host - was not possible to update a host where visible_name was not
         set in zabbix.
-      - zabbix_mediatype - Fixed to support zabbix 4.4 or more and python3 (see `#67693 <https://github.com/ansible/ansible/pull/67693>`).
+      - zabbix_mediatype - Fixed to support zabbix 4.4 or more and python3 (see `#67693 <https://github.com/ansible/ansible/pull/67693>`_).
       - zabbix_template - fixed error when providing empty ``link_templates`` to the
-        module (see `#66417 <https://github.com/ansible/ansible/issues/66417>`).
+        module (see `#66417 <https://github.com/ansible/ansible/issues/66417>`_).
       - zabbix_template - fixed invalid (non-importable) output provided by exporting
-        XML (see `#66466 <https://github.com/ansible/ansible/issues/66466>`).
+        XML (see `#66466 <https://github.com/ansible/ansible/issues/66466>`_).
       - zabbix_user - Fixed an issue where module failed with zabbix 4.4 or above
-        (see `#67475 <https://github.com/ansible/ansible/pull/67475>`).
+        (see `#67475 <https://github.com/ansible/ansible/pull/67475>`_).
       release_summary: '| Release date: 2020-06-15
 
         '
@@ -60,7 +60,7 @@ releases:
         when using ``ansible-playbook --check``.
       minor_changes:
       - Documentation for roles moved to ``docs/`` sub-directory in the collection.
-      - New **role zabbix_agent** - previously known as dj-wasabi/zabbix-agent.
+      - New **role zabbix_agent** - previously known as dj-wasabi/zabbix-agent (also see `UPGRADE.md `<https://github.com/ansible-collections/community.zabbix/blob/main/docs/UPGRADE.md>`_ for each role).
       - New **role zabbix_javagateway** - previously known as dj-wasabi/zabbix-javagateway.
       - New **role zabbix_proxy** - previously known as dj-wasabi/zabbix-proxy.
       - New **role zabbix_server** - previously known as dj-wasabi/zabbix-server.
@@ -74,7 +74,6 @@ releases:
       - zabbix_proxy (module) - now supports Zabbix 5.0.
       - zabbix_screen - ``host_group`` parameter now accepts multiple groups.
       release_summary: '| Release date: 2020-06-15
-
         '
     fragments:
     - 020release.yml
@@ -85,7 +84,7 @@ releases:
       - zabbix_action - choices for the ``inventory`` paramter sub option in ``*operations``
         arguments have been clarified to ``manual`` and ``automatic``.
       - zabbix_action - fixed error on changed API fields ``*default_message`` and ``*default_subject``
-        for Zabbix 5.0 (see `#92 <https://github.com/ansible-collections/community.zabbix/pull/92>`).
+        for Zabbix 5.0 (see `#92 <https://github.com/ansible-collections/community.zabbix/pull/92>`_).
       - zabbix_action - module will no longer fail when searching for global script
         provided to ``script_name`` parameter.
       - zabbix_action - now correctly selects mediatype for the (normal|recovery|update)
@@ -101,7 +100,7 @@ releases:
       - zabbix_web - now no longer fails when rendering apache vhost template.
       minor_changes:
       - All roles now **support Zabbix 5.0** and by default install this version (see
-        `#131 <https://github.com/ansible-collections/community.zabbix/pull/131>` and `#121 <https://github.com/ansible-collections/community.zabbix/pull/121>`).
+        `#131 <https://github.com/ansible-collections/community.zabbix/pull/131>`_ and `#121 <https://github.com/ansible-collections/community.zabbix/pull/121>`_).
       - Roles will now install gnupg on Debian OS family if not present.
       - zabbix_action - no longer requires ``password`` and ``ssh_*key_file`` parameters
         at the same time for ``remote_command`` operations of type SSH.
