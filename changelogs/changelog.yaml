@@ -117,6 +117,13 @@ releases:
       release_summary: '| Release date: 2020-07-26
 
         '
+    modules:
+      - name: zabbix_discovery_rule
+        description: Manage Zabbix discovery rules
+        namespace: ''
+      - name: zabbix_usergroup
+        description: Manage Zabbix user groups
+        namespace: ''
     fragments:
     - 030release.yml
     release_date: '2020-07-26'

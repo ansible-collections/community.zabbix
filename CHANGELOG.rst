@@ -40,6 +40,12 @@ Bugfixes
 - zabbix_service - fixed the zabbix_service has no idempotency with Zabbix 5.0.
 - zabbix_web - now no longer fails when rendering apache vhost template.
 
+New Modules
+-----------
+
+- community.zabbix.zabbix_discovery_rule - Manage Zabbix discovery rules
+- community.zabbix.zabbix_usergroup - Manage Zabbix user groups
+
 v0.2.0
 ======
 
