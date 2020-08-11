@@ -71,6 +71,10 @@ collections:
     version: v0.3.0
 ```
 
+### Upgrading collection
+
+Make sure to read [UPGRADE](docs/UPGRADE.md) document before installing newer version of this collection.
+
 ## Usage
 
 *Please note that these are not working examples. For documentation on how to use content included in this collection, refer to the links in the [Included content](#included-content) section.*
@@ -125,6 +129,8 @@ In case of pull requests, please make sure that your changes will not break any 
 ## Contributing
 
 See [CONTRIBUTING](CONTRIBUTING.md) for more information about how to contribute to this repository.
+
+Please also feel free to stop by our [Gitter community](https://gitter.im/community-zabbix/community).
 
 ## License
 

@@ -27,7 +27,7 @@ If you are interested in joining us as a maintainer, please open an issue.
 1. Fork this repository with community Zabbix collection.
 2. Create a new branch and apply your changes to it. In addition to that:
     1. Ensure that any changes you introduce to this collection are reflected in the documentation.
-    2. Should your change introduce a new feature, module or bug fix, note it under `devel` section in [CHANGELOG](CHANGELOG.md).
+    2. Ensure that your PR contains valid [changelog fragment](https://docs.ansible.com/ansible/devel/community/development_process.html#changelogs).
     3. Include tests with your contribution to ensure that future pull requests will not break your functionality.
     4. Make sure that tests succeed.
 3. Push the branch to your forked repository.
@@ -66,7 +66,7 @@ These rules are required for any contributions proposing a new Zabbix module or 
 
 It is recommended to use Docker for the testing as this repository is utilizing it for its own CI. Read [Docker installation guide](https://docs.docker.com/install/) for more information.
 
-Make sure you start your work on the current state of the repository with `master` branch up to date. The best way to both try new changes and run shipped tests is by cloning the repository to Ansible project:
+Make sure you start your work on the current state of the repository with `main` branch up to date. The best way to both try new changes and run shipped tests is by cloning the repository to Ansible project:
 
 ```bash
 cd <ANSIBLE-PROJECT>/
