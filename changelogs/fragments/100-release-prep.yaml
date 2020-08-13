@@ -1,0 +1,13 @@
+release_summary: |
+  | Release date: 2020-08-16
+  | Please also see changelog for 0.X.0 versions to see changes that may impact you.
+
+breaking_changes:
+- zabbix_javagateway - options ``javagateway_pidfile``, ``javagateway_listenip``, ``javagateway_listenport`` and ``javagateway_startpollers`` renamed to ``zabbix_javagateway_xyz`` (see `UPGRADE.md <https://github.com/ansible-collections/community.zabbix/blob/main/docs/UPGRADE.md>`_).
+
+minor_changes:
+- zabbix_agent - added option to change between HTTP/HTTPS with ``zabbix_repo_yum_schema``.
+- zabbix_proxy (role) - now supports ``startpreprocessors`` setting and encryption when connecting to database (see `#164 <https://github.com/ansible-collections/community.zabbix/pull/164>`_).
+- zabbix_server - added option to change between HTTP/HTTPS with ``zabbix_repo_yum_schema``.
+- zabbix_server - now supports ``startpreprocessors`` setting and encryption when connecting to database (see `#164 <https://github.com/ansible-collections/community.zabbix/pull/164>`_).
+- zabbix_web - added option to change between HTTP/HTTPS with ``zabbix_repo_yum_schema``.
