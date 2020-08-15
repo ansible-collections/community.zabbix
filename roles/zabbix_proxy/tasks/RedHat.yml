@@ -36,7 +36,7 @@
     state: absent
   become: yes
 
-  - name: "RedHat | Install basic repo file"
+- name: "RedHat | Install basic repo file"
   yum_repository:
     name: "{{ item.name }}"
     description: "{{ item.description }}"
