@@ -115,6 +115,7 @@ zabbix_server_proxydatafrequency: 1
 zabbix_server_allowroot: 0
 zabbix_server_user: zabbix
 zabbix_server_include: /etc/zabbix/zabbix_server.conf.d
+zabbix_server_include_mode: '0755'
 zabbix_server_sslcertlocation: ${datadir}/zabbix/ssl/certs
 zabbix_server_sslkeylocation: ${datadir}/zabbix/ssl/keys
 zabbix_server_sslcalocation:

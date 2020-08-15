@@ -25,7 +25,7 @@
     path: "{{ zabbix_proxy_include }}"
     owner: zabbix
     group: zabbix
-    mode: 0755
+    mode: "{{ zabbix_proxy_include_mode }}"
     state: directory
   become: yes
 
