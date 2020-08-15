@@ -7,4 +7,16 @@
     state: restarted
     enabled: yes
   become: yes
-  when: zabbix_proxy_manage_service | bool
+  when:
+    - zabbix_proxy_manage_service | bool
+    - zabbix_repo != 'epel'
+
+- name: restart zabbix-proxy
+  service:
+    name: zabbix-proxy-mysql{{ zabbix_proxy_database_long }}
+    state: restarted
+    enabled: yes
+  become: yes
+  when:
+    - zabbix_proxy_manage_service | bool
+    - zabbix_repo == 'epel'
