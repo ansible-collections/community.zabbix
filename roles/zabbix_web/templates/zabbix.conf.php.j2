@@ -27,6 +27,13 @@ $HISTORY['url']		= {{ zabbix_server_history_url }};
 $HISTORY['types']	= {{ zabbix_server_history_types | to_json }};
 {% endif %}
 
+{% if zabbix_web_doubleprecision is defined and zabbix_web_doubleprecision %}
+// Use IEEE754 compatible value range for 64-bit Numeric (float) history values.
+// This option is enabled by default for new Zabbix installations.
+// For upgraded installations, please read database upgrade notes before enabling this option.
+$DB['DOUBLE_IEEE754']   = true;
+{% endif %}
+
 {% if zabbix_web_env is defined %}
 {% for env,val in zabbix_web_env.iteritems() %}
 putenv("{{env}}={{val}}");
