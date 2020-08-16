@@ -1,6 +1,35 @@
 ---
 # Tasks specific for RedHat systems
 
+- name: "Set short version name"
+  set_fact:
+    zabbix_short_version: "{{ zabbix_version | regex_replace('\\.', '') }}"
+
+- name: "RedHat | Use EPEL package name"
+  set_fact:
+    zabbix_proxy_package: "zabbix{{ zabbix_version | regex_replace('\\.', '') }}-proxy"
+  when:
+    - zabbix_repo == "epel"
+  tags:
+    - zabbix-proxy
+    - init
+
+- name: "RedHat | Define package with version"
+  set_fact:
+    zabbix_proxy_package: "zabbix{{ zabbix_short_version }}-proxy-{{ zabbix_proxy_database }}"
+    cacheable: yes
+  when:
+    - zabbix_proxy_rhel_version is defined
+    - zabbix_repo != "epel"
+
+- name: "RedHat | Define package without version"
+  set_fact:
+    zabbix_proxy_package: "zabbix-proxy-{{ zabbix_proxy_database }}"
+    cacheable: yes
+  when:
+    - zabbix_proxy_rhel_version is not defined
+    - zabbix_repo != "epel"
+
 - name: "RedHat | Set some facts Zabbix < 3.0"
   set_fact:
     apache_log: httpd
@@ -26,9 +55,33 @@
   when:
     - zabbix_version is version_compare('3.0', '>=')
     - ansible_distribution_major_version == '8'
-    # - zabbix_proxy_database == 'sqlite3'
   tags:
     - zabbix-proxy
+
+- name: "RedHat | Set some facts EPEL"
+  set_fact:
+    datafiles_path: "/usr/share/zabbix-{{ zabbix_proxy_database_long }}"
+  when:
+    - zabbix_repo == "epel"
+  tags:
+    - zabbix-server
+
+- name: "RedHat | Create 'zabbix' group (EPEL)"
+  group:
+    name: "{{ zabbix_proxy_groupname | default('zabbix') }}"
+    gid: "{{ zabbix_proxy_groupid | default(omit) }}"
+    state: present
+  when:
+    - zabbix_repo == "epel"  
+
+- name: "RedHat | Create 'zabbix' user (EPEL)"
+  user:
+    name: "{{ zabbix_proxy_username | default('zabbix') }}"
+    comment: Zabbix Monitoring System
+    uid: "{{ zabbix_proxy_userid | default(omit) }}"
+    group: zabbix
+  when:
+    - zabbix_repo == "epel"
 
 - name: "Make sure old file is absent"
   file:
@@ -51,29 +104,15 @@
   register: yum_repo_installed
   become: yes
   when:
-    zabbix_repo == "zabbix"
+    - zabbix_repo == "zabbix"
   notify:
     - "clean repo files from proxy creds"
   tags:
     - zabbix-agent
 
-- name: "RedHat | Define package with version"
-  set_fact:
-    rhel_pkg: "zabbix-proxy-{{ zabbix_proxy_database }}-{{ zabbix_proxy_rhel_version }}"
-    cacheable: yes
-  when:
-    zabbix_proxy_rhel_version is defined
-
-- name: "RedHat | Define package without version"
-  set_fact:
-    rhel_pkg: "zabbix-proxy-{{ zabbix_proxy_database }}"
-    cacheable: yes
-  when:
-    zabbix_proxy_rhel_version is not defined
-
 - name: "RedHat | Installing zabbix-proxy-{{ zabbix_proxy_database }}"
   yum:
-    pkg: "{{ rhel_pkg }}"
+    pkg: "{{ zabbix_proxy_package }}"
     state: "{{ zabbix_proxy_package_state }}"
   become: yes
   register: is_zabbix_proxy_package_installed

@@ -1,6 +1,10 @@
 ---
 # Tasks specific for RedHat systems
 
+- name: "Set short version name"
+  set_fact:
+    zabbix_short_version: "{{ zabbix_version | regex_replace('\\.', '') }}"
+
 - name: "RedHat | Use Zabbix package name"
   set_fact:
     zabbix_server_package: "zabbix-server-{{ zabbix_server_database }}"
@@ -12,14 +16,6 @@
 - name: "RedHat | Use EPEL package name"
   set_fact:
     zabbix_server_package: "zabbix{{ zabbix_short_version }}-server-{{ zabbix_server_database }}"
-  when:
-    - zabbix_repo == "epel"
-  tags:
-    - zabbix-server
-
-- name: "RedHat | Set some facts EPEL"
-  set_fact:
-    datafiles_path: "/usr/share/zabbix-{{ zabbix_server_database_long }}"
   when:
     - zabbix_repo == "epel"
   tags:
@@ -49,6 +45,31 @@
   tags:
     - zabbix-server
 
+- name: "RedHat | Set some facts EPEL"
+  set_fact:
+    datafiles_path: "/usr/share/zabbix-{{ zabbix_server_database_long }}"
+  when:
+    - zabbix_repo == "epel"
+  tags:
+    - zabbix-server
+
+- name: "RedHat | Create 'zabbix' group (EPEL)"
+  group:
+    name: "{{ zabbix_server_groupname | default('zabbix') }}"
+    gid: "{{ zabbix_server_groupid | default(omit) }}"
+    state: present
+  when:
+    - zabbix_repo == "epel"  
+
+- name: "RedHat | Create 'zabbix' user (EPEL)"
+  user:
+    name: "{{ zabbix_server_username | default('zabbix') }}"
+    comment: Zabbix Monitoring System
+    uid: "{{ zabbix_server_userid | default(omit) }}"
+    group: zabbix
+  when:
+    - zabbix_repo == "epel"
+    
 - name: "Make sure old file is absent"
   file:
     path: /etc/yum.repos.d/zabbix-supported.repo

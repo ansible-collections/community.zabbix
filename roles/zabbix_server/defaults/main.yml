@@ -30,6 +30,10 @@ zabbix_repo_yum:
     gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-ZABBIX
     state: present
 
+# User (EPEL specific)
+zabbix_server_username: zabbix
+zabbix_server_groupname: zabbix
+
 # Database
 zabbix_server_database: pgsql
 zabbix_server_database_long: postgresql

@@ -2,9 +2,24 @@
 # handlers file for wdijkerman.zabbix
 
 - name: zabbix-server restarted
-  service: name=zabbix-server state=restarted enabled=yes
+  service:
+      name: zabbix-server
+      state: restarted
+      enabled: yes
   tags: zabbix-server
-  when: zabbix_server_manage_service | bool
+  when:
+    - zabbix_server_manage_service | bool
+    - zabbix_repo != 'epel'
+
+- name: zabbix-server restarted
+  service:
+    name: zabbix-proxy-mysql{{ zabbix_proxy_database_long }}
+    state: restarted
+    enabled: yes
+  become: yes
+  when:
+    - zabbix_proxy_manage_service | bool
+    - zabbix_repo == 'epel'
 
 - name: "clean repo files from proxy creds"
   shell: ls /etc/yum.repos.d/zabbix* && sed -i 's/^proxy =.*//' /etc/yum.repos.d/zabbix* || true

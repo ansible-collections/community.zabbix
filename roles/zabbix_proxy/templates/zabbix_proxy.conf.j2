@@ -181,6 +181,7 @@ StartPollers={{ zabbix_proxy_startpollers }}
 #
 StartIPMIPollers={{ zabbix_proxy_startipmipollers }}
 
+{% if zabbix_version is version('4.2', '>=') %}
 ### Option: StartPreprocessors
 #       Number of pre-forked instances of preprocessing workers.
 #               The preprocessing manager process is automatically started when preprocessor worker is started.
@@ -190,6 +191,7 @@ StartIPMIPollers={{ zabbix_proxy_startipmipollers }}
 # Default:
 # StartPreprocessors=3
 StartPreprocessors={{ zabbix_proxy_startpreprocessors }}
+{% endif %}
 
 ### Option: StartPollersUnreachable
 #	Number of pre-forked instances of pollers for unreachable hosts (including IPMI).

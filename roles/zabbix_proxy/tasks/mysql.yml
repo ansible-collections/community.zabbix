@@ -59,6 +59,7 @@
   changed_when: False
   when:
     - zabbix_database_sqlload
+    - zabbix_repo != "epel"
   register: ls_output_create
   tags:
     - zabbix-proxy
@@ -70,6 +71,7 @@
   register: done_file
   when:
     - zabbix_database_sqlload
+    - zabbix_repo != "epel"
 
 - name: "MySQL | Create database and import file"
   mysql_db:
@@ -85,6 +87,7 @@
     target: "{{ ls_output_create.stdout }}"
   when:
     - zabbix_database_sqlload
+    - zabbix_repo != "epel"
     - not done_file.stat.exists
   delegate_to: "{{ delegated_dbhost }}"
   tags:
@@ -97,4 +100,5 @@
     state: touch
   when:
     - zabbix_database_sqlload
+    - zabbix_repo != "epel"
     - not done_file.stat.exists
