@@ -52,6 +52,7 @@
     baseurl: "{{ item.baseurl }}"
     gpgcheck: "{{ item.gpgcheck }}"
     gpgkey: "{{ item.gpgkey }}"
+    mode:  "{{ item.mode | default('0644') }}"
     priority: "{{ item.priority | default('99') }}"
     state: "{{ item.state | default('present') }}"
     proxy: "{{ zabbix_http_proxy | default(omit) }}"
@@ -60,6 +61,8 @@
   become: yes
   when:
     zabbix_repo == "zabbix"
+  notify:
+    - "clean repo files from proxy creds"
   tags:
     - zabbix-agent
 
