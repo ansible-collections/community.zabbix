@@ -1,2 +1,0 @@
-minor_changes:
-    - Zabbix Agent can also install the zabbix-agent2 application when ``zabbix_agent2`` is set to ``true``.

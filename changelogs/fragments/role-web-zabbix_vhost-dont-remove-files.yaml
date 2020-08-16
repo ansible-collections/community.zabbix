@@ -1,2 +1,0 @@
-minor_changes:
-    - Don't remove the files that Zabbix will install during installation when you don't want to configure a virtual host configuration.

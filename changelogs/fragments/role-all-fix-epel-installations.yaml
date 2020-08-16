@@ -1,7 +1,0 @@
-minor_changes:
-    - "The ``zabbix-sender`` and ``zabbix-get`` will not be installed when ``zabbix_repo: epel`` is used, as they are not part of the repository."
-    - "A user and group are created on the host when ``zabbix_repo: epel`` is configured."
-
-bugfixes:
-    - "Only install the sql files that needs to be executed for when ``zabbix_repo: epel`` is set."
-    - "The ``StartPreprocessors`` only works with version 4.2 or higher. When a lower version is used, it will not be added to the configuration."
