@@ -50,7 +50,7 @@
     owner: zabbix
     group: zabbix
     state: directory
-    mode: 0755
+    mode: "{{ zabbix_server_include_mode }}"
   tags:
     - zabbix-server
     - init

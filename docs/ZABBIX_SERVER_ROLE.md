@@ -104,6 +104,7 @@ The following is an overview of all available configuration default for this rol
 * `zabbix_server_install_recommends`: Default: `True`. `False` does not install the recommended packages that come with the zabbix-server install.
 * `zabbix_server_manage_service`: Default: `True`. When you run multiple Zabbix servers in a High Available cluster setup (e.g. pacemaker), you don't want Ansible to manage the zabbix-server service, because Pacemaker is in control of zabbix-server service and in this case, it needs to be set to `False`.
 * `zabbix_proxy_startpreprocessors`: Number of pre-forked instances of preprocessing workers. The preprocessing manager process is automatically started when a preprocessor worker is started. This parameter is supported since Zabbix 4.2.0.
+* `zabbix_server_include_mode`: Default: `0755`. The "mode" for the directory configured with `zabbix_server_include`.
 
 ### Database specific
 
