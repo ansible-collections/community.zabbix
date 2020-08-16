@@ -79,6 +79,20 @@
   package:
     pkg:
       - "{{ zabbix_agent_package }}"
+    state: "{{ zabbix_agent_package_state }}"
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
+  register: zabbix_agent_package_installed
+  until: zabbix_agent_package_installed is succeeded
+  become: yes
+  tags:
+    - init
+    - zabbix-agent
+
+- name: "RedHat | Installing zabbix-{sender,get}}"
+  package:
+    pkg:
       - "{{ zabbix_sender_package }}"
       - "{{ zabbix_get_package }}"
     state: "{{ zabbix_agent_package_state }}"
@@ -87,6 +101,8 @@
     https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   register: zabbix_agent_package_installed
   until: zabbix_agent_package_installed is succeeded
+  when:
+    - zabbix_repo != 'epel'
   become: yes
   tags:
     - init

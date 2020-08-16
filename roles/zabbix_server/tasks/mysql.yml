@@ -60,6 +60,7 @@
   when:
     - zabbix_version is version('3.0', '>=')
     - zabbix_database_sqlload | bool
+    - zabbix_repo != "epel"
   register: ls_output_create
   tags:
     - zabbix-server
@@ -72,6 +73,7 @@
   when:
     - zabbix_version is version('3.0', '>=')
     - zabbix_database_sqlload | bool
+    - zabbix_repo != "epel"
 
 - name: "MySQL | Disable InnoDB Strict Mode"
   mysql_variables:
@@ -80,6 +82,7 @@
   when:
     - zabbix_version is version('3.0', '>=')
     - zabbix_database_sqlload | bool
+    - zabbix_repo != "epel"
     - not done_file.stat.exists
     - ansible_distribution_release == "buster"
   delegate_to: "{{ delegated_dbhost }}"
@@ -95,6 +98,7 @@
   when:
     - delegated_dbhost != inventory_hostname
     - zabbix_database_sqlload | bool
+    - zabbix_repo != "epel"
     - not done_file.stat.exists
 
 - name: "Copy sql create file"
@@ -105,6 +109,7 @@
   when:
     - delegated_dbhost != inventory_hostname
     - zabbix_database_sqlload | bool
+    - zabbix_repo != "epel"
     - not done_file.stat.exists
 
 - name: "MySQL | Create database and import file >= 3.0"
@@ -122,6 +127,7 @@
   when:
     - zabbix_version is version('3.0', '>=')
     - zabbix_database_sqlload | bool
+    - zabbix_repo != "epel"
     - not done_file.stat.exists
   delegate_to: "{{ delegated_dbhost }}"
   tags:
@@ -135,6 +141,7 @@
   when:
     - zabbix_version is version('3.0', '>=')
     - zabbix_database_sqlload | bool
+    - zabbix_repo != "epel"
     - not done_file.stat.exists
 
 - name: "Get the correct path for the SQL files < 3.0"
