@@ -1,6 +1,14 @@
 ---
 # tasks file for dj-wasabi.zabbix-agent
 
+- name: "Set variables specific for Zabbix Agent 2"
+  set_fact:
+    zabbix_agent_service: zabbix-agent2
+    zabbix_agent_package: zabbix-agent2
+  when:
+    - zabbix_agent2 is defined
+    - zabbix_agent2
+
 - name: "Fix facts for linuxmint - distribution release"
   set_fact:
     zabbix_agent_distribution_release: xenial
