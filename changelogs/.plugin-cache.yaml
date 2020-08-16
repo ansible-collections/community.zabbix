@@ -1,0 +1,115 @@
+plugins:
+  become: {}
+  cache: {}
+  callback: {}
+  cliconf: {}
+  connection: {}
+  httpapi: {}
+  inventory: {}
+  lookup: {}
+  module:
+    zabbix_action:
+      description: Create/Delete/Update Zabbix actions
+      name: zabbix_action
+      namespace: ''
+      version_added: null
+    zabbix_discovery_rule:
+      description: Create/delete/update Zabbix discovery rules
+      name: zabbix_discovery_rule
+      namespace: ''
+      version_added: null
+    zabbix_group:
+      description: Create/delete Zabbix host groups
+      name: zabbix_group
+      namespace: ''
+      version_added: null
+    zabbix_group_info:
+      description: Gather information about Zabbix hostgroup
+      name: zabbix_group_info
+      namespace: ''
+      version_added: null
+    zabbix_host:
+      description: Create/update/delete Zabbix hosts
+      name: zabbix_host
+      namespace: ''
+      version_added: null
+    zabbix_host_events_info:
+      description: Get all triggers about a Zabbix host
+      name: zabbix_host_events_info
+      namespace: ''
+      version_added: null
+    zabbix_host_info:
+      description: Gather information about Zabbix host
+      name: zabbix_host_info
+      namespace: ''
+      version_added: null
+    zabbix_hostmacro:
+      description: Create/update/delete Zabbix host macros
+      name: zabbix_hostmacro
+      namespace: ''
+      version_added: null
+    zabbix_maintenance:
+      description: Create Zabbix maintenance windows
+      name: zabbix_maintenance
+      namespace: ''
+      version_added: null
+    zabbix_map:
+      description: Create/update/delete Zabbix maps
+      name: zabbix_map
+      namespace: ''
+      version_added: null
+    zabbix_mediatype:
+      description: Create/Update/Delete Zabbix media types
+      name: zabbix_mediatype
+      namespace: ''
+      version_added: null
+    zabbix_proxy:
+      description: Create/delete/get/update Zabbix proxies
+      name: zabbix_proxy
+      namespace: ''
+      version_added: null
+    zabbix_screen:
+      description: Create/update/delete Zabbix screens
+      name: zabbix_screen
+      namespace: ''
+      version_added: null
+    zabbix_service:
+      description: Create/update/delete Zabbix service
+      name: zabbix_service
+      namespace: ''
+      version_added: null
+    zabbix_template:
+      description: Create/update/delete/dump Zabbix template
+      name: zabbix_template
+      namespace: ''
+      version_added: null
+    zabbix_template_info:
+      description: Gather information about Zabbix template
+      name: zabbix_template_info
+      namespace: ''
+      version_added: null
+    zabbix_user:
+      description: Create/update/delete Zabbix users
+      name: zabbix_user
+      namespace: ''
+      version_added: null
+    zabbix_user_info:
+      description: Gather information about Zabbix user
+      name: zabbix_user_info
+      namespace: ''
+      version_added: null
+    zabbix_usergroup:
+      description: Create/delete/update Zabbix user groups
+      name: zabbix_usergroup
+      namespace: ''
+      version_added: null
+    zabbix_valuemap:
+      description: Create/update/delete Zabbix value maps
+      name: zabbix_valuemap
+      namespace: ''
+      version_added: null
+  netconf: {}
+  shell: {}
+  strategy: {}
+  vars: {}
+version: 1.0.0
