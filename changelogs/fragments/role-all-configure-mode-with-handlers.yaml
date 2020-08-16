@@ -1,0 +1,5 @@
+minor_changes:
+    - Added the possibility to configure the ``mode`` for the ``yum`` repositories files in case it contains credentials.
+
+bugfixes:
+    - A ``handler`` is configured when ``zabbix_http(s)_proxy`` is defined which will remove the proxy line from the repository files. This results that execution of the roles are not idempotent anymore.

@@ -33,11 +33,13 @@ zabbix_repo_yum:
     description: Zabbix Official Repository - $basearch
     baseurl: "{{ zabbix_repo_yum_schema }}://repo.zabbix.com/zabbix/{{ zabbix_version }}/rhel/{{ ansible_distribution_major_version }}/$basearch/"
     gpgcheck: 0
+    mode: '0644'
     gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-ZABBIX
     state: present
   - name: zabbix-non-supported
     description: Zabbix Official Repository non-supported - $basearch
     baseurl: "{{ zabbix_repo_yum_schema }}://repo.zabbix.com/non-supported/rhel/{{ ansible_distribution_major_version }}/$basearch/"
+    mode: '0644'
     gpgcheck: 0
     gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-ZABBIX
     state: present
@@ -46,6 +48,7 @@ zabbix_5_repo_yum:
   - name: zabbix-frontend
     description: Zabbix Official Repository - $basearch
     baseurl: "{{ zabbix_repo_yum_schema }}://repo.zabbix.com/zabbix/{{ zabbix_version }}/rhel/{{ ansible_distribution_major_version }}/$basearch/frontend/"
+    mode: '0644'
     gpgcheck: 0
     gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-ZABBIX
     state: present

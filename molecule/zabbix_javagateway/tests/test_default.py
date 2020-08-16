@@ -19,5 +19,5 @@ def test_zabbix_java_gateway_dot_conf(host):
 
     assert zabbix_proxy_conf.contains("LISTEN_IP=0.0.0.0")
     assert zabbix_proxy_conf.contains("LISTEN_PORT=10052")
-    assert zabbix_proxy_conf.contains("PID_FILE=/tmp/zabbix_java.pid")
+    assert zabbix_proxy_conf.contains("PID_FILE=/run/zabbix/zabbix_java_gateway.pid")
     assert zabbix_proxy_conf.contains("START_POLLERS=5")
