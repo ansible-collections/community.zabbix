@@ -27,6 +27,7 @@
   file:
     path: "{{ item }}"
     state: absent
+  when: zabbix_vhost
   with_items:
     - /etc/apache2/conf-available/zabbix.conf
     - /etc/apache2/conf-enabled/zabbix.conf
