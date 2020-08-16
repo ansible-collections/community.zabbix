@@ -108,6 +108,7 @@ The following is an overview of all available configuration default for this rol
 * `zabbix_server_userid`: The UID of the account on the host. Will only be used when `zabbix_repo: epel` is used.
 * `zabbix_server_groupname`: Default: `zabbix`. The name of the group of the user on the host. Will only be used when `zabbix_repo: epel` is used.
 * `zabbix_server_groupid`: The GID of the group on the host. Will only be used when `zabbix_repo: epel` is used.
+* `zabbix_server_include_mode`: Default: `0755`. The "mode" for the directory configured with `zabbix_server_include`.
 
 ### Database specific
 

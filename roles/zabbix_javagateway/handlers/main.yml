@@ -6,3 +6,10 @@
     name: zabbix-java-gateway
     state: restarted
     enabled: yes
+
+- name: "clean repo files from proxy creds"
+  shell: ls /etc/yum.repos.d/zabbix* && sed -i 's/^proxy =.*//' /etc/yum.repos.d/zabbix* || true
+  become: yes
+  when:
+    - ansible_os_family == 'RedHat'
+    - zabbix_http_proxy is defined or zabbix_https_proxy is defined

@@ -116,6 +116,7 @@ The following is an overview of all available configuration default for this rol
 
 ### Zabbix Agent
 
+* `zabbix_agent2`: Default: `False`. When you want to install the `Zabbix Agent2` instead of the "old" `Zabbix Agent`.
 * `zabbix_agent_server`: The ip address for the zabbix-server or zabbix-proxy.
 * `zabbix_agent_serveractive`: The ip address for the zabbix-server or zabbix-proxy for active checks.
 * `zabbix_agent_listeninterface`: Interface zabbix-agent listens on. Leave blank for all.
@@ -134,6 +135,7 @@ The following is an overview of all available configuration default for this rol
 * `zabbix_agent_become_on_localhost`: Default: `True`. Set to `False` if you don't need to elevate privileges on localhost to install packages locally with pip.
 * `zabbix_install_pip_packages`: Default: `True`. Set to `False` if you don't want to install the required pip packages. Useful when you control your environment completely.
 * `zabbix_agent_apt_priority`: Add a weight (`Pin-Priority`) for the APT repository.
+* `zabbix_agent_include_mode`: Default: `0750`. The "mode" for the directory configured with `zabbix_agent_include`.
 
 ## TLS Specific configuration
 

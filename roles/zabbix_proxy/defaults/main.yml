@@ -22,11 +22,13 @@ zabbix_repo_yum:
     description: Zabbix Official Repository - $basearch
     baseurl: "{{ zabbix_repo_yum_schema }}://repo.zabbix.com/zabbix/{{ zabbix_version }}/rhel/{{ ansible_distribution_major_version }}/$basearch/"
     gpgcheck: 0
+    mode: '0644'
     gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-ZABBIX
     state: present
   - name: zabbix-non-supported
     description: Zabbix Official Repository non-supported - $basearch
     baseurl: "{{ zabbix_repo_yum_schema }}://repo.zabbix.com/non-supported/rhel/{{ ansible_distribution_major_version }}/$basearch/"
+    mode: '0644'
     gpgcheck: 0
     gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-ZABBIX
     state: present
@@ -117,6 +119,7 @@ zabbix_proxy_loglowqueries: 0
 zabbix_proxy_tmpdir: /tmp
 zabbix_proxy_allowroot: 0
 zabbix_proxy_include: /etc/zabbix/zabbix_proxy.conf.d
+zabbix_proxy_include_mode: '0755'
 zabbix_proxy_libdir: /usr/lib/zabbix
 zabbix_proxy_loadmodulepath: "{{ zabbix_proxy_libdir }}/modules"
 zabbix_proxy_manage_service: True

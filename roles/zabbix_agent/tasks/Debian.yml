@@ -129,7 +129,7 @@
   copy:
     dest: "/etc/apt/preferences.d/zabbix-agent-{{ zabbix_underscore_version }}"
     content: |
-      Package: zabbix-agent
+      Package: {{ zabbix_agent_package }}
       Pin: origin repo.zabbix.com
       Pin-Priority: {{ zabbix_agent_apt_priority | int }}
     owner: root

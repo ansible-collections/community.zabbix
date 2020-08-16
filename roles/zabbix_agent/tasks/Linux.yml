@@ -177,7 +177,7 @@
     path: "{{ zabbix_agent_include }}"
     owner: root
     group: zabbix
-    mode: 0750
+    mode: "{{ zabbix_agent_include_mode }}"
     state: directory
   become: yes
   tags:

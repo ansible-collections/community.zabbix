@@ -1,6 +1,7 @@
 ---
 # defaults file for zabbix-agent
 
+zabbix_agent2: False
 zabbix_agent_version: 5.0
 zabbix_version: "{{ zabbix_agent_version }}"
 zabbix_version_patch: 0
@@ -19,7 +20,7 @@ zabbix_agent_apt_priority:
 selinux_allow_zabbix_run_sudo: False
 
 zabbix_agent_packages:
-  - zabbix-agent
+  - "{{ zabbix_agent_package }}"
   - zabbix-sender
   - zabbix-get
 
@@ -38,12 +39,14 @@ zabbix_repo_yum:
   - name: zabbix
     description: Zabbix Official Repository - $basearch
     baseurl: "{{ zabbix_repo_yum_schema }}://repo.zabbix.com/zabbix/{{ zabbix_version }}/rhel/{{ zabbix_agent_distribution_major_version }}/$basearch/"
+    mode: '0644'
     gpgcheck: 0
     gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-ZABBIX
     state: present
   - name: zabbix-non-supported
     description: Zabbix Official Repository non-supported - $basearch
     baseurl: "{{ zabbix_repo_yum_schema }}://repo.zabbix.com/non-supported/rhel/{{ zabbix_agent_distribution_major_version }}/$basearch/"
+    mode: '0644'
     gpgcheck: 0
     gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-ZABBIX
     state: present
@@ -110,6 +113,7 @@ zabbix_agent_allowroot: 0
 zabbix_agent_zabbix_alias:
 zabbix_agent_timeout: 3
 zabbix_agent_include: /etc/zabbix/zabbix_agentd.d
+zabbix_agent_include_mode: '0750'
 zabbix_agent_unsafeuserparameters: 0
 zabbix_agent_userparameters: []
 zabbix_agent_userparameters_templates_src: "userparameters"
