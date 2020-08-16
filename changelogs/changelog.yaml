@@ -126,8 +126,3 @@ releases:
     fragments:
     - 030release.yml
     release_date: '2020-07-26'
-  1.0.0:
-    changes:
-      minor_changes:
-      - zabbix_agent role also installs when configured the zabbix-agent2.
-
