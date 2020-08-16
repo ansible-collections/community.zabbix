@@ -12,8 +12,8 @@ releases:
       - zabbix_hostmacro - ``macro_name`` now accepts macros in zabbix native format
         as well (e.g. ``{$MACRO}``).
       - zabbix_hostmacro - ``macro_value`` is no longer required when ``state=absent``.
-      - zabbix_proxy (module) - ``interface`` sub-options ``type`` and ``main`` are now
-        deprecated and will be removed in community.general 3.0.0. Also, the values
+      - zabbix_proxy (module) - ``interface`` sub-options ``type`` and ``main`` are
+        now deprecated and will be removed in community.general 3.0.0. Also, the values
         passed to ``interface`` are now checked for correct types and unexpected keys.
       - zabbix_proxy (module) - added option proxy_address for comma-delimited list
         of IP/CIDR addresses or DNS names to accept active proxy requests from.
@@ -24,10 +24,10 @@ releases:
       - zabbix_template_info - add new option omit_date to remove date from exported/dumped
         template (see `#67302 <https://github.com/ansible/ansible/pull/67302>`_).
       deprecated_features:
-      - zabbix_proxy (module) - deprecates ``interface`` sub-options ``type`` and ``main``
-        when proxy type is set to passive via ``status=passive``. Make sure these suboptions
-        are removed from your playbook as they were never supported by Zabbix in the
-        first place.
+      - zabbix_proxy (module) - deprecates ``interface`` sub-options ``type`` and
+        ``main`` when proxy type is set to passive via ``status=passive``. Make sure
+        these suboptions are removed from your playbook as they were never supported
+        by Zabbix in the first place.
       minor_changes:
       - zabbix_action - arguments ``event_source`` and ``esc_period`` no longer required
         when ``state=absent``.
@@ -35,7 +35,8 @@ releases:
         or more (see `#65304 <https://github.com/ansible/ansible/issues/65304>`_).
       - zabbix_host - was not possible to update a host where visible_name was not
         set in zabbix.
-      - zabbix_mediatype - Fixed to support zabbix 4.4 or more and python3 (see `#67693 <https://github.com/ansible/ansible/pull/67693>`_).
+      - zabbix_mediatype - Fixed to support zabbix 4.4 or more and python3 (see `#67693
+        <https://github.com/ansible/ansible/pull/67693>`_).
       - zabbix_template - fixed error when providing empty ``link_templates`` to the
         module (see `#66417 <https://github.com/ansible/ansible/issues/66417>`_).
       - zabbix_template - fixed invalid (non-importable) output provided by exporting
@@ -51,7 +52,8 @@ releases:
   0.2.0:
     changes:
       bugfixes:
-      - zabbix_action - documented ``value2`` parameter and ``notify_all_involved`` option.
+      - zabbix_action - documented ``value2`` parameter and ``notify_all_involved``
+        option.
       - zabbix_maintenance - changing value of ``description`` parameter now actually
         updates maintenance's description.
       - zabbix_template - is now able to perform ``state=dump`` when using ``ansible-playbook
@@ -60,7 +62,9 @@ releases:
         when using ``ansible-playbook --check``.
       minor_changes:
       - Documentation for roles moved to ``docs/`` sub-directory in the collection.
-      - New **role zabbix_agent** - previously known as dj-wasabi/zabbix-agent (also see `UPGRADE.md <https://github.com/ansible-collections/community.zabbix/blob/main/docs/UPGRADE.md>`_ for each role).
+      - New **role zabbix_agent** - previously known as dj-wasabi/zabbix-agent (also
+        see `UPGRADE.md <https://github.com/ansible-collections/community.zabbix/blob/main/docs/UPGRADE.md>`_
+        for each role).
       - New **role zabbix_javagateway** - previously known as dj-wasabi/zabbix-javagateway.
       - New **role zabbix_proxy** - previously known as dj-wasabi/zabbix-proxy.
       - New **role zabbix_server** - previously known as dj-wasabi/zabbix-server.
@@ -73,8 +77,7 @@ releases:
       - zabbix_host - now supports Zabbix 5.0.
       - zabbix_proxy (module) - now supports Zabbix 5.0.
       - zabbix_screen - ``host_group`` parameter now accepts multiple groups.
-      release_summary: '| Release date: 2020-06-15
-        '
+      release_summary: '| Release date: 2020-06-15 '
     fragments:
     - 020release.yml
     release_date: '2020-06-15'
@@ -83,15 +86,16 @@ releases:
       bugfixes:
       - zabbix_action - choices for the ``inventory`` paramter sub option in ``*operations``
         arguments have been clarified to ``manual`` and ``automatic``.
-      - zabbix_action - fixed error on changed API fields ``*default_message`` and ``*default_subject``
-        for Zabbix 5.0 (see `#92 <https://github.com/ansible-collections/community.zabbix/pull/92>`_).
+      - zabbix_action - fixed error on changed API fields ``*default_message`` and
+        ``*default_subject`` for Zabbix 5.0 (see `#92 <https://github.com/ansible-collections/community.zabbix/pull/92>`_).
       - zabbix_action - module will no longer fail when searching for global script
         provided to ``script_name`` parameter.
       - zabbix_action - now correctly selects mediatype for the (normal|recovery|update)
         operations with Zabbix 4.4 and newer.
       - zabbix_agent - fixed installation of agent on Windows to directories with
         spaces.
-      - zabbix_agent - role should no longer fail when looking for ``getenforce`` binary.
+      - zabbix_agent - role should no longer fail when looking for ``getenforce``
+        binary.
       - zabbix_host - module will no longer convert context part of user macro to
         upper case.
       - zabbix_proxy (role) - will now correctly install python3-libsemanage on RHEL
@@ -100,29 +104,89 @@ releases:
       - zabbix_web - now no longer fails when rendering apache vhost template.
       minor_changes:
       - All roles now **support Zabbix 5.0** and by default install this version (see
-        `#131 <https://github.com/ansible-collections/community.zabbix/pull/131>`_ and `#121 <https://github.com/ansible-collections/community.zabbix/pull/121>`_).
+        `#131 <https://github.com/ansible-collections/community.zabbix/pull/131>`_
+        and `#121 <https://github.com/ansible-collections/community.zabbix/pull/121>`_).
       - Roles will now install gnupg on Debian OS family if not present.
       - zabbix_action - no longer requires ``password`` and ``ssh_*key_file`` parameters
         at the same time for ``remote_command`` operations of type SSH.
       - zabbix_action - parameter ``ssh_auth_type`` for SSH ``remote_command`` operation
         now correctly identifies which other parameters are required.
-      - zabbix_discovery_rule - refactoring module to use ``module_utils`` classes and
-        functions, adjust return values on success, add documentation for return values.
+      - zabbix_discovery_rule - refactoring module to use ``module_utils`` classes
+        and functions, adjust return values on success, add documentation for return
+        values.
       - zabbix_discovery_rule - refactoring the module to remove unnecessary variables
         and fix a variable typo.
-      - zabbix_mediatype - new options ``message_templates``, ``description`` and many
-        more related to ``type=webhook``.
+      - zabbix_mediatype - new options ``message_templates``, ``description`` and
+        many more related to ``type=webhook``.
       - zabbix_mediatype - now supports new ``webhook`` media type.
       release_summary: '| Release date: 2020-07-26
 
         '
-    modules:
-      - name: zabbix_discovery_rule
-        description: Manage Zabbix discovery rules
-        namespace: ''
-      - name: zabbix_usergroup
-        description: Manage Zabbix user groups
-        namespace: ''
     fragments:
     - 030release.yml
+    modules:
+    - description: Manage Zabbix discovery rules
+      name: zabbix_discovery_rule
+      namespace: ''
+    - description: Manage Zabbix user groups
+      name: zabbix_usergroup
+      namespace: ''
     release_date: '2020-07-26'
+  1.0.0:
+    changes:
+      breaking_changes:
+      - zabbix_javagateway - options ``javagateway_pidfile``, ``javagateway_listenip``,
+        ``javagateway_listenport`` and ``javagateway_startpollers`` renamed to ``zabbix_javagateway_xyz``
+        (see `UPGRADE.md <https://github.com/ansible-collections/community.zabbix/blob/main/docs/UPGRADE.md>`_).
+      bugfixes:
+      - all roles - a ``handler`` is configured when ``zabbix_http(s)_proxy`` is defined
+        which will remove the proxy line from the repository files. This results that
+        execution of the roles are not idempotent anymore.
+      - zabbix_proxy (role) - ``StartPreprocessors`` only works with version 4.2 or
+        higher. When a lower version is used, it will not be added to the configuration.
+      - zabbix_proxy (role) - only install the sql files that needs to be executed
+        for when ``zabbix_repo`` is set to ``epel``.
+      - zabbix_server - ``StartPreprocessors`` only works with version 4.2 or higher.
+        When a lower version is used, it will not be added to the configuration.
+      - zabbix_server - only install the sql files that needs to be executed for when
+        ``zabbix_repo`` is set to ``epel``.
+      minor_changes:
+      - Added the possibility to configure the ``mode`` for the ``zabbix_{agent,server,proxy}_include``
+        directories.
+      - all roles - added the possibility to configure the ``mode`` for the ``yum``
+        repositories files in case it contains credentials.
+      - zabbix_agent - can also install the zabbix-agent2 application when ``zabbix_agent2``
+        is set to ``true``.
+      - zabbix_agent - ``zabbix-sender`` and ``zabbix-get`` will not be installed
+        when ``zabbix_repo`` is set to ``epel``, as they are not part of the repository.
+      - zabbix_agent - added option to change between HTTP/HTTPS with ``zabbix_repo_yum_schema``.
+      - zabbix_proxy (role) - a user and group are created on the host when ``zabbix_repo``
+        is set to ``epel``.
+      - zabbix_proxy (role) - now supports ``startpreprocessors`` setting and encryption
+        when connecting to database (see `#164 <https://github.com/ansible-collections/community.zabbix/pull/164>`_).
+      - zabbix_server - a user and group are created on the host when ``zabbix_repo``
+        is set to ``epel``.
+      - zabbix_server - added option to change between HTTP/HTTPS with ``zabbix_repo_yum_schema``.
+      - zabbix_server - now supports ``startpreprocessors`` setting and encryption
+        when connecting to database (see `#164 <https://github.com/ansible-collections/community.zabbix/pull/164>`_).
+      - zabbix_web - a property is added ``zabbix_web_doubleprecision`` which currently
+        is set to ``false`` for default installations. For new installations this
+        should be set to ``True``. For upgraded installations, please read database
+        `upgrade notes <https://www.zabbix.com/documentation/current/manual/installation/upgrade_notes_500>`_
+        (Paragraph "Enabling extended range of numeric (float) values") before enabling
+        this option.
+      - zabbix_web - added option to change between HTTP/HTTPS with ``zabbix_repo_yum_schema``.
+      - zabbix_web - don't remove the files that Zabbix will install during installation
+        when you don't want to configure a virtual host configuration.
+      release_summary: '| Release date: 2020-08-16
+
+        '
+    fragments:
+    - 100-release-prep.yaml
+    - role-agent-supports-zabbix-agent2.yaml
+    - role-all-configure-mode-include.yaml
+    - role-all-configure-mode-with-handlers.yaml
+    - role-all-fix-epel-installations.yaml
+    - role-web-add-doubleprecision.yaml
+    - role-web-zabbix_vhost-dont-remove-files.yaml
+    release_date: '2020-08-16'

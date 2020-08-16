@@ -5,6 +5,46 @@ community.zabbix Release Notes
 .. contents:: Topics
 
 
+v1.0.0
+======
+
+Release Summary
+---------------
+
+| Release date: 2020-08-16
+
+
+Minor Changes
+-------------
+
+- Added the possibility to configure the ``mode`` for the ``zabbix_{agent,server,proxy}_include`` directories.
+- all roles - added the possibility to configure the ``mode`` for the ``yum`` repositories files in case it contains credentials.
+- zabbix_agent - ``zabbix-sender`` and ``zabbix-get`` will not be installed when ``zabbix_repo`` is set to ``epel``, as they are not part of the repository.
+- zabbix_agent - added option to change between HTTP/HTTPS with ``zabbix_repo_yum_schema``.
+- zabbix_agent - can also install the zabbix-agent2 application when ``zabbix_agent2`` is set to ``true``.
+- zabbix_proxy (role) - a user and group are created on the host when ``zabbix_repo`` is set to ``epel``.
+- zabbix_proxy (role) - now supports ``startpreprocessors`` setting and encryption when connecting to database (see `#164 <https://github.com/ansible-collections/community.zabbix/pull/164>`_).
+- zabbix_server - a user and group are created on the host when ``zabbix_repo`` is set to ``epel``.
+- zabbix_server - added option to change between HTTP/HTTPS with ``zabbix_repo_yum_schema``.
+- zabbix_server - now supports ``startpreprocessors`` setting and encryption when connecting to database (see `#164 <https://github.com/ansible-collections/community.zabbix/pull/164>`_).
+- zabbix_web - a property is added ``zabbix_web_doubleprecision`` which currently is set to ``false`` for default installations. For new installations this should be set to ``True``. For upgraded installations, please read database `upgrade notes <https://www.zabbix.com/documentation/current/manual/installation/upgrade_notes_500>`_ (Paragraph "Enabling extended range of numeric (float) values") before enabling this option.
+- zabbix_web - added option to change between HTTP/HTTPS with ``zabbix_repo_yum_schema``.
+- zabbix_web - don't remove the files that Zabbix will install during installation when you don't want to configure a virtual host configuration.
+
+Breaking Changes / Porting Guide
+--------------------------------
+
+- zabbix_javagateway - options ``javagateway_pidfile``, ``javagateway_listenip``, ``javagateway_listenport`` and ``javagateway_startpollers`` renamed to ``zabbix_javagateway_xyz`` (see `UPGRADE.md <https://github.com/ansible-collections/community.zabbix/blob/main/docs/UPGRADE.md>`_).
+
+Bugfixes
+--------
+
+- all roles - a ``handler`` is configured when ``zabbix_http(s)_proxy`` is defined which will remove the proxy line from the repository files. This results that execution of the roles are not idempotent anymore.
+- zabbix_proxy (role) - ``StartPreprocessors`` only works with version 4.2 or higher. When a lower version is used, it will not be added to the configuration.
+- zabbix_proxy (role) - only install the sql files that needs to be executed for when ``zabbix_repo`` is set to ``epel``.
+- zabbix_server - ``StartPreprocessors`` only works with version 4.2 or higher. When a lower version is used, it will not be added to the configuration.
+- zabbix_server - only install the sql files that needs to be executed for when ``zabbix_repo`` is set to ``epel``.
+
 v0.3.0
 ======
 

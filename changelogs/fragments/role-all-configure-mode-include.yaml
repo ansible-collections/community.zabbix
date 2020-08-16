@@ -1,2 +1,0 @@
-minor_changes:
-    - Added the possibility to configure the ``mode`` for the ``zabbix_{agent,server,proxy}_include`` directories.
