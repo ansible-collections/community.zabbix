@@ -84,7 +84,7 @@
     dest: /etc/zabbix/zabbix_proxy.conf
     owner: zabbix
     group: zabbix
-    mode: 0644
+    mode: 0640
   notify: restart zabbix-proxy
 
 - name: "Installing the Zabbix-api package on localhost"
