@@ -58,6 +58,7 @@
     name: "{{ zabbix_server_groupname | default('zabbix') }}"
     gid: "{{ zabbix_server_groupid | default(omit) }}"
     state: present
+  become: yes
   when:
     - zabbix_repo == "epel"  
 
@@ -67,6 +68,7 @@
     comment: Zabbix Monitoring System
     uid: "{{ zabbix_server_userid | default(omit) }}"
     group: zabbix
+  become: yes
   when:
     - zabbix_repo == "epel"
     
@@ -103,6 +105,7 @@
     state: "{{ zabbix_server_package_state }}"
   register: zabbix_server_package_installed
   until: zabbix_server_package_installed is succeeded
+  become: yes
   tags:
     - zabbix-server
 
@@ -112,6 +115,7 @@
     state: present
   register: zabbix_server_dependencies_installed
   until: zabbix_server_dependencies_installed is succeeded
+  become: yes
   when:
     - zabbix_database_creation
     - zabbix_server_database == 'pgsql'
@@ -125,6 +129,7 @@
     state: present
   register: zabbix_server_dependencies_installed
   until: zabbix_server_dependencies_installed is succeeded
+  become: yes
   when:
     - zabbix_database_creation
     - zabbix_server_database == 'pgsql'
@@ -140,6 +145,7 @@
     state: present
   register: zabbix_server_dependencies_installed
   until: zabbix_server_dependencies_installed is succeeded
+  become: yes
   when:
     - zabbix_server_database == 'mysql'
     - ansible_distribution_major_version == "7"
@@ -154,6 +160,7 @@
     state: present
   register: zabbix_server_dependencies_installed
   until: zabbix_server_dependencies_installed is succeeded
+  become: yes
   when:
     - zabbix_server_database == 'mysql'
     - ansible_distribution_major_version == "6" or ansible_distribution_major_version == "5"
@@ -166,6 +173,7 @@
     state: present
   register: zabbix_server_dependencies_installed
   until: zabbix_server_dependencies_installed is succeeded
+  become: yes
   when:
     - zabbix_server_database == 'pgsql'
   tags:
@@ -180,6 +188,7 @@
     state: present
   register: zabbix_server_dependencies_installed
   until: zabbix_server_dependencies_installed is succeeded
+  become: yes
   when:
     - selinux_allow_zabbix_can_network
     - ansible_distribution_major_version == "7" or ansible_distribution_major_version == "6"
@@ -194,6 +203,7 @@
     state: present
   register: zabbix_server_dependencies_installed
   until: zabbix_server_dependencies_installed is succeeded
+  become: yes
   when:
     - selinux_allow_zabbix_can_network
     - ansible_distribution_major_version == "8"
@@ -206,6 +216,7 @@
     name: httpd_can_connect_zabbix
     state: yes
     persistent: yes
+  become: yes
   when:
     - selinux_allow_zabbix_can_http
     - zabbix_selinux | bool
@@ -217,6 +228,7 @@
     name: zabbix_can_network
     state: yes
     persistent: yes
+  become: yes
   when:
     - selinux_allow_zabbix_can_network
     - zabbix_selinux | bool
@@ -230,6 +242,7 @@
     state: present
   register: zabbix_server_dependencies_installed
   until: zabbix_server_dependencies_installed is succeeded
+  become: yes
   when:
     - ansible_distribution_major_version == "7" or ansible_distribution_major_version == "6"
     - zabbix_selinux | bool
@@ -245,6 +258,7 @@
     state: present
   register: zabbix_server_dependencies_installed
   until: zabbix_server_dependencies_installed is succeeded
+  become: yes
   when:
     - ansible_distribution_major_version == "8"
     - zabbix_selinux | bool
@@ -256,5 +270,6 @@
     cmd: files/install_semodule.bsx
   args:
     creates: /etc/selinux/targeted/active/modules/400/zabbix_server_add/cil
+    become: yes
   when:
     - zabbix_selinux | bool

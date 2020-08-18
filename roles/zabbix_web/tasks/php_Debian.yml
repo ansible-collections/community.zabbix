@@ -13,6 +13,7 @@
       - php5-gd
   register: zabbix_web_php_dependency_install
   until: zabbix_web_php_dependency_install is succeeded
+  become: yes
   when: >
     ( ansible_distribution == 'Ubuntu' and (ansible_distribution_version is version_compare('16.04', '<')))
     or ( ansible_distribution == 'Debian' and (ansible_distribution_version is version_compare('9', '<')) )
@@ -34,6 +35,7 @@
       - php-gd
   register: zabbix_web_php_dependency_install
   until: zabbix_web_php_dependency_install is succeeded
+  become: yes
   when: >
     ( ansible_distribution == 'Ubuntu' and (ansible_distribution_version is version_compare('16.04', '>=')))
     or ( ansible_distribution == 'Debian' and (ansible_distribution_version is version_compare('9', '>=')) )

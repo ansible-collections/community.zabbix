@@ -6,6 +6,7 @@
     name: zabbix-java-gateway
     state: restarted
     enabled: yes
+  become: yes
 
 - name: "clean repo files from proxy creds"
   shell: ls /etc/yum.repos.d/zabbix* && sed -i 's/^proxy =.*//' /etc/yum.repos.d/zabbix* || true

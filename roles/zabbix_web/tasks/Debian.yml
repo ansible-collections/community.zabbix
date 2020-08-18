@@ -23,6 +23,7 @@
   apt_repository:
     repo: "{{ item }} http://repo.zabbix.com/zabbix/{{ zabbix_version }}/{{ ansible_distribution.lower() }}/ {{ ansible_distribution_release }} main"
     state: present
+  become: yes
   when:
     - zabbix_repo == "zabbix"
   with_items:
@@ -45,6 +46,7 @@
     cache_valid_time: 0
   register: zabbix_web_package_install
   until: zabbix_web_package_install is succeeded
+  become: yes
   tags:
     - zabbix-web
     - init

@@ -26,3 +26,4 @@
     state: "{{ zabbix_javagateway_package_state }}"
   register: zabbix_java_gateway_install
   until: zabbix_java_gateway_install is succeeded
+  become: yes

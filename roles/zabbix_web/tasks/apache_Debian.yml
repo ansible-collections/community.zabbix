@@ -6,6 +6,7 @@
     cache_valid_time: 3600
     name:
       - libapache2-mod-php
+  become: yes
 
 - name: "Debian | install apache vhost"
   template:
@@ -15,6 +16,7 @@
     group: "{{ apache_group }}"
     mode: 0644
   when: zabbix_vhost
+  become: yes
   notify:
     - restart apache
   tags:
@@ -28,6 +30,7 @@
     path: "{{ item }}"
     state: absent
   when: zabbix_vhost
+  become: yes
   with_items:
     - /etc/apache2/conf-available/zabbix.conf
     - /etc/apache2/conf-enabled/zabbix.conf
@@ -40,6 +43,7 @@
     group: "{{ apache_group }}"
     state: link
   when: zabbix_vhost
+  become: yes
   notify:
     - restart apache
   tags:

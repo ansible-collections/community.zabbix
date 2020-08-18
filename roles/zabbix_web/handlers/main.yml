@@ -5,6 +5,7 @@
     name: rh-php72-php-fpm
     state: restarted
     enabled: yes
+  become: yes
   when:
     - zabbix_version is version('5.0', '>=')
 

@@ -21,6 +21,7 @@
     owner: "{{ apache_user }}"
     group: "{{ apache_group }}"
     mode: 0644
+  become: yes
   when:
     - zabbix_vhost
     - ansible_distribution_major_version != '8'
@@ -35,6 +36,7 @@
     group: "{{ apache_group }}"
     mode: 0644
   when: zabbix_vhost
+  become: yes
   notify:
     - restart apache
   tags:
