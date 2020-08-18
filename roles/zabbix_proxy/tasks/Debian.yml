@@ -47,7 +47,6 @@
     url: http://repo.zabbix.com/zabbix-official-repo.key
   register: are_zabbix_proxy_dependency_packages_installed
   until: are_zabbix_proxy_dependency_packages_installed is succeeded
-  become: yes
   when:
     - zabbix_repo == "zabbix"
   become: yes
