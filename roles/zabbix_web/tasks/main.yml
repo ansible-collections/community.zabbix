@@ -58,6 +58,7 @@
     name: httpd_can_network_connect_db
     persistent: yes
     state: yes
+  become: yes
   when:
     - ansible_selinux.status == "enabled"
     - selinux_allow_zabbix_can_network
@@ -68,6 +69,7 @@
     name: httpd_can_connect_zabbix
     persistent: yes
     state: yes
+  become: yes
   when:
     - ansible_selinux.status == "enabled"
     - selinux_allow_zabbix_can_network
@@ -78,6 +80,7 @@
     name: httpd_can_connect_ldap
     persistent: yes
     state: yes
+  become: yes
   when:
     - ansible_selinux.status == "enabled"
     - zabbix_apache_can_connect_ldap|bool

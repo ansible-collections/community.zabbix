@@ -11,11 +11,13 @@
   apt_key:
     id: "{{ sign_keys[zabbix_short_version][ansible_distribution_release]['sign_key'] }}"
     url: http://repo.zabbix.com/zabbix-official-repo.key
+  become: yes
 
 - name: "Debian | Installing repository Debian"
   apt_repository:
     repo: "deb http://repo.zabbix.com/zabbix/{{ zabbix_javagateway_version }}/debian/ {{ ansible_distribution_release }} main"
     state: present
+  become: yes
   when:
     - ansible_distribution == "Debian"
     - zabbix_repo == "zabbix"
@@ -24,6 +26,7 @@
   apt_repository:
     repo: "deb-src http://repo.zabbix.com/zabbix/{{ zabbix_javagateway_version }}/debian/ {{ ansible_distribution_release }} main"
     state: present
+  become: yes
   when:
     - ansible_distribution == "Debian"
     - zabbix_repo == "zabbix"
@@ -32,6 +35,7 @@
   apt_repository:
     repo: "deb http://repo.zabbix.com/zabbix/{{ zabbix_javagateway_version }}/ubuntu/ {{ ansible_distribution_release }} main"
     state: present
+  become: yes
   when:
     - ansible_distribution == "Ubuntu"
     - zabbix_repo == "zabbix"
@@ -40,6 +44,7 @@
   apt_repository:
     repo: "deb-src http://repo.zabbix.com/zabbix/{{ zabbix_javagateway_version }}/ubuntu/ {{ ansible_distribution_release }} main"
     state: present
+  become: yes
   when:
     - ansible_distribution == "Ubuntu"
     - zabbix_repo == "zabbix"
@@ -53,3 +58,4 @@
     cache_valid_time: 3600
   register: zabbix_java_gateway_install
   until: zabbix_java_gateway_install is succeeded
+  become: yes

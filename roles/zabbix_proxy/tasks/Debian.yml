@@ -39,6 +39,7 @@
     state: present
   register: gnupg_installed
   until: gnupg_installed is succeeded
+  become: yes
 
 - name: "Debian | Install gpg key"
   apt_key:
@@ -46,6 +47,7 @@
     url: http://repo.zabbix.com/zabbix-official-repo.key
   register: are_zabbix_proxy_dependency_packages_installed
   until: are_zabbix_proxy_dependency_packages_installed is succeeded
+  become: yes
   when:
     - zabbix_repo == "zabbix"
   become: yes
@@ -58,6 +60,7 @@
     repo: "{{ item }} http://repo.zabbix.com/zabbix/{{ zabbix_version }}/{{ ansible_distribution.lower() }}/ {{ ansible_distribution_release }} main"
     state: present
   when: zabbix_repo == "zabbix"
+  become: yes
   with_items:
     - deb-src
     - deb
@@ -104,6 +107,7 @@
     state: "{{ zabbix_proxy_package_state }}"
   register: is_zabbix_proxy_package_installed
   until: is_zabbix_proxy_package_installed is succeeded
+  become: yes
 
 - name: "Debian | Install Ansible module dependencies"
   apt:
@@ -111,6 +115,7 @@
     state: present
   register: zabbix_proxy_dependencies_installed
   until: zabbix_proxy_dependencies_installed is succeeded
+  become: yes
   when:
     - zabbix_database_creation
   tags:
@@ -125,6 +130,7 @@
     state: present
   register: zabbix_proxy_dependencies_installed
   until: zabbix_proxy_dependencies_installed is succeeded
+  become: yes
   when:
     - zabbix_proxy_database == 'mysql'
     - zabbix_proxy_install_database_client
@@ -142,6 +148,7 @@
     state: present
   register: zabbix_proxy_dependencies_installed
   until: zabbix_proxy_dependencies_installed is succeeded
+  become: yes
   when:
     - zabbix_proxy_database == 'mysql'
     - zabbix_proxy_install_database_client
@@ -157,6 +164,7 @@
     state: present
   register: are_zabbix_proxy_dependency_packages_installed
   until: are_zabbix_proxy_dependency_packages_installed is succeeded
+  become: yes
   when:
     - zabbix_database_creation or zabbix_database_sqlload
     - zabbix_proxy_database == 'pgsql'
