@@ -47,7 +47,7 @@ This role will work on the following operating systems:
  * macOS
 
 So, you'll need one of those operating systems.. :-)
-Please sent Pull Requests or suggestions when you want to use this role for other Operating systems.
+Please send Pull Requests or suggestions when you want to use this role for other Operating systems.
 
 ## Local system access
 
