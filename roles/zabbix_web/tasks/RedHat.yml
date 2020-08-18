@@ -52,6 +52,7 @@
     update_cache: yes
   register: zabbix_web_dependency_package_install
   until: zabbix_web_dependency_package_install is succeeded
+  become: yes
   when:
     - zabbix_version is version('5.0', '>=')
     - zabbix_web_centos_release
@@ -67,6 +68,7 @@
     update_cache: yes
   register: zabbix_web_package_install
   until: zabbix_web_package_install is succeeded
+  become: yes
   when:
     - zabbix_version is version('5.0', '>=')
     - ansible_distribution_major_version != '8'
@@ -80,6 +82,7 @@
     update_cache: yes
   register: zabbix_web_package_install
   until: zabbix_web_package_install is succeeded
+  become: yes
   tags:
     - zabbix-web
 
@@ -95,6 +98,7 @@
     state: present
   register: zabbix_web_dependencies_installed
   until: zabbix_web_dependencies_installed is succeeded
+  become: yes
   when:
     - selinux_allow_zabbix_can_network
     - ansible_distribution_major_version == "7" or ansible_distribution_major_version == "6"
@@ -108,6 +112,7 @@
     state: present
   register: zabbix_web_dependencies_installed
   until: zabbix_web_dependencies_installed is succeeded
+  become: yes
   when:
     - selinux_allow_zabbix_can_network
     - ansible_distribution_major_version == "8"
@@ -119,6 +124,7 @@
     name: zabbix_can_network
     state: yes
     persistent: yes
+  become: yes
   when:
     - selinux_allow_zabbix_can_network
   tags:

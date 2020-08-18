@@ -41,6 +41,7 @@
     state: present
   register: gnupg_installed
   until: gnupg_installed is succeeded
+  become: yes
 
 - name: "Debian | Install gpg key"
   apt_key:
@@ -60,6 +61,7 @@
     repo: "{{ item }} {{ zabbix_server_apt_repository | join(' ') }}"
     state: present
   when: zabbix_repo == "zabbix"
+  become: yes
   with_items:
     - deb-src
     - deb
@@ -72,6 +74,7 @@
   args:
     warn: False
   changed_when: False
+  become: yes
   tags:
     - skip_ansible_lint
 
@@ -90,6 +93,7 @@
   lineinfile:
     path: /etc/dpkg/dpkg.cfg.d/excludes
     line: 'path-include=/usr/share/doc/zabbix*'
+  become: yes
   when:
     - dpkg_exclude_line.rc == 0
 
@@ -102,6 +106,7 @@
     install_recommends: "{{ zabbix_server_install_recommends }}"
   register: zabbix_server_package_installed
   until: zabbix_server_package_installed is succeeded
+  become: yes
   tags:
     - zabbix-server
     - init
@@ -112,6 +117,7 @@
     state: present
   register: zabbix_server_dependencies_installed
   until: zabbix_server_dependencies_installed is succeeded
+  become: yes
   when:
     - zabbix_database_creation
   tags:
@@ -126,6 +132,7 @@
     state: present
   register: zabbix_server_dependencies_installed
   until: zabbix_server_dependencies_installed is succeeded
+  become: yes
   when:
     - zabbix_server_database == 'mysql'
     - zabbix_server_install_database_client
@@ -143,6 +150,7 @@
     state: present
   register: zabbix_server_dependencies_installed
   until: zabbix_server_dependencies_installed is succeeded
+  become: yes
   when:
     - zabbix_server_database == 'mysql'
     - zabbix_server_install_database_client
@@ -158,6 +166,7 @@
     state: present
   register: zabbix_server_dependencies_installed
   until: zabbix_server_dependencies_installed is succeeded
+  become: yes
   when:
     - zabbix_server_database == 'pgsql'
     - zabbix_server_install_database_client
