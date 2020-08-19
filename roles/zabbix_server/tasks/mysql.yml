@@ -77,12 +77,14 @@
 
 - name: "MySQL | Get current value for innodb_default_row_format"
   shell: |
-    set -o pipefail
+    set -euo pipefail
     mysql -h {{ zabbix_server_dbhost }} -u{{ zabbix_server_dbuser }} \
     -p'{{ zabbix_server_dbpassword }}' \
     -e 'SHOW VARIABLES;' 2>&1 | grep innodb_default_row_format \
     | awk '{print $2}' | tr [:upper:] [:lower:]
   register: mysql_innodb_default_row_format
+  args:
+    executable: /bin/bash
   changed_when: False
   become: true
 

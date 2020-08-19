@@ -19,13 +19,15 @@
 
 - name: "MySQL | Get current value for innodb_default_row_format"
   shell: |
-    set -o pipefail
+    set -euo pipefail
     mysql -h {{ zabbix_proxy_dbhost }} -u{{ zabbix_proxy_dbuser }} \
     -p'{{ zabbix_proxy_dbpassword }}' \
     -e 'SHOW VARIABLES;' 2>&1 | grep innodb_default_row_format \
     | awk '{print $2}' | tr [:upper:] [:lower:]
   register: mysql_innodb_default_row_format
   changed_when: False
+  args:
+    executable: /bin/bash
   become: true
 
 - name: "MySQL | Set innodb_default_row_format to dynamic"
