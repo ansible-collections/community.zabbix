@@ -98,7 +98,6 @@ The following is an overview of all available configuration defaults for this ro
 * `zabbix_vhost`: Default: `true`. When you don't want to create an Apache Virtual Host configuration, you can set it to False.
 * `zabbix_apache_vhost_port`: The port on which Zabbix HTTP vhost is running.
 * `zabbix_apache_vhost_tls_port`: The port on which Zabbix HTTPS vhost is running.
-* `zabbix_apache_vhost_port`: On which port the Apache Virtual Host is available.
 * `zabbix_apache_vhost_listen_ip`: On which interface the Apache Virtual Host is available.
 * `zabbix_apache_can_connect_ldap`: Default: `false`. Set SELinux boolean to allow httpd to connect to LDAP.
 * `zabbix_php_install`: Default: `true`. True / False. Switch for extra install of packages for PHP, currently on for Debian/Ubuntu.
