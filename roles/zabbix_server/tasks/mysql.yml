@@ -167,6 +167,26 @@
     - zabbix-server
     - database
 
+- name: "MySQL | Revert innodb_default_row_format to previous value"
+  mysql_variables:
+    variable: innodb_default_row_format
+    value: '{{ mysql_innodb_default_row_format.stdout }}'
+    login_host: "{{ zabbix_server_mysql_login_host | default(omit) }}"
+    login_user: "{{ zabbix_server_mysql_login_user | default(omit) }}"
+    login_password: "{{ zabbix_server_mysql_login_password | default(omit) }}"
+    login_port: "{{ zabbix_server_mysql_login_port | default(omit) }}"
+    login_unix_socket: "{{ zabbix_server_mysql_login_unix_socket | default(omit) }}"
+  when:
+    - zabbix_version is version('3.0', '>=')
+    - zabbix_database_sqlload | bool
+    - zabbix_repo != "epel"
+    - not done_file.stat.exists
+    - mysql_innodb_default_row_format.stdout != 'dynamic'
+  delegate_to: "{{ delegated_dbhost }}"
+  tags:
+    - zabbix-server
+    - database
+
 - name: "Check if we have sql_done files >= 3.0"
   file:
     path: /etc/zabbix/create.done
