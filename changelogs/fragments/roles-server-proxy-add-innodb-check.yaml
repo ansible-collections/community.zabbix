@@ -1,0 +1,2 @@
+minor_changes:
+    - Added the configuration of the ``innodb_default_row_format`` setting in MariaDB/MySQL if it isn't set to ``dynamic``.

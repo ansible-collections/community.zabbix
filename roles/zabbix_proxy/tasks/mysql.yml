@@ -17,39 +17,6 @@
     delegated_dbhost: "{{ zabbix_proxy_real_dbhost }}"
   when: zabbix_proxy_real_dbhost | default(false)
 
-- name: "MySQL | Get current value for innodb_default_row_format"
-  shell: |
-    set -euo pipefail
-    mysql -h {{ zabbix_proxy_dbhost }} -u{{ zabbix_proxy_dbuser }} \
-    -p'{{ zabbix_proxy_dbpassword }}' \
-    -e 'SHOW VARIABLES;' 2>&1 | grep innodb_default_row_format \
-    | awk '{print $2}' | tr [:upper:] [:lower:]
-  register: mysql_innodb_default_row_format
-  changed_when: False
-  args:
-    executable: /bin/bash
-  become: true
-
-- name: "MySQL | Set innodb_default_row_format to dynamic"
-  mysql_variables:
-    variable: innodb_default_row_format
-    value: dynamic
-    login_host: "{{ zabbix_proxy_mysql_login_host | default(omit) }}"
-    login_user: "{{ zabbix_proxy_mysql_login_user | default(omit) }}"
-    login_password: "{{ zabbix_proxy_mysql_login_password | default(omit) }}"
-    login_port: "{{ zabbix_proxy_mysql_login_port | default(omit) }}"
-    login_unix_socket: "{{ zabbix_proxy_mysql_login_unix_socket | default(omit) }}"
-  when:
-    - zabbix_version is version('3.0', '>=')
-    - zabbix_database_sqlload | bool
-    - zabbix_repo != "epel"
-    - not done_file.stat.exists
-    - mysql_innodb_default_row_format.stdout != 'dynamic'
-  delegate_to: "{{ delegated_dbhost }}"
-  tags:
-    - zabbix-proxy
-    - database
-
 - name: "MySQL | Create database"
   mysql_db:
     name: "{{ zabbix_proxy_dbname }}"
@@ -105,6 +72,39 @@
   when:
     - zabbix_database_sqlload
     - zabbix_repo != "epel"
+
+- name: "MySQL | Get current value for innodb_default_row_format"
+  shell: |
+    set -euo pipefail
+    mysql -h {{ zabbix_proxy_dbhost }} -u{{ zabbix_proxy_dbuser }} \
+    -p'{{ zabbix_proxy_dbpassword }}' \
+    -e 'SHOW VARIABLES;' 2>&1 | grep innodb_default_row_format \
+    | awk '{print $2}' | tr [:upper:] [:lower:]
+  register: mysql_innodb_default_row_format
+  changed_when: False
+  args:
+    executable: /bin/bash
+  become: true
+
+- name: "MySQL | Set innodb_default_row_format to dynamic"
+  mysql_variables:
+    variable: innodb_default_row_format
+    value: dynamic
+    login_host: "{{ zabbix_proxy_mysql_login_host | default(omit) }}"
+    login_user: "{{ zabbix_proxy_mysql_login_user | default(omit) }}"
+    login_password: "{{ zabbix_proxy_mysql_login_password | default(omit) }}"
+    login_port: "{{ zabbix_proxy_mysql_login_port | default(omit) }}"
+    login_unix_socket: "{{ zabbix_proxy_mysql_login_unix_socket | default(omit) }}"
+  when:
+    - zabbix_version is version('3.0', '>=')
+    - zabbix_database_sqlload | bool
+    - zabbix_repo != "epel"
+    - not done_file.stat.exists
+    - mysql_innodb_default_row_format.stdout != 'dynamic'
+  delegate_to: "{{ delegated_dbhost }}"
+  tags:
+    - zabbix-proxy
+    - database
 
 - name: "MySQL | Create database and import file"
   mysql_db:
