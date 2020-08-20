@@ -3,7 +3,11 @@ user = apache
 group = apache
 
 listen = {{ php_fpm_listen }}/zabbix.sock
-listen.acl_users = apache,nginx
+{% if zabbix_websrv == "apache" %}
+listen.acl_users = {{ apache_user }}
+{% else %}
+listen.acl_users = {{ zabbix_websrv }}
+{% endif %}
 listen.allowed_clients = 127.0.0.1
 
 pm = dynamic
