@@ -148,6 +148,48 @@ zabbix_agent_ipmi_password:
 zabbix_agent_ipmi_privilege: 2
 zabbix_agent_ipmi_username:
 
+# Zabbix Agent2
+zabbix_agent2_pidfile: /var/run/zabbix/zabbix_agent2.pid
+zabbix_agent2_logfile: /var/log/zabbix/zabbix_agent2.log
+zabbix_agent2_logtype: file
+zabbix_agent2_statusport: 9999
+zabbix_agent2_include: /etc/zabbix/zabbix_agent2.d
+zabbix_agent2_logfilesize: 100
+zabbix_agent2_debuglevel: 3
+zabbix_agent2_sourceip:
+zabbix_agent2_listenport: 10050
+zabbix_agent2_listenip:
+zabbix_agent2_hostname: "{{ inventory_hostname }}"
+zabbix_agent2_hostnameitem:
+zabbix_agent2_hostmetadata:
+zabbix_agent2_hostmetadataitem:
+zabbix_agent2_hostinterface:
+zabbix_agent2_hostinterfaceitem:
+zabbix_agent2_enablepersistentbuffer: 0
+zabbix_agent2_persistentbufferperiod: 1h
+zabbix_agent2_persistentbufferfile:
+zabbix_agent2_refreshactivechecks: 120
+zabbix_agent2_buffersend: 5
+zabbix_agent2_buffersize: 100
+zabbix_agent2_zabbix_alias:
+zabbix_agent2_timeout: 3
+zabbix_agent2_include_mode: '0750'
+zabbix_agent2_unsafeuserparameters: 0
+zabbix_agent2_controlsocket: /tmp/agent.sock
+zabbix_agent2_plugins: []
+
+# Zabbix Agent2 TLS settings
+zabbix_agent2_tlsconnect:
+zabbix_agent2_tlsaccept:
+zabbix_agent2_tlscafile:
+zabbix_agent2_tlscrlfile:
+zabbix_agent2_tlsservercertissuer:
+zabbix_agent2_tlsservercertsubject:
+zabbix_agent2_tlscertfile:
+zabbix_agent2_tlskeyfile:
+zabbix_agent2_tlspskidentity:
+zabbix_agent2_tlspsk_auto: False
+
 # Windows/macOS Related
 zabbix_version_long: 4.4.4
 
