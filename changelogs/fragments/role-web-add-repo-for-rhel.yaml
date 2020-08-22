@@ -1,0 +1,2 @@
+minor_changes:
+    - "Added installation of a repository on RHEL systems to be able to install the ``centos-release-scl`` package."
