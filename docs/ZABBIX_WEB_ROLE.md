@@ -34,7 +34,7 @@ This role will work on the following operating systems:
  * Ubuntu
 
 So, you'll need one of those operating systems.. :-)
-Please sent Pull Requests or suggestions when you want to use this role for other Operating Systems.
+Please send Pull Requests or suggestions when you want to use this role for other Operating systems.
 
 ## Zabbix Versions
 
