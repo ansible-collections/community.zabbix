@@ -138,7 +138,7 @@
     dest: "/etc/zabbix/{{ zabbix_agent_conf if not zabbix_agent2 else zabbix_agent2_conf }}"
     owner: root
     group: root
-    mode: 0644
+    mode: "{{ zabbix_agent_conf_mode }}"
   notify:
     - restart zabbix-agent
   become: yes

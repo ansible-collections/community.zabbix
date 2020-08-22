@@ -30,7 +30,7 @@
     dest: /etc/zabbix/zabbix_java_gateway.conf
     owner: zabbix
     group: zabbix
-    mode: 0644
+    mode: "{{ zabbix_java_gateway_conf_mode }}"
   notify:
     - zabbix-java-gateway restarted
 
