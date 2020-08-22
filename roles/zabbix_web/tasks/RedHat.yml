@@ -44,6 +44,28 @@
   tags:
     - zabbix-web
 
+- name: "RedHat | Install repo file centos-release-scl (RHEL)"
+  yum_repository:
+    name: "{{ item.name }}"
+    description: "{{ item.description }}"
+    baseurl: "{{ item.baseurl }}"
+    gpgcheck: "{{ item.gpgcheck }}"
+    gpgkey: "{{ item.gpgkey }}"
+    mode:  "{{ item.mode | default('0644') }}"
+    priority: "{{ item.priority | default('99') }}"
+    state: "{{ item.state | default('present') }}"
+    proxy: "{{ zabbix_http_proxy | default(omit) }}"
+  with_items: "{{ zabbix_repo_scl_rhel }}"
+  register: yum_repo_installed
+  become: yes
+  when:
+    - zabbix_repo == "zabbix"
+    - ansible_distribution == "RedHat"
+  notify:
+    - "clean repo files from proxy creds"
+  tags:
+    - zabbix-web
+
 - name: "RedHat | Install zabbix-web dependency (Zabbix 5.x)"
   yum:
     pkg:

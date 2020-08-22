@@ -55,6 +55,14 @@ zabbix_5_repo_yum:
     gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-ZABBIX
     state: present
 
+zabbix_repo_scl_rhel:
+  - name: copr:copr.fedorainfracloud.org:rhscl:centos-release-scl
+    description: Copr repo for centos-release-scl owned by rhscl
+    baseurl: https://download.copr.fedorainfracloud.org/results/rhscl/centos-release-scl/epel-{{ ansible_distribution_major_version }}-$basearch/
+    gpgcheck: 1
+    gpgkey: https://download.copr.fedorainfracloud.org/results/rhscl/centos-release-scl/pubkey.gpg
+    state: present
+
 zabbix_php_install: true
 zabbix_web_max_execution_time: 300
 zabbix_web_memory_limit: 128M
