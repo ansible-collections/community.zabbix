@@ -27,7 +27,7 @@
 - name: "Install the correct repository"
   include_tasks: "{{ ansible_os_family }}.yml"
 
-- name: "Installing the postgresql database"
+- name: "Installing the {{ zabbix_server_database_long }} database"
   include_tasks: "{{ zabbix_server_database_long }}.yml"
 
 - name: "Configure zabbix-server"
