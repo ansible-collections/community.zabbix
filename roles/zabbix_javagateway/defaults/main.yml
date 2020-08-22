@@ -7,6 +7,7 @@ zabbix_javagateway_package_state: present
 zabbix_selinux: False
 zabbix_repo: zabbix
 zabbix_repo_yum_schema: https
+zabbix_java_gateway_conf_mode: "0644"
 
 zabbix_repo_yum:
   - name: zabbix
