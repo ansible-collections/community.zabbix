@@ -134,8 +134,8 @@
 
 - name: "Configure zabbix-agent"
   template:
-    src: zabbix_agentd.conf.j2
-    dest: "/etc/zabbix/{{ zabbix_agent_conf }}"
+    src: "{{ 'zabbix_agentd.conf.j2' if not zabbix_agent2 else 'zabbix_agent2.conf.j2' }}"
+    dest: "/etc/zabbix/{{ zabbix_agent_conf if not zabbix_agent2 else zabbix_agent2_conf }}"
     owner: root
     group: root
     mode: 0644
@@ -157,6 +157,17 @@
   become: yes
   when:
     - zabbix_agent_tlspskfile is defined
+    - not zabbix_agent2
+
+- name: "Create directory for PSK file if not exist (zabbix-agent2)"
+  file:
+    path: "{{ zabbix_agent2_tlspskfile | dirname }}"
+    mode: 0755
+    state: directory
+  become: yes
+  when:
+    - zabbix_agent2_tlspskfile is defined
+    - zabbix_agent2
 
 - name: "Place TLS PSK File"
   copy:
@@ -169,15 +180,31 @@
   when:
     - zabbix_agent_tlspskfile is defined
     - zabbix_agent_tlspsk_secret is defined
+    - not zabbix_agent2
+  notify:
+    - restart zabbix-agent
+
+- name: "Place TLS PSK File (zabbix-agent2)"
+  copy:
+    dest: "{{ zabbix_agent2_tlspskfile }}"
+    content: "{{ zabbix_agent2_tlspsk_secret }}"
+    owner: zabbix
+    group: zabbix
+    mode: 0400
+  become: yes
+  when:
+    - zabbix_agent2_tlspskfile is defined
+    - zabbix_agent2_tlspsk_secret is defined
+    - zabbix_agent2
   notify:
     - restart zabbix-agent
 
 - name: "Create include dir zabbix-agent"
   file:
-    path: "{{ zabbix_agent_include }}"
+    path: "{{ zabbix_agent_include if not zabbix_agent2 else zabbix_agent2_include }}"
     owner: root
     group: zabbix
-    mode: "{{ zabbix_agent_include_mode }}"
+    mode: "{{ zabbix_agent_include_mode if not zabbix_agent2 else zabbix_agent2_include_mode }}"
     state: directory
   become: yes
   tags:

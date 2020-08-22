@@ -14,6 +14,7 @@ Table of Contents
     + [Overall Zabbix](#overall-zabbix)
     + [SElinux](#selinux)
     + [Zabbix Agent](#zabbix-agent)
+    + [Zabbix Agent vs Zabbix Agent 2 configuration](#zabbix-agent-vs-zabbix-agent-2-configuration)
   * [TLS Specific configuration](#tls-specific-configuration)
   * [Zabbix API variables](#zabbix-api-variables)
   * [Windows Variables](#windows-variables)
@@ -24,6 +25,7 @@ Table of Contents
   * [proxy](#proxy)
 - [Dependencies](#dependencies)
 - [Example Playbook](#example-playbook)
+  * [zabbix_agent2_plugins](#zabbix-agent2-plugins)
   * [agent_interfaces](#agent-interfaces)
   * [Other interfaces](#other-interfaces)
   * [Vars in role configuration](#vars-in-role-configuration)
@@ -130,38 +132,77 @@ The following is an overview of all available configuration default for this rol
     * `scripts_dir`: Directory name of the custom scripts needed for userparameters
 * `zabbix_agent_userparameters_templates_src`: indicates the relative path (from `templates/`) where userparameter templates are searched
 * `zabbix_agent_userparameters_scripts_src`: indicates the relative path (from `files/`) where userparameter scripts are searched
-* `zabbix_agent_allowroot`: Allow the agent to run as 'root'. 0 - do not allow, 1 - allow
 * `zabbix_agent_runas_user`: Drop privileges to a specific, existing user on the system. Only has effect if run as 'root' and AllowRoot is disabled.
 * `zabbix_agent_become_on_localhost`: Default: `True`. Set to `False` if you don't need to elevate privileges on localhost to install packages locally with pip.
 * `zabbix_install_pip_packages`: Default: `True`. Set to `False` if you don't want to install the required pip packages. Useful when you control your environment completely.
 * `zabbix_agent_apt_priority`: Add a weight (`Pin-Priority`) for the APT repository.
-* `zabbix_agent_include_mode`: Default: `0750`. The "mode" for the directory configured with `zabbix_agent_include`.
+
+### Zabbix Agent vs Zabbix Agent 2 configuration
+
+The following provides an overview of all the properties that can be set in the Zabbix Agent configuration file. When `(2)` is used in the name of the property, like `zabbix_agent(2)_pidfile`, it will show that you can configure `zabbix_agent_pidfile` for the Zabbix Agent configuration file and `zabbix_agent2_pidfile` for the Zabbix Agent 2 configuration file.
+
+Otherwise it just for the Zabbix Agent or for the Zabbix Agent 2.
+
+* `zabbix_agent(2)_pidfile`: name of pid file.
+* `zabbix_agent(2)_logfile`: name of log file.
+* `zabbix_agent(2)_logfilesize`: maximum size of log file in mb.
+* `zabbix_agent2_logtype`: Specifies where log messages are written to
+* `zabbix_agent(2)_debuglevel`: specifies debug level
+* `zabbix_agent(2)_sourceip`: source ip address for outgoing connections.
+* `zabbix_agent_enableremotecommands`: whether remote commands from zabbix server are allowed.
+* `zabbix_agent_logremotecommands`: enable logging of executed shell commands as warnings.
+* `zabbix_agent(2)_listenport`: agent will listen on this port for connections from the server.
+* `zabbix_agent2_statusport`: Agent will listen on this port for HTTP status requests.
+* `zabbix_agent_listenip`: list of comma delimited ip addresses that the agent should listen on.
+* `zabbix_agent_startagents`: number of pre-forked instances of zabbix_agentd that process passive checks.
+* `zabbix_agent(2)_hostname: unique, case sensitive hostname.
+* `zabbix_agent(2)_hostnameitem: item used for generating hostname if it is undefined.
+* `zabbix_agent(2)_hostmetadata: optional parameter that defines host metadata.
+* `zabbix_agent(2)_hostmetadataitem: optional parameter that defines an item used for getting the metadata.
+* `zabbix_agent(2)_refreshactivechecks: how often list of active checks is refreshed, in seconds.
+* `zabbix_agent(2)_buffersend: do not keep data longer than n seconds in buffer.
+* `zabbix_agent(2)_buffersize: maximum number of values in a memory buffer. the agent will send all collected data to zabbix server or proxy if the buffer is full.
+* `zabbix_agent2_enablepersistentbuffer: 0 - disabled, in-memory buffer is used (default); 1 - use persistent buffer
+* `zabbix_agent2_persistentbufferperiod: Zabbix Agent2 will keep data for this time period in case of no connectivity with Zabbix server or proxy. Older data will be lost. Log data will be preserved.
+* `zabbix_agent2_persistentbufferfile: Zabbix Agent2 will keep SQLite database in this file	* n is valid if `EnablePersistentBuffer=1`
+* `zabbix_agent_maxlinespersecond: maximum number of new lines the agent will send per second to zabbix server or proxy processing 'log' and 'logrt' active checks.
+* `zabbix_agent_allowroot: allow the agent to run as 'root'. if disabled and the agent is started by 'root', the agent will try to switch to user 'zabbix' instead. has no effect if started under a regular user.
+* `zabbix_agent(2)_zabbix_alias: sets an alias for parameter. it can be useful to substitute long and complex parameter name with a smaller and simpler one.
+* `zabbix_agent(2)_timeout: spend no more than timeout seconds on processing
+* `zabbix_agent(2)_include: you may include individual files or all files in a directory in the configuration file.
+* `zabbix_agent(2)_include_mode: The mode for the directory mentioned above.
+* `zabbix_agent(2)_unsafeuserparameters: allow all characters to be passed in arguments to user-defined parameters.
+* `zabbix_agent_loadmodulepath: Full path to location of agent modules.
+* `zabbix_agent_loadmodule: Module to load at agent startup. Modules are used to extend functionality of the agent.
+* `zabbix_agent2_controlsocket: The control socket, used to send runtime commands with '-R' option.
+* `zabbix_agent_allowroot:  Allow the agent to run as 'root'. 0 - do not allow, 1 - allow
+* `zabbix_agent2_plugins: A list containing plugin configuration.
 
 ## TLS Specific configuration
 
-These variables are specific for Zabbix 3.0 and higher:
+These variables are specific for Zabbix 3.0 and higher. When `(2)` is used in the name of the property, like `zabbix_agent(2)_tlsconnect`, it will show that you can configure `zabbix_agent_tlsconnect` for the Zabbix Agent configuration file and `zabbix_agent2_tlsconnect` for the Zabbix Agent 2 configuration file. 
 
-* `zabbix_agent_tlsconnect`: How the agent should connect to server or proxy. Used for active checks.
+* `zabbix_agent(2)_tlsconnect`: How the agent should connect to server or proxy. Used for active checks.
     Possible values:
     * unencrypted
     * psk
     * cert
-* `zabbix_agent_tlsaccept`: What incoming connections to accept.
+* `zabbix_agent(2)_tlsaccept`: What incoming connections to accept.
     Possible values:
     * unencrypted
     * psk
     * cert
-* `zabbix_agent_tlscafile`: Full pathname of a file containing the top-level CA(s) certificates for peer certificate verification.
-* `zabbix_agent_tlscrlfile`: Full pathname of a file containing revoked certificates.
-* `zabbix_agent_tlsservercertissuer`: Allowed server certificate issuer.
-* `zabbix_agent_tlsservercertsubject`: Allowed server certificate subject.
-* `zabbix_agent_tlscertfile`: Full pathname of a file containing the agent certificate or certificate chain.
-* `zabbix_agent_tlskeyfile`: Full pathname of a file containing the agent private key.
-* `zabbix_agent_tlspskidentity`: Unique, case sensitive string used to identify the pre-shared key.
-* `zabbix_agent_tlspskidentity_file`: Full pathname of a file containing the pre-shared key identity.
-* `zabbix_agent_tlspskfile`: Full pathname of a file containing the pre-shared key.
-* `zabbix_agent_tlspsk_secret`: The pre-shared secret key that should be placed in the file configured with `agent_tlspskfile`.
-* `zabbix_agent_tlspsk_auto`: Enables auto generation and storing of individual pre-shared keys and identities on clients.
+* `zabbix_agent(2)_tlscafile`: Full pathname of a file containing the top-level CA(s) certificates for peer certificate verification.
+* `zabbix_agent(2)_tlscrlfile`: Full pathname of a file containing revoked certificates.
+* `zabbix_agent(2)_tlsservercertissuer`: Allowed server certificate issuer.
+* `zabbix_agent(2)_tlsservercertsubject`: Allowed server certificate subject.
+* `zabbix_agent(2)_tlscertfile`: Full pathname of a file containing the agent certificate or certificate chain.
+* `zabbix_agent(2)_tlskeyfile`: Full pathname of a file containing the agent private key.
+* `zabbix_agent(2)_tlspskidentity`: Unique, case sensitive string used to identify the pre-shared key.
+* `zabbix_agent(2)_tlspskidentity_file`: Full pathname of a file containing the pre-shared key identity.
+* `zabbix_agent(2)_tlspskfile`: Full pathname of a file containing the pre-shared key.
+* `zabbix_agent(2)_tlspsk_secret`: The pre-shared secret key that should be placed in the file configured with `agent_tlspskfile`.
+* `zabbix_agent(2)_tlspsk_auto`: Enables auto generation and storing of individual pre-shared keys and identities on clients.
 
 ## Zabbix API variables
 
@@ -274,10 +315,28 @@ There are no dependencies on other roles.
 
 # Example Playbook
 
+## zabbix_agent2_plugins
+
+Specifically for the Zabbix Agent 2, a list of extra plugins can be configured. The following provides an overview of configuring the `SystemRun` plugin by setting the `LogRemoteCommands` to `0`:
+
+```yaml
+zabbix_agent2_plugins:
+  - name: SystemRun
+    options:
+      - parameter: LogRemoteCommands
+        value: 0
+```
+
+In the `zabbix_agent2.conf` an entry will be created with the following content:
+
+```
+Plugins.SystemRun.LogRemoteCommands=0
+```
+
 ## agent_interfaces
 
 This will configure the Zabbix Agent interface on the host.
-```
+```yaml
 zabbix_agent_interfaces:
   - type: 1
     main: 1
