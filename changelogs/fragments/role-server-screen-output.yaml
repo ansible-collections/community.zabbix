@@ -1,0 +1,2 @@
+minor_changes:
+    - "Minor output related change. When MySQL is used, the output now shows: Installing the mysql database. Before this was hardcoded to postgresql."
