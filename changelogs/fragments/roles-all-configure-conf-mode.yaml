@@ -1,0 +1,2 @@
+minor_changes:
+    - "Added an ``zabbix_{agent,web,server,proxy,javagateway}_conf_mode`` to configure the mode for the configuration file."
