@@ -59,7 +59,6 @@
   register: yum_repo_installed
   become: yes
   when:
-    - zabbix_repo == "zabbix"
     - ansible_distribution == "RedHat"
   notify:
     - "clean repo files from proxy creds"
