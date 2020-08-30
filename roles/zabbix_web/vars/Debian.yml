@@ -2,3 +2,10 @@
 apache_user: www-data
 apache_group: www-data
 apache_log: apache2
+apache_service: apache2
+
+_php_fpm_dir: /etc/php/{{ _zabbix_php_version }}/fpm/pool.d
+_php_fpm_session: /tmp
+_php_fpm_listen: /run/php/zabbix.sock
+_zabbix_php_fpm_mode: '0666'
+_zabbix_php_fpm_allowed_clients: 127.0.0.1
