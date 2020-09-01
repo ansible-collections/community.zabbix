@@ -156,28 +156,28 @@ Otherwise it just for the Zabbix Agent or for the Zabbix Agent 2.
 * `zabbix_agent2_statusport`: Agent will listen on this port for HTTP status requests.
 * `zabbix_agent_listenip`: list of comma delimited ip addresses that the agent should listen on.
 * `zabbix_agent_startagents`: number of pre-forked instances of zabbix_agentd that process passive checks.
-* `zabbix_agent(2)_hostname: unique, case sensitive hostname.
-* `zabbix_agent(2)_hostnameitem: item used for generating hostname if it is undefined.
-* `zabbix_agent(2)_hostmetadata: optional parameter that defines host metadata.
-* `zabbix_agent(2)_hostmetadataitem: optional parameter that defines an item used for getting the metadata.
-* `zabbix_agent(2)_refreshactivechecks: how often list of active checks is refreshed, in seconds.
-* `zabbix_agent(2)_buffersend: do not keep data longer than n seconds in buffer.
-* `zabbix_agent(2)_buffersize: maximum number of values in a memory buffer. the agent will send all collected data to zabbix server or proxy if the buffer is full.
-* `zabbix_agent2_enablepersistentbuffer: 0 - disabled, in-memory buffer is used (default); 1 - use persistent buffer
-* `zabbix_agent2_persistentbufferperiod: Zabbix Agent2 will keep data for this time period in case of no connectivity with Zabbix server or proxy. Older data will be lost. Log data will be preserved.
-* `zabbix_agent2_persistentbufferfile: Zabbix Agent2 will keep SQLite database in this file	* n is valid if `EnablePersistentBuffer=1`
-* `zabbix_agent_maxlinespersecond: maximum number of new lines the agent will send per second to zabbix server or proxy processing 'log' and 'logrt' active checks.
-* `zabbix_agent_allowroot: allow the agent to run as 'root'. if disabled and the agent is started by 'root', the agent will try to switch to user 'zabbix' instead. has no effect if started under a regular user.
-* `zabbix_agent(2)_zabbix_alias: sets an alias for parameter. it can be useful to substitute long and complex parameter name with a smaller and simpler one.
-* `zabbix_agent(2)_timeout: spend no more than timeout seconds on processing
-* `zabbix_agent(2)_include: you may include individual files or all files in a directory in the configuration file.
-* `zabbix_agent(2)_include_mode: The mode for the directory mentioned above.
-* `zabbix_agent(2)_unsafeuserparameters: allow all characters to be passed in arguments to user-defined parameters.
-* `zabbix_agent_loadmodulepath: Full path to location of agent modules.
-* `zabbix_agent_loadmodule: Module to load at agent startup. Modules are used to extend functionality of the agent.
-* `zabbix_agent2_controlsocket: The control socket, used to send runtime commands with '-R' option.
-* `zabbix_agent_allowroot:  Allow the agent to run as 'root'. 0 - do not allow, 1 - allow
-* `zabbix_agent2_plugins: A list containing plugin configuration.
+* `zabbix_agent(2)_hostname`: unique, case sensitive hostname.
+* `zabbix_agent(2)_hostnameitem`: item used for generating hostname if it is undefined.
+* `zabbix_agent(2)_hostmetadata`: optional parameter that defines host metadata.
+* `zabbix_agent(2)_hostmetadataitem`: optional parameter that defines an item used for getting the metadata.
+* `zabbix_agent(2)_refreshactivechecks`: how often list of active checks is refreshed, in seconds.
+* `zabbix_agent(2)_buffersend`: do not keep data longer than n seconds in buffer.
+* `zabbix_agent(2)_buffersize`: maximum number of values in a memory buffer. the agent will send all collected data to zabbix server or proxy if the buffer is full.
+* `zabbix_agent2_enablepersistentbuffer`: 0 - disabled, in-memory buffer is used (default); 1 - use persistent buffer
+* `zabbix_agent2_persistentbufferperiod`: Zabbix Agent2 will keep data for this time period in case of no connectivity with Zabbix server or proxy. Older data will be lost. Log data will be preserved.
+* `zabbix_agent2_persistentbufferfile`: Zabbix Agent2 will keep SQLite database in this file	* n is valid if `EnablePersistentBuffer=1`
+* `zabbix_agent_maxlinespersecond`: maximum number of new lines the agent will send per second to zabbix server or proxy processing 'log' and 'logrt' active checks.
+* `zabbix_agent_allowroot`: allow the agent to run as 'root'. if disabled and the agent is started by 'root', the agent will try to switch to user 'zabbix' instead. has no effect if started under a regular user.
+* `zabbix_agent(2)_zabbix_alias`: sets an alias for parameter. it can be useful to substitute long and complex parameter name with a smaller and simpler one.
+* `zabbix_agent(2)_timeout`: spend no more than timeout seconds on processing
+* `zabbix_agent(2)_include`: you may include individual files or all files in a directory in the configuration file.
+* `zabbix_agent(2)_include_mode`: The mode for the directory mentioned above.
+* `zabbix_agent(2)_unsafeuserparameters`: allow all characters to be passed in arguments to user-defined parameters.
+* `zabbix_agent_loadmodulepath`: Full path to location of agent modules.
+* `zabbix_agent_loadmodule`: Module to load at agent startup. Modules are used to extend functionality of the agent.
+* `zabbix_agent2_controlsocket`: The control socket, used to send runtime commands with '-R' option.
+* `zabbix_agent_allowroot`:  Allow the agent to run as 'root'. 0 - do not allow, 1 - allow
+* `zabbix_agent2_plugins`: A list containing plugin configuration.
 
 ## TLS Specific configuration
 
