@@ -110,10 +110,20 @@ The following is an overview of all available configuration defaults for this ro
 * `zabbix_apache_include_custom_fragment`: Default: `true`. Includes php_value vars max_execution_time, memory_limit, post_max_size, upload_max_filesize, max_input_time and date.timezone in vhost file.. place those in php-fpm configuration.
 * `zabbix_web_env`: (Optional) A Dictionary of PHP Environments settings.
 
-The following properties are specific to Zabbix 5.0:
+The following properties are specific to Zabbix 5.0 and for the PHP(-FPM) configuration:
 
-* `zabbix_php_fpm_dir_etc`: etc HOME root directory of PHP-FPM
-* `zabbix_php_fpm_dir_var`: Var HOME root directory of PHP-FPM
+* `zabbix_php_version`: Either `7.3` or `7.4` (Based on the OS Family). When you want to override the PHP Version.
+* `zabbix_php_fpm_session`: The directory where sessions will be stored. If none are provided, defaults are used.
+* `zabbix_php_fpm_listen`: The path to a socket file or ipaddress:port combination on which PHP-FPM needs to listen. If none are provided, defaults are used.
+* `zabbix_php_fpm_conf_listen`: Default: `true`. If we want to configure the `zabbix_php_fpm_listen` in the PHP-FPM configuration file.
+* `zabbix_php_fpm_conf_user`: The owner of the socket file (When `zabbix_php_fpm_listen` contains a patch to a socket file).
+* `zabbix_php_fpm_conf_enable_user`: Default: `true`. If we want to configure the owner of the `zabbix_php_fpm_listen` in the PHP-FPM configuration file.
+* `zabbix_php_fpm_conf_group`: The group of the owner of the socket file (When `zabbix_php_fpm_listen` contains a patch to a socket file).
+* `zabbix_php_fpm_conf_enable_group`: Default: `true`. If we want to configure the group of the `zabbix_php_fpm_listen` in the PHP-FPM configuration file.
+* `zabbix_php_fpm_conf_mode`: The mode for the socket file (When `zabbix_php_fpm_listen` contains a patch to a socket file).
+* `zabbix_php_fpm_conf_enable_mode`: Default: `true`. If we want to configure the mode of the `zabbix_php_fpm_listen` in the PHP-FPM configuration file.
+* `zabbix_php_fpm_dir_etc`: etc HOME root directory of PHP-FPM setup.
+* `zabbix_php_fpm_dir_var`: Var HOME root directory of PHP-FPM setup.
 
 ### TLS Specific configuration
 

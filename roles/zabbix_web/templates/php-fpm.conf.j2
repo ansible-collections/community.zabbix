@@ -2,11 +2,22 @@
 user = apache
 group = apache
 
-listen = {{ php_fpm_listen }}/zabbix.sock
+listen = {{ zabbix_php_fpm_listen }}
+{% if zabbix_php_fpm_conf_listen %}
 {% if zabbix_websrv == "apache" %}
 listen.acl_users = {{ apache_user }}
 {% else %}
 listen.acl_users = {{ zabbix_websrv }}
+{% endif %}
+{% endif %}
+{% if zabbix_php_fpm_conf_enable_user %}
+listen.owner = {{ zabbix_php_fpm_conf_user }}
+{% endif %}
+{% if zabbix_php_fpm_conf_enable_group %}
+listen.group = {{ zabbix_php_fpm_conf_group }}
+{% endif %}
+{% if zabbix_php_fpm_conf_enable_mode %}
+listen.mode = {{ zabbix_php_fpm_conf_mode }}
 {% endif %}
 listen.allowed_clients = 127.0.0.1
 
@@ -17,7 +28,7 @@ pm.min_spare_servers = 5
 pm.max_spare_servers = 35
 
 php_value[session.save_handler] = files
-php_value[session.save_path]    = {{ php_fpm_session }}
+php_value[session.save_path]    = {{ zabbix_php_fpm_session }}
 
 php_value[max_execution_time] = {{ zabbix_web_max_execution_time | default('300') }}
 php_value[memory_limit] = {{ zabbix_web_memory_limit | default('128M') }}

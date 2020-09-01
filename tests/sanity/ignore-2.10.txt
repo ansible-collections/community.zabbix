@@ -30,10 +30,10 @@ plugins/doc_fragments/zabbix.py future-import-boilerplate
 plugins/doc_fragments/zabbix.py metaclass-boilerplate
 roles/zabbix_agent/molecule/with-server/tests/test_agent.py future-import-boilerplate
 roles/zabbix_agent/molecule/with-server/tests/test_default.py future-import-boilerplate
-roles/zabbix_web/molecule/default/tests/test_default.py future-import-boilerplate
 roles/zabbix_agent/molecule/with-server/tests/test_agent.py metaclass-boilerplate
 roles/zabbix_agent/molecule/with-server/tests/test_default.py metaclass-boilerplate
-roles/zabbix_web/molecule/default/tests/test_default.py metaclass-boilerplate
+molecule/zabbix_web/tests/test_default.py metaclass-boilerplate
+molecule/zabbix_web/tests/test_default.py future-import-boilerplate
 molecule/zabbix_javagateway/tests/test_default.py metaclass-boilerplate
 molecule/zabbix_javagateway/tests/test_default.py future-import-boilerplate
 molecule/zabbix_server/tests/test_default.py future-import-boilerplate

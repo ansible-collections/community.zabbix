@@ -1,0 +1,142 @@
+---
+- name: Prepare
+  hosts: localhost
+  connection: local
+  pre_tasks:
+
+    - name: "Create MySQL Container"
+      docker_container:
+        name: mysql-host
+        image: mysql:5.7
+        state: started
+        recreate: yes
+        networks:
+          - name: zabbix
+        env:
+          MYSQL_ROOT_PASSWORD: changeme
+      no_log: true
+      with_items: "{{ molecule_yml.platforms }}"
+      when:
+        - '"mysql" in item.groups'
+
+    - name: "Create postgresql Container"
+      docker_container:
+        name: postgresql-host
+        image: postgres
+        state: started
+        recreate: yes
+        networks:
+          - name: zabbix
+        env:
+          POSTGRES_PASSWORD: changeme
+      no_log: true
+      with_items: "{{ molecule_yml.platforms }}"
+      when:
+        - '"postgresql" in item.groups'
+
+- name: Prepare
+  hosts: all
+  pre_tasks:
+
+    - name: "Create group for imaginary host"
+      add_host:
+        name: imaginary-host
+        groups:
+          - mysql
+          - postgresql
+      changed_when: False
+
+    - name: "Installing packages on CentOS"
+      yum:
+        name:
+          - net-tools
+          - which
+          - curl
+          - sudo
+          - "{{ 'python3-libselinux' if ansible_distribution_major_version == '8' else 'libselinux-python' }}"
+          - "{{ 'python3-pip' if ansible_distribution_major_version == '8' else 'python-pip' }}"
+        state: present
+      register: installation_dependencies
+      until: installation_dependencies is succeeded
+      when:
+        - ansible_os_family == 'RedHat'
+
+    - name: "Installing packages (CentOS7)"
+      yum:
+        name:
+          - centos-release-scl
+        state: present
+      register: installation_dependencies
+      when:
+        - ansible_os_family == 'RedHat'
+        - ansible_distribution_major_version == '7'
+
+    - name: "Installing packages on CentOS"
+      yum:
+        name:
+          - mysql
+        state: present
+      register: installation_dependencies
+      until: installation_dependencies is succeeded
+      when:
+        - ansible_os_family == 'RedHat'
+        - inventory_hostname in groups['mysql']
+
+    - name: "Installing packages on NON-CentOS"
+      apt:
+        name:
+          - net-tools
+          - curl
+          - apt-utils
+          - apt-transport-https
+          - ca-certificates
+          - python-apt
+          - gnupg2
+          - "{{ 'python3-pip' if ansible_distribution == 'Ubuntu' else 'python-pip' }}"
+          - "{{ 'gnupg-agent' if ansible_distribution_major_version in ['7', '8'] else 'gpg-agent' }}"
+          - sudo
+          - vim
+        update_cache: True
+        state: present
+      register: installation_dependencies
+      until: installation_dependencies is succeeded
+      when:
+        - ansible_os_family != 'RedHat'
+
+    - name: "Configure SUDO."
+      lineinfile:
+        dest: /etc/sudoers
+        line: "Defaults    !requiretty"
+        state: present
+
+    - name: "Make sure the docs are installed."
+      lineinfile:
+        dest: /etc/yum.conf
+        line: "tsflags=nodocs"
+        state: absent
+      when:
+        - ansible_os_family == 'RedHat'
+
+    - name: PyMySQL
+      pip:
+        name: PyMySQL
+      register: installation_dependencies
+      until: installation_dependencies is succeeded
+      when:
+        - inventory_hostname in groups['mysql']
+
+  roles:
+    - role: wdijkerman.php
+      when:
+        - ansible_os_family != 'RedHat'
+        - ansible_distribution_major_version == "8"
+    - role: zabbix_server
+    - role: geerlingguy.apache
+
+  post_tasks:
+    - name: "Remove file"
+      file:
+        path: '{{ item }}'
+        state: absent
+      with_items:
+        - /var/www/html/index.html

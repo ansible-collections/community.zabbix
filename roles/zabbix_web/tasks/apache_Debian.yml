@@ -25,15 +25,15 @@
     - config
     - apache
 
-- name: "Debian | Remove provided zabbix.conf files"
-  file:
-    path: "{{ item }}"
-    state: absent
-  when: zabbix_vhost
-  become: yes
-  with_items:
-    - /etc/apache2/conf-available/zabbix.conf
-    - /etc/apache2/conf-enabled/zabbix.conf
+# - name: "Debian | Remove provided zabbix.conf files"
+#   file:
+#     path: "{{ item }}"
+#     state: absent
+#   when: zabbix_vhost
+#   become: yes
+#   with_items:
+#     - /etc/apache2/conf-available/zabbix.conf
+#     - /etc/apache2/conf-enabled/zabbix.conf
 
 - name: "Debian | enable apache vhost"
   file:

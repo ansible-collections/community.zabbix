@@ -25,8 +25,4 @@ galaxy_info:
     - monitoring
     - zabbix
 
-dependencies:
-  - name: geerlingguy.apache
-    src: geerlingguy.apache
-    tags: apache
-    when: zabbix_websrv == 'apache'
+dependencies: []
