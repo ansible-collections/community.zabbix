@@ -1,16 +1,41 @@
 ---
 # tasks file for wdijkerman.zabbix-web
 
+- name: "Include distribution and version-specific vars"
+  include_vars: "{{ item }}"
+  with_first_found:
+    - files:
+        - "{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml"
+        - "{{ ansible_os_family }}-{{ ansible_distribution_major_version }}.yml"
+
+- name: "Set some versions"
+  set_fact:
+    zabbix_short_version: "{{ zabbix_version | regex_replace('\\.', '') }}"
+    zabbix_php_version: "{{ zabbix_php_version if zabbix_php_version is defined else _zabbix_php_version }}"
+  tags:
+    - always
+
 - name: "Include OS-specific variables"
   include_vars: "{{ ansible_os_family }}.yml"
   tags:
     - always
 
-- name: "Set short version name"
+- name: "Set default PHP-FPM variables"
   set_fact:
-    zabbix_short_version: "{{ zabbix_version | regex_replace('\\.', '') }}"
-  tags:
-    - always
+    zabbix_php_fpm_dir: "{{ zabbix_php_fpm_dir if zabbix_php_fpm_dir is defined else _php_fpm_dir }}"
+    zabbix_php_fpm_session: "{{ zabbix_php_fpm_session if zabbix_php_fpm_session is defined else _php_fpm_session }}"
+    zabbix_php_fpm_listen: "{{ zabbix_php_fpm_listen if zabbix_php_fpm_listen is defined else _php_fpm_listen }}"
+  when:
+    - not zabbix_php_fpm
+
+- name: "Set default PHP-FPM variables specific RH provided"
+  set_fact:
+    zabbix_php_fpm_dir: "{{ zabbix_php_fpm_dir if zabbix_php_fpm_dir is defined else zabbix_php_fpm_dir_etc }}"
+    zabbix_php_fpm_session: "{{ zabbix_php_fpm_session if zabbix_php_fpm_session is defined else _zabbix_php_fpm_session }}"
+    zabbix_php_fpm_listen: "{{ zabbix_php_fpm_listen if zabbix_php_fpm_listen is defined else _zabbix_php_fpm_listen }}"
+  when:
+    - zabbix_php_fpm
+    - ansible_os_family == "RedHat"
 
 - include_tasks: apache.yml
   when: zabbix_websrv == 'apache'

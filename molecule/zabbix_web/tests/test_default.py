@@ -13,17 +13,18 @@ testinfra_hosts = testinfra.utils.ansible_runner.AnsibleRunner(
 ])
 def test_zabbix_package(host, server, redhat, debian):
     host = host.backend.get_hostname()
-    host = host.replace("-centos", "")
+    host = host.replace("-centos7", "")
+    host = host.replace("-centos8", "")
     host = host.replace("-debian", "")
     host = host.replace("-ubuntu", "")
 
     if host == server:
         if host.system_info.distribution in ['debian', 'ubuntu']:
             zabbix_web = host.package(debian)
-            assert zabbix_web.version.startswith("1:4.4")
+            assert zabbix_web.version.startswith("1:5.0")
         elif host.system_info.distribution == 'centos':
             zabbix_web = host.package(redhat)
-            assert zabbix_web.version.startswith("4.4")
+            assert zabbix_web.version.startswith("5.0")
         assert zabbix_web.is_installed
 
 

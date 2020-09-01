@@ -1,8 +1,15 @@
 ---
 
+- name: restart apache
+  service:
+    name: "{{ apache_service }}"
+    state: restarted
+    enabled: yes
+  become: yes
+
 - name: restart rh-php72-php-fpm
   service:
-    name: rh-php72-php-fpm
+    name: "{{ 'rh-php72-php-fpm' if zabbix_php_fpm else 'php-fpm' }}"
     state: restarted
     enabled: yes
   become: yes
