@@ -7,5 +7,3 @@ apache_service: httpd
 _php_fpm_dir: /etc/php-fpm.d
 _php_fpm_session: /var/opt/rh/rh-php72/lib/php/session/
 _php_fpm_listen: /run/php-fpm/zabbix.sock
-
-_zabbix_php_version: 7.3
