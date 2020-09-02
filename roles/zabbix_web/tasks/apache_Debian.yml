@@ -12,8 +12,8 @@
   template:
     src: apache_vhost.conf.j2
     dest: /etc/apache2/sites-available/zabbix.conf
-    owner: "{{ apache_user }}"
-    group: "{{ apache_group }}"
+    owner: "{{ zabbix_web_conf_web_user }}"
+    group: "{{ zabbix_web_conf_web_group }}"
     mode: 0644
   when: zabbix_vhost
   become: yes
@@ -39,8 +39,8 @@
   file:
     src: /etc/apache2/sites-available/zabbix.conf
     dest: /etc/apache2/sites-enabled/zabbix.conf
-    owner: "{{ apache_user }}"
-    group: "{{ apache_group }}"
+    owner: "{{ zabbix_web_conf_web_user }}"
+    group: "{{ zabbix_web_conf_web_group }}"
     state: link
   when: zabbix_vhost
   become: yes
