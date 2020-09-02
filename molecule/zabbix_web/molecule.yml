@@ -10,7 +10,7 @@ dependency:
 driver:
   name: docker
 platforms:
-  - name: zabbix-web-${MY_MOLECULE_CONTAINER:-mysql-centos}
+  - name: zabbix-web-${MY_MOLECULE_CONTAINER:-mysql-centos8}
     image: ${MY_MOLECULE_IMAGE:-"geerlingguy/docker-centos8-ansible"}
     command: ${MY_MOLECULE_DOCKER_COMMAND:-""}
     privileged: True
@@ -67,10 +67,16 @@ provisioner:
         zabbix_url: zabbix-web-pgsql-centos7
         zabbix_websrv_servername: zabbix-web-pgsql-centos7
       zabbix-web-mysql-centos8:
+        ansible_rhn_repo_disable_gpg_check: True
+        php_fpm_pool_user: nginx
+        php_fpm_pool_group: nginx
+        zabbix_websrv: nginx
         zabbix_php_fpm_conf_listen: False
         zabbix_url: zabbix-web-mysql-centos8
         zabbix_websrv_servername: zabbix-web-mysql-centos8
       zabbix-web-mysql-ubuntu18:
+        zabbix_websrv: nginx
+        zabbix_php_fpm_conf_listen: False
         zabbix_url: zabbix-web-mysql-ubuntu18
         zabbix_websrv_servername: zabbix-web-mysql-ubuntu18
       zabbix-web-pgsql-ubuntu20:

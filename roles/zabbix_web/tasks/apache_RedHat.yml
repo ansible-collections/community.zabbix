@@ -1,18 +1,5 @@
 ---
 
-- name: "RedHat | Install PHP"
-  template:
-    src: php-fpm.conf.j2
-    dest: "{{ zabbix_php_fpm_dir }}/zabbix.conf"
-    owner: "{{ apache_user }}"
-    group: "{{ apache_group }}"
-    mode: 0644
-  become: yes
-  when:
-    - zabbix_vhost
-  notify:
-    - restart rh-php72-php-fpm
-
 - name: "RedHat | Install apache vhost"
   template:
     src: apache_vhost.conf.j2
