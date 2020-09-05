@@ -1,0 +1,81 @@
+name: repo-sanity
+on:
+  push:
+  pull_request:
+
+jobs:
+  tox-linters:
+    name: Tox-Lint (py${{ matrix.python }})
+    strategy:
+      matrix:
+        python:
+          - 2.7
+          - 3.7
+          - 3.8
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+        with:
+          path: ansible_collections/community/zabbix
+
+      - name: Set up Python ${{ matrix.python }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: Install dependencies
+        run: pip install flake8 tox
+
+      - name: Run lint test for py2
+        run: tox -elinters-py2 -vv
+        working-directory: ./ansible_collections/community/zabbix
+        if: matrix.python == '2.7'
+
+      - name: Run lint test for py3
+        run: tox -elinters-py3 -vv
+        working-directory: ./ansible_collections/community/zabbix
+        if: matrix.python != '2.7'
+
+  sanity:
+    name: Sanity (Ⓐ${{ matrix.ansible }}+py${{ matrix.python }})
+    strategy:
+      matrix:
+        ansible:
+          # It's important that Sanity is tested against all stable-X.Y branches
+          # Testing against `devel` may fail as new tests are added.
+        # - stable-2.9 # Only if your collection supports Ansible 2.9
+          - stable-2.10
+          - devel
+        python:
+          - 2.7
+          - 3.7
+          - 3.8
+        exclude:
+          - python: 3.8  # blocked by ansible/ansible#70155
+    runs-on: ubuntu-latest
+    steps:
+
+      # ansible-test requires the collection to be in a directory in the form
+      # .../ansible_collections/NAMESPACE/COLLECTION_NAME/
+
+      - name: Check out code
+        uses: actions/checkout@v2
+        with:
+          path: ansible_collections/community/zabbix
+
+      - name: Set up Python ${{ matrix.ansible }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python }}
+
+      # Install the head of the given branch (devel, stable-2.10)
+      - name: Install ansible-base (${{ matrix.ansible }})
+        run: pip install https://github.com/ansible/ansible/archive/${{ matrix.ansible }}.tar.gz --disable-pip-version-check
+
+      # run ansible-test sanity inside of Docker.
+      # The docker container has all the pinned dependencies that are required.
+      # Explicity specify the version of Python we want to test
+      - name: Run sanity tests
+        run: ansible-test sanity --docker -v --color --python ${{ matrix.python }}
+        working-directory: ./ansible_collections/community/zabbix
