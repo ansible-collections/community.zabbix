@@ -51,9 +51,9 @@
 
 {% endfor %}
   ## Logging
-  ErrorLog "/var/log/{{ apache_log }}/{{ zabbix_apache_servername }}_error.log"
+  ErrorLog "/var/log/{{ _apache_log }}/{{ zabbix_apache_servername }}_error.log"
   ServerSignature Off
-  CustomLog "/var/log/{{ apache_log }}/{{ zabbix_apache_servername }}_access.log" combined
+  CustomLog "/var/log/{{ _apache_log }}/{{ zabbix_apache_servername }}_access.log" combined
 
   ## Rewrite rules
   RewriteEngine On
@@ -148,9 +148,9 @@ SSLCryptoDevice {{ zabbix_apache_SSLCryptoDevice }}
 
 {% endfor %}
   ## Logging
-  ErrorLog "/var/log/{{ apache_log }}/{{ zabbix_apache_servername }}_tls_error.log"
+  ErrorLog "/var/log/{{ _apache_log }}/{{ zabbix_apache_servername }}_tls_error.log"
   ServerSignature Off
-  CustomLog "/var/log/{{ apache_log }}/{{ zabbix_apache_servername }}_tls_access.log" combined
+  CustomLog "/var/log/{{ _apache_log }}/{{ zabbix_apache_servername }}_tls_access.log" combined
 
   ## Rewrite rules
   RewriteEngine On

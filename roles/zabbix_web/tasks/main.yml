@@ -37,8 +37,23 @@
     - zabbix_php_fpm
     - ansible_os_family == "RedHat"
 
+- name: "Set websrv specific variables (Apache)"
+  set_fact:
+    zabbix_web_conf_web_user: "{{ zabbix_web_conf_web_user if zabbix_web_conf_web_user is defined else _apache_user }}"
+    zabbix_web_conf_web_group: "{{ zabbix_web_conf_web_group if zabbix_web_conf_web_group is defined else _apache_group }}"
+  when:
+    - zabbix_websrv == 'apache'
+
+- name: "Set websrv specific variables (nginx)"
+  set_fact:
+    zabbix_web_conf_web_user: "{{ zabbix_web_conf_web_user if zabbix_web_conf_web_user is defined else _nginx_user }}"
+    zabbix_web_conf_web_group: "{{ zabbix_web_conf_web_group if zabbix_web_conf_web_group is defined else _nginx_group }}"
+  when:
+    - zabbix_websrv == 'nginx'
+
 - include_tasks: apache.yml
-  when: zabbix_websrv == 'apache'
+  when:
+    - zabbix_websrv == 'apache'
 
 - name: "Install the correct repository"
   include: "RedHat.yml"
@@ -55,8 +70,8 @@
 - name: "Create zabbix-web directory"
   file:
     path: /etc/zabbix/web
-    owner: "{{ apache_user }}"
-    group: "{{ apache_group }}"
+    owner: "{{ zabbix_web_conf_web_user }}"
+    group: "{{ zabbix_web_conf_web_group }}"
     state: directory
     mode: 0755
   tags:
@@ -68,8 +83,8 @@
   template:
     src: zabbix.conf.php.j2
     dest: /etc/zabbix/web/zabbix.conf.php
-    owner: "{{ apache_user }}"
-    group: "{{ apache_group }}"
+    owner: "{{ zabbix_web_conf_web_user }}"
+    group: "{{ zabbix_web_conf_web_group }}"
     mode: "{{ zabbix_web_conf_mode }}"
   notify:
     - restart apache

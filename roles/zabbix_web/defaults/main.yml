@@ -22,9 +22,7 @@ zabbix_php_fpm: False
 zabbix_php_fpm_dir_etc: /etc/opt/rh/rh-php72/
 zabbix_php_fpm_dir_var: /var/opt/rh/rh-php72/
 zabbix_php_fpm_conf_listen: True
-zabbix_php_fpm_conf_user: "{{ apache_user }}"
 zabbix_php_fpm_conf_enable_user: true
-zabbix_php_fpm_conf_group: "{{ apache_group }}"
 zabbix_php_fpm_conf_enable_group: true
 zabbix_php_fpm_conf_mode: "0664"
 zabbix_php_fpm_conf_enable_mode: true
@@ -35,6 +33,20 @@ zabbix_apache_tls_crt: /etc/pki/server.crt
 zabbix_apache_tls_key: /etc/pki/server.key
 zabbix_apache_tls_chain:
 zabbix_apache_can_connect_ldap: False
+
+zabbix_nginx_vhost_port: 80
+zabbix_nginx_vhost_tls_port: 443
+zabbix_nginx_tls: False
+zabbix_nginx_redirect: False
+zabbix_nginx_tls_crt: /etc/pki/server.crt
+zabbix_nginx_tls_key: /etc/pki/server.key
+zabbix_nginx_tls_dhparam: /etc/pki/dhparam-server.pem
+zabbix_nginx_tls_session_timeout: 1d
+zabbix_nginx_tls_session_cache: shared:MySSL:10m
+zabbix_nginx_tls_session_tickets: off
+zabbix_nginx_tls_protocols: TLSv1.2
+zabbix_nginx_tls_ciphers: ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384
+
 zabbix_repo_yum_schema: https
 
 zabbix_repo_yum:
