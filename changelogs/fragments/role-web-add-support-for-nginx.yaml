@@ -1,0 +1,2 @@
+minor_changes:
+    - "Added support for configuring Zabbix Web with Nginx, same way as with Apache."

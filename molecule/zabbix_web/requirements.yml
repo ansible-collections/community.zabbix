@@ -1,4 +1,5 @@
 ---
 - src: geerlingguy.apache
+- src: geerlingguy.nginx
 - name: wdijkerman.php
   src: https://github.com/dj-wasabi/ansible-role-php.git

@@ -126,12 +126,16 @@
         - inventory_hostname in groups['mysql']
 
   roles:
+    - role: geerlingguy.apache
+      when:
+        - zabbix_websrv == "apache"
+    - role: geerlingguy.nginx
+      when:
+        - zabbix_websrv == "nginx"
     - role: wdijkerman.php
       when:
-        - ansible_os_family != 'RedHat'
-        - ansible_distribution_major_version == "8"
+        - ansible_os_family != 'RedHat' or (ansible_os_family == 'RedHat' and ansible_distribution_major_version == "8")
     - role: zabbix_server
-    - role: geerlingguy.apache
 
   post_tasks:
     - name: "Remove file"

@@ -1,9 +1,12 @@
 ---
-apache_user: apache
-apache_group: apache
-apache_log: httpd
-apache_service: httpd
+_apache_user: apache
+_apache_group: apache
+_apache_log: httpd
+_apache_service: httpd
 
 _php_fpm_dir: /etc/php-fpm.d
 _php_fpm_session: /var/opt/rh/rh-php72/lib/php/session/
 _php_fpm_listen: /run/php-fpm/zabbix.sock
+
+_nginx_user: nginx
+_nginx_group: nginx

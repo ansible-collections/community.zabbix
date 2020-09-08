@@ -2,14 +2,34 @@
 
 - name: restart apache
   service:
-    name: "{{ apache_service }}"
+    name: "{{ _apache_service }}"
     state: restarted
     enabled: yes
   become: yes
+  when:
+    - zabbix_websrv == 'apache'
 
-- name: restart rh-php72-php-fpm
+- name: restart nginx
+  service:
+    name: nginx
+    state: restarted
+    enabled: yes
+  become: yes
+  when:
+    - zabbix_websrv == 'nginx'
+
+- name: restart php-fpm
   service:
     name: "{{ 'rh-php72-php-fpm' if zabbix_php_fpm else 'php-fpm' }}"
+    state: restarted
+    enabled: yes
+  become: yes
+  when:
+    - zabbix_version is version('5.0', '>=')
+
+- name: restart php-fpm-version
+  service:
+    name: php{{ zabbix_php_version }}-fpm
     state: restarted
     enabled: yes
   become: yes

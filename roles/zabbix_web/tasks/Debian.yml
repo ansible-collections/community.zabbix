@@ -62,7 +62,41 @@
     - init
     - config
 
-- include_tasks: apache_Debian.yml
+- name: "Debian | Install PHP"
+  template:
+    src: php-fpm.conf.j2
+    dest: "{{ zabbix_php_fpm_dir }}/zabbix.conf"
+    owner: "{{ _apache_user }}"
+    group: "{{ _apache_group }}"
+    mode: 0644
+  become: yes
+  when:
+    - zabbix_vhost
+  notify:
+    - restart php-fpm-version
+
+- name: "Including Apache Configuration"
+  include_tasks: apache_Debian.yml
   vars:
     zabbix_apache_servername: "{{ zabbix_websrv_servername }}"
-  when: zabbix_websrv == 'apache'
+  when:
+    - zabbix_websrv == 'apache'
+
+- name: "Debian | Install Nginx vhost"
+  template:
+    src: nginx_vhost.conf.j2
+    dest: /etc/nginx/conf.d/zabbix.conf
+    owner: root
+    group: root
+    mode: 0644
+  when:
+    - zabbix_vhost
+    - zabbix_websrv == 'nginx'
+  become: yes
+  notify:
+    - restart nginx
+  tags:
+    - zabbix-web
+    - init
+    - config
+    - nginx

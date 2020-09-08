@@ -1,23 +1,25 @@
 # community.zabbix.zabbix_web role
 
-Table of Contents
+Table of contents
 
 - [Overview](#overview)
 - [Requirements](#requirements)
-  * [Operating Systems](#operating-systems)
-  * [Zabbix Versions](#zabbix-versions)
+  - [Operating Systems](#operating-systems)
+  - [Zabbix Versions](#zabbix-versions)
 - [Installation](#installation)
 - [Role Variables](#role-variables)
-  * [Main variables](#main-variables)
-    + [Overall Zabbix](#overall-zabbix)
-    + [Zabbix Web specific](#zabbix-web-specific)
-    + [TLS Specific configuration](#tls-specific-configuration)
-    + [Zabbix Server](#zabbix-server)
+  - [Main variables](#main-variables)
+    - [Overall Zabbix](#overall-zabbix)
+    - [Zabbix Web specific](#zabbix-web-specific)
+      - [Apache configuration](#apache-configuration)
+      - [Nginx configuration](#nginx-configuration)
+      - [PHP-FPM](#php-fpm)
+    - [Zabbix Server](#zabbix-server)
 - [Example Playbook](#example-playbook)
-  * [Single instance](#single-instance)
-  * [Multi host setup](#multi-host-setup)
-  * [Adding Environment Variables for zabbix_web](#adding-environment-variables-for-zabbix-web)
-  * [Using Elasticsearch for history storage](#using-elasticsearch-for-history-storage)
+  - [Single instance](#single-instance)
+  - [Multi host setup](#multi-host-setup)
+  - [Adding Environment Variables for zabbix_web](#adding-environment-variables-for-zabbixweb)
+  - [Using Elasticsearch for history storage](#using-elasticsearch-for-history-storage)
 - [Molecule](#molecule)
 - [License](#license)
 - [Author Information](#author-information)
@@ -97,6 +99,12 @@ The following is an overview of all available configuration defaults for this ro
 * `zabbix_url_aliases`: A list with Aliases for the Apache Virtual Host configuration.
 * `zabbix_timezone`: Default: `Europe/Amsterdam`. This is the timezone. The Apache Virtual Host needs this parameter.
 * `zabbix_vhost`: Default: `true`. When you don't want to create an Apache Virtual Host configuration, you can set it to False.
+* `zabbix_web_env`: (Optional) A Dictionary of PHP Environments settings.
+* `zabbix_web_conf_web_user`: When provided, the user (which should already exist on the host) will be used for ownership for web/php related processes. (Default set to either `apache` (`www-data` for Debian) or `nginx`).
+* `zabbix_web_conf_web_group`: When provided, the group (which should already exist on the host) will be used for ownership for web/php related processes. (Default set to either `apache` (`www-data` for Debian) or `nginx`).
+
+#### Apache configuration
+
 * `zabbix_apache_vhost_port`: The port on which Zabbix HTTP vhost is running.
 * `zabbix_apache_vhost_tls_port`: The port on which Zabbix HTTPS vhost is running.
 * `zabbix_apache_vhost_listen_ip`: On which interface the Apache Virtual Host is available.
@@ -108,7 +116,37 @@ The following is an overview of all available configuration defaults for this ro
 * `zabbix_web_upload_max_filesize`:
 * `zabbix_web_max_input_time`:
 * `zabbix_apache_include_custom_fragment`: Default: `true`. Includes php_value vars max_execution_time, memory_limit, post_max_size, upload_max_filesize, max_input_time and date.timezone in vhost file.. place those in php-fpm configuration.
-* `zabbix_web_env`: (Optional) A Dictionary of PHP Environments settings.
+* `zabbix_apache_tls`: If the Apache vhost should be configured with TLS encryption or not.
+* `zabbix_apache_redirect`: If a redirect should take place from HTTP to HTTPS
+* `zabbix_apache_tls_crt`: The path to the TLS certificate file.
+* `zabbix_apache_tls_key`: The path to the TLS key file.
+* `zabbix_apache_tls_chain`: The path to the TLS certificate chain file.
+* `zabbix_apache_SSLPassPhraseDialog`: Type of pass phrase dialog for encrypted private keys.
+* `zabbix_apache_SSLSessionCache`: Type of the global/inter-process SSL Session Cache
+* `zabbix_apache_SSLSessionCacheTimeout`: Number of seconds before an SSL session expires in the Session Cache
+* `zabbix_apache_SSLCryptoDevice`: Enable use of a cryptographic hardware accelerator
+
+When `zabbix_apache_tls_crt`, `zabbix_apache_tls_key` and/or `zabbix_apache_tls_chain` are used, make sure that these files exists before executing this role. The Zabbix-Web role will not install the mentioned files.
+
+See https://httpd.apache.org/docs/current/mod/mod_ssl.html for SSL* configuration options for Apache HTTPD.
+
+#### Nginx configuration
+
+* `zabbix_nginx_vhost_port`: The port on which Zabbix HTTP vhost is running.
+* `zabbix_nginx_vhost_tls_port`: The port on which Zabbix HTTPS vhost is running.
+* `zabbix_nginx_tls`: If the Nginx vhost should be configured with TLS encryption or not.
+* `zabbix_nginx_tls_crt`: The path to the TLS certificate file.
+* `zabbix_nginx_tls_key`: The path to the TLS key file.
+* `zabbix_nginx_tls_dhparam`: The path to the TLS DHParam file.
+* `zabbix_nginx_tls_session_cache`: Type of the global/inter-process SSL Session Cache
+* `zabbix_nginx_tls_session_timeout`: 
+* `zabbix_nginx_tls_session_tickets`: 
+* `zabbix_nginx_tls_protocols`: The TLS Protocols to accept.
+* `zabbix_nginx_tls_ciphers`: The TLS Ciphers to be allowed.
+
+When `zabbix_nginx_tls_crt` and `zabbix_nginx_tls_key` are used, make sure that these files exists before executing this role. The Zabbix-Web role will not install the mentioned files.
+
+#### PHP-FPM
 
 The following properties are specific to Zabbix 5.0 and for the PHP(-FPM) configuration:
 
@@ -124,24 +162,6 @@ The following properties are specific to Zabbix 5.0 and for the PHP(-FPM) config
 * `zabbix_php_fpm_conf_enable_mode`: Default: `true`. If we want to configure the mode of the `zabbix_php_fpm_listen` in the PHP-FPM configuration file.
 * `zabbix_php_fpm_dir_etc`: etc HOME root directory of PHP-FPM setup.
 * `zabbix_php_fpm_dir_var`: Var HOME root directory of PHP-FPM setup.
-
-### TLS Specific configuration
-
-The following properties are related when TLS/SSL is configured:
-
-* `zabbix_apache_tls`: If the Apache vhost should be configured with TLS encryption or not.
-* `zabbix_apache_redirect`: If a redirect should take place from HTTP to HTTPS
-* `zabbix_apache_tls_crt`: The path to the TLS certificate file.
-* `zabbix_apache_tls_key`: The path to the TLS key file.
-* `zabbix_apache_tls_chain`: The path to the TLS certificate chain file.
-* `zabbix_apache_SSLPassPhraseDialog`: Type of pass phrase dialog for encrypted private keys.
-* `zabbix_apache_SSLSessionCache`: Type of the global/inter-process SSL Session Cache
-* `zabbix_apache_SSLSessionCacheTimeout`: Number of seconds before an SSL session expires in the Session Cache
-* `zabbix_apache_SSLCryptoDevice`: Enable use of a cryptographic hardware accelerator
-
-When `zabbix_apache_tls_crt`, `zabbix_apache_tls_key` and/or `zabbix_apache_tls_chain` are used, make sure that these files exists before executing this role. The Zabbix-Web role will not install the mentioned files.
-
-See https://httpd.apache.org/docs/current/mod/mod_ssl.html for SSL* configuration options for Apache HTTPD.
 
 ### Zabbix Server
 
