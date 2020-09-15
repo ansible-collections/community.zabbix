@@ -148,7 +148,7 @@
     pkg: "{{ zabbix_agent_packages }}"
     state: "{{ zabbix_agent_package_state }}"
     update_cache: yes
-    cache_valid_time: 0
+    cache_valid_time: 3600
     force_apt_get: "{{ zabbix_apt_force_apt_get }}"
     install_recommends: "{{ zabbix_apt_install_recommends }}"
   environment:
