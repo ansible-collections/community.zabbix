@@ -20,7 +20,7 @@ jobs:
       matrix:
         zabbix_container:
           - version: "3.0"
-            port: "80"
+            port: "8080"
           - version: "4.0"
             port: "8080"
           - version: "4.4"
