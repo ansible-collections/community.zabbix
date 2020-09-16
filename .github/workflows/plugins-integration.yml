@@ -20,13 +20,9 @@ jobs:
       matrix:
         zabbix_container:
           - version: "3.0"
-            port: "8080"
           - version: "4.0"
-            port: "8080"
           - version: "4.4"
-            port: "8080"
           - version: "5.0"
-            port: "8080"
         ansible:
           # - stable-2.9 # Only if your collection supports Ansible 2.9
           - stable-2.10
