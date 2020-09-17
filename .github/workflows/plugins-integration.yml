@@ -20,13 +20,9 @@ jobs:
       matrix:
         zabbix_container:
           - version: "3.0"
-            port: "80"
           - version: "4.0"
-            port: "8080"
           - version: "4.4"
-            port: "8080"
           - version: "5.0"
-            port: "8080"
         ansible:
           # - stable-2.9 # Only if your collection supports Ansible 2.9
           - stable-2.10
@@ -62,7 +58,6 @@ jobs:
         working-directory: ./ansible_collections/community/zabbix
         env:
           zabbix_version: ${{ matrix.zabbix_container.version }}
-          zabbix_port: ${{ matrix.zabbix_container.port }}
 
       # Run the integration tests
       # As we need to connect to an existing docker container we can't use `--docker` here as the VMs would be on different
