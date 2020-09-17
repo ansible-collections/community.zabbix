@@ -34,4 +34,4 @@ services:
       - "zabbix-db"
       - "zabbix-server"
     ports:
-      - "8080:${zabbix_port}"
+      - "8080:8080"
