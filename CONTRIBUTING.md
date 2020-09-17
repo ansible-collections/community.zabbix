@@ -128,14 +128,12 @@ Integration test suite for modules can be run with the commands below:
 
 ```bash
 export zabbix_version=X.Y
-export zabbix_port=XY
 docker-compose up -d
 ansible-test integration -v --color --retry-on-error --continue-on-error --diff
 docker-compose down
 ```
 *Notes*:
 * `zabbix_version=X.Y` will be expanded to Docker image `ubuntu-X.Y-latest`
-* `zabbix_port=XY` is the mapping port for the container (local port 8080 will be mapped to port XY on the zabbix-web container). As of now, this needs to be set explicitly as different versions of zabbix-web docker images are exposing different ports.
 * Details for both variables and values that are in use can be read from [ansible-test.yml](.github/workflows/ansible-test.yml).
 
 Sanity test suite for the modules can be run with the commands:
