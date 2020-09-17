@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # (c) 2013, Greg Buehler
 # (c) 2018, Filippo Ferrazini
