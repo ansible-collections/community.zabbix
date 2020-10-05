@@ -8,6 +8,8 @@
   when:
     - zabbix_agent2 is defined
     - zabbix_agent2
+  tags:
+    - always
 
 - name: "Fix facts for linuxmint - distribution release"
   set_fact:
@@ -15,12 +17,16 @@
   when:
     - ansible_os_family == "Linuxmint"
     - ansible_distribution_release == "sonya" or ansible_distribution_release == "serena"
+  tags:
+    - always
 
 - name: "Fix facts for linuxmint - family"
   set_fact:
     zabbix_agent_os_family: Debian
   when:
     - ansible_os_family == "Linuxmint"
+  tags:
+    - always
 
 - name: "Fix facts for XCP-ng - family"
   set_fact:
@@ -31,18 +37,14 @@
 - name: "Include OS-specific variables"
   include_vars: "{{ zabbix_agent_os_family }}.yml"
   tags:
-    - vars
-    - zabbix-agent
+    - always
 
 - name: "Install the correct repository"
   include_tasks: "{{ zabbix_agent_os_family if (zabbix_agent_os_family not in ['Sangoma']) else 'RedHat' }}.yml"
   when:
     - not (zabbix_agent_docker | bool)
   tags:
-    - zabbix-agent
-    - init
-    - config
-    - service
+    - always
 
 - name: "Install local python-netaddr package"
   pip:
@@ -68,16 +70,22 @@
   include_tasks: Windows.yml
   when:
     - zabbix_agent_os_family == "Windows"
+  tags:
+    - always
 
 - name: "Install the correct repository"
   include_tasks: Linux.yml
   when:
     - (zabbix_agent_os_family != "Windows" and zabbix_agent_os_family != "Darwin") or (zabbix_agent_docker | bool)
+  tags:
+    - always
 
 - name: "Install the correct repository"
   include_tasks: macOS.yml
   when:
     - zabbix_agent_os_family == "Darwin"
+  tags:
+    - always
 
 - name: "Installing the Zabbix-api package on localhost"
   pip:
