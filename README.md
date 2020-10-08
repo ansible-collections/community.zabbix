@@ -120,11 +120,15 @@ Or you include collection name `community.zabbix` in the playbook's `collections
 
 ## Supported Zabbix versions
 
-As a main priority, this collection aims to cover all of the currently supported Zabbix releases, which are noted on the [Zabbix Life Cycle & Release Policy](https://www.zabbix.com/life_cycle_and_release_policy) page.
-Other versions are supported too, but not as strictly (changes would not be actively tested against them).
+Main priority is to support Zabbix releases which have official full support from Zabbix LLC. Please checkout the versions at [Zabbix Life Cycle & Release Policy](https://www.zabbix.com/life_cycle_and_release_policy) page.
 
-If you find any inconsistencies with the version of Zabbix you are using, feel free to open a pull request or an issue and we will try to address it as soon as possible.
-In case of pull requests, please make sure that your changes will not break any existing functionality for currently supported Zabbix releases.
+Support for Zabbix versions will be dropped with Major releases of the collection and mostly affect modules. Each role is following its unique support matrix. You should always consult documentation of roles in *docs/* directory.
+
+If you find any inconsistencies with the version of Zabbix you are using, feel free to open a pull request or an issue and we will try to address it as soon as possible. In case of pull requests, please make sure that your changes will not break any existing functionality for currently supported Zabbix releases.
+
+## Collection life cycle and support
+
+See [RELEASE](docs/RELEASE.md) document for more information regarding life cycle and support for the collection.
 
 ## Contributing
 
