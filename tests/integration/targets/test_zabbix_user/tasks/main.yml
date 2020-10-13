@@ -864,9 +864,6 @@
     login_user: "{{ zabbix_login_user }}"
     login_password: "{{ zabbix_login_password }}"
     alias: example1
-    usrgrps:
-      - Zabbix administrators
-    passwd: update_password
     state: absent
   check_mode: yes
   diff: yes
@@ -882,9 +879,6 @@
     login_user: "{{ zabbix_login_user }}"
     login_password: "{{ zabbix_login_password }}"
     alias: example1
-    usrgrps:
-      - Zabbix administrators
-    passwd: update_password
     state: absent
   register: delete_existing_user_result
 
@@ -898,12 +892,107 @@
     login_user: "{{ zabbix_login_user }}"
     login_password: "{{ zabbix_login_password }}"
     alias: example1
-    usrgrps:
-      - Zabbix administrators
-    passwd: update_password
     state: absent
   register: delete_existing_user_result
 
 - assert:
     that:
       - not delete_existing_user_result.changed is sameas true
+
+- when: zabbix_version is version('4.0', '<')
+  block:
+  - name: test - Create new password-less user without LDAP group (fail, <4.0)
+    zabbix_user:
+      server_url: "{{ zabbix_server_url }}"
+      login_user: "{{ zabbix_login_user }}"
+      login_password: "{{ zabbix_login_password }}"
+      alias: example2alias
+      name: example2
+      surname: testldap
+      usrgrps:
+        - Guests
+    register: create_zabbix_user_ldap_fail
+    ignore_errors: True
+
+  - assert:
+      that:
+        - create_zabbix_user_ldap_fail.failed is sameas True
+
+- when: zabbix_version is version('4.0', '>=')
+  block:
+  - name: test prepare - Create LDAP user group
+    zabbix_usergroup:
+      server_url: "{{ zabbix_server_url }}"
+      login_user: "{{ zabbix_login_user }}"
+      login_password: "{{ zabbix_login_password }}"
+      name: testLDAPgrp
+      gui_access: LDAP
+    register: zbxuser_create_ldap_group
+
+  - assert:
+      that:
+        - zbxuser_create_ldap_group.changed is sameas True
+
+  - name: test - Create new password-less user without LDAP group (fail)
+    zabbix_user:
+      server_url: "{{ zabbix_server_url }}"
+      login_user: "{{ zabbix_login_user }}"
+      login_password: "{{ zabbix_login_password }}"
+      alias: example2alias
+      name: example2
+      surname: testldap
+      usrgrps:
+        - Guests
+    register: create_zabbix_user_ldap_fail
+    ignore_errors: True
+
+  - assert:
+      that:
+        - create_zabbix_user_ldap_fail.failed is sameas True
+
+  - name: test - Create new password-less user as member in LDAP group
+    zabbix_user:
+      server_url: "{{ zabbix_server_url }}"
+      login_user: "{{ zabbix_login_user }}"
+      login_password: "{{ zabbix_login_password }}"
+      alias: example2alias
+      name: example2
+      surname: testldap
+      usrgrps:
+        - Guests
+        - testLDAPgrp
+    register: create_zabbix_user_ldap_result
+
+  - assert:
+      that:
+        - create_zabbix_user_ldap_result.changed is sameas True
+
+  - name: test - Create new password-less user as member in LDAP group (again)
+    zabbix_user:
+      server_url: "{{ zabbix_server_url }}"
+      login_user: "{{ zabbix_login_user }}"
+      login_password: "{{ zabbix_login_password }}"
+      alias: example2alias
+      name: example2
+      surname: testldap
+      usrgrps:
+        - Guests
+        - testLDAPgrp
+    register: create_zabbix_user_ldap_result
+
+  - assert:
+      that:
+        - create_zabbix_user_ldap_result.changed is sameas False
+
+  - name: test - Delete existing user
+    zabbix_user:
+      server_url: "{{ zabbix_server_url }}"
+      login_user: "{{ zabbix_login_user }}"
+      login_password: "{{ zabbix_login_password }}"
+      alias: example2alias
+      state: absent
+    register: delete_existing_user_result
+
+  - assert:
+      that:
+        - delete_existing_user_result.changed is sameas true
