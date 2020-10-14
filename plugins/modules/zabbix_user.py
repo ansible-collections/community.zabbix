@@ -290,7 +290,7 @@ class User(ZabbixBase):
             not_ldap = bool([g for g in res if g['gui_access'] != '2'])
             not_found_groups = set(usrgrps) - set([g['name'] for g in res])
             if not_found_groups:
-                self._module.fail_json('User groups not found: {}'.format(not_found_groups))
+                self._module.fail_json('User groups not found: %s' % not_found_groups)
             return ids, not_ldap
         else:
             self._module.fail_json('No user groups found')
