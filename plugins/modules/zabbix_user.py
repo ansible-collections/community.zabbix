@@ -45,7 +45,7 @@ options:
     passwd:
         description:
             - User's password.
-            - Required unless one of the I(usrgrps) is set to use LDAP as frontend access.
+            - Required unless all of the I(usrgrps) are set to use LDAP as frontend access.
             - Always required for Zabbix versions lower than 4.0.
         required: false
         type: str
@@ -277,18 +277,23 @@ import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabb
 class User(ZabbixBase):
     def get_usergroups_by_name(self, usrgrps):
         params = {
-            'output': ['usrgrpid', 'gui_access'],
+            'output': ['usrgrpid', 'name', 'gui_access'],
             'filter': {
                 'name': usrgrps
             }
         }
         res = self._zapi.usergroup.get(params)
         if res:
-            ids = {'usrgrpid': id for id in res['usrgrpid']}
-            has_ldap = bool([g for g in res if g['gui_access'] == '2'])
-            return ids, has_ldap
+            ids = [{'usrgrpid': g['usrgrpid']} for g in res]
+            # User can be created password-less only when all groups are LDAP
+            # Verify there are no groups with different access methods
+            not_ldap = bool([g for g in res if g['gui_access'] != '2'])
+            not_found_groups = set(usrgrps) - set([g['name'] for g in res])
+            if not_found_groups:
+                self._module.fail_json('User groups not found: {}'.format(not_found_groups))
+            return ids, not_ldap
         else:
-            self._module.fail_json()
+            self._module.fail_json('No user groups found')
 
     def check_user_exist(self, alias):
         zbx_user = self._zapi.user.get({'output': 'extend', 'filter': {'alias': alias},
@@ -395,7 +400,7 @@ class User(ZabbixBase):
         return user_parameter_difference_check_result, diff_params
 
     def add_user(self, alias, name, surname, user_group_ids, passwd, lang, theme, autologin, autologout, refresh,
-                 rows_per_page, url, user_medias, user_type):
+                 rows_per_page, url, user_medias, user_type, not_ldap):
 
         user_medias = self.convert_user_medias_parameter_types(user_medias)
 
@@ -417,7 +422,7 @@ class User(ZabbixBase):
             'type': user_type
         }
 
-        if LooseVersion(self._zbx_api_version) < LooseVersion('4.0') or not has_ldap:
+        if LooseVersion(self._zbx_api_version) < LooseVersion('4.0') or not_ldap:
             request_data['passwd'] = passwd
 
         diff_params = {}
@@ -586,9 +591,11 @@ def main():
     user_ids = {}
     zbx_user = user.check_user_exist(alias)
     if state == 'present':
-        user_group_ids, has_ldap = user.get_usergroups_by_name(usrgrps)
-        if passwd is None and (LooseVersion(user._zbx_api_version) < LooseVersion(4.0) or not has_ldap):
-            module.fail_json(msg='Parameter passwd is required')
+        user_group_ids, not_ldap = user.get_usergroups_by_name(usrgrps)
+        if LooseVersion(user._zbx_api_version) < LooseVersion('4.0') or not_ldap:
+            if passwd is None:
+                self._module.fail_json('User password is required. One or more groups are not LDAP based.')
+
         if zbx_user:
             diff_check_result, diff_params = user.user_parameter_difference_check(zbx_user, alias, name, surname,
                                                                                   user_group_ids, passwd, lang, theme,
@@ -605,7 +612,7 @@ def main():
             diff_check_result = True
             user_ids, diff_params = user.add_user(alias, name, surname, user_group_ids, passwd, lang, theme, autologin,
                                                   autologout, refresh, rows_per_page, after_login_url, user_medias,
-                                                  user_type, has_ldap)
+                                                  user_type, not_ldap)
 
     if state == 'absent':
         if zbx_user:
