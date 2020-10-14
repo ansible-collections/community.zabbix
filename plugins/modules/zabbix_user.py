@@ -594,7 +594,7 @@ def main():
         user_group_ids, not_ldap = user.get_usergroups_by_name(usrgrps)
         if LooseVersion(user._zbx_api_version) < LooseVersion('4.0') or not_ldap:
             if passwd is None:
-                self._module.fail_json('User password is required. One or more groups are not LDAP based.')
+                module.fail_json('User password is required. One or more groups are not LDAP based.')
 
         if zbx_user:
             diff_check_result, diff_params = user.user_parameter_difference_check(zbx_user, alias, name, surname,
