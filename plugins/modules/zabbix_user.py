@@ -290,10 +290,10 @@ class User(ZabbixBase):
             not_ldap = bool([g for g in res if g['gui_access'] != '2'])
             not_found_groups = set(usrgrps) - set([g['name'] for g in res])
             if not_found_groups:
-                self._module.fail_json('User groups not found: %s' % not_found_groups)
+                self._module.fail_json(msg='User groups not found: %s' % not_found_groups)
             return ids, not_ldap
         else:
-            self._module.fail_json('No user groups found')
+            self._module.fail_json(msg='No user groups found')
 
     def check_user_exist(self, alias):
         zbx_user = self._zapi.user.get({'output': 'extend', 'filter': {'alias': alias},
@@ -594,7 +594,7 @@ def main():
         user_group_ids, not_ldap = user.get_usergroups_by_name(usrgrps)
         if LooseVersion(user._zbx_api_version) < LooseVersion('4.0') or not_ldap:
             if passwd is None:
-                module.fail_json('User password is required. One or more groups are not LDAP based.')
+                module.fail_json(msg='User password is required. One or more groups are not LDAP based.')
 
         if zbx_user:
             diff_check_result, diff_params = user.user_parameter_difference_check(zbx_user, alias, name, surname,
