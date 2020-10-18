@@ -38,17 +38,21 @@ options:
     usrgrps:
         description:
             - User groups to add the user to.
-        required: true
+            - Required when I(state=present).
+        required: false
         type: list
         elements: str
     passwd:
         description:
             - User's password.
-        required: true
+            - Required unless all of the I(usrgrps) are set to use LDAP as frontend access.
+            - Always required for Zabbix versions lower than 4.0.
+        required: false
         type: str
     override_passwd:
         description:
-            - Override password.
+            - Override password for the user.
+            - Password will not be updated on subsequent runs without setting this value to yes.
         default: no
         type: bool
     lang:
@@ -204,7 +208,7 @@ extends_documentation_fragment:
 '''
 
 EXAMPLES = r'''
-- name: create of zabbix user.
+- name: create a new zabbix user.
   community.zabbix.zabbix_user:
     server_url: "http://zabbix.example.com/zabbix/"
     login_user: Admin
@@ -238,7 +242,7 @@ EXAMPLES = r'''
     type: Zabbix super admin
     state: present
 
-- name: delete of zabbix user.
+- name: delete existing zabbix user.
   community.zabbix.zabbix_user:
     server_url: "http://zabbix.example.com/zabbix/"
     login_user: admin
@@ -271,15 +275,25 @@ import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabb
 
 
 class User(ZabbixBase):
-    def get_usergroupid_by_user_group_name(self, usrgrps):
-        user_group_ids = []
-        for user_group_name in usrgrps:
-            user_group = self._zapi.usergroup.get({'output': 'extend', 'filter': {'name': user_group_name}})
-            if user_group:
-                user_group_ids.append({'usrgrpid': user_group[0]['usrgrpid']})
-            else:
-                self._module.fail_json(msg="User group not found: %s" % user_group_name)
-        return user_group_ids
+    def get_usergroups_by_name(self, usrgrps):
+        params = {
+            'output': ['usrgrpid', 'name', 'gui_access'],
+            'filter': {
+                'name': usrgrps
+            }
+        }
+        res = self._zapi.usergroup.get(params)
+        if res:
+            ids = [{'usrgrpid': g['usrgrpid']} for g in res]
+            # User can be created password-less only when all groups are LDAP
+            # Verify there are no groups with different access methods
+            not_ldap = bool([g for g in res if g['gui_access'] != '2'])
+            not_found_groups = set(usrgrps) - set([g['name'] for g in res])
+            if not_found_groups:
+                self._module.fail_json(msg='User groups not found: %s' % not_found_groups)
+            return ids, not_ldap
+        else:
+            self._module.fail_json(msg='No user groups found')
 
     def check_user_exist(self, alias):
         zbx_user = self._zapi.user.get({'output': 'extend', 'filter': {'alias': alias},
@@ -386,7 +400,7 @@ class User(ZabbixBase):
         return user_parameter_difference_check_result, diff_params
 
     def add_user(self, alias, name, surname, user_group_ids, passwd, lang, theme, autologin, autologout, refresh,
-                 rows_per_page, url, user_medias, user_type):
+                 rows_per_page, url, user_medias, user_type, not_ldap):
 
         user_medias = self.convert_user_medias_parameter_types(user_medias)
 
@@ -397,7 +411,6 @@ class User(ZabbixBase):
             'name': name,
             'surname': surname,
             'usrgrps': user_group_ids,
-            'passwd': passwd,
             'lang': lang,
             'theme': theme,
             'autologin': autologin,
@@ -408,6 +421,9 @@ class User(ZabbixBase):
             'user_medias': user_medias,
             'type': user_type
         }
+
+        if LooseVersion(self._zbx_api_version) < LooseVersion('4.0') or not_ldap:
+            request_data['passwd'] = passwd
 
         diff_params = {}
         if not self._module.check_mode:
@@ -497,8 +513,8 @@ def main():
         alias=dict(type='str', required=True),
         name=dict(type='str', default=''),
         surname=dict(type='str', default=''),
-        usrgrps=dict(type='list', required=True),
-        passwd=dict(type='str', required=True, no_log=True),
+        usrgrps=dict(type='list'),
+        passwd=dict(type='str', required=False, no_log=True),
         override_passwd=dict(type='bool', required=False, default=False),
         lang=dict(type='str', default='en_GB', choices=['en_GB', 'en_US', 'zh_CN', 'cs_CZ', 'fr_FR',
                                                         'he_IL', 'it_IT', 'ko_KR', 'ja_JP', 'nb_NO',
@@ -535,6 +551,9 @@ def main():
     ))
     module = AnsibleModule(
         argument_spec=argument_spec,
+        required_if=[
+            ['state', 'present', ['usrgrps']]
+        ],
         supports_check_mode=True
     )
 
@@ -572,7 +591,11 @@ def main():
     user_ids = {}
     zbx_user = user.check_user_exist(alias)
     if state == 'present':
-        user_group_ids = user.get_usergroupid_by_user_group_name(usrgrps)
+        user_group_ids, not_ldap = user.get_usergroups_by_name(usrgrps)
+        if LooseVersion(user._zbx_api_version) < LooseVersion('4.0') or not_ldap:
+            if passwd is None:
+                module.fail_json(msg='User password is required. One or more groups are not LDAP based.')
+
         if zbx_user:
             diff_check_result, diff_params = user.user_parameter_difference_check(zbx_user, alias, name, surname,
                                                                                   user_group_ids, passwd, lang, theme,
@@ -589,7 +612,7 @@ def main():
             diff_check_result = True
             user_ids, diff_params = user.add_user(alias, name, surname, user_group_ids, passwd, lang, theme, autologin,
                                                   autologout, refresh, rows_per_page, after_login_url, user_medias,
-                                                  user_type)
+                                                  user_type, not_ldap)
 
     if state == 'absent':
         if zbx_user:
