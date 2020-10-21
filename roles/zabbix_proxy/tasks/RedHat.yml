@@ -113,9 +113,11 @@
     - zabbix-agent
 
 - name: "RedHat | Installing zabbix-proxy-{{ zabbix_proxy_database }}"
-  yum:
+  package:
     pkg: "{{ zabbix_proxy_package }}"
     state: "{{ zabbix_proxy_package_state }}"
+    disablerepo: "*"
+    enablerepo: "{{ zabbix_repo }}"
   become: yes
   register: is_zabbix_proxy_package_installed
   until: is_zabbix_proxy_package_installed is succeeded

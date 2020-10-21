@@ -79,6 +79,8 @@
   package:
     pkg:
       - "{{ zabbix_agent_package }}"
+    disablerepo: "*"
+    enablerepo: "{{ zabbix_repo }}"
     state: "{{ zabbix_agent_package_state }}"
   environment:
     http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
@@ -95,6 +97,8 @@
     pkg:
       - "{{ zabbix_sender_package }}"
       - "{{ zabbix_get_package }}"
+    disablerepo: "*"
+    enablerepo: "{{ zabbix_repo }}"
     state: "{{ zabbix_agent_package_state }}"
   environment:
     http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
