@@ -5,6 +5,33 @@ community.zabbix Release Notes
 .. contents:: Topics
 
 
+v1.1.0
+======
+
+Release Summary
+---------------
+
+| Release date: 2020-10-22
+
+
+Minor Changes
+-------------
+
+- all roles - added ``zabbix_{agent,web,server,proxy,javagateway}_conf_mode`` option for configuring a mode of the configuration file for each Zabbix service.
+- zabbix_proxy (role) - added an option ``innodb_default_row_format`` for MariaDB/MySQL if it isn't set to ``dynamic``.
+- zabbix_server - fixed installation output when using MySQL database to not print PostgreSQL.
+- zabbix_user - ``passwd`` no longer required when ALL groups in ``usrgrps`` use LDAP as ``gui_access`` (see `#240 <https://github.com/ansible-collections/community.zabbix/issues/232>`_).
+- zabbix_user - no longer requires ``usrgrps`` when ``state=absent`` (see `#240 <https://github.com/ansible-collections/community.zabbix/issues/232>`_).
+- zabbix_web - added several configuration options for the PHP-FPM setup to configure the listen (socket) file.
+- zabbix_web - added support for configuring Zabbix Web with Nginx, same way as with Apache.
+
+Bugfixes
+--------
+
+- all roles - missing ``become`` set to ``true`` was added to each task that requires admin privleges.
+- zabbix_agent - added new properties and updated documentation to allow for correct Zabbix Agent2 configuration.
+- zabbix_agent - fixed bug where Nginx prevented Apache from working as it was part of the FPM configuration.
+
 v1.0.0
 ======
 

@@ -1,2 +1,0 @@
-minor_changes:
-    - "Added several configuration options for the PHP-FPM setup to configure the listen (socket) file."

@@ -155,11 +155,11 @@ releases:
         directories.
       - all roles - added the possibility to configure the ``mode`` for the ``yum``
         repositories files in case it contains credentials.
-      - zabbix_agent - can also install the zabbix-agent2 application when ``zabbix_agent2``
-        is set to ``true``.
       - zabbix_agent - ``zabbix-sender`` and ``zabbix-get`` will not be installed
         when ``zabbix_repo`` is set to ``epel``, as they are not part of the repository.
       - zabbix_agent - added option to change between HTTP/HTTPS with ``zabbix_repo_yum_schema``.
+      - zabbix_agent - can also install the zabbix-agent2 application when ``zabbix_agent2``
+        is set to ``true``.
       - zabbix_proxy (role) - a user and group are created on the host when ``zabbix_repo``
         is set to ``epel``.
       - zabbix_proxy (role) - now supports ``startpreprocessors`` setting and encryption
@@ -190,3 +190,36 @@ releases:
     - role-web-add-doubleprecision.yaml
     - role-web-zabbix_vhost-dont-remove-files.yaml
     release_date: '2020-08-16'
+  1.1.0:
+    changes:
+      bugfixes:
+      - zabbix_agent - added new properties and updated documentation to allow for correct Zabbix Agent2 configuration.
+      - zabbix_agent - fixed bug where Nginx prevented Apache from working as it was part of the FPM configuration.
+      - all roles - missing ``become`` set to ``true`` was added to each task that requires admin privleges.
+      minor_changes:
+      - all roles - added ``zabbix_{agent,web,server,proxy,javagateway}_conf_mode`` option for configuring
+        a mode of the configuration file for each Zabbix service.
+      - zabbix_proxy (role) - added an option ``innodb_default_row_format`` for MariaDB/MySQL
+        if it isn't set to ``dynamic``.
+      - zabbix_server - fixed installation output when using MySQL database to not print PostgreSQL.
+      - zabbix_user - ``passwd`` no longer required when ALL groups in ``usrgrps``
+        use LDAP as ``gui_access`` (see `#240 <https://github.com/ansible-collections/community.zabbix/issues/232>`_).
+      - zabbix_user - no longer requires ``usrgrps`` when ``state=absent`` (see `#240
+        <https://github.com/ansible-collections/community.zabbix/issues/232>`_).
+      - zabbix_web - added several configuration options for the PHP-FPM setup to configure the
+        listen (socket) file.
+      - zabbix_web - added support for configuring Zabbix Web with Nginx, same way as with Apache.
+      release_summary: '| Release date: 2020-10-22
+
+        '
+    fragments:
+    - 240-zabbix-user-nopass-ldap.yaml
+    - role-agent-correct-usage-acl.yaml
+    - role-agent-zabbix-agent2-props.yaml
+    - role-server-screen-output.yaml
+    - role-web-add-support-for-nginx.yaml
+    - role-web-added-some-properties.yaml
+    - roles-all-add-become.yaml
+    - roles-all-configure-conf-mode.yaml
+    - roles-server-proxy-add-innodb-check.yaml
+    release_date: '2020-10-22'
