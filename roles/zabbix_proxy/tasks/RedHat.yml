@@ -116,8 +116,8 @@
   package:
     pkg: "{{ zabbix_proxy_package }}"
     state: "{{ zabbix_proxy_package_state }}"
-    disablerepo: "*"
-    enablerepo: "{{ zabbix_repo }}"
+    disablerepo: "{{ '*' if (zabbix_repo_yum_enabled | length>0) else omit }}"
+    enablerepo: "{{ zabbix_repo_yum_enabled if zabbix_repo_yum_enabled is iterable and (zabbix_repo_yum_enabled | length>0) else omit }}"
   become: yes
   register: is_zabbix_proxy_package_installed
   until: is_zabbix_proxy_package_installed is succeeded

@@ -36,6 +36,8 @@ zabbix_agent_distribution_release: "{{ ansible_distribution_release }}"
 zabbix_agent_os_family: "{{ ansible_os_family }}"
 zabbix_repo_yum_schema: https
 
+zabbix_repo_yum_disabled: "*"
+zabbix_repo_yum_enabled: []
 zabbix_repo_yum:
   - name: zabbix
     description: Zabbix Official Repository - $basearch

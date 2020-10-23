@@ -79,8 +79,8 @@
   package:
     pkg:
       - "{{ zabbix_agent_package }}"
-    disablerepo: "*"
-    enablerepo: "{{ zabbix_repo }}"
+    disablerepo: "{{ '*' if (zabbix_repo_yum_enabled | length>0) else omit }}"
+    enablerepo: "{{ zabbix_repo_yum_enabled if zabbix_repo_yum_enabled is iterable and (zabbix_repo_yum_enabled | length>0) else omit }}"
     state: "{{ zabbix_agent_package_state }}"
   environment:
     http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
@@ -97,8 +97,8 @@
     pkg:
       - "{{ zabbix_sender_package }}"
       - "{{ zabbix_get_package }}"
-    disablerepo: "*"
-    enablerepo: "{{ zabbix_repo }}"
+    disablerepo: "{{ '*' if (zabbix_repo_yum_enabled | length>0) else omit }}"
+    enablerepo: "{{ zabbix_repo_yum_enabled if zabbix_repo_yum_enabled is iterable and (zabbix_repo_yum_enabled | length>0) else omit }}"
     state: "{{ zabbix_agent_package_state }}"
   environment:
     http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
