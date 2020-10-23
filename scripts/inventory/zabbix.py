@@ -53,7 +53,7 @@ import json
 class ZabbixInventory(object):
 
     def read_settings(self):
-        config = configparser.SafeConfigParser()
+        config = configparser.ConfigParser()
         conf_path = './zabbix.ini'
         if not os.path.exists(conf_path):
             conf_path = os.path.dirname(os.path.realpath(__file__)) + '/zabbix.ini'
