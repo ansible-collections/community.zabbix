@@ -15,11 +15,13 @@
   stat:
     path: "{{ zabbix_agent_tlspskfile }}"
   register: zabbix_agent_tlspskcheck
+  become: yes
 
 - name: AutoPSK | read existing TLS PSK file
   slurp:
     src: "{{ zabbix_agent_tlspskfile }}"
   register: zabbix_agent_tlspsk_base64
+  become: yes
   when: zabbix_agent_tlspskcheck.stat.exists
 
 - name: AutoPSK | Save existing TLS PSK secret
@@ -41,11 +43,13 @@
   stat:
     path: "{{ zabbix_agent_tlspskidentity_file }}"
   register: zabbix_agent_tlspskidentity_check
+  become: yes
 
 - name: AutoPSK | Read existing TLS PSK identity file
   slurp:
     src: "{{ zabbix_agent_tlspskidentity_file }}"
   register: zabbix_agent_tlspskidentity_base64
+  become: yes
   when: zabbix_agent_tlspskidentity_check.stat.exists
 
 - name: AutoPSK | Use existing TLS PSK identity
@@ -65,6 +69,7 @@
     owner: zabbix
     group: zabbix
     mode: 0400
+  become: yes
   when:
     - zabbix_agent_tlspskidentity_file is defined
     - zabbix_agent_tlspskidentity is defined
