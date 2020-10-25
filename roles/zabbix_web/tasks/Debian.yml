@@ -72,6 +72,7 @@
   become: yes
   when:
     - zabbix_vhost
+    - zabbix_php_fpm
   notify:
     - restart php-fpm-version
 
