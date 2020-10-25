@@ -59,7 +59,7 @@
   RewriteEngine On
   RewriteRule ^$ /index.php [L]
 
-{% if zabbix_version is version('4.4', '<=') %}
+{% if zabbix_version is version('5.0', '<=') %}
 {% if zabbix_apache_include_custom_fragment | default(true) %}
   ## Custom fragment
   {% if zabbix_php_fpm %}
@@ -156,7 +156,7 @@ SSLCryptoDevice {{ zabbix_apache_SSLCryptoDevice }}
   RewriteEngine On
   RewriteRule ^$ /index.php [L]
 
-{% if zabbix_version is version('4.4', '<=') %}
+{% if zabbix_version is version('5.0', '<=') %}
 {% if zabbix_apache_include_custom_fragment | default(true) %}
   ## Custom fragment
   {% if zabbix_php_fpm %}
