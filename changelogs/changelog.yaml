@@ -43,6 +43,8 @@ releases:
         XML (see `#66466 <https://github.com/ansible/ansible/issues/66466>`_).
       - zabbix_user - Fixed an issue where module failed with zabbix 4.4 or above
         (see `#67475 <https://github.com/ansible/ansible/pull/67475>`_).
+      - zabbix inventory plugin now no longer prints DeprecationWarning when used with
+        Python3 due to SafeConfigParser.
       release_summary: '| Release date: 2020-06-15
 
         '

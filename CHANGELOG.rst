@@ -157,6 +157,7 @@ Release Summary
 Minor Changes
 -------------
 
+- zabbix inventory plugin now no longer prints DeprecationWarning when used with Python3 due to SafeConfigParser.
 - zabbix_action - arguments ``event_source`` and ``esc_period`` no longer required when ``state=absent``.
 - zabbix_host - fixed inventory_mode key error, which occurs with Zabbix 4.4.1 or more (see `#65304 <https://github.com/ansible/ansible/issues/65304>`_).
 - zabbix_host - was not possible to update a host where visible_name was not set in zabbix.
