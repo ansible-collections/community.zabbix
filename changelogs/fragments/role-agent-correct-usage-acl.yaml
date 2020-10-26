@@ -1,2 +1,0 @@
-bugfixes:
-    - "Nginx was part of the FPM configuration when Apache is used, preventing it to work correctly."
