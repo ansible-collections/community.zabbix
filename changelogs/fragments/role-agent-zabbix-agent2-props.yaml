@@ -1,2 +1,0 @@
-bugfixes:
-    - "Configuring the Zabbix Agent2 was not possible, added new properties and updated documentation for correctly configuring Zabbix Agent2"
