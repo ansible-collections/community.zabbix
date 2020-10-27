@@ -163,6 +163,7 @@ SSLCryptoDevice {{ zabbix_apache_SSLCryptoDevice }}
   ProxyPassMatch ^/(.*\.php(/.*)?)$ fcgi://127.0.0.1:9000/usr/share/zabbix/$1
   ProxyTimeout 1800
   {% else %}
+  # Set minimal prerequisites for web gui
   php_value max_execution_time {{ zabbix_web_max_execution_time | default('300') }}
   php_value memory_limit {{ zabbix_web_memory_limit | default('128M') }}
   php_value post_max_size {{ zabbix_web_post_max_size | default('16M') }}
