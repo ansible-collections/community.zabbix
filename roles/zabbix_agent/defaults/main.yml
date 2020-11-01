@@ -22,8 +22,8 @@ selinux_allow_zabbix_run_sudo: False
 
 zabbix_agent_packages:
   - "{{ zabbix_agent_package }}"
-  - zabbix-sender
-  - zabbix-get
+  - "{{ zabbix_sender_package }}"
+  - "{{ zabbix_get_package }}"
 
 # Zabbix role related vars
 zabbix_install_pip_packages: true
