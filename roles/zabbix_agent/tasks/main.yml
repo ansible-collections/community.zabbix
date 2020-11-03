@@ -66,6 +66,14 @@
     - (zabbix_agent_tlspskfile is undefined) or (zabbix_agent_tlspskfile | length == '0')
     - (zabbix_agent_tlspsk_secret is undefined) or (zabbix_agent_tlspsk_secret | length == '0')
 
+- name: "Encrypt with TLS PSK auto management (for Zabbix Agent 2) "
+  include_tasks: tlspsk_auto2.yml
+  when:
+    - zabbix_agent2_tlspsk_auto | bool
+    - (zabbix_agent2_tlspskfile is undefined) or (zabbix_agent2_tlspskfile | length == '0')
+    - (zabbix_agent2_tlspsk_secret is undefined) or (zabbix_agent2_tlspsk_secret | length == '0')
+
+
 - name: "Install the correct repository"
   include_tasks: Windows.yml
   when:
@@ -136,12 +144,12 @@
     inventory_mode: "{{ zabbix_inventory_mode }}"
     interfaces: "{{ zabbix_agent_interfaces }}"
     visible_name: "{{ zabbix_visible_hostname | default(zabbix_agent_hostname) }}"
-    tls_psk: "{{ zabbix_agent_tlspsk_secret | default(omit) }}"
-    tls_psk_identity: "{{ zabbix_agent_tlspskidentity | default(omit) }}"
-    tls_issuer: "{{ zabbix_agent_tlsservercertissuer | default(omit) }}"
-    tls_subject: "{{ zabbix_agent_tlsservercertsubject | default(omit) }}"
-    tls_accept: "{{ zabbix_agent_tls_config[zabbix_agent_tlsaccept if zabbix_agent_tlsaccept else 'unencrypted'] }}"
-    tls_connect: "{{ zabbix_agent_tls_config[zabbix_agent_tlsconnect if zabbix_agent_tlsconnect else 'unencrypted'] }}"
+    tls_psk: "{{ zabbix_agent_tlspsk_secret if not zabbix_agent2 else zabbix_agent2_tlspsk_secret | default(omit) }}"
+    tls_psk_identity: "{{ zabbix_agent_tlspskidentity if not zabbix_agent2 else zabbix_agent2_tlspskidentity | default(omit) }}"
+    tls_issuer: "{{ zabbix_agent_tlsservercertissuer if not zabbix_agent2 else zabbix_agent2_tlsservercertissuer | default(omit) }}"
+    tls_subject: "{{ zabbix_agent_tlsservercertsubject if not zabbix_agent2 else zabbix_agent2_tlsservercertsubject | default(omit) }}"
+    tls_accept: "{{ zabbix_agent_tls_config[zabbix_agent_tlsaccept if zabbix_agent_tlsaccept else zabbix_agent2_tlsaccept if zabbix_agent2_tlsaccept else 'unencrypted'] }}"
+    tls_connect: "{{ zabbix_agent_tls_config[zabbix_agent_tlsconnect if zabbix_agent_tlsconnect else zabbix_agent2_tlsconnect if zabbix_agent2_tlsconnect else 'unencrypted'] }}"
     validate_certs: "{{ zabbix_validate_certs | default(omit) }}"
     description: "{{ zabbix_agent_description | default(omit) }}"
     inventory_zabbix: "{{ zabbix_agent_inventory_zabbix | default({}) }}"
