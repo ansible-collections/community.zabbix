@@ -515,7 +515,7 @@ def main():
         surname=dict(type='str', default=''),
         usrgrps=dict(type='list'),
         passwd=dict(type='str', required=False, no_log=True),
-        override_passwd=dict(type='bool', required=False, default=False),
+        override_passwd=dict(type='bool', required=False, default=False, no_log=False),
         lang=dict(type='str', default='en_GB', choices=['en_GB', 'en_US', 'zh_CN', 'cs_CZ', 'fr_FR',
                                                         'he_IL', 'it_IT', 'ko_KR', 'ja_JP', 'nb_NO',
                                                         'pl_PL', 'pt_BR', 'pt_PT', 'ru_RU', 'sk_SK',
