@@ -1,0 +1,2 @@
+bugfixes:
+  - zabbix_user - fixed it couldn't create a user since Zabbix 5.2 (https://github.com/ansible-collections/community.zabbix/pull/260).
