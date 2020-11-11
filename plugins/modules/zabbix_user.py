@@ -194,6 +194,14 @@ options:
             - 'Zabbix admin'
             - 'Zabbix super admin'
         type: str
+    timezone:
+        description:
+            - User's time zone.
+            - I(timezone) can use if since Zabbix 5.2.
+            - For the full list of supported time zones please refer to U(https://www.php.net/manual/en/timezones.php)
+        default: default
+        type: str
+        version_added: 1.2.0
     state:
         description:
             - State of the user.
@@ -337,7 +345,7 @@ class User(ZabbixBase):
 
     def user_parameter_difference_check(self, zbx_user, alias, name, surname, user_group_ids, passwd, lang, theme,
                                         autologin, autologout, refresh, rows_per_page, url, user_medias, user_type,
-                                        override_passwd):
+                                        timezone, override_passwd):
 
         user_medias = self.convert_user_medias_parameter_types(user_medias)
 
@@ -382,11 +390,17 @@ class User(ZabbixBase):
             'rows_per_page': rows_per_page,
             'url': url,
             'user_medias': sorted(user_medias, key=lambda x: x['sendto']),
-            'type': user_type
         }
 
         if override_passwd:
             request_data['passwd'] = passwd
+
+        # The type key has changed to roleid key since Zabbix 5.2
+        if LooseVersion(self._zbx_api_version) < LooseVersion('5.2'):
+            request_data['type'] = user_type
+        else:
+            request_data['roleid'] = user_type
+            request_data['timezone'] = timezone
 
         user_parameter_difference_check_result = True
         if existing_data == request_data:
@@ -400,7 +414,7 @@ class User(ZabbixBase):
         return user_parameter_difference_check_result, diff_params
 
     def add_user(self, alias, name, surname, user_group_ids, passwd, lang, theme, autologin, autologout, refresh,
-                 rows_per_page, url, user_medias, user_type, not_ldap):
+                 rows_per_page, url, user_medias, user_type, not_ldap, timezone):
 
         user_medias = self.convert_user_medias_parameter_types(user_medias)
 
@@ -419,11 +433,17 @@ class User(ZabbixBase):
             'rows_per_page': rows_per_page,
             'url': url,
             'user_medias': user_medias,
-            'type': user_type
         }
 
         if LooseVersion(self._zbx_api_version) < LooseVersion('4.0') or not_ldap:
             request_data['passwd'] = passwd
+
+        # The type key has changed to roleid key since Zabbix 5.2
+        if LooseVersion(self._zbx_api_version) < LooseVersion('5.2'):
+            request_data['type'] = user_type
+        else:
+            request_data['roleid'] = user_type
+            request_data['timezone'] = timezone
 
         diff_params = {}
         if not self._module.check_mode:
@@ -440,7 +460,7 @@ class User(ZabbixBase):
         return user_ids, diff_params
 
     def update_user(self, zbx_user, alias, name, surname, user_group_ids, passwd, lang, theme, autologin, autologout,
-                    refresh, rows_per_page, url, user_medias, user_type, override_passwd):
+                    refresh, rows_per_page, url, user_medias, user_type, timezone, override_passwd):
 
         user_medias = self.convert_user_medias_parameter_types(user_medias)
 
@@ -459,11 +479,17 @@ class User(ZabbixBase):
             'refresh': refresh,
             'rows_per_page': rows_per_page,
             'url': url,
-            'type': user_type
         }
 
         if override_passwd:
             request_data['passwd'] = passwd
+
+        # The type key has changed to roleid key since Zabbix 5.2
+        if LooseVersion(self._zbx_api_version) < LooseVersion('5.2'):
+            request_data['type'] = user_type
+        else:
+            request_data['roleid'] = user_type
+            request_data['timezone'] = timezone
 
         # In the case of zabbix 3.2 or less, it is necessary to use updatemedia method to update media.
         if LooseVersion(self._zbx_api_version) <= LooseVersion('3.2'):
@@ -546,6 +572,7 @@ def main():
                                                         high=True,
                                                         disaster=True)),
                                       active=dict(type='bool', default=True))),
+        timezone=dict(type='str', default='default'),
         type=dict(type='str', default='Zabbix user', choices=['Zabbix user', 'Zabbix admin', 'Zabbix super admin']),
         state=dict(type='str', default="present", choices=['present', 'absent'])
     ))
@@ -572,6 +599,7 @@ def main():
     after_login_url = module.params['after_login_url']
     user_medias = module.params['user_medias']
     user_type = module.params['type']
+    timezone = module.params['timezone']
     state = module.params['state']
 
     if autologin:
@@ -601,18 +629,18 @@ def main():
                                                                                   user_group_ids, passwd, lang, theme,
                                                                                   autologin, autologout, refresh,
                                                                                   rows_per_page, after_login_url,
-                                                                                  user_medias, user_type,
+                                                                                  user_medias, user_type, timezone,
                                                                                   override_passwd)
 
             if not module.check_mode and diff_check_result:
                 user_ids = user.update_user(zbx_user, alias, name, surname, user_group_ids, passwd, lang,
                                             theme, autologin, autologout, refresh, rows_per_page, after_login_url,
-                                            user_medias, user_type, override_passwd)
+                                            user_medias, user_type, timezone, override_passwd)
         else:
             diff_check_result = True
             user_ids, diff_params = user.add_user(alias, name, surname, user_group_ids, passwd, lang, theme, autologin,
                                                   autologout, refresh, rows_per_page, after_login_url, user_medias,
-                                                  user_type, not_ldap)
+                                                  user_type, not_ldap, timezone)
 
     if state == 'absent':
         if zbx_user:
