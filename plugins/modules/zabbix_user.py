@@ -58,6 +58,7 @@ options:
     lang:
         description:
             - Language code of the user's language.
+            - C(default) can use if Zabbix 5.2 or more.
         default: 'en_GB'
         choices:
             - 'en_GB'
@@ -77,6 +78,7 @@ options:
             - 'sk_SK'
             - 'tr_TR'
             - 'uk_UA'
+            - 'default'
         type: str
     theme:
         description:
@@ -188,6 +190,7 @@ options:
     type:
         description:
             - Type of the user.
+            - I(type) is necessary if Zabbix 5.0 and less.
         default: 'Zabbix user'
         choices:
             - 'Zabbix user'
@@ -200,6 +203,12 @@ options:
             - I(timezone) can use if since Zabbix 5.2.
             - For the full list of supported time zones please refer to U(https://www.php.net/manual/en/timezones.php)
         default: default
+        type: str
+        version_added: 1.2.0
+    role_name:
+        description:
+            - User's role.
+            - I(role_name) is necessary if Zabbix 5.2 or more.
         type: str
         version_added: 1.2.0
     state:
@@ -343,9 +352,17 @@ class User(ZabbixBase):
 
         return copy_user_medias
 
+    def get_roleid_by_name(self, role_name):
+        roles = self._zapi.role.get({'output': 'extend'})
+        for role in roles:
+            if role['name'] == role_name:
+                return role['roleid']
+
+        self._module.fail_json(msg="Role not found: %s" % role_name)
+
     def user_parameter_difference_check(self, zbx_user, alias, name, surname, user_group_ids, passwd, lang, theme,
                                         autologin, autologout, refresh, rows_per_page, url, user_medias, user_type,
-                                        timezone, override_passwd):
+                                        timezone, role_name, override_passwd):
 
         user_medias = self.convert_user_medias_parameter_types(user_medias)
 
@@ -399,7 +416,7 @@ class User(ZabbixBase):
         if LooseVersion(self._zbx_api_version) < LooseVersion('5.2'):
             request_data['type'] = user_type
         else:
-            request_data['roleid'] = user_type
+            request_data['roleid'] = self.get_roleid_by_name(role_name)
             request_data['timezone'] = timezone
 
         user_parameter_difference_check_result = True
@@ -414,7 +431,7 @@ class User(ZabbixBase):
         return user_parameter_difference_check_result, diff_params
 
     def add_user(self, alias, name, surname, user_group_ids, passwd, lang, theme, autologin, autologout, refresh,
-                 rows_per_page, url, user_medias, user_type, not_ldap, timezone):
+                 rows_per_page, url, user_medias, user_type, not_ldap, timezone, role_name):
 
         user_medias = self.convert_user_medias_parameter_types(user_medias)
 
@@ -442,7 +459,7 @@ class User(ZabbixBase):
         if LooseVersion(self._zbx_api_version) < LooseVersion('5.2'):
             request_data['type'] = user_type
         else:
-            request_data['roleid'] = user_type
+            request_data['roleid'] = self.get_roleid_by_name(role_name)
             request_data['timezone'] = timezone
 
         diff_params = {}
@@ -460,7 +477,7 @@ class User(ZabbixBase):
         return user_ids, diff_params
 
     def update_user(self, zbx_user, alias, name, surname, user_group_ids, passwd, lang, theme, autologin, autologout,
-                    refresh, rows_per_page, url, user_medias, user_type, timezone, override_passwd):
+                    refresh, rows_per_page, url, user_medias, user_type, timezone, role_name, override_passwd):
 
         user_medias = self.convert_user_medias_parameter_types(user_medias)
 
@@ -488,7 +505,7 @@ class User(ZabbixBase):
         if LooseVersion(self._zbx_api_version) < LooseVersion('5.2'):
             request_data['type'] = user_type
         else:
-            request_data['roleid'] = user_type
+            request_data['roleid'] = self.get_roleid_by_name(role_name)
             request_data['timezone'] = timezone
 
         # In the case of zabbix 3.2 or less, it is necessary to use updatemedia method to update media.
@@ -545,7 +562,7 @@ def main():
         lang=dict(type='str', default='en_GB', choices=['en_GB', 'en_US', 'zh_CN', 'cs_CZ', 'fr_FR',
                                                         'he_IL', 'it_IT', 'ko_KR', 'ja_JP', 'nb_NO',
                                                         'pl_PL', 'pt_BR', 'pt_PT', 'ru_RU', 'sk_SK',
-                                                        'tr_TR', 'uk_UA']),
+                                                        'tr_TR', 'uk_UA', 'default']),
         theme=dict(type='str', default='default', choices=['default', 'blue-theme', 'dark-theme']),
         autologin=dict(type='bool', default=False),
         autologout=dict(type='str', default='0'),
@@ -573,6 +590,7 @@ def main():
                                                         disaster=True)),
                                       active=dict(type='bool', default=True))),
         timezone=dict(type='str', default='default'),
+        role_name=dict(type='str'),
         type=dict(type='str', default='Zabbix user', choices=['Zabbix user', 'Zabbix admin', 'Zabbix super admin']),
         state=dict(type='str', default="present", choices=['present', 'absent'])
     ))
@@ -600,6 +618,7 @@ def main():
     user_medias = module.params['user_medias']
     user_type = module.params['type']
     timezone = module.params['timezone']
+    role_name = module.params['role_name']
     state = module.params['state']
 
     if autologin:
@@ -630,17 +649,17 @@ def main():
                                                                                   autologin, autologout, refresh,
                                                                                   rows_per_page, after_login_url,
                                                                                   user_medias, user_type, timezone,
-                                                                                  override_passwd)
+                                                                                  role_name, override_passwd)
 
             if not module.check_mode and diff_check_result:
                 user_ids = user.update_user(zbx_user, alias, name, surname, user_group_ids, passwd, lang,
                                             theme, autologin, autologout, refresh, rows_per_page, after_login_url,
-                                            user_medias, user_type, timezone, override_passwd)
+                                            user_medias, user_type, timezone, role_name, override_passwd)
         else:
             diff_check_result = True
             user_ids, diff_params = user.add_user(alias, name, surname, user_group_ids, passwd, lang, theme, autologin,
                                                   autologout, refresh, rows_per_page, after_login_url, user_medias,
-                                                  user_type, not_ldap, timezone)
+                                                  user_type, not_ldap, timezone, role_name)
 
     if state == 'absent':
         if zbx_user:
