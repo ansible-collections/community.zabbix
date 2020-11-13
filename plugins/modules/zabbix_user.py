@@ -209,6 +209,7 @@ options:
         description:
             - User's role.
             - I(role_name) is necessary if Zabbix 5.2 or more.
+        default: 'User role'
         type: str
         version_added: 1.2.0
     state:
@@ -590,7 +591,7 @@ def main():
                                                         disaster=True)),
                                       active=dict(type='bool', default=True))),
         timezone=dict(type='str', default='default'),
-        role_name=dict(type='str'),
+        role_name=dict(type='str', default='User role'),
         type=dict(type='str', default='Zabbix user', choices=['Zabbix user', 'Zabbix admin', 'Zabbix super admin']),
         state=dict(type='str', default="present", choices=['present', 'absent'])
     ))
