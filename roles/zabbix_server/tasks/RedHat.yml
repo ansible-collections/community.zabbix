@@ -100,9 +100,11 @@
     - zabbix-server
 
 - name: "RedHat | Installing zabbix-server-{{ zabbix_server_database }}"
-  yum:
+  package:
     pkg: "{{ zabbix_server_package }}"
     state: "{{ zabbix_server_package_state }}"
+    disablerepo: "{{ '*' if (zabbix_repo_yum_enabled | length>0) else omit }}"
+    enablerepo: "{{ zabbix_repo_yum_enabled if zabbix_repo_yum_enabled is iterable and (zabbix_repo_yum_enabled | length>0) else omit }}"
   register: zabbix_server_package_installed
   until: zabbix_server_package_installed is succeeded
   become: yes

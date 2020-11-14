@@ -17,7 +17,8 @@ zabbix_proxy_install_database_client: True
 zabbix_install_pip_packages: true
 zabbix_repo_yum_schema: https
 zabbix_proxy_conf_mode: "0644"
-
+zabbix_repo_yum_disabled: "*"
+zabbix_repo_yum_enabled: []
 zabbix_repo_yum:
   - name: zabbix
     description: Zabbix Official Repository - $basearch

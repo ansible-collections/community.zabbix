@@ -1,0 +1,3 @@
+---
+bugfixes:
+  - zabbix_user - disable no_log warning for option override_password.
