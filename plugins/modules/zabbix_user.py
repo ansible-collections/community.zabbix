@@ -58,7 +58,7 @@ options:
     lang:
         description:
             - Language code of the user's language.
-            - C(default) can use if Zabbix 5.2 or more.
+            - C(default) can be used with Zabbix version 5.2 or higher.
         default: 'en_GB'
         choices:
             - 'en_GB'
@@ -190,7 +190,7 @@ options:
     type:
         description:
             - Type of the user.
-            - I(type) is necessary if Zabbix 5.0 and less.
+            - I(type) is necessary if Zabbix version is 5.0 or lower.
         default: 'Zabbix user'
         choices:
             - 'Zabbix user'
@@ -200,7 +200,7 @@ options:
     timezone:
         description:
             - User's time zone.
-            - I(timezone) can use if since Zabbix 5.2.
+            - I(timezone) can be used with Zabbix version 5.2 or higher.
             - For the full list of supported time zones please refer to U(https://www.php.net/manual/en/timezones.php)
         default: default
         type: str
@@ -208,7 +208,7 @@ options:
     role_name:
         description:
             - User's role.
-            - I(role_name) is necessary if Zabbix 5.2 or more.
+            - I(role_name) is required when Zabbix version is 5.2 or higher.
         default: 'User role'
         type: str
         version_added: 1.2.0
