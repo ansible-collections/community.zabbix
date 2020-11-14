@@ -50,6 +50,8 @@
       - centos-release-scl
     state: "{{ zabbix_web_package_state }}"
     update_cache: yes
+    disablerepo: "{{ '*' if (zabbix_repo_yum_enabled | length>0) else omit }}"
+    enablerepo: "{{ zabbix_repo_yum_enabled if zabbix_repo_yum_enabled is iterable and (zabbix_repo_yum_enabled | length>0) else omit }}"
   register: zabbix_web_dependency_package_install
   until: zabbix_web_dependency_package_install is succeeded
   become: yes
@@ -66,6 +68,8 @@
       - zabbix-apache-conf-scl
     state: "{{ zabbix_web_package_state }}"
     update_cache: yes
+    disablerepo: "{{ '*' if (zabbix_repo_yum_enabled | length>0) else omit }}"
+    enablerepo: "{{ zabbix_repo_yum_enabled if zabbix_repo_yum_enabled is iterable and (zabbix_repo_yum_enabled | length>0) else omit }}"
   register: zabbix_web_package_install
   until: zabbix_web_package_install is succeeded
   become: yes
@@ -81,6 +85,8 @@
     pkg: zabbix-web-{{ zabbix_server_database }}{{ '-scl' if zabbix_version is version('5.0', '>=') and ansible_distribution_major_version != '8' else '' }}
     state: "{{ zabbix_web_package_state }}"
     update_cache: yes
+    disablerepo: "{{ '*' if (zabbix_repo_yum_enabled | length>0) else omit }}"
+    enablerepo: "{{ zabbix_repo_yum_enabled if zabbix_repo_yum_enabled is iterable and (zabbix_repo_yum_enabled | length>0) else omit }}"
   register: zabbix_web_package_install
   until: zabbix_web_package_install is succeeded
   become: yes
