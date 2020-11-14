@@ -13,8 +13,8 @@
       - Linux servers
       - Zabbix servers
     link_templates:
-      - Template App IMAP Service
-      - Template App NTP Service
+      - "{{ 'IMAP Service' if zabbix_version | float >= 5.2 else 'Template App IMAP Service' }}"
+      - "{{ 'NTP Service' if zabbix_version | float >= 5.2 else 'Template App NTP Service' }}"
     status: enabled
     state: present
     inventory_mode: manual
