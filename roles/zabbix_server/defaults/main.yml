@@ -14,7 +14,8 @@ zabbix_server_conf_mode: 0640
 zabbix_service_state: started
 zabbix_service_enabled: True
 zabbix_repo_yum_schema: https
-
+zabbix_repo_yum_disabled: "*"
+zabbix_repo_yum_enabled: []
 zabbix_repo_yum:
   - name: zabbix
     description: Zabbix Official Repository - $basearch
