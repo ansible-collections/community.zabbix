@@ -119,7 +119,8 @@ options:
     user_medias:
         description:
             - Set the user's media.
-        default: []
+            - If not set, makes no changes to media.
+        default: None
         suboptions:
             mediatype:
                 description:
@@ -365,7 +366,7 @@ class User(ZabbixBase):
                                         autologin, autologout, refresh, rows_per_page, url, user_medias, user_type,
                                         timezone, role_name, override_passwd):
 
-        user_medias = self.convert_user_medias_parameter_types(user_medias)
+        if user_medias: user_medias = self.convert_user_medias_parameter_types(user_medias)
 
         # existing data
         existing_data = copy.deepcopy(zbx_user[0])
@@ -407,8 +408,12 @@ class User(ZabbixBase):
             'refresh': refresh,
             'rows_per_page': rows_per_page,
             'url': url,
-            'user_medias': sorted(user_medias, key=lambda x: x['sendto']),
         }
+
+        if user_medias:
+            request_data['user_medias'] = sorted(user_medias, key=lambda x: x['sendto'])
+        else:
+            del existing_data['user_medias']
 
         if override_passwd:
             request_data['passwd'] = passwd
@@ -434,7 +439,7 @@ class User(ZabbixBase):
     def add_user(self, alias, name, surname, user_group_ids, passwd, lang, theme, autologin, autologout, refresh,
                  rows_per_page, url, user_medias, user_type, not_ldap, timezone, role_name):
 
-        user_medias = self.convert_user_medias_parameter_types(user_medias)
+        if user_medias: user_medias = self.convert_user_medias_parameter_types(user_medias)
 
         user_ids = {}
 
@@ -450,8 +455,8 @@ class User(ZabbixBase):
             'refresh': refresh,
             'rows_per_page': rows_per_page,
             'url': url,
-            'user_medias': user_medias,
         }
+        if user_medias: request_data['user_medias'] = user_medias
 
         if LooseVersion(self._zbx_api_version) < LooseVersion('4.0') or not_ldap:
             request_data['passwd'] = passwd
@@ -480,7 +485,7 @@ class User(ZabbixBase):
     def update_user(self, zbx_user, alias, name, surname, user_group_ids, passwd, lang, theme, autologin, autologout,
                     refresh, rows_per_page, url, user_medias, user_type, timezone, role_name, override_passwd):
 
-        user_medias = self.convert_user_medias_parameter_types(user_medias)
+        if user_medias: user_medias = self.convert_user_medias_parameter_types(user_medias)
 
         user_ids = {}
 
@@ -526,7 +531,7 @@ class User(ZabbixBase):
 
         if LooseVersion(self._zbx_api_version) >= LooseVersion('3.4'):
             try:
-                request_data['user_medias'] = user_medias
+                if user_medias: request_data['user_medias'] = user_medias
                 user_ids = self._zapi.user.update(request_data)
             except Exception as e:
                 self._module.fail_json(msg="Failed to update user %s: %s" % (alias, e))
@@ -570,7 +575,7 @@ def main():
         refresh=dict(type='str', default='30'),
         rows_per_page=dict(type='str', default='50'),
         after_login_url=dict(type='str', default=''),
-        user_medias=dict(type='list', default=[], elements='dict',
+        user_medias=dict(type='list', default=None, elements='dict',
                          options=dict(mediatype=dict(type='str', default='Email'),
                                       sendto=dict(type='str', required=True),
                                       period=dict(type='str', default='1-7,00:00-24:00'),
