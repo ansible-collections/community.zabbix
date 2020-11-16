@@ -120,7 +120,6 @@ options:
         description:
             - Set the user's media.
             - If not set, makes no changes to media.
-        default: None
         suboptions:
             mediatype:
                 description:
