@@ -535,7 +535,8 @@ class User(ZabbixBase):
 
         if LooseVersion(self._zbx_api_version) >= LooseVersion('3.4'):
             try:
-                if user_medias: request_data['user_medias'] = user_medias
+                if user_medias:
+                    request_data['user_medias'] = user_medias
                 user_ids = self._zapi.user.update(request_data)
             except Exception as e:
                 self._module.fail_json(msg="Failed to update user %s: %s" % (alias, e))
