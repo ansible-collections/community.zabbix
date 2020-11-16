@@ -366,7 +366,8 @@ class User(ZabbixBase):
                                         autologin, autologout, refresh, rows_per_page, url, user_medias, user_type,
                                         timezone, role_name, override_passwd):
 
-        if user_medias: user_medias = self.convert_user_medias_parameter_types(user_medias)
+        if user_medias:
+            user_medias = self.convert_user_medias_parameter_types(user_medias)
 
         # existing data
         existing_data = copy.deepcopy(zbx_user[0])
@@ -439,7 +440,8 @@ class User(ZabbixBase):
     def add_user(self, alias, name, surname, user_group_ids, passwd, lang, theme, autologin, autologout, refresh,
                  rows_per_page, url, user_medias, user_type, not_ldap, timezone, role_name):
 
-        if user_medias: user_medias = self.convert_user_medias_parameter_types(user_medias)
+        if user_medias:
+            user_medias = self.convert_user_medias_parameter_types(user_medias)
 
         user_ids = {}
 
@@ -456,7 +458,8 @@ class User(ZabbixBase):
             'rows_per_page': rows_per_page,
             'url': url,
         }
-        if user_medias: request_data['user_medias'] = user_medias
+        if user_medias:
+            request_data['user_medias'] = user_medias
 
         if LooseVersion(self._zbx_api_version) < LooseVersion('4.0') or not_ldap:
             request_data['passwd'] = passwd
@@ -485,7 +488,8 @@ class User(ZabbixBase):
     def update_user(self, zbx_user, alias, name, surname, user_group_ids, passwd, lang, theme, autologin, autologout,
                     refresh, rows_per_page, url, user_medias, user_type, timezone, role_name, override_passwd):
 
-        if user_medias: user_medias = self.convert_user_medias_parameter_types(user_medias)
+        if user_medias:
+            user_medias = self.convert_user_medias_parameter_types(user_medias)
 
         user_ids = {}
 
