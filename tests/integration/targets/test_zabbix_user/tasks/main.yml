@@ -880,7 +880,7 @@
 
 - assert:
     that:
-    - update_user_optional_user_medias_existing_user_result.change is sameas False
+    - update_user_optional_user_medias_existing_user_result.changed is sameas False
 
 - name: test - Delete existing user with check_mode and diff
   zabbix_user:
