@@ -91,7 +91,8 @@ The following is an overview of all available configuration defaults for this ro
 * `zabbix_repo_yum_enabled`: A list with repository names that should be enabled when installing Zabbix component specific packages.
 
 * `zabbix_web_package_state`: Default: `present`. Can be overridden to `latest` to update packages when needed.
-* `zabbix_web_centos_release`: Default: False. When the `centos-release-scl` repository needs to be enabled. This is required when using Zabbix 5.0 due to installation of a recent version of `PHP`.
+* `zabbix_web_centos_release`: Default: True. When the `centos-release-scl` repository needs to be enabled. This is required when using Zabbix 5.0 due to installation of a recent version of `PHP`.
+* `zabbix_web_rhel_release`: Default: True. When the `scl-utils` repository needs to be enabled. This is required when using Zabbix 5.0 due to installation of a recent version of `PHP`.
 * `zabbix_web_doubleprecision`: Default: `False`. For upgraded installations, please read database [upgrade notes](https://www.zabbix.com/documentation/current/manual/installation/upgrade_notes_500) (Paragraph "Enabling extended range of numeric (float) values") before enabling this option.
 * `zabbix_web_conf_mode`: Default: `0644`. The "mode" for the Zabbix configuration file.
 

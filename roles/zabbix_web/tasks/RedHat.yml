@@ -44,7 +44,7 @@
   tags:
     - zabbix-web
 
-- name: "RedHat | Install zabbix-web dependency (Zabbix 5.x)"
+- name: "RedHat | Install zabbix-web dependency (Zabbix 5.x) (CentOS)"
   yum:
     pkg:
       - centos-release-scl
@@ -59,6 +59,27 @@
     - zabbix_version is version('5.0', '>=')
     - zabbix_web_centos_release
     - ansible_distribution_major_version != '8'
+    - ansible_distribution == "CentOS"
+  tags:
+    - zabbix-web
+
+- name: "RedHat | Install zabbix-web dependency (Zabbix 5.x) (RHEL)"
+  yum:
+    pkg:
+      - scl-utils
+      - scl-utils-build
+    state: "{{ zabbix_web_package_state }}"
+    update_cache: yes
+    disablerepo: "{{ '*' if (zabbix_repo_yum_enabled | length>0) else omit }}"
+    enablerepo: "{{ zabbix_repo_yum_enabled if zabbix_repo_yum_enabled is iterable and (zabbix_repo_yum_enabled | length>0) else omit }}"
+  register: zabbix_web_dependency_package_install
+  until: zabbix_web_dependency_package_install is succeeded
+  become: yes
+  when:
+    - zabbix_version is version('5.0', '>=')
+    - zabbix_web_centos_release
+    - ansible_distribution_major_version != '8'
+    - ansible_distribution == "RedHat"
   tags:
     - zabbix-web
 
