@@ -42,7 +42,7 @@ jobs:
       - name: Build the collection
         run: |
           collection_file=$( basename $(ansible-galaxy collection build -f | awk -F" " '{print $NF}'))
-          echo "::set-env name=COLLECTION_FILE::$collection_file"
+          echo "COLLECTION_FILE=$collection_file" >> $GITHUB_ENV
 
       - name: Install the collection
         run: ansible-galaxy collection install $COLLECTION_FILE
