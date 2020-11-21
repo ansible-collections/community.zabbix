@@ -6,6 +6,7 @@ zabbix_version: "{{ zabbix_web_version }}"
 zabbix_repo: zabbix
 zabbix_web_package_state: present
 zabbix_web_centos_release: true
+zabbix_web_rhel_release: true
 zabbix_selinux: False
 zabbix_web_doubleprecision: False
 zabbix_web_conf_mode: "0640"
