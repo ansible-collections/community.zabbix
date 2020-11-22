@@ -914,6 +914,30 @@
     that:
     - delete_user_group_existing_user_result.changed is sameas true
 
+- name: test - optional user_medias
+  zabbix_user:
+    server_url: "{{ zabbix_server_url }}"
+    login_user: "{{ zabbix_login_user }}"
+    login_password: "{{ zabbix_login_password }}"
+    alias: example1
+    name: example2
+    surname: test2
+    usrgrps:
+      - Zabbix administrators
+    passwd: update_password
+    autologout: 500
+    refresh: 60
+    rows_per_page: 300
+    after_login_url: http://example.com
+    theme: dark-theme
+    type: Zabbix super admin
+    lang: en_GB
+  register: update_user_optional_user_medias_existing_user_result
+
+- assert:
+    that:
+    - update_user_optional_user_medias_existing_user_result.changed is sameas False
+
 - name: test - Delete existing user with check_mode and diff
   zabbix_user:
     server_url: "{{ zabbix_server_url }}"
