@@ -228,6 +228,10 @@
         state: present
       register: import_template_json
 
+    - assert:
+        that:
+          - import_template_json.changed is sameas false
+
 - when: zabbix_version is version('5.2', '>=')
   block:
     - name: Import Zabbix template from JSON file with matching values (idempotency check).
@@ -239,9 +243,9 @@
         state: present
       register: import_template_json
 
-- assert:
-    that:
-      - import_template_json.changed is sameas false
+    - assert:
+        that:
+          - import_template_json.changed is sameas false
 
 - when: zabbix_version is version('5.2', '<')
   block:
@@ -254,6 +258,10 @@
         state: present
       register: import_template_json
 
+    - assert:
+        that:
+          - import_template_json.changed is sameas true
+
 - when: zabbix_version is version('5.2', '>=')
   block:
     - name: Import Zabbix template from JSON file with updated values.
@@ -265,9 +273,9 @@
         state: present
       register: import_template_json
 
-- assert:
-    that:
-      - import_template_json.changed is sameas true
+    - assert:
+        that:
+          - import_template_json.changed is sameas true
 
 - name: Gather Zabbix template infomation.
   zabbix_template_info:
@@ -298,6 +306,10 @@
         state: present
       register: import_template_xml
 
+    - assert:
+        that:
+          - import_template_xml.changed is sameas true
+
 - when: zabbix_version is version('5.2', '>=')
   block:
     - name: Import Zabbix template from XML file with updated values.
@@ -309,9 +321,9 @@
         state: present
       register: import_template_xml
 
-- assert:
-    that:
-      - import_template_xml.changed is sameas true
+    - assert:
+        that:
+          - import_template_xml.changed is sameas true
 
 - name: Gather Zabbix template infomation.
   zabbix_template_info:
