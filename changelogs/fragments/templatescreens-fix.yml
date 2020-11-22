@@ -1,0 +1,2 @@
+bugfixes:
+    - "zabbix_template - fixed issue when importing templates to zabbix version. >= 5.2"
