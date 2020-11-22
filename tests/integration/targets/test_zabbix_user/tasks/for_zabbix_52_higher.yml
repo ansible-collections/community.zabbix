@@ -930,7 +930,8 @@
     rows_per_page: 300
     after_login_url: http://example.com
     theme: dark-theme
-    type: Zabbix super admin
+    role_name: Admin role
+    timezone: Asia/Tokyo
     lang: en_GB
   register: update_user_optional_user_medias_existing_user_result
 
