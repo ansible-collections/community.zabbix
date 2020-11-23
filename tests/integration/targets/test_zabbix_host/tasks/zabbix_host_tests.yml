@@ -11,8 +11,8 @@
       - Linux servers
       - Zabbix servers
     link_templates:
-      - Template App IMAP Service
-      - Template App NTP Service
+      - "{{ 'IMAP Service' if zabbix_version | float >= 5.2 else 'Template App IMAP Service' }}"
+      - "{{ 'NTP Service' if zabbix_version | float >= 5.2 else 'Template App NTP Service' }}"
     status: enabled
     state: present
     inventory_mode: manual
@@ -75,8 +75,8 @@
       - Linux servers
       - Zabbix servers
     link_templates:
-      - Template App IMAP Service
-      - Template App NTP Service
+      - "{{ 'IMAP Service' if zabbix_version | float >= 5.2 else 'Template App IMAP Service' }}"
+      - "{{ 'NTP Service' if zabbix_version | float >= 5.2 else 'Template App NTP Service' }}"
     status: enabled
     state: present
     inventory_mode: manual
@@ -140,8 +140,8 @@
       - Linux servers
       - Zabbix servers
     link_templates:
-      - Template App IMAP Service
-      - Template App NTP Service
+      - "{{ 'IMAP Service' if zabbix_version | float >= 5.2 else 'Template App IMAP Service' }}"
+      - "{{ 'NTP Service' if zabbix_version | float >= 5.2 else 'Template App NTP Service' }}"
     status: enabled
     state: present
     inventory_mode: manual
@@ -196,8 +196,8 @@
       - Linux servers
       - Zabbix servers
     link_templates:
-      - Template App IMAP Service
-      - Template App NTP Service
+      - "{{ 'IMAP Service' if zabbix_version | float >= 5.2 else 'Template App IMAP Service' }}"
+      - "{{ 'NTP Service' if zabbix_version | float >= 5.2 else 'Template App NTP Service' }}"
     status: enabled
     state: present
     inventory_mode: manual
@@ -385,8 +385,8 @@
     login_password: "{{ zabbix_login_password }}"
     host_name: ExampleHost
     link_templates:
-      - Template App IMAP Service
-      - Template App NTP Service
+      - "{{ 'IMAP Service' if zabbix_version | float >= 5.2 else 'Template App IMAP Service' }}"
+      - "{{ 'NTP Service' if zabbix_version | float >= 5.2 else 'Template App NTP Service' }}"
   register: zabbix_host1
 
 - name: expect to succeed and that things have not changed
@@ -401,9 +401,9 @@
     login_password: "{{ zabbix_login_password }}"
     host_name: ExampleHost
     link_templates:
-      - Template App IMAP Service
-      - Template App NTP Service
-      - Template App HTTP Service
+      - "{{ 'IMAP Service' if zabbix_version | float >= 5.2 else 'Template App IMAP Service' }}"
+      - "{{ 'NTP Service' if zabbix_version | float >= 5.2 else 'Template App NTP Service' }}"
+      - "{{ 'HTTP Service' if zabbix_version | float >= 5.2 else 'Template App HTTP Service' }}"
   register: zabbix_host1
 
 - name: expect to succeed and that things have changed
@@ -418,7 +418,7 @@
     login_password: "{{ zabbix_login_password }}"
     host_name: ExampleHost
     link_templates:
-      - Template App LDAP Service
+      - "{{ 'LDAP Service' if zabbix_version | float >= 5.2 else 'Template App LDAP Service' }}"
     force: no
   register: zabbix_host1
 
@@ -434,10 +434,10 @@
     login_password: "{{ zabbix_login_password }}"
     host_name: ExampleHost
     link_templates:
-      - Template App IMAP Service
-      - Template App NTP Service
-      - Template App HTTP Service
-      - Template App LDAP Service
+      - "{{ 'IMAP Service' if zabbix_version | float >= 5.2 else 'Template App IMAP Service' }}"
+      - "{{ 'NTP Service' if zabbix_version | float >= 5.2 else 'Template App NTP Service' }}"
+      - "{{ 'HTTP Service' if zabbix_version | float >= 5.2 else 'Template App HTTP Service' }}"
+      - "{{ 'LDAP Service' if zabbix_version | float >= 5.2 else 'Template App LDAP Service' }}"
   register: zabbix_host1
 
 - name: expect to succeed and that things have not changed
