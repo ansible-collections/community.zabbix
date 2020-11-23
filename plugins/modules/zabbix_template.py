@@ -610,10 +610,10 @@ class Template(ZabbixBase):
             if LooseVersion(self._zbx_api_version) >= LooseVersion('4.4.4'):
                 update_rules['templateLinkage']['deleteMissing'] = True
 
-            #templateScreens is named templateDashboards in zabbix >= 5.2  
-            #https://support.zabbix.com/browse/ZBX-18677
+            # templateScreens is named templateDashboards in zabbix >= 5.2
+            # https://support.zabbix.com/browse/ZBX-18677
             if LooseVersion(self._zbx_api_version) >= LooseVersion('5.2'):
-               update_rules["templateDashboards"] = update_rules.pop("templateScreens")
+                update_rules["templateDashboards"] = update_rules.pop("templateScreens")
 
             import_data = {'format': template_type, 'source': template_content, 'rules': update_rules}
             self._zapi.configuration.import_(import_data)
