@@ -1,0 +1,4 @@
+bugfixes:
+    - "Also work on SLES 12 sp5"
+minor_changes:
+  - zabbix_agent - added `zabbix_agent_install_agent_only` Will only install the Zabbix Agent package and not the `zabbix-sender` or `zabbix-get` packages.
