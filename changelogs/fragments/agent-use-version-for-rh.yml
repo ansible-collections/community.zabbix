@@ -1,0 +1,2 @@
+bugfixes:
+    - "Zabbix packages were not able to install properly on Fedora. When the packages are installed, the version will be appended to the package name. This is eofr all RedHat related OS'es."
