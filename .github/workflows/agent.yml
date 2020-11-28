@@ -26,6 +26,9 @@ jobs:
           - container: centos
             image: geerlingguy/docker-centos7-ansible:latest
             group: agent
+          - container: fedora32
+            image: geerlingguy/docker-fedora32-ansible:latest
+            group: agent
           - container: ubuntu
             image: geerlingguy/docker-ubuntu2004-ansible
             group: agent
