@@ -12,6 +12,7 @@
     total_private_ip_addresses: "{{ ansible_all_ipv4_addresses | ipaddr('private') | length }}"
   when:
     - ansible_all_ipv4_addresses is defined
+    - not zabbix_agent_dont_detect_ip
 
 - name: "Set first public ip address for zabbix_agent_ip"
   set_fact:
