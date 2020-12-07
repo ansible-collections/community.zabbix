@@ -39,7 +39,6 @@ options:
         description:
             - If yes, calculate the SLA value for this service, showsla in Zabbix API
         required: false
-        default: false
         type: bool
     algorithm:
         description:
