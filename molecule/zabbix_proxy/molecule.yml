@@ -6,6 +6,8 @@
 #     ignore-errors: True
 #     role-file: requirements-roles.yml
 
+driver:
+  name: docker
 platforms:
   - name: zabbix-proxy-${MY_MOLECULE_CONTAINER:-mysql-centos}
     image: ${MY_MOLECULE_IMAGE:-"geerlingguy/docker-centos8-ansible"}
@@ -49,6 +51,10 @@ provisioner:
         zabbix_proxy_pgsql_login_user: postgres
         zabbix_proxy_pgsql_login_password: changeme
         zabbix_proxy_pgsql_login_port: 5432
+      sqlite3:
+        zabbix_proxy_database: sqlite3
+        zabbix_proxy_database_long: sqlite3
+        zabbix_proxy_dbname: /path/to/sqlite3.db
 
 verifier:
   name: testinfra
