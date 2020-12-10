@@ -108,7 +108,7 @@
               high: yes
               disaster: yes
             active: no
-        role_name: Super Admin role
+        role_name: Super admin role
         timezone: Asia/Tokyo
         state: present
       register: create_zabbix_user_result
