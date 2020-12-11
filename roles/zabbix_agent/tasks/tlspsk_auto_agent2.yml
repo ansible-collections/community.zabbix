@@ -1,0 +1,85 @@
+---
+- name: AutoPSK | Set default path variables for Linux
+  set_fact:
+    zabbix_agent2_tlspskfile: "/etc/zabbix/tls_psk_auto.secret"
+    zabbix_agent2_tlspskidentity_file: "/etc/zabbix/tls_psk_auto.identity"
+  when: (zabbix_agent_os_family != "Windows") or (zabbix_agent_docker | bool)
+
+- name: AutoPSK | Set default path variables for Windows
+  set_fact:
+    zabbix_agent2_tlspskfile: "{{ zabbix_win_install_dir }}\tls_psk_auto.secret.txt"
+    zabbix_agent2_tlspskidentity_file: "{{ zabbix_win_install_dir }}\tls_psk_auto.identity.txt"
+  when: zabbix_agent_os_family == "Windows"
+
+- name: AutoPSK | Check for existing TLS PSK file
+  stat:
+    path: "{{ zabbix_agent2_tlspskfile }}"
+  register: zabbix_agent2_tlspskcheck
+  become: yes
+
+- name: AutoPSK | read existing TLS PSK file
+  slurp:
+    src: "{{ zabbix_agent2_tlspskfile }}"
+  register: zabbix_agent2_tlspsk_base64
+  become: yes
+  when: zabbix_agent2_tlspskcheck.stat.exists
+
+- name: AutoPSK | Save existing TLS PSK secret
+  set_fact:
+    zabbix_agent2_tlspsk_read: "{{ zabbix_agent2_tlspsk_base64['content'] | b64decode | trim }}"
+  when: zabbix_agent2_tlspskcheck.stat.exists
+
+- name: AutoPSK | Use existing TLS PSK secret
+  set_fact:
+    zabbix_agent2_tlspsk_secret: "{{ zabbix_agent2_tlspsk_read }}"
+  when: zabbix_agent2_tlspskcheck.stat.exists and zabbix_agent2_tlspsk_read|length >= 32
+
+- name: AutoPSK | Generate new TLS PSK secret
+  set_fact:
+    zabbix_agent2_tlspsk_secret: "{{ lookup('password', '/dev/null chars=hexdigits length=64') }}"
+  when: not zabbix_agent2_tlspskcheck.stat.exists or zabbix_agent2_tlspsk_read|length < 32
+
+- name: AutoPSK | Check for existing TLS PSK identity
+  stat:
+    path: "{{ zabbix_agent2_tlspskidentity_file }}"
+  register: zabbix_agent2_tlspskidentity_check
+  become: yes
+
+- name: AutoPSK | Read existing TLS PSK identity file
+  slurp:
+    src: "{{ zabbix_agent2_tlspskidentity_file }}"
+  register: zabbix_agent2_tlspskidentity_base64
+  become: yes
+  when: zabbix_agent2_tlspskidentity_check.stat.exists
+
+- name: AutoPSK | Use existing TLS PSK identity
+  set_fact:
+    zabbix_agent2_tlspskidentity: "{{ zabbix_agent2_tlspskidentity_base64['content'] | b64decode | trim }}"
+  when: zabbix_agent2_tlspskidentity_check.stat.exists
+
+- name: AutoPSK | Generate new TLS PSK identity
+  set_fact:
+    zabbix_agent2_tlspskidentity: "{{ zabbix_visible_hostname | default(zabbix_agent_hostname) + '_' + lookup('password', '/dev/null chars=hexdigits length=4') }}"
+  when: not zabbix_agent2_tlspskidentity_check.stat.exists
+
+- name: AutoPSK | Template TLS PSK identity in file
+  copy:
+    dest: "{{ zabbix_agent2_tlspskidentity_file }}"
+    content: "{{ zabbix_agent2_tlspskidentity }}"
+    owner: zabbix
+    group: zabbix
+    mode: 0400
+  become: yes
+  when:
+    - zabbix_agent2_tlspskidentity_file is defined
+    - zabbix_agent2_tlspskidentity is defined
+  notify:
+    - restart zabbix-agent
+    - restart win zabbix agent
+    - restart mac zabbix agent
+
+- name: AutoPSK | Default tlsaccept and tlsconnect to enforce PSK
+  set_fact:
+    zabbix_agent2_tlsaccept: psk
+    zabbix_agent2_tlsconnect: psk
+  when: zabbix_api_create_hosts
