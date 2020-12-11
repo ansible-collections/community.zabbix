@@ -1,0 +1,2 @@
+bugfixes:
+    - "There was an task that wasn't able to use an http(s)_proxy environment while installing an package."
