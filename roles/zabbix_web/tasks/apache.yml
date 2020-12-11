@@ -17,3 +17,19 @@
     apache_version: "{{ apachectl_version.stdout }}"
   tags:
     - zabbix-web
+
+- name: "Set some"
+  set_fact:
+    _zabbix_web_apache_php_addition: True
+  when:
+    - zabbix_version is version('4.4', '<=')
+  tags:
+    - zabbix-web
+
+- name: "Set some"
+  set_fact:
+    _zabbix_web_apache_php_addition: True
+  when:
+    - ansible_os_family == "Debian"
+  tags:
+    - zabbix-web

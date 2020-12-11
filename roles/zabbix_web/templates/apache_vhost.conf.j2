@@ -59,7 +59,7 @@
   RewriteEngine On
   RewriteRule ^$ /index.php [L]
 
-{% if zabbix_version is version('4.4', '<=') %}
+{% if _zabbix_web_apache_php_addition | default(false) %}
 {% if zabbix_apache_include_custom_fragment | default(true) %}
   ## Custom fragment
   {% if zabbix_php_fpm %}
@@ -71,6 +71,11 @@
   php_value post_max_size {{ zabbix_web_post_max_size | default('16M') }}
   php_value upload_max_filesize {{ zabbix_web_upload_max_filesize | default('2M') }}
   php_value max_input_time {{ zabbix_web_max_input_time | default('300') }}
+
+  {% if zabbix_version is version('5.0', '>=') %}
+  php_value max_input_vars {{ zabbix_web_max_input_vars | default('10000') }}
+  {% endif %}
+
   # Set correct timezone.
   php_value date.timezone {{ zabbix_timezone }}
   {% endif %}
@@ -156,7 +161,7 @@ SSLCryptoDevice {{ zabbix_apache_SSLCryptoDevice }}
   RewriteEngine On
   RewriteRule ^$ /index.php [L]
 
-{% if zabbix_version is version('4.4', '<=') %}
+{% if _zabbix_web_apache_php_addition | default(false) %}
 {% if zabbix_apache_include_custom_fragment | default(true) %}
   ## Custom fragment
   {% if zabbix_php_fpm %}
@@ -168,6 +173,11 @@ SSLCryptoDevice {{ zabbix_apache_SSLCryptoDevice }}
   php_value post_max_size {{ zabbix_web_post_max_size | default('16M') }}
   php_value upload_max_filesize {{ zabbix_web_upload_max_filesize | default('2M') }}
   php_value max_input_time {{ zabbix_web_max_input_time | default('300') }}
+
+  {% if zabbix_version is version('5.0', '>=') %}
+  php_value max_input_vars {{ zabbix_web_max_input_vars | default('10000') }}
+  {% endif %}
+
   # Set correct timezone.
   php_value date.timezone {{ zabbix_timezone }}
   {% endif %}
