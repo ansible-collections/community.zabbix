@@ -40,7 +40,7 @@
 
 - name: "Debian | Install zabbix-web"
   apt:
-    pkg: zabbix-frontend-php
+    pkg: "zabbix-frontend-php{{ '-deprecated' if zabbix_php_frontend_deprecated else '' }}"
     state: "{{ zabbix_web_package_state }}"
     update_cache: yes
     cache_valid_time: 0
