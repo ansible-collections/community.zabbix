@@ -16,6 +16,7 @@
     serole: object_r
     setype: zabbix_var_lib_t
     state: directory
+  become: yes
   when:
     - zabbix_database_creation
 
@@ -40,6 +41,7 @@
     seuser: system_u
     serole: object_r
     setype: zabbix_var_lib_t
+  become: yes
   when:
     - ansible_selinux.status == "enabled"
     - zabbix_database_creation

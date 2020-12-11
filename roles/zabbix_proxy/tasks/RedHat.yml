@@ -141,8 +141,8 @@
   yum:
     name: python3-psycopg2
     state: present
-  register: zabbix_server_dependencies_installed
-  until: zabbix_server_dependencies_installed is succeeded
+  register: zabbix_proxy_dependencies_installed
+  until: zabbix_proxy_dependencies_installed is succeeded
   become: yes
   when:
     - zabbix_database_creation
@@ -206,8 +206,8 @@
       - libsemanage-python
       - checkpolicy
     state: present
-  register: zabbix_server_dependencies_installed
-  until: zabbix_server_dependencies_installed is succeeded
+  register: zabbix_proxy_dependencies_installed
+  until: zabbix_proxy_dependencies_installed is succeeded
   become: yes
   when:
     - ansible_distribution_major_version == "7" or ansible_distribution_major_version == "6"
@@ -222,8 +222,8 @@
       - checkpolicy
       - python3-libsemanage
     state: present
-  register: zabbix_server_dependencies_installed
-  until: zabbix_server_dependencies_installed is succeeded
+  register: zabbix_proxy_dependencies_installed
+  until: zabbix_proxy_dependencies_installed is succeeded
   become: yes
   when:
     - ansible_distribution_major_version == "8"
@@ -231,11 +231,24 @@
   tags:
     - zabbix-proxy
 
-- name: "RedHat | Add SEmodule to fix SELinux issue: zabbix_server_alerter.sock"
+- name: "RedHat | Install sqlite3"
+  yum:
+    name:
+      - sqlite
+    state: present
+  register: zabbix_proxy_dependencies_installed
+  until: zabbix_proxy_dependencies_installed is succeeded
+  become: yes
+  when:
+    - zabbix_proxy_database == 'sqlite3'
+  tags:
+    - zabbix-proxy
+
+- name: "RedHat | Add SEmodule to fix SELinux issue: zabbix_proxy_alerter.sock"
   script:
     cmd: files/install_semodule.bsx
   args:
-    creates: /etc/selinux/targeted/active/modules/400/zabbix_server_add/cil
+    creates: /etc/selinux/targeted/active/modules/400/zabbix_proxy_add/cil
   become: yes
   when:
     - zabbix_selinux | bool

@@ -1,0 +1,4 @@
+bugfixes:
+    - "The become option was missing in some essential tasks when installing the Zabbix Proxy with SQLite3 as database."
+    - "Various documentation fixes removing the Zabbix Server and replaced it with actual Zabbix Proxy information."
+    - "Added missing paragraph for the SQLite3 as database."
