@@ -19,6 +19,7 @@ zabbix_apache_vhost_port: 80
 zabbix_apache_vhost_tls_port: 443
 zabbix_timezone: Europe/Amsterdam
 zabbix_vhost: True
+zabbix_php_frontend_deprecated: False
 zabbix_php_fpm: False
 zabbix_php_fpm_dir_etc: /etc/opt/rh/rh-php72/
 zabbix_php_fpm_dir_var: /var/opt/rh/rh-php72/

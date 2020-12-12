@@ -1,10 +1,4 @@
 ---
-# dependency:
-#   name: galaxy
-#   options:
-#     ignore-certs: True
-#     ignore-errors: True
-#     role-file: requirements-roles.yml
 
 driver:
   name: docker
@@ -54,6 +48,10 @@ provisioner:
         zabbix_repo_yum_enabled:
           - zabbix
           - zabbix-non-supported
+      sqlite3:
+        zabbix_proxy_database: sqlite3
+        zabbix_proxy_database_long: sqlite3
+        zabbix_proxy_dbname: /path/to/sqlite3.db
 
 verifier:
   name: testinfra

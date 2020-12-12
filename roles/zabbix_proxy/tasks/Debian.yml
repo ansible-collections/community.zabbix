@@ -172,3 +172,15 @@
     - zabbix-proxy
     - init
     - database
+
+- name: "Debian | Install sqlite3"
+  apt:
+    name: sqlite
+    state: present
+  register: are_zabbix_proxy_dependency_packages_installed
+  until: are_zabbix_proxy_dependency_packages_installed is succeeded
+  become: yes
+  when:
+    - zabbix_proxy_database == 'sqlite3'
+  tags:
+    - zabbix-proxy
