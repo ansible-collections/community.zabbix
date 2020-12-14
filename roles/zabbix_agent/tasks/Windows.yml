@@ -54,23 +54,6 @@
     - zabbix_win_exe_info.win_file_version.product_version is version(zabbix_version_long, '<')
     - zabbix_agent_package_state == 'latest'
 
-- name: "Windows | Create directory structure"
-  win_file:
-    path: "{{ item }}"
-    state: directory
-  with_items:
-    - "{{ zabbix_win_install_dir }}"
-    - "{{ zabbix_agent_win_include }}"
-
-- name: "Windows | Place TLS-PSK file"
-  win_copy:
-    content: "{{ zabbix_agent_tlspsk_secret }}"
-    dest: "{{ zabbix_agent_tlspskfile }}"
-  when:
-    - zabbix_agent_tlspskfile is defined
-    - zabbix_agent_tlspsk_secret is defined
-  notify: restart win zabbix agent
-
 - name: "Windows | Stop Zabbix (Update)"
   win_service:
     name: Zabbix Agent
@@ -95,6 +78,23 @@
     - update_zabbix_agent | default(false)
     - agent_file_info.stat.exists
 
+- name: "Windows | Create directory structure"
+  win_file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - "{{ zabbix_win_install_dir }}"
+    - "{{ zabbix_agent_win_include }}"
+
+- name: "Windows | Place TLS-PSK file"
+  win_copy:
+    content: "{{ zabbix_agent_tlspsk_secret }}"
+    dest: "{{ zabbix_agent_tlspskfile }}"
+  when:
+    - zabbix_agent_tlspskfile is defined
+    - zabbix_agent_tlspsk_secret is defined
+  notify: restart win zabbix agent
+  
 - name: "Windows | Check if file is already downloaded"
   win_stat:
     path: '{{ zabbix_win_install_dir }}\{{ zabbix_win_package }}'
