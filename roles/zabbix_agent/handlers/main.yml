@@ -5,7 +5,7 @@
   service:
     name: "{{ zabbix_agent_service }}"
     state: restarted
-    start_mode: auto
+    enabled: yes
   become: yes
   when:
     - not zabbix_agent_docker
