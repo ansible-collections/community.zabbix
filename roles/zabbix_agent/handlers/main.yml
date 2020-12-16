@@ -18,7 +18,6 @@
   win_service:
     name: "{{ zabbix_win_agent_service }}"
     state: restarted
-    enabled: yes
   when:
     - zabbix_agent_os_family == "Windows"
 
