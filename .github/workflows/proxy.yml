@@ -38,13 +38,13 @@ jobs:
             group: sqlite3
             command: /sbin/init
           - container: mysql-debian
-            image: geerlingguy/docker-debian9-ansible
+            image: geerlingguy/docker-debian10-ansible
             group: mysql
           - container: pgsql-debian
-            image: geerlingguy/docker-debian9-ansible
+            image: geerlingguy/docker-debian10-ansible
             group: postgresql
           - container: sqlite-debian
-            image: geerlingguy/docker-debian9-ansible
+            image: geerlingguy/docker-debian10-ansible
             group: sqlite3
         collection_role:
           - zabbix_proxy
