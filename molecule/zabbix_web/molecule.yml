@@ -68,8 +68,8 @@ provisioner:
         zabbix_url: zabbix-web-mysql-debian
         zabbix_websrv_servername: zabbix-web-mysql-debian
       zabbix-web-pgsql-centos8:
+        ansible_rhn_repo_disable_gpg_check: True
         zabbix_websrv: apache
-        zabbix_php_fpm: True
         zabbix_php_fpm_conf_listen: False
         zabbix_url: zabbix-web-pgsql-centos8
         zabbix_websrv_servername: zabbix-web-pgsql-centos8

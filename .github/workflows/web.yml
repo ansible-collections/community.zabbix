@@ -30,10 +30,10 @@ jobs:
             image: geerlingguy/docker-ubuntu2004-ansible
             group: postgresql
           - container: mysql-debian
-            image: geerlingguy/docker-debian9-ansible
+            image: geerlingguy/docker-debian10-ansible
             group: mysql
           - container: pgsql-debian
-            image: geerlingguy/docker-debian9-ansible
+            image: geerlingguy/docker-debian10-ansible
             group: postgresql
         collection_role:
           - zabbix_web
