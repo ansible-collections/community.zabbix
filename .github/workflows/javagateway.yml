@@ -22,7 +22,7 @@ jobs:
           - container: ubuntu
             image: geerlingguy/docker-ubuntu2004-ansible
           - container: debian
-            image: geerlingguy/docker-debian9-ansible
+            image: geerlingguy/docker-debian10-ansible
         collection_role:
           - zabbix_javagateway
     steps:

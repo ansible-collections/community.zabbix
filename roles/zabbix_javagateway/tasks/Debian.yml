@@ -59,3 +59,12 @@
   register: zabbix_java_gateway_install
   until: zabbix_java_gateway_install is succeeded
   become: yes
+
+- name: "Make sure Zabbix Java Gateway is not yet running"
+  systemd:
+    name: zabbix-java-gateway
+    state: stopped
+    enabled: yes
+    daemon_reload: true
+  when:
+    - zabbix_java_gateway_install.changed

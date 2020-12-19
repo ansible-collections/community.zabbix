@@ -45,9 +45,9 @@ provisioner:
         zabbix_proxy_pgsql_login_user: postgres
         zabbix_proxy_pgsql_login_password: changeme
         zabbix_proxy_pgsql_login_port: 5432
-        zabbix_repo_yum_enabled:
-          - zabbix
-          - zabbix-non-supported
+        # zabbix_repo_yum_enabled:
+        #   - zabbix
+          # - zabbix-non-supported
       sqlite3:
         zabbix_proxy_database: sqlite3
         zabbix_proxy_database_long: sqlite3

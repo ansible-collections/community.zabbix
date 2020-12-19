@@ -51,7 +51,7 @@ See the following list of supported Operating systems with the Zabbix releases:
 | Zabbix              | 5.2 | 5.0 | 4.4 | 4.0 (LTS) | 3.0 (LTS) |
 |---------------------|-----|-----|-----|-----------|-----------|
 | Red Hat Fam 8       |  V  |  V  | V   |           |           |
-| Red Hat Fam 7       |  V  |  V  | V   | V         | V         |
+| Red Hat Fam 7       |     |  V  | V   | V         | V         |
 | Red Hat Fam 6       |  V  |  V  |     |           | V         |
 | Red Hat Fam 5       |  V  |  V  |     |           | V         |
 | Fedora              |     |     | V   | V         |           |
@@ -66,6 +66,8 @@ See the following list of supported Operating systems with the Zabbix releases:
 | Debian 7 wheezy     |     |     |     | V         | V         |
 | macOS 10.15         |     |     | V   | V         |           |
 | macOS 10.14         |     |     | V   | V         |           |
+
+See https://support.zabbix.com/browse/ZBX-18790 why RHEL7 is not supported anymore.
 
 # Installation
 

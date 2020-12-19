@@ -20,8 +20,8 @@ jobs:
           - container: mysql-centos8
             image: geerlingguy/docker-centos8-ansible:latest
             group: mysql
-          - container: pgsql-centos7
-            image: geerlingguy/docker-centos7-ansible:latest
+          - container: pgsql-centos8
+            image: geerlingguy/docker-centos8-ansible:latest
             group: postgresql
           - container: mysql-ubuntu18
             image: geerlingguy/docker-ubuntu1804-ansible

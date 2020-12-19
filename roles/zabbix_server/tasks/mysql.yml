@@ -112,6 +112,11 @@
   mysql_variables:
     variable: innodb_strict_mode
     value: 0
+    login_host: "{{ zabbix_server_mysql_login_host | default(omit) }}"
+    login_user: "{{ zabbix_server_mysql_login_user | default(omit) }}"
+    login_password: "{{ zabbix_server_mysql_login_password | default(omit) }}"
+    login_port: "{{ zabbix_server_mysql_login_port | default(omit) }}"
+    login_unix_socket: "{{ zabbix_server_mysql_login_unix_socket | default(omit) }}"
   when:
     - zabbix_version is version('3.0', '>=')
     - zabbix_database_sqlload | bool
