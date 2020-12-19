@@ -33,11 +33,19 @@
     - ansible_distribution == "Amazon"
     - ansible_distribution_major_version == "2"
 
-- name: "Fedora | Override zabbix_agent_distribution_major_version for Fedora"
+- name: "Fedora | Override zabbix_agent_distribution_major_version for Fedora <= 27"
   set_fact:
     zabbix_agent_distribution_major_version: 7
   when:
     - ansible_distribution == "Fedora"
+    - ansible_distribution_major_version <= "27"
+
+- name: "Fedora | Override zabbix_agent_distribution_major_version for Fedora >= 27"
+  set_fact:
+    zabbix_agent_distribution_major_version: 8
+  when:
+    - ansible_distribution == "Fedora"
+    - ansible_distribution_major_version >= "27"
 
 - name: "XCP-ng | Override zabbix_agent_distribution_major_version for XCP-ng"
   set_fact:
@@ -78,7 +86,7 @@
 - name: "RedHat | Installing zabbix-agent"
   package:
     pkg:
-      - "{{ zabbix_agent_package }}"
+      - "{{ zabbix_agent_package }}-{{ zabbix_agent_version }}.*"
     disablerepo: "{{ '*' if (zabbix_repo_yum_enabled | length>0) else omit }}"
     enablerepo: "{{ zabbix_repo_yum_enabled if zabbix_repo_yum_enabled is iterable and (zabbix_repo_yum_enabled | length>0) else omit }}"
     state: "{{ zabbix_agent_package_state }}"
@@ -95,8 +103,8 @@
 - name: "RedHat | Installing zabbix-{sender,get}}"
   package:
     pkg:
-      - "{{ zabbix_sender_package }}"
-      - "{{ zabbix_get_package }}"
+      - "{{ zabbix_sender_package }}-{{ zabbix_agent_version }}.*"
+      - "{{ zabbix_get_package }}-{{ zabbix_agent_version }}.*"
     disablerepo: "{{ '*' if (zabbix_repo_yum_enabled | length>0) else omit }}"
     enablerepo: "{{ zabbix_repo_yum_enabled if zabbix_repo_yum_enabled is iterable and (zabbix_repo_yum_enabled | length>0) else omit }}"
     state: "{{ zabbix_agent_package_state }}"

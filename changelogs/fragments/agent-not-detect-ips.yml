@@ -1,0 +1,2 @@
+minor_changes:
+  - "Added a new property `zabbix_agent_dont_detect_ip` when set to true, it won't detect the ips and no need to install the python module `netaddr`."

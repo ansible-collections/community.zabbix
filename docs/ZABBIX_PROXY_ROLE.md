@@ -19,6 +19,7 @@ Table of Content
     + [PostgreSQL](#postgresql)
       - [Local Setup](#local-setup-1)
       - [Separate Setup](#separate-setup-1)
+    + [SQLite3](#sqlite3)
   * [Zabbix API variables](#zabbix-api-variables)
 - [Example Playbook](#example-playbook)
 - [Molecule](#molecule)
@@ -81,7 +82,7 @@ The following is an overview of all available configuration default for this rol
 
 ### SElinux
 
-* `zabbix_selinux`: Default: `False`. Enables an SELinux policy so that the server will run.
+* `zabbix_selinux`: Default: `False`. Enables an SELinux policy so that the Proxy will run.
 
 ### Zabbix Proxy
 
@@ -103,14 +104,14 @@ The following is an overview of all available configuration default for this rol
 ### Database specific
 
 * `zabbix_proxy_dbhost_run_install`: Default: `True`. When set to `True`, sql files will be executed on the host running the database.
-* `zabbix_proxy_database`: Default: `pgsql`. The type of database used. Can be: `mysql` or `pgsql`
-* `zabbix_proxy_database_long`: Default: `postgresql`. The type of database used, but long name. Can be: `mysql` or `postgresql`
-* `zabbix_proxy_dbhost`: The hostname on which the database is running.
-* `zabbix_proxy_real_dbhost`: The hostname of the dbhost that is running behind a loadbalancer/VIP (loadbalancers doesn't accept ssh connections)
-* `zabbix_proxy_dbname`: The database name which is used by the Zabbix Server.
-* `zabbix_proxy_dbuser`: The database username which is used by the Zabbix Server.
-* `zabbix_proxy_dbpassword`: The database user password which is used by the Zabbix Server.
-* `zabbix_proxy_dbport`: The database port which is used by the Zabbix Server.
+* `zabbix_proxy_database`: Default: `pgsql`. The type of database used. Can be: `mysql`, `pgsql` or `sqlite3`
+* `zabbix_proxy_database_long`: Default: `postgresql`. The type of database used, but long name. Can be: `mysql`, `postgresql` or `sqlite3`
+* `zabbix_proxy_dbhost`: The hostname on which the database is running. Will be ignored when `sqlite3` is used as database.
+* `zabbix_proxy_real_dbhost`: The hostname of the dbhost that is running behind a loadbalancer/VIP (loadbalancers doesn't accept ssh connections) Will be ignored when `sqlite3` is used as database.
+* `zabbix_proxy_dbname`: The database name which is used by the Zabbix Proxy.
+* `zabbix_proxy_dbuser`: The database username which is used by the Zabbix Proxy. Will be ignored when `sqlite3` is used as database.
+* `zabbix_proxy_dbpassword`: The database user password which is used by the Zabbix Proxy. Will be ignored when `sqlite3` is used as database.
+* `zabbix_proxy_dbport`: The database port which is used by the Zabbix Proxy. Will be ignored when `sqlite3` is used as database.
 * `zabbix_database_creation`: Default: `True`. When you don't want to create the database including user, you can set it to False.
 * `zabbix_proxy_install_database_client`: Default: `True`. False does not install database client. Default true
 * `zabbix_database_sqlload`:True / False. When you don't want to load the sql files into the database, you can set it to False.
@@ -148,32 +149,33 @@ By default not set to any option and the behaviour depends on database configura
 This parameter is supported since Zabbix 5.0.0.
 
 * `zabbix_proxy_dbtlscafile`: Full pathname of a file containing the top-level CA(s) certificates for database certificate verification. This parameter is supported since Zabbix 5.0.0.
-* `zabbix_proxy_dbtlscertfile`: Full pathname of file containing Zabbix server certificate for authenticating to database. This parameter is supported since Zabbix 5.0.0.
+* `zabbix_proxy_dbtlscertfile`: Full pathname of file containing Zabbix Proxy certificate for authenticating to database. This parameter is supported since Zabbix 5.0.0.
 * `zabbix_proxy_dbtlskeyfile`: Full pathname of file containing the private key for authenticating to database. This parameter is supported since Zabbix 5.0.0.
-* `zabbix_proxy_dbtlscipher`: The list of encryption ciphers that Zabbix server permits for TLS protocols up through TLSv1.2. Supported only for MySQL.This parameter is supported since Zabbix 5.0.0.
-* `zabbix_proxy_dbtlscipher13`: The list of encryption ciphersuites that Zabbix server permits for TLSv1.3 protocol. Supported only for MySQL, starting from version 8.0.16. This parameter is supported since Zabbix 5.0.0.
+* `zabbix_proxy_dbtlscipher`: The list of encryption ciphers that Zabbix Proxy permits for TLS protocols up through TLSv1.2. Supported only for MySQL.This parameter is supported since Zabbix 5.0.0.
+* `zabbix_proxy_dbtlscipher13`: The list of encryption ciphersuites that Zabbix Proxy permits for TLSv1.3 protocol. Supported only for MySQL, starting from version 8.0.16. This parameter is supported since Zabbix 5.0.0.
 
 ## Database
 
-With Zabbix Server you can make use of 2 different databases:
+With Zabbix Proxy you can make use of 2 different databases:
 
 * `mysql`
 * `postgresql`
+* `SQLite3`
 
 In the following paragraphs we dive into both setups.
 
 ### MySQL
 
-To make the Zabbix Server work with a `MySQL` database, there are 2 types on setup:
+To make the Zabbix Proxy work with a `MySQL` database, there are 2 types on setup:
 
-1. Local setup, `MySQL` running on same host as the Zabbix Server;
-2. Separate setup, `MySQL` running on a different host than the Zabbix Server.
+1. Local setup, `MySQL` running on same host as the Zabbix Proxy;
+2. Separate setup, `MySQL` running on a different host than the Zabbix Proxy.
 
 #### Local Setup
 
 We need to have the following dependencies met:
 
-1. Find an (Ansible) role that will install a `MySQL` instance on the host. Example: `geerlingguy.mysql` can be used, but also others can be used. Please make sure that before installing the Zabbix Server, you have a fully functional `MySQL` instance running.
+1. Find an (Ansible) role that will install a `MySQL` instance on the host. Example: `geerlingguy.mysql` can be used, but also others can be used. Please make sure that before installing the Zabbix Proxy, you have a fully functional `MySQL` instance running.
 2. We need to set some variables, either as input for the playbook or set them into the `group_vars` or `host_vars` (Your preference choice). We need to set the following properties:
 
 ```yaml
@@ -184,7 +186,7 @@ zabbix_proxy_dbpassword: <SOME_SECRET_STRING>
 ```
 
 Please generate a value for the `zabbix_proxy_dbpassword` property (Maybe use `ansible-vault` for this). The zabbix-proxy role will create an database and username (With the provided value for the password) in `MySQL`.
-3. Execute the role by running the Ansible playbook that calls this role. At the end of this run, the Zabbix Server with `MySQL` will be running.
+3. Execute the role by running the Ansible playbook that calls this role. At the end of this run, the Zabbix Proxy with `MySQL` will be running.
 
 #### Separate Setup
 
@@ -209,33 +211,33 @@ zabbix_proxy_mysql_login_port: 3306
 
 Please generate a value for the `zabbix_proxy_dbpassword` property (Maybe use `ansible-vault` for this). The zabbix-proxy role will create an database and username (With the provided value for the password) in `MySQL`.
 
-The `zabbix_proxy_privileged_host` can be set to the hostname/ip of the host running Zabbix Server for security related purposes. Also make sure that `zabbix_proxy_mysql_login_password` is set to the correct password for the user provided with `zabbix_proxy_mysql_login_host` to create a database and user in the `MySQL` instance.
+The `zabbix_proxy_privileged_host` can be set to the hostname/ip of the host running Zabbix Proxy for security related purposes. Also make sure that `zabbix_proxy_mysql_login_password` is set to the correct password for the user provided with `zabbix_proxy_mysql_login_host` to create a database and user in the `MySQL` instance.
 
-3. Execute the role by running the Ansible playbook that calls this role. At the end of this run, the Zabbix Server with `MySQL` on a different host will be running.
+3. Execute the role by running the Ansible playbook that calls this role. At the end of this run, the Zabbix Proxy with `MySQL` on a different host will be running.
 
 ### PostgreSQL
 
-To make the Zabbix Server work with a `PgSQL` database, there are 2 types on setup:
+To make the Zabbix Proxy work with a `PgSQL` database, there are 2 types on setup:
 
-1. Local setup, `PgSQL` running on same host as the Zabbix Server;
-2. Separate setup, `PgSQL` running on a different host than the Zabbix Server.
+1. Local setup, `PgSQL` running on same host as the Zabbix Proxy;
+2. Separate setup, `PgSQL` running on a different host than the Zabbix Proxy.
 
 #### Local Setup
 
 We need to have the following dependencies met:
 
-1. Find an (Ansible) role that will install a `PgSQL` instance on the host. Example: `geerlingguy.postgresql` can be used, but also others can be used. Please make sure that before installing the Zabbix Server, you have a fully functional `PgSQL` instance running.
+1. Find an (Ansible) role that will install a `PgSQL` instance on the host. Example: `geerlingguy.postgresql` can be used, but also others can be used. Please make sure that before installing the Zabbix Proxy, you have a fully functional `PgSQL` instance running.
 2. We need to set some variables, either as input for the playbook or set them into the `group_vars` or `host_vars` (Your preference choice). We need to set the following properties:
 
 ```yaml
-zabbix_proxy_database: pgsq;
+zabbix_proxy_database: pgsql
 zabbix_proxy_database_long: postgresql
 zabbix_proxy_dbport: 5432
 zabbix_proxy_dbpassword: <SOME_SECRET_STRING>
 ```
 
 Please generate a value for the `zabbix_proxy_dbpassword` property (Maybe use `ansible-vault` for this). The zabbix-proxy role will create an database and username (With the provided value for the password) in `PgSQL`.
-3. Execute the role by running the Ansible playbook that calls this role. At the end of this run, the Zabbix Server with `PgSQL` will be running.
+3. Execute the role by running the Ansible playbook that calls this role. At the end of this run, the Zabbix Proxy with `PgSQL` will be running.
 
 #### Separate Setup
 
@@ -245,7 +247,7 @@ We need to have the following dependencies met:
 2. We need to set some variables, either as input for the playbook or set them into the `group_vars` or `host_vars` (Your preference choice). We need to set the following properties:
 
 ```yaml
-zabbix_proxy_database: pgsq;
+zabbix_proxy_database: pgsql
 zabbix_proxy_database_long: postgresql
 zabbix_proxy_dbport: 5432
 zabbix_proxy_dbhost: pgsql-host
@@ -260,9 +262,23 @@ zabbix_proxy_pgsql_login_port: 5432
 
 Please generate a value for the `zabbix_proxy_dbpassword` property (Maybe use `ansible-vault` for this). The zabbix-proxy role will create an database and username (With the provided value for the password) in `PgSQL`.
 
-The `zabbix_proxy_privileged_host` can be set to the hostname/ip of the host running Zabbix Server for security related purposes. Also make sure that `zabbix_proxy_mysql_login_password` is set to the correct password for the user provided with `zabbix_proxy_mysql_login_host` to create a database and user in the `PgSQL` instance.
+The `zabbix_proxy_privileged_host` can be set to the hostname/ip of the host running Zabbix Proxy for security related purposes. Also make sure that `zabbix_proxy_mysql_login_password` is set to the correct password for the user provided with `zabbix_proxy_mysql_login_host` to create a database and user in the `PgSQL` instance.
 
-3. Execute the role by running the Ansible playbook that calls this role. At the end of this run, the Zabbix Server with `PgSQL` on a different host will be running.zabbix_proxy_
+3. Execute the role by running the Ansible playbook that calls this role. At the end of this run, the Zabbix Proxy with `PgSQL` on a different host will be running.zabbix_proxy_
+
+### SQLite3
+
+The SQLite3 can only be used on the same host as on which the Zabbix Proxy is running. If you want to use a seperate host for running the database for the proxy, please consider going for MySQL or PostGreSQL.
+
+The following properties needs to be set when using `SQLite3` as the database:
+
+```yaml
+zabbix_proxy_database: sqlite3
+zabbix_proxy_database_long: sqlite3
+zabbix_proxy_dbname: /path/to/sqlite3.db
+```
+
+NOTE: When using `zabbix_proxy_dbname: zabbix_proxy` (Which is default with this role), it will automatically be stored on `/var/lib/zabbix/zabbix_proxy.db`
 
 ## Zabbix API variables
 
@@ -288,8 +304,8 @@ Including an example of how to use your role (for instance, with variables passe
     roles:
       - role: community.zabbix.zabbix_proxy
         zabbix_server_host: 192.168.1.1
-        zabbix_server_database: mysql
-        zabbix_server_database_long: mysql
+        zabbix_proxy_database: mysql
+        zabbix_proxy_database_long: mysql
 ```
 
 # Molecule

@@ -23,6 +23,9 @@ jobs:
           - container: pgsql-centos
             image: geerlingguy/docker-centos8-ansible:latest
             group: postgresql
+          - container: sqlite-centos
+            image: geerlingguy/docker-centos8-ansible:latest
+            group: sqlite3
           - container: mysql-ubuntu
             image: geerlingguy/docker-ubuntu2004-ansible
             group: mysql
@@ -30,12 +33,19 @@ jobs:
             image: geerlingguy/docker-ubuntu2004-ansible
             group: postgresql
             command: /sbin/init
+          - container: sqlite-ubuntu
+            image: geerlingguy/docker-ubuntu2004-ansible
+            group: sqlite3
+            command: /sbin/init
           - container: mysql-debian
             image: geerlingguy/docker-debian9-ansible
             group: mysql
           - container: pgsql-debian
             image: geerlingguy/docker-debian9-ansible
             group: postgresql
+          - container: sqlite-debian
+            image: geerlingguy/docker-debian9-ansible
+            group: sqlite3
         collection_role:
           - zabbix_proxy
     steps:

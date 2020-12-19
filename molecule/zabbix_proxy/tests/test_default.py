@@ -16,7 +16,7 @@ def test_zabbixproxy_running_and_enabled(host):
         assert zabbix.is_running
 
 
-@pytest.mark.parametrize("proxy", [("zabbix-proxy-pgsql"), ("zabbix-proxy-mysql")])
+@pytest.mark.parametrize("proxy", [("zabbix-proxy-pgsql"), ("zabbix-proxy-mysql"), ("zabbix-proxy-sqlite3")])
 def test_zabbix_package(host, proxy):
     ansible_data = host.ansible.get_variables()
     zabbixhost = ansible_data['inventory_hostname']
