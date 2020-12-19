@@ -129,6 +129,7 @@ The following is an overview of all available configuration default for this rol
 * `zabbix_get_package`: The name of the zabbix-get package. Default: `zabbix-get`. In case for EPEL, it is automatically renamed.
 * `zabbix_agent_package_state`: If Zabbix-agent needs to be `present` or `latest`.
 * `zabbix_agent_interfaces`: A list that configured the interfaces you can use when configuring via API.
+* `zabbix_agent_install_agent_only`: Only install the Zabbix Agent and not the `zabbix-sender` and `zabbix-get` packages. Default: `False`
 * `zabbix_agent_userparameters`: Default: `[]]`. List of userparameter names and scripts (if any). Detailed description is given in the [Deploying Userparameters](#deploying-userparameters) section.
     * `name`: Userparameter name (should be the same with userparameter template file name)
     * `scripts_dir`: Directory name of the custom scripts needed for userparameters

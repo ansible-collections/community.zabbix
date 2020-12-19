@@ -107,6 +107,7 @@
   until: zabbix_agent_package_installed is succeeded
   when:
     - zabbix_repo != 'epel'
+    - not zabbix_agent_install_agent_only
   become: yes
   tags:
     - init
