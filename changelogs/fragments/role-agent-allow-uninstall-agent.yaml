@@ -1,0 +1,2 @@
+minor_changes:
+    - "Added parameter `zabbix_agent_package_remove` when set to `true` and `zabbix_agent2` is set to `true` it will uninstall the `zabbix-agent` service and package."
