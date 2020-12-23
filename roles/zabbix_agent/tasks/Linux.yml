@@ -263,6 +263,12 @@
     - firewalld-reload
   tags: zabbix_agent_firewalld_enable
 
+- name: "Remove zabbix-agent installation when zabbix-agent2 is used."
+  include: remove.yml
+  when:
+    - zabbix_agent2
+    - zabbix_agent_package_remove
+
 - name: "Make sure the zabbix-agent service is running"
   service:
     name: "{{ zabbix_agent_service }}"

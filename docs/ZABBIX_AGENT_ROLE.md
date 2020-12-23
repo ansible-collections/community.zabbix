@@ -124,6 +124,7 @@ The following is an overview of all available configuration default for this rol
 * `zabbix_agent_server`: The ip address for the zabbix-server or zabbix-proxy.
 * `zabbix_agent_serveractive`: The ip address for the zabbix-server or zabbix-proxy for active checks.
 * `zabbix_agent_listeninterface`: Interface zabbix-agent listens on. Leave blank for all.
+* `zabbix_agent_package_remove`: If `zabbix_agent2: True` and you want to remove the old installation. Default: `False`.
 * `zabbix_agent_package`: The name of the zabbix-agent package. Default: `zabbix-agent`. In case for EPEL, it is automatically renamed.
 * `zabbix_sender_package`: The name of the zabbix-sender package. Default: `zabbix-sender`. In case for EPEL, it is automatically renamed.
 * `zabbix_get_package`: The name of the zabbix-get package. Default: `zabbix-get`. In case for EPEL, it is automatically renamed.
