@@ -36,6 +36,9 @@ jobs:
             image: geerlingguy/docker-ubuntu1804-ansible
             group: agent
           - container: debian
+            image: geerlingguy/docker-debian10-ansible
+            group: agent
+          - container: debian
             image: geerlingguy/docker-debian9-ansible
             group: agent
           - container: debian

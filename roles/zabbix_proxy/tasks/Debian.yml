@@ -7,6 +7,7 @@
   set_fact:
     zabbix_short_version: "{{ zabbix_version | regex_replace('\\.', '') }}"
     zabbix_python_prefix: "python{% if ansible_python_version is version('3', '>=') %}3{% endif %}"
+    zabbix_underscore_version: "{{ zabbix_version | regex_replace('\\.', '_') }}"
 
 - name: "Debian | Set some facts"
   set_fact:
@@ -97,6 +98,26 @@
   when:
     zabbix_proxy_deb_version is not defined
 
+- name: "Debian | Create /etc/apt/preferences.d/"
+  file:
+    path: /etc/apt/preferences.d/
+    state: directory
+  when:
+    - zabbix_proxy_apt_priority | int
+  become: yes
+
+- name: "Debian | Configuring the weight for APT"
+  copy:
+    dest: "/etc/apt/preferences.d/zabbix-proxy-{{ zabbix_proxy_database }}"
+    content: |
+      Package: zabbix-proxy-{{ zabbix_proxy_database }}
+      Pin: origin repo.zabbix.com
+      Pin-Priority: {{ zabbix_proxy_apt_priority }}
+    owner: root
+  when:
+    - zabbix_proxy_apt_priority | int
+  become: yes
+
 - name: "Debian | Installing zabbix-proxy-{{ zabbix_proxy_database }}"
   apt:
     pkg: "{{ deb_pkg }}"
@@ -104,6 +125,7 @@
     cache_valid_time: 3600
     force: yes
     state: "{{ zabbix_proxy_package_state }}"
+    default_release: "{{ ansible_distribution_release }}"
   register: is_zabbix_proxy_package_installed
   until: is_zabbix_proxy_package_installed is succeeded
   become: yes

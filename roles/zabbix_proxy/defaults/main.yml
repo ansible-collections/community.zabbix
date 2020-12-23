@@ -1,7 +1,7 @@
 ---
 # defaults file for zabbix-proxy
 
-zabbix_proxy_version: 5.0
+zabbix_proxy_version: 5.2
 zabbix_version: "{{ zabbix_proxy_version }}"
 zabbix_selinux: False
 
@@ -12,6 +12,7 @@ zabbix_selinux: False
 # zabbix_proxy_ubuntu_version: 1:4.4.4-1+xenial
 
 zabbix_repo: zabbix
+zabbix_proxy_apt_priority:
 zabbix_proxy_package_state: present
 zabbix_proxy_install_database_client: True
 zabbix_install_pip_packages: true

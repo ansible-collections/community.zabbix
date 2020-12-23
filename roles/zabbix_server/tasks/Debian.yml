@@ -10,6 +10,7 @@
       - "http://repo.zabbix.com/zabbix/{{ zabbix_version }}/{{ ansible_distribution.lower() }}/"
       - "{{ ansible_distribution_release }}"
       - "main"
+    zabbix_underscore_version: "{{ zabbix_version | regex_replace('\\.', '_') }}"
     zabbix_python_prefix: "python{% if ansible_python_version is version('3', '>=') %}3{% endif %}"
 
 - name: "Debian | Set some facts"
@@ -69,6 +70,26 @@
     - zabbix-server
     - init
 
+- name: "Debian | Create /etc/apt/preferences.d/"
+  file:
+    path: /etc/apt/preferences.d/
+    state: directory
+  when:
+    - zabbix_server_apt_priority | int
+  become: yes
+
+- name: "Debian | Configuring the weight for APT"
+  copy:
+    dest: "/etc/apt/preferences.d/zabbix_server-{{ zabbix_proxy_database }}"
+    content: |
+      Package: zabbix_server-{{ zabbix_proxy_database }}
+      Pin: origin repo.zabbix.com
+      Pin-Priority: {{ zabbix_server_apt_priority }}
+    owner: root
+  when:
+    - zabbix_server_apt_priority | int
+  become: yes
+
 - name: apt-get clean
   shell: apt-get clean; rm -rf /tmp/*; apt-get update
   args:
@@ -104,6 +125,7 @@
     update_cache: yes
     cache_valid_time: 0
     install_recommends: "{{ zabbix_server_install_recommends }}"
+    default_release: "{{ ansible_distribution_release }}"
   register: zabbix_server_package_installed
   until: zabbix_server_package_installed is succeeded
   become: yes
