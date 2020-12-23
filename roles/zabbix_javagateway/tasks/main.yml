@@ -35,7 +35,8 @@
     - zabbix-java-gateway restarted
 
 - name: "Make sure Zabbix Java Gateway is running"
-  service:
+  systemd:
     name: zabbix-java-gateway
     state: started
     enabled: yes
+    daemon_reload: true
