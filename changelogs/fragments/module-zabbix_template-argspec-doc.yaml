@@ -1,0 +1,2 @@
+bugfixes:
+  - zabbix_template - fixed documentation for ``macros`` argument.
