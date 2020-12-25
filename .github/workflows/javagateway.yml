@@ -4,11 +4,13 @@ on:
     paths:
       - 'roles/zabbix_javagateway/**'
       - 'molecule/zabbix_javagateway/**'
+      - 'molecule/requirements.txt'
       - '.github/workflows/javagateway.yml'
   pull_request:
     paths:
       - 'roles/zabbix_javagateway/**'
       - 'molecule/zabbix_javagateway/**'
+      - 'molecule/requirements.txt'
       - '.github/workflows/javagateway.yml'
 jobs:
   molecule:
