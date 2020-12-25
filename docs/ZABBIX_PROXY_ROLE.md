@@ -2,7 +2,7 @@
 
 ![Zabbix Proxy](https://github.com/ansible-collections/community.zabbix/workflows/community.zabbix.zabbix_proxy/badge.svg)
 
-**Table of Content**
+**Table of Contents**
 
 - [Overview](#overview)
   * [Operating systems](#operating-systems)

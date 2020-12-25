@@ -2,7 +2,7 @@
 
 ![Zabbix Web](https://github.com/ansible-collections/community.zabbix/workflows/community.zabbix.zabbix_web/badge.svg)
 
-**Table of contents**
+**Table of Contents**
 
 - [Overview](#overview)
 - [Requirements](#requirements)
