@@ -6,6 +6,7 @@
 
 - [Requirements](#requirements)
   * [Operating systems](#operating-systems)
+    + [Windows](#windows)
   * [Local system access](#local-system-access)
   * [Zabbix Versions](#zabbix-versions)
 - [Getting started](#getting-started)
@@ -52,6 +53,16 @@ This role will work on the following operating systems:
 
 So, you'll need one of those operating systems.. :-)
 Please send Pull Requests or suggestions when you want to use this role for other Operating systems.
+
+### Windows
+
+When you are a Windows user and using Ansible 2.10 or newer, then there is a dependency on a collection named `ansible.windows`. This collection is needed as the `win_service` is part of this collection and not standard in Ansible anymmore. Installing the collection:
+
+```sh
+ansible-galaxy collection install ansible.windows
+```
+
+For more information, see: https://github.com/ansible-collections/community.zabbix/issues/236 
 
 ## Local system access
 
