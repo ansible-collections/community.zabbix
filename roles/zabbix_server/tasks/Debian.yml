@@ -40,6 +40,9 @@
     cache_valid_time: 3600
     force: yes
     state: present
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   register: gnupg_installed
   until: gnupg_installed is succeeded
   become: yes
@@ -126,6 +129,9 @@
     cache_valid_time: 0
     install_recommends: "{{ zabbix_server_install_recommends }}"
     default_release: "{{ ansible_distribution_release }}"
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   register: zabbix_server_package_installed
   until: zabbix_server_package_installed is succeeded
   become: yes
@@ -137,6 +143,9 @@
   apt:
     name: "{{ zabbix_python_prefix }}-psycopg2"
     state: present
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   register: zabbix_server_dependencies_installed
   until: zabbix_server_dependencies_installed is succeeded
   become: yes
@@ -152,6 +161,9 @@
       - mysql-client
       - "{{ zabbix_python_prefix }}-mysqldb"
     state: present
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   register: zabbix_server_dependencies_installed
   until: zabbix_server_dependencies_installed is succeeded
   become: yes
@@ -170,6 +182,9 @@
       - mariadb-client
       - "{{ zabbix_python_prefix }}-mysqldb"
     state: present
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   register: zabbix_server_dependencies_installed
   until: zabbix_server_dependencies_installed is succeeded
   become: yes
@@ -186,6 +201,9 @@
   apt:
     name: postgresql-client
     state: present
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   register: zabbix_server_dependencies_installed
   until: zabbix_server_dependencies_installed is succeeded
   become: yes

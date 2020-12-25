@@ -56,6 +56,9 @@
     update_cache: yes
     force: yes
     cache_valid_time: 3600
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   register: zabbix_java_gateway_install
   until: zabbix_java_gateway_install is succeeded
   become: yes

@@ -14,6 +14,7 @@
     + [Zabbix Proxy](#zabbix-proxy)
     + [Database specific](#database-specific)
     + [TLS Specific configuration](#tls-specific-configuration)
+  * [proxy](#proxy)
   * [Database](#database)
     + [MySQL](#mysql)
       - [Local Setup](#local-setup)
@@ -155,6 +156,13 @@ This parameter is supported since Zabbix 5.0.0.
 * `zabbix_proxy_dbtlskeyfile`: Full pathname of file containing the private key for authenticating to database. This parameter is supported since Zabbix 5.0.0.
 * `zabbix_proxy_dbtlscipher`: The list of encryption ciphers that Zabbix Proxy permits for TLS protocols up through TLSv1.2. Supported only for MySQL.This parameter is supported since Zabbix 5.0.0.
 * `zabbix_proxy_dbtlscipher13`: The list of encryption ciphersuites that Zabbix Proxy permits for TLSv1.3 protocol. Supported only for MySQL, starting from version 8.0.16. This parameter is supported since Zabbix 5.0.0.
+
+## proxy
+
+When the target host does not have access to the internet, but you do have a proxy available then the following properties needs to be set to download the packages via the proxy:
+
+* `zabbix_http_proxy`
+* `zabbix_https_proxy`
 
 ## Database
 
