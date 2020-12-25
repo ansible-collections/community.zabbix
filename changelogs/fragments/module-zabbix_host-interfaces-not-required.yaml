@@ -1,0 +1,2 @@
+bugfixes:
+  - zabbix_host - module will no longer require ``interfaces`` to be present when creating host  with Zabbix 5.2.
