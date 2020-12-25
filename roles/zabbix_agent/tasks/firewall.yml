@@ -1,0 +1,53 @@
+---
+
+- name: "Firewall | Configure IPTables (zabbix_agent_listenport)"
+  iptables:
+    action: "{{ zabbix_agent_firewall_action }}"
+    destination_port: "{{ zabbix_agent_listenport | string }}"
+    source: "{{ zabbix_agent_firewall_source | default(omit) }}"
+    protocol: tcp
+    chain: "{{ zabbix_agent_firewall_chain }}"
+    jump: ACCEPT
+  become: yes
+  when:
+    - zabbix_agent_firewall_enable | bool
+
+- name: "Firewall | Configure IPTables (zabbix_agent_jmx_listenport)"
+  iptables:
+    action: "{{ zabbix_agent_firewall_action }}"
+    destination_port: "{{ zabbix_agent_listenport | string }}"
+    source: "{{ zabbix_agent_firewall_source | default(omit) }}"
+    protocol: tcp
+    chain: "{{ zabbix_agent_firewall_chain }}"
+    jump: ACCEPT
+  become: yes
+  when:
+    - zabbix_agent_firewall_enable | bool
+    - zabbix_agent_jmx_listenport | bool
+
+- name: "Firewall | Configure firewalld (zabbix_agent_listenport)"
+  firewalld:
+    rich_rule: 'rule family="ipv4" source address="{{ zabbix_agent_firewalld_source }}" port protocol="tcp" port="{{ zabbix_agent_listenport }}" accept'
+    zone: "{{ zabbix_agent_firewalld_zone }}"
+    permanent: true
+    state: enabled
+  become: yes
+  when:
+    - zabbix_agent_firewalld_enable | bool
+  notify:
+    - firewalld-reload
+  tags: zabbix_agent_firewalld_enable
+
+- name: "Firewall | Configure firewalld (zabbix_agent_jmx_listenport)"
+  firewalld:
+    rich_rule: 'rule family="ipv4" source address="{{ zabbix_agent_firewalld_source }}" port protocol="tcp" port="{{ zabbix_agent_jmx_listenport }}" accept'
+    zone: "{{ zabbix_agent_firewalld_zone }}"
+    permanent: true
+    state: enabled
+  become: yes
+  when:
+    - zabbix_agent_firewalld_enable | bool
+    - zabbix_agent_jmx_listenport | bool
+  notify:
+    - firewalld-reload
+  tags: zabbix_agent_firewalld_enable
