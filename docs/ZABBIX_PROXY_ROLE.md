@@ -1,6 +1,8 @@
 # community.zabbix.zabbix_proxy role
 
-Table of Content
+![Zabbix Proxy](https://github.com/ansible-collections/community.zabbix/workflows/community.zabbix.zabbix_proxy/badge.svg)
+
+**Table of Content**
 
 - [Overview](#overview)
   * [Operating systems](#operating-systems)

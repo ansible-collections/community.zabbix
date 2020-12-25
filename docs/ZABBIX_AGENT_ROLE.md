@@ -1,6 +1,8 @@
 # community.zabbix.zabbix_agent role
 
-Table of Contents
+![Zabbix Agent](https://github.com/ansible-collections/community.zabbix/workflows/community.zabbix.zabbix_agent/badge.svg)
+
+**Table of Contents**
 
 - [Requirements](#requirements)
   * [Operating systems](#operating-systems)

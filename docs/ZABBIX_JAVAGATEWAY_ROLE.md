@@ -1,6 +1,8 @@
 # community.zabbix.zabbix_javagateway role
 
-Table of Contents
+![Zabbix Javagateway](https://github.com/ansible-collections/community.zabbix/workflows/community.zabbix.zabbix_javagateway/badge.svg)
+
+**Table of Contents**
 
 - [Overview](#overview)
   * [Operating systems](#operating-systems)

@@ -1,6 +1,8 @@
 # community.zabbix.zabbix_web role
 
-Table of contents
+![Zabbix Web](https://github.com/ansible-collections/community.zabbix/workflows/community.zabbix.zabbix_web/badge.svg)
+
+**Table of contents**
 
 - [Overview](#overview)
 - [Requirements](#requirements)
