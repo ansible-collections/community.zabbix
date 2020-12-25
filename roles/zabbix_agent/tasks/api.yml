@@ -1,0 +1,135 @@
+---
+
+- name: "API | Installing the Zabbix-api package on localhost"
+  pip:
+    name: zabbix-api
+    state: present
+  register: zabbix_api_package_installed
+  until: zabbix_api_package_installed is succeeded
+  delegate_to: localhost
+  run_once: True
+  become: "{{ zabbix_agent_become_on_localhost }}"
+  when:
+    - zabbix_install_pip_packages | bool
+    - (zabbix_api_create_hostgroup | bool) or (zabbix_api_create_hosts | bool)
+
+- name: "API | Create hostgroups"
+  zabbix_group:
+    server_url: "{{ zabbix_url }}"
+    http_login_user: "{{ zabbix_api_http_user | default(omit) }}"
+    http_login_password: "{{ zabbix_api_http_password | default(omit) }}"
+    login_user: "{{ zabbix_api_user }}"
+    login_password: "{{ zabbix_api_pass }}"
+    host_group: "{{ zabbix_host_groups }}"
+    state: "{{ zabbix_create_hostgroup }}"
+    validate_certs: "{{ zabbix_validate_certs|default(omit) }}"
+  when:
+    - zabbix_api_create_hostgroup | bool
+  register: zabbix_api_hostgroup_created
+  until: zabbix_api_hostgroup_created is succeeded
+  delegate_to: localhost
+  become: no
+  tags:
+    - api
+
+- name: "API | Create a new host or update an existing host's info"
+  zabbix_host:
+    server_url: "{{ zabbix_url }}"
+    http_login_user: "{{ zabbix_api_http_user | default(omit) }}"
+    http_login_password: "{{ zabbix_api_http_password | default(omit) }}"
+    login_user: "{{ zabbix_api_user }}"
+    login_password: "{{ zabbix_api_pass }}"
+    host_name: "{{ zabbix_agent_hostname }}"
+    host_groups: "{{ zabbix_host_groups }}"
+    link_templates: "{{ zabbix_link_templates }}"
+    status: "{{ zabbix_host_status }}"
+    state: "{{ zabbix_create_host }}"
+    force: "{{ zabbix_update_host }}"
+    proxy: "{{ zabbix_proxy }}"
+    inventory_mode: "{{ zabbix_inventory_mode }}"
+    interfaces: "{{ zabbix_agent_interfaces }}"
+    visible_name: "{{ zabbix_visible_hostname | default(zabbix_agent_hostname) }}"
+    tls_psk: "{{ zabbix_agent_tlspsk_secret | default(omit) }}"
+    tls_psk_identity: "{{ zabbix_agent_tlspskidentity | default(omit) }}"
+    tls_issuer: "{{ zabbix_agent_tlsservercertissuer | default(omit) }}"
+    tls_subject: "{{ zabbix_agent_tlsservercertsubject | default(omit) }}"
+    tls_accept: "{{ zabbix_agent_tls_config[zabbix_agent_tlsaccept if zabbix_agent_tlsaccept else 'unencrypted'] }}"
+    tls_connect: "{{ zabbix_agent_tls_config[zabbix_agent_tlsconnect if zabbix_agent_tlsconnect else 'unencrypted'] }}"
+    validate_certs: "{{ zabbix_validate_certs | default(omit) }}"
+    description: "{{ zabbix_agent_description | default(omit) }}"
+    inventory_zabbix: "{{ zabbix_agent_inventory_zabbix | default({}) }}"
+    ipmi_authtype: "{{ zabbix_agent_ipmi_authtype | default(omit) }}"
+    ipmi_password: "{{ zabbix_agent_ipmi_password| default(omit) }}"
+    ipmi_privilege: "{{ zabbix_agent_ipmi_privilege | default(omit) }}"
+    ipmi_username: "{{ zabbix_agent_ipmi_username | default(omit) }}"
+  when:
+    - not zabbix_agent2
+  register: zabbix_api_host_created
+  until: zabbix_api_host_created is succeeded
+  delegate_to: localhost
+  become: no
+  changed_when: false
+  tags:
+    - api
+
+- name: "API | Create a new host using agent2 or update an existing host's info"
+  zabbix_host:
+    server_url: "{{ zabbix_url }}"
+    http_login_user: "{{ zabbix_api_http_user | default(omit) }}"
+    http_login_password: "{{ zabbix_api_http_password | default(omit) }}"
+    login_user: "{{ zabbix_api_user }}"
+    login_password: "{{ zabbix_api_pass }}"
+    host_name: "{{ zabbix_agent_hostname }}"
+    host_groups: "{{ zabbix_host_groups }}"
+    link_templates: "{{ zabbix_link_templates }}"
+    status: "{{ zabbix_host_status }}"
+    state: "{{ zabbix_create_host }}"
+    force: "{{ zabbix_update_host }}"
+    proxy: "{{ zabbix_proxy }}"
+    inventory_mode: "{{ zabbix_inventory_mode }}"
+    interfaces: "{{ zabbix_agent_interfaces }}"
+    visible_name: "{{ zabbix_visible_hostname | default(zabbix_agent_hostname) }}"
+    tls_psk: "{{ zabbix_agent2_tlspsk_secret | default(omit) }}"
+    tls_psk_identity: "{{ zabbix_agent2_tlspskidentity | default(omit) }}"
+    tls_issuer: "{{ zabbix_agent2_tlsservercertissuer | default(omit) }}"
+    tls_subject: "{{ zabbix_agent2_tlsservercertsubject | default(omit) }}"
+    tls_accept: "{{ zabbix_agent_tls_config[zabbix_agent2_tlsaccept if zabbix_agent2_tlsaccept else 'unencrypted'] }}"
+    tls_connect: "{{ zabbix_agent_tls_config[zabbix_agent2_tlsconnect if zabbix_agent2_tlsconnect else 'unencrypted'] }}"
+    validate_certs: "{{ zabbix_validate_certs | default(omit) }}"
+    description: "{{ zabbix_agent_description | default(omit) }}"
+    inventory_zabbix: "{{ zabbix_agent_inventory_zabbix | default({}) }}"
+    ipmi_authtype: "{{ zabbix_agent_ipmi_authtype | default(omit) }}"
+    ipmi_password: "{{ zabbix_agent_ipmi_password| default(omit) }}"
+    ipmi_privilege: "{{ zabbix_agent_ipmi_privilege | default(omit) }}"
+    ipmi_username: "{{ zabbix_agent_ipmi_username | default(omit) }}"
+  when:
+    - zabbix_agent2 | bool
+  register: zabbix_api_host_created
+  until: zabbix_api_host_created is succeeded
+  delegate_to: localhost
+  become: no
+  changed_when: false
+  tags:
+    - api
+
+- name: "API | Updating host configuration with macros"
+  zabbix_hostmacro:
+    server_url: "{{ zabbix_url }}"
+    http_login_user: "{{ zabbix_api_http_user | default(omit) }}"
+    http_login_password: "{{ zabbix_api_http_password | default(omit) }}"
+    login_user: "{{ zabbix_api_user }}"
+    login_password: "{{ zabbix_api_pass }}"
+    host_name: "{{ zabbix_agent_hostname }}"
+    macro_name: "{{ item.macro_key }}"
+    macro_value: "{{ item.macro_value }}"
+    validate_certs: "{{ zabbix_validate_certs | default(omit) }}"
+  with_items: "{{ zabbix_macros | default([]) }}"
+  when:
+    - zabbix_macros is defined
+    - item.macro_key is defined
+  register: zabbix_api_hostmarcro_created
+  until: zabbix_api_hostmarcro_created is succeeded
+  delegate_to: localhost
+  become: no
+  tags:
+    - api
