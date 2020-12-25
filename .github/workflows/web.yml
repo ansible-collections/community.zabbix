@@ -4,11 +4,13 @@ on:
     paths:
       - 'roles/zabbix_web/**'
       - 'molecule/zabbix_web/**'
+      - 'molecule/requirements.txt'
       - '.github/workflows/web.yml'
   pull_request:
     paths:
       - 'roles/zabbix_web/**'
       - 'molecule/zabbix_web/**'
+      - 'molecule/requirements.txt'
       - '.github/workflows/web.yml'
 jobs:
   molecule:
