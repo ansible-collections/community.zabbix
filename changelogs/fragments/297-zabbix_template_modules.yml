@@ -1,0 +1,4 @@
+bugfixes:
+  - zabbix_template - fixed encode error occurs when using Python2 (https://github.com/ansible-collections/community.zabbix/pull/297).
+bugfixes:
+  - zabbix_template_info - fixed encode error occurs when using Python2 (https://github.com/ansible-collections/community.zabbix/pull/297).
