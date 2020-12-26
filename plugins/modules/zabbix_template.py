@@ -80,15 +80,17 @@ options:
         type: list
         elements: dict
         suboptions:
-            name:
+            macro:
                 description:
                     - Name of the macro.
                     - Must be specified in {$NAME} format.
                 type: str
+                required: true
             value:
                 description:
                     - Value of the macro.
                 type: str
+                required: true
     dump_format:
         description:
             - Format to use when dumping template with C(state=dump).
@@ -631,7 +633,14 @@ def main():
         template_groups=dict(type='list', required=False),
         link_templates=dict(type='list', required=False),
         clear_templates=dict(type='list', required=False),
-        macros=dict(type='list', required=False),
+        macros=dict(
+            type='list',
+            elements='dict',
+            options=dict(
+                macro=dict(type='str', required=True),
+                value=dict(type='str', required=True)
+            )
+        ),
         omit_date=dict(type='bool', required=False, default=False),
         dump_format=dict(type='str', required=False, default='json', choices=['json', 'xml']),
         state=dict(type='str', default="present", choices=['present', 'absent', 'dump']),
