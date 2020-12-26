@@ -1,2 +1,2 @@
 bugfixes:
-  - zabbix_template - fixed documentation for ``macros`` argument.
+  - zabbix_template - fixed documentation for ``macros`` argument (https://github.com/ansible-collections/community.zabbix/pull/296).
