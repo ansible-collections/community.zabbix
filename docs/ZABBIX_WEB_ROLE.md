@@ -17,6 +17,7 @@
       - [Nginx configuration](#nginx-configuration)
       - [PHP-FPM](#php-fpm)
     - [Zabbix Server](#zabbix-server)
+  * [proxy](#proxy)
 - [Example Playbook](#example-playbook)
   - [Single instance](#single-instance)
   - [Multi host setup](#multi-host-setup)
@@ -189,6 +190,13 @@ The following properties are related when using Elasticsearch for history storag
 See the following links for more information regarding Zabbix and Elasticsearch
 https://www.zabbix.com/documentation/3.4/manual/appendix/install/elastic_search_setup
 https://www.zabbix.com/documentation/4.0/manual/appendix/install/elastic_search_setup
+
+## proxy
+
+When the target host does not have access to the internet, but you do have a proxy available then the following properties needs to be set to download the packages via the proxy:
+
+* `zabbix_http_proxy`
+* `zabbix_https_proxy`
 
 # Example Playbook
 

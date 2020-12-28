@@ -44,6 +44,9 @@
     state: "{{ zabbix_web_package_state }}"
     update_cache: yes
     cache_valid_time: 0
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   register: zabbix_web_package_install
   until: zabbix_web_package_install is succeeded
   become: yes
@@ -100,3 +103,8 @@
     - init
     - config
     - nginx
+
+- name: "Configure SELinux when enabled"
+  include: selinux.yml
+  when:
+    - zabbix_selinux | bool

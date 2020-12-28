@@ -105,6 +105,9 @@
     state: "{{ zabbix_server_package_state }}"
     disablerepo: "{{ '*' if (zabbix_repo_yum_enabled | length>0) else omit }}"
     enablerepo: "{{ zabbix_repo_yum_enabled if zabbix_repo_yum_enabled is iterable and (zabbix_repo_yum_enabled | length>0) else omit }}"
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   register: zabbix_server_package_installed
   until: zabbix_server_package_installed is succeeded
   become: yes
@@ -115,6 +118,9 @@
   yum:
     name: python-psycopg2
     state: present
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   register: zabbix_server_dependencies_installed
   until: zabbix_server_dependencies_installed is succeeded
   become: yes
@@ -129,6 +135,9 @@
   yum:
     name: python3-psycopg2
     state: present
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   register: zabbix_server_dependencies_installed
   until: zabbix_server_dependencies_installed is succeeded
   become: yes
@@ -145,6 +154,9 @@
       - mariadb
       - MySQL-python
     state: present
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   register: zabbix_server_dependencies_installed
   until: zabbix_server_dependencies_installed is succeeded
   become: yes
@@ -160,6 +172,9 @@
       - mysql
       - MySQL-python
     state: present
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   register: zabbix_server_dependencies_installed
   until: zabbix_server_dependencies_installed is succeeded
   become: yes
@@ -173,6 +188,9 @@
   yum:
     name: postgresql
     state: present
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   register: zabbix_server_dependencies_installed
   until: zabbix_server_dependencies_installed is succeeded
   become: yes
@@ -181,97 +199,7 @@
   tags:
     - zabbix-server
 
-- name: "RedHat | Install related SELinux package"
-  yum:
-    name:
-      - libsemanage-python
-      - policycoreutils
-      - checkpolicy
-    state: present
-  register: zabbix_server_dependencies_installed
-  until: zabbix_server_dependencies_installed is succeeded
-  become: yes
-  when:
-    - selinux_allow_zabbix_can_network
-    - ansible_distribution_major_version == "7" or ansible_distribution_major_version == "6"
-    - zabbix_selinux | bool
-  tags:
-    - zabbix-server
-
-- name: "RedHat | Install related SELinux package on RHEL8"
-  yum:
-    name:
-      - python3-libsemanage
-    state: present
-  register: zabbix_server_dependencies_installed
-  until: zabbix_server_dependencies_installed is succeeded
-  become: yes
-  when:
-    - selinux_allow_zabbix_can_network
-    - ansible_distribution_major_version == "8"
-    - zabbix_selinux | bool
-  tags:
-    - zabbix-server
-
-- name: "RedHat | Enable httpd_can_connect_zabbix SELinux boolean"
-  seboolean:
-    name: httpd_can_connect_zabbix
-    state: yes
-    persistent: yes
-  become: yes
-  when:
-    - selinux_allow_zabbix_can_http
-    - zabbix_selinux | bool
-  tags:
-    - zabbix-server
-
-- name: "RedHat | Enable zabbix_can_network SELinux boolean"
-  seboolean:
-    name: zabbix_can_network
-    state: yes
-    persistent: yes
-  become: yes
-  when:
-    - selinux_allow_zabbix_can_network
-    - zabbix_selinux | bool
-  tags:
-    - zabbix-server
-
-- name: "RedHat | Install related SELinux package to fix issues"
-  yum:
-    name:
-      - policycoreutils-python
-    state: present
-  register: zabbix_server_dependencies_installed
-  until: zabbix_server_dependencies_installed is succeeded
-  become: yes
-  when:
-    - ansible_distribution_major_version == "7" or ansible_distribution_major_version == "6"
-    - zabbix_selinux | bool
-  tags:
-    - zabbix-server
-
-- name: "RedHat | Install related SELinux package to fix issues on RHEL8"
-  yum:
-    name:
-      - policycoreutils
-      - checkpolicy
-      - python3-libsemanage
-    state: present
-  register: zabbix_server_dependencies_installed
-  until: zabbix_server_dependencies_installed is succeeded
-  become: yes
-  when:
-    - ansible_distribution_major_version == "8"
-    - zabbix_selinux | bool
-  tags:
-    - zabbix-server
-
-- name: "RedHat | Add SEmodule to fix SELinux issue: zabbix_server_alerter.sock"
-  script:
-    cmd: files/install_semodule.bsx
-  args:
-    creates: /etc/selinux/targeted/active/modules/400/zabbix_server_add/cil
-    become: yes
+- name: "Configure SELinux when enabled"
+  include: selinux.yml
   when:
     - zabbix_selinux | bool
