@@ -1,0 +1,81 @@
+---
+
+- name: "SELinux | RedHat | Install related SELinux package"
+  yum:
+    name:
+      - libsemanage-python
+    state: present
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
+  register: zabbix_web_dependencies_installed
+  until: zabbix_web_dependencies_installed is succeeded
+  become: yes
+  when:
+    - ansible_os_family == "RedHat"
+    - selinux_allow_zabbix_can_network
+    - ansible_distribution_major_version == "7" or ansible_distribution_major_version == "6"
+  tags:
+    - zabbix-web
+
+- name: "SELinux | RedHat | Install related SELinux package on RHEL8"
+  yum:
+    name:
+      - python3-libsemanage
+    state: present
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
+  register: zabbix_web_dependencies_installed
+  until: zabbix_web_dependencies_installed is succeeded
+  become: yes
+  when:
+    - ansible_os_family == "RedHat"
+    - selinux_allow_zabbix_can_network
+  tags:
+    - zabbix-web
+
+- name: "SELinux | RedHat | Enable zabbix_can_network SELinux boolean"
+  seboolean:
+    name: zabbix_can_network
+    state: yes
+    persistent: yes
+  become: yes
+  when:
+    - ansible_os_family == "RedHat"
+    - selinux_allow_zabbix_can_network
+  tags:
+    - zabbix-web
+
+- name: "SELinux | Allow httpd to connect to db (SELinux)"
+  seboolean:
+    name: httpd_can_network_connect_db
+    persistent: yes
+    state: yes
+  become: yes
+  when:
+    - ansible_selinux.status == "enabled"
+    - selinux_allow_zabbix_can_network
+  tags: selinux
+
+- name: "SELinux | Allow httpd to connect to zabbix (SELinux)"
+  seboolean:
+    name: httpd_can_connect_zabbix
+    persistent: yes
+    state: yes
+  become: yes
+  when:
+    - ansible_selinux.status == "enabled"
+    - selinux_allow_zabbix_can_network
+  tags: selinux
+
+- name: "SELinux | Allow httpd to connect to ldap (SELinux)"
+  seboolean:
+    name: httpd_can_connect_ldap
+    persistent: yes
+    state: yes
+  become: yes
+  when:
+    - ansible_selinux.status == "enabled"
+    - zabbix_apache_can_connect_ldap | bool
+  tags: selinux

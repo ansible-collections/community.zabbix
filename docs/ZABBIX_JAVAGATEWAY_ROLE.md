@@ -8,6 +8,10 @@
   * [Operating systems](#operating-systems)
   * [Zabbix Versions](#zabbix-versions)
 - [Role Variables](#role-variables)
+  * [Main variables](#main-variables)
+    + [Overall Zabbix](#overall-zabbix)
+    + [Java Gatewaty](#java-gatewaty)
+    + [proxy](#proxy)
 - [Dependencies](#dependencies)
 - [Example Playbook](#example-playbook)
 - [Molecule](#molecule)
@@ -76,6 +80,13 @@ The following is an overview of all available configuration default for this rol
 * `zabbix_javagateway_listenip`: Default: `0.0.0.0`. The IP address to listen on.
 * `zabbix_javagateway_listenport`: Default: `10052`. The port on which Java Gateway is listening on.
 * `zabbix_javagateway_startpollers`: Default: `5`. The amount of pollers to start.
+
+### proxy
+
+When the target host does not have access to the internet, but you do have a proxy available then the following properties needs to be set to download the packages via the proxy:
+
+* `zabbix_http_proxy`
+* `zabbix_https_proxy`
 
 # Dependencies
 

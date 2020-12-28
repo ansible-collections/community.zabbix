@@ -38,6 +38,9 @@
     cache_valid_time: 3600
     force: yes
     state: present
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   register: gnupg_installed
   until: gnupg_installed is succeeded
   become: yes
@@ -126,6 +129,9 @@
     force: yes
     state: "{{ zabbix_proxy_package_state }}"
     default_release: "{{ ansible_distribution_release }}"
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   register: is_zabbix_proxy_package_installed
   until: is_zabbix_proxy_package_installed is succeeded
   become: yes
@@ -134,6 +140,9 @@
   apt:
     name: "{{ zabbix_python_prefix }}-psycopg2"
     state: present
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   register: zabbix_proxy_dependencies_installed
   until: zabbix_proxy_dependencies_installed is succeeded
   become: yes
@@ -149,6 +158,9 @@
       - mysql-client
       - "{{ zabbix_python_prefix }}-mysqldb"
     state: present
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   register: zabbix_proxy_dependencies_installed
   until: zabbix_proxy_dependencies_installed is succeeded
   become: yes
@@ -167,6 +179,9 @@
       - mariadb-client
       - "{{ zabbix_python_prefix }}-mysqldb"
     state: present
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   register: zabbix_proxy_dependencies_installed
   until: zabbix_proxy_dependencies_installed is succeeded
   become: yes
@@ -183,6 +198,9 @@
   apt:
     name: postgresql-client
     state: present
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   register: are_zabbix_proxy_dependency_packages_installed
   until: are_zabbix_proxy_dependency_packages_installed is succeeded
   become: yes
@@ -199,6 +217,9 @@
   apt:
     name: sqlite
     state: present
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   register: are_zabbix_proxy_dependency_packages_installed
   until: are_zabbix_proxy_dependency_packages_installed is succeeded
   become: yes

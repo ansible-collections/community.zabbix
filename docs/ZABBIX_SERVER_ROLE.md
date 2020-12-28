@@ -17,6 +17,7 @@
     + [Database specific](#database-specific)
     + [TLS Specific configuration](#tls-specific-configuration)
     + [Custom Zabbix Scripts](#custom-zabbix-scripts)
+  * [proxy](#proxy)
   * [Database](#database)
     + [MySQL](#mysql)
       - [Local Setup](#local-setup)
@@ -184,6 +185,13 @@ Example:
     - path: "{{ lookup('first_found', 'zabbix-scripts/somescript.php') }}"
       name: "somescript.php"
 ```
+
+## proxy
+
+When the target host does not have access to the internet, but you do have a proxy available then the following properties needs to be set to download the packages via the proxy:
+
+* `zabbix_http_proxy`
+* `zabbix_https_proxy`
 
 ## Database
 
