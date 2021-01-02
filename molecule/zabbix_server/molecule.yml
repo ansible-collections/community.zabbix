@@ -1,10 +1,4 @@
 ---
-dependency:
-  name: galaxy
-  options:
-    ignore-certs: True
-    ignore-errors: True
-    role-file: requirements-roles.yml
 
 driver:
   name: docker
@@ -57,18 +51,18 @@ verifier:
   lint:
     name: flake8
 
-scenario:
-  test_sequence:
-    - dependency
-    - lint
-    - cleanup
-    - destroy
-    - syntax
-    - create
-    - prepare
-    - converge
-    # - idempotence
-    - side_effect
-    - verify
-    - cleanup
-    - destroy
+# scenario:
+#   test_sequence:
+#     - dependency
+#     - lint
+#     - cleanup
+#     - destroy
+#     - syntax
+#     - create
+#     - prepare
+#     - converge
+#     # - idempotence
+#     - side_effect
+#     - verify
+#     - cleanup
+#     - destroy
