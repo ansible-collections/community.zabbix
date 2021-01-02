@@ -1,0 +1,3 @@
+bugfixes:
+    - "The 'interface' option was missing when creating an Proxy via the API."
+    - "Added new property 'zabbix_proxy_ip' to determine ip for host running the Zabbix Proxy."
