@@ -15,6 +15,8 @@ zabbix_url: zabbix.example.com
 zabbix_websrv: apache
 zabbix_websrv_servername: "{{ zabbix_url | regex_findall('(?:https?\\://)?([\\w\\-\\.]+)') | first }}"
 zabbix_url_aliases: []
+zabbix_web_htpasswd: False
+zabbix_web_htpasswd_file: /etc/zabbix/web/htpasswd
 zabbix_apache_vhost_port: 80
 zabbix_apache_vhost_tls_port: 443
 zabbix_timezone: Europe/Amsterdam

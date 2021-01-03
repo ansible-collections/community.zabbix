@@ -92,3 +92,11 @@
     - zabbix-web
     - init
     - config
+
+- include_tasks: access.yml
+  when:
+    - zabbix_web_htpasswd
+  tags:
+    - zabbix-web
+    - init
+    - config
