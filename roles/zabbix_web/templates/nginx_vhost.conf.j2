@@ -26,13 +26,14 @@ server {
     allow {{ ip }};
 {% endfor %}
     deny all;
+
 {% endif %}
 {% if zabbix_web_htpasswd is defined and zabbix_web_htpasswd %}
     # HTTP authentication via zabbix_web_htpasswd
     auth_basic "Restricted";
     auth_basic_user_file {{ zabbix_web_htpasswd_file }};
-{% endif %}
 
+{% endif %}
     root    /usr/share/zabbix;
 
     index   index.php;
