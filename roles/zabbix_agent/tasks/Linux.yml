@@ -81,13 +81,6 @@
     - zabbix-agent
     - config
 
-- name: "Only install the Zabbix Agent"
-  set_fact:
-    zabbix_agent_packages:
-      - "{{ zabbix_agent_package }}"
-  when:
-    - zabbix_agent_install_agent_only
-
 # straight to getenforce binary , workaround for missing python_selinux library
 - name: "Get getenforce binary"
   stat:

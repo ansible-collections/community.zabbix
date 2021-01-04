@@ -30,6 +30,13 @@
     - zabbix-agent
     - init
 
+- name: "Only install the Zabbix Agent"
+  set_fact:
+    zabbix_agent_packages:
+      - "{{ zabbix_agent_package }}"
+  when:
+    - zabbix_agent_install_agent_only
+
 - name: "Suse | Install zabbix-agent"
   zypper:
     name: "{{ zabbix_agent_packages }}"
