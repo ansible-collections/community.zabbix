@@ -5,6 +5,7 @@
   when:
     - zabbix_web_htpasswd is defined
     - zabbix_web_htpasswd
+    - zabbix_web_htpasswd_users is defined
 
 - name: "htpasswd | install passlib for Python interpreter"
   package:
@@ -13,6 +14,7 @@
   when:
     - zabbix_web_htpasswd is defined
     - zabbix_web_htpasswd
+    - zabbix_web_htpasswd_users is defined
 
 - name: "htpasswd | manage HTTP authentication controls"
   htpasswd:
@@ -27,3 +29,4 @@
   when:
     - zabbix_web_htpasswd is defined
     - zabbix_web_htpasswd
+    - zabbix_web_htpasswd_users is defined
