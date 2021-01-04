@@ -1,10 +1,10 @@
 # Nginx configuration for Zabbix Web
 
 server {
-    {% if not zabbix_nginx_tls %}
-    listen          80;
-    {% else %}
-    {% if zabbix_letsencrypt %}
+{% if not zabbix_nginx_tls %}
+    listen 80;
+{% else %}
+{% if zabbix_letsencrypt %}
     server_tokens off;
     server_name     {{ zabbix_websrv_servername }} {% for alias in zabbix_url_aliases -%}{{ alias -}} {% endfor %};
     location ^~ /.well-known/acme-challenge {
@@ -18,8 +18,8 @@ server {
 }
 
 server {
-    {% endif %}
-    listen          443 ssl http2;
+{% endif %}
+    listen 443 ssl;
 {% if zabbix_letsencrypt and zabbix_letsencrypt_cert.stat.exists %}
     ssl_certificate /etc/letsencrypt/live/{{ zabbix_websrv_servername }}/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/{{ zabbix_websrv_servername }}/privkey.pem;
@@ -36,7 +36,8 @@ server {
     ssl_ciphers {{ zabbix_nginx_tls_ciphers }};
     ssl_prefer_server_ciphers off;
 
-    {% endif %}
+{% endif %}
+    server_tokens off;
     server_name     {{ zabbix_websrv_servername }} {% for alias in zabbix_url_aliases -%}{{ alias -}} {% endfor %};
 
     root    /usr/share/zabbix;
