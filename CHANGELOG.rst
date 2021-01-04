@@ -5,6 +5,42 @@ community.zabbix Release Notes
 .. contents:: Topics
 
 
+v1.2.0
+======
+
+Minor Changes
+-------------
+
+- Added a new property `zabbix_agent_dont_detect_ip` when set to true, it won't detect the ips and no need to install the python module `netaddr`.
+- Added parameter `zabbix_agent_package_remove` when set to `true` and `zabbix_agent2` is set to `true` it will uninstall the `zabbix-agent` service and package.
+- Updated the roles to Zabbix 5.2
+- zabbix_user - added new parameters to set timezone and role_name for users (https://github.com/ansible-collections/community.zabbix/pull/260).
+- zabbix_user - user_medias now defaults to None and is optional (https://github.com/ansible-collections/community.zabbix/pull/264).
+- zabbix_web - added `zabbix_web_rhel_release` which enable scl on RHEL (https://github.com/ansible-collections/community.zabbix/pull/266).
+
+Bugfixes
+--------
+
+- Added missing paragraph for the SQLite3 as database.
+- Agent 2 also be able to use userparameters file.
+- The become option was missing in some essential tasks when installing the Zabbix Proxy with SQLite3 as database.
+- There was an task that wasn't able to use an http(s)_proxy environment while installing an package.
+- Various documentation fixes removing the Zabbix Server and replaced it with actual Zabbix Proxy information.
+- When installing the Zabbix packages, we disable all other yum repositories except the one for the Zabbix.
+- Windows - Able to create PSK file
+- Windows - Fixing download links to proper version/url
+- Windows - Removal of not working property
+- Zabbix packages were not able to install properly on Fedora. When the packages are installed, the version will be appended to the package name. This is eofr all RedHat related OS'es.
+- zabbix_agent - fixed issue with zabbix_agent2_tlspsk_auto having no effect when using zabbix_agent2
+- zabbix_agent - fixed issue with zabbix_api_create_hosts and TLS configuration when using zabbix_agent2, where zabbix_agent_tls* settings were used instead of zabbix_agent2_tls*
+- zabbix_template - fixed documentation for ``macros`` argument (https://github.com/ansible-collections/community.zabbix/pull/296).
+- zabbix_template - fixed encode error when using Python2 (https://github.com/ansible-collections/community.zabbix/pull/297).
+- zabbix_template - fixed issue when importing templates to zabbix version. >= 5.2
+- zabbix_template_info - fixed encode error when using Python2 (https://github.com/ansible-collections/community.zabbix/pull/297).
+- zabbix_user - disable no_log warning for option override_password.
+- zabbix_user - fixed issue where module couldn't create a user since Zabbix 5.2 (https://github.com/ansible-collections/community.zabbix/pull/260).
+- zabbix_web - fixed issue Role cannot install Zabbix web 5.0 on RHEL 7 (https://github.com/ansible-collections/community.zabbix/issues/202).
+
 v1.1.0
 ======
 
