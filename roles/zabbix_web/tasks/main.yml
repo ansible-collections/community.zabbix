@@ -44,16 +44,13 @@
   when:
     - zabbix_websrv == 'apache'
 
-- name: "Set websrv specific variables (nginx)"
-  set_fact:
-    zabbix_web_conf_web_user: "{{ zabbix_web_conf_web_user if zabbix_web_conf_web_user is defined else _nginx_user }}"
-    zabbix_web_conf_web_group: "{{ zabbix_web_conf_web_group if zabbix_web_conf_web_group is defined else _nginx_group }}"
-  when:
-    - zabbix_websrv == 'nginx'
-
 - include_tasks: apache.yml
   when:
     - zabbix_websrv == 'apache'
+
+- include_tasks: nginx.yml
+  when:
+    - zabbix_websrv == 'nginx'
 
 - name: "Install the correct repository"
   include: "RedHat.yml"
@@ -92,36 +89,3 @@
     - zabbix-web
     - init
     - config
-
-- name: "Allow httpd to connect to db (SELinux)"
-  seboolean:
-    name: httpd_can_network_connect_db
-    persistent: yes
-    state: yes
-  become: yes
-  when:
-    - ansible_selinux.status == "enabled"
-    - selinux_allow_zabbix_can_network
-  tags: selinux
-
-- name: "Allow httpd to connect to zabbix (SELinux)"
-  seboolean:
-    name: httpd_can_connect_zabbix
-    persistent: yes
-    state: yes
-  become: yes
-  when:
-    - ansible_selinux.status == "enabled"
-    - selinux_allow_zabbix_can_network
-  tags: selinux
-
-- name: "Allow httpd to connect to ldap (SELinux)"
-  seboolean:
-    name: httpd_can_connect_ldap
-    persistent: yes
-    state: yes
-  become: yes
-  when:
-    - ansible_selinux.status == "enabled"
-    - zabbix_apache_can_connect_ldap|bool
-  tags: selinux

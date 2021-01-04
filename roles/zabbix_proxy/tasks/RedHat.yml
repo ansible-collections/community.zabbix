@@ -118,6 +118,9 @@
     state: "{{ zabbix_proxy_package_state }}"
     disablerepo: "{{ '*' if (zabbix_repo_yum_enabled | length>0) else omit }}"
     enablerepo: "{{ zabbix_repo_yum_enabled if zabbix_repo_yum_enabled is iterable and (zabbix_repo_yum_enabled | length>0) else omit }}"
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   become: yes
   register: is_zabbix_proxy_package_installed
   until: is_zabbix_proxy_package_installed is succeeded
@@ -126,6 +129,9 @@
   yum:
     name: python-psycopg2
     state: present
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   become: yes
   register: are_zabbix_proxy_dependency_packages_installed
   until: are_zabbix_proxy_dependency_packages_installed is succeeded
@@ -141,6 +147,9 @@
   yum:
     name: python3-psycopg2
     state: present
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   register: zabbix_proxy_dependencies_installed
   until: zabbix_proxy_dependencies_installed is succeeded
   become: yes
@@ -153,8 +162,13 @@
 
 - name: "RedHat | Install Mysql Client package RHEL7"
   yum:
-    name: ['mariadb', 'MySQL-python']
+    name:
+      - mariadb
+      - MySQL-python
     state: installed
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   become: yes
   register: are_zabbix_proxy_dependency_packages_installed
   until: are_zabbix_proxy_dependency_packages_installed is succeeded
@@ -168,8 +182,13 @@
 
 - name: "RedHat | Install Mysql Client package RHEL5 - 6"
   yum:
-    name: ['mysql', 'MySQL-python']
+    name:
+      - mysql
+      - MySQL-python
     state: present
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   become: yes
   register: are_zabbix_proxy_dependency_packages_installed
   until: are_zabbix_proxy_dependency_packages_installed is succeeded
@@ -187,6 +206,9 @@
   yum:
     name: postgresql
     state: present
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   become: yes
   register: are_zabbix_proxy_dependency_packages_installed
   until: are_zabbix_proxy_dependency_packages_installed is succeeded
@@ -199,43 +221,14 @@
     - init
     - database
 
-- name: "RedHat | Install related SELinux package to fix issues"
-  yum:
-    name:
-      - policycoreutils-python
-      - libsemanage-python
-      - checkpolicy
-    state: present
-  register: zabbix_proxy_dependencies_installed
-  until: zabbix_proxy_dependencies_installed is succeeded
-  become: yes
-  when:
-    - ansible_distribution_major_version == "7" or ansible_distribution_major_version == "6"
-    - zabbix_selinux | bool
-  tags:
-    - zabbix-proxy
-
-- name: "RedHat | Install related SELinux package to fix issues on RHEL8"
-  yum:
-    name:
-      - policycoreutils
-      - checkpolicy
-      - python3-libsemanage
-    state: present
-  register: zabbix_proxy_dependencies_installed
-  until: zabbix_proxy_dependencies_installed is succeeded
-  become: yes
-  when:
-    - ansible_distribution_major_version == "8"
-    - zabbix_selinux | bool
-  tags:
-    - zabbix-proxy
-
 - name: "RedHat | Install sqlite3"
   yum:
     name:
       - sqlite
     state: present
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   register: zabbix_proxy_dependencies_installed
   until: zabbix_proxy_dependencies_installed is succeeded
   become: yes
@@ -244,13 +237,7 @@
   tags:
     - zabbix-proxy
 
-- name: "RedHat | Add SEmodule to fix SELinux issue: zabbix_proxy_alerter.sock"
-  script:
-    cmd: files/install_semodule.bsx
-  args:
-    creates: /etc/selinux/targeted/active/modules/400/zabbix_proxy_add/cil
-  become: yes
+- name: "Configure SELinux when enabled"
+  include: selinux.yml
   when:
     - zabbix_selinux | bool
-  tags:
-    - zabbix-proxy

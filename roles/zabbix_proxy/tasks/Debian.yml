@@ -7,6 +7,7 @@
   set_fact:
     zabbix_short_version: "{{ zabbix_version | regex_replace('\\.', '') }}"
     zabbix_python_prefix: "python{% if ansible_python_version is version('3', '>=') %}3{% endif %}"
+    zabbix_underscore_version: "{{ zabbix_version | regex_replace('\\.', '_') }}"
 
 - name: "Debian | Set some facts"
   set_fact:
@@ -37,6 +38,9 @@
     cache_valid_time: 3600
     force: yes
     state: present
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   register: gnupg_installed
   until: gnupg_installed is succeeded
   become: yes
@@ -97,6 +101,26 @@
   when:
     zabbix_proxy_deb_version is not defined
 
+- name: "Debian | Create /etc/apt/preferences.d/"
+  file:
+    path: /etc/apt/preferences.d/
+    state: directory
+  when:
+    - zabbix_proxy_apt_priority | int
+  become: yes
+
+- name: "Debian | Configuring the weight for APT"
+  copy:
+    dest: "/etc/apt/preferences.d/zabbix-proxy-{{ zabbix_proxy_database }}"
+    content: |
+      Package: zabbix-proxy-{{ zabbix_proxy_database }}
+      Pin: origin repo.zabbix.com
+      Pin-Priority: {{ zabbix_proxy_apt_priority }}
+    owner: root
+  when:
+    - zabbix_proxy_apt_priority | int
+  become: yes
+
 - name: "Debian | Installing zabbix-proxy-{{ zabbix_proxy_database }}"
   apt:
     pkg: "{{ deb_pkg }}"
@@ -104,6 +128,10 @@
     cache_valid_time: 3600
     force: yes
     state: "{{ zabbix_proxy_package_state }}"
+    default_release: "{{ ansible_distribution_release }}"
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   register: is_zabbix_proxy_package_installed
   until: is_zabbix_proxy_package_installed is succeeded
   become: yes
@@ -112,6 +140,9 @@
   apt:
     name: "{{ zabbix_python_prefix }}-psycopg2"
     state: present
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   register: zabbix_proxy_dependencies_installed
   until: zabbix_proxy_dependencies_installed is succeeded
   become: yes
@@ -127,6 +158,9 @@
       - mysql-client
       - "{{ zabbix_python_prefix }}-mysqldb"
     state: present
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   register: zabbix_proxy_dependencies_installed
   until: zabbix_proxy_dependencies_installed is succeeded
   become: yes
@@ -145,6 +179,9 @@
       - mariadb-client
       - "{{ zabbix_python_prefix }}-mysqldb"
     state: present
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   register: zabbix_proxy_dependencies_installed
   until: zabbix_proxy_dependencies_installed is succeeded
   become: yes
@@ -161,6 +198,9 @@
   apt:
     name: postgresql-client
     state: present
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   register: are_zabbix_proxy_dependency_packages_installed
   until: are_zabbix_proxy_dependency_packages_installed is succeeded
   become: yes
@@ -177,6 +217,9 @@
   apt:
     name: sqlite
     state: present
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   register: are_zabbix_proxy_dependency_packages_installed
   until: are_zabbix_proxy_dependency_packages_installed is succeeded
   become: yes

@@ -1,9 +1,12 @@
 # community.zabbix.zabbix_agent role
 
-Table of Contents
+![Zabbix Agent](https://github.com/ansible-collections/community.zabbix/workflows/community.zabbix.zabbix_agent/badge.svg)
+
+**Table of Contents**
 
 - [Requirements](#requirements)
   * [Operating systems](#operating-systems)
+    + [Windows](#windows)
   * [Local system access](#local-system-access)
   * [Zabbix Versions](#zabbix-versions)
 - [Getting started](#getting-started)
@@ -51,6 +54,16 @@ This role will work on the following operating systems:
 So, you'll need one of those operating systems.. :-)
 Please send Pull Requests or suggestions when you want to use this role for other Operating systems.
 
+### Windows
+
+When you are a Windows user and using Ansible 2.10 or newer, then there is a dependency on a collection named `ansible.windows`. This collection is needed as the `win_service` is part of this collection and not standard in Ansible anymmore. Installing the collection:
+
+```sh
+ansible-galaxy collection install ansible.windows
+```
+
+For more information, see: https://github.com/ansible-collections/community.zabbix/issues/236 
+
 ## Local system access
 
 To successfully complete the install the role requires `python-netaddr` on the controller to be able to manage IP addresses. This requires that the library is available on your local machine (or that `pip` is installed to be able to run). This will likely mean that running the role will require `sudo` access to your local machine and therefore you may need the `-K` flag to be able to enter your local machine password if you are not running under root.
@@ -59,24 +72,24 @@ To successfully complete the install the role requires `python-netaddr` on the c
 
 See the following list of supported Operating systems with the Zabbix releases:
 
-| Zabbix              | 5.0 | 4.4 | 4.0 (LTS) | 3.0 (LTS) |
-|---------------------|-----|-----|-----------|-----------|
-| Red Hat Fam 8       | V   | V   |           |           |
-| Red Hat Fam 7       | V   | V   | V         | V         |
-| Red Hat Fam 6       | V   |     |           | V         |
-| Red Hat Fam 5       | V   |     |           | V         |
-| Fedora              |     | V   | V         |           |
-| Ubuntu 20.04 focal  | V   |     |           |           |
-| Ubuntu 19.10 eoan   |     |     |           |           |
-| Ubuntu 18.04 bionic | V   | V   | V         |           |
-| Ubuntu 16.04 xenial | V   | V   | V         |           |
-| Ubuntu 14.04 trusty | V   | V   | V         | V         |
-| Debian 10 buster    | V   | V   |           |           |
-| Debian 9 stretch    | V   | V   | V         |           |
-| Debian 8 jessie     | V   | V   | V         | V         |
-| Debian 7 wheezy     |     |     | V         | V         |
-| macOS 10.15         |     | V   | V         |           |
-| macOS 10.14         |     | V   | V         |           |
+| Zabbix              | 5.2 | 5.0 | 4.4 | 4.0 (LTS) | 3.0 (LTS) |
+|---------------------|-----|-----|-----|-----------|-----------|
+| Red Hat Fam 8       |  V  |  V  | V   |           |           |
+| Red Hat Fam 7       |  V  |  V  | V   | V         | V         |
+| Red Hat Fam 6       |  V  |  V  |     |           | V         |
+| Red Hat Fam 5       |  V  |  V  |     |           | V         |
+| Fedora              |     |     | V   | V         |           |
+| Ubuntu 20.04 focal  |  V  |  V  |     |           |           |
+| Ubuntu 19.10 eoan   |     |     |     |           |           |
+| Ubuntu 18.04 bionic |  V  |  V  | V   | V         |           |
+| Ubuntu 16.04 xenial |  V  |  V  | V   | V         |           |
+| Ubuntu 14.04 trusty |  V  |  V  | V   | V         | V         |
+| Debian 10 buster    |  V  |  V  | V   |           |           |
+| Debian 9 stretch    |  V  |  V  | V   | V         |           |
+| Debian 8 jessie     |  V  |  V  | V   | V         | V         |
+| Debian 7 wheezy     |     |     |     | V         | V         |
+| macOS 10.15         |     |     | V   | V         |           |
+| macOS 10.14         |     |     | V   | V         |           |
 
 # Getting started
 
@@ -104,7 +117,7 @@ The following is an overview of all available configuration default for this rol
 
 ### Overall Zabbix
 
-* `zabbix_agent_version`: This is the version of zabbix. Default: 5.0. Can be overridden to 4.4, 4.0, 3.4, 3.2, 3.0, 2.4, or 2.2. Previously the variable `zabbix_version` was used directly but it could cause [some inconvenience](https://github.com/dj-wasabi/ansible-zabbix-agent/pull/303). That variable is maintained by retrocompativility.
+* `zabbix_agent_version`: This is the version of zabbix. Default: 5.2. Can be overridden to 5.0, 4.4, 4.0, 3.4, 3.2, 3.0, 2.4, or 2.2. Previously the variable `zabbix_version` was used directly but it could cause [some inconvenience](https://github.com/dj-wasabi/ansible-zabbix-agent/pull/303). That variable is maintained by retrocompativility.
 * `zabbix_repo`: Default: `zabbix`
   * `epel`: install agent from EPEL repo
   * `zabbix`: (default) install agent from Zabbix repo
@@ -124,6 +137,7 @@ The following is an overview of all available configuration default for this rol
 * `zabbix_agent_server`: The ip address for the zabbix-server or zabbix-proxy.
 * `zabbix_agent_serveractive`: The ip address for the zabbix-server or zabbix-proxy for active checks.
 * `zabbix_agent_listeninterface`: Interface zabbix-agent listens on. Leave blank for all.
+* `zabbix_agent_package_remove`: If `zabbix_agent2: True` and you want to remove the old installation. Default: `False`.
 * `zabbix_agent_package`: The name of the zabbix-agent package. Default: `zabbix-agent`. In case for EPEL, it is automatically renamed.
 * `zabbix_sender_package`: The name of the zabbix-sender package. Default: `zabbix-sender`. In case for EPEL, it is automatically renamed.
 * `zabbix_get_package`: The name of the zabbix-get package. Default: `zabbix-get`. In case for EPEL, it is automatically renamed.

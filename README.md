@@ -1,6 +1,29 @@
 # Zabbix collection for Ansible
 
-![plugins](https://github.com/ansible-collections/community.zabbix/workflows/plugins/badge.svg)
+Plugins:
+
+![plugins](https://github.com/ansible-collections/community.zabbix/workflows/plugins-integration/badge.svg) ![repo-sanity](https://github.com/ansible-collections/community.zabbix/workflows/repo-sanity/badge.svg)
+
+Roles:
+
+![Zabbix Agent](https://github.com/ansible-collections/community.zabbix/workflows/community.zabbix.zabbix_agent/badge.svg) ![Zabbix Server](https://github.com/ansible-collections/community.zabbix/workflows/community.zabbix.zabbix_server/badge.svg) ![Zabbix Proxy](https://github.com/ansible-collections/community.zabbix/workflows/community.zabbix.zabbix_proxy/badge.svg) ![Zabbix Web](https://github.com/ansible-collections/community.zabbix/workflows/community.zabbix.zabbix_web/badge.svg) ![Zabbix Javagateway](https://github.com/ansible-collections/community.zabbix/workflows/community.zabbix.zabbix_javagateway/badge.svg)
+
+**Table of Contents**
+
+- [Zabbix collection for Ansible](#zabbix-collection-for-ansible)
+  * [Introduction](#introduction)
+  * [Included content](#included-content)
+  * [Installation](#installation)
+    + [Requirements](#requirements)
+    + [Installing the Collection from Ansible Galaxy](#installing-the-collection-from-ansible-galaxy)
+    + [Upgrading collection](#upgrading-collection)
+  * [Usage](#usage)
+  * [Supported Zabbix versions](#supported-zabbix-versions)
+  * [Collection life cycle and support](#collection-life-cycle-and-support)
+  * [Contributing](#contributing)
+  * [License](#license)
+
+## Introduction
 
 This repo hosts the `community.zabbix` Ansible Collection.
 
