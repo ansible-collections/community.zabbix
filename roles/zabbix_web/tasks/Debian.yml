@@ -85,25 +85,6 @@
   when:
     - zabbix_websrv == 'apache'
 
-- name: "Debian | Install Nginx vhost"
-  template:
-    src: nginx_vhost.conf.j2
-    dest: /etc/nginx/conf.d/zabbix.conf
-    owner: root
-    group: root
-    mode: 0644
-  when:
-    - zabbix_vhost
-    - zabbix_websrv == 'nginx'
-  become: yes
-  notify:
-    - restart nginx
-  tags:
-    - zabbix-web
-    - init
-    - config
-    - nginx
-
 - name: "Configure SELinux when enabled"
   include: selinux.yml
   when:

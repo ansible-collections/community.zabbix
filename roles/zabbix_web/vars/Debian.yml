@@ -12,3 +12,9 @@ _zabbix_php_fpm_allowed_clients: 127.0.0.1
 
 _nginx_user: www-data
 _nginx_group: www-data
+_nginx_config_path: /etc/nginx/conf.d
+_nginx_log_path: /var/log/nginx
+_nginx_service: nginx
+_nginx_tls_crt: /etc/ssl/certs/ssl-cert-snakeoil.pem
+_nginx_tls_key: /etc/ssl/private/ssl-cert-snakeoil.key
+_nginx_tls_dhparam: /etc/ssl/private/dhparams.pem

@@ -10,3 +10,9 @@ _php_fpm_listen: /run/php-fpm/zabbix.sock
 
 _nginx_user: nginx
 _nginx_group: nginx
+_nginx_config_path: /etc/nginx/conf.d
+_nginx_log_path: /var/log/nginx
+_nginx_service: nginx
+_nginx_tls_crt: /etc/pki/server.crt
+_nginx_tls_key: /etc/pki/server.key
+_nginx_tls_dhparam: /etc/pki/dhparam-server.pem
