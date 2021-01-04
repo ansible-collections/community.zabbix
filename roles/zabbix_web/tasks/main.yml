@@ -44,16 +44,13 @@
   when:
     - zabbix_websrv == 'apache'
 
-- name: "Set websrv specific variables (nginx)"
-  set_fact:
-    zabbix_web_conf_web_user: "{{ zabbix_web_conf_web_user if zabbix_web_conf_web_user is defined else _nginx_user }}"
-    zabbix_web_conf_web_group: "{{ zabbix_web_conf_web_group if zabbix_web_conf_web_group is defined else _nginx_group }}"
-  when:
-    - zabbix_websrv == 'nginx'
-
 - include_tasks: apache.yml
   when:
     - zabbix_websrv == 'apache'
+
+- include_tasks: nginx.yml
+  when:
+    - zabbix_websrv == 'nginx'
 
 - name: "Install the correct repository"
   include: "RedHat.yml"
