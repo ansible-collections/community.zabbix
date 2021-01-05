@@ -18,6 +18,7 @@ Minor Changes
 - zabbix_user - added new parameters to set timezone and role_name for users (https://github.com/ansible-collections/community.zabbix/pull/260).
 - zabbix_user - user_medias now defaults to None and is optional (https://github.com/ansible-collections/community.zabbix/pull/264).
 - zabbix_web - added `zabbix_web_rhel_release` which enable scl on RHEL (https://github.com/ansible-collections/community.zabbix/pull/266).
+- zabbix_web - quality of life improvements when using Nginx (https://github.com/ansible-collections/community.zabbix/pull/304).
 
 Bugfixes
 --------
