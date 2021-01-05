@@ -146,8 +146,8 @@ Bugfixes
 New Modules
 -----------
 
-- community.zabbix.zabbix_discovery_rule - Manage Zabbix discovery rules
-- community.zabbix.zabbix_usergroup - Manage Zabbix user groups
+- community.zabbix.zabbix_discovery_rule - Create/delete/update Zabbix discovery rules
+- community.zabbix.zabbix_usergroup - Create/delete/update Zabbix user groups
 
 v0.2.0
 ======
