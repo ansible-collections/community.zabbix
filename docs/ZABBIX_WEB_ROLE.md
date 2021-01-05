@@ -108,6 +108,10 @@ The following is an overview of all available configuration defaults for this ro
 * `zabbix_web_env`: (Optional) A Dictionary of PHP Environments settings.
 * `zabbix_web_conf_web_user`: When provided, the user (which should already exist on the host) will be used for ownership for web/php related processes. (Default set to either `apache` (`www-data` for Debian) or `nginx`).
 * `zabbix_web_conf_web_group`: When provided, the group (which should already exist on the host) will be used for ownership for web/php related processes. (Default set to either `apache` (`www-data` for Debian) or `nginx`).
+* `zabbix_web_htpasswd`: (Optional) Allow HTTP authentication at the webserver level via a htpasswd file.
+* `zabbix_web_htpasswd_file`: Default: `/etc/zabbix/web/htpasswd`. Allows the change the default path to the htpasswd file.
+* `zabbix_web_htpasswd_users`: (Optional) Dictionary for creating users via `htpasswd_user` and passphrases via `htpasswd_pass` in htpasswd file.
+* `zabbix_web_allowlist_ips`: (Optional) Allow web access at webserver level to a list of defined IPs or CIDR.
 
 #### Apache configuration
 
