@@ -40,6 +40,21 @@ server {
     server_tokens off;
     server_name     {{ zabbix_websrv_servername }} {% for alias in zabbix_url_aliases -%}{{ alias -}} {% endfor %};
 
+{% if zabbix_web_allowlist_ips is defined and zabbix_web_allowlist_ips %}
+    # Allow list IPs via zabbix_web_allowlist_ips
+    satisfy any;
+{% for ip in zabbix_web_allowlist_ips | ipaddr %}
+    allow {{ ip }};
+{% endfor %}
+    deny all;
+
+{% endif %}
+{% if zabbix_web_htpasswd is defined and zabbix_web_htpasswd %}
+    # HTTP authentication via zabbix_web_htpasswd
+    auth_basic "Restricted";
+    auth_basic_user_file {{ zabbix_web_htpasswd_file }};
+
+{% endif %}
     root    /usr/share/zabbix;
 
     index   index.php;

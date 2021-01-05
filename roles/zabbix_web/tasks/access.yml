@@ -1,0 +1,32 @@
+---
+- name: "htpasswd | check Python version to set prefix variable"
+  set_fact:
+    zabbix_python_prefix: "python{% if ansible_python_version is version_compare('3', '>=') %}3{% endif %}"
+  when:
+    - zabbix_web_htpasswd is defined
+    - zabbix_web_htpasswd
+    - zabbix_web_htpasswd_users is defined
+
+- name: "htpasswd | install passlib for Python interpreter"
+  package:
+    name: "{{ zabbix_python_prefix }}-passlib"
+    state: present
+  when:
+    - zabbix_web_htpasswd is defined
+    - zabbix_web_htpasswd
+    - zabbix_web_htpasswd_users is defined
+
+- name: "htpasswd | manage HTTP authentication controls"
+  htpasswd:
+    path: "{{ zabbix_web_htpasswd_file }}"
+    name: "{{ item.value.htpasswd_user }}"
+    password: "{{ item.value.htpasswd_pass }}"
+    group: www-data
+    state: present
+  loop_control:
+    label: "{{ item.value.htpasswd_user }}"
+  with_dict: "{{ zabbix_web_htpasswd_users }}"
+  when:
+    - zabbix_web_htpasswd is defined
+    - zabbix_web_htpasswd
+    - zabbix_web_htpasswd_users is defined
