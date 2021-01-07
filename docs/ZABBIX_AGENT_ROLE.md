@@ -133,6 +133,7 @@ The following is an overview of all available configuration default for this rol
 
 ### Zabbix Agent
 
+* `zabbix_agent_ip`: The IP address of the host. When not provided, it will be determined via the `ansible_default_ipv4` fact.
 * `zabbix_agent2`: Default: `False`. When you want to install the `Zabbix Agent2` instead of the "old" `Zabbix Agent`.
 * `zabbix_agent_server`: The ip address for the zabbix-server or zabbix-proxy.
 * `zabbix_agent_serveractive`: The ip address for the zabbix-server or zabbix-proxy for active checks.

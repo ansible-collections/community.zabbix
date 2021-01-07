@@ -89,6 +89,7 @@ The following is an overview of all available configuration default for this rol
 
 ### Zabbix Proxy
 
+* `zabbix_proxy_ip`: The IP address of the host. When not provided, it will be determined via the `ansible_default_ipv4` fact.
 * `zabbix_server_host`: The ip or dns name for the zabbix-server machine.
 * `zabbix_server_port`: The port on which the zabbix-server is running. Default: 10051
 * `*zabbix_proxy_package_state`: Default: `present`. Can be overridden to `latest` to update packages
