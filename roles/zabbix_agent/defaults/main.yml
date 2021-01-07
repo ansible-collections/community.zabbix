@@ -22,6 +22,7 @@ zabbix_agent_dont_detect_ip: False
 # Selinux related vars 
 selinux_allow_zabbix_run_sudo: False
 
+zabbix_agent_install_agent_only: False
 zabbix_agent_packages:
   - "{{ zabbix_agent_package }}"
   - "{{ zabbix_sender_package }}"
