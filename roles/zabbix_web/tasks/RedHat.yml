@@ -52,6 +52,9 @@
     update_cache: yes
     disablerepo: "{{ '*' if (zabbix_repo_yum_enabled | length>0) else omit }}"
     enablerepo: "{{ zabbix_repo_yum_enabled if zabbix_repo_yum_enabled is iterable and (zabbix_repo_yum_enabled | length>0) else omit }}"
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   register: zabbix_web_dependency_package_install
   until: zabbix_web_dependency_package_install is succeeded
   become: yes
@@ -72,6 +75,9 @@
     update_cache: yes
     disablerepo: "{{ '*' if (zabbix_repo_yum_enabled | length>0) else omit }}"
     enablerepo: "{{ zabbix_repo_yum_enabled if zabbix_repo_yum_enabled is iterable and (zabbix_repo_yum_enabled | length>0) else omit }}"
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   register: zabbix_web_dependency_package_install
   until: zabbix_web_dependency_package_install is succeeded
   become: yes
@@ -91,6 +97,9 @@
     update_cache: yes
     disablerepo: "{{ '*' if (zabbix_repo_yum_enabled | length>0) else omit }}"
     enablerepo: "{{ zabbix_repo_yum_enabled if zabbix_repo_yum_enabled is iterable and (zabbix_repo_yum_enabled | length>0) else omit }}"
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   register: zabbix_web_package_install
   until: zabbix_web_package_install is succeeded
   become: yes
@@ -108,6 +117,9 @@
     update_cache: yes
     disablerepo: "{{ '*' if (zabbix_repo_yum_enabled | length>0) else omit }}"
     enablerepo: "{{ zabbix_repo_yum_enabled if zabbix_repo_yum_enabled is iterable and (zabbix_repo_yum_enabled | length>0) else omit }}"
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   register: zabbix_web_package_install
   until: zabbix_web_package_install is succeeded
   become: yes
@@ -152,41 +164,7 @@
     - config
     - nginx
 
-- name: "RedHat | Install related SELinux package"
-  yum:
-    name:
-      - libsemanage-python
-    state: present
-  register: zabbix_web_dependencies_installed
-  until: zabbix_web_dependencies_installed is succeeded
-  become: yes
+- name: "Configure SELinux when enabled"
+  include: selinux.yml
   when:
-    - selinux_allow_zabbix_can_network
-    - ansible_distribution_major_version == "7" or ansible_distribution_major_version == "6"
-  tags:
-    - zabbix-web
-
-- name: "RedHat | Install related SELinux package on RHEL8"
-  yum:
-    name:
-      - python3-libsemanage
-    state: present
-  register: zabbix_web_dependencies_installed
-  until: zabbix_web_dependencies_installed is succeeded
-  become: yes
-  when:
-    - selinux_allow_zabbix_can_network
-    - ansible_distribution_major_version == "8"
-  tags:
-    - zabbix-web
-
-- name: "RedHat | Enable zabbix_can_network SELinux boolean"
-  seboolean:
-    name: zabbix_can_network
-    state: yes
-    persistent: yes
-  become: yes
-  when:
-    - selinux_allow_zabbix_can_network
-  tags:
-    - zabbix-web
+    - zabbix_selinux | bool

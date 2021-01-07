@@ -1,0 +1,124 @@
+---
+
+# straight to getenforce binary , workaround for missing python_selinux library
+- name: "Get getenforce binary"
+  stat:
+    path: /usr/sbin/getenforce
+  register: getenforce_bin
+  become: yes
+
+- name: "Collect getenforce output"
+  command: getenforce
+  register: sestatus
+  when: 'getenforce_bin.stat.exists'
+  changed_when: false
+  become: yes
+  check_mode: no
+
+- name: "Set zabbix_selinux to true if getenforce returns Enforcing or Permissive"
+  set_fact:
+    zabbix_selinux: "{{ true }}"
+  when: 'getenforce_bin.stat.exists and ("Enforcing" in sestatus.stdout or "Permissive" in sestatus.stdout)'
+
+- name: "SELinux | RedHat | Install related SELinux package"
+  yum:
+    name:
+      - libsemanage-python
+      - policycoreutils
+      - checkpolicy
+    state: present
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
+  register: zabbix_server_dependencies_installed
+  until: zabbix_server_dependencies_installed is succeeded
+  become: yes
+  when:
+    - ansible_os_family == "RedHat"
+    - selinux_allow_zabbix_can_network
+    - ansible_distribution_major_version == "7" or ansible_distribution_major_version == "6"
+  tags:
+    - zabbix-server
+
+- name: "SELinux | RedHat | Install related SELinux package on RHEL8"
+  yum:
+    name:
+      - python3-libsemanage
+    state: present
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
+  register: zabbix_server_dependencies_installed
+  until: zabbix_server_dependencies_installed is succeeded
+  become: yes
+  when:
+    - ansible_os_family == "RedHat"
+    - selinux_allow_zabbix_can_network
+    - ansible_distribution_major_version == "8"
+  tags:
+    - zabbix-server
+
+- name: "SELinux | RedHat | Enable httpd_can_connect_zabbix SELinux boolean"
+  seboolean:
+    name: httpd_can_connect_zabbix
+    state: yes
+    persistent: yes
+  become: yes
+  when:
+    - selinux_allow_zabbix_can_http
+  tags:
+    - zabbix-server
+
+- name: "SELinux | RedHat | Enable zabbix_can_network SELinux boolean"
+  seboolean:
+    name: zabbix_can_network
+    state: yes
+    persistent: yes
+  become: yes
+  when:
+    - selinux_allow_zabbix_can_network
+  tags:
+    - zabbix-server
+
+- name: "SELinux | RedHat | Install related SELinux package to fix issues"
+  yum:
+    name:
+      - policycoreutils-python
+    state: present
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
+  register: zabbix_server_dependencies_installed
+  until: zabbix_server_dependencies_installed is succeeded
+  become: yes
+  when:
+    - ansible_os_family == "RedHat"
+    - ansible_distribution_major_version == "7" or ansible_distribution_major_version == "6"
+  tags:
+    - zabbix-server
+
+- name: "SELinux | RedHat | Install related SELinux package to fix issues on RHEL8"
+  yum:
+    name:
+      - policycoreutils
+      - checkpolicy
+      - python3-libsemanage
+    state: present
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
+  register: zabbix_server_dependencies_installed
+  until: zabbix_server_dependencies_installed is succeeded
+  become: yes
+  when:
+    - ansible_os_family == "RedHat"
+    - ansible_distribution_major_version == "8"
+  tags:
+    - zabbix-server
+
+- name: "SELinux | RedHat | Add SEmodule to fix SELinux issue: zabbix_server_alerter.sock"
+  script:
+    cmd: files/install_semodule.bsx
+  args:
+    creates: /etc/selinux/targeted/active/modules/400/zabbix_server_add/cil
+    become: yes

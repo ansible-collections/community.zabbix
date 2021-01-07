@@ -4,11 +4,13 @@ on:
     paths:
       - 'roles/zabbix_agent/**'
       - 'molecule/zabbix_agent/**'
+      - 'molecule/requirements.txt'
       - '.github/workflows/agent.yml'
   pull_request:
     paths:
       - 'roles/zabbix_agent/**'
       - 'molecule/zabbix_agent/**'
+      - 'molecule/requirements.txt'
       - '.github/workflows/agent.yml'
 jobs:
   molecule:
@@ -34,6 +36,9 @@ jobs:
             group: agent
           - container: pgsql-ubuntu
             image: geerlingguy/docker-ubuntu1804-ansible
+            group: agent
+          - container: debian
+            image: geerlingguy/docker-debian10-ansible
             group: agent
           - container: debian
             image: geerlingguy/docker-debian9-ansible

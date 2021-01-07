@@ -1,6 +1,8 @@
 # community.zabbix.zabbix_proxy role
 
-Table of Content
+![Zabbix Proxy](https://github.com/ansible-collections/community.zabbix/workflows/community.zabbix.zabbix_proxy/badge.svg)
+
+**Table of Contents**
 
 - [Overview](#overview)
   * [Operating systems](#operating-systems)
@@ -12,6 +14,7 @@ Table of Content
     + [Zabbix Proxy](#zabbix-proxy)
     + [Database specific](#database-specific)
     + [TLS Specific configuration](#tls-specific-configuration)
+  * [proxy](#proxy)
   * [Database](#database)
     + [MySQL](#mysql)
       - [Local Setup](#local-setup)
@@ -43,24 +46,24 @@ Please send Pull Requests or suggestions when you want to use this role for othe
 
 See the following list of supported Operating systems with the Zabbix releases.
 
-| Zabbix              | 5.0 | 4.4 | 4.0 (LTS) | 3.0 (LTS) |
-|---------------------|-----|-----|-----------|-----------|
-| Red Hat Fam 8       |  V  | V   |           |           |
-| Red Hat Fam 7       |  V  | V   | V         | V         |
-| Red Hat Fam 6       |     |     |           | V         |
-| Red Hat Fam 5       |     |     |           | V         |
-| Fedora              |     | V   | V         |           |
-| Ubuntu 20.04 focal  |  V  |     |           |           |
-| Ubuntu 19.10 eoan   |  ?  |     |           |           |
-| Ubuntu 18.04 bionic |  V  | V   | V         |           |
-| Ubuntu 16.04 xenial |  V  | V   | V         |           |
-| Ubuntu 14.04 trusty |  V  | V   | V         | V         |
-| Debian 10 buster    |  V  | V   |           |           |
-| Debian 9 stretch    |  V  | V   | V         |           |
-| Debian 8 jessie     |  V  | V   | V         | V         |
-| Debian 7 wheezy     |     |     | V         | V         |
-| macOS 10.15         |     | V   | V         |           |
-| macOS 10.14         |     | V   | V         |           |
+| Zabbix              | 5.2 | 5.0 | 4.4 | 4.0 (LTS) | 3.0 (LTS) |
+|---------------------|-----|-----|-----|-----------|-----------|
+| Red Hat Fam 8       |  V  |  V  | V   |           |           |
+| Red Hat Fam 7       |  V  |  V  | V   | V         | V         |
+| Red Hat Fam 6       |  V  |  V  |     |           | V         |
+| Red Hat Fam 5       |  V  |  V  |     |           | V         |
+| Fedora              |     |     | V   | V         |           |
+| Ubuntu 20.04 focal  |  V  |  V  |     |           |           |
+| Ubuntu 19.10 eoan   |     |     |     |           |           |
+| Ubuntu 18.04 bionic |  V  |  V  | V   | V         |           |
+| Ubuntu 16.04 xenial |  V  |  V  | V   | V         |           |
+| Ubuntu 14.04 trusty |  V  |  V  | V   | V         | V         |
+| Debian 10 buster    |  V  |  V  | V   |           |           |
+| Debian 9 stretch    |  V  |  V  | V   | V         |           |
+| Debian 8 jessie     |  V  |  V  | V   | V         | V         |
+| Debian 7 wheezy     |     |     |     | V         | V         |
+| macOS 10.15         |     |     | V   | V         |           |
+| macOS 10.14         |     |     | V   | V         |           |
 
 # Role Variables
 
@@ -70,7 +73,7 @@ The following is an overview of all available configuration default for this rol
 
 ### Overall Zabbix
 
-* `zabbix_proxy_version`: This is the version of zabbix. Default: 5.0. Can be overridden to 4.4, 4.0, 3.4, 3.2, 3.0, 2.4, or 2.2. Previously the variable `zabbix_version` was used directly but it could cause [some inconvenience](https://github.com/dj-wasabi/ansible-zabbix-agent/pull/303). That variable is maintained by retrocompativility.
+* `zabbix_proxy_version`: This is the version of zabbix. Default: 5.2. Can be overridden to 5.0, 4.4, 4.0, 3.4, 3.2, 3.0, 2.4, or 2.2. Previously the variable `zabbix_version` was used directly but it could cause [some inconvenience](https://github.com/dj-wasabi/ansible-zabbix-agent/pull/303). That variable is maintained by retrocompativility.
 * `zabbix_repo`: Default: `zabbix`
   * `epel`: install agent from EPEL repo
   * `zabbix`: (default) install agent from Zabbix repo
@@ -86,6 +89,7 @@ The following is an overview of all available configuration default for this rol
 
 ### Zabbix Proxy
 
+* `zabbix_proxy_ip`: The IP address of the host. When not provided, it will be determined via the `ansible_default_ipv4` fact.
 * `zabbix_server_host`: The ip or dns name for the zabbix-server machine.
 * `zabbix_server_port`: The port on which the zabbix-server is running. Default: 10051
 * `*zabbix_proxy_package_state`: Default: `present`. Can be overridden to `latest` to update packages
@@ -153,6 +157,13 @@ This parameter is supported since Zabbix 5.0.0.
 * `zabbix_proxy_dbtlskeyfile`: Full pathname of file containing the private key for authenticating to database. This parameter is supported since Zabbix 5.0.0.
 * `zabbix_proxy_dbtlscipher`: The list of encryption ciphers that Zabbix Proxy permits for TLS protocols up through TLSv1.2. Supported only for MySQL.This parameter is supported since Zabbix 5.0.0.
 * `zabbix_proxy_dbtlscipher13`: The list of encryption ciphersuites that Zabbix Proxy permits for TLSv1.3 protocol. Supported only for MySQL, starting from version 8.0.16. This parameter is supported since Zabbix 5.0.0.
+
+## proxy
+
+When the target host does not have access to the internet, but you do have a proxy available then the following properties needs to be set to download the packages via the proxy:
+
+* `zabbix_http_proxy`
+* `zabbix_https_proxy`
 
 ## Database
 

@@ -185,22 +185,6 @@
     - zabbix-agent
     - init
 
-- name: "Install policycoreutils-python"
-  apt:
-    pkg: policycoreutils-python-utils
-    state: present
-    update_cache: yes
-    cache_valid_time: 0
-    force_apt_get: "{{ zabbix_apt_force_apt_get }}"
-    install_recommends: "{{ zabbix_apt_install_recommends }}"
-  environment:
-    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
-    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
-  register: zabbix_agent_policycoreutils_installed
-  until: zabbix_agent_package_installed is succeeded
-  become: yes
-  when: zabbix_selinux | bool
-
 - name: "Debian | Enable the service"
   service:
     name: "{{ zabbix_agent_service }}"

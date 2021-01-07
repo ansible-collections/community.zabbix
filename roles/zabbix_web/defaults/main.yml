@@ -1,7 +1,7 @@
 ---
 # defaults file for zabbix-web
 
-zabbix_web_version: 5.0
+zabbix_web_version: 5.2
 zabbix_version: "{{ zabbix_web_version }}"
 zabbix_repo: zabbix
 zabbix_web_package_state: present
@@ -15,10 +15,11 @@ zabbix_url: zabbix.example.com
 zabbix_websrv: apache
 zabbix_websrv_servername: "{{ zabbix_url | regex_findall('(?:https?\\://)?([\\w\\-\\.]+)') | first }}"
 zabbix_url_aliases: []
-zabbix_apache_vhost_port: 80
-zabbix_apache_vhost_tls_port: 443
+zabbix_web_htpasswd: False
+zabbix_web_htpasswd_file: /etc/zabbix/web/htpasswd
 zabbix_timezone: Europe/Amsterdam
 zabbix_vhost: True
+
 zabbix_php_frontend_deprecated: False
 zabbix_php_fpm: False
 zabbix_php_fpm_dir_etc: /etc/opt/rh/rh-php72/
@@ -28,6 +29,9 @@ zabbix_php_fpm_conf_enable_user: true
 zabbix_php_fpm_conf_enable_group: true
 zabbix_php_fpm_conf_mode: "0664"
 zabbix_php_fpm_conf_enable_mode: true
+
+zabbix_apache_vhost_port: 80
+zabbix_apache_vhost_tls_port: 443
 zabbix_apache_vhost_listen_ip: "*"
 zabbix_apache_tls: False
 zabbix_apache_redirect: False
@@ -35,19 +39,24 @@ zabbix_apache_tls_crt: /etc/pki/server.crt
 zabbix_apache_tls_key: /etc/pki/server.key
 zabbix_apache_tls_chain:
 zabbix_apache_can_connect_ldap: False
+zabbix_apache_include_custom_fragment: true
+zabbix_apache_SSLPassPhraseDialog: exec:/usr/libexec/httpd-ssl-pass-dialog
+zabbix_apache_SSLSessionCache: shmcb:/run/httpd/sslcache(512000)
+zabbix_apache_SSLSessionCacheTimeout: 300
+zabbix_apache_SSLCryptoDevice: builtin
 
 zabbix_nginx_vhost_port: 80
 zabbix_nginx_vhost_tls_port: 443
 zabbix_nginx_tls: False
 zabbix_nginx_redirect: False
-zabbix_nginx_tls_crt: /etc/pki/server.crt
-zabbix_nginx_tls_key: /etc/pki/server.key
-zabbix_nginx_tls_dhparam: /etc/pki/dhparam-server.pem
 zabbix_nginx_tls_session_timeout: 1d
 zabbix_nginx_tls_session_cache: shared:MySSL:10m
-zabbix_nginx_tls_session_tickets: off
+zabbix_nginx_tls_session_tickets: !!str off
 zabbix_nginx_tls_protocols: TLSv1.2
 zabbix_nginx_tls_ciphers: ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384
+
+zabbix_letsencrypt: False
+zabbix_letsencrypt_webroot_path: /var/www/letsencrypt
 
 zabbix_repo_yum_schema: https
 zabbix_repo_yum_disabled: "*"
@@ -84,12 +93,6 @@ zabbix_web_post_max_size: 16M
 zabbix_web_upload_max_filesize: 2M
 zabbix_web_max_input_time: 300
 zabbix_web_max_input_vars: 10000
-zabbix_apache_include_custom_fragment: true
-
-zabbix_apache_SSLPassPhraseDialog: exec:/usr/libexec/httpd-ssl-pass-dialog
-zabbix_apache_SSLSessionCache: shmcb:/run/httpd/sslcache(512000)
-zabbix_apache_SSLSessionCacheTimeout: 300
-zabbix_apache_SSLCryptoDevice: builtin
 
 # Database
 zabbix_server_database: pgsql

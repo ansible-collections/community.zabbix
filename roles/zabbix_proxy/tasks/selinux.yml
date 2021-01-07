@@ -1,0 +1,50 @@
+---
+
+- name: "SELinux | RedHat | Install related SELinux package to fix issues"
+  yum:
+    name:
+      - policycoreutils-python
+      - libsemanage-python
+      - checkpolicy
+    state: present
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
+  register: zabbix_proxy_dependencies_installed
+  until: zabbix_proxy_dependencies_installed is succeeded
+  become: yes
+  when:
+    - ansible_os_family == "RedHat"
+    - ansible_distribution_major_version == "7" or ansible_distribution_major_version == "6"
+  tags:
+    - zabbix-proxy
+
+- name: "SELinux | RedHat | Install related SELinux package to fix issues on RHEL8"
+  yum:
+    name:
+      - policycoreutils
+      - checkpolicy
+      - python3-libsemanage
+    state: present
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
+  register: zabbix_proxy_dependencies_installed
+  until: zabbix_proxy_dependencies_installed is succeeded
+  become: yes
+  when:
+    - ansible_os_family == "RedHat"
+    - ansible_distribution_major_version == "8"
+  tags:
+    - zabbix-proxy
+
+- name: "SELinux | RedHat | Add SEmodule to fix SELinux issue: zabbix_proxy_alerter.sock"
+  script:
+    cmd: files/install_semodule.bsx
+  args:
+    creates: /etc/selinux/targeted/active/modules/400/zabbix_proxy_add/cil
+  become: yes
+  when:
+    - ansible_os_family == "RedHat"
+  tags:
+    - zabbix-proxy
