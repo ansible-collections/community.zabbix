@@ -189,3 +189,4 @@ suse:
     "12":
       name: server_monitoring
       url: http://download.opensuse.org/repositories/server:/monitoring/SLE_12_SP3/
+
