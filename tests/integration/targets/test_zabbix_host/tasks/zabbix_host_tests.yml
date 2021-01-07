@@ -1458,3 +1458,31 @@
   assert:
       that:
           - "not zabbix_host1 is changed"
+
+- when: zabbix_version is version('5.2', '>=')
+  block:
+  - name: "test: create host without host interfaces"
+    zabbix_host:
+      server_url: "{{ zabbix_server_url }}"
+      login_user: "{{ zabbix_login_user }}"
+      login_password: "{{ zabbix_login_password }}"
+      host_name: ExampleHost
+      visible_name: ExampleName
+      description: My ExampleHost Description
+      host_groups:
+        - Linux servers
+      status: disabled
+      state: present
+    register: zbx_host_create_interfaceless
+
+  - name: verify host was created without interfaces
+    assert:
+      that: zbx_host_create_interfaceless is changed
+
+  - name: "cleanup"
+    zabbix_host:
+      server_url: "{{ zabbix_server_url }}"
+      login_user: "{{ zabbix_login_user }}"
+      login_password: "{{ zabbix_login_password }}"
+      host_name: ExampleHost
+      state: absent
