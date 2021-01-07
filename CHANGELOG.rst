@@ -25,6 +25,7 @@ Bugfixes
 
 - When installing the Zabbix packages, we disable all other yum repositories except the one for the Zabbix.
 - zabbix_agent - Agent 2 also be able to use userparameters file.
+- zabbix_agent - Documented the property 'zabbix_proxy_ip' in the documentation.
 - zabbix_agent - There was an task that wasn't able to use an http(s)_proxy environment while installing an package.
 - zabbix_agent - Windows - Able to create PSK file
 - zabbix_agent - Windows - Fixing download links to proper version/url
@@ -32,9 +33,12 @@ Bugfixes
 - zabbix_agent - Zabbix packages were not able to install properly on Fedora. When the packages are installed, the version will be appended to the package name. This is eofr all RedHat related OS'es.
 - zabbix_agent - fixed issue with zabbix_agent2_tlspsk_auto having no effect when using zabbix_agent2
 - zabbix_agent - fixed issue with zabbix_api_create_hosts and TLS configuration when using zabbix_agent2, where zabbix_agent_tls* settings were used instead of zabbix_agent2_tls*
+- zabbix_host - module will no longer require ``interfaces`` to be present when creating host  with Zabbix 5.2 (https://github.com/ansible-collections/community.zabbix/pull/291).
 - zabbix_proxy (role) - Added missing paragraph for the SQLite3 as database.
 - zabbix_proxy (role) - The become option was missing in some essential tasks when installing the Zabbix Proxy with SQLite3 as database.
 - zabbix_proxy (role) - Various documentation fixes removing the Zabbix Server and replaced it with actual Zabbix Proxy information.
+- zabbix_proxy - Added new property 'zabbix_proxy_ip' to determine ip for host running the Zabbix Proxy.
+- zabbix_proxy - The 'interface' option was missing when creating an Proxy via the API.
 - zabbix_template - fixed documentation for ``macros`` argument (https://github.com/ansible-collections/community.zabbix/pull/296).
 - zabbix_template - fixed encode error when using Python2 (https://github.com/ansible-collections/community.zabbix/pull/297).
 - zabbix_template - fixed issue when importing templates to zabbix version. >= 5.2
