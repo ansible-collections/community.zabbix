@@ -1,0 +1,2 @@
+bugfixes:
+- zabbix_host - should no longer fail with 'host cannot have more than one default interface' error (https://github.com/ansible-collections/community.zabbix/pull/309).
