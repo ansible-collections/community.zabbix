@@ -8,6 +8,11 @@ community.zabbix Release Notes
 v1.2.0
 ======
 
+Release Summary
+---------------
+
+| Release date: 2021-01-11 | Last major release to support Zabbix server 3.X versions.
+
 Minor Changes
 -------------
 
