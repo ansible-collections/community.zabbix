@@ -233,6 +233,7 @@ releases:
   1.2.0:
     changes:
       bugfixes:
+      - zabbix_agent - Also work on SLES 12 sp5
       - When installing the Zabbix packages, we disable all other yum repositories
         except the one for the Zabbix.
       - zabbix_agent - Agent 2 also be able to use userparameters file.
@@ -278,6 +279,8 @@ releases:
       - zabbix_agent - Added parameter `zabbix_agent_package_remove` when set to `true`
         and `zabbix_agent2` is set to `true` it will uninstall the `zabbix-agent`
         service and package.
+      - zabbix_agent - added `zabbix_agent_install_agent_only` Will only install the
+        Zabbix Agent package and not the `zabbix-sender` or `zabbix-get` packages.
       - zabbix_template - Fixed to decode Unicode Escape of multibyte strings in an
         importing template data(https://github.com/ansible-collections/community.zabbix/pull/226).
       - zabbix_user - added new parameters to set timezone and role_name for users
@@ -302,6 +305,7 @@ releases:
     - role-agent-allow-uninstall-agent.yaml
     - role-agent-userparameter.yaml
     - role-agent-windows-service-handling.yaml
+    - role-agent-work-with-sles.yaml
     - role-proxy-sqlite3-zabbix-proxy.yaml
     - roles-all-enable-zabbix-disable-rest.yaml
     - roles-all-update-to-zabbix-52.yml

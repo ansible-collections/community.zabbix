@@ -14,6 +14,7 @@ Minor Changes
 - Updated the roles to support Zabbix 5.2.
 - zabbix_agent - Added a new property `zabbix_agent_dont_detect_ip` when set to true, it won't detect the ips and no need to install the python module `netaddr`.
 - zabbix_agent - Added parameter `zabbix_agent_package_remove` when set to `true` and `zabbix_agent2` is set to `true` it will uninstall the `zabbix-agent` service and package.
+- zabbix_agent - added `zabbix_agent_install_agent_only` Will only install the Zabbix Agent package and not the `zabbix-sender` or `zabbix-get` packages.
 - zabbix_template - Fixed to decode Unicode Escape of multibyte strings in an importing template data(https://github.com/ansible-collections/community.zabbix/pull/226).
 - zabbix_user - added new parameters to set timezone and role_name for users (https://github.com/ansible-collections/community.zabbix/pull/260).
 - zabbix_user - user_medias now defaults to None and is optional (https://github.com/ansible-collections/community.zabbix/pull/264).
@@ -25,6 +26,7 @@ Bugfixes
 
 - When installing the Zabbix packages, we disable all other yum repositories except the one for the Zabbix.
 - zabbix_agent - Agent 2 also be able to use userparameters file.
+- zabbix_agent - Also work on SLES 12 sp5
 - zabbix_agent - Documented the property 'zabbix_proxy_ip' in the documentation.
 - zabbix_agent - There was an task that wasn't able to use an http(s)_proxy environment while installing an package.
 - zabbix_agent - Windows - Able to create PSK file
