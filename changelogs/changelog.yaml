@@ -233,10 +233,10 @@ releases:
   1.2.0:
     changes:
       bugfixes:
-      - zabbix_agent - Also work on SLES 12 sp5
       - When installing the Zabbix packages, we disable all other yum repositories
         except the one for the Zabbix.
       - zabbix_agent - Agent 2 also be able to use userparameters file.
+      - zabbix_agent - Also work on SLES 12 sp5
       - zabbix_agent - Documented the property 'zabbix_proxy_ip' in the documentation.
       - zabbix_agent - There was an task that wasn't able to use an http(s)_proxy
         environment while installing an package.
@@ -253,6 +253,8 @@ releases:
         of zabbix_agent2_tls*
       - zabbix_host - module will no longer require ``interfaces`` to be present when
         creating host  with Zabbix 5.2 (https://github.com/ansible-collections/community.zabbix/pull/291).
+      - zabbix_host - should no longer fail with 'host cannot have more than one default
+        interface' error (https://github.com/ansible-collections/community.zabbix/pull/309).
       - zabbix_proxy (role) - Added missing paragraph for the SQLite3 as database.
       - zabbix_proxy (role) - The become option was missing in some essential tasks
         when installing the Zabbix Proxy with SQLite3 as database.
@@ -295,6 +297,7 @@ releases:
     - 264-allow-user_medias-to-be-optional.yaml
     - 266-zabbix_web.yml
     - 297-zabbix_template_modules.yml
+    - 309-host-interfaces.yaml
     - agent-missing-proxy-task.yaml
     - agent-not-detect-ips.yml
     - agent-use-version-for-rh.yml
