@@ -1,2 +1,0 @@
-bugfixes:
-    - "When installing the Zabbix packages, we disable all other yum repositories except the one for the Zabbix."

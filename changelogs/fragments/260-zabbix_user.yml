@@ -1,4 +1,0 @@
-bugfixes:
-  - zabbix_user - fixed issue where module couldn't create a user since Zabbix 5.2 (https://github.com/ansible-collections/community.zabbix/pull/260).
-minor_changes:
-  - zabbix_user - added new parameters to set timezone and role_name for users (https://github.com/ansible-collections/community.zabbix/pull/260).
