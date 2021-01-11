@@ -1102,6 +1102,7 @@ def main():
 
             # get existing host's interfaces
             exist_interfaces = host._zapi.hostinterface.get({'output': 'extend', 'hostids': host_id})
+            exist_interfaces.sort(key=lambda x: int(x['interfaceid']))
 
             # When force=no is specified, append existing interfaces to interfaces to update. When
             # no interfaces have been specified, copy existing interfaces as specified from the API.
