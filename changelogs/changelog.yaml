@@ -290,6 +290,8 @@ releases:
       - zabbix_user - user_medias now defaults to None and is optional (https://github.com/ansible-collections/community.zabbix/pull/264).
       - zabbix_web - added `zabbix_web_rhel_release` which enable scl on RHEL (https://github.com/ansible-collections/community.zabbix/pull/266).
       - zabbix_web - quality of life improvements when using Nginx (https://github.com/ansible-collections/community.zabbix/pull/304).
+      release_summary: '| Release date: 2021-01-11 | Last major release to support
+        Zabbix server 3.X versions in plugins.'
     fragments:
     - 226-zabbix_template.yaml
     - 254-disable-no-log-warning.yml
@@ -313,4 +315,4 @@ releases:
     - roles-all-enable-zabbix-disable-rest.yaml
     - roles-all-update-to-zabbix-52.yml
     - templatescreens-fix.yml
-    release_date: '2021-01-04'
+    release_date: '2021-01-11'
