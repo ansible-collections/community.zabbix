@@ -26,6 +26,23 @@
   become: yes
   when:
     - zabbix_repo == "zabbix"
+    - ansible_machine != "aarch64"
+  with_items:
+    - deb-src
+    - deb
+  tags:
+    - zabbix-web
+    - init
+    - config
+
+- name: "Debian | Installing repository {{ ansible_distribution }}"
+  apt_repository:
+    repo: "{{ item }} http://repo.zabbix.com/zabbix/{{ zabbix_version }}/{{ ansible_distribution.lower() }}-arm64/ {{ ansible_distribution_release }} main"
+    state: present
+  become: yes
+  when:
+    - zabbix_repo == "zabbix"
+    - ansible_machine == "aarch64"
   with_items:
     - deb-src
     - deb
