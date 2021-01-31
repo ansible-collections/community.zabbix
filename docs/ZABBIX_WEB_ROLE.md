@@ -149,8 +149,8 @@ See https://httpd.apache.org/docs/current/mod/mod_ssl.html for SSL* configuratio
 * `zabbix_nginx_tls_key`: The path to the TLS key file.
 * `zabbix_nginx_tls_dhparam`: The path to the TLS DHParam file.
 * `zabbix_nginx_tls_session_cache`: Type of the global/inter-process SSL Session Cache
-* `zabbix_nginx_tls_session_timeout`: 
-* `zabbix_nginx_tls_session_tickets`: 
+* `zabbix_nginx_tls_session_timeout`:
+* `zabbix_nginx_tls_session_tickets`:
 * `zabbix_nginx_tls_protocols`: The TLS Protocols to accept.
 * `zabbix_nginx_tls_ciphers`: The TLS Ciphers to be allowed.
 
@@ -310,7 +310,7 @@ zabbix_server_history_types:
 
 # Molecule
 
-This role is configured to be tested with Molecule. You can find on this page some more information regarding Molecule: 
+This role is configured to be tested with Molecule. You can find on this page some more information regarding Molecule:
 
 * http://werner-dijkerman.nl/2016/07/10/testing-ansible-roles-with-molecule-testinfra-and-docker/
 * http://werner-dijkerman.nl/2016/07/27/extending-ansible-role-testing-with-molecule-by-adding-group_vars-dependencies-and-using-travis-ci/
