@@ -264,6 +264,15 @@ zabbix.conf.php, for example to add LDAP CA certificates. To do this add a `zabb
   become: yes
   roles:
     - role: geerlingguy.apache
+    - role: geerlingguy.php
+      php_memory_limit: "128M"
+      php_max_execution_time: "300"
+      php_upload_max_filesize: "256M"
+      php_packages:
+        - php
+        - php-fpm
+        - php-acpu
+    - role: geerlingguy.apache-php-fpm
     - role: community.zabbix.zabbix_web
       zabbix_url: zabbix.mydomain.com
       zabbix_server_hostname: zabbix-server
