@@ -12,6 +12,21 @@
       - "main"
     zabbix_underscore_version: "{{ zabbix_version | regex_replace('\\.', '_') }}"
     zabbix_python_prefix: "python{% if ansible_python_version is version('3', '>=') %}3{% endif %}"
+  when:
+    - ansible_machine != "aarch64"
+
+- name: "Set some variables"
+  set_fact:
+    zabbix_short_version: "{{ zabbix_version | regex_replace('\\.', '') }}"
+    zabbix_server_apt_repository:
+      - "http://repo.zabbix.com/zabbix/{{ zabbix_version }}/{{ ansible_distribution.lower() }}-arm64/"
+      - "{{ ansible_distribution_release }}"
+      - "main"
+    zabbix_underscore_version: "{{ zabbix_version | regex_replace('\\.', '_') }}"
+    zabbix_python_prefix: "python{% if ansible_python_version is version('3', '>=') %}3{% endif %}"
+  when:
+    - ansible_machine == "aarch64"
+
 
 - name: "Debian | Set some facts"
   set_fact:
