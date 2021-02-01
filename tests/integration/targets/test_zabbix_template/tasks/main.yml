@@ -406,3 +406,33 @@
 - assert:
     that:
       - delete_zabbix_template_result.changed is sameas false
+
+- when: zabbix_version is version('5.0', '>=')
+  block:
+    # The test if decode Unicode correctly and to be imported the template.
+    # https://github.com/ansible-collections/community.zabbix/issues/314
+    - name: Import Zabbix template from JSON file with unicode.
+      zabbix_template:
+        server_url: "{{ zabbix_server_url }}"
+        login_user: "{{ zabbix_login_user }}"
+        login_password: "{{ zabbix_login_password }}"
+        template_json: "{{ lookup('file', 'template1_50_higher_decode_unicode.json') }}"
+        state: present
+      register: import_template_json
+
+    - assert:
+        that:
+          - import_template_json.changed is sameas true
+
+    - name: Delete Zabbix template.
+      zabbix_template:
+        server_url: "{{ zabbix_server_url }}"
+        login_user: "{{ zabbix_login_user }}"
+        login_password: "{{ zabbix_login_password }}"
+        template_name: ExampleTemplate314
+        state: absent
+      register: delete_zabbix_template_result
+
+    - assert:
+        that:
+          - delete_zabbix_template_result.changed is sameas true
