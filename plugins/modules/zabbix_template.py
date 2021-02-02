@@ -308,7 +308,7 @@ template_xml:
 
 import json
 import traceback
-import codecs
+import re
 import xml.etree.ElementTree as ET
 
 from distutils.version import LooseVersion
@@ -622,7 +622,13 @@ class Template(ZabbixBase):
             if LooseVersion(self._zbx_api_version) >= LooseVersion('5.2'):
                 update_rules["templateDashboards"] = update_rules.pop("templateScreens")
 
-            template_content = codecs.decode(template_content, 'unicode-escape')
+            # The loaded unicode slash of multibyte as a string is escaped when parsing JSON by json.loads in Python2.
+            # So, it is imported in the unicode string into Zabbix.
+            # The following processing is removing the unnecessary slash in escaped for decoding correctly to the multibyte string.
+            # https://github.com/ansible-collections/community.zabbix/issues/314
+            if PY2:
+                template_content = re.sub(r'\\\\u([0-9a-z]{,4})', r'\\u\1', template_content)
+
             import_data = {'format': template_type, 'source': template_content, 'rules': update_rules}
             self._zapi.configuration.import_(import_data)
         except Exception as e:
