@@ -1,0 +1,29 @@
+{
+    "zabbix_export": {
+        "version": "5.0",
+        "groups": [
+            {
+                "name": "Templates"
+            }
+        ],
+        "templates": [
+            {
+                "template": "ExampleTemplate314",
+                "name": "ExampleTemplate314",
+                "description": "\u30c6\u30b9\u30c8\u30b3\u30e1\u30f3\u30c8",
+                "groups": [
+                    {
+                        "name": "Templates"
+                    }
+                ],
+                "items": [
+                    {
+                        "name": "test",
+                        "type": "ZABBIX_ACTIVE",
+                        "key": "logrt[\"/test.*test.log\",\"test.*total=([0-9.]+)\",,,skip,\\1]"
+                    }
+                ],
+            }
+        ],
+    }
+}

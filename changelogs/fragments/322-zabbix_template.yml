@@ -1,0 +1,2 @@
+bugfixes:
+  - zabbix_template - fixed the bug that it doesn't decode the Unicode in Python2 (https://github.com/ansible-collections/community.zabbix/pull/322).
