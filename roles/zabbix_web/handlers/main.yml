@@ -9,7 +9,16 @@
   when:
     - zabbix_websrv == 'apache'
 
-- name: restart nginx
+- name: test nginx config
+  listen: restart nginx
+  command: nginx -t
+  register: zabbix_nginx_cfg_check
+  notify: restart nginx tested
+  become: yes
+  when:
+    - zabbix_websrv == 'nginx'
+
+- name: restart nginx tested
   service:
     name: nginx
     state: restarted
@@ -17,6 +26,7 @@
   become: yes
   when:
     - zabbix_websrv == 'nginx'
+    - zabbix_nginx_cfg_check.rc == 0
 
 - name: restart php-fpm
   service:

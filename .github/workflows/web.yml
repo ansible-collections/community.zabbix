@@ -4,11 +4,13 @@ on:
     paths:
       - 'roles/zabbix_web/**'
       - 'molecule/zabbix_web/**'
+      - 'molecule/requirements.txt'
       - '.github/workflows/web.yml'
   pull_request:
     paths:
       - 'roles/zabbix_web/**'
       - 'molecule/zabbix_web/**'
+      - 'molecule/requirements.txt'
       - '.github/workflows/web.yml'
 jobs:
   molecule:
@@ -20,8 +22,8 @@ jobs:
           - container: mysql-centos8
             image: geerlingguy/docker-centos8-ansible:latest
             group: mysql
-          - container: pgsql-centos7
-            image: geerlingguy/docker-centos7-ansible:latest
+          - container: pgsql-centos8
+            image: geerlingguy/docker-centos8-ansible:latest
             group: postgresql
           - container: mysql-ubuntu18
             image: geerlingguy/docker-ubuntu1804-ansible
@@ -29,12 +31,12 @@ jobs:
           - container: pgsql-ubuntu20
             image: geerlingguy/docker-ubuntu2004-ansible
             group: postgresql
-          # - container: mysql-debian
-          #   image: geerlingguy/docker-debian9-ansible
-          #   group: mysql
-          # - container: pgsql-debian
-          #   image: geerlingguy/docker-debian9-ansible
-          #   group: postgresql
+          - container: mysql-debian
+            image: geerlingguy/docker-debian10-ansible
+            group: mysql
+          - container: pgsql-debian
+            image: geerlingguy/docker-debian10-ansible
+            group: postgresql
         collection_role:
           - zabbix_web
     steps:

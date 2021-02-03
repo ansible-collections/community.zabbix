@@ -2,10 +2,11 @@
 # defaults file for zabbix-agent
 
 zabbix_agent2: False
-zabbix_agent_version: 5.0
+zabbix_agent_version: 5.2
 zabbix_version: "{{ zabbix_agent_version }}"
 zabbix_version_patch: 0
 zabbix_repo: zabbix
+zabbix_agent_package_remove: False
 zabbix_agent_package: zabbix-agent
 zabbix_sender_package: zabbix-sender
 zabbix_get_package: zabbix-get
@@ -16,10 +17,12 @@ zabbix_selinux: False
 zabbix_agent_src_reinstall: True
 zabbix_agent_apt_priority:
 zabbix_agent_conf_mode: "0644"
+zabbix_agent_dont_detect_ip: False
 
 # Selinux related vars 
 selinux_allow_zabbix_run_sudo: False
 
+zabbix_agent_install_agent_only: False
 zabbix_agent_packages:
   - "{{ zabbix_agent_package }}"
   - "{{ zabbix_sender_package }}"
@@ -193,12 +196,12 @@ zabbix_agent2_tlspskidentity:
 zabbix_agent2_tlspsk_auto: False
 
 # Windows/macOS Related
-zabbix_version_long: 4.4.4
+zabbix_version_long: 5.2.4
 
 # Windows Related
-zabbix_win_package: zabbix_agent-{{ zabbix_version_long }}-windows-i386.zip
-zabbix_win_download_url: https://www.zabbix.com/downloads
-zabbix_win_download_link: "{{ zabbix_win_download_url }}/{{ zabbix_version_long }}/{{ zabbix_win_package }}"
+zabbix_win_package: zabbix_agent-{{ zabbix_version_long }}-windows-amd64-openssl.zip
+zabbix_win_download_url: https://cdn.zabbix.com/zabbix/binaries/stable
+zabbix_win_download_link: "{{ zabbix_win_download_url }}/{{ zabbix_agent_version }}/{{ zabbix_version_long }}/{{ zabbix_win_package }}"
 zabbix_win_install_dir: 'C:\Zabbix'
 zabbix_agent_win_logfile: 'C:\Zabbix\zabbix_agentd.log'
 zabbix_agent_win_include: 'C:\Zabbix\zabbix_agent.d\'

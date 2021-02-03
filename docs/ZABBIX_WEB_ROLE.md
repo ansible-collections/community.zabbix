@@ -1,6 +1,8 @@
 # community.zabbix.zabbix_web role
 
-Table of contents
+![Zabbix Web](https://github.com/ansible-collections/community.zabbix/workflows/community.zabbix.zabbix_web/badge.svg)
+
+**Table of Contents**
 
 - [Overview](#overview)
 - [Requirements](#requirements)
@@ -15,6 +17,7 @@ Table of contents
       - [Nginx configuration](#nginx-configuration)
       - [PHP-FPM](#php-fpm)
     - [Zabbix Server](#zabbix-server)
+  * [proxy](#proxy)
 - [Example Playbook](#example-playbook)
   - [Single instance](#single-instance)
   - [Multi host setup](#multi-host-setup)
@@ -42,24 +45,24 @@ Please send Pull Requests or suggestions when you want to use this role for othe
 
 See the following list of supported Operating Systems with the Zabbix releases.
 
-| Zabbix              | 5.0 | 4.4 | 4.0 (LTS) | 3.0 (LTS) |
-|---------------------|-----|-----|-----------|-----------|
-| Red Hat Fam 8       |     | V   |           |           |
-| Red Hat Fam 7       |     | V   | V         | V         |
-| Red Hat Fam 6       |     |     |           | V         |
-| Red Hat Fam 5       |     |     |           | V         |
-| Fedora              |     | V   | V         |           |
-| Ubuntu 20.04 focal  |     |     |           |           |
-| Ubuntu 19.10 eoan   |     |     |           |           |
-| Ubuntu 18.04 bionic |     | V   | V         |           |
-| Ubuntu 16.04 xenial |     | V   | V         |           |
-| Ubuntu 14.04 trusty |     | V   | V         | V         |
-| Debian 10 buster    |     | V   |           |           |
-| Debian 9 stretch    |     | V   | V         |           |
-| Debian 8 jessie     |     | V   | V         | V         |
-| Debian 7 wheezy     |     |     | V         | V         |
-| macOS 10.15         |     | V   | V         |           |
-| macOS 10.14         |     | V   | V         |           |
+| Zabbix              | 5.2 | 5.0 | 4.4 | 4.0 (LTS) | 3.0 (LTS) |
+|---------------------|-----|-----|-----|-----------|-----------|
+| Red Hat Fam 8       |  V  |  V  | V   |           |           |
+| Red Hat Fam 7       |  V  |  V  | V   | V         | V         |
+| Red Hat Fam 6       |  V  |  V  |     |           | V         |
+| Red Hat Fam 5       |  V  |  V  |     |           | V         |
+| Fedora              |     |     | V   | V         |           |
+| Ubuntu 20.04 focal  |  V  |  V  |     |           |           |
+| Ubuntu 19.10 eoan   |     |     |     |           |           |
+| Ubuntu 18.04 bionic |  V  |  V  | V   | V         |           |
+| Ubuntu 16.04 xenial |  V  |  V  | V   | V         |           |
+| Ubuntu 14.04 trusty |  V  |  V  | V   | V         | V         |
+| Debian 10 buster    |  V  |  V  | V   |           |           |
+| Debian 9 stretch    |  V  |  V  | V   | V         |           |
+| Debian 8 jessie     |  V  |  V  | V   | V         | V         |
+| Debian 7 wheezy     |     |     |     | V         | V         |
+| macOS 10.15         |     |     | V   | V         |           |
+| macOS 10.14         |     |     | V   | V         |           |
 
 # Installation
 
@@ -80,7 +83,7 @@ The following is an overview of all available configuration defaults for this ro
 
 ### Overall Zabbix
 
-* `zabbix_server_version`: This is the version of zabbix. Default: 5.0. Can be overridden to 4.4, 4.0, 3.4, 3.2, 3.0, 2.4, or 2.2. Previously the variable `zabbix_version` was used directly but it could cause [some inconvenience](https://github.com/dj-wasabi/ansible-zabbix-agent/pull/303). That variable is maintained by retrocompativility.
+* `zabbix_web_version`: This is the version of zabbix. Default: 5.2. Can be overridden to 5.0, 4.4, 4.0, 3.4, 3.2, 3.0, 2.4, or 2.2. Previously the variable `zabbix_version` was used directly but it could cause [some inconvenience](https://github.com/dj-wasabi/ansible-zabbix-agent/pull/303). That variable is maintained by retrocompativility.
 * `zabbix_repo`: Default: `zabbix`
   * `epel`: install agent from EPEL repo
   * `zabbix`: (default) install agent from Zabbix repo
@@ -105,6 +108,10 @@ The following is an overview of all available configuration defaults for this ro
 * `zabbix_web_env`: (Optional) A Dictionary of PHP Environments settings.
 * `zabbix_web_conf_web_user`: When provided, the user (which should already exist on the host) will be used for ownership for web/php related processes. (Default set to either `apache` (`www-data` for Debian) or `nginx`).
 * `zabbix_web_conf_web_group`: When provided, the group (which should already exist on the host) will be used for ownership for web/php related processes. (Default set to either `apache` (`www-data` for Debian) or `nginx`).
+* `zabbix_web_htpasswd`: (Optional) Allow HTTP authentication at the webserver level via a htpasswd file.
+* `zabbix_web_htpasswd_file`: Default: `/etc/zabbix/web/htpasswd`. Allows the change the default path to the htpasswd file.
+* `zabbix_web_htpasswd_users`: (Optional) Dictionary for creating users via `htpasswd_user` and passphrases via `htpasswd_pass` in htpasswd file.
+* `zabbix_web_allowlist_ips`: (Optional) Allow web access at webserver level to a list of defined IPs or CIDR.
 
 #### Apache configuration
 
@@ -187,6 +194,13 @@ The following properties are related when using Elasticsearch for history storag
 See the following links for more information regarding Zabbix and Elasticsearch
 https://www.zabbix.com/documentation/3.4/manual/appendix/install/elastic_search_setup
 https://www.zabbix.com/documentation/4.0/manual/appendix/install/elastic_search_setup
+
+## proxy
+
+When the target host does not have access to the internet, but you do have a proxy available then the following properties needs to be set to download the packages via the proxy:
+
+* `zabbix_http_proxy`
+* `zabbix_https_proxy`
 
 # Example Playbook
 

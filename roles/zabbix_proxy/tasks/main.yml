@@ -1,6 +1,13 @@
 ---
 # tasks file for dj-wasabi.zabbix-proxy
 
+- name: "Set default ip address for zabbix_proxy_ip"
+  set_fact:
+    zabbix_proxy_ip: "{{ hostvars[inventory_hostname]['ansible_default_ipv4'].address }}"
+  when:
+    - zabbix_proxy_ip is not defined
+    - "'ansible_default_ipv4' in hostvars[inventory_hostname]"
+
 - name: "Set OS dependent variables"
   include_vars: "{{ item }}"
   with_first_found:
@@ -86,6 +93,7 @@
     group: zabbix
     mode: "{{ zabbix_proxy_conf_mode }}"
   notify: restart zabbix-proxy
+  become: yes
 
 - name: "Installing the Zabbix-api package on localhost"
   pip:
@@ -112,6 +120,7 @@
     status: "{{ zabbix_proxy_status }}"
     proxy_name: "{{ zabbix_proxy_name }}"
     description: "{{ zabbix_proxy_description | default(omit) }}"
+    interface: "{{ zabbix_proxy_interface }}"
     tls_psk: "{{ zabbix_proxy_tlspsk_secret | default(omit) }}"
     tls_psk_identity: "{{ zabbix_proxy_tlspskidentity | default(omit) }}"
     tls_subject: "{{ zabbix_proxy_tlsservercertsubject | default(omit) }}"

@@ -42,12 +42,13 @@
         name:
           - net-tools
           - apt-utils
+          - procps
           - "{{ zabbix_python_prefix }}-pip"
           - gpg-agent
           - "{{ zabbix_python_prefix }}-apt"
           - sudo
           - software-properties-common
-          - openjdk-8-jdk
+          - openjdk-11-jdk
         update_cache: True
         state: present
       register: installation_dependencies

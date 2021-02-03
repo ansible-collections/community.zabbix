@@ -33,11 +33,19 @@
     - ansible_distribution == "Amazon"
     - ansible_distribution_major_version == "2"
 
-- name: "Fedora | Override zabbix_agent_distribution_major_version for Fedora"
+- name: "Fedora | Override zabbix_agent_distribution_major_version for Fedora <= 27"
   set_fact:
     zabbix_agent_distribution_major_version: 7
   when:
     - ansible_distribution == "Fedora"
+    - ansible_distribution_major_version <= "27"
+
+- name: "Fedora | Override zabbix_agent_distribution_major_version for Fedora >= 27"
+  set_fact:
+    zabbix_agent_distribution_major_version: 8
+  when:
+    - ansible_distribution == "Fedora"
+    - ansible_distribution_major_version >= "27"
 
 - name: "XCP-ng | Override zabbix_agent_distribution_major_version for XCP-ng"
   set_fact:
@@ -78,7 +86,7 @@
 - name: "RedHat | Installing zabbix-agent"
   package:
     pkg:
-      - "{{ zabbix_agent_package }}"
+      - "{{ zabbix_agent_package }}-{{ zabbix_agent_version }}.*"
     disablerepo: "{{ '*' if (zabbix_repo_yum_enabled | length>0) else omit }}"
     enablerepo: "{{ zabbix_repo_yum_enabled if zabbix_repo_yum_enabled is iterable and (zabbix_repo_yum_enabled | length>0) else omit }}"
     state: "{{ zabbix_agent_package_state }}"
@@ -95,8 +103,8 @@
 - name: "RedHat | Installing zabbix-{sender,get}}"
   package:
     pkg:
-      - "{{ zabbix_sender_package }}"
-      - "{{ zabbix_get_package }}"
+      - "{{ zabbix_sender_package }}-{{ zabbix_agent_version }}.*"
+      - "{{ zabbix_get_package }}-{{ zabbix_agent_version }}.*"
     disablerepo: "{{ '*' if (zabbix_repo_yum_enabled | length>0) else omit }}"
     enablerepo: "{{ zabbix_repo_yum_enabled if zabbix_repo_yum_enabled is iterable and (zabbix_repo_yum_enabled | length>0) else omit }}"
     state: "{{ zabbix_agent_package_state }}"
@@ -107,48 +115,7 @@
   until: zabbix_agent_package_installed is succeeded
   when:
     - zabbix_repo != 'epel'
-  become: yes
-  tags:
-    - init
-    - zabbix-agent
-
-- name: "Install policycoreutils-python"
-  package:
-    name: policycoreutils-python
-    state: installed
-  environment:
-    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
-    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
-  register: zabbix_agent_policycoreutils_installed
-  until: zabbix_agent_policycoreutils_installed is succeeded
-  when: (zabbix_selinux | bool) and (zabbix_agent_distribution_major_version == "6" or zabbix_agent_distribution_major_version == "7")
-  become: yes
-  tags:
-    - init
-    - zabbix-agent
-
-- name: "Install python3-policycoreutils on RHEL8"
-  package:
-    name: python3-policycoreutils
-    state: installed
-  environment:
-    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
-    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
-  register: zabbix_agent_policycoreutils_installed
-  until: zabbix_agent_policycoreutils_installed is succeeded
-  when: (zabbix_selinux | bool) and ansible_distribution_major_version == "8"
-  become: yes
-  tags:
-    - init
-    - zabbix-agent
-
-- name: "Install selinux-policy-targeted"
-  package:
-    name: selinux-policy-targeted
-    state: installed
-  register: zabbix_agent_selinuxpolicytargeted_installed
-  until: zabbix_agent_selinuxpolicytargeted_installed is succeeded
-  when: zabbix_selinux | bool
+    - not zabbix_agent_install_agent_only
   become: yes
   tags:
     - init
@@ -164,13 +131,3 @@
     - zabbix-agent
     - init
     - service
-
-- name: "Allow zabbix to run sudo commands (SELinux)"
-  seboolean:
-    name: zabbix_run_sudo
-    persistent: yes
-    state: yes
-  when:
-    - ansible_selinux.status == "enabled"
-    - selinux_allow_zabbix_run_sudo|bool
-  tags: selinux

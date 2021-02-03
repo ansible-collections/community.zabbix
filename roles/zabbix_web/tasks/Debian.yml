@@ -40,10 +40,13 @@
 
 - name: "Debian | Install zabbix-web"
   apt:
-    pkg: zabbix-frontend-php
+    pkg: "zabbix-frontend-php{{ '-deprecated' if zabbix_php_frontend_deprecated else '' }}"
     state: "{{ zabbix_web_package_state }}"
     update_cache: yes
     cache_valid_time: 0
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   register: zabbix_web_package_install
   until: zabbix_web_package_install is succeeded
   become: yes
@@ -82,21 +85,7 @@
   when:
     - zabbix_websrv == 'apache'
 
-- name: "Debian | Install Nginx vhost"
-  template:
-    src: nginx_vhost.conf.j2
-    dest: /etc/nginx/conf.d/zabbix.conf
-    owner: root
-    group: root
-    mode: 0644
+- name: "Configure SELinux when enabled"
+  include: selinux.yml
   when:
-    - zabbix_vhost
-    - zabbix_websrv == 'nginx'
-  become: yes
-  notify:
-    - restart nginx
-  tags:
-    - zabbix-web
-    - init
-    - config
-    - nginx
+    - zabbix_selinux | bool

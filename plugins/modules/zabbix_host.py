@@ -1102,6 +1102,7 @@ def main():
 
             # get existing host's interfaces
             exist_interfaces = host._zapi.hostinterface.get({'output': 'extend', 'hostids': host_id})
+            exist_interfaces.sort(key=lambda x: int(x['interfaceid']))
 
             # When force=no is specified, append existing interfaces to interfaces to update. When
             # no interfaces have been specified, copy existing interfaces as specified from the API.
@@ -1180,7 +1181,8 @@ def main():
             module.fail_json(msg="Specify at least one group for creating host '%s'." % host_name)
 
         if not interfaces or (interfaces and len(interfaces) == 0):
-            module.fail_json(msg="Specify at least one interface for creating host '%s'." % host_name)
+            if LooseVersion(host._zbx_api_version) < LooseVersion('5.2.0'):
+                module.fail_json(msg="Specify at least one interface for creating host '%s'." % host_name)
 
         # create host
         host_id = host.add_host(

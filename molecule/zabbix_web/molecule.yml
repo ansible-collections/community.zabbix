@@ -56,19 +56,21 @@ provisioner:
       zabbix-web-pgsql-debian:
         zabbix_websrv: apache
         php_default_version_debian: 7.4
+        zabbix_php_fpm_conf_listen: False
         zabbix_url: zabbix-web-pgsql-debian
         zabbix_websrv_servername: zabbix-web-pgsql-debian
       zabbix-web-mysql-debian:
         zabbix_websrv: apache
         php_default_version_debian: 7.4
+        zabbix_php_fpm_conf_listen: False
         zabbix_url: zabbix-web-mysql-debian
         zabbix_websrv_servername: zabbix-web-mysql-debian
-      zabbix-web-pgsql-centos7:
+      zabbix-web-pgsql-centos8:
+        ansible_rhn_repo_disable_gpg_check: True
         zabbix_websrv: apache
-        zabbix_php_fpm: True
         zabbix_php_fpm_conf_listen: False
-        zabbix_url: zabbix-web-pgsql-centos7
-        zabbix_websrv_servername: zabbix-web-pgsql-centos7
+        zabbix_url: zabbix-web-pgsql-centos8
+        zabbix_websrv_servername: zabbix-web-pgsql-centos8
       zabbix-web-mysql-centos8:
         ansible_rhn_repo_disable_gpg_check: True
         php_fpm_pool_user: nginx
@@ -92,19 +94,3 @@ verifier:
   name: testinfra
   lint:
     name: flake8
-
-scenario:
-  test_sequence:
-    - dependency
-    - lint
-    - cleanup
-    - destroy
-    - syntax
-    - create
-    - prepare
-    - converge
-    # - idempotence
-    - side_effect
-    - verify
-    - cleanup
-    - destroy

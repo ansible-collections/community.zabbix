@@ -80,15 +80,17 @@ options:
         type: list
         elements: dict
         suboptions:
-            name:
+            macro:
                 description:
                     - Name of the macro.
                     - Must be specified in {$NAME} format.
                 type: str
+                required: true
             value:
                 description:
                     - Value of the macro.
                 type: str
+                required: true
     dump_format:
         description:
             - Format to use when dumping template with C(state=dump).
@@ -306,11 +308,13 @@ template_xml:
 
 import json
 import traceback
+import re
 import xml.etree.ElementTree as ET
 
 from distutils.version import LooseVersion
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils._text import to_native
+from ansible.module_utils.six import PY2
 
 from ansible_collections.community.zabbix.plugins.module_utils.base import ZabbixBase
 import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabbix_utils
@@ -467,7 +471,10 @@ class Template(ZabbixBase):
                     date = xmlroot.find(".date")
                     if date is not None:
                         xmlroot.remove(date)
-                return str(ET.tostring(xmlroot, encoding='utf-8').decode('utf-8'))
+                if PY2:
+                    return str(ET.tostring(xmlroot, encoding='utf-8'))
+                else:
+                    return str(ET.tostring(xmlroot, encoding='utf-8').decode('utf-8'))
             else:
                 return self.load_json_template(dump, omit_date=omit_date)
 
@@ -615,6 +622,13 @@ class Template(ZabbixBase):
             if LooseVersion(self._zbx_api_version) >= LooseVersion('5.2'):
                 update_rules["templateDashboards"] = update_rules.pop("templateScreens")
 
+            # The loaded unicode slash of multibyte as a string is escaped when parsing JSON by json.loads in Python2.
+            # So, it is imported in the unicode string into Zabbix.
+            # The following processing is removing the unnecessary slash in escaped for decoding correctly to the multibyte string.
+            # https://github.com/ansible-collections/community.zabbix/issues/314
+            if PY2:
+                template_content = re.sub(r'\\\\u([0-9a-z]{,4})', r'\\u\1', template_content)
+
             import_data = {'format': template_type, 'source': template_content, 'rules': update_rules}
             self._zapi.configuration.import_(import_data)
         except Exception as e:
@@ -631,7 +645,14 @@ def main():
         template_groups=dict(type='list', required=False),
         link_templates=dict(type='list', required=False),
         clear_templates=dict(type='list', required=False),
-        macros=dict(type='list', required=False),
+        macros=dict(
+            type='list',
+            elements='dict',
+            options=dict(
+                macro=dict(type='str', required=True),
+                value=dict(type='str', required=True)
+            )
+        ),
         omit_date=dict(type='bool', required=False, default=False),
         dump_format=dict(type='str', required=False, default='json', choices=['json', 'xml']),
         state=dict(type='str', default="present", choices=['present', 'absent', 'dump']),
