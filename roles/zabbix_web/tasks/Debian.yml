@@ -95,13 +95,6 @@
   notify:
     - restart php-fpm-version
 
-- name: "Including Apache Configuration"
-  include_tasks: apache_Debian.yml
-  vars:
-    zabbix_apache_servername: "{{ zabbix_websrv_servername }}"
-  when:
-    - zabbix_websrv == 'apache'
-
 - name: "Configure SELinux when enabled"
   include: selinux.yml
   when:

@@ -139,12 +139,6 @@
   notify:
     - restart php-fpm
 
-- include_tasks: apache_RedHat.yml
-  vars:
-    zabbix_apache_servername: "{{ zabbix_websrv_servername }}"
-  when:
-    - zabbix_websrv == 'apache'
-
 - name: "RedHat | Install Nginx vhost"
   template:
     src: nginx_vhost.conf.j2

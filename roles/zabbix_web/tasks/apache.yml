@@ -33,3 +33,8 @@
     - ansible_os_family == "Debian"
   tags:
     - zabbix-web
+
+- name: "Including OS Specific Apache tasks"
+  include_tasks: apache_{{ ansible_os_family }}.yml
+  vars:
+    zabbix_apache_servername: "{{ zabbix_websrv_servername }}"

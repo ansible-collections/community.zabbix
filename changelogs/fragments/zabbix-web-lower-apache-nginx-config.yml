@@ -1,0 +1,2 @@
+bugfixes:
+  - zabbix_web - include_tasks apache.yml and nginx.yaml now after installing packages
