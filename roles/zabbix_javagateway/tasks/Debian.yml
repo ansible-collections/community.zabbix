@@ -29,7 +29,19 @@
   become: yes
   when:
     - ansible_distribution == "Debian"
+    - ansible_machine == "aarch64"
     - zabbix_repo == "zabbix"
+
+- name: "Debian | Installing repository Ubuntu"
+  apt_repository:
+    repo: "deb http://repo.zabbix.com/zabbix/{{ zabbix_javagateway_version }}/ubuntu-arm64/ {{ ansible_distribution_release }} main"
+    state: present
+  become: yes
+  when:
+    - ansible_distribution == "Ubuntu"
+    - ansible_machine == "aarch64"
+    - zabbix_repo == "zabbix"
+
 
 - name: "Debian | Installing repository Ubuntu"
   apt_repository:
@@ -38,7 +50,19 @@
   become: yes
   when:
     - ansible_distribution == "Ubuntu"
+    - ansible_machine != "aarch64"
     - zabbix_repo == "zabbix"
+
+- name: "Debian | Installing repository Ubuntu"
+  apt_repository:
+    repo: "deb-src http://repo.zabbix.com/zabbix/{{ zabbix_javagateway_version }}/ubuntu-arm64/ {{ ansible_distribution_release }} main"
+    state: present
+  become: yes
+  when:
+    - ansible_distribution == "Ubuntu"
+    - ansible_machine == "aarch64"
+    - zabbix_repo == "zabbix"
+
 
 - name: "Debian | Installing repository Ubuntu"
   apt_repository:
