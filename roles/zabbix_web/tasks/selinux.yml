@@ -32,6 +32,7 @@
   when:
     - ansible_os_family == "RedHat"
     - selinux_allow_zabbix_can_network
+    - ansible_distribution_major_version == "8"
   tags:
     - zabbix-web
 
