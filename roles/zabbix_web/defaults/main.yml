@@ -20,6 +20,7 @@ zabbix_web_htpasswd_file: /etc/zabbix/web/htpasswd
 zabbix_timezone: Europe/Amsterdam
 zabbix_vhost: True
 
+zabbix_php_install: true
 zabbix_php_frontend_deprecated: False
 zabbix_php_fpm: False
 zabbix_php_fpm_dir_etc: /etc/opt/rh/rh-php72/
@@ -86,7 +87,6 @@ zabbix_5_repo_yum:
     gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-ZABBIX
     state: present
 
-zabbix_php_install: true
 zabbix_web_max_execution_time: 300
 zabbix_web_memory_limit: 128M
 zabbix_web_post_max_size: 16M
@@ -122,3 +122,4 @@ zabbix_server_history_types:
   - 'dbl'
 
 selinux_allow_zabbix_can_network: False
+_zabbix_web_apache_php_addition: False
