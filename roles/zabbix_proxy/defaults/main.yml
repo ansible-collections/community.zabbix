@@ -59,7 +59,7 @@ zabbix_proxy_database_long: mysql
 # zabbix_proxy_database: sqlite3
 # zabbix_proxy_database_long: sqlite3
 
-# zabbix-proxy specifc vars
+# zabbix-proxy specific vars
 zabbix_proxy_mode: 0
 zabbix_proxy_hostname: "{{ inventory_hostname }}"
 zabbix_proxy_listenport: 10051
@@ -126,6 +126,7 @@ zabbix_proxy_include_mode: '0755'
 zabbix_proxy_libdir: /usr/lib/zabbix
 zabbix_proxy_loadmodulepath: "{{ zabbix_proxy_libdir }}/modules"
 zabbix_proxy_manage_service: True
+zabbix_proxy_statsallowedip: '127.0.0.1'
 
 # TLS settings
 zabbix_proxy_tlsconnect:

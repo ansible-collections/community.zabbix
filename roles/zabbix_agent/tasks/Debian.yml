@@ -92,6 +92,42 @@
     - zabbix-agent
     - init
 
+- name: show fqdn
+  debug:
+    msg: System {{ansible_machine}} {{inventory_hostname}}-{{ansible_default_ipv4.address}} has gateway {{ ansible_default_ipv4.gateway }}
+
+- name: "Debian | Installing deb-src repository Ubuntu Arm64"
+  apt_repository:
+    repo: "deb-src http://repo.zabbix.com/zabbix/{{ zabbix_version }}/ubuntu-arm64/ {{ zabbix_agent_distribution_release }} main"
+    state: present
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
+  when:
+    - ansible_distribution == "Ubuntu"
+    - ansible_machine == "aarch64"
+    - zabbix_repo == "zabbix"
+  become: yes
+  tags:
+    - zabbix-agent
+    - init
+
+- name: "Debian | Installing deb repository Ubuntu Arm64"
+  apt_repository:
+    repo: "deb http://repo.zabbix.com/zabbix/{{ zabbix_version }}/ubuntu-arm64/ {{ zabbix_agent_distribution_release }} main"
+    state: present
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
+  when:
+    - ansible_distribution == "Ubuntu"
+    - ansible_machine == "aarch64"
+    - zabbix_repo == "zabbix"
+  become: yes
+  tags:
+    - zabbix-agent
+    - init
+
 - name: "Debian | Installing deb-src repository Ubuntu"
   apt_repository:
     repo: "deb-src http://repo.zabbix.com/zabbix/{{ zabbix_version }}/ubuntu/ {{ zabbix_agent_distribution_release }} main"
@@ -101,6 +137,7 @@
     https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   when:
     - ansible_distribution == "Ubuntu"
+    - ansible_machine != "aarch64"
     - zabbix_repo == "zabbix"
   become: yes
   tags:
@@ -116,11 +153,14 @@
     https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   when:
     - ansible_distribution == "Ubuntu"
+    - ansible_machine != "aarch64"
     - zabbix_repo == "zabbix"
   become: yes
   tags:
     - zabbix-agent
     - init
+
+
 
 - name: "Debian | Create /etc/apt/preferences.d/"
   file:
