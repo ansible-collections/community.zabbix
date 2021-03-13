@@ -100,6 +100,8 @@
   include_tasks: api.yml
   when:
     - (zabbix_api_create_hostgroup | bool) or (zabbix_api_create_hosts | bool)
+  tags:
+    - api
 
 - name: "Including userparameters"
   include_tasks: "userparameter.yml"
