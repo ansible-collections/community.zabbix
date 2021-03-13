@@ -586,7 +586,7 @@ def main():
                     'Telnet']
                 ),
                 ports=dict(type='str'),
-                key=dict(type='str'),
+                key=dict(type='str', no_log=False),
                 snmp_community=dict(type='str'),
                 snmpv3_authpassphrase=dict(type='str'),
                 snmpv3_authprotocol=dict(type='str', choices=['MD5', 'SHA']),
