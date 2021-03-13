@@ -17,6 +17,7 @@
   set_fact:
     zabbix_short_version: "{{ zabbix_version | regex_replace('\\.', '') }}"
     zabbix_php_version: "{{ zabbix_php_version if zabbix_php_version is defined else _zabbix_php_version }}"
+    _zabbix_php_package_prefix: ''
   tags:
     - always
 
