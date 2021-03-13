@@ -972,9 +972,9 @@ def main():
                         contextname=dict(type='str', default=''),
                         securitylevel=dict(type='int', choices=[0, 1, 2], default=0),
                         authprotocol=dict(type='int', choices=[0, 1], default=0),
-                        authpassphrase=dict(type='str', default=''),
+                        authpassphrase=dict(type='str', default='', no_log=True),
                         privprotocol=dict(type='int', choices=[0, 1], default=0),
-                        privpassphrase=dict(type='str', default='')
+                        privpassphrase=dict(type='str', default='', no_log=True)
                     )
                 )
             ),
