@@ -104,6 +104,7 @@ The following is an overview of all available configuration default for this rol
 * `zabbix_proxy_groupid`: The GID of the group on the host. Will only be used when `zabbix_repo: epel` is used.
 * `zabbix_proxy_include_mode`: Default: `0755`. The "mode" for the directory configured with `zabbix_proxy_include`.
 * `zabbix_proxy_conf_mode`: Default: `0644`. The "mode" for the Zabbix configuration file.
+* `zabbix_proxy_statsallowedip`: Default: `127.0.0.1`. Allowed IP foe remote gathering of the ZabbixPorixy internal metrics.
 
 ### Database specific
 
