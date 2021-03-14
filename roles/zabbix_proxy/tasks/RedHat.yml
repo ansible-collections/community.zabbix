@@ -189,11 +189,11 @@
   environment:
     http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
     https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
-  register: zabbix_server_dependencies_installed
-  until: zabbix_server_dependencies_installed is succeeded
+  register: zabbix_proxy_dependencies_installed
+  until: zabbix_proxy_dependencies_installed is succeeded
   become: yes
   when:
-    - zabbix_server_database == 'mysql'
+    - zabbix_proxy_database == 'mysql'
     - ansible_distribution_major_version == "8"
   tags:
     - zabbix-proxy
