@@ -676,7 +676,7 @@ class Zapi(ZapiWrapper):
         try:
             discovery_check_list = self._zapi.dcheck.get({
                 'output': 'extend',
-                'filter': {'name': [discovery_check_name]}
+                'filter': {'key_': [discovery_check_name]}
             })
             if len(discovery_check_list) < 1:
                 self._module.fail_json(msg="Discovery check not found: %s" % discovery_check_name)
