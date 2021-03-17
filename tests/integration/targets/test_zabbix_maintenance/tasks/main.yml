@@ -35,6 +35,21 @@
     that:
       - create_maintenance_host_name_result.changed is sameas true
 
+- name: "test - Create maintenance with a host_name param and disabled visible_name"
+  zabbix_maintenance:
+    server_url: "{{ zabbix_server_url }}"
+    login_user: "{{ zabbix_login_user }}"
+    login_password: "{{ zabbix_login_password }}"
+    name: maintenance
+    host_name: example
+    visible_name: no
+    state: present
+  register: create_maintenance_host_name_result
+
+- assert:
+    that:
+      - create_maintenance_host_name_result.changed is sameas true
+
 - name: "test - Create maintenance with a host_name param(again - expectations: no change will occur)"
   zabbix_maintenance:
     server_url: "{{ zabbix_server_url }}"
