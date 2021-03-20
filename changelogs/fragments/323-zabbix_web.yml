@@ -1,0 +1,2 @@
+bugfixes:
+- zabbix_web - updated default PHP version for Debian10 (https://github.com/ansible-collections/community.zabbix/pull/323).
