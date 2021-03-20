@@ -1,2 +1,0 @@
-bugfixes:
-- zabbix_server - now installs correct MySQL client packages on RHEL8 systems (https://github.com/ansible-collections/community.zabbix/pull/343).
