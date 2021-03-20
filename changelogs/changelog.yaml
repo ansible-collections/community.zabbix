@@ -316,3 +316,46 @@ releases:
     - roles-all-update-to-zabbix-52.yml
     - templatescreens-fix.yml
     release_date: '2021-01-11'
+  1.3.0:
+    changes:
+      bugfixes:
+      - zabbix_action - now properly filters discovery rule checks by name (https://github.com/ansible-collections/community.zabbix/pull/349).
+      - zabbix_agent - corrected version for Windows agents (https://github.com/ansible-collections/community.zabbix/pull/316).
+      - zabbix_agent - fixed download URL for MacOS (https://github.com/ansible-collections/community.zabbix/pull/325).
+      - zabbix_server - now installs correct MySQL client packages on RHEL8 systems
+        (https://github.com/ansible-collections/community.zabbix/pull/343).
+      - zabbix_template - fixed an issue with Python2 where module wouldn't decode
+        Unicode characters (https://github.com/ansible-collections/community.zabbix/pull/322).
+      - zabbix_web - fixed installation of python3-libsemanage package RHEL7 and older
+        systems (https://github.com/ansible-collections/community.zabbix/pull/330).
+      - zabbix_web - role should now correctly determine naming of PHP packages on
+        older systems (https://github.com/ansible-collections/community.zabbix/pull/344).
+      - zabbix_web - updated default PHP version for Debian10 (https://github.com/ansible-collections/community.zabbix/pull/323).
+      minor_changes:
+      - zabbix_agent - added support for installations on arm64 systems (https://github.com/ansible-collections/community.zabbix/pull/320).
+      - zabbix_proxy - now supports configuring StatsAllowedIP (https://github.com/ansible-collections/community.zabbix/pull/337).
+      - zabbix_server - added support for installtions on arm64 systems (https://github.com/ansible-collections/community.zabbix/pull/320).
+      - zabbix_web - added support for installtions on arm64 systems (https://github.com/ansible-collections/community.zabbix/pull/320).
+      security_fixes:
+      - zabbix_action - no longer exposes remote SSH command password used in operations,
+        recovery & acknowledge operations to system logs (https://github.com/ansible-collections/community.zabbix/pull/345).
+      - zabbix_discovery_rule - no longer exposes SNMPv3 auth and priv passphrases
+        to system logs (https://github.com/ansible-collections/community.zabbix/pull/345).
+      - zabbix_host - no longer exposes SNMPv3 auth and priv passphrases to system
+        logs (https://github.com/ansible-collections/community.zabbix/pull/345).
+      release_summary: '| Release date: 2021-03-20 | Last major release to support
+        Zabbix server 3.X versions in plugins.'
+    fragments:
+    - 316-zbx-agent-windows-long-version.yaml
+    - 322-zabbix_template.yml
+    - 323-zabbix_web.yml
+    - 325-zbx-agent-macos.yaml
+    - 330-zabbix_web-selinux.yaml
+    - 337-zabbix_proxy-statsAllowedIP.yaml
+    - 343-zabbix_server-rhel8-mysql.yaml
+    - 344-zabbix_web-legacyphp.yaml
+    - 345-security-fixes-no_log.yaml
+    - 349-zabbix_action-dcheck-filter.yaml
+    - raspberry-server.yaml
+    - raspberry.yaml
+    release_date: '2021-03-20'

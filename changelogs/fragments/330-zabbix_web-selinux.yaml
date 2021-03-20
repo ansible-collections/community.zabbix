@@ -1,2 +1,0 @@
-bugfixes:
-- zabbix_web - fixed installation of python3-libsemanage package RHEL7 and older systems (https://github.com/ansible-collections/community.zabbix/pull/330).

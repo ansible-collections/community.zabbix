@@ -1,2 +1,0 @@
-bugfixes:
-- zabbix_agent - corrected version for Windows agents (https://github.com/ansible-collections/community.zabbix/pull/316).
