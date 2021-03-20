@@ -1,0 +1,2 @@
+bugfixes:
+- zabbix_action - now properly filters discovery rule checks by name (https://github.com/ansible-collections/community.zabbix/pull/349).

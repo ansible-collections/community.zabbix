@@ -1,2 +1,2 @@
 minor_changes:
-- add support to install agent on arm64 (another repository) 
+- zabbix_agent - added support for installations on arm64 systems (https://github.com/ansible-collections/community.zabbix/pull/320).

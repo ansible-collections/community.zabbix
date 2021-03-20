@@ -1,0 +1,2 @@
+bugfixes:
+- zabbix_agent - fixed download URL for MacOS (https://github.com/ansible-collections/community.zabbix/pull/325).
