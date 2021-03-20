@@ -1,2 +1,0 @@
-bugfixes:
-- zabbix_web - role should now correctly determine naming of PHP packages on older systems (https://github.com/ansible-collections/community.zabbix/pull/344).
