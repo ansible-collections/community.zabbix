@@ -59,9 +59,10 @@ options:
             - Type of maintenance. With data collection, or without.
         type: bool
         default: 'yes'
-    visible_name
+    visible_name:
         description:
-            - Type of zabbix host name to use. No: Technical name of the host. Yes: Visible name of the host.
+            - Type of zabbix host name to use for identifying hosts to include in the maintenance.
+            - I(visible_name=yes) to search by visible name,  I(visible_name=no) to search by technical name.
         type: bool
         default: 'yes'
 
