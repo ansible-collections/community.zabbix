@@ -109,7 +109,7 @@
   become: yes
 
 - name: apt-get clean
-  shell: apt-get clean; rm -rf /tmp/*; apt-get update
+  shell: apt-get clean; apt-get update
   args:
     warn: False
   changed_when: False
