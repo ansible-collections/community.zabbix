@@ -21,19 +21,19 @@
   tags:
     - zabbix-server
 
-- name: "RedHat | Set some facts Zabbix < 3.0"
+- name: "RedHat | Set some facts Zabbix <= 3.2"
   set_fact:
     datafiles_path: "/usr/share/doc/zabbix-server-{{ zabbix_server_database }}-{{ zabbix_version }}*"
   when:
-    - zabbix_version is version('3.0', '<')
+    - zabbix_version is version('3.2', '<=')
   tags:
     - zabbix-server
 
-- name: "RedHat | Set facts for Zabbix >= 3.0"
+- name: "RedHat | Set facts for Zabbix > 3.2"
   set_fact:
-    datafiles_path: "/usr/share/doc/zabbix-server-{{ zabbix_server_database }}-{{ zabbix_version }}*"
+    datafiles_path: "/usr/share/doc/zabbix-server-{{ zabbix_server_database }}*"
   when:
-    - zabbix_version is version('3.0', '>=')
+    - zabbix_version is version('3.2', '>')
   tags:
     - zabbix-server
 
@@ -60,7 +60,7 @@
     state: present
   become: yes
   when:
-    - zabbix_repo == "epel"  
+    - zabbix_repo == "epel"
 
 - name: "RedHat | Create 'zabbix' user (EPEL)"
   user:
@@ -71,7 +71,7 @@
   become: yes
   when:
     - zabbix_repo == "epel"
-    
+
 - name: "Make sure old file is absent"
   file:
     path: /etc/yum.repos.d/zabbix-supported.repo
