@@ -65,6 +65,7 @@ options:
             - I(visible_name=yes) to search by visible name,  I(visible_name=no) to search by technical name.
         type: bool
         default: 'yes'
+        version_added: '2.0.0'
 
 extends_documentation_fragment:
 - community.zabbix.zabbix
