@@ -27,12 +27,13 @@ jobs:
         ansible:
           # - stable-2.9 # Only if your collection supports Ansible 2.9
           - stable-2.10
+          - stable-2.11
           - devel
         python:
           - 2.7
           - 3.7
-        exclude:
-          - python: 3.8  # blocked by ansible/ansible#70155
+          - 3.8
+          - 3.9
 
     steps:
       - name: Check out code
