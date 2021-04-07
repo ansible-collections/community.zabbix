@@ -59,6 +59,13 @@ options:
             - Type of maintenance. With data collection, or without.
         type: bool
         default: 'yes'
+    visible_name:
+        description:
+            - Type of zabbix host name to use for identifying hosts to include in the maintenance.
+            - I(visible_name=yes) to search by visible name,  I(visible_name=no) to search by technical name.
+        type: bool
+        default: 'yes'
+        version_added: '2.0.0'
 
 extends_documentation_fragment:
 - community.zabbix.zabbix
@@ -231,7 +238,7 @@ class MaintenanceModule(ZabbixBase):
 
         return 0, group_ids, None
 
-    def get_host_ids(self, host_names):
+    def get_host_ids(self, host_names, zabbix_host):
         host_ids = []
         for host in host_names:
             try:
@@ -240,7 +247,7 @@ class MaintenanceModule(ZabbixBase):
                         "output": "extend",
                         "filter":
                         {
-                            "name": host
+                            zabbix_host: host
                         }
                     }
                 )
@@ -266,6 +273,7 @@ def main():
         name=dict(type='str', required=True),
         desc=dict(type='str', required=False, default="Created by Ansible"),
         collect_data=dict(type='bool', required=False, default=True),
+        visible_name=dict(type='bool', required=False, default=True),
     ))
     module = AnsibleModule(
         argument_spec=argument_spec,
@@ -281,11 +289,17 @@ def main():
     name = module.params['name']
     desc = module.params['desc']
     collect_data = module.params['collect_data']
+    visible_name = module.params['visible_name']
 
     if collect_data:
         maintenance_type = 0
     else:
         maintenance_type = 1
+
+    if visible_name:
+        zabbix_host = "name"
+    else:
+        zabbix_host = "host"
 
     changed = False
 
@@ -305,7 +319,7 @@ def main():
             group_ids = []
 
         if host_names:
-            (rc, host_ids, error) = maint.get_host_ids(host_names)
+            (rc, host_ids, error) = maint.get_host_ids(host_names, zabbix_host)
             if rc != 0:
                 module.fail_json(msg="Failed to get host_ids: %s" % error)
         else:
