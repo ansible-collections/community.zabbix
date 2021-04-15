@@ -201,7 +201,7 @@ HostInterfaceItem={{ zabbix_agent2_hostinterfaceitem }}
 ### Option: AllowKey
 # 	Optional parameter that defines AllowKey
 # 	Allow execution of those item keys that match a pattern.
-# 	Key pattern is a wildcard expression that supports “*” character to match any number of any characters.
+# 	Key pattern is a wildcard expression that supports "*" character to match any number of any characters.
 # 	Multiple key matching rules may be defined in combination with DenyKey.
 # 	The parameters are processed one by one according to their appearance order.
 
@@ -366,7 +366,9 @@ TLSConnect={{ zabbix_agent2_tlsconnect }}
 #
 # Mandatory: yes, if TLS certificate or PSK parameters are defined (even for 'unencrypted' connection)
 # Default:
-{% if zabbix_agent2_tlsaccept is defined and zabbix_agent2_tlsaccept %}
+{% if zabbix_agent_connections_tlsaccept is defined and zabbix_agent_connections_tlsaccept %}
+TLSAccept={{ zabbix_agent_connections_tlsaccept }}
+{% elif zabbix_agent2_tlsaccept is defined and zabbix_agent2_tlsaccept %}
 TLSAccept={{ zabbix_agent2_tlsaccept }}
 {% endif %}
 
