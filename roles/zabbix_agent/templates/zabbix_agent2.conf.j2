@@ -198,6 +198,19 @@ HostInterface={{ zabbix_agent2_hostinterface }}
 HostInterfaceItem={{ zabbix_agent2_hostinterfaceitem }}
 {% endif %}
 
+### Option: AllowKey
+# 	Optional parameter that defines AllowKey
+# 	Allow execution of those item keys that match a pattern.
+# 	Key pattern is a wildcard expression that supports "*" character to match any number of any characters.
+# 	Multiple key matching rules may be defined in combination with DenyKey.
+# 	The parameters are processed one by one according to their appearance order.
+
+{% if zabbix_agent_allow_key is defined and zabbix_agent_allow_key %}
+{% for item in zabbix_agent_allow_key %}
+AllowKey={{ item }}
+{% endfor %}
+{% endif %}
+
 ### Option: RefreshActiveChecks
 #	How often list of active checks is refreshed, in seconds.
 #
