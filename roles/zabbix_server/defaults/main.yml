@@ -76,6 +76,7 @@ zabbix_server_historystoragedateindex: 0
 zabbix_server_exportdir:
 zabbix_server_exportfilesize: 1G
 zabbix_server_startpollers: 5
+zabbix_server_startlldprocessors: 2
 zabbix_server_startipmipollers: 0
 zabbix_server_startpollersunreachable: 1
 zabbix_server_starttrappers: 5
