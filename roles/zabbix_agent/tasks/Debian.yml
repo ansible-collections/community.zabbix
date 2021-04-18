@@ -188,7 +188,7 @@
 # http://askubuntu.com/questions/75565/why-am-i-getting-authentication-errors-for-packages-from-an-ubuntu-repository
 - name: "Debian | Installing zabbix-agent"
   apt:
-    pkg: "{{ zabbix_agent_packages }}"
+    pkg: "{{ zabbix_agent_package }}"
     state: "{{ zabbix_agent_package_state }}"
     update_cache: yes
     cache_valid_time: 0
@@ -198,6 +198,30 @@
     http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
     https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   when: ansible_distribution in ['Ubuntu', 'Debian']
+  register: zabbix_agent_package_installed
+  until: zabbix_agent_package_installed is succeeded
+  become: yes
+  check_mode: no
+  tags:
+    - zabbix-agent
+    - init
+
+- name: "Debian | Installing zabbix-{sender,get}"
+  apt:
+    pkg:
+      - "{{ zabbix_sender_package }}"
+      - "{{ zabbix_get_package }}"
+    state: "{{ zabbix_agent_package_state }}"
+    update_cache: yes
+    cache_valid_time: 0
+    force_apt_get: "{{ zabbix_apt_force_apt_get }}"
+    install_recommends: "{{ zabbix_apt_install_recommends }}"
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
+  when:
+    - ansible_distribution in ['Ubuntu', 'Debian']
+    - not zabbix_agent_install_agent_only
   register: zabbix_agent_package_installed
   until: zabbix_agent_package_installed is succeeded
   become: yes
