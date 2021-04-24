@@ -92,10 +92,6 @@
     - zabbix-agent
     - init
 
-- name: show fqdn
-  debug:
-    msg: System {{ansible_machine}} {{inventory_hostname}}-{{ansible_default_ipv4.address}} has gateway {{ ansible_default_ipv4.gateway }}
-
 - name: "Debian | Installing deb-src repository Ubuntu Arm64"
   apt_repository:
     repo: "deb-src http://repo.zabbix.com/zabbix/{{ zabbix_version }}/ubuntu-arm64/ {{ zabbix_agent_distribution_release }} main"
