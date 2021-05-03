@@ -14,7 +14,7 @@ module: zabbix_globalmacro
 short_description: Create/update/delete Zabbix Global macros
 description:
    - manages Zabbix Global macros, it can create, update or delete them.
-   - For macro_type 1 (Secret Text) the value field cannot be validated and will always be overwritten due to the secret nature of the Text. 
+   - For macro_type 1 (Secret Text) the value field cannot be validated and will always be overwritten due to the secret nature of the Text.
 author:
     - "Cove (@cove)"
     - Dean Hailin Song (!UNKNOWN)
@@ -110,7 +110,7 @@ class GlobalMacro(ZabbixBase):
     def get_global_macro(self, macro_name):
         try:
             all_global_macro_list = self._zapi.usermacro.get({"globalmacro": 'true'})
-            global_macro_list=[d for d in all_global_macro_list if d['macro'] == macro_name]
+            global_macro_list = [d for d in all_global_macro_list if d['macro'] == macro_name]
             if len(global_macro_list) > 0:
                 return global_macro_list[0]
             return None
@@ -219,4 +219,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
