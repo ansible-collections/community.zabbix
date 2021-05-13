@@ -34,7 +34,7 @@ options:
         description: Proxy server to use for reaching zabbix API
         type: string
         default: ''
-    host_zapi_query: 
+    host_zapi_query:
         description:
             - API query for hosts - see zabbix documentation for more details U(https://www.zabbix.com/documentation/current/manual/api/reference/host/get)
         type: dict
@@ -44,26 +44,29 @@ options:
             selectApplications:
                 type: str
                 description:
-                    - query 
+                    - query
                     - Return an applications property with host applications.
                     - To return all values specify 'extend'
-                    - can be limited to different fields for example setting the vaule to ['name'] will only return the name additional fields can be specified by comma seperated value ['name', 'field2']
-                    - please see U(https://www.zabbix.com/documentation/current/manual/api/reference/application/object) for more details on field names
+                    - Can be limited to different fields for example setting the vaule to ['name'] will only return the name
+                    - Additional fields can be specified by comma seperated value ['name', 'field2']
+                    - Please see U(https://www.zabbix.com/documentation/current/manual/api/reference/application/object) for more details on field names
             selectDiscoveries:
                 type: str
                 description:
                     - query
                     - Return a discoveries property with host low-level discovery rules.
                     - To return all values specify 'extend'
-                    - can be limited to different fields for example setting the vaule to ['name'] will only return the name additional fields can be specified by comma seperated value ['name', 'field2']
-                    - please see U(https://www.zabbix.com/documentation/current/manual/api/reference/discoveryrule/object) for more details on field names
+                    - Can be limited to different fields for example setting the vaule to ['name'] will only return the name
+                    - Additional fields can be specified by comma seperated value ['name', 'field2']
+                    - Please see U(https://www.zabbix.com/documentation/current/manual/api/reference/discoveryrule/object) for more details on field names
             selectDiscoveryRule:
                 type: str
                 description:
                     - query
                     - Return a discoveryRule property with the low-level discovery rule that created the host (from host prototype in VMware monitoring).
                     - To return all values specify 'extend'
-                    - can be limited to different fields for example setting the vaule to ['name'] will only return the name additional fields can be specified by comma seperated value ['name', 'field2']
+                    - Can be limited to different fields for example setting the vaule to ['name'] will only return the name
+                    - Additional fields can be specified by comma seperated value ['name', 'field2']
                     - please see U(https://www.zabbix.com/documentation/current/manual/api/reference/discoveryrule/object)  for more details on field names
             selectGraphs:
                 type: str
@@ -71,104 +74,117 @@ options:
                     - query
                     - Return a discoveries property with host low-level discovery rules.
                     - To return all values specify 'extend'
-                    - can be limited to different fields for example setting the vaule to ['name'] will only return the name additional fields can be specified by comma seperated value ['name', 'field2']
-                    - please see U(https://www.zabbix.com/documentation/current/manual/api/reference/graph/object) for more details on field names
+                    - Can be limited to different fields for example setting the vaule to ['name'] will only return the name
+                    - Additional fields can be specified by comma seperated value ['name', 'field2']
+                    - Please see U(https://www.zabbix.com/documentation/current/manual/api/reference/graph/object) for more details on field names
             selectGroups:
                 type: str
                 description:
                     - query
                     - Return a groups property with host groups data that the host belongs to.
                     - To return all values specify 'extend'
-                    - can be limited to different fields for example setting the vaule to ['name'] will only return the name additional fields can be specified by comma seperated value ['name', 'field2']
-                    - please see U(https://www.zabbix.com/documentation/current/manual/api/reference/hostgroup/object) for more details on field names
+                    - Can be limited to different fields for example setting the vaule to ['name'] will only return the name
+                    - Additional fields can be specified by comma seperated value ['name', 'field2']
+                    - Please see U(https://www.zabbix.com/documentation/current/manual/api/reference/hostgroup/object) for more details on field names
             selectHostDiscovery:
                 type: str
                 description:
                     - query
                     - Return a hostDiscovery property with host discovery object data.
                     - To return all values specify 'extend'
-                    - can be limited to different fields for example setting the vaule to ['name'] will only return the name additional fields can be specified by comma seperated value ['name', 'field2']
-                    - please see U(https://www.zabbix.com/documentation/current/manual/api/reference/host/get) for more details on field names
+                    - Can be limited to different fields for example setting the vaule to ['name'] will only return the name
+                    - Additional fields can be specified by comma seperated value ['name', 'field2']
+                    - Please see U(https://www.zabbix.com/documentation/current/manual/api/reference/host/get) for more details on field names
             selectHttpTests:
                 type: str
                 description:
                     - query
                     - Return an httpTests property with host web scenarios.
                     - To return all values specify 'extend'
-                    - can be limited to different fields for example setting the vaule to ['name'] will only return the name additional fields can be specified by comma seperated value ['name', 'field2']
-                    - please see U(https://www.zabbix.com/documentation/current/manual/api/reference/httptest/object) for more details on field names
+                    - Can be limited to different fields for example setting the vaule to ['name'] will only return the name
+                    - Additional fields can be specified by comma seperated value ['name', 'field2']
+                    - Please see U(https://www.zabbix.com/documentation/current/manual/api/reference/httptest/object) for more details on field names
             selectInterfaces:
                 type: str
                 description:
                     - query
                     - Return an interfaces property with host interfaces.
                     - To return all values specify 'extend'
-                    - can be limited to different fields for example setting the vaule to ['name'] will only return the name additional fields can be specified by comma seperated value ['name', 'field2']
-                    - please see U(https://www.zabbix.com/documentation/current/manual/api/reference/hostinterface/object) for more details on field names
+                    - Can be limited to different fields for example setting the vaule to ['name'] will only return the name
+                    - Additional fields can be specified by comma seperated value ['name', 'field2']
+                    - Please see U(https://www.zabbix.com/documentation/current/manual/api/reference/hostinterface/object) for more details on field names
             selectInventory:
                 type: str
                 description:
                     - query
                     - Return an inventory property with host inventory data.
                     - To return all values specify 'extend'
-                    - can be limited to different fields for example setting the vaule to ['name'] will only return the name additional fields can be specified by comma seperated value ['name', 'field2']
-                    - please see U(https://www.zabbix.com/documentation/current/manual/api/reference/host/object#host_inventory) for more details on field names
+                    - Can be limited to different fields for example setting the vaule to ['name'] will only return the name
+                    - Additional fields can be specified by comma seperated value ['name', 'field2']
+                    - Please see U(https://www.zabbix.com/documentation/current/manual/api/reference/host/object#host_inventory) for more details on field names
             selectItems:
                 type: str
                 description:
                     - query
                     - Return an items property with host items.
                     - To return all values specify 'extend'
-                    - can be limited to different fields for example setting the vaule to ['name'] will only return the name additional fields can be specified by comma seperated value ['name', 'field2']
-                    - please see U(https://www.zabbix.com/documentation/current/manual/api/reference/item/object) for more details on field names
+                    - Can be limited to different fields for example setting the vaule to ['name'] will only return the name
+                    - Additional fields can be specified by comma seperated value ['name', 'field2']
+                    - Please see U(https://www.zabbix.com/documentation/current/manual/api/reference/item/object) for more details on field names
             selectMacros:
                 type: str
                 description:
                     - query
                     - Return a macros property with host macros.
                     - To return all values specify 'extend'
-                    - can be limited to different fields for example setting the vaule to ['name'] will only return the name additional fields can be specified by comma seperated value ['name', 'field2']
-                    - please see U(https://www.zabbix.com/documentation/current/manual/api/reference/usermacro/object) for more details on field names
+                    - Can be limited to different fields for example setting the vaule to ['name'] will only return the name
+                    - Additional fields can be specified by comma seperated value ['name', 'field2']
+                    - Please see U(https://www.zabbix.com/documentation/current/manual/api/reference/usermacro/object) for more details on field names
             selectParentTemplates:
                 type: str
                 description:
                     - query
                     - Return a parentTemplates property with templates that the host is linked to
                     - To return all values specify 'extend'
-                    - can be limited to different fields for example setting the vaule to ['name'] will only return the name additional fields can be specified by comma seperated value ['name', 'field2']
-                    - please see U(https://www.zabbix.com/documentation/current/manual/api/reference/template/object) for more details on field names
+                    - Can be limited to different fields for example setting the vaule to ['name'] will only return the name
+                    - Additional fields can be specified by comma seperated value ['name', 'field2']
+                    - Please see U(https://www.zabbix.com/documentation/current/manual/api/reference/template/object) for more details on field names
             selectDashboards:
                 type: str
                 description:
                     - query
                     - Return a dashboards property.
                     - To return all values specify 'extend'
-                    - can be limited to different fields for example setting the vaule to ['name'] will only return the name additional fields can be specified by comma seperated value ['name', 'field2']
-                    - please see U(https://www.zabbix.com/documentation/current/manual/api/reference/templatedashboard/object) for more details on field names
+                    - Can be limited to different fields for example setting the vaule to ['name'] will only return the name
+                    - Additional fields can be specified by comma seperated value ['name', 'field2']
+                    - Please see U(https://www.zabbix.com/documentation/current/manual/api/reference/templatedashboard/object) for more details on field names
             selectTags:
                 type: str
                 description:
                     - query
                     - Return a tags property with host tags.
                     - To return all values specify 'extend'
-                    - can be limited to different fields for example setting the vaule to ['name'] will only return the name additional fields can be specified by comma seperated value ['name', 'field2']
-                    - please see U(https://www.zabbix.com/documentation/current/manual/api/reference/host/object#host_tag) for more details on field names
+                    - Can be limited to different fields for example setting the vaule to ['name'] will only return the name
+                    - Additional fields can be specified by comma seperated value ['name', 'field2']
+                    - Please see U(https://www.zabbix.com/documentation/current/manual/api/reference/host/object#host_tag) for more details on field names
             selectInheritedTags:
                 type: str
                 description:
                     - query
                     - Return an inheritedTags property with tags that are on all templates which are linked to host.
                     - To return all values specify 'extend'
-                    - can be limited to different fields for example setting the vaule to ['name'] will only return the name additional fields can be specified by comma seperated value ['name', 'field2']
-                    - please see U(https://www.zabbix.com/documentation/current/manual/api/reference/host/object#host_tag) for more details on field names
+                    - Can be limited to different fields for example setting the vaule to ['name'] will only return the name
+                    - Additional fields can be specified by comma seperated value ['name', 'field2']
+                    - Please see U(https://www.zabbix.com/documentation/current/manual/api/reference/host/object#host_tag) for more details on field names
             selectTriggers:
                 type: str
                 description:
                     - query
                     - Return a triggers property with host triggers.
                     - To return all values specify 'extend'
-                    - can be limited to different fields for example setting the vaule to ['name'] will only return the name additional fields can be specified by comma seperated value ['name', 'field2']
-                    - please see U(https://www.zabbix.com/documentation/current/manual/api/reference/host/object#host_tag) for more details on field names
+                    - Can be limited to different fields for example setting the vaule to ['name'] will only return the name
+                    - Additional fields can be specified by comma seperated value ['name', 'field2']
+                    - Please see U(https://www.zabbix.com/documentation/current/manual/api/reference/host/object#host_tag) for more details on field names
     login_user:
         description:
             - Zabbix user name.
@@ -208,13 +224,13 @@ extends_documentation_fragment:
 '''
 
 EXAMPLES = r'''
-# Simple Inventory Plugin example 
-# This will create an inventory with all hosts in a zabbix instance with their applications name, applicaitonids, Parent Template Name, and group membership name
-#It will also create 2 ansible inventory groups for enabled and disabled hosts in zabbix based on the status field. 
+# Simple Inventory Plugin example
+# This will create an inventory with details from zabbix such as applications name, applicaitonids, Parent Template Name, and group membership name
+#It will also create 2 ansible inventory groups for enabled and disabled hosts in zabbix based on the status field.
 plugin: community.zabbix.zabbix_inventory
 server_url: https://zabbix.com
 login_user: Admin
-login_password: password 
+login_password: password
 host_zapi_query:
   selectApplications: ['name', 'applicationid']
   selectParentTemplates: ['name']
@@ -266,24 +282,25 @@ compose:
 
 '''
 
-from ansible.errors import AnsibleError, AnsibleParserError
 from ansible.plugins.inventory import BaseInventoryPlugin, Constructable, Cacheable, to_safe_group_name
 import os
+import atexit
+import traceback
 
 try:
-    from zabbix_api import ZabbixAPI, Already_Exists, ZabbixAPIException
-
+    from zabbix_api import ZabbixAPI
     HAS_ZABBIX_API = True
 except ImportError:
     ZBX_IMP_ERR = traceback.format_exc()
     HAS_ZABBIX_API = False
+
 
 class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
 
     NAME = 'community.zabbix.zabbix_inventory'
 
     def login_zabbix(self):
-        #set proxy information if required
+        # set proxy information if required
         proxy = self.get_option('proxy')
         os.environ['http_proxy'] = proxy
         os.environ['HTTP_PROXY'] = proxy
@@ -295,7 +312,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         http_login_password = self.get_option('login_password')
         validate_certs = self.get_option('validate_certs')
         timeout = self.get_option('timeout')
-        self._zapi = ZabbixAPI(server_url, timeout=timeout, user=http_login_user, passwd=http_login_password,validate_certs=validate_certs)
+        self._zapi = ZabbixAPI(server_url, timeout=timeout, user=http_login_user, passwd=http_login_password, validate_certs=validate_certs)
         self.login()
         self._zbx_api_version = self._zapi.api_version()[:5]
 
@@ -331,33 +348,33 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         self.update_cache = self.get_option('cache') and not cache
 
         self.login_zabbix()
-        zapi_query = login_user = self.get_option('host_zapi_query')
-        content=self._zapi.host.get(zapi_query)
+        zapi_query = self.get_option('host_zapi_query')
+        content = self._zapi.host.get(zapi_query)
 
         strict = self.get_option('strict')
 
-        for record in content: 
+        for record in content:
             # add host to inventory
             host_name = self.inventory.add_host(record['host'])
             # set variables for host
             for k in record.keys():
                 self.inventory.set_variable(host_name, 'zbx_%s' % k, record[k])
 
-            #added for compose vars and keyed groups
+            # added for compose vars and keyed groups
             self._set_composite_vars(
                 self.get_option('compose'),
-                self.inventory.get_host(host_name).get_vars(), host_name,strict)
+                self.inventory.get_host(host_name).get_vars(), host_name, strict)
 
-            self._add_host_to_composed_groups(self.get_option('groups'),dict(), host_name, strict)
-            self._add_host_to_keyed_groups(self.get_option('keyed_groups'),dict(), host_name, strict)
+            self._add_host_to_composed_groups(self.get_option('groups'), dict(), host_name, strict)
+            self._add_host_to_keyed_groups(self.get_option('keyed_groups'), dict(), host_name, strict)
 
-        #organize inventory by zabbix groups
+        # organize inventory by zabbix groups
         if self.get_option('add_zabbix_groups'):
-            content=self._zapi.host.get({'selectGroups': ['name']})
+            content = self._zapi.host.get({'selectGroups': ['name']})
             for record in content:
                 host_name = record['host']
                 if len(record['groups']) >= 1:
                     for group in record['groups']:
-                        group_name=to_safe_group_name(group['name'])
+                        group_name = to_safe_group_name(group['name'])
                         self.inventory.add_group(group_name)
                         self.inventory.add_child(group_name, host_name)
