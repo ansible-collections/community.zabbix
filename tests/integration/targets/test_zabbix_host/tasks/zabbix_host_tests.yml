@@ -4,6 +4,7 @@
     server_url: "{{ zabbix_server_url }}"
     login_user: "{{ zabbix_login_user }}"
     login_password: "{{ zabbix_login_password }}"
+    timeout: 30     # slower with py2.7
     host_name: ExampleHost
     visible_name: ExampleName
     description: My ExampleHost Description
@@ -68,6 +69,7 @@
     server_url: "{{ zabbix_server_url }}"
     login_user: "{{ zabbix_login_user }}"
     login_password: "{{ zabbix_login_password }}"
+    timeout: 30     # slower with py2.7
     host_name: ExampleHost
     visible_name: ExampleName
     description: My ExampleHost Description
@@ -133,6 +135,7 @@
     server_url: "{{ zabbix_server_url }}"
     login_user: "{{ zabbix_login_user }}"
     login_password: "{{ zabbix_login_password }}"
+    timeout: 30     # slower with py2.7
     host_name: ExampleHost
     visible_name: ExampleName
     description: My ExampleHost Description
@@ -189,6 +192,7 @@
     server_url: "{{ zabbix_server_url }}"
     login_user: "{{ zabbix_login_user }}"
     login_password: "{{ zabbix_login_password }}"
+    timeout: 30     # slower with py2.7
     host_name: ExampleHost
     visible_name: ExampleName
     description: My ExampleHost Description
@@ -450,6 +454,7 @@
     server_url: "{{ zabbix_server_url }}"
     login_user: "{{ zabbix_login_user }}"
     login_password: "{{ zabbix_login_password }}"
+    timeout: 30     # slower with py2.7
     host_name: ExampleHost
     link_templates:
       -
