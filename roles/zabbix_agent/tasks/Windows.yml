@@ -123,9 +123,12 @@
     force: False
     follow_redirects: all
     proxy_url: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
+    validate_certs: "{{ zabbix_download_validate_certs | default(False) | bool }}"
+    timeout: "{{ zabbix_download_timeout | default(120) | int }}"
   when: not file_info.stat.exists
   register: zabbix_agent_win_download_zip
   until: zabbix_agent_win_download_zip is succeeded
+  throttle: "{{ zabbix_download_throttle | default(5) | int }}"
 
 - name: "Windows | Unzip file"
   win_unzip:
