@@ -118,6 +118,8 @@
   win_get_url:
     url: "{{ zabbix_win_download_link }}"
     dest: '{{ zabbix_win_install_dir }}\{{ zabbix_win_package }}'
+    url_username: "{{zabbix_download_user|default(omit)}}"
+    url_password: "{{zabbix_download_pass|default(omit)}}"
     force: False
     follow_redirects: all
     proxy_url: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
