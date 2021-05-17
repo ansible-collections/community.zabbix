@@ -98,7 +98,7 @@
     state: directory
   with_items:
     - "{{ zabbix_win_install_dir }}"
-    - "{{ zabbix_agent_win_include }}"
+    - "{{ ('.' in zabbix_agent_win_include) | ternary(omit, zabbix_agent_win_include) }}"
 
 - name: "Windows | Place TLS-PSK file"
   win_copy:
