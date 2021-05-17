@@ -88,8 +88,9 @@
     path: '{{ zabbix_win_install_dir }}'
     state: absent
   when:
-    - update_zabbix_agent | default(false)
+    - update_zabbix_agent | default(False) | bool
     - agent_file_info.stat.exists
+    - remove_zabbix_directory | default(False) | bool
 
 - name: "Windows | Create directory structure"
   win_file:
