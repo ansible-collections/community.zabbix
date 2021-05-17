@@ -33,8 +33,9 @@ The collection includes a variety of Ansible content to help automate the manage
 
 Click on the name of a plugin or module to view that content's documentation:
 
-  - **Inventory Source**:
-    - [zabbix](scripts/inventory/zabbix.py)
+  - **Inventory Sources**:
+    - [zabbix](scripts/inventory/zabbix.py) - Zabbix Inventory Script 
+	- [zabbix_inventory](plugins/inventory/zabbix_inventory.py) - Zabbix Ansible Inventory Plguin 
   - **Modules**:
     - [zabbix_action](https://docs.ansible.com/ansible/2.10/collections/community/zabbix/zabbix_action_module.html)
     - [zabbix_group_info](https://docs.ansible.com/ansible/2.10/collections/community/zabbix/zabbix_group_info_module.html)

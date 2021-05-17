@@ -14,8 +14,9 @@ DOCUMENTATION = r'''
 name: community.zabbix.zabbix_inventory
 plugin_type: inventory
 author:
-    - Timothy Test (ttestscripting)
+    - Timothy Test (@ttestscripting)
 short_description: Zabbix Inventory Plugin
+version_added: 1.4.0
 description:
     - Zabbix Inventory plugin
     - All vars from zabbix are prefixed with zbx_
