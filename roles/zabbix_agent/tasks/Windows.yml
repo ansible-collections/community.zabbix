@@ -121,6 +121,7 @@
     force: False
     follow_redirects: all
     proxy_url: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
+  when: not file_info.stat.exists
   register: zabbix_agent_win_download_zip
   until: zabbix_agent_win_download_zip is succeeded
 
