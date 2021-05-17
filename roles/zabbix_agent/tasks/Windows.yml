@@ -59,6 +59,11 @@
     name: Zabbix Agent
   register: zabbix_service_info
 
+- name: Windows | Check firewall service
+  win_service:
+    name: MpsSvc
+  register: firewall_info
+
 - name: "Windows | Stop Zabbix (Update)"
   win_service:
     name: Zabbix Agent
@@ -170,3 +175,4 @@
     protocol: tcp
     state: present
     enabled: yes
+  when: firewall_info.state == 'started'
