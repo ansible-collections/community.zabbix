@@ -1,0 +1,2 @@
+minor_changes:
+- zabbix_globalmacros - it is now possible to create global macros using this module

@@ -148,7 +148,7 @@ class GlobalMacro(ZabbixBase):
         try:
             if self._module.check_mode:
                 self._module.exit_json(changed=True)
-            self._zapi.usermacro.deleteglobal(global_macro_id)
+            self._zapi.usermacro.deleteglobal([global_macro_id])
             self._module.exit_json(changed=True, result="Successfully deleted global macro %s" % macro_name)
         except Exception as e:
             self._module.fail_json(msg="Failed to delete global macro %s: %s" % (macro_name, e))
