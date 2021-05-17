@@ -108,7 +108,7 @@
     - zabbix_agent_tlspskfile is defined
     - zabbix_agent_tlspsk_secret is defined
   notify: restart win zabbix agent
-  
+
 - name: "Windows | Check if file is already downloaded"
   win_stat:
     path: '{{ zabbix_win_install_dir }}\{{ zabbix_win_package }}'
