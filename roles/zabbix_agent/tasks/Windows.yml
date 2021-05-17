@@ -98,7 +98,15 @@
     state: directory
   with_items:
     - "{{ zabbix_win_install_dir }}"
-    - "{{ ('.' in zabbix_agent_win_include) | ternary(omit, zabbix_agent_win_include) }}"
+
+- name: "Windows | Create directory structure, includes"
+  win_file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - "{{ zabbix_agent_win_include }}"
+  when:
+    - ('.' not in zabbix_agent_win_include)
 
 - name: "Windows | Place TLS-PSK file"
   win_copy:
