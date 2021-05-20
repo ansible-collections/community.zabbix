@@ -70,8 +70,6 @@
     start_mode: auto
     state: stopped
   when:
-    - update_zabbix_agent | default(False) | bool
-    - agent_file_info.stat.exists
     - zabbix_service_info.exists
     - zabbix_service_info.state == 'running'
 
