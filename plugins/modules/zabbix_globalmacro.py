@@ -154,7 +154,7 @@ class GlobalMacro(ZabbixBase):
                     self._module.exit_json(changed=True)
                 self._zapi.usermacro.updateglobal({'globalmacroid': global_macro_id, 'macro': macro_name, 'value': macro_value})
                 self._module.exit_json(changed=True, result="Successfully updated global macro %s" % macro_name)
-            if LooseVersion(self._zbx_api_version) >= LooseVersion('4.4.0'):
+            elif LooseVersion(self._zbx_api_version) >= LooseVersion('5.0.0'):
                 if LooseVersion(self._zbx_api_version) >= LooseVersion('5.4.0'):
                     if macro_type == '1':
                         macro_type = '0'
