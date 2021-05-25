@@ -145,7 +145,7 @@ def helper_compare_dictionaries(d1, d2, diff_dict):
     return diff_dict
 
 
-def helper_normalize_data(data, del_keys=[]):
+def helper_normalize_data(data, del_keys=None):
     """
     Delete None parameter or specified keys from data.
 
@@ -156,6 +156,9 @@ def helper_normalize_data(data, del_keys=[]):
         data: None parameter removed data
         del_keys: deleted keys
     """
+    if del_keys is None:
+        del_keys = []
+
     for key, value in data.items():
         if value is None:
             del_keys.append(key)
