@@ -6,7 +6,7 @@
     login_password: "{{ zabbix_login_password }}"
     macro_name: zbxgmacro_test01
     macro_value: 123
-    macro_type: 0
+    macro_type: text
     macro_description: Global Macro description
   register: zbxgmacro_new
 
@@ -21,7 +21,7 @@
     login_password: "{{ zabbix_login_password }}"
     macro_name: zbxgmacro_test01
     macro_value: 123
-    macro_type: 0
+    macro_type: text
     macro_description: Global Macro description
   register: zbxgmacro_existing
 
@@ -36,7 +36,7 @@
     login_password: "{{ zabbix_login_password }}"
     macro_name: "{$zbxgmacro_test01}"
     macro_value: 123
-    macro_type: 0
+    macro_type: text
     macro_description: Global Macro description
   register: zbxgmacro_existing_native
 
@@ -51,7 +51,7 @@
     login_password: "{{ zabbix_login_password }}"
     macro_name: "{$ZBXGMACRO_TEST02}"
     macro_value: abcd
-    macro_type: 0
+    macro_type: text
   register: zbxgmacro_new_native
 
 - name: assert that nothing macro was created
@@ -65,7 +65,7 @@
     login_password: "{{ zabbix_login_password }}"
     macro_name: zbxgmacro_test01
     macro_value: abc
-    macro_type: 0
+    macro_type: text
     force: no
   register: zbxgmacro_update_noforce
 
@@ -80,7 +80,7 @@
     login_password: "{{ zabbix_login_password }}"
     macro_name: zbxgmacro_test01
     macro_value: abc
-    macro_type: 0
+    macro_type: text
   register: zbxgmacro_update
 
 - name: assert that global macro was updated
@@ -94,7 +94,7 @@
     login_password: "{{ zabbix_login_password }}"
     macro_name: low_space_limit:/home
     macro_value: 10
-    macro_type: 0
+    macro_type: text
   register: zbxgmacro_context_new
 
 - name: assert that macro was created
@@ -108,7 +108,7 @@
     login_password: "{{ zabbix_login_password }}"
     macro_name: LOW_SPACE_LIMIT:/home
     macro_value: 10
-    macro_type: 0
+    macro_type: text
   register: zbxgmacro_context_existing
 
 - name: assert that nothing has been changed

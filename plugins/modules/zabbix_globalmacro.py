@@ -38,11 +38,11 @@ options:
         description:
             - Type of the global macro Text or Secret Text.
             - Required if I(state=present).
-            - 0 Text
-            - 1 Secret Text Works only with Zabbix >= 5.0 and will default to Text in lower versions
-            - 2 Vault secret Works only with Zabbix >= 5.2 and will default to Text in lower versions
+            - text
+            - secret - Secret Text Works only with Zabbix >= 5.0 and will default to Text in lower versions
+            - vault - Vault Secret Works only with Zabbix >= 5.2 and will default to Text in lower versions
         type: str
-        choices: ['0', '1', '2']
+        choices: [text, secret, vault]
         default: "0"
     macro_description:
         description:
@@ -161,18 +161,23 @@ class GlobalMacro(ZabbixBase):
                 if LooseVersion(self._zbx_api_version) >= LooseVersion('5.0.0') and LooseVersion(self._zbx_api_version) < LooseVersion('5.4.0'):
                     if macro_type == '2' or macro_type == '1':
                         macro_type = '0'
-                if global_macro_obj['macro'] == macro_name and global_macro_obj['value'] == macro_value and global_macro_obj['type'] == macro_type and global_macro_obj['description'] == macro_description:
-                    self._module.exit_json(changed=False, result="Global macro %s already up to date" % macro_name)
+                if global_macro_obj['type'] == '0' or global_macro_obj['type'] == '2':
+                    if (global_macro_obj['macro'] == macro_name and global_macro_obj['value'] == macro_value
+                            and global_macro_obj['type'] == macro_type and global_macro_obj['description'] == macro_description):
+                        self._module.exit_json(changed=False, result="Global macro %s already up to date" % macro_name)
                 if self._module.check_mode:
                     self._module.exit_json(changed=True)
-                self._zapi.usermacro.updateglobal({'globalmacroid': global_macro_id, 'macro': macro_name, 'value': macro_value, 'type': macro_type, 'description': macro_description})
+                self._zapi.usermacro.updateglobal({'globalmacroid': global_macro_id, 'macro': macro_name,
+                                                   'value': macro_value, 'type': macro_type, 'description': macro_description})
                 self._module.exit_json(changed=True, result="Successfully updated global macro %s" % macro_name)
             else:
-                if global_macro_obj['macro'] == macro_name and global_macro_obj['value'] == macro_value and global_macro_obj['description'] == macro_description:
+                if (global_macro_obj['macro'] == macro_name and global_macro_obj['value'] == macro_value
+                        and global_macro_obj['description'] == macro_description):
                     self._module.exit_json(changed=False, result="Global macro %s already up to date" % macro_name)
                 if self._module.check_mode:
                     self._module.exit_json(changed=True)
-                self._zapi.usermacro.updateglobal({'globalmacroid': global_macro_id, 'macro': macro_name, 'value': macro_value, 'description': macro_description})
+                self._zapi.usermacro.updateglobal({'globalmacroid': global_macro_id, 'macro': macro_name,
+                                                   'value': macro_value, 'description': macro_description})
                 self._module.exit_json(changed=True, result="Successfully updated global macro %s" % macro_name)
         except Exception as e:
             self._module.fail_json(msg="Failed to update global macro %s: %s" % (macro_name, e))
@@ -210,7 +215,7 @@ def main():
     argument_spec.update(dict(
         macro_name=dict(type='str', required=True),
         macro_value=dict(type='str', required=False),
-        macro_type=dict(type='str', default='0', choices=['0', '1', '2']),
+        macro_type=dict(type='str', default='text', choices=['text', 'secret', 'vault']),
         macro_description=dict(type='str', default=''),
         state=dict(type='str', default='present', choices=['present', 'absent']),
         force=dict(type='bool', default=True)
@@ -230,6 +235,13 @@ def main():
     macro_description = module.params['macro_description']
     state = module.params['state']
     force = module.params['force']
+
+    if macro_type == 'text':
+        macro_type = '0'
+    elif macro_type == 'secret':
+        macro_type = '1'
+    elif macro_type == 'vault':
+        macro_type = '2'
 
     global_macro_class_obj = GlobalMacro(module)
 
