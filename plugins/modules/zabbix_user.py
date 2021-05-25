@@ -28,12 +28,10 @@ options:
     name:
         description:
             - Name of the user.
-        default: ''
         type: str
     surname:
         description:
             - Surname of the user.
-        default: ''
         type: str
     usrgrps:
         description:
@@ -59,7 +57,6 @@ options:
         description:
             - Language code of the user's language.
             - C(default) can be used with Zabbix version 5.2 or higher.
-        default: 'en_GB'
         choices:
             - 'en_GB'
             - 'en_US'
@@ -83,7 +80,6 @@ options:
     theme:
         description:
             - User's theme.
-        default: 'default'
         choices:
             - 'default'
             - 'blue-theme'
@@ -93,28 +89,27 @@ options:
         description:
             - Whether to enable auto-login.
             - If enable autologin, cannot enable autologout.
-        default: false
         type: bool
     autologout:
         description:
             - User session life time in seconds. If set to 0, the session will never expire.
             - If enable autologout, cannot enable autologin.
-        default: '0'
         type: str
     refresh:
         description:
             - Automatic refresh period in seconds.
+            - The default value will be removed at the version 2.0.0.
         default: '30'
         type: str
     rows_per_page:
         description:
             - Amount of object rows to show per page.
+            - The default value will be removed at the version 2.0.0.
         default: '50'
         type: str
     after_login_url:
         description:
             - URL of the page to redirect the user to after logging in.
-        default: ''
         type: str
     user_medias:
         description:
@@ -202,7 +197,6 @@ options:
             - User's time zone.
             - I(timezone) can be used with Zabbix version 5.2 or higher.
             - For the full list of supported time zones please refer to U(https://www.php.net/manual/en/timezones.php)
-        default: default
         type: str
         version_added: 1.2.0
     role_name:
@@ -289,6 +283,7 @@ from distutils.version import LooseVersion
 from ansible.module_utils.basic import AnsibleModule
 
 from ansible_collections.community.zabbix.plugins.module_utils.base import ZabbixBase
+from ansible_collections.community.zabbix.plugins.module_utils.helpers import helper_normalize_data
 import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabbix_utils
 
 
@@ -425,6 +420,9 @@ class User(ZabbixBase):
             request_data['roleid'] = self.get_roleid_by_name(role_name)
             request_data['timezone'] = timezone
 
+        request_data, del_keys = helper_normalize_data(request_data)
+        existing_data, _del_keys = helper_normalize_data(existing_data, del_keys)
+
         user_parameter_difference_check_result = True
         if existing_data == request_data:
             user_parameter_difference_check_result = False
@@ -469,6 +467,8 @@ class User(ZabbixBase):
         else:
             request_data['roleid'] = self.get_roleid_by_name(role_name)
             request_data['timezone'] = timezone
+
+        request_data, _del_keys = helper_normalize_data(request_data)
 
         diff_params = {}
         if not self._module.check_mode:
@@ -516,6 +516,8 @@ class User(ZabbixBase):
         else:
             request_data['roleid'] = self.get_roleid_by_name(role_name)
             request_data['timezone'] = timezone
+
+        request_data, _del_keys = helper_normalize_data(request_data)
 
         # In the case of zabbix 3.2 or less, it is necessary to use updatemedia method to update media.
         if LooseVersion(self._zbx_api_version) <= LooseVersion('3.2'):
@@ -565,22 +567,22 @@ def main():
     argument_spec = zabbix_utils.zabbix_common_argument_spec()
     argument_spec.update(dict(
         alias=dict(type='str', required=True),
-        name=dict(type='str', default=''),
-        surname=dict(type='str', default=''),
+        name=dict(type='str'),
+        surname=dict(type='str'),
         usrgrps=dict(type='list'),
         passwd=dict(type='str', required=False, no_log=True),
         override_passwd=dict(type='bool', required=False, default=False, no_log=False),
-        lang=dict(type='str', default='en_GB', choices=['en_GB', 'en_US', 'zh_CN', 'cs_CZ', 'fr_FR',
-                                                        'he_IL', 'it_IT', 'ko_KR', 'ja_JP', 'nb_NO',
-                                                        'pl_PL', 'pt_BR', 'pt_PT', 'ru_RU', 'sk_SK',
-                                                        'tr_TR', 'uk_UA', 'default']),
-        theme=dict(type='str', default='default', choices=['default', 'blue-theme', 'dark-theme']),
-        autologin=dict(type='bool', default=False),
-        autologout=dict(type='str', default='0'),
+        lang=dict(type='str', choices=['en_GB', 'en_US', 'zh_CN', 'cs_CZ', 'fr_FR',
+                                       'he_IL', 'it_IT', 'ko_KR', 'ja_JP', 'nb_NO',
+                                       'pl_PL', 'pt_BR', 'pt_PT', 'ru_RU', 'sk_SK',
+                                       'tr_TR', 'uk_UA', 'default']),
+        theme=dict(type='str', choices=['default', 'blue-theme', 'dark-theme']),
+        autologin=dict(type='bool'),
+        autologout=dict(type='str'),
         refresh=dict(type='str', default='30'),
         rows_per_page=dict(type='str', default='50'),
-        after_login_url=dict(type='str', default=''),
-        user_medias=dict(type='list', default=None, elements='dict',
+        after_login_url=dict(type='str'),
+        user_medias=dict(type='list', elements='dict',
                          options=dict(mediatype=dict(type='str', default='Email'),
                                       sendto=dict(type='str', required=True),
                                       period=dict(type='str', default='1-7,00:00-24:00'),
@@ -600,7 +602,7 @@ def main():
                                                         high=True,
                                                         disaster=True)),
                                       active=dict(type='bool', default=True))),
-        timezone=dict(type='str', default='default'),
+        timezone=dict(type='str'),
         role_name=dict(type='str', default='User role'),
         type=dict(type='str', default='Zabbix user', choices=['Zabbix user', 'Zabbix admin', 'Zabbix super admin']),
         state=dict(type='str', default="present", choices=['present', 'absent'])
@@ -608,7 +610,10 @@ def main():
     module = AnsibleModule(
         argument_spec=argument_spec,
         required_if=[
-            ['state', 'present', ['usrgrps']]
+            ['state', 'present', ['usrgrps', 'refresh', 'rows_per_page', 'type']]
+        ],
+        mutually_exclusive=[
+            ('autologin', 'autologout')
         ],
         supports_check_mode=True
     )
@@ -632,10 +637,11 @@ def main():
     role_name = module.params['role_name']
     state = module.params['state']
 
-    if autologin:
-        autologin = '1'
-    else:
-        autologin = '0'
+    if autologin is not None:
+        if autologin:
+            autologin = '1'
+        else:
+            autologin = '0'
 
     user_type_dict = {
         'Zabbix user': '1',
