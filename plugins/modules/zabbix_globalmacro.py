@@ -99,7 +99,8 @@ EXAMPLES = r'''
     state: absent
 '''
 
-
+RETURN=r"""
+"""
 from ansible.module_utils.basic import AnsibleModule
 
 from ansible_collections.community.zabbix.plugins.module_utils.base import ZabbixBase
