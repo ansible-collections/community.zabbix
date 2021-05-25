@@ -101,9 +101,8 @@ EXAMPLES = r'''
     state: absent
 '''
 
-RETURN=r"""
+RETURN = r"""
 """
-
 from distutils.version import LooseVersion
 from ansible.module_utils.basic import AnsibleModule
 
