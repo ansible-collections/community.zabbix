@@ -1,2 +1,2 @@
-minor_changes
+minor_changes:
   - zabbix_user - removed some default values because a configuration should be changed only if specified a parameter (https://github.com/ansible-collections/community.zabbix/pull/382).
