@@ -612,9 +612,6 @@ def main():
         required_if=[
             ['state', 'present', ['usrgrps', 'refresh', 'rows_per_page', 'type']]
         ],
-        mutually_exclusive=[
-            ('autologin', 'autologout')
-        ],
         supports_check_mode=True
     )
 
