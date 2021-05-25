@@ -15,7 +15,7 @@ short_description: Create/update/delete Zabbix Global macros
 version_added: 1.4.0
 description:
    - manages Zabbix Global macros, it can create, update or delete them.
-   - For macro_type 1 (Secret Text) the value field cannot be validated and will always be overwritten due to the secret nature of the Text.
+   - For macro_type Secret the value field cannot be validated and will always be overwritten due to the secret nature of the Text.
 author:
     - "Cove (@cove)"
     - Dean Hailin Song (!UNKNOWN)
@@ -43,7 +43,7 @@ options:
             - vault - Vault Secret Works only with Zabbix >= 5.2 and will default to Text in lower versions
         type: str
         choices: [text, secret, vault]
-        default: "0"
+        default: text
     macro_description:
         description:
             - Text Description of the global macro.
