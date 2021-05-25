@@ -82,7 +82,6 @@
     macro_value: abc
     macro_type: 0
   register: zbxgmacro_update
-  ignore_errors: True
 
 - name: assert that global macro was updated
   assert:

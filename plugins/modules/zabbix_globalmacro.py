@@ -39,13 +39,15 @@ options:
             - Type of the global macro Text or Secret Text.
             - Required if I(state=present).
             - 0 Text
-            - 1 Secret Text
+            - 1 Secret Text Works only with Zabbix >= 5.0 and will default to Text in lower versions
+            - 2 Vault secret Works only with Zabbix >= 5.2 and will default to Text in lower versions
         type: str
-        choices: ['0', '1']
+        choices: ['0', '1', '2']
         default: "0"
     macro_description:
         description:
             - Text Description of the global macro.
+            - Works only with Zabbix >= 4.4 and is silently ignored in lower versions
         type: str
     state:
         description:
@@ -101,6 +103,8 @@ EXAMPLES = r'''
 
 RETURN=r"""
 """
+
+from distutils.version import LooseVersion
 from ansible.module_utils.basic import AnsibleModule
 
 from ansible_collections.community.zabbix.plugins.module_utils.base import ZabbixBase
@@ -124,22 +128,53 @@ class GlobalMacro(ZabbixBase):
         try:
             if self._module.check_mode:
                 self._module.exit_json(changed=True)
-            self._zapi.usermacro.createglobal({'macro': macro_name, 'value': macro_value, 'type': macro_type, 'description': macro_description})
-            self._module.exit_json(changed=True, result="Successfully added global macro %s" % macro_name)
+            if LooseVersion(self._zbx_api_version) < LooseVersion('4.4.0'):
+                self._zapi.usermacro.createglobal({'macro': macro_name, 'value': macro_value})
+                self._module.exit_json(changed=True, result="Successfully added global macro %s" % macro_name)
+            if LooseVersion(self._zbx_api_version) >= LooseVersion('4.4.0'):
+                if LooseVersion(self._zbx_api_version) >= LooseVersion('5.0.0'):
+                    if LooseVersion(self._zbx_api_version) >= LooseVersion('5.0.0') and LooseVersion(self._zbx_api_version) < LooseVersion('5.4.0'):
+                        if macro_type == '2':
+                            macro_type = '0'
+                    self._zapi.usermacro.createglobal({'macro': macro_name, 'value': macro_value, 'type': macro_type, 'description': macro_description})
+                    self._module.exit_json(changed=True, result="Successfully added global macro %s" % macro_name)
+                else:
+                    self._zapi.usermacro.createglobal({'macro': macro_name, 'value': macro_value, 'description': macro_description})
+                    self._module.exit_json(changed=True, result="Successfully added global macro %s" % macro_name)
         except Exception as e:
             self._module.fail_json(msg="Failed to create global macro %s: %s" % (macro_name, e))
 
     # update global macro
     def update_global_macro(self, global_macro_obj, macro_name, macro_value, macro_type, macro_description):
         global_macro_id = global_macro_obj['globalmacroid']
-        if global_macro_obj['type'] == '0':
-            if global_macro_obj['macro'] == macro_name and global_macro_obj['value'] == macro_value and global_macro_obj['type'] == macro_type and global_macro_obj['description'] == macro_description:
-                self._module.exit_json(changed=False, result="Global macro %s already up to date" % macro_name)
         try:
-            if self._module.check_mode:
-                self._module.exit_json(changed=True)
-            self._zapi.usermacro.updateglobal({'globalmacroid': global_macro_id, 'macro': macro_name, 'value': macro_value, 'type': macro_type, 'description': macro_description})
-            self._module.exit_json(changed=True, result="Successfully updated global macro %s" % macro_name)
+            if LooseVersion(self._zbx_api_version) < LooseVersion('4.4.0'):
+                if global_macro_obj['macro'] == macro_name and global_macro_obj['value'] == macro_value:
+                    self._module.exit_json(changed=False, result="Global macro %s already up to date" % macro_name)
+                if self._module.check_mode:
+                    self._module.exit_json(changed=True)
+                self._zapi.usermacro.updateglobal({'globalmacroid': global_macro_id, 'macro': macro_name, 'value': macro_value})
+                self._module.exit_json(changed=True, result="Successfully updated global macro %s" % macro_name)
+            if LooseVersion(self._zbx_api_version) >= LooseVersion('4.4.0'):
+                if LooseVersion(self._zbx_api_version) >= LooseVersion('5.4.0'):
+                    if macro_type == '1':
+                        macro_type = '0'
+                if LooseVersion(self._zbx_api_version) >= LooseVersion('5.0.0') and LooseVersion(self._zbx_api_version) < LooseVersion('5.4.0'):
+                    if macro_type == '2' or macro_type == '1':
+                        macro_type = '0'
+                if global_macro_obj['macro'] == macro_name and global_macro_obj['value'] == macro_value and global_macro_obj['type'] == macro_type and global_macro_obj['description'] == macro_description:
+                    self._module.exit_json(changed=False, result="Global macro %s already up to date" % macro_name)
+                if self._module.check_mode:
+                    self._module.exit_json(changed=True)
+                self._zapi.usermacro.updateglobal({'globalmacroid': global_macro_id, 'macro': macro_name, 'value': macro_value, 'type': macro_type, 'description': macro_description})
+                self._module.exit_json(changed=True, result="Successfully updated global macro %s" % macro_name)
+            else:
+                if global_macro_obj['macro'] == macro_name and global_macro_obj['value'] == macro_value and global_macro_obj['description'] == macro_description:
+                    self._module.exit_json(changed=False, result="Global macro %s already up to date" % macro_name)
+                if self._module.check_mode:
+                    self._module.exit_json(changed=True)
+                self._zapi.usermacro.updateglobal({'globalmacroid': global_macro_id, 'macro': macro_name, 'value': macro_value, 'description': macro_description})
+                self._module.exit_json(changed=True, result="Successfully updated global macro %s" % macro_name)
         except Exception as e:
             self._module.fail_json(msg="Failed to update global macro %s: %s" % (macro_name, e))
 
@@ -176,7 +211,7 @@ def main():
     argument_spec.update(dict(
         macro_name=dict(type='str', required=True),
         macro_value=dict(type='str', required=False),
-        macro_type=dict(type='str', default='0', choices=['0', '1']),
+        macro_type=dict(type='str', default='0', choices=['0', '1', '2']),
         macro_description=dict(type='str', default=''),
         state=dict(type='str', default='present', choices=['present', 'absent']),
         force=dict(type='bool', default=True)
