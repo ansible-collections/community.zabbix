@@ -185,8 +185,7 @@ options:
     type:
         description:
             - Type of the user.
-            - I(type) is necessary if Zabbix version is 5.0 or lower.
-        default: 'Zabbix user'
+            - I(type) can be used when Zabbix version is 5.0 or lower.
         choices:
             - 'Zabbix user'
             - 'Zabbix admin'
@@ -202,8 +201,9 @@ options:
     role_name:
         description:
             - User's role.
-            - I(role_name) is required when Zabbix version is 5.2 or higher.
-        default: 'User role'
+            - I(role_name) can be used when Zabbix version is 5.2 or higher.
+            - Default is C(User role) when creating a new user.
+            - The default value will be removed at the version 2.0.0.
         type: str
         version_added: 1.2.0
     state:
@@ -417,7 +417,7 @@ class User(ZabbixBase):
         if LooseVersion(self._zbx_api_version) < LooseVersion('5.2'):
             request_data['type'] = user_type
         else:
-            request_data['roleid'] = self.get_roleid_by_name(role_name)
+            request_data['roleid'] = self.get_roleid_by_name(role_name) if role_name else None
             request_data['timezone'] = timezone
 
         request_data, del_keys = helper_normalize_data(request_data)
@@ -436,6 +436,12 @@ class User(ZabbixBase):
 
     def add_user(self, alias, name, surname, user_group_ids, passwd, lang, theme, autologin, autologout, refresh,
                  rows_per_page, url, user_medias, user_type, not_ldap, timezone, role_name):
+
+        if role_name is None and LooseVersion(self._zbx_api_version) >= LooseVersion('5.2'):
+            # This variable is to set the default value because the module must have a backward-compatible.
+            # The default value will be removed at the version 2.0.0.
+            # https://github.com/ansible-collections/community.zabbix/pull/382
+            role_name = "User role"
 
         if user_medias:
             user_medias = self.convert_user_medias_parameter_types(user_medias)
@@ -514,7 +520,7 @@ class User(ZabbixBase):
         if LooseVersion(self._zbx_api_version) < LooseVersion('5.2'):
             request_data['type'] = user_type
         else:
-            request_data['roleid'] = self.get_roleid_by_name(role_name)
+            request_data['roleid'] = self.get_roleid_by_name(role_name) if role_name else None
             request_data['timezone'] = timezone
 
         request_data, _del_keys = helper_normalize_data(request_data)
@@ -603,14 +609,14 @@ def main():
                                                         disaster=True)),
                                       active=dict(type='bool', default=True))),
         timezone=dict(type='str'),
-        role_name=dict(type='str', default='User role'),
-        type=dict(type='str', default='Zabbix user', choices=['Zabbix user', 'Zabbix admin', 'Zabbix super admin']),
+        role_name=dict(type='str'),
+        type=dict(type='str', choices=['Zabbix user', 'Zabbix admin', 'Zabbix super admin']),
         state=dict(type='str', default="present", choices=['present', 'absent'])
     ))
     module = AnsibleModule(
         argument_spec=argument_spec,
         required_if=[
-            ['state', 'present', ['usrgrps', 'refresh', 'rows_per_page', 'type']]
+            ['state', 'present', ['usrgrps', 'refresh', 'rows_per_page']]
         ],
         supports_check_mode=True
     )
@@ -645,7 +651,7 @@ def main():
         'Zabbix admin': '2',
         'Zabbix super admin': '3'
     }
-    user_type = user_type_dict[user_type]
+    user_type = user_type_dict[user_type] if user_type else None
 
     user = User(module)
 
