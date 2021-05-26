@@ -1019,7 +1019,7 @@
       that:
         - delete_existing_user_result.changed is sameas true
 
-# The tests are to check the patch for PR hasn’t a problem.
+# The tests are to check the patch for PR hasn't a problem.
 # https://github.com/ansible-collections/community.zabbix/pull/382
 - name: test - Create a zabbix user with minimum parameters
   zabbix_user:
