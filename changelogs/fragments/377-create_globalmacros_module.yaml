@@ -1,2 +1,2 @@
 minor_changes:
-- zabbix_globalmacros - it is now possible to create global macros using this module
+- zabbix_globalmacros - it is now possible to create global macros using this module (https://github.com/ansible-collections/community.zabbix/pull/377).
