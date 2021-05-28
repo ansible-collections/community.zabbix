@@ -54,29 +54,39 @@
     - zabbix_win_exe_info.win_file_version.product_version is version(zabbix_version_long, '<')
     - zabbix_agent_package_state == 'latest'
 
+- name: Windows | Check Zabbix service
+  win_service:
+    name: Zabbix Agent
+  register: zabbix_service_info
+
+- name: Windows | Check firewall service
+  win_service:
+    name: MpsSvc
+  register: firewall_info
+
 - name: "Windows | Stop Zabbix (Update)"
   win_service:
     name: Zabbix Agent
     start_mode: auto
     state: stopped
   when:
-    - update_zabbix_agent | default(false)
-    - agent_file_info.stat.exists
+    - zabbix_service_info.exists
+    - zabbix_service_info.state == 'running'
 
 - name: "Windows | Uninstall Zabbix (Update)"
   win_command: '"{{ zabbix_win_exe_path }}" --config "{{ zabbix_win_install_dir }}\zabbix_agentd.conf" --uninstall'
   register: zabbix_windows_install
   when:
-    - update_zabbix_agent | default(false)
-    - agent_file_info.stat.exists
+    - zabbix_service_info.exists
 
 - name: "Windows | Removing Zabbix Directory (Update)"
   win_file:
     path: '{{ zabbix_win_install_dir }}'
     state: absent
   when:
-    - update_zabbix_agent | default(false)
+    - update_zabbix_agent | default(False) | bool
     - agent_file_info.stat.exists
+    - remove_zabbix_directory | default(False) | bool
 
 - name: "Windows | Create directory structure"
   win_file:
@@ -84,7 +94,15 @@
     state: directory
   with_items:
     - "{{ zabbix_win_install_dir }}"
+
+- name: "Windows | Create directory structure, includes"
+  win_file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
     - "{{ zabbix_agent_win_include }}"
+  when:
+    - ('.' not in zabbix_agent_win_include)
 
 - name: "Windows | Place TLS-PSK file"
   win_copy:
@@ -94,7 +112,7 @@
     - zabbix_agent_tlspskfile is defined
     - zabbix_agent_tlspsk_secret is defined
   notify: restart win zabbix agent
-  
+
 - name: "Windows | Check if file is already downloaded"
   win_stat:
     path: '{{ zabbix_win_install_dir }}\{{ zabbix_win_package }}'
@@ -104,11 +122,17 @@
   win_get_url:
     url: "{{ zabbix_win_download_link }}"
     dest: '{{ zabbix_win_install_dir }}\{{ zabbix_win_package }}'
+    url_username: "{{zabbix_download_user|default(omit)}}"
+    url_password: "{{zabbix_download_pass|default(omit)}}"
     force: False
     follow_redirects: all
     proxy_url: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
+    validate_certs: "{{ zabbix_download_validate_certs | default(False) | bool }}"
+    timeout: "{{ zabbix_download_timeout | default(120) | int }}"
+  when: not file_info.stat.exists
   register: zabbix_agent_win_download_zip
   until: zabbix_agent_win_download_zip is succeeded
+  throttle: "{{ zabbix_download_throttle | default(5) | int }}"
 
 - name: "Windows | Unzip file"
   win_unzip:
@@ -162,3 +186,4 @@
     protocol: tcp
     state: present
     enabled: yes
+  when: firewall_info.state == 'started'
