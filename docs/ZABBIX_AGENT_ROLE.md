@@ -174,7 +174,7 @@ Otherwise it just for the Zabbix Agent or for the Zabbix Agent 2.
 * `zabbix_agent_logremotecommands`: enable logging of executed shell commands as warnings.
 * `zabbix_agent(2)_listenport`: agent will listen on this port for connections from the server.
 * `zabbix_agent2_statusport`: Agent will listen on this port for HTTP status requests.
-* `zabbix_agent_listenip`: list of comma delimited ip addresses that the agent should listen on.
+* `zabbix_agent(2)_listenip`: list of comma delimited ip addresses that the agent should listen on.
 * `zabbix_agent_startagents`: number of pre-forked instances of zabbix_agentd that process passive checks.
 * `zabbix_agent(2)_hostname`: unique, case sensitive hostname.
 * `zabbix_agent(2)_hostnameitem`: item used for generating hostname if it is undefined.
