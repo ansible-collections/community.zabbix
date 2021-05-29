@@ -141,7 +141,7 @@ zabbix_proxy_tlspskidentity:
 
 zabbix_proxy_tls_config:
   no_encryption: 'no_encryption'
-  PSK: 'PSK'
+  psk: 'PSK'
   certificate: 'certificate'
 
 # Zabbix API stuff
