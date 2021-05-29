@@ -994,6 +994,48 @@
           that:
               - "zabbix_host1 is changed"
 
+- name: "reset interfaces to two of the same type"
+  zabbix_host:
+    server_url: "{{ zabbix_server_url }}"
+    login_user: "{{ zabbix_login_user }}"
+    login_password: "{{ zabbix_login_password }}"
+    host_name: ExampleHost
+    interfaces:
+      - type: "1"
+        main: 1
+        useip: 1
+        ip: 127.0.0.1
+      - type: "1"
+        useip: 1
+        ip: 127.0.1.1
+  register: zabbix_host1
+
+- name: expect to succeed and that things have changed
+  assert:
+      that:
+          - "zabbix_host1 is changed"
+
+- name: "reset interfaces to two of the same type (again)"
+  zabbix_host:
+    server_url: "{{ zabbix_server_url }}"
+    login_user: "{{ zabbix_login_user }}"
+    login_password: "{{ zabbix_login_password }}"
+    host_name: ExampleHost
+    interfaces:
+      - type: "1"
+        main: 1
+        useip: 1
+        ip: 127.0.0.1
+      - type: "1"
+        useip: 1
+        ip: 127.0.1.1
+  register: zabbix_host1
+
+- name: expect to succeed and that things have not changed
+  assert:
+      that:
+          - "zabbix_host1 is not changed"
+
 - name: "test: add IPMI settings"
   zabbix_host:
     server_url: "{{ zabbix_server_url }}"
