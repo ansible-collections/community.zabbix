@@ -98,14 +98,10 @@ options:
     refresh:
         description:
             - Automatic refresh period in seconds.
-            - The default value will be removed at the version 2.0.0.
-        default: '30'
         type: str
     rows_per_page:
         description:
             - Amount of object rows to show per page.
-            - The default value will be removed at the version 2.0.0.
-        default: '50'
         type: str
     after_login_url:
         description:
@@ -585,8 +581,8 @@ def main():
         theme=dict(type='str', choices=['default', 'blue-theme', 'dark-theme']),
         autologin=dict(type='bool'),
         autologout=dict(type='str'),
-        refresh=dict(type='str', default='30'),
-        rows_per_page=dict(type='str', default='50'),
+        refresh=dict(type='str'),
+        rows_per_page=dict(type='str'),
         after_login_url=dict(type='str'),
         user_medias=dict(type='list', elements='dict',
                          options=dict(mediatype=dict(type='str', default='Email'),
@@ -616,7 +612,7 @@ def main():
     module = AnsibleModule(
         argument_spec=argument_spec,
         required_if=[
-            ['state', 'present', ['usrgrps', 'refresh', 'rows_per_page']]
+            ['state', 'present', ['usrgrps']]
         ],
         supports_check_mode=True
     )
