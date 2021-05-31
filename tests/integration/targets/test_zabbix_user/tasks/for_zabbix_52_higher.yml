@@ -1075,3 +1075,79 @@
   - assert:
       that:
         - delete_existing_user_result.changed is sameas true
+
+# The tests are to check the patch for PR hasn't a problem.
+# https://github.com/ansible-collections/community.zabbix/pull/382
+- name: test - Create a zabbix user with minimum parameters
+  zabbix_user:
+    server_url: "{{ zabbix_server_url }}"
+    login_user: "{{ zabbix_login_user }}"
+    login_password: "{{ zabbix_login_password }}"
+    alias: example2
+    usrgrps:
+      - Guests
+    passwd: password
+    role_name: "User role"
+  register: create_zabbix_user_with_minimum_params_result
+
+- assert:
+    that:
+      - create_zabbix_user_with_minimum_params_result.changed is sameas true
+
+- name: test - Create a zabbix user with minimum parameters(again)
+  zabbix_user:
+    server_url: "{{ zabbix_server_url }}"
+    login_user: "{{ zabbix_login_user }}"
+    login_password: "{{ zabbix_login_password }}"
+    alias: example2
+    usrgrps:
+      - Guests
+    passwd: password
+    role_name: "User role"
+  register: create_zabbix_user_with_minimum_params_result
+
+- assert:
+    that:
+      - create_zabbix_user_with_minimum_params_result.changed is sameas false
+
+- name: test - Update the parameters without role_name
+  zabbix_user:
+    server_url: "{{ zabbix_server_url }}"
+    login_user: "{{ zabbix_login_user }}"
+    login_password: "{{ zabbix_login_password }}"
+    alias: example2
+    name: example2
+    surname: test
+    usrgrps:
+      - Guests
+    passwd: password
+  register: update_params_without_role_name_result
+
+- assert:
+    that:
+      - update_params_without_role_name_result.changed is sameas true
+
+- name: test - Update the parameters without role_name(again)
+  zabbix_user:
+    server_url: "{{ zabbix_server_url }}"
+    login_user: "{{ zabbix_login_user }}"
+    login_password: "{{ zabbix_login_password }}"
+    alias: example2
+    name: example2
+    surname: test
+    usrgrps:
+      - Guests
+    passwd: password
+  register: update_params_without_role_name_result
+
+- assert:
+    that:
+      - update_params_without_role_name_result.changed is sameas false
+
+- name: test - Delete existing user
+  zabbix_user:
+    server_url: "{{ zabbix_server_url }}"
+    login_user: "{{ zabbix_login_user }}"
+    login_password: "{{ zabbix_login_password }}"
+    alias: example2
+    state: absent
