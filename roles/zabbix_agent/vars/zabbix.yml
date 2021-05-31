@@ -60,8 +60,6 @@ sign_keys:
     xenial:
       sign_key: E709712C
   "42":
-    focal:
-      sign_key: A14FE591
     eoan:
       sign_key: A14FE591
     cosmic:
