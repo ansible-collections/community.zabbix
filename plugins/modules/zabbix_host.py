@@ -691,6 +691,8 @@ class Host(ZabbixBase):
         if sorted(i_ports) != sorted(exist_i_ports):
             return True
 
+        _matched_intfs = []
+
         for exist_interface in exist_interfaces:
             exist_interface_port = str(exist_interface['port'])
 
@@ -699,6 +701,10 @@ class Host(ZabbixBase):
                 exist_interface['details'] = {}
 
             for interface in interfaces:
+                # ensure one interface is not matched multiple times
+                if interface in _matched_intfs:
+                    continue
+
                 if str(interface['port']) == exist_interface_port:
                     for key in interface.keys():
                         # since 5.0, zabbix API returns details for each host interface, but only SNMP is not empty
@@ -718,6 +724,11 @@ class Host(ZabbixBase):
 
                         elif str(exist_interface[key]) != str(interface[key]):
                             return True
+
+                # if the code got here, that means interfaces did match, remove the one matched and break loop for
+                # current intf, otherwise it would start comparing to next intf of the same type and not match
+                _matched_intfs.append(interface)
+                break
 
         return False
 
