@@ -2,7 +2,7 @@
 
 - name: "Remove | Make sure the \"old\" zabbix-agent service is running"
   service:
-    name: "{{ zabbix_agent_service }}"
+    name: "zabbix-agent"
     state: stopped
     enabled: no
   become: yes
@@ -15,6 +15,6 @@
 
 - name: "Remove | Remove the agent-include-dir"
   file:
-    path: "{{ zabbix_agent_include  }}"
+    path: "{{ zabbix_agent_include }}"
     state: absent
   become: yes
