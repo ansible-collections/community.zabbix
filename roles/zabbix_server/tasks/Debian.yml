@@ -38,7 +38,7 @@
     - init
     - config
 
-- name: "Debian | Set some facts for Zabbix 3.0"
+- name: "Debian | Set some facts for Zabbix >= 3.0 && < 5.4"
   set_fact:
     datafiles_path: /usr/share/doc/zabbix-server-{{ zabbix_server_database }}
   when:
@@ -49,9 +49,9 @@
     - init
     - config
 
-- name: "Debian | Set some facts for Zabbix 3.0"
+- name: "Debian | Set some facts for Zabbix >= 5.4"
   set_fact:
-    datafiles_path: /usr/share/doc/zabbix-sql-scripts/{{ zabbix_server_database }}
+    datafiles_path: /usr/share/doc/zabbix-sql-scripts/{{ zabbix_server_database_long }}
   when:
     - zabbix_version is version('5.4', '>=')
   tags:
