@@ -22,11 +22,10 @@
 - name: "Reload systemd"
   shell: systemctl daemon-reload
   when:
+    - zabbix_version is version('5.4', '<')
     - systemd_state.changed
   tags:
     - skip_ansible_lint
-  when:
-    - zabbix_version is version('5.4', '<')
 
 - name: "Configure zabbix-proxy"
   template:
