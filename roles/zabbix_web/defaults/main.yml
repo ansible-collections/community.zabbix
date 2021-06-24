@@ -123,3 +123,8 @@ zabbix_server_history_types:
 
 selinux_allow_zabbix_can_network: False
 _zabbix_web_apache_php_addition: False
+
+# SAML certificates
+# zabbix_saml_idp_crt:
+# zabbix_saml_sp_crt:
+# zabbix_saml_sp_key:

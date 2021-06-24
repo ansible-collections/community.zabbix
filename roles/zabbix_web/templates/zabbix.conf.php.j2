@@ -39,4 +39,14 @@ $DB['DOUBLE_IEEE754']   = true;
 putenv("{{env}}={{val}}");
 {% endfor %}
 {% endif %}
+
+{% if zabbix_saml_idp_crt is defined %}
+$SSO['IDP_CERT'] = '{{ zabbix_saml_idp_crt }}';
+{% endif %}
+{% if zabbix_saml_sp_crt is defined %}
+$SSO['SP_CERT'] = '{{ zabbix_saml_sp_crt }}';
+{% endif %}
+{% if zabbix_saml_sp_key is defined %}
+$SSO['SP_KEY'] = '{{ zabbix_saml_sp_key }}';
+{% endif %}
 ?>

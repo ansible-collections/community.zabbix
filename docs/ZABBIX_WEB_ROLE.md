@@ -112,6 +112,9 @@ The following is an overview of all available configuration defaults for this ro
 * `zabbix_web_htpasswd_file`: Default: `/etc/zabbix/web/htpasswd`. Allows the change the default path to the htpasswd file.
 * `zabbix_web_htpasswd_users`: (Optional) Dictionary for creating users via `htpasswd_user` and passphrases via `htpasswd_pass` in htpasswd file.
 * `zabbix_web_allowlist_ips`: (Optional) Allow web access at webserver level to a list of defined IPs or CIDR.
+* `zabbix_saml_idp_crt`: (Optional) TLS Certificate of the Identity Provider used for SAML authentication
+* `zabbix_saml_sp_crt`: (Optional) Public TLS certificate of Zabbix as Service Provider
+* `zabbix_saml_sp_key`: (Optional) Private TLS certificate of Zabbix as Service Provider
 
 #### Apache configuration
 
