@@ -23,6 +23,7 @@ options:
         description:
             - Name of the user alias in Zabbix.
             - alias is the unique identifier used and cannot be updated using this module.
+        aliases: [ username ]
         required: true
         type: str
     name:
@@ -284,6 +285,17 @@ import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabb
 
 
 class User(ZabbixBase):
+
+    def alias_key(self):
+        """ Returns the key name for 'alias', which has been renamed to
+        'username' in Zabbix 5.4.
+
+        """
+        if LooseVersion(self._zbx_api_version) >= LooseVersion('5.4'):
+            return 'username'
+
+        return 'alias'
+
     def get_usergroups_by_name(self, usrgrps):
         params = {
             'output': ['usrgrpid', 'name', 'gui_access'],
@@ -305,9 +317,10 @@ class User(ZabbixBase):
             self._module.fail_json(msg='No user groups found')
 
     def check_user_exist(self, alias):
-        zbx_user = self._zapi.user.get({'output': 'extend', 'filter': {'alias': alias},
+        zbx_user = self._zapi.user.get({'output': 'extend', 'filter': {self.alias_key(): alias},
                                         'getAccess': True, 'selectMedias': 'extend',
                                         'selectUsrgrps': 'extend'})
+
         return zbx_user
 
     def convert_user_medias_parameter_types(self, user_medias):
@@ -388,7 +401,7 @@ class User(ZabbixBase):
         # request data
         request_data = {
             'userid': zbx_user[0]['userid'],
-            'alias': alias,
+            self.alias_key(): alias,
             'name': name,
             'surname': surname,
             'usrgrps': sorted(user_group_ids, key=lambda x: x['usrgrpid']),
@@ -445,7 +458,7 @@ class User(ZabbixBase):
         user_ids = {}
 
         request_data = {
-            'alias': alias,
+            self.alias_key(): alias,
             'name': name,
             'surname': surname,
             'usrgrps': user_group_ids,
@@ -496,7 +509,7 @@ class User(ZabbixBase):
 
         request_data = {
             'userid': zbx_user[0]['userid'],
-            'alias': alias,
+            self.alias_key(): alias,
             'name': name,
             'surname': surname,
             'usrgrps': user_group_ids,
@@ -568,7 +581,7 @@ class User(ZabbixBase):
 def main():
     argument_spec = zabbix_utils.zabbix_common_argument_spec()
     argument_spec.update(dict(
-        alias=dict(type='str', required=True),
+        alias=dict(type='str', required=True, aliases=['username']),
         name=dict(type='str'),
         surname=dict(type='str'),
         usrgrps=dict(type='list'),
