@@ -20,14 +20,25 @@
     - init
     - config
 
-- name: "Debian | Set some facts for Zabbix 3.0"
+- name: "Debian | Set some facts for Zabbix >= 3.0 && < 5.4"
   set_fact:
     apache_log: apache2
-    datafiles_path: "/usr/share/doc/zabbix-proxy-{{ zabbix_proxy_database }}"
+    datafiles_path: /usr/share/doc/zabbix-proxy-{{ zabbix_proxy_database }}
   when:
-    - zabbix_version is version_compare('3.0', '>=')
+    - zabbix_version is version('3.0', '>=')
+    - zabbix_version is version('5.4', '<')
   tags:
     - zabbix-proxy
+    - init
+    - config
+
+- name: "Debian | Set some facts for Zabbix >= 5.4"
+  set_fact:
+    datafiles_path: /usr/share/doc/zabbix-sql-scripts/{{ zabbix_proxy_database_long }}
+  when:
+    - zabbix_version is version('5.4', '>=')
+  tags:
+    - zabbix-server
     - init
     - config
 
@@ -135,6 +146,25 @@
   register: is_zabbix_proxy_package_installed
   until: is_zabbix_proxy_package_installed is succeeded
   become: yes
+
+- name: "Debian | Installing zabbix-sql-scripts"
+  apt:
+    pkg: zabbix-sql-scripts
+    state: "{{ zabbix_proxy_package_state }}"
+    update_cache: yes
+    cache_valid_time: 0
+    default_release: "{{ ansible_distribution_release }}"
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
+  register: zabbix_proxy_package_sql_installed
+  until: zabbix_proxy_package_sql_installed is succeeded
+  when:
+    - zabbix_version is version('5.4', '>=')
+  become: yes
+  tags:
+    - zabbix-server
+    - init
 
 - name: "Debian | Install Ansible module dependencies"
   apt:

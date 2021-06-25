@@ -1,5 +1,22 @@
 ---
 sign_keys:
+  "54":
+    buster:
+      sign_key: E709712C
+    stretch:
+      sign_key: E709712C
+    jessie:
+      sign_key: E709712C
+    focal:
+      sign_key: E709712C
+    bionic:
+      sign_key: E709712C
+    xenial:
+      sign_key: E709712C
+    trusty:
+      sign_key: E709712C
+    tricia:
+      sign_key: E709712C
   "52":
     buster:
       sign_key: E709712C
@@ -60,8 +77,6 @@ sign_keys:
     xenial:
       sign_key: E709712C
   "42":
-    focal:
-      sign_key: A14FE591
     eoan:
       sign_key: A14FE591
     cosmic:
@@ -186,3 +201,6 @@ suse:
     "11":
       name: server_monitoring
       url: http://download.opensuse.org/repositories/server:/monitoring/SLE_11_SP3/
+    "12":
+      name: server_monitoring
+      url: http://download.opensuse.org/repositories/server:/monitoring/SLE_12_SP3/
