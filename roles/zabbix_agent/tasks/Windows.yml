@@ -102,7 +102,7 @@
   with_items:
     - "{{ zabbix_agent_win_include }}"
   when:
-    - ('.' not in zabbix_agent_win_include)
+    - ('.' in zabbix_agent_win_include)
 
 - name: "Windows | Place TLS-PSK file"
   win_copy:
