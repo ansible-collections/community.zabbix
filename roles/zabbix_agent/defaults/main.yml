@@ -2,7 +2,7 @@
 # defaults file for zabbix-agent
 
 zabbix_agent2: False
-zabbix_agent_version: 5.2
+zabbix_agent_version: 5.4
 zabbix_version: "{{ zabbix_agent_version }}"
 zabbix_version_patch: 0
 zabbix_repo: zabbix
