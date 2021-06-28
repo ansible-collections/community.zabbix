@@ -622,6 +622,10 @@ class Template(ZabbixBase):
             if LooseVersion(self._zbx_api_version) >= LooseVersion('5.2'):
                 update_rules["templateDashboards"] = update_rules.pop("templateScreens")
 
+            # Zabbix 5.4 no longer supports applications
+            if LooseVersion(self._zbx_api_version) >= LooseVersion('5.4'):
+                update_rules.pop('applications', None)
+
             # The loaded unicode slash of multibyte as a string is escaped when parsing JSON by json.loads in Python2.
             # So, it is imported in the unicode string into Zabbix.
             # The following processing is removing the unnecessary slash in escaped for decoding correctly to the multibyte string.
