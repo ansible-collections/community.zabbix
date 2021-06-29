@@ -336,6 +336,8 @@ releases:
       - zabbix_proxy - now supports configuring StatsAllowedIP (https://github.com/ansible-collections/community.zabbix/pull/337).
       - zabbix_server - added support for installtions on arm64 systems (https://github.com/ansible-collections/community.zabbix/pull/320).
       - zabbix_web - added support for installtions on arm64 systems (https://github.com/ansible-collections/community.zabbix/pull/320).
+      release_summary: '| Release date: 2021-03-20 | Last major release to support
+        Zabbix server 3.X versions in plugins.'
       security_fixes:
       - zabbix_action - no longer exposes remote SSH command password used in operations,
         recovery & acknowledge operations to system logs (https://github.com/ansible-collections/community.zabbix/pull/345).
@@ -343,8 +345,6 @@ releases:
         to system logs (https://github.com/ansible-collections/community.zabbix/pull/345).
       - zabbix_host - no longer exposes SNMPv3 auth and priv passphrases to system
         logs (https://github.com/ansible-collections/community.zabbix/pull/345).
-      release_summary: '| Release date: 2021-03-20 | Last major release to support
-        Zabbix server 3.X versions in plugins.'
     fragments:
     - 316-zbx-agent-windows-long-version.yaml
     - 322-zabbix_template.yml
@@ -359,3 +359,68 @@ releases:
     - raspberry-server.yaml
     - raspberry.yaml
     release_date: '2021-03-20'
+  1.4.0:
+    changes:
+      bugfixes:
+      - zabbix_agent - StatusPort will be configured only when `zabbix_agent2_statusport`
+        is defined (https://github.com/ansible-collections/community.zabbix/pull/378)
+      - zabbix_agent - fixed issue preventing installation of zabbix-agent 4.2 on
+        Ubuntu Focal 20.04 (https://github.com/ansible-collections/community.zabbix/pull/390)
+      - zabbix_agent - role will now configure correct port for hostinterface in Zabbix
+        Server if `zabbix_agent2_listenport` is defined (https://github.com/ansible-collections/community.zabbix/pull/400)
+      - zabbix_agent - should no longer be failing on Windows platform due to re-running
+        all of the tasks for the 2nd time (https://github.com/ansible-collections/community.zabbix/pull/376)
+      - zabbix_agent - should no longer fail while cleaning up zabbix_agent installation
+        if Zabbix Agent2 is being used (https://github.com/ansible-collections/community.zabbix/pull/409)
+      - zabbix_agent - will no longer install zabbix_get package on Debian systems
+        when `zabbix_agent_install_agent_only` is defined (https://github.com/ansible-collections/community.zabbix/pull/363)
+      - zabbix_host - fixed issue where module was idempotent when multiple host interfaces
+        of the same type were present (https://github.com/ansible-collections/community.zabbix/pull/391)
+      - zabbix_proxy (role) - will no longer fail on proxy creation in Zabbix Server
+        when TLS parameters are used (https://github.com/ansible-collections/community.zabbix/pull/388)
+      - zabbix_server - Removed the removal everything from /tmp directory command
+        as it removes things that it shouldnt do.
+      - zabbix_template - first time import of template now works with Zabbix 5.4
+        (https://github.com/ansible-collections/community.zabbix/pull/407), please
+        note that rerunning the task will fail as there are breaking changes in Zabbix
+        5.4 API that module not yet covers.
+      - zabbix_user - now works with Zabbix 5.4 (https://github.com/ansible-collections/community.zabbix/pull/406)
+      minor_changes:
+      - all roles were updated to support Zabbix 5.4 release (https://github.com/ansible-collections/community.zabbix/pull/405)
+      - new inventory plugin zabbix_inventory (https://github.com/ansible-collections/community.zabbix/pull/373)
+      - new module plugin zabbix_globalmacro (https://github.com/ansible-collections/community.zabbix/pull/377)
+      - zabbix_agent - `zabbix_agent_src_reinstall` now defaults to `False` (https://github.com/ansible-collections/community.zabbix/pull/403)
+      - zabbix_agent - now supports setting AllowKey (https://github.com/ansible-collections/community.zabbix/pull/358)
+      - zabbix_globalmacros - it is now possible to create global macros using this
+        module (https://github.com/ansible-collections/community.zabbix/pull/377).
+      - zabbix_inventory - Created Ansible - Zabbix inventory plugin to create dynamic
+        inventory from Zabbix.
+      - zabbix_maintenance - it is now possible to target hosts by their technical
+        name if it differs from the visible name
+      - zabbix_proxy - Add MySQL Python 3 package installation.
+      - zabbix_server - Add MySQL Python 3 package installation.
+      - zabbix_server - now supports setting StartLLDProcessors (https://github.com/ansible-collections/community.zabbix/pull/361)
+      - zabbix_user - now supports parameter `username` as an alternative to `alias`
+        (https://github.com/ansible-collections/community.zabbix/pull/406)
+      - zabbix_user - removed some of the default values because a configuration should
+        be changed only if specified as a parameter (https://github.com/ansible-collections/community.zabbix/pull/382).
+      - zabbix_web - now supports setting SAML certificates (https://github.com/ansible-collections/community.zabbix/pull/408)
+    fragments:
+    - 350-zabbix_maintenance-visible_name.yaml
+    - 373-create_zabbix_inventory.yaml
+    - 377-create_globalmacros_module.yaml
+    - 382-zabbix_user.yml
+    - 391-zabbix_host-intf_idempotency_fix.yml
+    - zabbix-proxy-package-installation.yaml
+    - zabbix-server-tmp-dir.yml
+    - zbx-catch-all.yml
+    modules:
+    - description: Create/update/delete Zabbix Global macros
+      name: zabbix_globalmacro
+      namespace: ''
+    plugins:
+      inventory:
+      - description: Zabbix Inventory Plugin
+        name: zabbix_inventory
+        namespace: null
+    release_date: '2021-06-29'

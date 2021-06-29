@@ -1,2 +1,0 @@
-minor_changes:
-- zabbix_maintenance - it is now possible to target hosts by their technical name if it differs from the visible name
