@@ -1,2 +1,0 @@
-minor_changes:
-- zabbix_inventory - Created Ansible - Zabbix inventory plugin to create dynamic inventory from Zabbix.

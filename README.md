@@ -93,7 +93,7 @@ You can also include it in a `requirements.yml` file and install it via `ansible
 ---
 collections:
   - name: community.zabbix
-    version: 1.3.0
+    version: 1.4.0
 ```
 
 ### Upgrading collection

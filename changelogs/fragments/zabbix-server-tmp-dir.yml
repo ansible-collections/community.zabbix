@@ -1,2 +1,0 @@
-bugfixes:
-  - "zabbix_server - Removed the removal everything from /tmp directory command as it removes things that it shouldnt do."
