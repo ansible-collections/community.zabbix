@@ -1,3 +1,0 @@
-minor_changes:
-- zabbix_server - Add MySQL Python 3 package installation.
-- zabbix_proxy - Add MySQL Python 3 package installation.
