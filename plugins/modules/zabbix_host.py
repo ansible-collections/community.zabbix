@@ -588,6 +588,9 @@ class Host(ZabbixBase):
         if LooseVersion(self._zbx_api_version) >= LooseVersion('4.2.0'):
             params.update({'selectTags': 'extend'})
 
+        if LooseVersion(self._zbx_api_version) >= LooseVersion('5.4.0'):
+            params.update({'output': ["inventory_mode", "hostid", "proxy_hostid", "host", "status", "lastaccess", "ipmi_authtype", "ipmi_privilege", "ipmi_username", "ipmi_password", "maintenanceid", "maintenance_status", "maintenance_type", "maintenance_from", "name", "flags", "templateid", "description", "tls_connect", "tls_accept", "tls_issuer", "tls_subject", "proxy_address", "auto_compress", "custom_interfaces","uuid"]})
+
         host_list = self._zapi.host.get(params)
         if len(host_list) < 1:
             self._module.fail_json(msg="Host not found: %s" % host_name)
