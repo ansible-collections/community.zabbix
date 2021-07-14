@@ -10,7 +10,7 @@ listen.acl_users = {{ zabbix_php_fpm_conf_user if zabbix_php_fpm_conf_user is de
 listen.owner = {{ zabbix_php_fpm_conf_user if zabbix_php_fpm_conf_user is defined else zabbix_web_conf_web_user }}
 {% endif %}
 {% if zabbix_php_fpm_conf_enable_group %}
-listen.group = {{ zabbix_php_fpm_conf_group if zabbix_php_fpm_conf_group is defined else zabbix_web_conf_web_group }}
+listen.group = {{ _nginx_group if zabbix_websrv=='nginx' else _apache_group }}
 {% endif %}
 {% if zabbix_php_fpm_conf_enable_mode %}
 listen.mode = {{ zabbix_php_fpm_conf_mode }}
