@@ -2,7 +2,7 @@
 
 server {
 {% if not zabbix_nginx_tls %}
-    listen 80;
+    listen {{ zabbix_nginx_vhost_port }};
 {% else %}
 {% if zabbix_letsencrypt %}
     server_tokens off;
@@ -19,7 +19,7 @@ server {
 
 server {
 {% endif %}
-    listen 443 ssl;
+    listen {{ zabbix_nginx_vhost_tls_port }} ssl;
 {% if zabbix_letsencrypt and zabbix_letsencrypt_cert.stat.exists %}
     ssl_certificate /etc/letsencrypt/live/{{ zabbix_websrv_servername }}/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/{{ zabbix_websrv_servername }}/privkey.pem;
