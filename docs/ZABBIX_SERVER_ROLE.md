@@ -132,7 +132,7 @@ The following is an overview of all available configuration default for this rol
 * `zabbix_database_creation`: Default: `True`. When you don't want to create the database including user, you can set it to False.
 * `zabbix_server_install_database_client`: Default: `True`. False does not install database client. Default true
 * `zabbix_database_sqlload`:True / False. When you don't want to load the sql files into the database, you can set it to False.
-* `zabbix_database_timescaledb`:False / True. When you want to use timescaledb extension into the database, you can set it to True.
+* `zabbix_database_timescaledb`:False / True. When you want to use timescaledb extension into the database, you can set it to True (this option only works for postgreSQL database).
 * `zabbix_server_dbencoding`: Default: `utf8`. The encoding for the MySQL database.
 * `zabbix_server_dbcollation`: Default: `utf8_bin`. The collation for the MySQL database.
 
