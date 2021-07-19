@@ -42,6 +42,7 @@ zabbix_server_database: pgsql
 zabbix_server_database_long: postgresql
 zabbix_database_creation: True
 zabbix_database_sqlload: True
+zabbix_database_timescaledb: False
 zabbix_server_dbtlsconnect:
 zabbix_server_dbtlscafile:
 zabbix_server_dbtlscertfile:
