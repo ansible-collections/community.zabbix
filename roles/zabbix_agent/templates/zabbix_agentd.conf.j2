@@ -262,7 +262,13 @@ LoadModulePath={{ zabbix_agent_loadmodulepath }}
 #       It is allowed to include multiple LoadModule parameters.
 #
 {% if zabbix_agent_loadmodule is defined and zabbix_agent_loadmodule %}
+{% if zabbix_agent_loadmodule is string %}
 LoadModule={{ zabbix_agent_loadmodule }}
+{% else %}
+{% for module in zabbix_agent_loadmodule %}
+LoadModule={{ module }}
+{% endfor %}
+{% endif %}
 {% endif %}
 
 {% if zabbix_version is version_compare('3.0', '>=') %}
