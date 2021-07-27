@@ -23,11 +23,10 @@
 
 - name: "Windows | Set variables specific to Zabbix 4.0"
   set_fact:
-    zabbix_win_package: zabbix_agent-{{ zabbix_version_long }}-windows-amd64.zip
     zabbix_win_exe_path: '{{ zabbix_win_install_dir }}\bin\zabbix_agentd.exe'
   when:
     - zabbix_version_long is version('4.0.0', '>=')
-
+    
 - name: "Windows | Check if Zabbix agent is present"
   win_stat:
     path: '{{ zabbix_win_exe_path }}'
