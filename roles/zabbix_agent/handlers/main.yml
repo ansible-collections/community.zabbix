@@ -21,6 +21,13 @@
   when:
     - zabbix_agent_os_family == "Windows"
 
+- name: restart win zabbix agent 2
+  win_service:
+    name: "{{ zabbix_win_agent2_service }}"
+    state: restarted
+  when:
+    - zabbix_agent_os_family == "Windows"
+
 - name: restart mac zabbix agent
   command: "launchctl kickstart -k system/{{ zabbix_agent_service }}"
   become: true
