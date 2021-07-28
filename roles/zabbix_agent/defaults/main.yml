@@ -205,6 +205,8 @@ zabbix_win_download_link: "{{ zabbix_win_download_url }}/{{ zabbix_agent_version
 zabbix_win_install_dir: 'C:\Zabbix'
 zabbix_agent_win_logfile: 'C:\Zabbix\zabbix_agentd.log'
 zabbix_agent_win_include: 'C:\Zabbix\zabbix_agent.d\'
+zabbix_agent2_win_logfile: 'C:\Zabbix\zabbix_agent2.log'
+zabbix_agent2_win_include: 'C:\Zabbix\zabbix_agent2.d\'
 zabbix_agent_win_svc_recovery: True
 
 # macOS Related
