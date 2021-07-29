@@ -1,5 +1,4 @@
 ---
-
 - name: "Set default ip address for zabbix_agent_ip"
   set_fact:
     zabbix_agent_ip: "{{ hostvars[inventory_hostname]['ansible_ip_addresses'][0] }}"
@@ -21,12 +20,19 @@
   set_fact:
     zabbix_win_exe_path: '{{ zabbix_win_install_dir }}\bin\win{{ windows_arch }}\zabbix_agentd.exe'
 
-- name: "Windows | Set variables specific to Zabbix 4.0"
+- name: "Windows | Set variables specific to Zabbix >= 4"
   set_fact:
-    zabbix_win_package: zabbix_agent-{{ zabbix_version_long }}-windows-amd64.zip
+    zabbix_win_svc_name: Zabbix Agent
     zabbix_win_exe_path: '{{ zabbix_win_install_dir }}\bin\zabbix_agentd.exe'
   when:
     - zabbix_version_long is version('4.0.0', '>=')
+
+- name: "Windows | Set variables specific to Zabbix (agent 2)"
+  set_fact:
+    zabbix_win_svc_name: Zabbix Agent 2
+    zabbix_win_exe_path: '{{ zabbix_win_install_dir }}\bin\zabbix_agent2.exe'
+  when:
+    - zabbix_agent2 | bool
 
 - name: "Windows | Check if Zabbix agent is present"
   win_stat:
@@ -54,9 +60,9 @@
     - zabbix_win_exe_info.win_file_version.product_version is version(zabbix_version_long, '<')
     - zabbix_agent_package_state == 'latest'
 
-- name: Windows | Check Zabbix service
+- name: "Windows | Check Zabbix service"
   win_service:
-    name: Zabbix Agent
+    name: "{{ zabbix_win_svc_name }}"
   register: zabbix_service_info
 
 - name: Windows | Check firewall service
@@ -66,11 +72,12 @@
 
 - name: "Windows | Stop Zabbix (Update)"
   win_service:
-    name: Zabbix Agent
+    name: "{{ zabbix_win_svc_name }}"
     start_mode: auto
     state: stopped
   when:
     - zabbix_service_info.exists
+    - update_zabbix_agent | default(False) | bool
     - zabbix_service_info.state == 'running'
 
 - name: "Windows | Uninstall Zabbix (Update)"
@@ -78,6 +85,15 @@
   register: zabbix_windows_install
   when:
     - zabbix_service_info.exists
+    - update_zabbix_agent | default(False) | bool
+
+- name: "Windows | Uninstall Zabbix (Update) (agent 2)"
+  win_command: '"{{ zabbix_win_exe_path }}" --config "{{ zabbix_win_install_dir }}\zabbix_agent2.conf" --uninstall'
+  register: zabbix_windows_install
+  when:
+    - zabbix_service_info.exists
+    - update_zabbix_agent | default(False) | bool
+    - zabbix_agent2 | bool
 
 - name: "Windows | Removing Zabbix Directory (Update)"
   win_file:
@@ -140,17 +156,44 @@
     dest: "{{ zabbix_win_install_dir }}"
     creates: '{{ zabbix_win_exe_path }}'
 
+- name: "Windows | Cleanup downloaded Zabbix Agent Zip file"
+  win_file:
+    path: '{{ zabbix_win_install_dir }}\{{ zabbix_win_package }}'
+    state: absent
+  when:
+    - zabbix_agent_win_download_zip.changed
+
 - name: "Windows | Configure zabbix-agent"
   win_template:
     src: zabbix_agentd.conf.j2
     dest: '{{ zabbix_win_install_dir }}\zabbix_agentd.conf'
   notify: restart win zabbix agent
+  when:
+    - not zabbix_agent2
+
+- name: "Windows | Configure zabbix-agent2"
+  win_template:
+    src: zabbix_agent2.conf.j2
+    dest: '{{ zabbix_win_install_dir }}\zabbix_agent2.conf'
+  notify: restart win zabbix agent
+  when:
+    - zabbix_agent2 | bool
 
 - name: "Windows | Register Service"
   win_command: '"{{ zabbix_win_exe_path }}" --config "{{ zabbix_win_install_dir }}\zabbix_agentd.conf" --install'
   register: zabbix_windows_install
   args:
     creates: '{{ zabbix_win_install_dir }}\.installed'
+  when:
+    - not zabbix_agent2
+
+- name: "Windows | Register Service (agent 2)"
+  win_command: '"{{ zabbix_win_exe_path }}" --config "{{ zabbix_win_install_dir }}\zabbix_agent2.conf" --install'
+  register: zabbix_windows_install
+  args:
+    creates: '{{ zabbix_win_install_dir }}\.installed'
+  when:
+    - zabbix_agent2 | bool
 
 - name: "Windows | Create done file so it won't register itself again"
   win_file:
@@ -160,26 +203,26 @@
 
 - name: "Windows | Set service startup mode to auto and ensure it is started"
   win_service:
-    name: Zabbix Agent
+    name: "{{ zabbix_win_svc_name }}"
     start_mode: auto
     state: started
 
 - name: "Windows | Getting Zabbix Service Recovery Settings"
-  win_shell: sc.exe qfailure "Zabbix Agent" 1100
+  win_shell: 'sc.exe qfailure "{{ zabbix_win_svc_name }}" 1100'
   register: svc_recovery
   changed_when: false
   check_mode: false
   when: zabbix_agent_win_svc_recovery
 
 - name: "Windows | Setting Zabbix Service Recovery"
-  win_shell: sc.exe failure "Zabbix Agent" actions= restart/5000/restart/10000/restart/20000 reset= 86400
+  win_shell: 'sc.exe failure "{{ zabbix_win_svc_name }}" actions= restart/5000/restart/10000/restart/20000 reset= 86400'
   when:
     - "'RESTART -- Delay' not in svc_recovery.stdout"
     - zabbix_agent_win_svc_recovery
 
 - name: "Windows | Firewall rule"
   win_firewall_rule:
-    name: Zabbix Agent
+    name: "{{ zabbix_win_svc_name }}"
     localport: "{{ zabbix_agent_listenport }}"
     action: allow
     direction: in
