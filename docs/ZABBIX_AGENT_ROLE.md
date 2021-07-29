@@ -264,7 +264,7 @@ _Supporting Windows is a best effort (I don't have the possibility to either tes
 * `zabbix_win_download_link`: The download url to the `win.zip` file.
 * `zabbix_win_install_dir`: The directory where Zabbix needs to be installed.
 * `zabbix_agent_win_logfile`: The full path to the logfile for the Zabbix Agent.
-* `zabbix_agent_win_include`: The directory in which the Zabbix Agent 2 specific configuration files are stored.
+* `zabbix_agent_win_include`: The directory in which the Zabbix Agent specific configuration files are stored.
 * `zabbix_agent_win_svc_recovery`: Enable Zabbix Agent service auto-recovery settings.
 
 ## macOS Variables
