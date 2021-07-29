@@ -157,6 +157,7 @@ The following is an overview of all available configuration default for this rol
 * `zabbix_agent_conf_mode`: Default: `0644`. The "mode" for the Zabbix configuration file.
 * `zabbix_agent_dont_detect_ip`: Default `false`. When set to `true`, it won't detect available ip addresses on the host and no need for the Python module `netaddr` to be installed.
 * `zabbix_agent_allow_key`: list of AllowKey configurations.
+* `zabbix_agent_deny_key`: list of DenyKey configurations.
 
 ### Zabbix Agent vs Zabbix Agent 2 configuration
 
