@@ -119,6 +119,7 @@
     - "{{ zabbix_agent_win_include }}"
   when:
     - ('.conf' not in zabbix_agent_win_include)
+    - not zabbix_agent2
 
 - name: "Windows | Create directory structure, includes (agent 2)"
   win_file:
