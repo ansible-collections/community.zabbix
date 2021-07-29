@@ -137,7 +137,7 @@
   when:
     - zabbix_vhost
   notify:
-    - restart php-fpm
+    - restart redhat-php-fpm
 
 - include_tasks: apache_RedHat.yml
   vars:

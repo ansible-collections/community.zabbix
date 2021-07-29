@@ -28,7 +28,7 @@
     - zabbix_websrv == 'nginx'
     - zabbix_nginx_cfg_check.rc == 0
 
-- name: restart php-fpm
+- name: restart redhat-php-fpm
   service:
     name: "{{ 'rh-php72-php-fpm' if zabbix_php_fpm else 'php-fpm' }}"
     state: restarted
