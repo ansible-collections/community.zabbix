@@ -156,6 +156,13 @@
     dest: "{{ zabbix_win_install_dir }}"
     creates: '{{ zabbix_win_exe_path }}'
 
+- name: "Windows | Cleanup downloaded Zabbix Agent Zip file"
+  win_file:
+    path: '{{ zabbix_win_install_dir }}\{{ zabbix_win_package }}'
+    state: absent
+  when:
+    - zabbix_agent_win_download_zip.changed
+
 - name: "Windows | Configure zabbix-agent"
   win_template:
     src: zabbix_agentd.conf.j2
