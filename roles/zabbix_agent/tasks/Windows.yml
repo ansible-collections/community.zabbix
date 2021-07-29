@@ -77,7 +77,7 @@
     state: stopped
   when:
     - zabbix_service_info.exists
-    - update_zabbix_agent | bool
+    - update_zabbix_agent | default(False) | bool
     - zabbix_service_info.state == 'running'
 
 - name: "Windows | Uninstall Zabbix (Update)"
@@ -85,14 +85,14 @@
   register: zabbix_windows_install
   when:
     - zabbix_service_info.exists
-    - update_zabbix_agent | bool
+    - update_zabbix_agent | default(False) | bool
 
 - name: "Windows | Uninstall Zabbix (Update) (agent 2)"
   win_command: '"{{ zabbix_win_exe_path }}" --config "{{ zabbix_win_install_dir }}\zabbix_agent2.conf" --uninstall'
   register: zabbix_windows_install
   when:
     - zabbix_service_info.exists
-    - update_zabbix_agent | bool
+    - update_zabbix_agent | default(False) | bool
     - zabbix_agent2 | bool
 
 - name: "Windows | Removing Zabbix Directory (Update)"
