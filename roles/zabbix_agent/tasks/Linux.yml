@@ -12,7 +12,7 @@
     total_private_ip_addresses: "{{ ansible_all_ipv4_addresses | ipaddr('private') | length }}"
   when:
     - ansible_all_ipv4_addresses is defined
-    - not zabbix_agent_dont_detect_ip
+    - not (zabbix_agent_dont_detect_ip)
 
 - name: "Set first public ip address for zabbix_agent_ip"
   set_fact:
@@ -36,8 +36,8 @@
   fail:
     msg: "The specified network interface does not exist"
   when:
-    - zabbix_agent_listeninterface | bool
-    - (zabbix_agent_listeninterface not in ansible_all_ipv4_addresses)
+    - (zabbix_agent_listeninterface)
+    - (zabbix_agent_listeninterface not in ansible_interfaces)
   tags:
     - zabbix-agent
     - config
@@ -46,7 +46,7 @@
   set_fact:
     network_interface: ansible_{{ zabbix_agent_listeninterface }}
   when:
-    - zabbix_agent_listeninterface | bool
+    - (zabbix_agent_listeninterface)
     - not zabbix_agent_listenip
 
 - name: "Get IP of agent_listeninterface when no agent_listenip specified"
@@ -54,7 +54,7 @@
     zabbix_agent_listenip: "{{ hostvars[inventory_hostname][network_interface]['ipv4'].address | default('0.0.0.0') }}"
     zabbix_agent_ip: "{{ hostvars[inventory_hostname][network_interface]['ipv4'].address | default('0.0.0.0') }}"
   when:
-    - zabbix_agent_listeninterface | bool
+    - (zabbix_agent_listeninterface)
     - not zabbix_agent_listenip
   tags:
     - zabbix-agent
@@ -65,7 +65,7 @@
   set_fact:
     zabbix_agent_listenip: '0.0.0.0'
   when:
-    - not zabbix_agent_listenip
+    - not (zabbix_agent_listenip)
   tags:
     - zabbix-agent
     - config
