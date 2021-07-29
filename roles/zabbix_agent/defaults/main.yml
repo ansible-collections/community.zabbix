@@ -18,6 +18,8 @@ zabbix_agent_src_reinstall: False
 zabbix_agent_apt_priority:
 zabbix_agent_conf_mode: "0644"
 zabbix_agent_dont_detect_ip: False
+zabbix_agent_allow_key: []
+zabbix_agent_deny_key: []
 
 # Selinux related vars 
 selinux_allow_zabbix_run_sudo: False
