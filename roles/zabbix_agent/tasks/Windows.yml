@@ -119,17 +119,6 @@
     - "{{ zabbix_agent_win_include }}"
   when:
     - ('.conf' not in zabbix_agent_win_include)
-    - not zabbix_agent2
-
-- name: "Windows | Create directory structure, includes (agent 2)"
-  win_file:
-    path: "{{ item }}"
-    state: directory
-  with_items:
-    - "{{ zabbix_agent2_win_include }}"
-  when:
-    - ('.conf' not in zabbix_agent2_win_include)
-    - zabbix_agent2 | bool
 
 - name: "Windows | Place TLS-PSK file"
   win_copy:
