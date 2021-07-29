@@ -9,7 +9,9 @@
 # Mandatory: no
 # Default:
 
+{% if zabbix_agent_os_family != "Windows" %}
 PidFile={{ zabbix_agent2_pidfile }}
+{% endif %}
 
 ### Option: LogType
 #	Specifies where log messages are written to:
@@ -52,6 +54,7 @@ LogFileSize={{ zabbix_agent2_logfilesize }}
 # Mandatory: no
 # Range: 0-5
 # Default:
+
 DebugLevel={{ zabbix_agent2_debuglevel }}
 
 ### Option: SourceIP
@@ -59,6 +62,7 @@ DebugLevel={{ zabbix_agent2_debuglevel }}
 #
 # Mandatory: no
 # Default:
+
 {% if zabbix_agent2_sourceip is defined and zabbix_agent2_sourceip %}
 SourceIP={{ zabbix_agent2_sourceip }}
 {% endif %}
@@ -303,7 +307,6 @@ Timeout={{ zabbix_agent2_timeout }}
 #
 # Mandatory: no
 # Default:
-
 {% if zabbix_agent_os_family == "Windows" %}
 Include={{ zabbix_agent_win_include }}
 {% else %}
@@ -341,8 +344,9 @@ UnsafeUserParameters={{ zabbix_agent2_unsafeuserparameters }}
 # Mandatory: no
 # Default:
 # ControlSocket=
-
+{% if zabbix_agent_os_family != "Windows" %}
 ControlSocket={{ zabbix_agent2_controlsocket }}
+{% endif %}
 
 ####### TLS-RELATED PARAMETERS #######
 
