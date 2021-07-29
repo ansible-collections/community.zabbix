@@ -175,7 +175,7 @@
   win_template:
     src: zabbix_agent2.conf.j2
     dest: '{{ zabbix_win_install_dir }}\zabbix_agent2.conf'
-  notify: restart win zabbix agent 2
+  notify: restart win zabbix agent
   when:
     - zabbix_agent2 | bool
 
