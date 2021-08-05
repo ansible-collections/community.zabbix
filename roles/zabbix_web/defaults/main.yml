@@ -105,6 +105,8 @@ zabbix_server_dbname: zabbix-server
 zabbix_server_dbuser: zabbix-server
 zabbix_server_dbpassword: zabbix-server
 zabbix_server_dbport: 5432
+zabbix_server_dbencryption: "false"
+zabbix_server_dbverifyhost: "false"
 zabbix_server_dbschema:
 
 # Elasticsearch
