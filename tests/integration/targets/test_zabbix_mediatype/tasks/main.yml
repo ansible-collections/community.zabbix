@@ -1,7 +1,7 @@
 ---
 - name: test - email mediatypes
   module_defaults:
-    zabbix_mediatype:
+    community.zabbix.zabbix_mediatype:
       server_url: "{{ zabbix_server_url }}"
       login_user: "{{ zabbix_login_user }}"
       login_password: "{{ zabbix_login_password }}"
@@ -313,7 +313,7 @@
 
 - name: test - script mediatypes
   module_defaults:
-    zabbix_mediatype:
+    community.zabbix.zabbix_mediatype:
       server_url: "{{ zabbix_server_url }}"
       login_user: "{{ zabbix_login_user }}"
       login_password: "{{ zabbix_login_password }}"
@@ -378,7 +378,7 @@
 
 - name: test - sms mediatypes
   module_defaults:
-    zabbix_mediatype:
+    community.zabbix.zabbix_mediatype:
       server_url: "{{ zabbix_server_url }}"
       login_user: "{{ zabbix_login_user }}"
       login_password: "{{ zabbix_login_password }}"
@@ -448,7 +448,7 @@
 - name: test - jabber mediatypes
   when: zabbix_version is version('4.2', '<=')
   module_defaults:
-    zabbix_mediatype:
+    community.zabbix.zabbix_mediatype:
       server_url: "{{ zabbix_server_url }}"
       login_user: "{{ zabbix_login_user }}"
       login_password: "{{ zabbix_login_password }}"
@@ -486,7 +486,7 @@
 - name: test - ez_texting mediatypes
   when: zabbix_version is version('4.2', '<=')
   module_defaults:
-    zabbix_mediatype:
+    community.zabbix.zabbix_mediatype:
       server_url: "{{ zabbix_server_url }}"
       login_user: "{{ zabbix_login_user }}"
       login_password: "{{ zabbix_login_password }}"
@@ -536,7 +536,7 @@
 - name: test - email mediatypes
   when: zabbix_version is version('4.4', '>=')
   module_defaults:
-    zabbix_mediatype:
+    community.zabbix.zabbix_mediatype:
       server_url: "{{ zabbix_server_url }}"
       login_user: "{{ zabbix_login_user }}"
       login_password: "{{ zabbix_login_password }}"
