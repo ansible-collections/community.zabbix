@@ -5,7 +5,7 @@
 
 - name: test - Zabbix discovery rule
   module_defaults:
-    zabbix_discovery_rule:
+    community.zabbix.zabbix_discovery_rule:
       server_url: "{{ zabbix_server_url }}"
       login_user: "{{ zabbix_login_user }}"
       login_password: "{{ zabbix_login_password }}"

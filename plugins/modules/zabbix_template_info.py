@@ -208,7 +208,7 @@ def main():
     ))
     module = AnsibleModule(
         argument_spec=argument_spec,
-        supports_check_mode=False
+        supports_check_mode=True
     )
 
     template_name = module.params['template_name']

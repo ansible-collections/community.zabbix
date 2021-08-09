@@ -33,7 +33,7 @@
 
 - name: "test - Set default parameters to zabbix_host_info"
   module_defaults:
-    zabbix_host_info:
+    community.zabbix.zabbix_host_info:
       server_url: "{{ zabbix_server_url }}"
       login_user: "{{ zabbix_login_user }}"
       login_password: "{{ zabbix_login_password }}"

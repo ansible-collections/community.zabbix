@@ -1,0 +1,2 @@
+---
+service_example_trigger: "Zabbix http poller processes more than 75% busy"
