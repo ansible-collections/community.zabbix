@@ -5,7 +5,7 @@
 
 - name: test - Zabbix user group
   module_defaults:
-    zabbix_usergroup:
+    community.zabbix.zabbix_usergroup:
       server_url: "{{ zabbix_server_url }}"
       login_user: "{{ zabbix_login_user }}"
       login_password: "{{ zabbix_login_password }}"
