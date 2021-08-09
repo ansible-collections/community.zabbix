@@ -131,6 +131,11 @@
     that:
       - update_calculate_sla_idempotency_check_result.changed is sameas false
 
+- name: "Override trigger_name for different version of Zabbix"
+  set_fact:
+    service_example_trigger: "Zabbix server: Utilization of http poller processes over 75%"
+  when: zabbix_version is version("5.0", "==")
+
 - name: "test - Update trigger_host and trigger_name with check_mode"
   zabbix_service:
     server_url: "{{ zabbix_server_url }}"
@@ -140,7 +145,7 @@
     sla: 99.999
     calculate_sla: yes
     trigger_host: "Zabbix server"
-    trigger_name: "Zabbix server: Utilization of http poller processes over 75%"
+    trigger_name: "{{ service_example_trigger }}"
     state: present
   check_mode: yes
   register: update_trigger_name_check_mode_result
@@ -158,7 +163,7 @@
     sla: 99.999
     calculate_sla: yes
     trigger_host: "Zabbix server"
-    trigger_name: "Zabbix server: Utilization of http poller processes over 75%"
+    trigger_name: "{{ service_example_trigger }}"
     state: present
   register: update_trigger_name_result
 
@@ -175,7 +180,7 @@
     sla: 99.999
     calculate_sla: yes
     trigger_host: "Zabbix server"
-    trigger_name: "Zabbix server: Utilization of http poller processes over 75%"
+    trigger_name: "{{ service_example_trigger }}"
     state: present
   register: update_trigger_name_idempotency_check_result
 
@@ -192,7 +197,7 @@
     sla: 99.999
     calculate_sla: yes
     trigger_host: "Zabbix server"
-    trigger_name: "Zabbix server: Utilization of http poller processes over 75%"
+    trigger_name: "{{ service_example_trigger }}"
     algorithm: all_children
     state: present
   check_mode: yes
@@ -211,7 +216,7 @@
     sla: 99.999
     calculate_sla: yes
     trigger_host: "Zabbix server"
-    trigger_name: "Zabbix server: Utilization of http poller processes over 75%"
+    trigger_name: "{{ service_example_trigger }}"
     algorithm: all_children
     state: present
   register: update_algorithm_result
@@ -229,7 +234,7 @@
     sla: 99.999
     calculate_sla: yes
     trigger_host: "Zabbix server"
-    trigger_name: "Zabbix server: Utilization of http poller processes over 75%"
+    trigger_name: "{{ service_example_trigger }}"
     algorithm: all_children
     state: present
   register: update_algorithm_idempotency_check_result
@@ -261,7 +266,7 @@
     sla: 99.999
     calculate_sla: yes
     trigger_host: "Zabbix server"
-    trigger_name: "Zabbix server: Utilization of http poller processes over 75%"
+    trigger_name: "{{ service_example_trigger }}"
     algorithm: all_children
     parent: ExampleServiceForServiceModuleRoot
     state: present
@@ -281,7 +286,7 @@
     sla: 99.999
     calculate_sla: yes
     trigger_host: "Zabbix server"
-    trigger_name: "Zabbix server: Utilization of http poller processes over 75%"
+    trigger_name: "{{ service_example_trigger }}"
     algorithm: all_children
     parent: ExampleServiceForServiceModuleRoot
     state: present
@@ -300,7 +305,7 @@
     sla: 99.999
     calculate_sla: yes
     trigger_host: "Zabbix server"
-    trigger_name: "Zabbix server: Utilization of http poller processes over 75%"
+    trigger_name: "{{ service_example_trigger }}"
     algorithm: all_children
     parent: ExampleServiceForServiceModuleRoot
     state: present
