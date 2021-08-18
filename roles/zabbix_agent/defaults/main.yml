@@ -21,7 +21,7 @@ zabbix_agent_dont_detect_ip: False
 zabbix_agent_allow_key: []
 zabbix_agent_deny_key: []
 
-# Selinux related vars 
+# Selinux related vars
 selinux_allow_zabbix_run_sudo: False
 
 zabbix_agent_install_agent_only: False
@@ -39,6 +39,7 @@ zabbix_apt_install_recommends: no
 zabbix_agent_distribution_major_version: "{{ ansible_distribution_major_version }}"
 zabbix_agent_distribution_release: "{{ ansible_distribution_release }}"
 zabbix_agent_os_family: "{{ ansible_os_family }}"
+zabbix_repo_yum_gpgcheck: 0
 zabbix_repo_yum_schema: https
 zabbix_repo_yum_disabled: "*"
 zabbix_repo_yum_enabled: []
@@ -47,14 +48,14 @@ zabbix_repo_yum:
     description: Zabbix Official Repository - $basearch
     baseurl: "{{ zabbix_repo_yum_schema }}://repo.zabbix.com/zabbix/{{ zabbix_version }}/rhel/{{ zabbix_agent_distribution_major_version }}/$basearch/"
     mode: '0644'
-    gpgcheck: 0
+    gpgcheck: "{{ zabbix_repo_yum_gpgcheck }}"
     gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-ZABBIX
     state: present
   - name: zabbix-non-supported
     description: Zabbix Official Repository non-supported - $basearch
     baseurl: "{{ zabbix_repo_yum_schema }}://repo.zabbix.com/non-supported/rhel/{{ zabbix_agent_distribution_major_version }}/$basearch/"
     mode: '0644'
-    gpgcheck: 0
+    gpgcheck: "{{ zabbix_repo_yum_gpgcheck }}"
     gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-ZABBIX
     state: present
 
