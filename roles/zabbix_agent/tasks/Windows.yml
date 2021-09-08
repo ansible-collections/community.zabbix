@@ -41,7 +41,7 @@
 
 - name: "Windows | Get Installed Zabbix Agent Version"
   win_file_version:
-    path: "{{ zabbix_win_exe_path }}"
+    path: "{{ item.item }}"
   register: zabbix_win_exe_info
   when:
     - item.stat.exists | bool
