@@ -62,7 +62,7 @@ When you are a Windows user and using Ansible 2.10 or newer, then there is a dep
 ansible-galaxy collection install ansible.windows
 ```
 
-For more information, see: https://github.com/ansible-collections/community.zabbix/issues/236 
+For more information, see: https://github.com/ansible-collections/community.zabbix/issues/236
 
 ## Local system access
 
@@ -202,7 +202,7 @@ Otherwise it just for the Zabbix Agent or for the Zabbix Agent 2.
 
 ## TLS Specific configuration
 
-These variables are specific for Zabbix 3.0 and higher. When `(2)` is used in the name of the property, like `zabbix_agent(2)_tlsconnect`, it will show that you can configure `zabbix_agent_tlsconnect` for the Zabbix Agent configuration file and `zabbix_agent2_tlsconnect` for the Zabbix Agent 2 configuration file. 
+These variables are specific for Zabbix 3.0 and higher. When `(2)` is used in the name of the property, like `zabbix_agent(2)_tlsconnect`, it will show that you can configure `zabbix_agent_tlsconnect` for the Zabbix Agent configuration file and `zabbix_agent2_tlsconnect` for the Zabbix Agent 2 configuration file.
 
 * `zabbix_agent(2)_tlsconnect`: How the agent should connect to server or proxy. Used for active checks.
     Possible values:
@@ -260,13 +260,18 @@ When `zabbix_api_create_hostgroup` or `zabbix_api_create_hosts` is set to `True`
 **NOTE**
 
 _Supporting Windows is a best effort (I don't have the possibility to either test/verify changes on the various amount of available Windows instances). PRs specific to Windows will almost immediately be merged, unless someone is able to provide a Windows test mechanism via Travis for Pull Requests._
+When `(2)` is used in the name of the property, like `zabbix_agent(2)_win_logfile`, it will show that you can configure `zabbix_agent_win_logfile` for the Zabbix Agent configuration file and `zabbix_agent2_win_logfile` for the Zabbix Agent 2 configuration file.
 
-* `zabbix_version_long`: The long (major.minor.patch) version of the Zabbix Agent. This will be used to generate the `zabbix_win_download_link` link and for Zabbix Agent update if `zabbix_agent_package_state: latest`.
-* `zabbix_win_download_link`: The download url to the `win.zip` file.
+Otherwise it just for the Zabbix Agent or for the Zabbix Agent 2.
+
+* `zabbix(2)_win_package`: file name pattern (zip only). This will be used to generate the `zabbix(2)_win_download_link` variable.
+* `zabbix_version_long`: The long (major.minor.patch) version of the Zabbix Agent. This will be used to generate the `zabbix(2)_win_package` and `zabbix(2)_win_download_link` variables.
+* `zabbix(2)_win_download_link`: The download url to the `win.zip` file.
 * `zabbix_win_install_dir`: The directory where Zabbix needs to be installed.
-* `zabbix_agent_win_logfile`: The full path to the logfile for the Zabbix Agent.
+* `zabbix_agent(2)_win_logfile`: The full path to the logfile for the Zabbix Agent.
 * `zabbix_agent_win_include`: The directory in which the Zabbix Agent specific configuration files are stored.
 * `zabbix_agent_win_svc_recovery`: Enable Zabbix Agent service auto-recovery settings.
+* `zabbix_win_firewall_management`: Enable Windows firewall management (add service and port to allow rules). Default: `True`
 
 ## macOS Variables
 
@@ -460,7 +465,7 @@ Variables e.g. in the playbook or in `host_vars/myhost`:
 
 # Molecule
 
-This role is configured to be tested with Molecule. You can find on this page some more information regarding Molecule: 
+This role is configured to be tested with Molecule. You can find on this page some more information regarding Molecule:
 
 * http://werner-dijkerman.nl/2016/07/10/testing-ansible-roles-with-molecule-testinfra-and-docker/
 * http://werner-dijkerman.nl/2016/07/27/extending-ansible-role-testing-with-molecule-by-adding-group_vars-dependencies-and-using-travis-ci/
