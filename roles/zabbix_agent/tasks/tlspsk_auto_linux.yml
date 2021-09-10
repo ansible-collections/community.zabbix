@@ -15,4 +15,3 @@
     path: "{{ zabbix_agent_tlspskidentity_file }}"
   register: zabbix_agent_tlspskidentity_check
   become: yes
-
