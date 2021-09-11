@@ -12,6 +12,8 @@
     - files:
         - "{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml"
         - "{{ ansible_os_family }}-{{ ansible_distribution_major_version }}.yml"
+  tags:
+    - always
 
 - name: "Set some versions"
   set_fact:
