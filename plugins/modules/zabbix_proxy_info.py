@@ -9,7 +9,7 @@ __metaclass__ = type
 
 
 DOCUMENTATION = '''
-module: zabbix_proxy
+module: zabbix_proxy_info
 short_description: Gather information about Zabbix proxy
 author:
     - Dusan Matejka (@D3DeFi)
