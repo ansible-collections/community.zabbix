@@ -8,7 +8,6 @@
     proxy_name: ExampleProxy
     description: ExampleProxy
     status: passive
-    state: present
     interface:
       useip: 1
       ip: 10.1.1.2

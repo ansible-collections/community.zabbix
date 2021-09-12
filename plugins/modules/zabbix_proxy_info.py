@@ -46,6 +46,7 @@ EXAMPLES = '''
 '''
 
 RETURN = '''
+zabbix_proxy:
   description: example
   returned: always
   type: dict
