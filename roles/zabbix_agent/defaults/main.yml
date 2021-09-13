@@ -208,9 +208,9 @@ zabbix_win_download_url: https://cdn.zabbix.com/zabbix/binaries/stable
 zabbix_win_download_link: "{{ zabbix_win_download_url }}/{{ zabbix_agent_version }}/{{ zabbix_version_long }}/{{ zabbix_win_package }}"
 zabbix2_win_download_link: "{{ zabbix_win_download_url }}/{{ zabbix_agent_version }}/{{ zabbix_version_long }}/{{ zabbix2_win_package }}"
 zabbix_win_install_dir: 'C:\Zabbix'
-zabbix_agent_win_logfile: 'C:\Zabbix\zabbix_agentd.log'
-zabbix_agent_win_include: 'C:\Zabbix\zabbix_agent.d\'
-zabbix_agent2_win_logfile: 'C:\Zabbix\zabbix_agent2.log'
+zabbix_agent_win_logfile: "{{ zabbix_win_install_dir }}\\zabbix_agentd.log"
+zabbix_agent_win_include: "{{ zabbix_win_install_dir }}\\zabbix_agent.d\\"
+zabbix_agent2_win_logfile: "{{ zabbix_win_install_dir }}\\zabbix_agent2.log"
 zabbix_agent_win_svc_recovery: True
 zabbix_win_firewall_management: True
 

@@ -32,6 +32,12 @@ LogType={{ zabbix_agent2_logtype }}
 
 LogFile={{ zabbix_agent2_logfile }}
 
+{% if zabbix_agent_os_family == "Windows" %}
+LogFile={{ zabbix_agent2_win_logfile }}
+{% else %}
+LogFile={{ zabbix_agent2_logfile }}
+{% endif %}
+
 ### Option: LogFileSize
 #	Maximum size of log file in MB.
 #	0 - disable automatic log rotation.
