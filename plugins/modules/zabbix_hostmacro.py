@@ -37,14 +37,15 @@ options:
             - Required if I(state=present).
         type: str
     macro_type:
-        type: int
+        type: str
         description:
             - Type of the host macro.
-            - 0 = Text macro (default)
-            - 1 = Secret macro (Works only with Zabbix >= 5.0)
-            - 2 = Vault secret (Works only with Zabbix >= 5.2)
-        choices: [0, 1, 2]
-        default: '0'
+            - text (default)
+            - secret (Works only with Zabbix >= 5.0)
+            - vault (Works only with Zabbix >= 5.2)
+        required: false
+        choices: ['text', 'secret', 'vault']
+        default: 'text'
     state:
         description:
             - State of the macro.
@@ -138,7 +139,13 @@ class HostMacro(ZabbixBase):
             if self._module.check_mode:
                 self._module.exit_json(changed=True)
             if LooseVersion(self._zbx_api_version) >= LooseVersion('5.0'):
-                self._zapi.usermacro.create({'hostid': host_id, 'macro': macro_name, 'value': macro_value, 'type': macro_type})
+                if macro_type == 'text':
+                    macro_type_value = 0
+                elif macro_type == 'secret':
+                    macro_type_value = 1
+                elif LooseVersion(self._zbx_api_version) >= LooseVersion('5.2') and macro_type == 'vault':
+                    macro_type_value = 2
+                self._zapi.usermacro.create({'hostid': host_id, 'macro': macro_name, 'value': macro_value, 'type': macro_type_value})
             else:
                 self._zapi.usermacro.create({'hostid': host_id, 'macro': macro_name, 'value': macro_value})
             self._module.exit_json(changed=True, result="Successfully added host macro %s" % macro_name)
@@ -148,19 +155,25 @@ class HostMacro(ZabbixBase):
     # update host macro
     def update_host_macro(self, host_macro_obj, macro_name, macro_value, macro_type):
         host_macro_id = host_macro_obj['hostmacroid']
+        if macro_type == 'text':
+            macro_type_value = 0
+        elif macro_type == 'secret':
+            macro_type_value = 1
+        elif macro_type == 'vault':
+            macro_type_value = 2
         if host_macro_obj['macro'] == macro_name:
             if LooseVersion(self._zbx_api_version) >= LooseVersion('5.0'):
-            # no change only when macro type == 0. when type = 1 or 2 zabbix will not output value of it.
-                if host_macro_obj['type'] == 0 and host_macro_obj['value'] == macro_value and host_macro_obj['type'] == macro_type:
+                # no change only when macro type == 0. when type = 1 or 2 zabbix will not output value of it.
+                if host_macro_obj['type'] == 0 and macro_type_value == 0 and host_macro_obj['value'] == macro_value:
                     self._module.exit_json(changed=False, result="Host macro %s already up to date" % macro_name)
             else:
-                if host_macro_obj['type'] == 0 and host_macro_obj['value'] == macro_value:
+                if host_macro_obj['value'] == macro_value:
                     self._module.exit_json(changed=False, result="Host macro %s already up to date" % macro_name)
         try:
             if self._module.check_mode:
                 self._module.exit_json(changed=True)
             if LooseVersion(self._zbx_api_version) >= LooseVersion('5.0'):
-                self._zapi.usermacro.update({'hostmacroid': host_macro_id, 'value': macro_value, 'type': macro_type})
+                self._zapi.usermacro.update({'hostmacroid': host_macro_id, 'value': macro_value, 'type': macro_type_value})
             else:
                 self._zapi.usermacro.update({'hostmacroid': host_macro_id, 'value': macro_value})
             self._module.exit_json(changed=True, result="Successfully updated host macro %s" % macro_name)
@@ -200,7 +213,7 @@ def main():
         host_name=dict(type='str', required=True),
         macro_name=dict(type='str', required=True),
         macro_value=dict(type='str', required=False),
-        macro_type=dict(type='int', default=0, choices=[0, 1, 2]),
+        macro_type=dict(type='str', default='text', choices=['text', 'secret', 'vault']),
         state=dict(type='str', default='present', choices=['present', 'absent']),
         force=dict(type='bool', default=True)
     ))
