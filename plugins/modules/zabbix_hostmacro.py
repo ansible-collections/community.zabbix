@@ -101,6 +101,7 @@ EXAMPLES = r'''
 '''
 
 
+from distutils.version import LooseVersion
 from ansible.module_utils.basic import AnsibleModule
 
 from ansible_collections.community.zabbix.plugins.module_utils.base import ZabbixBase
@@ -136,7 +137,10 @@ class HostMacro(ZabbixBase):
         try:
             if self._module.check_mode:
                 self._module.exit_json(changed=True)
-            self._zapi.usermacro.create({'hostid': host_id, 'macro': macro_name, 'value': macro_value, 'type': macro_type})
+            if LooseVersion(self._zbx_api_version) >= LooseVersion('5.0'):
+                self._zapi.usermacro.create({'hostid': host_id, 'macro': macro_name, 'value': macro_value, 'type': macro_type})
+            else:
+                self._zapi.usermacro.create({'hostid': host_id, 'macro': macro_name, 'value': macro_value})
             self._module.exit_json(changed=True, result="Successfully added host macro %s" % macro_name)
         except Exception as e:
             self._module.fail_json(msg="Failed to create host macro %s: %s" % (macro_name, e))
@@ -155,7 +159,10 @@ class HostMacro(ZabbixBase):
         try:
             if self._module.check_mode:
                 self._module.exit_json(changed=True)
-            self._zapi.usermacro.update({'hostmacroid': host_macro_id, 'value': macro_value, 'type': macro_type})
+            if LooseVersion(self._zbx_api_version) >= LooseVersion('5.0'):
+                self._zapi.usermacro.update({'hostmacroid': host_macro_id, 'value': macro_value, 'type': macro_type})
+            else:
+                self._zapi.usermacro.update({'hostmacroid': host_macro_id, 'value': macro_value})
             self._module.exit_json(changed=True, result="Successfully updated host macro %s" % macro_name)
         except Exception as e:
             self._module.fail_json(msg="Failed to update host macro %s: %s" % (macro_name, e))
@@ -186,7 +193,6 @@ def normalize_macro_name(macro_name):
         macro_name = macro_name + '}'
 
     return macro_name
-
 
 def main():
     argument_spec = zabbix_utils.zabbix_common_argument_spec()
