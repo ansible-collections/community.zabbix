@@ -1,5 +1,5 @@
 # Install CI dependencies for the Zabbix Roles
-ansible==2.10.7
+ansible==4.2.0
 ansible-lint==4.3.7
 docker==4.3.1
 molecule==3.2.1
