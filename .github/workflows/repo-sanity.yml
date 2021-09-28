@@ -47,6 +47,7 @@ jobs:
           # Testing against `devel` may fail as new tests are added.
           - stable-2.10
           - stable-2.11
+          - stable-2.12
           - devel
         python:
           - 2.7
@@ -57,6 +58,10 @@ jobs:
           - ansible: devel
             python: 3.7
           - ansible: devel
+            python: 2.7
+          - ansible: stable-2.12
+            python: 3.7
+          - ansible: stable-2.12
             python: 2.7
     runs-on: ubuntu-latest
     steps:
