@@ -50,6 +50,7 @@ Click on the name of a plugin or module to view that content's documentation:
     - [zabbix_map](https://docs.ansible.com/ansible/2.10/collections/community/zabbix/zabbix_map_module.html)
     - [zabbix_mediatype](https://docs.ansible.com/ansible/2.10/collections/community/zabbix/zabbix_mediatype_module.html)
     - [zabbix_proxy](https://docs.ansible.com/ansible/2.10/collections/community/zabbix/zabbix_proxy_module.html)
+    - [zabbix_proxy_info](https://docs.ansible.com/ansible/latest/collections/community/zabbix/zabbix_proxy_info_module.html)
     - [zabbix_screen](https://docs.ansible.com/ansible/2.10/collections/community/zabbix/zabbix_screen_module.html)
     - [zabbix_service](https://docs.ansible.com/ansible/2.10/collections/community/zabbix/zabbix_service_module.html)
     - [zabbix_template_info](https://docs.ansible.com/ansible/2.10/collections/community/zabbix/zabbix_template_info_module.html)
