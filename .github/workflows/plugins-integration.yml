@@ -36,6 +36,8 @@ jobs:
         exclude:
           - ansible: devel
             python: 3.7
+          - ansible: devel
+            python: 2.7
 
     steps:
       - name: Check out code
