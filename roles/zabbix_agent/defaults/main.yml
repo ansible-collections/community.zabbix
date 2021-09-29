@@ -98,6 +98,7 @@ zabbix_agent_firewall_chain: INPUT
 zabbix_agent_firewalld_zone:
 # Zabbix configuration variables
 zabbix_agent_pidfile: /var/run/zabbix/zabbix_agentd.pid
+zabbix_agent_logtype: file
 zabbix_agent_logfile: /var/log/zabbix/zabbix_agentd.log
 zabbix_agent_logfilesize: 100
 zabbix_agent_debuglevel: 3
