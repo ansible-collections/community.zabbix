@@ -168,7 +168,7 @@ Otherwise it just for the Zabbix Agent or for the Zabbix Agent 2.
 * `zabbix_agent(2)_pidfile`: name of pid file.
 * `zabbix_agent(2)_logfile`: name of log file.
 * `zabbix_agent(2)_logfilesize`: maximum size of log file in mb.
-* `zabbix_agent2_logtype`: Specifies where log messages are written to
+* `zabbix_agent(2)_logtype`: Specifies where log messages are written to
 * `zabbix_agent(2)_debuglevel`: specifies debug level
 * `zabbix_agent(2)_sourceip`: source ip address for outgoing connections.
 * `zabbix_agent_enableremotecommands`: whether remote commands from zabbix server are allowed.
