@@ -35,6 +35,7 @@ sign_keys:
     tricia:
       sign_key: E709712C
   "52":
+    # bullseye: not available upstream
     buster:
       sign_key: E709712C
     stretch:
@@ -52,6 +53,8 @@ sign_keys:
     tricia:
       sign_key: E709712C
   "50":
+    bullseye:
+      sign_key: E709712C
     buster:
       sign_key: E709712C
     stretch:
