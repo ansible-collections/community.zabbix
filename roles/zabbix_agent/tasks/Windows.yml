@@ -233,25 +233,19 @@
   win_command: '"{{ zabbix_win_exe_path }}" --config "{{ zabbix_win_install_dir }}\{{ zabbix_win_config_name }}" --install'
   when: not zabbix_windows_service.exists
 
-- name: "Windows | Set service startup mode to auto and ensure it is started"
+- name: "Windows | Set service startup mode to auto, ensure it is started and set auto-recovery"
   win_service:
     name: "{{ zabbix_win_svc_name }}"
     start_mode: auto
     state: started
-
-- name: "Windows | Getting Zabbix Service Recovery Settings"
-  win_shell: 'sc.exe qfailure "{{ zabbix_win_svc_name }}" 1100'
-  register: svc_recovery
-  changed_when: false
-  check_mode: false
-  when:
-    - zabbix_agent_win_svc_recovery
-
-- name: "Windows | Setting Zabbix Service Recovery"
-  win_shell: 'sc.exe failure "{{ zabbix_win_svc_name }}" actions= restart/5000/restart/10000/restart/20000 reset= 86400'
-  when:
-    - "'RESTART -- Delay' not in svc_recovery.stdout"
-    - zabbix_agent_win_svc_recovery
+    failure_actions:
+    - type: restart
+      delay_ms: 5000
+    - type: restart
+      delay_ms: 10000
+    - type: restart
+      delay_ms: 20000
+    failure_reset_period_sec: 86400
 
 - name: "Windows | Check firewall service"
   ansible.windows.win_service_info:
