@@ -151,13 +151,12 @@
 
 - name: "PostgreSQL | Importing schema file"
   shell: >
-    cd {{ datafiles_path }} &&
-    if [ -f schema.sql.gz ]; then gunzip schema.sql.gz ; fi &&
-    psql -h '{{ zabbix_server_dbhost }}'
+    set -o pipefail
+    zcat {{ datafiles_path }}/schema.sql.gz | psql -h '{{ zabbix_server_dbhost }}'
     -U '{{ zabbix_server_dbuser }}'
     -d '{{ zabbix_server_dbname }}'
     -p '{{ zabbix_server_dbport }}'
-    -f schema.sql && touch /etc/zabbix/schema.done
+    && touch /etc/zabbix/schema.done
   args:
     creates: /etc/zabbix/schema.done
     warn: no

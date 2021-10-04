@@ -71,12 +71,9 @@
 
 - name: "PostgreSQL | Importing schema file"
   shell: |
-    cd {{ datafiles_path }}
-    if [ -f schema.sql.gz ]
-      then gunzip schema.sql.gz
-    fi
-    psql -h '{{ zabbix_proxy_dbhost }}' -U '{{ zabbix_proxy_dbuser }}' \
-    -d '{{ zabbix_proxy_dbname }}' -f schema.sql && touch /etc/zabbix/schema.done
+    set -o pipefail
+    zcat {{ datafiles_path }}/schema.sql.gz | psql -h '{{ zabbix_proxy_dbhost }}' -U '{{ zabbix_proxy_dbuser }}' \
+    -d '{{ zabbix_proxy_dbname }}' && touch /etc/zabbix/schema.done
   args:
     creates: /etc/zabbix/schema.done
   environment:
