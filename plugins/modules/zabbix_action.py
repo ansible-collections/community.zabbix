@@ -747,9 +747,13 @@ class Zapi(ZapiWrapper):
 
         """
         try:
+            if LooseVersion(self._zbx_api_version) >= LooseVersion('5.4'):
+                filter = {'username': [user_name]}
+            else:
+                filter = {'alias': [user_name]}
             user_list = self._zapi.user.get({
                 'output': 'extend',
-                'filter': {'alias': [user_name]}
+                'filter': filter,
             })
             if len(user_list) < 1:
                 self._module.fail_json(msg="User not found: %s" % user_name)
