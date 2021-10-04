@@ -20,9 +20,9 @@ sign_keys:
       sign_key: E709712C
     buster:
       sign_key: E709712C
-    stretch:
-      sign_key: E709712C
     jessie:
+      sign_key: E709712C
+    stretch:
       sign_key: E709712C
     focal:
       sign_key: E709712C
@@ -38,9 +38,9 @@ sign_keys:
     # bullseye: not available upstream
     buster:
       sign_key: E709712C
-    stretch:
-      sign_key: E709712C
     jessie:
+      sign_key: E709712C
+    stretch:
       sign_key: E709712C
     focal:
       sign_key: E709712C
@@ -57,9 +57,9 @@ sign_keys:
       sign_key: E709712C
     buster:
       sign_key: E709712C
-    stretch:
-      sign_key: E709712C
     jessie:
+      sign_key: E709712C
+    stretch:
       sign_key: E709712C
     focal:
       sign_key: E709712C
@@ -72,6 +72,12 @@ sign_keys:
     tricia:
       sign_key: E709712C
   "44":
+    buster:
+      sign_key: A14FE591
+    jessie:
+      sign_key: 79EA5ED4
+    stretch:
+      sign_key: A14FE591
     focal:
       sign_key: A14FE591
     eoan:
@@ -84,19 +90,17 @@ sign_keys:
       sign_key: A14FE591
     serena:
       sign_key: A14FE591
-    buster:
-      sign_key: A14FE591
-    stretch:
-      sign_key: A14FE591
-    wheezy:
-      sign_key: A14FE591
-    jessie:
-      sign_key: 79EA5ED4
     trusty:
       sign_key: 79EA5ED4
     xenial:
       sign_key: E709712C
   "42":
+    buster:
+      sign_key: A14FE591
+    jessie:
+      sign_key: 79EA5ED4
+    stretch:
+      sign_key: A14FE591
     eoan:
       sign_key: A14FE591
     cosmic:
@@ -107,19 +111,19 @@ sign_keys:
       sign_key: A14FE591
     serena:
       sign_key: A14FE591
-    buster:
-      sign_key: A14FE591
-    stretch:
-      sign_key: A14FE591
-    wheezy:
-      sign_key: A14FE591
-    jessie:
-      sign_key: 79EA5ED4
     trusty:
       sign_key: 79EA5ED4
     xenial:
       sign_key: E709712C
   "40":
+    bullseye:
+      sign_key: A14FE591
+    buster:
+      sign_key: A14FE591
+    jessie:
+      sign_key: 79EA5ED4
+    stretch:
+      sign_key: A14FE591
     focal:
       sign_key: A14FE591
     bionic:
@@ -128,71 +132,61 @@ sign_keys:
       sign_key: A14FE591
     serena:
       sign_key: A14FE591
-    buster:
-      sign_key: A14FE591
-    stretch:
-      sign_key: A14FE591
-    wheezy:
-      sign_key: A14FE591
-    jessie:
-      sign_key: 79EA5ED4
     trusty:
       sign_key: 79EA5ED4
     xenial:
       sign_key: E709712C
   "34":
+    jessie:
+      sign_key: 79EA5ED4
+    stretch:
+      sign_key: A14FE591
+    wheezy:
+      sign_key: A14FE591
     bionic:
       sign_key: A14FE591
     sonya:
       sign_key: A14FE591
     serena:
       sign_key: A14FE591
-    stretch:
-      sign_key: A14FE591
-    wheezy:
-      sign_key: A14FE591
-    jessie:
-      sign_key: 79EA5ED4
     trusty:
       sign_key: 79EA5ED4
     xenial:
       sign_key: E709712C
   "32":
+    stretch:
+      sign_key: A14FE591
+    wheezy:
+      sign_key: 79EA5ED4
     bionic:
       sign_key: A14FE591
     sonya:
       sign_key: 79EA5ED4
     serena:
-      sign_key: 79EA5ED4
-    stretch:
-      sign_key: A14FE591
-    wheezy:
-      sign_key: 79EA5ED4
-    jessie:
       sign_key: 79EA5ED4
     trusty:
       sign_key: 79EA5ED4
     xenial:
       sign_key: E709712C
   "30":
-    bionic:
+    buster:
       sign_key: A14FE591
-    wheezy:
-      sign_key: 79EA5ED4
     jessie:
       sign_key: 79EA5ED4
     stretch:
       sign_key: A14FE591
-    buster:
+    wheezy:
+      sign_key: 79EA5ED4
+    bionic:
       sign_key: A14FE591
     trusty:
       sign_key: 79EA5ED4
     xenial:
       sign_key: E709712C
   "24":
-    wheezy:
-      sign_key: 79EA5ED4
     jessie:
+      sign_key: 79EA5ED4
+    wheezy:
       sign_key: 79EA5ED4
     precise:
       sign_key: 79EA5ED4
@@ -201,7 +195,7 @@ sign_keys:
   "22":
     squeeze:
       sign_key: 79EA5ED4
-    jessie:
+    wheezy:
       sign_key: 79EA5ED4
     precise:
       sign_key: 79EA5ED4
