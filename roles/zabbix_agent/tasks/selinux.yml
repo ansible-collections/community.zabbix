@@ -86,13 +86,13 @@
     - 'getenforce_bin.stat.exists and ("Enforcing" in sestatus.stdout or "Permissive" in sestatus.stdout)'
 
 - name: "SELinux | Allow zabbix_agent to start (SELinux)"
-  selinux_permissive:
+  community.general.selinux_permissive:
     name: zabbix_agent_t
     permissive: true
   become: yes
 
 - name: "SELinux | Allow zabbix to run sudo commands (SELinux)"
-  seboolean:
+  ansible.posix.seboolean:
     name: zabbix_run_sudo
     persistent: yes
     state: yes
