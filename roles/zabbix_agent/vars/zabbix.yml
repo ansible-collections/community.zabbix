@@ -1,6 +1,23 @@
 ---
 sign_keys:
+  "55":
+    bullseye:
+      sign_key: E709712C
+    buster:
+      sign_key: E709712C
+    stretch:
+      sign_key: E709712C
+    focal:
+      sign_key: E709712C
+    bionic:
+      sign_key: E709712C
+    xenial:
+      sign_key: E709712C
+    trusty:
+      sign_key: E709712C
   "54":
+    bullseye:
+      sign_key: E709712C
     buster:
       sign_key: E709712C
     stretch:
@@ -18,6 +35,7 @@ sign_keys:
     tricia:
       sign_key: E709712C
   "52":
+    # bullseye: not available upstream
     buster:
       sign_key: E709712C
     stretch:
@@ -35,6 +53,8 @@ sign_keys:
     tricia:
       sign_key: E709712C
   "50":
+    bullseye:
+      sign_key: E709712C
     buster:
       sign_key: E709712C
     stretch:

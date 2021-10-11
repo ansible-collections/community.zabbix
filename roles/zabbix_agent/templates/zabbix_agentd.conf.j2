@@ -11,6 +11,19 @@
 PidFile={{ zabbix_agent_pidfile }}
 {% endif %}
 
+{% if zabbix_agent_version is version('3.0', '>=') %}
+### Option: LogType
+#	Specifies where log messages are written to:
+#		system  - syslog
+#		file    - file specified with LogFile parameter
+#		console - standard output
+#
+# Mandatory: no
+# Default:
+
+LogType={{ zabbix_agent_logtype }}
+{% endif %}
+
 ### option: logfile
 #       name of log file.
 #       if not set, syslog is used.

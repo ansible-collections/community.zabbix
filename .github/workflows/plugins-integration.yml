@@ -25,15 +25,24 @@ jobs:
           - version: "5.0"
           - version: "5.2"
         ansible:
-          # - stable-2.9 # Only if your collection supports Ansible 2.9
           - stable-2.10
           - stable-2.11
+          - stable-2.12
           - devel
         python:
           - 2.7
           - 3.7
           - 3.8
           - 3.9
+        exclude:
+          - ansible: devel
+            python: 3.7
+          - ansible: devel
+            python: 2.7
+          - ansible: stable-2.12
+            python: 3.7
+          - ansible: stable-2.12
+            python: 2.7
 
     steps:
       - name: Check out code
