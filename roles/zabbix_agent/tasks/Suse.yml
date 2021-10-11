@@ -5,7 +5,7 @@
   include_vars: zabbix.yml
 
 - name: "Install zypper repo dependency"
-  zypper:
+  community.general.zypper:
     name: ["python-libxml2", "python-xml"]
     state: present
   environment:
@@ -16,7 +16,7 @@
   until: zabbix_agent_package_dependency is succeeded
 
 - name: "Suse | Install basic repo file"
-  zypper_repository:
+  community.general.zypper_repository:
     repo: "{{ suse[ansible_distribution][zabbix_agent_distribution_major_version]['url'] }}"
     name: "{{ suse[ansible_distribution][zabbix_agent_distribution_major_version]['name'] }}"
     state: present
@@ -38,7 +38,7 @@
     - zabbix_agent_install_agent_only
 
 - name: "Suse | Install zabbix-agent"
-  zypper:
+  community.general.zypper:
     name: "{{ zabbix_agent_packages }}"
     state: "{{ zabbix_agent_package_state }}"
     disable_gpg_check: yes

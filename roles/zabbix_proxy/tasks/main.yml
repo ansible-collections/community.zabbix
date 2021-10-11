@@ -68,7 +68,7 @@
     - restart zabbix-proxy
 
 - name: "Allow zabbix-proxy to open connections (SELinux)"
-  seboolean:
+  ansible.posix.seboolean:
     name: zabbix_can_network
     persistent: yes
     state: yes
@@ -77,7 +77,7 @@
   tags: selinux
 
 - name: "Allow zabbix-proxy to connect to zabbix_proxy_preprocessing.sock (SELinux)"
-  seboolean:
+  ansible.posix.seboolean:
     name: daemons_enable_cluster_mode
     persistent: yes
     state: yes
