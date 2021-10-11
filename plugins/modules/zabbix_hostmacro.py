@@ -152,7 +152,7 @@ class HostMacro(ZabbixBase):
         if host_macro_obj['macro'] == macro_name:
             if LooseVersion(self._zbx_api_version) >= LooseVersion('5.0'):
                 # no change only when macro type == 0. when type = 1 or 2 zabbix will not output value of it.
-                if host_macro_obj['type'] == 0 and macro_type == 0 and host_macro_obj['value'] == macro_value:
+                if host_macro_obj['type'] == '0' and macro_type == '0' and host_macro_obj['value'] == macro_value:
                     self._module.exit_json(changed=False, result="Host macro %s already up to date" % macro_name)
             else:
                 if host_macro_obj['value'] == macro_value:
@@ -219,11 +219,11 @@ def main():
     state = module.params['state']
     force = module.params['force']
     if module.params['macro_type'] == 'secret':
-        macro_type = 1
+        macro_type = '1'
     elif module.params['macro_type'] == 'vault':
-        macro_type = 2
+        macro_type = '2'
     else:
-        macro_type = 0
+        macro_type = '0'
 
     host_macro_class_obj = HostMacro(module)
 
