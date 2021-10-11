@@ -59,7 +59,7 @@
     - zabbix-server
 
 - name: "SELinux | RedHat | Enable httpd_can_connect_zabbix SELinux boolean"
-  seboolean:
+  ansible.posix.seboolean:
     name: httpd_can_connect_zabbix
     state: yes
     persistent: yes
@@ -70,7 +70,7 @@
     - zabbix-server
 
 - name: "SELinux | RedHat | Enable zabbix_can_network SELinux boolean"
-  seboolean:
+  ansible.posix.seboolean:
     name: zabbix_can_network
     state: yes
     persistent: yes
