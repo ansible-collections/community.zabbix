@@ -195,6 +195,7 @@ def normalize_macro_name(macro_name):
 
     return macro_name
 
+
 def main():
     argument_spec = zabbix_utils.zabbix_common_argument_spec()
     argument_spec.update(dict(
