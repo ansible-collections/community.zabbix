@@ -10,6 +10,7 @@
 - name: "Sqlite3 | Create database"
   file:
     name: "{{ zabbix_proxy_dbname | dirname }}"
+    mode: 0744
     owner: zabbix
     group: zabbix
     seuser: system_u
