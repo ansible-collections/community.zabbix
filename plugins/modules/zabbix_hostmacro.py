@@ -36,6 +36,16 @@ options:
             - Value of the host macro.
             - Required if I(state=present).
         type: str
+    macro_type:
+        type: str
+        description:
+            - Type of the host macro.
+            - text (default)
+            - secret (Works only with Zabbix >= 5.0)
+            - vault (Works only with Zabbix >= 5.2)
+        required: false
+        choices: ['text', 'secret', 'vault']
+        default: 'text'
     state:
         description:
             - State of the macro.
@@ -92,6 +102,7 @@ EXAMPLES = r'''
 '''
 
 
+from distutils.version import LooseVersion
 from ansible.module_utils.basic import AnsibleModule
 
 from ansible_collections.community.zabbix.plugins.module_utils.base import ZabbixBase
@@ -123,24 +134,36 @@ class HostMacro(ZabbixBase):
             self._module.fail_json(msg="Failed to get host macro %s: %s" % (macro_name, e))
 
     # create host macro
-    def create_host_macro(self, macro_name, macro_value, host_id):
+    def create_host_macro(self, macro_name, macro_value, macro_type, host_id):
         try:
             if self._module.check_mode:
                 self._module.exit_json(changed=True)
-            self._zapi.usermacro.create({'hostid': host_id, 'macro': macro_name, 'value': macro_value})
+            if LooseVersion(self._zbx_api_version) >= LooseVersion('5.0'):
+                self._zapi.usermacro.create({'hostid': host_id, 'macro': macro_name, 'value': macro_value, 'type': macro_type})
+            else:
+                self._zapi.usermacro.create({'hostid': host_id, 'macro': macro_name, 'value': macro_value})
             self._module.exit_json(changed=True, result="Successfully added host macro %s" % macro_name)
         except Exception as e:
             self._module.fail_json(msg="Failed to create host macro %s: %s" % (macro_name, e))
 
     # update host macro
-    def update_host_macro(self, host_macro_obj, macro_name, macro_value):
+    def update_host_macro(self, host_macro_obj, macro_name, macro_value, macro_type):
         host_macro_id = host_macro_obj['hostmacroid']
-        if host_macro_obj['macro'] == macro_name and host_macro_obj['value'] == macro_value:
-            self._module.exit_json(changed=False, result="Host macro %s already up to date" % macro_name)
+        if host_macro_obj['macro'] == macro_name:
+            if LooseVersion(self._zbx_api_version) >= LooseVersion('5.0'):
+                # no change only when macro type == 0. when type = 1 or 2 zabbix will not output value of it.
+                if host_macro_obj['type'] == '0' and macro_type == '0' and host_macro_obj['value'] == macro_value:
+                    self._module.exit_json(changed=False, result="Host macro %s already up to date" % macro_name)
+            else:
+                if host_macro_obj['value'] == macro_value:
+                    self._module.exit_json(changed=False, result="Host macro %s already up to date" % macro_name)
         try:
             if self._module.check_mode:
                 self._module.exit_json(changed=True)
-            self._zapi.usermacro.update({'hostmacroid': host_macro_id, 'value': macro_value})
+            if LooseVersion(self._zbx_api_version) >= LooseVersion('5.0'):
+                self._zapi.usermacro.update({'hostmacroid': host_macro_id, 'value': macro_value, 'type': macro_type})
+            else:
+                self._zapi.usermacro.update({'hostmacroid': host_macro_id, 'value': macro_value})
             self._module.exit_json(changed=True, result="Successfully updated host macro %s" % macro_name)
         except Exception as e:
             self._module.fail_json(msg="Failed to update host macro %s: %s" % (macro_name, e))
@@ -179,6 +202,7 @@ def main():
         host_name=dict(type='str', required=True),
         macro_name=dict(type='str', required=True),
         macro_value=dict(type='str', required=False),
+        macro_type=dict(type='str', default='text', choices=['text', 'secret', 'vault']),
         state=dict(type='str', default='present', choices=['present', 'absent']),
         force=dict(type='bool', default=True)
     ))
@@ -195,6 +219,12 @@ def main():
     macro_value = module.params['macro_value']
     state = module.params['state']
     force = module.params['force']
+    if module.params['macro_type'] == 'secret':
+        macro_type = '1'
+    elif module.params['macro_type'] == 'vault':
+        macro_type = '2'
+    else:
+        macro_type = '0'
 
     host_macro_class_obj = HostMacro(module)
 
@@ -211,10 +241,10 @@ def main():
     else:
         if not host_macro_obj:
             # create host macro
-            host_macro_class_obj.create_host_macro(macro_name, macro_value, host_id)
+            host_macro_class_obj.create_host_macro(macro_name, macro_value, macro_type, host_id)
         elif force:
             # update host macro
-            host_macro_class_obj.update_host_macro(host_macro_obj, macro_name, macro_value)
+            host_macro_class_obj.update_host_macro(host_macro_obj, macro_name, macro_value, macro_type)
         else:
             module.exit_json(changed=False, result="Host macro %s already exists and force is set to no" % macro_name)
 
