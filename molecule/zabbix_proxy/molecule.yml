@@ -44,6 +44,7 @@ provisioner:
         zabbix_proxy_pgsql_login_host: postgresql-host
         zabbix_proxy_pgsql_login_user: postgres
         zabbix_proxy_pgsql_login_password: changeme
+        zabbix_proxy_dbpassword: changeme
         zabbix_proxy_pgsql_login_port: 5432
       sqlite3:
         zabbix_proxy_database: sqlite3
