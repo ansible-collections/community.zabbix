@@ -11,21 +11,25 @@
   register: zabbix_agent2_tlspsk_base64
   become: yes
   when: zabbix_agent2_tlspskcheck.stat.exists
+  no_log: "{{ ansible_verbosity < 3 }}"
 
 - name: AutoPSK | Save existing TLS PSK secret
   set_fact:
     zabbix_agent2_tlspsk_read: "{{ zabbix_agent2_tlspsk_base64['content'] | b64decode | trim }}"
   when: zabbix_agent2_tlspskcheck.stat.exists
+  no_log: "{{ ansible_verbosity < 3 }}"
 
 - name: AutoPSK | Use existing TLS PSK secret
   set_fact:
     zabbix_agent2_tlspsk_secret: "{{ zabbix_agent2_tlspsk_read }}"
   when: zabbix_agent2_tlspskcheck.stat.exists and zabbix_agent2_tlspsk_read|length >= 32
+  no_log: "{{ ansible_verbosity < 3 }}"
 
 - name: AutoPSK | Generate new TLS PSK secret
   set_fact:
     zabbix_agent2_tlspsk_secret: "{{ lookup('password', '/dev/null chars=hexdigits length=64') }}"
   when: not zabbix_agent2_tlspskcheck.stat.exists or zabbix_agent2_tlspsk_read|length < 32
+  no_log: "{{ ansible_verbosity < 3 }}"
 
 - name: AutoPSK | Read existing TLS PSK identity file
   slurp:
@@ -33,16 +37,19 @@
   register: zabbix_agent2_tlspskidentity_base64
   become: yes
   when: zabbix_agent2_tlspskidentity_check.stat.exists
+  no_log: "{{ ansible_verbosity < 3 }}"
 
 - name: AutoPSK | Use existing TLS PSK identity
   set_fact:
     zabbix_agent2_tlspskidentity: "{{ zabbix_agent2_tlspskidentity_base64['content'] | b64decode | trim }}"
   when: zabbix_agent2_tlspskidentity_check.stat.exists
+  no_log: "{{ ansible_verbosity < 3 }}"
 
 - name: AutoPSK | Generate new TLS PSK identity
   set_fact:
     zabbix_agent2_tlspskidentity: "{{ zabbix_visible_hostname | default(zabbix_agent_hostname) + '_' + lookup('password', '/dev/null chars=hexdigits length=4') }}"
   when: not zabbix_agent2_tlspskidentity_check.stat.exists
+  no_log: "{{ ansible_verbosity < 3 }}"
 
 - name: AutoPSK | Template TLS PSK identity in file
   copy:
