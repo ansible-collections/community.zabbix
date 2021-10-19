@@ -224,4 +224,3 @@
     - type: restart
       delay_ms: 20000
     failure_reset_period_sec: 86400
-
