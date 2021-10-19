@@ -80,6 +80,6 @@
   args:
     creates: /etc/zabbix/schema.done
   environment:
-    PGPASSWORD: '{{ zabbix_proxy_dbpassword }}'
+    PGPASSWORD: "{{ zabbix_proxy_dbpassword }}"
   when:
     - zabbix_database_creation
