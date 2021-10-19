@@ -1,5 +1,5 @@
 ---
-# defaults file for dj-wasabi.zabbix-javagateway
+# defaults file for zabbix_javagateway
 
 zabbix_javagateway_version: 5.4
 zabbix_version: "{{ zabbix_javagateway_version }}"

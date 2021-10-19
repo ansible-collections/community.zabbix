@@ -1,5 +1,5 @@
 ---
-# tasks file for dj-wasabi.zabbix-proxy
+# tasks file for zabbix_proxy
 
 - name: "Set default ip address for zabbix_proxy_ip"
   set_fact:

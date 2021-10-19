@@ -1,5 +1,5 @@
 ---
-# tasks file for dj-wasabi.zabbix-agent
+# tasks file for zabbix_agent
 
 - name: "Set variables specific for Zabbix Agent 2"
   set_fact:
