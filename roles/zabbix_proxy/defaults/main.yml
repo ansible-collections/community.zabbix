@@ -1,5 +1,5 @@
 ---
-# defaults file for zabbix-proxy
+# defaults file for zabbix_proxy
 
 zabbix_proxy_version: 5.4
 zabbix_version: "{{ zabbix_proxy_version }}"
