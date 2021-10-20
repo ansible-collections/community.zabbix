@@ -1,5 +1,5 @@
 ---
-# vars file for zabbix-agent (Debian)
+# vars file for zabbix_agent (Debian)
 
 zabbix_agent: zabbix-agent
 zabbix_agent_service: zabbix-agent

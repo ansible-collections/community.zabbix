@@ -1,5 +1,5 @@
 ---
-# vars file for zabbix-agent (Suse)
+# vars file for zabbix_agent (Suse)
 
 zabbix_agent: zabbix-agentd
 zabbix_agent_service: zabbix_agentd

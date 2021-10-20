@@ -1,5 +1,5 @@
 ---
-# defaults file for zabbix-agent
+# defaults file for zabbix_agent
 
 zabbix_agent2: False
 zabbix_agent_version: 5.4
