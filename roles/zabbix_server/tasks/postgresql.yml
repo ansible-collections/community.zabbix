@@ -67,6 +67,7 @@
         priv: ALL
         state: present
         encrypted: yes
+      no_log: false
     - name: "PostgreSQL | Remote | Create timescaledb extension"
       community.postgresql.postgresql_ext:
         login_host: "{{ zabbix_server_pgsql_login_host | default(omit) }}"
@@ -85,6 +86,7 @@
 
 - name: "PostgreSQL | Create schema"
   shell: >
+    echo aa $PGPASSWORD bb &&
     cd {{ datafiles_path }} &&
     if [ -f create.sql.gz ]; then gunzip create.sql.gz ; fi &&
     psql -h '{{ zabbix_server_dbhost }}'
@@ -95,6 +97,7 @@
   args:
     creates: /etc/zabbix/schema.done
     warn: no
+  no_log: false
   environment:
     PGPASSWORD: "{{ zabbix_server_dbpassword }}"
   when:

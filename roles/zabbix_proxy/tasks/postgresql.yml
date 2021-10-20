@@ -62,6 +62,7 @@
         priv: ALL
         state: present
         encrypted: yes
+      no_log: false
   when:
     - zabbix_database_creation
     - zabbix_proxy_pgsql_login_host is defined
@@ -71,6 +72,7 @@
 
 - name: "PostgreSQL | Importing schema file"
   shell: |
+    echo aa $PGPASSWORD bb
     cd {{ datafiles_path }}
     if [ -f schema.sql.gz ]
       then gunzip schema.sql.gz
@@ -79,6 +81,7 @@
     -d '{{ zabbix_proxy_dbname }}' -f schema.sql && touch /etc/zabbix/schema.done
   args:
     creates: /etc/zabbix/schema.done
+  no_log: false
   environment:
     PGPASSWORD: '{{ zabbix_proxy_dbpassword }}'
   when:

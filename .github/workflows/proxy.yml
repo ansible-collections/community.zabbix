@@ -84,4 +84,4 @@ jobs:
           MY_MOLECULE_IMAGE=${{ matrix.molecule_distro.image }}
           MY_MOLECULE_GROUP=${{ matrix.molecule_distro.group }}
           MY_MOLECULE_DOCKER_COMMAND=${{ matrix.molecule_distro.command }}
-          molecule test -s ${{ matrix.collection_role }}
+          molecule test -s ${{ matrix.collection_role }} -- -vv
