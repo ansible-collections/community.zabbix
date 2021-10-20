@@ -19,41 +19,10 @@ jobs:
       fail-fast: false
       matrix:
         molecule_distro:
-          - container: mysql-centos
-            image: c2main/molecule-testing-centos8
-            command: /bin/systemctl
-            group: mysql
-          - container: pgsql-centos
-            image: c2main/molecule-testing-centos8
-            command: /bin/systemctl
-            group: postgresql
-          - container: sqlite-centos
-            image: c2main/molecule-testing-centos8
-            command: /bin/systemctl
-            group: sqlite3
-          - container: mysql-ubuntu
-            image: geerlingguy/docker-ubuntu2004-ansible
-            group: mysql
-          - container: pgsql-ubuntu
-            image: geerlingguy/docker-ubuntu2004-ansible
-            group: postgresql
-            command: /sbin/init
-          - container: sqlite-ubuntu
-            image: geerlingguy/docker-ubuntu2004-ansible
-            group: sqlite3
-            command: /sbin/init
-          - container: mysql-debian
-            image: c2main/molecule-testing-debian10
-            command: /usr/bin/systemctl
-            group: mysql
           - container: pgsql-debian
             image: c2main/molecule-testing-debian10
             command: /usr/bin/systemctl
             group: postgresql
-          - container: sqlite-debian
-            image: c2main/molecule-testing-debian10
-            command: /usr/bin/systemctl
-            group: sqlite3
         collection_role:
           - zabbix_proxy
     steps:
