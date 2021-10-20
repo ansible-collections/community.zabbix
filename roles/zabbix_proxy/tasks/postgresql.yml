@@ -63,6 +63,21 @@
         state: present
         encrypted: yes
       no_log: false
+    - name: Simple select query to acme
+      postgresql_query:
+        login_host: "{{ zabbix_proxy_pgsql_login_host | default(omit) }}"
+        login_user: "{{ zabbix_proxy_pgsql_login_user | default(omit) }}"
+        login_password: "{{ zabbix_proxy_pgsql_login_password | default(omit) }}"
+        db: "{{ zabbix_proxy_dbname }}"
+        port: "{{ zabbix_proxy_dbport }}"
+        query: select * from pg_roles join pg_shadow on usename=rolname
+      register: debugsql
+    - name: debug PostgreSQL
+      debug:
+        var: zabbix_proxy_pgsql_login_host
+    - name: debug PostgreSQL
+      debug:
+        var: debugsql
   when:
     - zabbix_database_creation
     - zabbix_proxy_pgsql_login_host is defined
