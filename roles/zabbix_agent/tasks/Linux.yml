@@ -19,6 +19,8 @@
     zabbix_agent_ip: "{{ ansible_all_ipv4_addresses | ipaddr('public') | first }}"
     zabbix_agent_server: "{{ zabbix_agent_server_public_ip | default(zabbix_agent_server) }}"
     zabbix_agent_serveractive: "{{ zabbix_agent_serveractive_public_ip | default(zabbix_agent_serveractive) }}"
+    zabbix_agent2_server: "{{ zabbix_agent_server_public_ip | default(zabbix_agent2_server) }}"
+    zabbix_agent2_serveractive: "{{ zabbix_agent_serveractive_public_ip | default(zabbix_agent2_serveractive) }}"
   when:
     - zabbix_agent_ip is not defined
     - total_private_ip_addresses is defined

@@ -85,7 +85,7 @@ Example of using the role in this collection::
 - hosts: zabbix-proxy
   roles:
     - role: community.zabbix.zabbix_proxy
-      zabbix_server_host: 192.168.1.1
+      zabbix_proxy_server: 192.168.1.1
       zabbix_server_database: mysql
       zabbix_server_database_long: mysql
       zabbix_server_dbport: 3306

@@ -115,8 +115,8 @@ The following is an overview of all available configuration default for this rol
 ### Zabbix Proxy
 
 * `zabbix_proxy_ip`: The IP address of the host. When not provided, it will be determined via the `ansible_default_ipv4` fact.
-* `zabbix_server_host`: The ip or dns name for the zabbix-server machine.
-* `zabbix_server_port`: The port on which the zabbix-server is running. Default: 10051
+* `zabbix_proxy_server`: The ip or dns name for the zabbix-server machine.
+* `zabbix_proxy_serverport`: The port on which the zabbix-server is running. Default: 10051
 * `*zabbix_proxy_package_state`: Default: `present`. Can be overridden to `latest` to update packages
 * `zabbix_proxy_install_database_client`: Default: `True`. False does not install database client.
 * `zabbix_proxy_become_on_localhost`: Default: `True`. Set to `False` if you don't need to elevate privileges on localhost to install packages locally with pip.
@@ -340,7 +340,7 @@ Including an example of how to use your role (for instance, with variables passe
   - hosts: zabbix-proxy
     roles:
       - role: community.zabbix.zabbix_proxy
-        zabbix_server_host: 192.168.1.1
+        zabbix_proxy_server: 192.168.1.1
         zabbix_proxy_database: mysql
         zabbix_proxy_database_long: mysql
 ```
