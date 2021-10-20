@@ -22,7 +22,7 @@
     - name: "Create postgresql Container"
       docker_container:
         name: postgresql-host
-        image: postgres
+        image: postgres:13
         state: started
         recreate: yes
         networks:
