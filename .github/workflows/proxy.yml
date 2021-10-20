@@ -20,13 +20,16 @@ jobs:
       matrix:
         molecule_distro:
           - container: mysql-centos
-            image: geerlingguy/docker-centos8-ansible:latest
+            image: c2main/molecule-testing-centos8
+            command: /bin/systemctl
             group: mysql
           - container: pgsql-centos
-            image: geerlingguy/docker-centos8-ansible:latest
+            image: c2main/molecule-testing-centos8
+            command: /bin/systemctl
             group: postgresql
           - container: sqlite-centos
-            image: geerlingguy/docker-centos8-ansible:latest
+            image: c2main/molecule-testing-centos8
+            command: /bin/systemctl
             group: sqlite3
           - container: mysql-ubuntu
             image: geerlingguy/docker-ubuntu2004-ansible
@@ -40,13 +43,16 @@ jobs:
             group: sqlite3
             command: /sbin/init
           - container: mysql-debian
-            image: geerlingguy/docker-debian10-ansible
+            image: c2main/molecule-testing-debian10
+            command: /usr/bin/systemctl
             group: mysql
           - container: pgsql-debian
-            image: geerlingguy/docker-debian10-ansible
+            image: c2main/molecule-testing-debian10
+            command: /usr/bin/systemctl
             group: postgresql
           - container: sqlite-debian
-            image: geerlingguy/docker-debian10-ansible
+            image: c2main/molecule-testing-debian10
+            command: /usr/bin/systemctl
             group: sqlite3
         collection_role:
           - zabbix_proxy

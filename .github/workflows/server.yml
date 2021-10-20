@@ -20,10 +20,12 @@ jobs:
       matrix:
         molecule_distro:
           - container: mysql-centos
-            image: geerlingguy/docker-centos8-ansible:latest
+            image: c2main/molecule-testing-centos8:latest
+            command: /bin/systemctl
             group: mysql
           - container: pgsql-centos
-            image: geerlingguy/docker-centos8-ansible:latest
+            image: c2main/molecule-testing-centos8:latest
+            command: /bin/systemctl
             group: postgresql
           - container: mysql-ubuntu
             image: geerlingguy/docker-ubuntu2004-ansible
@@ -33,10 +35,12 @@ jobs:
             group: postgresql
             command: /sbin/init
           - container: mysql-debian
-            image: geerlingguy/docker-debian10-ansible
+            image: c2main/molecule-testing-debian10
+            command: /usr/bin/systemctl
             group: mysql
           - container: pgsql-debian
-            image: geerlingguy/docker-debian10-ansible
+            image: c2main/molecule-testing-debian10
+            command: /usr/bin/systemctl
             group: postgresql
         collection_role:
           - zabbix_server
