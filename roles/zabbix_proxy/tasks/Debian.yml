@@ -245,7 +245,7 @@
 
 - name: "Debian | Install sqlite3"
   apt:
-    name: sqlite
+    name: sqlite3
     state: present
   environment:
     http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
