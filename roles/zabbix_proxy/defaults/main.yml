@@ -143,7 +143,7 @@ zabbix_proxy_tlspskidentity:
 zabbix_proxy_tls_config:
   no_encryption: 'no_encryption'
   psk: 'PSK'
-  certificate: 'certificate'
+  cert: 'certificate'
 
 # Zabbix API stuff
 zabbix_url: http://localhost          # Will be deprecated in 2.0.0
