@@ -43,7 +43,6 @@
   include_tasks: "{{ zabbix_agent_os_family if (zabbix_agent_os_family not in ['Sangoma']) else 'RedHat' }}.yml"
   when:
     - not (zabbix_agent_docker | bool)
-    #- not (zabbix_agent_os_family == 'Windows')
   tags:
     - always
 
