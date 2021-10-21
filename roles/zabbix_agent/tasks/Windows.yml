@@ -1,11 +1,4 @@
 ---
-- name: "Set default ip address for zabbix_agent_ip"
-  set_fact:
-    zabbix_agent_ip: "{{ hostvars[inventory_hostname]['ansible_ip_addresses'][0] }}"
-  when:
-    - zabbix_agent_ip is not defined
-    - "'ansible_ip_addresses' in hostvars[inventory_hostname]"
-
 - name: "Windows | Set default architecture"
   set_fact:
     windows_arch: 32
@@ -159,15 +152,6 @@
   when:
     - ('.conf' not in zabbix_agent_win_include)
 
-- name: "Windows | Place TLS-PSK file"
-  ansible.windows.win_copy:
-    content: "{{ zabbix_agent_tlspsk_secret }}"
-    dest: "{{ zabbix_agent_tlspskfile }}"
-  when:
-    - zabbix_agent_tlspskfile is defined
-    - zabbix_agent_tlspsk_secret is defined
-  notify: restart win zabbix agent
-
 - name: "Windows | Set installation settings (agent 2)"
   set_fact:
     zabbix_win_package: "{{ zabbix2_win_package }}"
@@ -218,12 +202,6 @@
   when:
     - zabbix_agent_win_download_zip.changed
 
-- name: "Windows | Configure zabbix-agent"
-  ansible.windows.win_template:
-    src:  "{{ zabbix_win_config_name }}.j2"
-    dest: "{{ zabbix_win_install_dir }}\\{{ zabbix_win_config_name }}"
-  notify: restart win zabbix agent
-
 - name: "Windows | Check if windows service exist"
   ansible.windows.win_service:
     name: "{{ zabbix_win_svc_name }}"
@@ -237,7 +215,7 @@
   ansible.windows.win_service:
     name: "{{ zabbix_win_svc_name }}"
     start_mode: auto
-    state: started
+    #state: started
     failure_actions:
     - type: restart
       delay_ms: 5000
@@ -246,22 +224,3 @@
     - type: restart
       delay_ms: 20000
     failure_reset_period_sec: 86400
-
-- name: "Windows | Check firewall service"
-  ansible.windows.win_service_info:
-    name: MpsSvc
-  register: firewall_info
-  when: zabbix_win_firewall_management
-
-- name: "Windows | Firewall rule"
-  community.windows.win_firewall_rule:
-    name: "{{ zabbix_win_svc_name }}"
-    localport: "{{ zabbix_agent_listenport }}"
-    action: allow
-    direction: in
-    protocol: tcp
-    state: present
-    enabled: yes
-  when:
-    - zabbix_win_firewall_management
-    - firewall_info.services[0].state == 'started' or firewall_info.services[0].start_mode == 'auto'
