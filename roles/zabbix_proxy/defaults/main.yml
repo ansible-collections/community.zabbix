@@ -41,8 +41,10 @@ zabbix_repo_yum:
 zabbix_proxy_username: zabbix
 zabbix_proxy_groupname: zabbix
 
-zabbix_server_host: 192.168.1.1
-zabbix_server_port: 10051
+zabbix_server_host: 192.168.1.1          # Will be deprecated in 2.0.0
+zabbix_proxy_server: "{{ zabbix_server_host }}"
+zabbix_server_port: 10051          # Will be deprecated in 2.0.0
+zabbix_proxy_serverport: "{{ zabbix_server_port }}"
 zabbix_database_creation: True
 zabbix_database_sqlload: True
 zabbix_proxy_dbtlsconnect:
@@ -82,8 +84,10 @@ zabbix_proxy_dbsocket:
 zabbix_proxy_dbport: 5432
 zabbix_proxy_dbhost_run_install: true
 zabbix_proxy_privileged_host: localhost
-zabbix_proxy_localbuffer: 0
-zabbix_proxy_offlinebuffer: 1
+zabbix_proxy_localbuffer: 0          # Will be deprecated in 2.0.0
+zabbix_proxy_proxylocalbuffer: "{{ zabbix_proxy_localbuffer }}"
+zabbix_proxy_offlinebuffer: 1          # Will be deprecated in 2.0.0
+zabbix_proxy_proxyofflinebuffer:  "{{ zabbix_proxy_offlinebuffer }}"
 zabbix_proxy_heartbeatfrequency: 60
 zabbix_proxy_configfrequency: 3600
 zabbix_proxy_datasenderfrequency: 1

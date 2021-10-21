@@ -16,13 +16,13 @@ ProxyMode={{ zabbix_proxy_mode }}
 #	Active proxy will get configuration data from the server.
 #	For a proxy in the passive mode this parameter will be ignored.
 #
-Server={{ zabbix_server_host }}
+Server={{ zabbix_proxy_server }}
 
 ### Option: ServerPort
 #	Port of Zabbix trapper on Zabbix server.
 #	For a proxy in the passive mode this parameter will be ignored.
 #
-ServerPort={{ zabbix_server_port }}
+ServerPort={{ zabbix_proxy_serverport }}
 
 ### Option: Hostname
 #	Unique, case sensitive Proxy name. Make sure the Proxy name is known to the server!
@@ -141,13 +141,13 @@ DBPort={{ zabbix_proxy_dbport }}
 #	Proxy will keep data locally for N hours, even if the data have already been synced with the server.
 #	This parameter may be used if local data will be used by third party applications.
 #
-ProxyLocalBuffer={{ zabbix_proxy_localbuffer }}
+ProxyLocalBuffer={{ zabbix_proxy_proxylocalbuffer }}
 
 ### Option: ProxyOfflineBuffer
 #	Proxy will keep data for N hours in case if no connectivity with Zabbix Server.
 #	Older data will be lost.
 #
-ProxyOfflineBuffer={{ zabbix_proxy_offlinebuffer }}
+ProxyOfflineBuffer={{ zabbix_proxy_proxyofflinebuffer }}
 
 ### Option: HeartbeatFrequency
 #	Frequency of heartbeat messages in seconds.
