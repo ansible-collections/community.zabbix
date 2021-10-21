@@ -112,11 +112,11 @@
 
 - name: "Create proxy"
   zabbix_proxy:
-    server_url: "{{ zabbix_url }}"
+    server_url: "{{ zabbix_api_server_url }}"
     http_login_user: "{{ zabbix_api_http_user | default(omit) }}"
     http_login_password: "{{ zabbix_api_http_password | default(omit) }}"
-    login_user: "{{ zabbix_api_user }}"
-    login_password: "{{ zabbix_api_pass }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     state: "{{ zabbix_create_proxy }}"
     status: "{{ zabbix_proxy_status }}"
     proxy_name: "{{ zabbix_proxy_name }}"
