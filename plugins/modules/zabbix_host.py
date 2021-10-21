@@ -771,7 +771,7 @@ class Host(ZabbixBase):
     # check all the properties before link or clear template
     def check_all_properties(self, host_id, group_ids, status, interfaces, template_ids,
                              exist_interfaces, host, proxy_id, visible_name, description, host_name,
-                             inventory_mode, inventory_zabbix, tls_accept, tls_psk_identity, tls_psk,
+                             inventory_mode, inventory_zabbix, tls_accept,
                              tls_issuer, tls_subject, tls_connect, ipmi_authtype, ipmi_privilege,
                              ipmi_username, ipmi_password, macros, tags):
         # get the existing host's groups
@@ -825,14 +825,6 @@ class Host(ZabbixBase):
 
         if tls_accept is not None and 'tls_accept' in host:
             if int(host['tls_accept']) != tls_accept:
-                return True
-
-        if tls_psk_identity is not None and 'tls_psk_identity' in host:
-            if host['tls_psk_identity'] != tls_psk_identity:
-                return True
-
-        if tls_psk is not None and 'tls_psk' in host:
-            if host['tls_psk'] != tls_psk:
                 return True
 
         if tls_issuer is not None and 'tls_issuer' in host:
@@ -1194,8 +1186,8 @@ def main():
             if host.check_all_properties(
                     host_id, group_ids, status, interfaces, template_ids, exist_interfaces, zabbix_host_obj, proxy_id,
                     visible_name, description, host_name, inventory_mode, inventory_zabbix, tls_accept,
-                    tls_psk_identity, tls_psk, tls_issuer, tls_subject, tls_connect, ipmi_authtype, ipmi_privilege,
-                    ipmi_username, ipmi_password, macros, tags):
+                    tls_issuer, tls_subject, tls_connect, ipmi_authtype, ipmi_privilege,
+                    ipmi_username, ipmi_password, macros, tags) or tls_psk is not None or tls_psk_identity is not None:
 
                 host.update_host(
                     host_name, group_ids, status, host_id, interfaces, exist_interfaces, proxy_id, visible_name,
