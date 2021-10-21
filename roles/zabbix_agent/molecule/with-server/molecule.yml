@@ -54,7 +54,7 @@ provisioner:
         zabbix_agent_src_reinstall: False
         zabbix_api_create_hosts: True
         zabbix_api_create_hostgroup: True
-        zabbix_url: http://zabbix-server-centos
+        zabbix_api_server_url: http://zabbix-server-centos
         zabbix_apache_servername: zabbix-server-centos
       mysql:
         zabbix_server_database: mysql

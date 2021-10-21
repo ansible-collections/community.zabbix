@@ -110,7 +110,7 @@ The following is an overview of all available configuration defaults for this ro
 
 ### Zabbix Web specific
 
-* `zabbix_url`: This is the url on which the zabbix web interface is available. Default is zabbix.example.com, you should override it. For example, see "Example Playbook"
+* `zabbix_api_server_url`: This is the url on which the zabbix web interface is available. Default is zabbix.example.com, you should override it. For example, see "Example Playbook"
 * `zabbix_url_aliases`: A list with Aliases for the Apache Virtual Host configuration.
 * `zabbix_timezone`: Default: `Europe/Amsterdam`. This is the timezone. The Apache Virtual Host needs this parameter.
 * `zabbix_vhost`: Default: `true`. When you don't want to create an Apache Virtual Host configuration, you can set it to False.
@@ -235,7 +235,7 @@ When there is one host running both Zabbix Server and the Zabbix Web (Running My
       zabbix_server_database_long: mysql
       zabbix_server_dbport: 3306
     - role: community.zabbix.zabbix_web
-      zabbix_url: zabbix.mydomain.com
+      zabbix_api_server_url: zabbix.mydomain.com
       zabbix_server_database: mysql
       zabbix_server_database_long: mysql
       zabbix_server_dbport: 3306
@@ -259,7 +259,7 @@ This is a two host setup. On one host (Named: "zabbix-server") the Zabbix Server
   roles:
     - role: geerlingguy.apache
     - role: community.zabbix.zabbix_web
-      zabbix_url: zabbix.mydomain.com
+      zabbix_api_server_url: zabbix.mydomain.com
       zabbix_server_hostname: zabbix-server
       zabbix_server_database: mysql
       zabbix_server_database_long: mysql
@@ -286,7 +286,7 @@ zabbix.conf.php, for example to add LDAP CA certificates. To do this add a `zabb
         - php-acpu
     - role: geerlingguy.apache-php-fpm
     - role: community.zabbix.zabbix_web
-      zabbix_url: zabbix.mydomain.com
+      zabbix_api_server_url: zabbix.mydomain.com
       zabbix_server_hostname: zabbix-server
       zabbix_server_database: mysql
       zabbix_server_database_long: mysql

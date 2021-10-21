@@ -16,6 +16,54 @@ Table of content
 
 This document provides an overview of all the changes that are needed to be applied to have a correctly working environment per version. If a version is not part of this document, then there are no changes needed to apply.
 
+## 1.4.1
+
+### Roles
+
+#### Agent
+
+The following properties are added in the `zabbix_agent` role.
+
+* `zabbix_agent2_server = "{{ zabbix_agent_server }}"`
+* `zabbix_agent2_serveractive = "{{ zabbix_agent_serveractive }}"`
+* `zabbix_agent2_allow_key = "{{ zabbix_agent_allow_key }}"`
+* `zabbix_agent2_deny_key = "{{ zabbix_agent_deny_key }}"`
+
+NOTE: The original properties can still be used but it's suggested to update to
+use the new ones.
+
+The following properties are renamed in the `zabbix_agent` role.
+
+| From                       | To                              |
+|----------------------------|---------------------------------|
+| zabbix_server_url          | zabbix_api_server_url           |
+| zabbix_http_user           | zabbix_api_http_user            |
+| zabbix_http_password       | zabbix_api_http_password        |
+| zabbix_login_user          | zabbix_api_login_user           |
+| zabbix_login_pass          | zabbix_api_login_pass           |
+
+NOTE: the old parameters are still valid but it's suggested to update to use the
+new ones.
+
+#### Proxy
+
+The following properties are renamed in the `zabbix_proxy` role.
+
+| From                       | To                              |
+|----------------------------|---------------------------------|
+| zabbix_server_host         | zabbix_proxy_server             |
+| zabbix_server_port         | zabbix_proxy_serverport         |
+| zabbix_proxy_localbuffer   | zabbix_proxy_proxylocalbuffer   |
+| zabbix_proxy_offlinebuffer | zabbix_proxy_proxyofflinebuffer |
+| zabbix_server_url          | zabbix_api_server_url           |
+| zabbix_http_user           | zabbix_api_http_user            |
+| zabbix_http_password       | zabbix_api_http_password        |
+| zabbix_login_user          | zabbix_api_login_user           |
+| zabbix_login_pass          | zabbix_api_login_pass           |
+
+NOTE: the old parameters are still valid but it's suggested to update to use the
+new ones.
+
 ## 1.0.0
 
 ### Roles

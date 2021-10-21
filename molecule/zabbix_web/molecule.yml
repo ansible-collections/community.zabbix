@@ -57,19 +57,19 @@ provisioner:
         zabbix_websrv: apache
         php_default_version_debian: 7.3
         zabbix_php_fpm_conf_listen: False
-        zabbix_url: zabbix-web-pgsql-debian
+        zabbix_api_server_url: zabbix-web-pgsql-debian
         zabbix_websrv_servername: zabbix-web-pgsql-debian
       zabbix-web-mysql-debian:
         zabbix_websrv: apache
         php_default_version_debian: 7.3
         zabbix_php_fpm_conf_listen: False
-        zabbix_url: zabbix-web-mysql-debian
+        zabbix_api_server_url: zabbix-web-mysql-debian
         zabbix_websrv_servername: zabbix-web-mysql-debian
       zabbix-web-pgsql-centos8:
         ansible_rhn_repo_disable_gpg_check: True
         zabbix_websrv: apache
         zabbix_php_fpm_conf_listen: False
-        zabbix_url: zabbix-web-pgsql-centos8
+        zabbix_api_server_url: zabbix-web-pgsql-centos8
         zabbix_websrv_servername: zabbix-web-pgsql-centos8
       zabbix-web-mysql-centos8:
         ansible_rhn_repo_disable_gpg_check: True
@@ -77,17 +77,17 @@ provisioner:
         php_fpm_pool_group: nginx
         zabbix_websrv: nginx
         zabbix_php_fpm_conf_listen: False
-        zabbix_url: zabbix-web-mysql-centos8
+        zabbix_api_server_url: zabbix-web-mysql-centos8
         zabbix_websrv_servername: zabbix-web-mysql-centos8
       zabbix-web-mysql-ubuntu18:
         zabbix_websrv: nginx
         zabbix_php_fpm_conf_listen: False
-        zabbix_url: zabbix-web-mysql-ubuntu18
+        zabbix_api_server_url: zabbix-web-mysql-ubuntu18
         zabbix_websrv_servername: zabbix-web-mysql-ubuntu18
       zabbix-web-pgsql-ubuntu20:
         zabbix_php_fpm_conf_listen: False
         zabbix_websrv: apache
-        zabbix_url: zabbix-web-pgsql-ubuntu20
+        zabbix_api_server_url: zabbix-web-pgsql-ubuntu20
         zabbix_websrv_servername: zabbix-web-pgsql-ubuntu20
 
 verifier:

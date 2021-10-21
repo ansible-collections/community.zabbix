@@ -252,13 +252,13 @@ Host encryption configuration will be set to match agent configuration.
 
 When `zabbix_api_create_hostgroup` or `zabbix_api_create_hosts` is set to `True`, it will install on the host executing the Ansible playbook the `zabbix-api` python module.
 
-* `zabbix_url`: The url on which the Zabbix webpage is available. Example: http://zabbix.example.com
+* `zabbix_api_server_url`: The url on which the Zabbix webpage is available. Example: http://zabbix.example.com
 * `zabbix_api_http_user`: The http user to access zabbix url with Basic Auth
 * `zabbix_api_http_password`: The http password to access zabbix url with Basic Auth
 * `zabbix_api_create_hosts`: Default: `False`. When you want to enable the Zabbix API to create/delete the host. This has to be set to `True` if you want to make use of `zabbix_create_host`.
 * `zabbix_api_create_hostgroup`: When you want to enable the Zabbix API to create/delete the hostgroups. This has to be set to `True` if you want to make use of `zabbix_create_hostgroup`.Default: `False`
-* `zabbix_api_user`: Username of user which has API access.
-* `zabbix_api_pass`: Password for the user which has API access.
+* `zabbix_api_login_user`: Username of user which has API access.
+* `zabbix_api_login_pass`: Password for the user which has API access.
 * `zabbix_create_hostgroup`: present (Default) if the hostgroup needs to be created or absent if you want to delete it. This only works when `zabbix_api_create_hostgroup` is set to `True`.
 * `zabbix_host_status`: enabled (Default) when host in monitored, disabled when host is disabled for monitoring.
 * `zabbix_create_host`: present (Default) if the host needs to be created or absent is you want to delete it. This only works when `zabbix_api_create_hosts` is set to `True`.
@@ -425,10 +425,10 @@ Including an example of how to use your role (for instance, with variables passe
          - role: community.zabbix.zabbix_agent
            zabbix_agent_server: 192.168.33.30
            zabbix_agent_serveractive: 192.168.33.30
-           zabbix_url: http://zabbix.example.com
+           zabbix_api_server_url: http://zabbix.example.com
            zabbix_api_use: true # use zabbix_api_create_hosts and/or zabbix_api_create_hostgroup from 0.8.0
-           zabbix_api_user: Admin
-           zabbix_api_pass: zabbix
+           zabbix_api_login_user: Admin
+           zabbix_api_login_pass: zabbix
            zabbix_create_host: present
            zabbix_host_groups:
              - Linux Servers
@@ -446,10 +446,10 @@ You can also use the group_vars or the host_vars files for setting the variables
 ```yaml
     zabbix_agent_server: 192.168.33.30
     zabbix_agent_serveractive: 192.168.33.30
-    zabbix_url: http://zabbix.example.com
+    zabbix_api_server_url: http://zabbix.example.com
     zabbix_api_use: true # use zabbix_api_create_hosts and/or zabbix_api_create_hostgroup from 0.8.0
-    zabbix_api_user: Admin
-    zabbix_api_pass: zabbix
+    zabbix_api_login_user: Admin
+    zabbix_api_login_pass: zabbix
     zabbix_create_host: present
     zabbix_host_groups:
       - Linux Servers

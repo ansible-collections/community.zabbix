@@ -15,11 +15,11 @@
 
 - name: "API | Create hostgroups"
   zabbix_group:
-    server_url: "{{ zabbix_url }}"
+    server_url: "{{ zabbix_api_server_url }}"
     http_login_user: "{{ zabbix_api_http_user | default(omit) }}"
     http_login_password: "{{ zabbix_api_http_password | default(omit) }}"
-    login_user: "{{ zabbix_api_user }}"
-    login_password: "{{ zabbix_api_pass }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     host_group: "{{ zabbix_host_groups }}"
     state: "{{ zabbix_create_hostgroup }}"
     validate_certs: "{{ zabbix_validate_certs|default(omit) }}"
@@ -34,11 +34,11 @@
 
 - name: "API | Create a new host or update an existing host's info"
   zabbix_host:
-    server_url: "{{ zabbix_url }}"
+    server_url: "{{ zabbix_api_server_url }}"
     http_login_user: "{{ zabbix_api_http_user | default(omit) }}"
     http_login_password: "{{ zabbix_api_http_password | default(omit) }}"
-    login_user: "{{ zabbix_api_user }}"
-    login_password: "{{ zabbix_api_pass }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     host_name: "{{ zabbix_agent_hostname }}"
     host_groups: "{{ zabbix_host_groups }}"
     link_templates: "{{ zabbix_link_templates }}"
@@ -74,11 +74,11 @@
 
 - name: "API | Create a new host using agent2 or update an existing host's info"
   zabbix_host:
-    server_url: "{{ zabbix_url }}"
+    server_url: "{{ zabbix_api_server_url }}"
     http_login_user: "{{ zabbix_api_http_user | default(omit) }}"
     http_login_password: "{{ zabbix_api_http_password | default(omit) }}"
-    login_user: "{{ zabbix_api_user }}"
-    login_password: "{{ zabbix_api_pass }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     host_name: "{{ zabbix_agent_hostname }}"
     host_groups: "{{ zabbix_host_groups }}"
     link_templates: "{{ zabbix_link_templates }}"
@@ -114,11 +114,11 @@
 
 - name: "API | Updating host configuration with macros"
   zabbix_hostmacro:
-    server_url: "{{ zabbix_url }}"
+    server_url: "{{ zabbix_api_server_url }}"
     http_login_user: "{{ zabbix_api_http_user | default(omit) }}"
     http_login_password: "{{ zabbix_api_http_password | default(omit) }}"
-    login_user: "{{ zabbix_api_user }}"
-    login_password: "{{ zabbix_api_pass }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     host_name: "{{ zabbix_agent_hostname }}"
     macro_name: "{{ item.macro_key }}"
     macro_value: "{{ item.macro_value }}"
