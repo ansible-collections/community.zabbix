@@ -43,7 +43,6 @@
   include_tasks: "{{ zabbix_agent_os_family if (zabbix_agent_os_family not in ['Sangoma']) else 'RedHat' }}.yml"
   when:
     - not (zabbix_agent_docker | bool)
-    - not (zabbix_agent_os_family == 'Windows')
   tags:
     - always
 
@@ -76,21 +75,21 @@
     - (zabbix_agent2_tlspskfile is undefined) or (zabbix_agent2_tlspskfile | length == '0')
     - (zabbix_agent2_tlspsk_secret is undefined) or (zabbix_agent2_tlspsk_secret | length == '0')
 
-- name: "Install the correct repository"
-  include_tasks: Windows.yml
+- name: "Configure Agent"
+  include_tasks: Windows_conf.yml
   when:
     - zabbix_agent_os_family == "Windows"
   tags:
     - always
 
-- name: "Install the correct repository"
+- name: "Configure Agent"
   include_tasks: Linux.yml
   when:
     - (zabbix_agent_os_family != "Windows" and zabbix_agent_os_family != "Darwin") or (zabbix_agent_docker | bool)
   tags:
     - always
 
-- name: "Install the correct repository"
+- name: "Configure Agent"
   include_tasks: macOS.yml
   when:
     - zabbix_agent_os_family == "Darwin"
