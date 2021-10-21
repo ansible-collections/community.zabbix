@@ -103,7 +103,7 @@ or when using the zabbix-proxy:
 ```yaml
   roles:
     - role: community.zabbix.zabbix_proxy
-      zabbix_server_host: 192.168.1.1
+      zabbix_proxy_server: 192.168.1.1
       zabbix_proxy_javagateway: 192.168.1.2
 ```
 

@@ -116,12 +116,12 @@ See the following list of supported Operating systems with the Zabbix releases:
 In order to get the Zabbix Agent running, you'll have to define the following properties before executing the role:
 
 * `zabbix_agent_version`
-* `zabbix_agent_server`
-* `zabbix_agent_serveractive` (When using active checks)
+* `zabbix_agent(2)_server`
+* `zabbix_agent(2)_serveractive` (When using active checks)
 
 The `zabbix_agent_version` is optional. The latest available major.minor version of Zabbix will be installed on the host(s). If you want to use an older version, please specify this in the major.minor format. Example: `zabbix_agent_version: 4.0`, `zabbix_agent_version: 3.4` or `zabbix_agent_version: 2.2`.
 
-The `zabbix_agent_server` (and `zabbix_agent_serveractive`) should contain the ip or fqdn of the host running the Zabbix Server.
+The `zabbix_agent(2)_server` (and `zabbix_agent(2)_serveractive`) should contain the ip or fqdn of the host running the Zabbix Server.
 
 ## Issues
 
@@ -153,8 +153,6 @@ The following is an overview of all available configuration default for this rol
 
 * `zabbix_agent_ip`: The IP address of the host. When not provided, it will be determined via the `ansible_default_ipv4` fact.
 * `zabbix_agent2`: Default: `False`. When you want to install the `Zabbix Agent2` instead of the "old" `Zabbix Agent`.
-* `zabbix_agent_server`: The ip address for the zabbix-server or zabbix-proxy.
-* `zabbix_agent_serveractive`: The ip address for the zabbix-server or zabbix-proxy for active checks.
 * `zabbix_agent_listeninterface`: Interface zabbix-agent listens on. Leave blank for all.
 * `zabbix_agent_package_remove`: If `zabbix_agent2: True` and you want to remove the old installation. Default: `False`.
 * `zabbix_agent_package`: The name of the zabbix-agent package. Default: `zabbix-agent`. In case for EPEL, it is automatically renamed.
@@ -174,8 +172,6 @@ The following is an overview of all available configuration default for this rol
 * `zabbix_agent_apt_priority`: Add a weight (`Pin-Priority`) for the APT repository.
 * `zabbix_agent_conf_mode`: Default: `0644`. The "mode" for the Zabbix configuration file.
 * `zabbix_agent_dont_detect_ip`: Default `false`. When set to `true`, it won't detect available ip addresses on the host and no need for the Python module `netaddr` to be installed.
-* `zabbix_agent_allow_key`: list of AllowKey configurations.
-* `zabbix_agent_deny_key`: list of DenyKey configurations.
 
 ### Zabbix Agent vs Zabbix Agent 2 configuration
 
@@ -183,6 +179,10 @@ The following provides an overview of all the properties that can be set in the 
 
 Otherwise it just for the Zabbix Agent or for the Zabbix Agent 2.
 
+* `zabbix_agent(2)_server`: The ip address for the zabbix-server or zabbix-proxy.
+* `zabbix_agent(2)_serveractive`: The ip address for the zabbix-server or zabbix-proxy for active checks.
+* `zabbix_agent(2)_allow_key`: list of AllowKey configurations.
+* `zabbix_agent(2)_deny_key`: list of DenyKey configurations.
 * `zabbix_agent(2)_pidfile`: name of pid file.
 * `zabbix_agent(2)_logfile`: name of log file.
 * `zabbix_agent(2)_logfilesize`: maximum size of log file in mb.
