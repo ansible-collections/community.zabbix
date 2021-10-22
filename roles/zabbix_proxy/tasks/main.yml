@@ -110,7 +110,7 @@
   tags:
     - api
 
-- name: "Create proxy"
+- name: Ensure proxy definition is up-to-date (added/updated/removed)
   zabbix_proxy:
     server_url: "{{ zabbix_api_server_url }}"
     http_login_user: "{{ zabbix_api_http_user | default(omit) }}"
