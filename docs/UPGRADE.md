@@ -24,6 +24,7 @@ This document provides an overview of all the changes that are needed to be appl
 
 The following properties are added in the `zabbix_agent` role.
 
+* `zabbix_api_timeout = 30`
 * `zabbix_agent_tls_subject = "{{ zabbix_agent_tlsservercertsubject }}"`
 * `zabbix_agent2_server = "{{ zabbix_agent_server }}"`
 * `zabbix_agent2_serveractive = "{{ zabbix_agent_serveractive }}"`
@@ -51,6 +52,7 @@ new ones.
 
 The following properties are added in the `zabbix_proxy` role.
 
+* `zabbix_api_timeout = 30`
 * `zabbix_proxy_tls_subject = "{{ zabbix_proxy_tlsservercertsubject }}"`
 
 The following properties are renamed in the `zabbix_proxy` role.

@@ -75,6 +75,7 @@ zabbix_api_login_user: "{{ zabbix_api_user }}"
 zabbix_api_login_pass: "{{ zabbix_api_pass }}"
 zabbix_api_create_hostgroup: False
 zabbix_api_create_hosts: False
+zabbix_api_timeout: 30
 zabbix_create_hostgroup: present  # or absent
 zabbix_create_host: present       # or absent
 zabbix_update_host: yes

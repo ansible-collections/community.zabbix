@@ -160,6 +160,7 @@ zabbix_api_pass: zabbix
 zabbix_api_login_user: "{{ zabbix_api_user }}"
 zabbix_api_login_pass: "{{ zabbix_api_pass }}"
 zabbix_api_create_proxy: False
+zabbix_api_timeout: 30
 zabbix_create_proxy: present  # or absent
 zabbix_proxy_status: active   # or passive
 zabbix_proxy: null

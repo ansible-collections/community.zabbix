@@ -128,6 +128,7 @@
     tls_accept: "{{ zabbix_proxy_tls_config[zabbix_proxy_tlsaccept if zabbix_proxy_tlsaccept else 'no_encryption'] }}"
     tls_connect: "{{ zabbix_proxy_tls_config[zabbix_proxy_tlsconnect if zabbix_proxy_tlsconnect else 'no_encryption'] }}"
     validate_certs: "{{ zabbix_validate_certs | default(omit) }}"
+    timeout: "{{ zabbix_api_timeout }}"
   when:
     - zabbix_api_create_proxy | bool
   delegate_to: localhost
