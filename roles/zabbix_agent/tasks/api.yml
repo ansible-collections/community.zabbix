@@ -23,6 +23,7 @@
     host_group: "{{ zabbix_host_groups }}"
     state: "{{ zabbix_create_hostgroup }}"
     validate_certs: "{{ zabbix_validate_certs|default(omit) }}"
+    timeout: "{{ zabbix_api_timeout }}"
   when:
     - zabbix_api_create_hostgroup | bool
   register: zabbix_api_hostgroup_created
@@ -56,6 +57,7 @@
     tls_accept: "{{ zabbix_agent_tls_config[zabbix_agent_tlsaccept if zabbix_agent_tlsaccept else 'unencrypted'] }}"
     tls_connect: "{{ zabbix_agent_tls_config[zabbix_agent_tlsconnect if zabbix_agent_tlsconnect else 'unencrypted'] }}"
     validate_certs: "{{ zabbix_validate_certs | default(omit) }}"
+    timeout: "{{ zabbix_api_timeout }}"
     description: "{{ zabbix_agent_description | default(omit) }}"
     inventory_zabbix: "{{ zabbix_agent_inventory_zabbix | default({}) }}"
     ipmi_authtype: "{{ zabbix_agent_ipmi_authtype | default(omit) }}"
@@ -96,6 +98,7 @@
     tls_accept: "{{ zabbix_agent_tls_config[zabbix_agent2_tlsaccept if zabbix_agent2_tlsaccept else 'unencrypted'] }}"
     tls_connect: "{{ zabbix_agent_tls_config[zabbix_agent2_tlsconnect if zabbix_agent2_tlsconnect else 'unencrypted'] }}"
     validate_certs: "{{ zabbix_validate_certs | default(omit) }}"
+    timeout: "{{ zabbix_api_timeout }}"
     description: "{{ zabbix_agent_description | default(omit) }}"
     inventory_zabbix: "{{ zabbix_agent_inventory_zabbix | default({}) }}"
     ipmi_authtype: "{{ zabbix_agent_ipmi_authtype | default(omit) }}"
@@ -123,6 +126,7 @@
     macro_name: "{{ item.macro_key }}"
     macro_value: "{{ item.macro_value }}"
     validate_certs: "{{ zabbix_validate_certs | default(omit) }}"
+    timeout: "{{ zabbix_api_timeout }}"
   with_items: "{{ zabbix_macros | default([]) }}"
   when:
     - zabbix_macros is defined
