@@ -54,7 +54,6 @@
 - name: "Get IP of agent_listeninterface when no agent_listenip specified"
   set_fact:
     zabbix_agent_listenip: "{{ hostvars[inventory_hostname][network_interface]['ipv4'].address | default('0.0.0.0') }}"
-    zabbix_agent_ip: "{{ hostvars[inventory_hostname][network_interface]['ipv4'].address | default('0.0.0.0') }}"
   when:
     - (zabbix_agent_listeninterface)
     - not zabbix_agent_listenip
