@@ -124,7 +124,7 @@
     interface: "{{ zabbix_proxy_interface }}"
     tls_psk: "{{ zabbix_proxy_tlspsk_secret | default(omit) }}"
     tls_psk_identity: "{{ zabbix_proxy_tlspskidentity | default(omit) }}"
-    tls_subject: "{{ zabbix_proxy_tlsservercertsubject | default(omit) }}"
+    tls_subject: "{{ zabbix_proxy_tls_subject | default(omit) }}"
     tls_accept: "{{ zabbix_proxy_tls_config[zabbix_proxy_tlsaccept if zabbix_proxy_tlsaccept else 'no_encryption'] }}"
     tls_connect: "{{ zabbix_proxy_tls_config[zabbix_proxy_tlsconnect if zabbix_proxy_tlsconnect else 'no_encryption'] }}"
     validate_certs: "{{ zabbix_validate_certs | default(omit) }}"
