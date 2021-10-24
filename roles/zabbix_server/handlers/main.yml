@@ -3,9 +3,9 @@
 
 - name: zabbix-server restarted
   service:
-      name: zabbix-server
-      state: restarted
-      enabled: yes
+    name: zabbix-server
+    state: restarted
+    enabled: yes
   tags: zabbix-server
   become: yes
   when:
