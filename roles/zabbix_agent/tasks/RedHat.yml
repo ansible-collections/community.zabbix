@@ -100,7 +100,7 @@
     - init
     - zabbix-agent
 
-- name: "RedHat | Installing zabbix-{sender,get}}"
+- name: "RedHat | Installing zabbix-{sender,get}"
   package:
     pkg:
       - "{{ zabbix_sender_package }}-{{ zabbix_agent_version }}.*"

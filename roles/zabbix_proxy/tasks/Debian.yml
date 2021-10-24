@@ -116,6 +116,7 @@
   file:
     path: /etc/apt/preferences.d/
     state: directory
+    mode: '0755'
   when:
     - zabbix_proxy_apt_priority | int
   become: true
@@ -128,6 +129,7 @@
       Pin: origin repo.zabbix.com
       Pin-Priority: {{ zabbix_proxy_apt_priority }}
     owner: root
+    mode: '0644'
   when:
     - zabbix_proxy_apt_priority | int
   become: true

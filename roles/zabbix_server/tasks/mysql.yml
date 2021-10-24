@@ -150,6 +150,7 @@
   copy:
     src: /tmp/{{ role_name }}/
     dest: "{{ ls_output_create.stdout | dirname }}"
+    mode: '0640'
   delegate_to: "{{ delegated_dbhost }}"
   when:
     - delegated_dbhost != inventory_hostname
@@ -203,6 +204,7 @@
   file:
     path: /etc/zabbix/create.done
     state: touch
+    mode: '0644'
   when:
     - zabbix_version is version('3.0', '>=')
     - zabbix_database_sqlload | bool
@@ -271,6 +273,7 @@
   file:
     path: /etc/zabbix/{{ item }}.done
     state: touch
+    mode: '0644'
   with_items:
     - schema
     - images

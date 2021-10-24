@@ -42,6 +42,7 @@
     owner: zabbix
     group: zabbix
     state: directory
+    mode: '0755'
   become: true
 
 - name: "Create directory for PSK file if not exist."

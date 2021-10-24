@@ -88,7 +88,7 @@
 
 - name: "Let's Encrypt | Check if zabbix_websrv_servername is resolvable"
   set_fact:
-    zabbix_websrv_servername_ip: "{{ lookup('dig', 'qtype=A', '{{ zabbix_websrv_servername }}')}}"
+    zabbix_websrv_servername_ip: "{{ lookup('dig', 'qtype=A', zabbix_websrv_servername) }}"
   changed_when: zabbix_websrv_servername_ip != ansible_default_ipv4.address
   register: zabbix_letsencrypt_resolve
   when: zabbix_letsencrypt

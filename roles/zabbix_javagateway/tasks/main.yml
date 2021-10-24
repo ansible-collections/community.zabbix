@@ -15,6 +15,7 @@
   copy:
     src: systemd.service
     dest: /etc/systemd/system/zabbix-java-gateway.service
+    mode: '0644'
   register: systemd_state
   when:
     - zabbix_version is version('5.4', '<')

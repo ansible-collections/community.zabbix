@@ -47,7 +47,11 @@
 
 - name: AutoPSK | Generate new TLS PSK identity
   set_fact:
-    zabbix_agent_tlspskidentity: "{{ zabbix_visible_hostname | default(zabbix_agent_hostname) + '_' + lookup('password', '/dev/null chars=hexdigits length=4') }}"
+    zabbix_agent_tlspskidentity: >
+      zabbix_visible_hostname
+      | default(zabbix_agent_hostname)
+      + '_'
+      + lookup('password', '/dev/null chars=hexdigits length=4')
   when: not zabbix_agent_tlspskidentity_check.stat.exists
   no_log: "{{ ansible_verbosity < 3 }}"
 

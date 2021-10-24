@@ -86,10 +86,14 @@
 - name: "Windows | Set fact about version change requirement"
   set_fact:
     zabbix_agent_version_change: true
-  when: (zabbix_agent_1_binary_exist | default(false) and zabbix_win_exe_info.results[0].win_file_version.product_version is version(zabbix_version_long, '<>')) or
-        (zabbix_agent_2_binary_exist | default(false) and zabbix_win_exe_info.results[1].win_file_version.product_version is version(zabbix_version_long, '<>')) or
-        (zabbix_agent_1_binary_exist | default(false) and zabbix_agent2) or
-        (zabbix_agent_2_binary_exist | default(false) and not zabbix_agent2)
+  when: >
+    (zabbix_agent_1_binary_exist | default(false) and
+     zabbix_win_exe_info.results[0].win_file_version.product_version is version(zabbix_version_long, '<>'))
+    or
+    (zabbix_agent_2_binary_exist | default(false) and
+     zabbix_win_exe_info.results[1].win_file_version.product_version is version(zabbix_version_long, '<>'))
+    or (zabbix_agent_1_binary_exist | default(false) and zabbix_agent2)
+    or (zabbix_agent_2_binary_exist | default(false) and not zabbix_agent2)
 
 ##################
 # delete section #
@@ -175,8 +179,8 @@
   ansible.windows.win_get_url:
     url: "{{ zabbix_win_download_link }}"
     dest: '{{ zabbix_win_install_dir }}\{{ zabbix_win_package }}'
-    url_username: "{{zabbix_download_user|default(omit)}}"
-    url_password: "{{zabbix_download_pass|default(omit)}}"
+    url_username: "{{ zabbix_download_user | default(omit) }}"
+    url_password: "{{ zabbix_download_pass | default(omit) }}"
     force: false
     follow_redirects: all
     proxy_url: "{{ zabbix_https_proxy | default(None) | default(omit) }}"

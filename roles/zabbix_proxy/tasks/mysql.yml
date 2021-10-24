@@ -151,6 +151,7 @@
   file:
     path: /etc/zabbix/schema.done
     state: touch
+    mode: '0644'
   when:
     - zabbix_database_sqlload
     - zabbix_repo != "epel"

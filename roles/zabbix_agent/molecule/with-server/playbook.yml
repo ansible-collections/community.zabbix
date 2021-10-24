@@ -18,7 +18,7 @@
         - skip_ansible_lint
 
   roles:
-    - role: ansible-zabbix-agent
+    - role: zabbix_agent
       zabbix_agent_ip: "{{ ip_address_host.stdout }}"
       zabbix_agent_server: "{{ ip_address.stdout }}"
       zabbix_agent_serveractive: "{{ ip_address.stdout }}"

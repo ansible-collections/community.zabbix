@@ -819,8 +819,8 @@
 
     - name: expect to fail
       assert:
-      that:
-        - "zabbix_host1 is failed"
+        that:
+          - "zabbix_host1 is failed"
 
     - name: "test: configure details for SNMPv2 interface"
       zabbix_host:
@@ -846,8 +846,8 @@
 
     - name: expect to succeed and that things have changed
       assert:
-      that:
-        - "zabbix_host1 is changed"
+        that:
+          - "zabbix_host1 is changed"
 
     - name: "test: configure details for SNMPv2 interface (again)"
       zabbix_host:
@@ -873,8 +873,8 @@
 
     - name: expect to succeed and that things have not changed
       assert:
-      that:
-        - "zabbix_host1 is not changed"
+        that:
+          - "zabbix_host1 is not changed"
 
     - name: "test: update details for SNMPv2 interface with bulk sub option"
       zabbix_host:
@@ -901,8 +901,8 @@
 
     - name: expect to succeed and that things have changed
       assert:
-      that:
-        - "zabbix_host1 is changed"
+        that:
+          - "zabbix_host1 is changed"
 
     - name: "test: configure details for SNMPv3 interface"
       zabbix_host:
@@ -930,8 +930,8 @@
 
     - name: expect to succeed and that things have changed
       assert:
-      that:
-        - "zabbix_host1 is changed"
+        that:
+          - "zabbix_host1 is changed"
 
     - name: "test: configure details for SNMPv3 interface (again)"
       zabbix_host:
@@ -959,8 +959,8 @@
 
     - name: expect to succeed and that things have not changed
       assert:
-      that:
-        - "zabbix_host1 is not changed"
+        that:
+          - "zabbix_host1 is not changed"
 
     - name: "test: update details for SNMPv3 interface"
       zabbix_host:
@@ -992,8 +992,8 @@
 
     - name: expect to succeed and that things have changed
       assert:
-      that:
-        - "zabbix_host1 is changed"
+        that:
+          - "zabbix_host1 is changed"
 
 # https://github.com/ansible-collections/community.zabbix/pull/391
 - name: "reset interfaces to two of the same type"
@@ -1239,8 +1239,8 @@
 
     - name: expect to succeed and that things have not changed
       assert:
-      that:
-        - "zabbix_host1 is not changed"
+        that:
+          - "zabbix_host1 is not changed"
 
     - name: "test: update one of the user macros by removing description"
       zabbix_host:
@@ -1257,8 +1257,8 @@
 
     - name: expect to succeed and that things have changed
       assert:
-      that:
-        - "zabbix_host1 is changed"
+        that:
+          - "zabbix_host1 is changed"
 
 - name: "test: add user macro while keeping previous ones with force=no"
   zabbix_host:
@@ -1314,8 +1314,8 @@
 
     - name: expect to succeed and that things have changed
       assert:
-      that:
-        - "zabbix_host1 is changed"
+        that:
+          - "zabbix_host1 is changed"
 
     - name: "test: add new user macro with type secret (again)"
       zabbix_host:
@@ -1331,8 +1331,8 @@
 
     - name: expect to succeed and that things have not changed
       assert:
-      that:
-        - "zabbix_host1 is not changed"
+        that:
+          - "zabbix_host1 is not changed"
 
 - name: "test: wipe out all of the user macros"
   zabbix_host:
@@ -1379,8 +1379,8 @@
 
     - name: expect to succeed and that things have changed
       assert:
-      that:
-        - "zabbix_host1 is changed"
+        that:
+          - "zabbix_host1 is changed"
 
     - name: "test: add new set of tags to the host (again)"
       zabbix_host:
@@ -1396,8 +1396,8 @@
 
     - name: expect to succeed and that things have not changed
       assert:
-      that:
-        - "zabbix_host1 is not changed"
+        that:
+          - "zabbix_host1 is not changed"
 
     - name: "test: update one of the tags present on the host"
       zabbix_host:
@@ -1413,8 +1413,8 @@
 
     - name: expect to succeed and that things have changed
       assert:
-      that:
-        - "zabbix_host1 is changed"
+        that:
+          - "zabbix_host1 is changed"
 
     - name: "test: add tag while keeping previous ones with force=no"
       zabbix_host:
@@ -1430,8 +1430,8 @@
 
     - name: expect to succeed and that things have changed
       assert:
-      that:
-        - "zabbix_host1 is changed"
+        that:
+          - "zabbix_host1 is changed"
 
     - name: "test: add the same tags (again)"
       zabbix_host:
@@ -1449,8 +1449,8 @@
 
     - name: expect to succeed and that things have not changed
       assert:
-      that:
-        - "zabbix_host1 is not changed"
+        that:
+          - "zabbix_host1 is not changed"
 
     - name: "test: wipe out all of the tags"
       zabbix_host:
@@ -1463,8 +1463,8 @@
 
     - name: expect to succeed and that things have changed
       assert:
-      that:
-        - "zabbix_host1 is changed"
+        that:
+          - "zabbix_host1 is changed"
 
 - name: "test: wipe out all of the tags (again)"
   zabbix_host:

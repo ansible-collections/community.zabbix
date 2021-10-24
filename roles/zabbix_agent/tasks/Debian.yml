@@ -160,6 +160,7 @@
   file:
     path: /etc/apt/preferences.d/
     state: directory
+    mode: '0755'
   when:
     - zabbix_agent_apt_priority | int
   become: true
@@ -172,6 +173,7 @@
       Pin: origin repo.zabbix.com
       Pin-Priority: {{ zabbix_agent_apt_priority | int }}
     owner: root
+    mode: '0644'
   when:
     - zabbix_agent_apt_priority | int
   become: true
