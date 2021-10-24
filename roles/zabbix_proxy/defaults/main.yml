@@ -87,7 +87,7 @@ zabbix_proxy_privileged_host: localhost
 zabbix_proxy_localbuffer: 0          # Will be deprecated in 2.0.0
 zabbix_proxy_proxylocalbuffer: "{{ zabbix_proxy_localbuffer }}"
 zabbix_proxy_offlinebuffer: 1          # Will be deprecated in 2.0.0
-zabbix_proxy_proxyofflinebuffer:  "{{ zabbix_proxy_offlinebuffer }}"
+zabbix_proxy_proxyofflinebuffer: "{{ zabbix_proxy_offlinebuffer }}"
 zabbix_proxy_heartbeatfrequency: 60
 zabbix_proxy_configfrequency: 3600
 zabbix_proxy_datasenderfrequency: 1

@@ -83,7 +83,7 @@
     state: present
   become: yes
   when:
-    - zabbix_repo == "epel"  
+    - zabbix_repo == "epel"
 
 - name: "RedHat | Create 'zabbix' user (EPEL)"
   user:
@@ -108,7 +108,7 @@
     baseurl: "{{ item.baseurl }}"
     gpgcheck: "{{ item.gpgcheck }}"
     gpgkey: "{{ item.gpgkey }}"
-    mode:  "{{ item.mode | default('0644') }}"
+    mode: "{{ item.mode | default('0644') }}"
     priority: "{{ item.priority | default('99') }}"
     state: "{{ item.state | default('present') }}"
     proxy: "{{ zabbix_http_proxy | default(omit) }}"

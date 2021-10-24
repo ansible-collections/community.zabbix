@@ -36,7 +36,7 @@
         type: Zabbix super admin
         state: present
       register: create_zabbix_user_result
-    
+
     - assert:
         that:
           - create_zabbix_user_result.changed is sameas true
@@ -112,7 +112,7 @@
         timezone: Asia/Tokyo
         state: present
       register: create_zabbix_user_result
-    
+
     - assert:
         that:
           - create_zabbix_user_result.changed is sameas true

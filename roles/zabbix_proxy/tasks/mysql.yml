@@ -8,7 +8,7 @@
 
 - name: "Set the correct delegated_dbhost (to support MySQL db deployment on a remote dbhost)"
   set_fact:
-    delegated_dbhost:  "{{ inventory_hostname }}"
+    delegated_dbhost: "{{ inventory_hostname }}"
   when:
     - not zabbix_proxy_dbhost_run_install
 

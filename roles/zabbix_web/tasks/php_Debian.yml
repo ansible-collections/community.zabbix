@@ -6,7 +6,7 @@
   set_fact:
     _zabbix_php_package_prefix: 5
   when:
-    - ansible_distribution == 'Ubuntu' and ansible_distribution_version is version_compare('16.04', '<') 
+    - ansible_distribution == 'Ubuntu' and ansible_distribution_version is version_compare('16.04', '<')
       or ansible_distribution == 'Debian' and ansible_distribution_version is version_compare('9', '<')
 
 - name: "Debian | Determine php prefix for packages installations (Current distros)"

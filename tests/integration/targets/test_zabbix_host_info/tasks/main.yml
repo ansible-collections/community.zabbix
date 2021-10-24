@@ -106,7 +106,7 @@
           - gather_all_facts_result.hosts.0.hostinterfaces.0.port == "10050"
           - gather_all_facts_result.hosts.0.hostinterfaces.0.type == "1"
           - gather_all_facts_result.hosts.0.hostinterfaces.0.useip == "1"
-    
+
     - name: "test - Gather facts of zabbix host with host_inventory"
       zabbix_host_info:
         host_inventory:
@@ -133,7 +133,7 @@
         host_name: HostForHostInfo
         exact_match: no
       register: partial_match_result
-    
+
     - assert:
         that:
           - partial_match_result.hosts | length == 1

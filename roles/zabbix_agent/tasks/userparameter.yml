@@ -7,7 +7,7 @@
     notify:
       - restart win zabbix agent
     with_items: "{{ zabbix_agent_userparameters }}"
-  
+
   - name: "Windows | Installing user-defined scripts"
     ansible.windows.win_copy:
       src: "{{ zabbix_agent_userparameters_scripts_src }}/{{ item.scripts_dir }}"
@@ -33,7 +33,7 @@
       - restart mac zabbix agent
     become: yes
     with_items: "{{ zabbix_agent_userparameters }}"
-  
+
   - name: "Installing user-defined scripts"
     copy:
       src: "{{ zabbix_agent_userparameters_scripts_src }}/{{ item.scripts_dir }}"
@@ -65,7 +65,7 @@
       - restart mac zabbix agent
     become: yes
     with_items: "{{ zabbix_agent_userparameters }}"
-  
+
   - name: "Installing user-defined scripts"
     copy:
       src: "{{ zabbix_agent_userparameters_scripts_src }}/{{ item.scripts_dir }}"

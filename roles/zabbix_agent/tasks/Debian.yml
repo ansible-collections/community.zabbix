@@ -156,8 +156,6 @@
     - zabbix-agent
     - init
 
-
-
 - name: "Debian | Create /etc/apt/preferences.d/"
   file:
     path: /etc/apt/preferences.d/
