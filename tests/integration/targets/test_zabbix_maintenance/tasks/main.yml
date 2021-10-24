@@ -47,12 +47,11 @@
     state: present
   register: create_maintenance_host_name_result
 
-
 # BUGGED: sometimes when test "lags" and some time passes since previous tasks,
 # maintenance_start will not match and be updated, thus resulting in changed
-#- assert:
-#    that:
-#      - create_maintenance_host_name_result.changed is sameas false
+# - assert:
+#     that:
+#       - create_maintenance_host_name_result.changed is sameas false
 
 - name: "test - Create maintenance with a host_name param(again - expectations: false change will occur)"
   zabbix_maintenance:
@@ -66,9 +65,9 @@
 
 # BUGGED: sometimes when test "lags" and some time passes since previous tasks,
 # maintenance_start will not match and be updated, thus resulting in changed
-#- assert:
-#    that:
-#      - create_maintenance_host_name_again_result.changed is sameas false
+# - assert:
+#     that:
+#       - create_maintenance_host_name_again_result.changed is sameas false
 
 - name: "test - Update maintenance with a desc param"
   zabbix_maintenance:
@@ -100,9 +99,9 @@
 
 # BUGGED: sometimes when test "lags" and some time passes since previous tasks,
 # maintenance_start will not match and be updated, thus resulting in changed
-#- assert:
-#    that:
-#      - update_maintenance_desc_again_result.changed is sameas false
+# - assert:
+#     that:
+#       - update_maintenance_desc_again_result.changed is sameas false
 
 - name: "test - Update maintenance with a collect_data"
   zabbix_maintenance:
@@ -134,9 +133,9 @@
 
 # BUGGED: sometimes when test "lags" and some time passes since previous tasks,
 # maintenance_start will not match and be updated, thus resulting in changed
-#- assert:
-#    that:
-#      - update_maintenance_collect_data_again_result.changed is sameas false
+# - assert:
+#     that:
+#       - update_maintenance_collect_data_again_result.changed is sameas false
 
 - name: "test - Update maintenance with a minutes param"
   zabbix_maintenance:
@@ -170,9 +169,9 @@
 
 # BUGGED: sometimes when test "lags" and some time passes since previous tasks,
 # maintenance_start will not match and be updated, thus resulting in changed
-#- assert:
-#    that:
-#      - update_maintenance_minutes_again_result.changed is sameas false
+# - assert:
+#     that:
+#       - update_maintenance_minutes_again_result.changed is sameas false
 
 - name: "test - Update maintenance with a host_groups param"
   zabbix_maintenance:
@@ -212,9 +211,9 @@
 
 # BUGGED: sometimes when test "lags" and some time passes since previous tasks,
 # maintenance_start will not match and be updated, thus resulting in changed
-#- assert:
-#    that:
-#      - update_maintenance_host_groups_again_result.changed is sameas false
+# - assert:
+#     that:
+#       - update_maintenance_host_groups_again_result.changed is sameas false
 
 - name: "test - Update maintenance with change host_name to host_names param"
   zabbix_maintenance:
@@ -258,9 +257,9 @@
 
 # BUGGED: sometimes when test "lags" and some time passes since previous tasks,
 # maintenance_start will not match and be updated, thus resulting in changed
-#- assert:
-#    that:
-#      - update_maintenance_host_names_again_result.changed is sameas false
+# - assert:
+#     that:
+#       - update_maintenance_host_names_again_result.changed is sameas false
 
 - name: "test - Delete maintenance"
   zabbix_maintenance:

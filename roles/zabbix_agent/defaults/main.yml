@@ -149,7 +149,7 @@ zabbix_agent_tlscafile:
 zabbix_agent_tlscrlfile:
 zabbix_agent_tlsservercertissuer:
 zabbix_agent_tlsservercertsubject:
-zabbix_agent_tls_subject: "{{ zabbix_agent_tlsservercertsubject }}" # FIXME this is not correct and should be removed with 2.0.0, here only to prevent regression
+zabbix_agent_tls_subject: "{{ zabbix_agent_tlsservercertsubject }}"    # FIXME this is not correct and should be removed with 2.0.0, here only to prevent regression
 zabbix_agent_tlscertfile:
 zabbix_agent_tlskeyfile:
 zabbix_agent_tlspskidentity:
@@ -203,7 +203,7 @@ zabbix_agent2_tlscafile:
 zabbix_agent2_tlscrlfile:
 zabbix_agent2_tlsservercertissuer:
 zabbix_agent2_tlsservercertsubject:
-zabbix_agent2_tls_subject: "{{ zabbix_agent2_tlsservercertsubject }}" # FIXME this is not correct and should be removed with 2.0.0, here only to prevent regression
+zabbix_agent2_tls_subject: "{{ zabbix_agent2_tlsservercertsubject }}"    # FIXME this is not correct and should be removed with 2.0.0, here only to prevent regression
 zabbix_agent2_tlscertfile:
 zabbix_agent2_tlskeyfile:
 zabbix_agent2_tlspskidentity:

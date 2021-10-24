@@ -140,7 +140,7 @@ zabbix_proxy_tlscafile:
 zabbix_proxy_tlscrlfile:
 zabbix_proxy_tlsservercertissuer:
 zabbix_proxy_tlsservercertsubject:
-zabbix_proxy_tls_subject: "{{ zabbix_proxy_tlsservercertsubject }}" # FIXME this is not correct and should be removed with 2.0.0, here only to prevent regression
+zabbix_proxy_tls_subject: "{{ zabbix_proxy_tlsservercertsubject }}"      # FIXME this is not correct and should be removed with 2.0.0, here only to prevent regression
 zabbix_proxy_tlscertfile:
 zabbix_proxy_tlskeyfile:
 zabbix_proxy_tlspskidentity:

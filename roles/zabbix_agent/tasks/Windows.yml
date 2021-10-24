@@ -215,7 +215,6 @@
   ansible.windows.win_service:
     name: "{{ zabbix_win_svc_name }}"
     start_mode: auto
-    #state: started
     failure_actions:
     - type: restart
       delay_ms: 5000
