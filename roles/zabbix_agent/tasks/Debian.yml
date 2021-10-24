@@ -12,16 +12,16 @@
 - name: "Debian | Installing gnupg"
   apt:
     pkg: gnupg
-    update_cache: yes
+    update_cache: true
     cache_valid_time: 3600
-    force: yes
+    force: true
     state: present
   environment:
     http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
     https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   register: gnupg_installed
   until: gnupg_installed is succeeded
-  become: yes
+  become: true
 
 - name: "Debian | Install gpg key"
   apt_key:
@@ -29,7 +29,7 @@
     url: http://repo.zabbix.com/zabbix-official-repo.key
   when:
     - zabbix_repo == "zabbix"
-  become: yes
+  become: true
   tags:
     - zabbix-agent
     - init
@@ -40,7 +40,7 @@
     patterns: repo_zabbix_com_zabbix*.list
     excludes: "repo_zabbix_com_zabbix_{{ zabbix_underscore_version }}_ubuntu.list"
   register: repositories
-  become: yes
+  become: true
   when:
     - ansible_distribution in ['Ubuntu', 'Debian']
     - zabbix_repo == "zabbix"
@@ -57,7 +57,7 @@
     - ansible_distribution in ['Ubuntu', 'Debian']
     - zabbix_repo == "zabbix"
     - zabbix_agent_src_reinstall
-  become: yes
+  become: true
   tags:
     - zabbix-agent
     - init
@@ -72,7 +72,7 @@
   when:
     - ansible_distribution == "Debian"
     - zabbix_repo == "zabbix"
-  become: yes
+  become: true
   tags:
     - zabbix-agent
     - init
@@ -87,7 +87,7 @@
   when:
     - ansible_distribution == "Debian"
     - zabbix_repo == "zabbix"
-  become: yes
+  become: true
   tags:
     - zabbix-agent
     - init
@@ -103,7 +103,7 @@
     - ansible_distribution == "Ubuntu"
     - ansible_machine == "aarch64"
     - zabbix_repo == "zabbix"
-  become: yes
+  become: true
   tags:
     - zabbix-agent
     - init
@@ -119,7 +119,7 @@
     - ansible_distribution == "Ubuntu"
     - ansible_machine == "aarch64"
     - zabbix_repo == "zabbix"
-  become: yes
+  become: true
   tags:
     - zabbix-agent
     - init
@@ -135,7 +135,7 @@
     - ansible_distribution == "Ubuntu"
     - ansible_machine != "aarch64"
     - zabbix_repo == "zabbix"
-  become: yes
+  become: true
   tags:
     - zabbix-agent
     - init
@@ -151,7 +151,7 @@
     - ansible_distribution == "Ubuntu"
     - ansible_machine != "aarch64"
     - zabbix_repo == "zabbix"
-  become: yes
+  become: true
   tags:
     - zabbix-agent
     - init
@@ -162,7 +162,7 @@
     state: directory
   when:
     - zabbix_agent_apt_priority | int
-  become: yes
+  become: true
 
 - name: "Debian | Configuring the weight for APT"
   copy:
@@ -174,7 +174,7 @@
     owner: root
   when:
     - zabbix_agent_apt_priority | int
-  become: yes
+  become: true
 
 # Note: set cache_valid_time=0 to ensure that an apt-get update after the added repo-key
 # else you often get 'WARNING: The following packages cannot be authenticated!
@@ -184,7 +184,7 @@
   apt:
     pkg: "{{ zabbix_agent_package }}"
     state: "{{ zabbix_agent_package_state }}"
-    update_cache: yes
+    update_cache: true
     cache_valid_time: 0
     force_apt_get: "{{ zabbix_apt_force_apt_get }}"
     install_recommends: "{{ zabbix_apt_install_recommends }}"
@@ -194,8 +194,8 @@
   when: ansible_distribution in ['Ubuntu', 'Debian']
   register: zabbix_agent_package_installed
   until: zabbix_agent_package_installed is succeeded
-  become: yes
-  check_mode: no
+  become: true
+  check_mode: false
   tags:
     - zabbix-agent
     - init
@@ -206,7 +206,7 @@
       - "{{ zabbix_sender_package }}"
       - "{{ zabbix_get_package }}"
     state: "{{ zabbix_agent_package_state }}"
-    update_cache: yes
+    update_cache: true
     cache_valid_time: 0
     force_apt_get: "{{ zabbix_apt_force_apt_get }}"
     install_recommends: "{{ zabbix_apt_install_recommends }}"
@@ -218,8 +218,8 @@
     - not zabbix_agent_install_agent_only
   register: zabbix_agent_package_installed
   until: zabbix_agent_package_installed is succeeded
-  become: yes
-  check_mode: no
+  become: true
+  check_mode: false
   tags:
     - zabbix-agent
     - init
@@ -228,7 +228,7 @@
   apt:
     pkg: "zabbix-agent"
     state: "{{ zabbix_agent_package_state }}"
-    update_cache: yes
+    update_cache: true
     cache_valid_time: 0
     force_apt_get: "{{ zabbix_apt_force_apt_get }}"
     install_recommends: "{{ zabbix_apt_install_recommends }}"
@@ -238,7 +238,7 @@
   when: ansible_distribution not in ['Ubuntu', 'Debian']
   register: zabbix_agent_package_installed
   until: zabbix_agent_package_installed is succeeded
-  become: yes
+  become: true
   tags:
     - zabbix-agent
     - init
@@ -246,9 +246,9 @@
 - name: "Debian | Enable the service"
   service:
     name: "{{ zabbix_agent_service }}"
-    enabled: yes
+    enabled: true
     use: service
-  become: yes
+  become: true
   tags:
     - zabbix-agent
     - init

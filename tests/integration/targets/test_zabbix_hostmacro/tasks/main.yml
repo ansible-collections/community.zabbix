@@ -76,7 +76,7 @@
     host_name: zbx_hmacro_host01
     macro_name: zbxhmacro_test01
     macro_value: abc
-    force: no
+    force: false
   register: zbxhmacro_update_noforce
 
 - name: assert that nothing has been changed
@@ -92,7 +92,7 @@
     macro_name: zbxhmacro_test01
     macro_value: abc
   register: zbxhmacro_update
-  ignore_errors: True
+  ignore_errors: true
 
 - name: assert that host macro was updated
   assert:
@@ -173,7 +173,7 @@
     macro_value: abcd
     macro_type: secret
   register: zbxhmacro_update
-  ignore_errors: True
+  ignore_errors: true
 
 - name: assert that host macro was updated
   assert:
@@ -189,7 +189,7 @@
     macro_value: abcd
     macro_type: secret
   register: zbxhmacro_update
-  ignore_errors: True
+  ignore_errors: true
 
 - name: assert that host macro was updated
   assert:

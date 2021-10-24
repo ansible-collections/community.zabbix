@@ -50,7 +50,7 @@
     direction: in
     protocol: tcp
     state: present
-    enabled: yes
+    enabled: true
   when:
     - zabbix_win_firewall_management
     - firewall_info.services[0].state == 'started' or firewall_info.services[0].start_mode == 'auto'

@@ -6,14 +6,14 @@
       shell: grep $(hostname) /etc/hosts | awk '{ print $1 }' | tail -n 1
       register: ip_address
       delegate_to: zabbix-server-centos
-      changed_when: False
+      changed_when: false
       tags:
         - skip_ansible_lint
 
     - name: "Get IP hosts"
       shell: grep $(hostname) /etc/hosts | awk '{ print $1 }' | tail -n 1
       register: ip_address_host
-      changed_when: False
+      changed_when: false
       tags:
         - skip_ansible_lint
 

@@ -340,7 +340,7 @@
     host_name: ExampleHost
     host_groups:
       - Virtual machines
-    force: no
+    force: false
   register: zabbix_host1
 
 - name: expect to succeed and that things changed
@@ -376,7 +376,7 @@
     host_groups:
       -
   register: zabbix_host1
-  ignore_errors: yes
+  ignore_errors: true
 
 - name: expect to fail
   assert:
@@ -424,7 +424,7 @@
     host_name: ExampleHost
     link_templates:
       - "{{ 'LDAP Service' if zabbix_version | float >= 5.2 else 'Template App LDAP Service' }}"
-    force: no
+    force: false
   register: zabbix_host1
 
 - name: expect to succeed and that things have changed
@@ -712,7 +712,7 @@
         ip: 10.1.1.1
         dns: ""
         port: "12345"
-    force: no
+    force: false
   register: zabbix_host1
 
 - name: expect to succeed and that things have changed
@@ -763,7 +763,7 @@
         ip: 10.1.1.1
         port: "12345"
   register: zabbix_host1
-  ignore_errors: yes
+  ignore_errors: true
 
 - name: expect to fail
   assert:
@@ -788,7 +788,7 @@
         ip: 10.1.1.1
         port: "12345"
   register: zabbix_host1
-  ignore_errors: yes
+  ignore_errors: true
 
 - name: expect to fail
   assert:
@@ -815,7 +815,7 @@
             ip: 10.1.1.1
             port: "161"
       register: zabbix_host1
-      ignore_errors: True
+      ignore_errors: true
 
     - name: expect to fail
       assert:
@@ -1266,7 +1266,7 @@
     login_user: "{{ zabbix_login_user }}"
     login_password: "{{ zabbix_login_password }}"
     host_name: ExampleHost
-    force: no
+    force: false
     macros:
       - macro: '{$NEWMACRO3}'
         value: testing
@@ -1422,7 +1422,7 @@
         login_user: "{{ zabbix_login_user }}"
         login_password: "{{ zabbix_login_password }}"
         host_name: ExampleHost
-        force: no
+        force: false
         tags:
           - tag: newtag3
             value: testing

@@ -91,7 +91,7 @@
     mode: 0644
   notify:
     - restart mac zabbix agent
-  become: yes
+  become: true
   when:
     - not (zabbix_agent_docker | bool)
   tags:
@@ -104,7 +104,7 @@
     path: "{{ zabbix_agent_tlspskfile | dirname }}"
     mode: 0755
     state: directory
-  become: yes
+  become: true
   when:
     - zabbix_agent_tlspskfile is defined
 
@@ -115,7 +115,7 @@
     owner: zabbix
     group: zabbix
     mode: 0400
-  become: yes
+  become: true
   when:
     - zabbix_agent_tlspskfile is defined
     - zabbix_agent_tlspsk_secret is defined
@@ -129,7 +129,7 @@
     group: zabbix
     mode: 0750
     state: directory
-  become: yes
+  become: true
   tags:
     - config
     - include
@@ -141,7 +141,7 @@
     owner: zabbix
     group: zabbix
     mode: 0755
-  become: yes
+  become: true
 
 - name: "Install the Docker container"
   include: Docker.yml
@@ -153,17 +153,17 @@
     set -o pipefail
     launchctl list | grep com.zabbix.zabbix_agentd | awk '{print $1}'
   register: launchctl_pid
-  check_mode: no
+  check_mode: false
   changed_when: false
   failed_when: launchctl_pid.rc == 2
-  become: yes
+  become: true
   tags:
     - init
     - service
 
 - name: "Make sure the zabbix-agent service is running"
   command: launchctl start com.zabbix.zabbix_agentd
-  become: yes
+  become: true
   when:
     - not (zabbix_agent_docker | bool)
     - launchctl_pid.stdout == "-"

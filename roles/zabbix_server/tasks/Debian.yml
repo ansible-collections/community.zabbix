@@ -62,16 +62,16 @@
 - name: "Debian | Installing gnupg"
   apt:
     pkg: gnupg
-    update_cache: yes
+    update_cache: true
     cache_valid_time: 3600
-    force: yes
+    force: true
     state: present
   environment:
     http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
     https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   register: gnupg_installed
   until: gnupg_installed is succeeded
-  become: yes
+  become: true
 
 - name: "Debian | Install gpg key"
   apt_key:
@@ -81,7 +81,7 @@
   until: zabbix_server_repo_files_installed is succeeded
   when:
     - zabbix_repo == "zabbix"
-  become: yes
+  become: true
   tags:
     - zabbix-server
     - init
@@ -91,7 +91,7 @@
     repo: "{{ item }} {{ zabbix_server_apt_repository | join(' ') }}"
     state: present
   when: zabbix_repo == "zabbix"
-  become: yes
+  become: true
   with_items:
     - deb-src
     - deb
@@ -105,7 +105,7 @@
     state: directory
   when:
     - zabbix_server_apt_priority | int
-  become: yes
+  become: true
 
 - name: "Debian | Configuring the weight for APT"
   copy:
@@ -117,14 +117,14 @@
     owner: root
   when:
     - zabbix_server_apt_priority | int
-  become: yes
+  become: true
 
 - name: apt-get clean
   shell: apt-get clean; apt-get update
   args:
-    warn: False
-  changed_when: False
-  become: yes
+    warn: false
+  changed_when: false
+  become: true
   tags:
     - skip_ansible_lint
 
@@ -137,13 +137,13 @@
   register: dpkg_exclude_line
   failed_when: false
   changed_when: false
-  check_mode: no
+  check_mode: false
 
 - name: Allow Zabbix dpkg installs to /usr/share/doc/zabbix*
   lineinfile:
     path: /etc/dpkg/dpkg.cfg.d/excludes
     line: 'path-include=/usr/share/doc/zabbix*'
-  become: yes
+  become: true
   when:
     - dpkg_exclude_line.rc == 0
 
@@ -151,7 +151,7 @@
   apt:
     pkg: zabbix-server-{{ zabbix_server_database }}
     state: "{{ zabbix_server_package_state }}"
-    update_cache: yes
+    update_cache: true
     cache_valid_time: 0
     install_recommends: "{{ zabbix_server_install_recommends }}"
     default_release: "{{ ansible_distribution_release }}"
@@ -160,7 +160,7 @@
     https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   register: zabbix_server_package_installed
   until: zabbix_server_package_installed is succeeded
-  become: yes
+  become: true
   tags:
     - zabbix-server
     - init
@@ -169,7 +169,7 @@
   apt:
     pkg: zabbix-sql-scripts
     state: "{{ zabbix_server_package_state }}"
-    update_cache: yes
+    update_cache: true
     cache_valid_time: 0
     install_recommends: "{{ zabbix_server_install_recommends }}"
     default_release: "{{ ansible_distribution_release }}"
@@ -180,7 +180,7 @@
   until: zabbix_server_package_sql_installed is succeeded
   when:
     - zabbix_version is version('5.4', '>=')
-  become: yes
+  become: true
   tags:
     - zabbix-server
     - init
@@ -194,7 +194,7 @@
     https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   register: zabbix_server_dependencies_installed
   until: zabbix_server_dependencies_installed is succeeded
-  become: yes
+  become: true
   when:
     - zabbix_database_creation
   tags:
@@ -212,7 +212,7 @@
     https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   register: zabbix_server_dependencies_installed
   until: zabbix_server_dependencies_installed is succeeded
-  become: yes
+  become: true
   when:
     - zabbix_server_database == 'mysql'
     - zabbix_server_install_database_client
@@ -233,7 +233,7 @@
     https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   register: zabbix_server_dependencies_installed
   until: zabbix_server_dependencies_installed is succeeded
-  become: yes
+  become: true
   when:
     - zabbix_server_database == 'mysql'
     - zabbix_server_install_database_client
@@ -252,7 +252,7 @@
     https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   register: zabbix_server_dependencies_installed
   until: zabbix_server_dependencies_installed is succeeded
-  become: yes
+  become: true
   when:
     - zabbix_server_database == 'pgsql'
     - zabbix_server_install_database_client

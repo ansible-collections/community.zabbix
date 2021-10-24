@@ -17,7 +17,7 @@
 - name: "RedHat | Define package with version"
   set_fact:
     zabbix_proxy_package: "zabbix{{ zabbix_short_version }}-proxy-{{ zabbix_proxy_database }}"
-    cacheable: yes
+    cacheable: true
   when:
     - zabbix_proxy_rhel_version is defined
     - zabbix_repo != "epel"
@@ -25,7 +25,7 @@
 - name: "RedHat | Define package without version"
   set_fact:
     zabbix_proxy_package: "zabbix-proxy-{{ zabbix_proxy_database }}"
-    cacheable: yes
+    cacheable: true
   when:
     - zabbix_proxy_rhel_version is not defined
     - zabbix_repo != "epel"
@@ -81,7 +81,7 @@
     name: "{{ zabbix_proxy_groupname | default('zabbix') }}"
     gid: "{{ zabbix_proxy_groupid | default(omit) }}"
     state: present
-  become: yes
+  become: true
   when:
     - zabbix_repo == "epel"
 
@@ -91,7 +91,7 @@
     comment: Zabbix Monitoring System
     uid: "{{ zabbix_proxy_userid | default(omit) }}"
     group: zabbix
-  become: yes
+  become: true
   when:
     - zabbix_repo == "epel"
 
@@ -99,7 +99,7 @@
   file:
     path: /etc/yum.repos.d/zabbix-supported.repo
     state: absent
-  become: yes
+  become: true
 
 - name: "RedHat | Install basic repo file"
   yum_repository:
@@ -114,7 +114,7 @@
     proxy: "{{ zabbix_http_proxy | default(omit) }}"
   with_items: "{{ zabbix_repo_yum }}"
   register: yum_repo_installed
-  become: yes
+  become: true
   when:
     - zabbix_repo == "zabbix"
   notify:
@@ -131,7 +131,7 @@
   environment:
     http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
     https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
-  become: yes
+  become: true
   register: is_zabbix_proxy_package_installed
   until: is_zabbix_proxy_package_installed is succeeded
 
@@ -148,7 +148,7 @@
   until: zabbix_proxy_sql_package_installed is succeeded
   when:
     - zabbix_version is version('5.4', '>=')
-  become: yes
+  become: true
   tags:
     - zabbix-server
 
@@ -159,7 +159,7 @@
   environment:
     http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
     https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
-  become: yes
+  become: true
   register: are_zabbix_proxy_dependency_packages_installed
   until: are_zabbix_proxy_dependency_packages_installed is succeeded
   when:
@@ -179,7 +179,7 @@
     https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   register: zabbix_proxy_dependencies_installed
   until: zabbix_proxy_dependencies_installed is succeeded
-  become: yes
+  become: true
   when:
     - zabbix_database_creation
     - zabbix_proxy_database == 'pgsql'
@@ -196,7 +196,7 @@
   environment:
     http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
     https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
-  become: yes
+  become: true
   register: are_zabbix_proxy_dependency_packages_installed
   until: are_zabbix_proxy_dependency_packages_installed is succeeded
   when:
@@ -218,7 +218,7 @@
     https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   register: zabbix_proxy_dependencies_installed
   until: zabbix_proxy_dependencies_installed is succeeded
-  become: yes
+  become: true
   when:
     - zabbix_proxy_database == 'mysql'
     - ansible_distribution_major_version == "8"
@@ -235,7 +235,7 @@
   environment:
     http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
     https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
-  become: yes
+  become: true
   register: are_zabbix_proxy_dependency_packages_installed
   until: are_zabbix_proxy_dependency_packages_installed is succeeded
   when:
@@ -255,7 +255,7 @@
   environment:
     http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
     https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
-  become: yes
+  become: true
   register: are_zabbix_proxy_dependency_packages_installed
   until: are_zabbix_proxy_dependency_packages_installed is succeeded
   when:
@@ -277,7 +277,7 @@
     https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   register: zabbix_proxy_dependencies_installed
   until: zabbix_proxy_dependencies_installed is succeeded
-  become: yes
+  become: true
   when:
     - zabbix_proxy_database == 'sqlite3'
   tags:

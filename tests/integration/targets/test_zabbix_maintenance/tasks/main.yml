@@ -43,7 +43,7 @@
     login_password: "{{ zabbix_login_password }}"
     name: maintenance
     host_name: example
-    visible_name: no
+    visible_name: false
     state: present
   register: create_maintenance_host_name_result
 
@@ -54,7 +54,7 @@
 #    that:
 #      - create_maintenance_host_name_result.changed is sameas false
 
-- name: "test - Create maintenance with a host_name param(again - expectations: no change will occur)"
+- name: "test - Create maintenance with a host_name param(again - expectations: false change will occur)"
   zabbix_maintenance:
     server_url: "{{ zabbix_server_url }}"
     login_user: "{{ zabbix_login_user }}"
@@ -112,7 +112,7 @@
     name: maintenance
     host_name: example
     desc: "test description"
-    collect_data: no
+    collect_data: false
     state: present
   register: update_maintenance_collect_data_result
 
@@ -128,7 +128,7 @@
     name: maintenance
     host_name: example
     desc: "test description"
-    collect_data: no
+    collect_data: false
     state: present
   register: update_maintenance_collect_data_again_result
 
@@ -146,7 +146,7 @@
     name: maintenance
     host_name: example
     desc: "test description"
-    collect_data: no
+    collect_data: false
     minutes: 90
     state: present
   register: update_maintenance_minutes_result
@@ -163,7 +163,7 @@
     name: maintenance
     host_name: example
     desc: "test description"
-    collect_data: no
+    collect_data: false
     minutes: 90
     state: present
   register: update_maintenance_minutes_again_result
@@ -185,7 +185,7 @@
       - Linux servers
       - Hypervisors
     desc: "test description"
-    collect_data: no
+    collect_data: false
     minutes: 90
     state: present
   register: update_maintenance_host_groups_result
@@ -205,7 +205,7 @@
       - Linux servers
       - Hypervisors
     desc: "test description"
-    collect_data: no
+    collect_data: false
     minutes: 90
     state: present
   register: update_maintenance_host_groups_again_result
@@ -229,7 +229,7 @@
       - Linux servers
       - Hypervisors
     desc: "test description"
-    collect_data: no
+    collect_data: false
     minutes: 90
     state: present
   register: update_maintenance_host_names_result
@@ -251,7 +251,7 @@
       - Linux servers
       - Hypervisors
     desc: "test description"
-    collect_data: no
+    collect_data: false
     minutes: 90
     state: present
   register: update_maintenance_host_names_again_result

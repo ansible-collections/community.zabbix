@@ -41,5 +41,5 @@
   systemd:
     name: zabbix-java-gateway
     state: started
-    enabled: yes
+    enabled: true
     daemon_reload: true

@@ -131,7 +131,7 @@
     - name: "test - Partial match of zabbix host name"
       zabbix_host_info:
         host_name: HostForHostInfo
-        exact_match: no
+        exact_match: false
       register: partial_match_result
 
     - assert:
@@ -140,7 +140,7 @@
 
     - name: "test - Exact match of zabbix host name"
       zabbix_host_info:
-        exact_match: yes
+        exact_match: true
       register: exact_match_result
 
     - assert:
@@ -150,9 +150,9 @@
     - name: "test - Exact match of zabbix host name(expectations - host not found)"
       zabbix_host_info:
         host_name: HostForHostInfo
-        exact_match: yes
+        exact_match: true
       register: exact_match_host_not_found_result
-      ignore_errors: yes
+      ignore_errors: true
 
     - assert:
         that:

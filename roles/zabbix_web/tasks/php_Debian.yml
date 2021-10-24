@@ -21,7 +21,7 @@
 - name: "Debian | Install php packages"
   apt:
     state: present
-    update_cache: yes
+    update_cache: true
     cache_valid_time: 3600
     name:
       - php{{ _zabbix_php_package_prefix }}-{{ zabbix_server_database }}
@@ -32,7 +32,7 @@
       - php{{ _zabbix_php_package_prefix }}-gd
   register: zabbix_web_php_dependency_install
   until: zabbix_web_php_dependency_install is succeeded
-  become: yes
+  become: true
   tags:
     - zabbix-web
     - init

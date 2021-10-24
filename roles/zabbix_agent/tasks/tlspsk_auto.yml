@@ -9,7 +9,7 @@
   slurp:
     src: "{{ zabbix_agent_tlspskfile }}"
   register: zabbix_agent_tlspsk_base64
-  become: yes
+  become: true
   when: zabbix_agent_tlspskcheck.stat.exists
   no_log: "{{ ansible_verbosity < 3 }}"
 
@@ -35,7 +35,7 @@
   slurp:
     src: "{{ zabbix_agent_tlspskidentity_file }}"
   register: zabbix_agent_tlspskidentity_base64
-  become: yes
+  become: true
   when: zabbix_agent_tlspskidentity_check.stat.exists
   no_log: "{{ ansible_verbosity < 3 }}"
 
@@ -58,7 +58,7 @@
     owner: zabbix
     group: zabbix
     mode: 0400
-  become: yes
+  become: true
   when:
     - zabbix_agent_tlspskidentity_file is defined
     - zabbix_agent_tlspskidentity is defined

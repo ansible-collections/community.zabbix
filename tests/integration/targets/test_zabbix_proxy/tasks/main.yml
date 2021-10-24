@@ -189,7 +189,7 @@
       dns: zbxproxy_example01
       port: 10051
   register: zbxproxy_interface_fail
-  ignore_errors: True
+  ignore_errors: true
 
 - name: assert that module has failed
   assert:

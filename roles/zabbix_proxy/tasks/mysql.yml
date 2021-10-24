@@ -56,7 +56,7 @@
 
 - name: "Get the file for schema.sql"
   shell: ls -1 {{ datafiles_path }}/schema.sq*
-  changed_when: False
+  changed_when: false
   when:
     - zabbix_database_sqlload
     - zabbix_repo != "epel"
@@ -81,7 +81,7 @@
     -e 'SHOW VARIABLES;' 2>&1 | grep innodb_default_row_format \
     | awk '{print $2}' | tr [:upper:] [:lower:]
   register: mysql_innodb_default_row_format
-  changed_when: False
+  changed_when: false
   args:
     executable: /bin/bash
   become: true

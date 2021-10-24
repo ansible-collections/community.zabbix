@@ -34,7 +34,7 @@
     group: zabbix
     mode: "{{ zabbix_proxy_include_mode }}"
     state: directory
-  become: yes
+  become: true
 
 - name: "Create module dir zabbix-proxy"
   file:
@@ -42,14 +42,14 @@
     owner: zabbix
     group: zabbix
     state: directory
-  become: yes
+  become: true
 
 - name: "Create directory for PSK file if not exist."
   file:
     path: "{{ zabbix_proxy_tlspskfile | dirname }}"
     mode: 0755
     state: directory
-  become: yes
+  become: true
   when:
     - zabbix_proxy_tlspskfile is defined
 
@@ -60,7 +60,7 @@
     owner: zabbix
     group: zabbix
     mode: 0400
-  become: yes
+  become: true
   when:
     - zabbix_proxy_tlspskfile is defined
     - zabbix_proxy_tlspsk_secret is defined
@@ -70,18 +70,18 @@
 - name: "Allow zabbix-proxy to open connections (SELinux)"
   ansible.posix.seboolean:
     name: zabbix_can_network
-    persistent: yes
-    state: yes
-  become: yes
+    persistent: true
+    state: true
+  become: true
   when: ansible_selinux.status == "enabled"
   tags: selinux
 
 - name: "Allow zabbix-proxy to connect to zabbix_proxy_preprocessing.sock (SELinux)"
   ansible.posix.seboolean:
     name: daemons_enable_cluster_mode
-    persistent: yes
-    state: yes
-  become: yes
+    persistent: true
+    state: true
+  become: true
   when: ansible_selinux.status == "enabled"
   tags: selinux
 
@@ -93,7 +93,7 @@
     group: zabbix
     mode: "{{ zabbix_proxy_conf_mode }}"
   notify: restart zabbix-proxy
-  become: yes
+  become: true
 
 - name: "Installing the Zabbix-api package on localhost"
   pip:
@@ -132,7 +132,7 @@
   when:
     - zabbix_api_create_proxy | bool
   delegate_to: localhost
-  become: no
+  become: false
   tags:
     - api
 
@@ -140,6 +140,6 @@
   service:
     name: zabbix-proxy
     state: started
-    enabled: yes
-  become: yes
+    enabled: true
+  become: true
   when: zabbix_proxy_manage_service | bool

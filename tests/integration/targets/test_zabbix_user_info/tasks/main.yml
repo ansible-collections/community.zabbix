@@ -16,7 +16,7 @@
         passwd: password
         lang: en_GB
         theme: blue-theme
-        autologin: no
+        autologin: false
         autologout: '0'
         refresh: '30'
         rows_per_page: '200'
@@ -26,13 +26,13 @@
             sendto: example@example.com
             period: 1-7,00:00-24:00
             severity:
-              not_classified: no
-              information: yes
-              warning: yes
-              average: yes
-              high: yes
-              disaster: yes
-            active: no
+              not_classified: false
+              information: true
+              warning: true
+              average: true
+              high: true
+              disaster: true
+            active: false
         type: Zabbix super admin
         state: present
       register: create_zabbix_user_result
@@ -91,7 +91,7 @@
         passwd: password
         lang: en_GB
         theme: blue-theme
-        autologin: no
+        autologin: false
         autologout: '0'
         refresh: '30'
         rows_per_page: '200'
@@ -101,13 +101,13 @@
             sendto: example@example.com
             period: 1-7,00:00-24:00
             severity:
-              not_classified: no
-              information: yes
-              warning: yes
-              average: yes
-              high: yes
-              disaster: yes
-            active: no
+              not_classified: false
+              information: true
+              warning: true
+              average: true
+              high: true
+              disaster: true
+            active: false
         role_name: Super admin role
         timezone: Asia/Tokyo
         state: present

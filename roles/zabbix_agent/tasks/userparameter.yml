@@ -31,7 +31,7 @@
     notify:
       - restart zabbix-agent
       - restart mac zabbix agent
-    become: yes
+    become: true
     with_items: "{{ zabbix_agent_userparameters }}"
 
   - name: "Installing user-defined scripts"
@@ -44,7 +44,7 @@
     notify:
       - restart zabbix-agent
       - restart mac zabbix agent
-    become: yes
+    become: true
     with_items: "{{ zabbix_agent_userparameters }}"
     when: item.scripts_dir is defined
 
@@ -63,7 +63,7 @@
     notify:
       - restart zabbix-agent
       - restart mac zabbix agent
-    become: yes
+    become: true
     with_items: "{{ zabbix_agent_userparameters }}"
 
   - name: "Installing user-defined scripts"
@@ -76,7 +76,7 @@
     notify:
       - restart zabbix-agent
       - restart mac zabbix agent
-    become: yes
+    become: true
     with_items: "{{ zabbix_agent_userparameters }}"
     when: item.scripts_dir is defined
 
