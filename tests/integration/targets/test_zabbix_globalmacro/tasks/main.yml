@@ -66,7 +66,7 @@
     macro_name: zbxgmacro_test01
     macro_value: abc
     macro_type: text
-    force: no
+    force: false
   register: zbxgmacro_update_noforce
 
 - name: assert that nothing has been changed

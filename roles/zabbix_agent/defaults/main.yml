@@ -1,12 +1,12 @@
 ---
 # defaults file for zabbix_agent
 
-zabbix_agent2: False
+zabbix_agent2: false
 zabbix_agent_version: 5.4
 zabbix_version: "{{ zabbix_agent_version }}"
 zabbix_version_patch: 0
 zabbix_repo: zabbix
-zabbix_agent_package_remove: False
+zabbix_agent_package_remove: false
 zabbix_agent_package: zabbix-agent
 zabbix_sender_package: zabbix-sender
 zabbix_get_package: zabbix-get
@@ -15,20 +15,20 @@ zabbix_agent_server:
 zabbix_agent_serveractive:
 zabbix_agent2_server: "{{ zabbix_agent_server }}"
 zabbix_agent2_serveractive: "{{ zabbix_agent_serveractive }}"
-zabbix_selinux: False
-zabbix_agent_src_reinstall: False
+zabbix_selinux: false
+zabbix_agent_src_reinstall: false
 zabbix_agent_apt_priority:
 zabbix_agent_conf_mode: "0644"
-zabbix_agent_dont_detect_ip: False
+zabbix_agent_dont_detect_ip: false
 zabbix_agent_allow_key: []
 zabbix_agent_deny_key: []
 zabbix_agent2_allow_key: "{{ zabbix_agent_allow_key }}"
 zabbix_agent2_deny_key: "{{ zabbix_agent_deny_key }}"
 
 # Selinux related vars
-selinux_allow_zabbix_run_sudo: False
+selinux_allow_zabbix_run_sudo: false
 
-zabbix_agent_install_agent_only: False
+zabbix_agent_install_agent_only: false
 zabbix_agent_packages:
   - "{{ zabbix_agent_package }}"
   - "{{ zabbix_sender_package }}"
@@ -36,8 +36,8 @@ zabbix_agent_packages:
 
 # Zabbix role related vars
 zabbix_install_pip_packages: true
-zabbix_apt_force_apt_get: yes
-zabbix_apt_install_recommends: no
+zabbix_apt_force_apt_get: true
+zabbix_apt_install_recommends: false
 
 # Override Ansible specific facts
 zabbix_agent_distribution_major_version: "{{ ansible_distribution_major_version }}"
@@ -73,12 +73,12 @@ zabbix_api_user: Admin                             # Will be deprecated in 2.0.0
 zabbix_api_pass: !unsafe zabbix                    # Will be deprecated in 2.0.0
 zabbix_api_login_user: "{{ zabbix_api_user }}"
 zabbix_api_login_pass: "{{ zabbix_api_pass }}"
-zabbix_api_create_hostgroup: False
-zabbix_api_create_hosts: False
+zabbix_api_create_hostgroup: false
+zabbix_api_create_hosts: false
 zabbix_api_timeout: 30
 zabbix_create_hostgroup: present  # or absent
 zabbix_create_host: present       # or absent
-zabbix_update_host: yes
+zabbix_update_host: true
 zabbix_host_status: enabled       # or disabled
 zabbix_proxy: null
 zabbix_inventory_mode: disabled
@@ -96,8 +96,8 @@ zabbix_agent_interfaces:
     dns: "{{ ansible_fqdn }}"
     port: "{{ (zabbix_agent2 == True) | ternary(zabbix_agent2_listenport, zabbix_agent_listenport) }}"
 
-zabbix_agent_firewall_enable: False
-zabbix_agent_firewalld_enable: False
+zabbix_agent_firewall_enable: false
+zabbix_agent_firewalld_enable: false
 zabbix_agent_firewalld_source: "{{ zabbix_agent_server }}"
 zabbix_agent_firewall_action: insert
 zabbix_agent_firewall_chain: INPUT
@@ -138,7 +138,7 @@ zabbix_agent_userparameters_scripts_src: "scripts"
 zabbix_agent_custom_scripts: false
 zabbix_agent_loadmodulepath: ${libdir}/modules
 zabbix_agent_loadmodule:
-zabbix_agent_become_on_localhost: True
+zabbix_agent_become_on_localhost: true
 zabbix_agent_description:
 zabbix_agent_inventory_zabbix: {}
 
@@ -149,11 +149,11 @@ zabbix_agent_tlscafile:
 zabbix_agent_tlscrlfile:
 zabbix_agent_tlsservercertissuer:
 zabbix_agent_tlsservercertsubject:
-zabbix_agent_tls_subject: "{{ zabbix_agent_tlsservercertsubject }}" # FIXME this is not correct and should be removed with 2.0.0, here only to prevent regression
+zabbix_agent_tls_subject: "{{ zabbix_agent_tlsservercertsubject }}"    # FIXME this is not correct and should be removed with 2.0.0, here only to prevent regression
 zabbix_agent_tlscertfile:
 zabbix_agent_tlskeyfile:
 zabbix_agent_tlspskidentity:
-zabbix_agent_tlspsk_auto: False
+zabbix_agent_tlspsk_auto: false
 
 zabbix_agent_tls_config:
   unencrypted: '1'
@@ -203,11 +203,11 @@ zabbix_agent2_tlscafile:
 zabbix_agent2_tlscrlfile:
 zabbix_agent2_tlsservercertissuer:
 zabbix_agent2_tlsservercertsubject:
-zabbix_agent2_tls_subject: "{{ zabbix_agent2_tlsservercertsubject }}" # FIXME this is not correct and should be removed with 2.0.0, here only to prevent regression
+zabbix_agent2_tls_subject: "{{ zabbix_agent2_tlsservercertsubject }}"    # FIXME this is not correct and should be removed with 2.0.0, here only to prevent regression
 zabbix_agent2_tlscertfile:
 zabbix_agent2_tlskeyfile:
 zabbix_agent2_tlspskidentity:
-zabbix_agent2_tlspsk_auto: False
+zabbix_agent2_tlspsk_auto: false
 
 # Windows/macOS Related
 zabbix_version_long: 5.2.4
@@ -222,8 +222,8 @@ zabbix_win_install_dir: 'C:\Zabbix'
 zabbix_agent_win_logfile: "{{ zabbix_win_install_dir }}\\zabbix_agentd.log"
 zabbix_agent_win_include: "{{ zabbix_win_install_dir }}\\zabbix_agent.d\\"
 zabbix_agent2_win_logfile: "{{ zabbix_win_install_dir }}\\zabbix_agent2.log"
-zabbix_agent_win_svc_recovery: True
-zabbix_win_firewall_management: True
+zabbix_agent_win_svc_recovery: true
+zabbix_win_firewall_management: true
 
 # macOS Related
 zabbix_mac_package: zabbix_agent-{{ zabbix_version_long }}-macos-amd64-openssl.pkg
@@ -231,7 +231,7 @@ zabbix_mac_download_url: https://cdn.zabbix.com/zabbix/binaries/stable
 zabbix_mac_download_link: "{{ zabbix_mac_download_url }}/{{ zabbix_agent_version }}/{{ zabbix_version_long }}/{{ zabbix_mac_package }}"
 
 # Zabbix Agent Docker facts
-zabbix_agent_docker: False
+zabbix_agent_docker: false
 zabbix_agent_docker_state: started
 zabbix_agent_docker_name: zabbix-agent
 zabbix_agent_docker_image: "zabbix/zabbix-agent"
@@ -240,7 +240,7 @@ zabbix_agent_docker_user_gid: 101
 zabbix_agent_docker_user_uid: 101
 zabbix_agent_docker_network_mode: host
 zabbix_agent_docker_restart_policy: unless-stopped
-zabbix_agent_docker_privileged: False
+zabbix_agent_docker_privileged: false
 zabbix_agent_docker_ports:
   - 10050:10050
 zabbix_agent_docker_security_opts:

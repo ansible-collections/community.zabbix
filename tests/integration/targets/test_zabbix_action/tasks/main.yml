@@ -116,7 +116,7 @@
   - name: test - update action with pause_in_maintenance
     zabbix_action:
       esc_period: 120
-      pause_in_maintenance: False
+      pause_in_maintenance: false
     register: zbxaction_maintpause
 
   - assert:
@@ -125,7 +125,7 @@
   - name: test - update action with pause_in_maintenance (again)
     zabbix_action:
       esc_period: 120
-      pause_in_maintenance: False
+      pause_in_maintenance: false
     register: zbxaction_maintpause
 
   - assert:

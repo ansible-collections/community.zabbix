@@ -31,7 +31,7 @@
     - name: "Apt update"
       shell: "apt-get update && mkdir -p /usr/share/man/man1"
       args:
-        warn: False
+        warn: false
       register: installation_dependencies
       until: installation_dependencies is succeeded
       when:
@@ -49,7 +49,7 @@
           - sudo
           - software-properties-common
           - openjdk-11-jdk
-        update_cache: True
+        update_cache: true
         state: present
       register: installation_dependencies
       until: installation_dependencies is succeeded

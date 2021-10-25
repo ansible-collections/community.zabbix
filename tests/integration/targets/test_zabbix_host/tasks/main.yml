@@ -19,4 +19,4 @@
       login_password: "{{ zabbix_login_password }}"
       host_name: ExampleHost
       state: absent
-    ignore_errors: True
+    ignore_errors: true

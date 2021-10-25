@@ -1,0 +1,20 @@
+---
+# Based on ansible-lint config
+extends: default
+
+rules:
+  braces:
+    max-spaces-inside: 1
+    level: error
+  brackets:
+    max-spaces-inside: 1
+    level: error
+  indentation:
+    spaces: consistent
+    indent-sequences: whatever
+  key-ordering: disable
+  line-length: disable
+  new-lines:
+    type: unix
+  truthy:
+    check-keys: false

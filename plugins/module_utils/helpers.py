@@ -153,7 +153,7 @@ def helper_normalize_data(data, del_keys=None):
         data: dictionary
 
     Returns:
-        data: None parameter removed data
+        data: falsene parameter removed data
         del_keys: deleted keys
     """
     if del_keys is None:

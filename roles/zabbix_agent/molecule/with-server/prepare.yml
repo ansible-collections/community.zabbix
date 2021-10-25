@@ -48,8 +48,8 @@
 
   roles:
     - role: geerlingguy.mysql
-    - role: dj-wasabi.zabbix-server
-    - role: dj-wasabi.zabbix-web
+    - role: zabbix_server
+    - role: zabbix_web
 
 - name: Prepare
   hosts: all:!zabbix_server:!docker

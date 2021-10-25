@@ -1,3 +1,4 @@
+---
 name: "community.zabbix.zabbix_javagateway"
 on:
   push:

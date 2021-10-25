@@ -4,9 +4,9 @@
     PATH=/usr/sbin:$PATH
     set -o pipefail
     apachectl -v | grep 'version' | awk -F '/' '{ print $2 }'| awk '{ print $1 }' | cut -c 1-3
-  changed_when: False
+  changed_when: false
   register: apachectl_version
-  check_mode: no
+  check_mode: false
   args:
     executable: /bin/bash
   tags:
@@ -20,7 +20,7 @@
 
 - name: "Set some"
   set_fact:
-    _zabbix_web_apache_php_addition: True
+    _zabbix_web_apache_php_addition: true
   when:
     - zabbix_version is version('4.4', '<=')
   tags:
@@ -28,7 +28,7 @@
 
 - name: "Set some"
   set_fact:
-    _zabbix_web_apache_php_addition: True
+    _zabbix_web_apache_php_addition: true
   when:
     - ansible_os_family == "Debian"
   tags:

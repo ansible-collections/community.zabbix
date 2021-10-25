@@ -6,8 +6,8 @@
   service:
     name: "zabbix-agent"
     state: stopped
-    enabled: no
-  become: yes
+    enabled: false
+  become: true
   when: |
     ansible_facts.services["zabbix-agent.service"] is defined or
     ansible_facts.services["zabbix-agent"] is defined
@@ -16,10 +16,10 @@
   package:
     name: "zabbix-agent"
     state: absent
-  become: yes
+  become: true
 
 - name: "Remove | Remove the agent-include-dir"
   file:
     path: "{{ zabbix_agent_include }}"
     state: absent
-  become: yes
+  become: true

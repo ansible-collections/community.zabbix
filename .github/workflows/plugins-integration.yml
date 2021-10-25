@@ -1,3 +1,4 @@
+---
 name: plugins-integration
 on:
   push:

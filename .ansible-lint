@@ -1,0 +1,10 @@
+---
+exclude_paths:
+- ${HOME}/.cache/
+
+skip_list:
+- command-instead-of-shell  # Use shell only when shell functionality is required
+- experimental  # all rules tagged as experimental
+- meta-no-info  # meta/main.yml should contain relevant info
+- no-handler  # Tasks that run when changed should likely be handlers
+- unnamed-task  # All tasks should be named

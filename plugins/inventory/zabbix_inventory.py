@@ -213,7 +213,7 @@ options:
       description:
        - If set to False, SSL certificates will not be validated. This should only be used on personally controlled sites using self-signed certificates.
       type: bool
-      default: yes
+      default: true
     add_zabbix_groups:
       description:
        - If set to True, hosts will be added to groups based on their zabbix groups
@@ -236,7 +236,7 @@ host_zapi_query:
   selectApplications: ['name', 'applicationid']
   selectParentTemplates: ['name']
   selectGroups: ['name']
-validate_certs: no
+validate_certs: false
 groups:
   enabled: zbx_status == "0"
   disabled: zbx_status == "1"
@@ -247,7 +247,7 @@ plugin: community.zabbix.zabbix_inventory
 server_url: https://zabbix.com
 login_user: Admin
 login_password: password
-validate_certs: no
+validate_certs: false
 keyed_groups:
   - key: zbx_status | lower
     prefix: 'env'
@@ -261,22 +261,22 @@ server_url: https://zabbix.com
 proxy: http://someproxy:8080
 login_user: Admin
 login_password: password
-validate_certs: no
+validate_certs: false
 
 #Organize inventory groups based on zabbix host groups
 plugin: community.zabbix.zabbix_inventory
 server_url: https://zabbix.com
-add_zabbix_groups: True
+add_zabbix_groups: true
 login_user: Admin
 login_password: password
-validate_certs: no
+validate_certs: false
 
 #Using compose to modify vars
 plugin: community.zabbix.zabbix_inventory
 server_url: https://zabbix.com
 login_user: Admin
 login_password: password
-validate_certs: no
+validate_certs: false
 compose:
   zbx_testvar: zbx_status.replace("1", "Disabled")
 

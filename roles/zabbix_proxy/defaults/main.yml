@@ -3,7 +3,7 @@
 
 zabbix_proxy_version: 5.4
 zabbix_version: "{{ zabbix_proxy_version }}"
-zabbix_selinux: False
+zabbix_selinux: false
 
 # These variables are optional. They specify the version of Zabbix proxy package.
 
@@ -14,7 +14,7 @@ zabbix_selinux: False
 zabbix_repo: zabbix
 zabbix_proxy_apt_priority:
 zabbix_proxy_package_state: present
-zabbix_proxy_install_database_client: True
+zabbix_proxy_install_database_client: true
 zabbix_install_pip_packages: true
 zabbix_repo_yum_schema: https
 zabbix_proxy_conf_mode: "0644"
@@ -45,8 +45,8 @@ zabbix_server_host: 192.168.1.1          # Will be deprecated in 2.0.0
 zabbix_proxy_server: "{{ zabbix_server_host }}"
 zabbix_server_port: 10051          # Will be deprecated in 2.0.0
 zabbix_proxy_serverport: "{{ zabbix_server_port }}"
-zabbix_database_creation: True
-zabbix_database_sqlload: True
+zabbix_database_creation: true
+zabbix_database_sqlload: true
 zabbix_proxy_dbtlsconnect:
 zabbix_proxy_dbtlscafile:
 zabbix_proxy_dbtlscertfile:
@@ -87,7 +87,7 @@ zabbix_proxy_privileged_host: localhost
 zabbix_proxy_localbuffer: 0          # Will be deprecated in 2.0.0
 zabbix_proxy_proxylocalbuffer: "{{ zabbix_proxy_localbuffer }}"
 zabbix_proxy_offlinebuffer: 1          # Will be deprecated in 2.0.0
-zabbix_proxy_proxyofflinebuffer:  "{{ zabbix_proxy_offlinebuffer }}"
+zabbix_proxy_proxyofflinebuffer: "{{ zabbix_proxy_offlinebuffer }}"
 zabbix_proxy_heartbeatfrequency: 60
 zabbix_proxy_configfrequency: 3600
 zabbix_proxy_datasenderfrequency: 1
@@ -130,7 +130,7 @@ zabbix_proxy_include: /etc/zabbix/zabbix_proxy.conf.d
 zabbix_proxy_include_mode: '0755'
 zabbix_proxy_libdir: /usr/lib/zabbix
 zabbix_proxy_loadmodulepath: "{{ zabbix_proxy_libdir }}/modules"
-zabbix_proxy_manage_service: True
+zabbix_proxy_manage_service: true
 zabbix_proxy_statsallowedip: '127.0.0.1'
 
 # TLS settings
@@ -140,7 +140,7 @@ zabbix_proxy_tlscafile:
 zabbix_proxy_tlscrlfile:
 zabbix_proxy_tlsservercertissuer:
 zabbix_proxy_tlsservercertsubject:
-zabbix_proxy_tls_subject: "{{ zabbix_proxy_tlsservercertsubject }}" # FIXME this is not correct and should be removed with 2.0.0, here only to prevent regression
+zabbix_proxy_tls_subject: "{{ zabbix_proxy_tlsservercertsubject }}"      # FIXME this is not correct and should be removed with 2.0.0, here only to prevent regression
 zabbix_proxy_tlscertfile:
 zabbix_proxy_tlskeyfile:
 zabbix_proxy_tlspskidentity:
@@ -159,13 +159,13 @@ zabbix_api_user: Admin
 zabbix_api_pass: zabbix
 zabbix_api_login_user: "{{ zabbix_api_user }}"
 zabbix_api_login_pass: "{{ zabbix_api_pass }}"
-zabbix_api_create_proxy: False
+zabbix_api_create_proxy: false
 zabbix_api_timeout: 30
 zabbix_create_proxy: present  # or absent
 zabbix_proxy_status: active   # or passive
 zabbix_proxy: null
 zabbix_useuip: 1
-zabbix_proxy_become_on_localhost: True
+zabbix_proxy_become_on_localhost: true
 zabbix_proxy_interface:
   useip: "{{ zabbix_useuip }}"
   ip: "{{ zabbix_proxy_ip }}"

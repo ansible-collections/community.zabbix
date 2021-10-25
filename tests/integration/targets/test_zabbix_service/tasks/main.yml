@@ -7,7 +7,7 @@
     name: ExampleServiceForServiceModule
     sla: 99.99
     state: present
-  check_mode: yes
+  check_mode: true
   register: create_service_check_mode_result
 
 - assert:
@@ -50,7 +50,7 @@
     name: ExampleServiceForServiceModule
     sla: 99.999
     state: present
-  check_mode: yes
+  check_mode: true
   register: update_sla_check_mode_result
 
 - assert:
@@ -92,9 +92,9 @@
     login_password: "{{ zabbix_login_password }}"
     name: ExampleServiceForServiceModule
     sla: 99.999
-    calculate_sla: yes
+    calculate_sla: true
     state: present
-  check_mode: yes
+  check_mode: true
   register: update_calculate_sla_check_mode_result
 
 - assert:
@@ -108,7 +108,7 @@
     login_password: "{{ zabbix_login_password }}"
     name: ExampleServiceForServiceModule
     sla: 99.999
-    calculate_sla: yes
+    calculate_sla: true
     state: present
   register: update_calculate_sla_result
 
@@ -123,7 +123,7 @@
     login_password: "{{ zabbix_login_password }}"
     name: ExampleServiceForServiceModule
     sla: 99.999
-    calculate_sla: yes
+    calculate_sla: true
     state: present
   register: update_calculate_sla_idempotency_check_result
 
@@ -143,11 +143,11 @@
     login_password: "{{ zabbix_login_password }}"
     name: ExampleServiceForServiceModule
     sla: 99.999
-    calculate_sla: yes
+    calculate_sla: true
     trigger_host: "Zabbix server"
     trigger_name: "{{ service_example_trigger }}"
     state: present
-  check_mode: yes
+  check_mode: true
   register: update_trigger_name_check_mode_result
 
 - assert:
@@ -161,7 +161,7 @@
     login_password: "{{ zabbix_login_password }}"
     name: ExampleServiceForServiceModule
     sla: 99.999
-    calculate_sla: yes
+    calculate_sla: true
     trigger_host: "Zabbix server"
     trigger_name: "{{ service_example_trigger }}"
     state: present
@@ -178,7 +178,7 @@
     login_password: "{{ zabbix_login_password }}"
     name: ExampleServiceForServiceModule
     sla: 99.999
-    calculate_sla: yes
+    calculate_sla: true
     trigger_host: "Zabbix server"
     trigger_name: "{{ service_example_trigger }}"
     state: present
@@ -195,12 +195,12 @@
     login_password: "{{ zabbix_login_password }}"
     name: ExampleServiceForServiceModule
     sla: 99.999
-    calculate_sla: yes
+    calculate_sla: true
     trigger_host: "Zabbix server"
     trigger_name: "{{ service_example_trigger }}"
     algorithm: all_children
     state: present
-  check_mode: yes
+  check_mode: true
   register: update_algorithm_check_mode_result
 
 - assert:
@@ -214,7 +214,7 @@
     login_password: "{{ zabbix_login_password }}"
     name: ExampleServiceForServiceModule
     sla: 99.999
-    calculate_sla: yes
+    calculate_sla: true
     trigger_host: "Zabbix server"
     trigger_name: "{{ service_example_trigger }}"
     algorithm: all_children
@@ -232,7 +232,7 @@
     login_password: "{{ zabbix_login_password }}"
     name: ExampleServiceForServiceModule
     sla: 99.999
-    calculate_sla: yes
+    calculate_sla: true
     trigger_host: "Zabbix server"
     trigger_name: "{{ service_example_trigger }}"
     algorithm: all_children
@@ -264,13 +264,13 @@
     login_password: "{{ zabbix_login_password }}"
     name: ExampleServiceForServiceModule
     sla: 99.999
-    calculate_sla: yes
+    calculate_sla: true
     trigger_host: "Zabbix server"
     trigger_name: "{{ service_example_trigger }}"
     algorithm: all_children
     parent: ExampleServiceForServiceModuleRoot
     state: present
-  check_mode: yes
+  check_mode: true
   register: create_parent_child_service_check_mode_result
 
 - assert:
@@ -284,7 +284,7 @@
     login_password: "{{ zabbix_login_password }}"
     name: ExampleServiceForServiceModule
     sla: 99.999
-    calculate_sla: yes
+    calculate_sla: true
     trigger_host: "Zabbix server"
     trigger_name: "{{ service_example_trigger }}"
     algorithm: all_children
@@ -303,7 +303,7 @@
     login_password: "{{ zabbix_login_password }}"
     name: ExampleServiceForServiceModule
     sla: 99.999
-    calculate_sla: yes
+    calculate_sla: true
     trigger_host: "Zabbix server"
     trigger_name: "{{ service_example_trigger }}"
     algorithm: all_children
@@ -323,7 +323,7 @@
     name: ExampleServiceForServiceModule
     sla: 99.999
     state: absent
-  check_mode: yes
+  check_mode: true
   register: remove_service_with_check_mode_result
 
 - assert:
@@ -366,7 +366,7 @@
     name: ExampleServiceForServiceModuleRoot
     sla: 99.999
     state: absent
-  check_mode: yes
+  check_mode: true
   register: remove_root_service_with_check_mode_result
 
 - assert:

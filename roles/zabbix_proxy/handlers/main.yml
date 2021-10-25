@@ -5,8 +5,8 @@
   service:
     name: zabbix-proxy
     state: restarted
-    enabled: yes
-  become: yes
+    enabled: true
+  become: true
   when:
     - zabbix_proxy_manage_service | bool
     - zabbix_repo != 'epel'
@@ -15,15 +15,15 @@
   service:
     name: zabbix-proxy-mysql{{ zabbix_proxy_database_long }}
     state: restarted
-    enabled: yes
-  become: yes
+    enabled: true
+  become: true
   when:
     - zabbix_proxy_manage_service | bool
     - zabbix_repo == 'epel'
 
 - name: "clean repo files from proxy creds"
   shell: ls /etc/yum.repos.d/zabbix* && sed -i 's/^proxy =.*//' /etc/yum.repos.d/zabbix* || true
-  become: yes
+  become: true
   when:
     - ansible_os_family == 'RedHat'
     - zabbix_http_proxy is defined or zabbix_https_proxy is defined

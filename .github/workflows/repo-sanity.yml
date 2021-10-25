@@ -1,3 +1,4 @@
+---
 name: repo-sanity
 on:
   push:

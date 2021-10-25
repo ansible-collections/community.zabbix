@@ -53,7 +53,7 @@
   register: zabbix_python_netaddr_package_installed
   until: zabbix_python_netaddr_package_installed is succeeded
   delegate_to: localhost
-  run_once: True
+  run_once: true
   become: "{{ zabbix_agent_become_on_localhost }}"
   when:
     - zabbix_install_pip_packages | bool
