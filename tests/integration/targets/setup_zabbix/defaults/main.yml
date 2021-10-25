@@ -1,4 +1,4 @@
 ---
-zabbix_server_url: http://127.0.0.1:8080
-zabbix_login_user: Admin
-zabbix_login_password: zabbix
+zabbix_api_server_url: http://127.0.0.1:8080
+zabbix_api_login_user: Admin
+zabbix_api_login_pass: zabbix

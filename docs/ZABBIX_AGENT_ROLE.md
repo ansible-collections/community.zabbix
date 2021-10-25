@@ -255,21 +255,21 @@ When `zabbix_api_create_hostgroup` or `zabbix_api_create_hosts` is set to `True`
 * `zabbix_api_server_url`: The url on which the Zabbix webpage is available. Example: http://zabbix.example.com
 * `zabbix_api_http_user`: The http user to access zabbix url with Basic Auth
 * `zabbix_api_http_password`: The http password to access zabbix url with Basic Auth
-* `zabbix_api_create_hosts`: Default: `False`. When you want to enable the Zabbix API to create/delete the host. This has to be set to `True` if you want to make use of `zabbix_create_host`.
-* `zabbix_api_create_hostgroup`: When you want to enable the Zabbix API to create/delete the hostgroups. This has to be set to `True` if you want to make use of `zabbix_create_hostgroup`.Default: `False`
+* `zabbix_api_create_hosts`: Default: `False`. When you want to enable the Zabbix API to create/delete the host. This has to be set to `True` if you want to make use of `zabbix_agent_host_state`.
+* `zabbix_api_create_hostgroup`: When you want to enable the Zabbix API to create/delete the hostgroups. This has to be set to `True` if you want to make use of `zabbix_agent_hostgroups_state`.Default: `False`
 * `zabbix_api_login_user`: Username of user which has API access.
 * `zabbix_api_login_pass`: Password for the user which has API access.
-* `zabbix_create_hostgroup`: present (Default) if the hostgroup needs to be created or absent if you want to delete it. This only works when `zabbix_api_create_hostgroup` is set to `True`.
+* `zabbix_agent_hostgroups_state`: present (Default) if the hostgroup needs to be created or absent if you want to delete it. This only works when `zabbix_api_create_hostgroup` is set to `True`.
 * `zabbix_host_status`: enabled (Default) when host in monitored, disabled when host is disabled for monitoring.
-* `zabbix_create_host`: present (Default) if the host needs to be created or absent is you want to delete it. This only works when `zabbix_api_create_hosts` is set to `True`.
-* `zabbix_update_host`: yes (Default) if the host should be updated if already present. This only works when `zabbix_api_create_hosts` is set to `True`.
+* `zabbix_agent_host_state`: present (Default) if the host needs to be created or absent is you want to delete it. This only works when `zabbix_api_create_hosts` is set to `True`.
+* `zabbix_agent_host_update`: yes (Default) if the host should be updated if already present. This only works when `zabbix_api_create_hosts` is set to `True`.
 * `zabbix_useuip`: 1 if connection to zabbix-agent is made via ip, 0 for fqdn.
 * `zabbix_host_groups`: A list of hostgroups which this host belongs to.
-* `zabbix_link_templates`: A list of templates which needs to be link to this host. The templates should exist.
-* `zabbix_macros`: A list with macro_key and macro_value for creating hostmacro's.
-* `zabbix_inventory_mode`: Configure Zabbix inventory mode. Needed for building inventory data, manually when configuring a host or automatically by using some automatic population options. This has to be set to `automatic` if you want to make automatically building inventory data.
-* `zabbix_visible_hostname` : Configure Zabbix visible name inside Zabbix web UI for the node.
-* `zabbix_validate_certs` : yes (Default) if we need to validate tls certificates of the API. Use `no` in case self-signed certificates are used
+* `zabbix_agent_link_templates`: A list of templates which needs to be link to this host. The templates should exist.
+* `zabbix_agent_macros`: A list with macro_key and macro_value for creating hostmacro's.
+* `zabbix_agent_inventory_mode`: Configure Zabbix inventory mode. Needed for building inventory data, manually when configuring a host or automatically by using some automatic population options. This has to be set to `automatic` if you want to make automatically building inventory data.
+* `zabbix_agent_visible_hostname` : Configure Zabbix visible name inside Zabbix web UI for the node.
+* `zabbix_api_validate_certs` : yes (Default) if we need to validate tls certificates of the API. Use `no` in case self-signed certificates are used
 * `zabbix_agent_description`: Description of the host in Zabbix.
 * `zabbix_agent_inventory_zabbix`: Adds Facts for a zabbix inventory
 
@@ -429,13 +429,13 @@ Including an example of how to use your role (for instance, with variables passe
            zabbix_api_use: true # use zabbix_api_create_hosts and/or zabbix_api_create_hostgroup from 0.8.0
            zabbix_api_login_user: Admin
            zabbix_api_login_pass: zabbix
-           zabbix_create_host: present
+           zabbix_agent_host_state: present
            zabbix_host_groups:
              - Linux Servers
-           zabbix_link_templates:
+           zabbix_agent_link_templates:
              - Template OS Linux
              - Apache APP Template
-           zabbix_macros:
+           zabbix_agent_macros:
              - macro_key: apache_type
                macro_value: reverse_proxy
 ```
@@ -450,13 +450,13 @@ You can also use the group_vars or the host_vars files for setting the variables
     zabbix_api_use: true # use zabbix_api_create_hosts and/or zabbix_api_create_hostgroup from 0.8.0
     zabbix_api_login_user: Admin
     zabbix_api_login_pass: zabbix
-    zabbix_create_host: present
+    zabbix_agent_host_state: present
     zabbix_host_groups:
       - Linux Servers
-    zabbix_link_templates:
+    zabbix_agent_link_templates:
       - Template OS Linux
       - Apache APP Template
-    zabbix_macros:
+    zabbix_agent_macros:
       - macro_key: apache_type
         macro_value: reverse_proxy
 ```
