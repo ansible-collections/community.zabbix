@@ -8,7 +8,7 @@
 
 - name: "Set the correct delegated_dbhost (to support MySQL db deployment on a remote dbhost)"
   set_fact:
-    delegated_dbhost:  "{{ inventory_hostname }}"
+    delegated_dbhost: "{{ inventory_hostname }}"
   when:
     - not zabbix_server_dbhost_run_install
 
@@ -56,7 +56,7 @@
 
 - name: "Get the file for create.sql >= 3.0"
   shell: ls -1 {{ datafiles_path }}/create.sq*
-  changed_when: False
+  changed_when: false
   when:
     - zabbix_version is version('3.0', '>=')
     - zabbix_database_sqlload | bool
@@ -72,8 +72,8 @@
     -p'{{ zabbix_server_dbpassword }}' -D '{{ zabbix_server_dbname }}' \
     -e 'SELECT mandatory FROM dbversion;'
   register: mysql_db_version
-  changed_when: False
-  ignore_errors: True
+  changed_when: false
+  ignore_errors: true
 
 # If the above check failed, then there was no dbversion table in the database.
 # We'll create it, below. Otherwise, we can access the database version in
@@ -92,7 +92,7 @@
   register: mysql_innodb_default_row_format
   args:
     executable: /bin/bash
-  changed_when: False
+  changed_when: false
   become: true
 
 - name: "MySQL | Set innodb_default_row_format to dynamic"
@@ -139,7 +139,7 @@
   fetch:
     src: "{{ ls_output_create.stdout }}"
     dest: /tmp/{{ role_name }}/
-    flat: yes
+    flat: true
   when:
     - delegated_dbhost != inventory_hostname
     - zabbix_database_sqlload | bool
@@ -150,6 +150,7 @@
   copy:
     src: /tmp/{{ role_name }}/
     dest: "{{ ls_output_create.stdout | dirname }}"
+    mode: '0640'
   delegate_to: "{{ delegated_dbhost }}"
   when:
     - delegated_dbhost != inventory_hostname
@@ -203,6 +204,7 @@
   file:
     path: /etc/zabbix/create.done
     state: touch
+    mode: '0644'
   when:
     - zabbix_version is version('3.0', '>=')
     - zabbix_database_sqlload | bool
@@ -211,7 +213,7 @@
 
 - name: "Get the correct path for the SQL files < 3.0"
   shell: ls -1 {{ datafiles_path }}/{{ mysql_create_dir }}{{ item }}.sql*
-  changed_when: False
+  changed_when: false
   register: ls_output_schema
   with_items:
     - schema
@@ -271,6 +273,7 @@
   file:
     path: /etc/zabbix/{{ item }}.done
     state: touch
+    mode: '0644'
   with_items:
     - schema
     - images

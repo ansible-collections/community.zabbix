@@ -7,12 +7,12 @@ zabbix_repo: zabbix
 
 zabbix_server_apt_priority:
 zabbix_server_package_state: present
-zabbix_server_install_recommends: True
-zabbix_server_install_database_client: True
+zabbix_server_install_recommends: true
+zabbix_server_install_database_client: true
 zabbix_server_conf_mode: 0640
 
 zabbix_service_state: started
-zabbix_service_enabled: True
+zabbix_service_enabled: true
 
 zabbix_repo_yum_gpgcheck: 0
 zabbix_repo_yum_schema: https
@@ -41,9 +41,9 @@ zabbix_server_groupname: zabbix
 # Database
 zabbix_server_database: pgsql
 zabbix_server_database_long: postgresql
-zabbix_database_creation: True
-zabbix_database_sqlload: True
-zabbix_database_timescaledb: False
+zabbix_database_creation: true
+zabbix_database_sqlload: true
+zabbix_database_timescaledb: false
 zabbix_server_dbtlsconnect:
 zabbix_server_dbtlscafile:
 zabbix_server_dbtlscertfile:
@@ -140,9 +140,9 @@ zabbix_server_tlskeyfile:
 zabbix_server_startescalators: 1
 zabbix_server_vmwareperffrequency: 60
 zabbix_server_vmwaretimeout: 10
-zabbix_server_manage_service: True
+zabbix_server_manage_service: true
 
 # SELinux specific
-zabbix_selinux: False
-selinux_allow_zabbix_can_network: False
-selinux_allow_zabbix_can_http: False
+zabbix_selinux: false
+selinux_allow_zabbix_can_network: false
+selinux_allow_zabbix_can_http: false

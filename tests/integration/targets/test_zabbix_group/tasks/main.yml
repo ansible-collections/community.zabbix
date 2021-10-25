@@ -69,7 +69,7 @@
       - zbxgrp_example_group01
     state: absent
   register: zbxgrp_existing_delete_failed
-  ignore_errors: True
+  ignore_errors: true
 
 - name: assert that group deletion failed
   assert:

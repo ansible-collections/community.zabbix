@@ -8,10 +8,10 @@
   stat:
     path: "{{ zabbix_agent2_tlspskfile }}"
   register: zabbix_agent2_tlspskcheck
-  become: yes
+  become: true
 
 - name: AutoPSK | Check for existing TLS PSK identity (Linux)
   stat:
     path: "{{ zabbix_agent2_tlspskidentity_file }}"
   register: zabbix_agent2_tlspskidentity_check
-  become: yes
+  become: true

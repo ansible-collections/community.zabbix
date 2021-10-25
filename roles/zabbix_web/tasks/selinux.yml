@@ -10,7 +10,7 @@
     https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   register: zabbix_web_dependencies_installed
   until: zabbix_web_dependencies_installed is succeeded
-  become: yes
+  become: true
   when:
     - ansible_os_family == "RedHat"
     - selinux_allow_zabbix_can_network
@@ -28,7 +28,7 @@
     https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   register: zabbix_web_dependencies_installed
   until: zabbix_web_dependencies_installed is succeeded
-  become: yes
+  become: true
   when:
     - ansible_os_family == "RedHat"
     - selinux_allow_zabbix_can_network
@@ -39,9 +39,9 @@
 - name: "SELinux | RedHat | Enable zabbix_can_network SELinux boolean"
   ansible.posix.seboolean:
     name: zabbix_can_network
-    state: yes
-    persistent: yes
-  become: yes
+    state: true
+    persistent: true
+  become: true
   when:
     - ansible_os_family == "RedHat"
     - selinux_allow_zabbix_can_network
@@ -51,9 +51,9 @@
 - name: "SELinux | Allow httpd to connect to db (SELinux)"
   ansible.posix.seboolean:
     name: httpd_can_network_connect_db
-    persistent: yes
-    state: yes
-  become: yes
+    persistent: true
+    state: true
+  become: true
   when:
     - ansible_selinux.status == "enabled"
     - selinux_allow_zabbix_can_network
@@ -62,9 +62,9 @@
 - name: "SELinux | Allow httpd to connect to zabbix (SELinux)"
   ansible.posix.seboolean:
     name: httpd_can_connect_zabbix
-    persistent: yes
-    state: yes
-  become: yes
+    persistent: true
+    state: true
+  become: true
   when:
     - ansible_selinux.status == "enabled"
     - selinux_allow_zabbix_can_network
@@ -73,9 +73,9 @@
 - name: "SELinux | Allow httpd to connect to ldap (SELinux)"
   ansible.posix.seboolean:
     name: httpd_can_connect_ldap
-    persistent: yes
-    state: yes
-  become: yes
+    persistent: true
+    state: true
+  become: true
   when:
     - ansible_selinux.status == "enabled"
     - zabbix_apache_can_connect_ldap | bool

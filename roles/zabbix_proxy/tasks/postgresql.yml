@@ -28,8 +28,8 @@
         port: "{{ zabbix_proxy_dbport }}"
         priv: ALL
         state: present
-        encrypted: yes
-  become: yes
+        encrypted: true
+  become: true
   become_user: postgres
   delegate_to: "{{ delegated_dbhost }}"
   when:
@@ -61,7 +61,7 @@
         port: "{{ zabbix_proxy_dbport }}"
         priv: ALL
         state: present
-        encrypted: yes
+        encrypted: true
   when:
     - zabbix_database_creation
     - zabbix_proxy_pgsql_login_host is defined

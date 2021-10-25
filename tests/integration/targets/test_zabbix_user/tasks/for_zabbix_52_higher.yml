@@ -11,8 +11,8 @@
     usrgrps:
       - Guests
     passwd: password
-  check_mode: yes
-  diff: yes
+  check_mode: true
+  diff: true
   register: create_zabbix_user_result
 
 - assert:
@@ -89,13 +89,13 @@
         sendto: example@example.com
         period: 1-7,00:00-24:00
         severity:
-          not_classified: no
-          information: yes
-          warning: yes
-          average: yes
-          high: yes
-          disaster: yes
-        active: yes
+          not_classified: false
+          information: true
+          warning: true
+          average: true
+          high: true
+          disaster: true
+        active: true
   register: add_user_medias_to_existing_user_result
 
 - assert:
@@ -119,24 +119,24 @@
         sendto: example@example.com
         period: 1-7,00:00-24:00
         severity:
-          not_classified: no
-          information: yes
-          warning: yes
-          average: yes
-          high: yes
-          disaster: yes
-        active: yes
+          not_classified: false
+          information: true
+          warning: true
+          average: true
+          high: true
+          disaster: true
+        active: true
       - mediatype: SMS
         sendto: example@example.com
         period: 1-5,01:00-23:00
         severity:
-          not_classified: no
-          information: yes
-          warning: yes
-          average: no
-          high: yes
-          disaster: yes
-        active: yes
+          not_classified: false
+          information: true
+          warning: true
+          average: false
+          high: true
+          disaster: true
+        active: true
   register: add_user_medias_to_existing_user_result
 
 - assert:
@@ -156,30 +156,30 @@
       - Guests
       - Zabbix administrators
     passwd: update_password
-    override_passwd: yes
+    override_passwd: true
     user_medias:
       - mediatype: Email
         sendto: example@example.com
         period: 1-7,00:00-24:00
         severity:
-          not_classified: no
-          information: yes
-          warning: yes
-          average: yes
-          high: yes
-          disaster: yes
-        active: yes
+          not_classified: false
+          information: true
+          warning: true
+          average: true
+          high: true
+          disaster: true
+        active: true
       - mediatype: SMS
         sendto: example@example.com
         period: 1-5,01:00-23:00
         severity:
-          not_classified: no
-          information: yes
-          warning: yes
-          average: no
-          high: yes
-          disaster: yes
-        active: yes
+          not_classified: false
+          information: true
+          warning: true
+          average: false
+          high: true
+          disaster: true
+        active: true
   register: update_password_parameter_existing_user_result
 
 - assert:
@@ -198,30 +198,30 @@
       - Guests
       - Zabbix administrators
     passwd: update_password
-    autologin: yes
+    autologin: true
     user_medias:
       - mediatype: Email
         sendto: example@example.com
         period: 1-7,00:00-24:00
         severity:
-          not_classified: no
-          information: yes
-          warning: yes
-          average: yes
-          high: yes
-          disaster: yes
-        active: yes
+          not_classified: false
+          information: true
+          warning: true
+          average: true
+          high: true
+          disaster: true
+        active: true
       - mediatype: SMS
         sendto: example@example.com
         period: 1-5,01:00-23:00
         severity:
-          not_classified: no
-          information: yes
-          warning: yes
-          average: no
-          high: yes
-          disaster: yes
-        active: yes
+          not_classified: false
+          information: true
+          warning: true
+          average: false
+          high: true
+          disaster: true
+        active: true
   register: update_autologin_parameter_existing_user_result
 
 - assert:
@@ -246,24 +246,24 @@
         sendto: example@example.com
         period: 1-7,00:00-24:00
         severity:
-          not_classified: no
-          information: yes
-          warning: yes
-          average: yes
-          high: yes
-          disaster: yes
-        active: yes
+          not_classified: false
+          information: true
+          warning: true
+          average: true
+          high: true
+          disaster: true
+        active: true
       - mediatype: SMS
         sendto: example@example.com
         period: 1-5,01:00-23:00
         severity:
-          not_classified: no
-          information: yes
-          warning: yes
-          average: no
-          high: yes
-          disaster: yes
-        active: yes
+          not_classified: false
+          information: true
+          warning: true
+          average: false
+          high: true
+          disaster: true
+        active: true
   register: update_autologout_parameter_existing_user_result
 
 - assert:
@@ -289,24 +289,24 @@
         sendto: example@example.com
         period: 1-7,00:00-24:00
         severity:
-          not_classified: no
-          information: yes
-          warning: yes
-          average: yes
-          high: yes
-          disaster: yes
-        active: yes
+          not_classified: false
+          information: true
+          warning: true
+          average: true
+          high: true
+          disaster: true
+        active: true
       - mediatype: SMS
         sendto: example@example.com
         period: 1-5,01:00-23:00
         severity:
-          not_classified: no
-          information: yes
-          warning: yes
-          average: no
-          high: yes
-          disaster: yes
-        active: yes
+          not_classified: false
+          information: true
+          warning: true
+          average: false
+          high: true
+          disaster: true
+        active: true
   register: update_refresh_parameter_existing_user_result
 
 - assert:
@@ -333,24 +333,24 @@
         sendto: example@example.com
         period: 1-7,00:00-24:00
         severity:
-          not_classified: no
-          information: yes
-          warning: yes
-          average: yes
-          high: yes
-          disaster: yes
-        active: yes
+          not_classified: false
+          information: true
+          warning: true
+          average: true
+          high: true
+          disaster: true
+        active: true
       - mediatype: SMS
         sendto: example@example.com
         period: 1-5,01:00-23:00
         severity:
-          not_classified: no
-          information: yes
-          warning: yes
-          average: no
-          high: yes
-          disaster: yes
-        active: yes
+          not_classified: false
+          information: true
+          warning: true
+          average: false
+          high: true
+          disaster: true
+        active: true
   register: update_rows_per_page_parameter_existing_user_result
 
 - assert:
@@ -378,24 +378,24 @@
         sendto: example@example.com
         period: 1-7,00:00-24:00
         severity:
-          not_classified: no
-          information: yes
-          warning: yes
-          average: yes
-          high: yes
-          disaster: yes
-        active: yes
+          not_classified: false
+          information: true
+          warning: true
+          average: true
+          high: true
+          disaster: true
+        active: true
       - mediatype: SMS
         sendto: example@example.com
         period: 1-5,01:00-23:00
         severity:
-          not_classified: no
-          information: yes
-          warning: yes
-          average: no
-          high: yes
-          disaster: yes
-        active: yes
+          not_classified: false
+          information: true
+          warning: true
+          average: false
+          high: true
+          disaster: true
+        active: true
   register: update_after_login_url_parameter_existing_user_result
 
 - assert:
@@ -424,24 +424,24 @@
         sendto: example@example.com
         period: 1-7,00:00-24:00
         severity:
-          not_classified: no
-          information: yes
-          warning: yes
-          average: yes
-          high: yes
-          disaster: yes
-        active: yes
+          not_classified: false
+          information: true
+          warning: true
+          average: true
+          high: true
+          disaster: true
+        active: true
       - mediatype: SMS
         sendto: example@example.com
         period: 1-5,01:00-23:00
         severity:
-          not_classified: no
-          information: yes
-          warning: yes
-          average: no
-          high: yes
-          disaster: yes
-        active: yes
+          not_classified: false
+          information: true
+          warning: true
+          average: false
+          high: true
+          disaster: true
+        active: true
   loop:
     - blue-theme
     - dark-theme
@@ -475,24 +475,24 @@
         sendto: example@example.com
         period: 1-7,00:00-24:00
         severity:
-          not_classified: no
-          information: yes
-          warning: yes
-          average: yes
-          high: yes
-          disaster: yes
-        active: yes
+          not_classified: false
+          information: true
+          warning: true
+          average: true
+          high: true
+          disaster: true
+        active: true
       - mediatype: SMS
         sendto: example@example.com
         period: 1-5,01:00-23:00
         severity:
-          not_classified: no
-          information: yes
-          warning: yes
-          average: no
-          high: yes
-          disaster: yes
-        active: yes
+          not_classified: false
+          information: true
+          warning: true
+          average: false
+          high: true
+          disaster: true
+        active: true
   loop:
     - Guest role
     - Admin role
@@ -527,24 +527,24 @@
         sendto: example@example.com
         period: 1-7,00:00-24:00
         severity:
-          not_classified: no
-          information: yes
-          warning: yes
-          average: yes
-          high: yes
-          disaster: yes
-        active: yes
+          not_classified: false
+          information: true
+          warning: true
+          average: true
+          high: true
+          disaster: true
+        active: true
       - mediatype: SMS
         sendto: example@example.com
         period: 1-5,01:00-23:00
         severity:
-          not_classified: no
-          information: yes
-          warning: yes
-          average: no
-          high: yes
-          disaster: yes
-        active: yes
+          not_classified: false
+          information: true
+          warning: true
+          average: false
+          high: true
+          disaster: true
+        active: true
   register: update_lang_parameter_existing_user_result
 
 - assert:
@@ -576,24 +576,24 @@
         sendto: example@example.com
         period: 1-7,00:00-24:00
         severity:
-          not_classified: no
-          information: yes
-          warning: yes
-          average: yes
-          high: yes
-          disaster: yes
-        active: yes
+          not_classified: false
+          information: true
+          warning: true
+          average: true
+          high: true
+          disaster: true
+        active: true
       - mediatype: SMS
         sendto: example@example.com
         period: 1-5,01:00-23:00
         severity:
-          not_classified: no
-          information: yes
-          warning: yes
-          average: no
-          high: yes
-          disaster: yes
-        active: yes
+          not_classified: false
+          information: true
+          warning: true
+          average: false
+          high: true
+          disaster: true
+        active: true
   register: update_timezone_parameter_existing_user_result
 
 - assert:
@@ -625,24 +625,24 @@
         sendto: example@example.com
         period: 1-7,00:00-24:00
         severity:
-          not_classified: no
-          information: yes
-          warning: yes
-          average: yes
-          high: yes
-          disaster: yes
-        active: yes
+          not_classified: false
+          information: true
+          warning: true
+          average: true
+          high: true
+          disaster: true
+        active: true
       - mediatype: SMS
         sendto: example@example.com
         period: 1-5,01:00-23:00
         severity:
-          not_classified: no
-          information: yes
-          warning: yes
-          average: no
-          high: yes
-          disaster: yes
-        active: yes
+          not_classified: false
+          information: true
+          warning: true
+          average: false
+          high: true
+          disaster: true
+        active: true
   register: update_name_and_surname_parameter_existing_user_result
 
 - assert:
@@ -674,26 +674,26 @@
         sendto: example@example.com
         period: 1-7,00:00-24:00
         severity:
-          not_classified: no
-          information: yes
-          warning: yes
-          average: yes
-          high: yes
-          disaster: yes
-        active: yes
+          not_classified: false
+          information: true
+          warning: true
+          average: true
+          high: true
+          disaster: true
+        active: true
       - mediatype: SMS
         sendto: example@example.com
         period: 1-5,01:00-23:00
         severity:
-          not_classified: no
-          information: yes
-          warning: yes
-          average: no
-          high: yes
-          disaster: yes
-        active: yes
-  check_mode: yes
-  diff: yes
+          not_classified: false
+          information: true
+          warning: true
+          average: false
+          high: true
+          disaster: true
+        active: true
+  check_mode: true
+  diff: true
   register: update_lang_parameter_existing_user_with_check_mode_diff_result
 
 - assert:
@@ -725,24 +725,24 @@
         sendto: example@example.com
         period: 1-7,00:00-24:00
         severity:
-          not_classified: no
-          information: yes
-          warning: yes
-          average: yes
-          high: yes
-          disaster: yes
-        active: yes
+          not_classified: false
+          information: true
+          warning: true
+          average: true
+          high: true
+          disaster: true
+        active: true
       - mediatype: SMS
         sendto: example@example.com
         period: 1-5,01:00-23:00
         severity:
-          not_classified: no
-          information: yes
-          warning: yes
-          average: no
-          high: yes
-          disaster: yes
-        active: yes
+          not_classified: false
+          information: true
+          warning: true
+          average: false
+          high: true
+          disaster: true
+        active: true
   register: update_lang_parameter_existing_user_result
 
 - assert:
@@ -774,24 +774,24 @@
         sendto: example@example.com
         period: 1-7,00:00-24:00
         severity:
-          not_classified: no
-          information: yes
-          warning: yes
-          average: yes
-          high: yes
-          disaster: yes
-        active: yes
+          not_classified: false
+          information: true
+          warning: true
+          average: true
+          high: true
+          disaster: true
+        active: true
       - mediatype: SMS
         sendto: example@example.com
         period: 1-5,01:00-23:00
         severity:
-          not_classified: no
-          information: yes
-          warning: yes
-          average: no
-          high: yes
-          disaster: yes
-        active: yes
+          not_classified: false
+          information: true
+          warning: true
+          average: false
+          high: true
+          disaster: true
+        active: true
   register: update_lang_parameter_existing_user_result
 
 - assert:
@@ -824,15 +824,15 @@
         sendto: example@example.com
         period: 1-7,00:00-24:00
         severity:
-          not_classified: no
-          information: yes
-          warning: yes
-          average: yes
-          high: yes
-          disaster: yes
-        active: yes
-  check_mode: yes
-  diff: yes
+          not_classified: false
+          information: true
+          warning: true
+          average: true
+          high: true
+          disaster: true
+        active: true
+  check_mode: true
+  diff: true
   register: delete_user_medias_existing_user_result
 
 - assert:
@@ -864,13 +864,13 @@
         sendto: example@example.com
         period: 1-7,00:00-24:00
         severity:
-          not_classified: no
-          information: yes
-          warning: yes
-          average: yes
-          high: yes
-          disaster: yes
-        active: yes
+          not_classified: false
+          information: true
+          warning: true
+          average: true
+          high: true
+          disaster: true
+        active: true
   register: delete_user_medias_existing_user_result
 
 - assert:
@@ -901,13 +901,13 @@
         sendto: example@example.com
         period: 1-7,00:00-24:00
         severity:
-          not_classified: no
-          information: yes
-          warning: yes
-          average: yes
-          high: yes
-          disaster: yes
-        active: yes
+          not_classified: false
+          information: true
+          warning: true
+          average: true
+          high: true
+          disaster: true
+        active: true
   register: delete_user_group_existing_user_result
 
 - assert:
@@ -946,8 +946,8 @@
     login_password: "{{ zabbix_login_password }}"
     alias: example1
     state: absent
-  check_mode: yes
-  diff: yes
+  check_mode: true
+  diff: true
   register: delete_existing_user_result
 
 - assert:
@@ -993,7 +993,7 @@
       usrgrps:
         - Guests
     register: create_zabbix_user_ldap_fail
-    ignore_errors: True
+    ignore_errors: true
 
   - assert:
       that:
@@ -1025,7 +1025,7 @@
       usrgrps:
         - Guests
     register: create_zabbix_user_ldap_fail
-    ignore_errors: True
+    ignore_errors: true
 
   - assert:
       that:

@@ -42,7 +42,7 @@
 
 - name: "Windows | Set facts current zabbix agent installation"
   set_fact:
-    zabbix_agent_1_binary_exist: True
+    zabbix_agent_1_binary_exist: true
     zabbix_agent_1_version: zabbix_win_exe_info.results[0].win_file_version.product_version
   when:
     - zabbix_win_exe_info.results[0] is defined
@@ -52,7 +52,7 @@
 
 - name: "Windows | Set facts current zabbix agent installation (agent 2)"
   set_fact:
-    zabbix_agent_2_binary_exist: True
+    zabbix_agent_2_binary_exist: true
     zabbix_agent_2_version: zabbix_win_exe_info.results[1].win_file_version.product_version
   when:
     - zabbix_win_exe_info.results[1] is defined
@@ -86,10 +86,14 @@
 - name: "Windows | Set fact about version change requirement"
   set_fact:
     zabbix_agent_version_change: true
-  when: (zabbix_agent_1_binary_exist | default(false) and zabbix_win_exe_info.results[0].win_file_version.product_version is version(zabbix_version_long, '<>')) or
-        (zabbix_agent_2_binary_exist | default(false) and zabbix_win_exe_info.results[1].win_file_version.product_version is version(zabbix_version_long, '<>')) or
-        (zabbix_agent_1_binary_exist | default(false) and zabbix_agent2) or
-        (zabbix_agent_2_binary_exist | default(false) and not zabbix_agent2)
+  when: >
+    (zabbix_agent_1_binary_exist | default(false) and
+     zabbix_win_exe_info.results[0].win_file_version.product_version is version(zabbix_version_long, '<>'))
+    or
+    (zabbix_agent_2_binary_exist | default(false) and
+     zabbix_win_exe_info.results[1].win_file_version.product_version is version(zabbix_version_long, '<>'))
+    or (zabbix_agent_1_binary_exist | default(false) and zabbix_agent2)
+    or (zabbix_agent_2_binary_exist | default(false) and not zabbix_agent2)
 
 ##################
 # delete section #
@@ -175,9 +179,9 @@
   ansible.windows.win_get_url:
     url: "{{ zabbix_win_download_link }}"
     dest: '{{ zabbix_win_install_dir }}\{{ zabbix_win_package }}'
-    url_username: "{{zabbix_download_user|default(omit)}}"
-    url_password: "{{zabbix_download_pass|default(omit)}}"
-    force: False
+    url_username: "{{ zabbix_download_user | default(omit) }}"
+    url_password: "{{ zabbix_download_pass | default(omit) }}"
+    force: false
     follow_redirects: all
     proxy_url: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
     validate_certs: "{{ zabbix_download_validate_certs | default(False) | bool }}"
@@ -209,13 +213,12 @@
 
 - name: "Windows | Register Service"
   ansible.windows.win_command: '"{{ zabbix_win_exe_path }}" --config "{{ zabbix_win_install_dir }}\{{ zabbix_win_config_name }}" --install'
-  when: not zabbix_windows_service.exists
+  when: falset zabbix_windows_service.exists
 
 - name: "Windows | Set service startup mode to auto, ensure it is started and set auto-recovery"
   ansible.windows.win_service:
     name: "{{ zabbix_win_svc_name }}"
     start_mode: auto
-    #state: started
     failure_actions:
     - type: restart
       delay_ms: 5000

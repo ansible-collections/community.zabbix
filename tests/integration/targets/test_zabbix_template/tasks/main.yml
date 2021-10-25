@@ -10,7 +10,7 @@
       - 'Templates'
     state: present
   register: create_zabbix_template_result
-  check_mode: yes
+  check_mode: true
 
 - assert:
     that:

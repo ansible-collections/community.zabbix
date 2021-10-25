@@ -44,7 +44,7 @@
     login_password: "{{ zabbix_login_password }}"
     template_name: ExampleTemplateForTempleteInfoModule
     format: json
-    omit_date: yes
+    omit_date: true
   register: fetch_template_json_format_omit_date_result
 
 - assert:
@@ -76,7 +76,7 @@
     login_password: "{{ zabbix_login_password }}"
     template_name: ExampleTemplateForTempleteInfoModule
     format: xml
-    omit_date: yes
+    omit_date: true
   register: fetch_template_xml_format_omit_date_result
 
 - assert:

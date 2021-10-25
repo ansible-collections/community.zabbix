@@ -60,13 +60,13 @@
     baseurl: "{{ item.baseurl }}"
     gpgcheck: "{{ item.gpgcheck }}"
     gpgkey: "{{ item.gpgkey }}"
-    mode:  "{{ item.mode | default('0644') }}"
+    mode: "{{ item.mode | default('0644') }}"
     priority: "{{ item.priority | default('99') }}"
     state: "{{ item.state | default('present') }}"
     proxy: "{{ zabbix_http_proxy | default(omit) }}"
   with_items: "{{ zabbix_repo_yum }}"
   register: yum_repo_installed
-  become: yes
+  become: true
   when:
     zabbix_repo == "zabbix"
   notify:
@@ -77,9 +77,9 @@
 - name: "Do a yum clean"
   shell: yum clean all
   args:
-    warn: False
+    warn: false
   when: yum_repo_installed.changed
-  become: yes
+  become: true
   tags:
     - skip_ansible_lint
 
@@ -95,12 +95,12 @@
     https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   register: zabbix_agent_package_installed
   until: zabbix_agent_package_installed is succeeded
-  become: yes
+  become: true
   tags:
     - init
     - zabbix-agent
 
-- name: "RedHat | Installing zabbix-{sender,get}}"
+- name: "RedHat | Installing zabbix-{sender,get}"
   package:
     pkg:
       - "{{ zabbix_sender_package }}-{{ zabbix_agent_version }}.*"
@@ -116,7 +116,7 @@
   when:
     - zabbix_repo != 'epel'
     - not zabbix_agent_install_agent_only
-  become: yes
+  become: true
   tags:
     - init
     - zabbix-agent
@@ -124,9 +124,9 @@
 - name: "RedHat | Enable the service"
   service:
     name: "{{ zabbix_agent_service }}"
-    enabled: yes
+    enabled: true
     use: service
-  become: yes
+  become: true
   tags:
     - zabbix-agent
     - init

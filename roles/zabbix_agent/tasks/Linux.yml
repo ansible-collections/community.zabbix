@@ -92,7 +92,7 @@
     name: zabbix
     state: present
     gid: "{{ zabbix_agent_docker_user_gid | default(omit) }}"
-  become: yes
+  become: true
   when:
     - zabbix_agent_docker | bool
 
@@ -101,11 +101,11 @@
     name: zabbix
     group: zabbix
     state: present
-    create_home: False
+    create_home: false
     home: /etc/zabbix
     uid: "{{ zabbix_agent_docker_user_uid | default(omit) }}"
-    system: True
-  become: yes
+    system: true
+  become: true
   when:
     - zabbix_agent_docker | bool
 
@@ -118,7 +118,7 @@
     mode: "{{ zabbix_agent_conf_mode }}"
   notify:
     - restart zabbix-agent
-  become: yes
+  become: true
   when:
     - not (zabbix_agent_docker | bool)
   tags:
@@ -131,7 +131,7 @@
     path: "{{ zabbix_agent_tlspskfile | dirname }}"
     mode: 0755
     state: directory
-  become: yes
+  become: true
   when:
     - zabbix_agent_tlspskfile is defined
     - not zabbix_agent2
@@ -141,7 +141,7 @@
     path: "{{ zabbix_agent2_tlspskfile | dirname }}"
     mode: 0755
     state: directory
-  become: yes
+  become: true
   when:
     - zabbix_agent2_tlspskfile is defined
     - zabbix_agent2
@@ -153,7 +153,7 @@
     owner: zabbix
     group: zabbix
     mode: 0400
-  become: yes
+  become: true
   when:
     - zabbix_agent_tlspskfile is defined
     - zabbix_agent_tlspsk_secret is defined
@@ -168,7 +168,7 @@
     owner: zabbix
     group: zabbix
     mode: 0400
-  become: yes
+  become: true
   when:
     - zabbix_agent2_tlspskfile is defined
     - zabbix_agent2_tlspsk_secret is defined
@@ -183,7 +183,7 @@
     group: zabbix
     mode: "{{ zabbix_agent_include_mode if not zabbix_agent2 else zabbix_agent2_include_mode }}"
     state: directory
-  become: yes
+  become: true
   tags:
     - config
     - include
@@ -208,8 +208,8 @@
   service:
     name: "{{ zabbix_agent_service }}"
     state: started
-    enabled: yes
-  become: yes
+    enabled: true
+  become: true
   when:
     - not (zabbix_agent_docker | bool)
   tags:
