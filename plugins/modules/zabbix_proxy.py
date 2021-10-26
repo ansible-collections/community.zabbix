@@ -306,6 +306,12 @@ class Proxy(ZabbixBase):
                 if len(new_interface) > 0:
                     parameters['interface'] = new_interface
 
+            if 'tls_psk_identity' in data:
+                parameters['tls_psk_identity'] = data['tls_psk_identity']
+
+            if 'tls_psk' in data:
+                parameters['tls_psk'] = data['tls_psk']
+
             if len(parameters) > 1:
                 self._zapi.proxy.update(parameters)
                 self._module.exit_json(
