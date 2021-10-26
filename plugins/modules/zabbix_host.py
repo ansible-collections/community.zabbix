@@ -836,7 +836,7 @@ class Host(ZabbixBase):
             if tls_psk is not None and 'tls_psk' in host:
                 if host['tls_psk'] != tls_psk:
                     return True
-￼
+
         if tls_issuer is not None and 'tls_issuer' in host:
             if host['tls_issuer'] != tls_issuer:
                 return True
