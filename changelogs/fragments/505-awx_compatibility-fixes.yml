@@ -1,0 +1,7 @@
+---
+bugfixes:
+  - Change default value for host_zapi_query from list "[]" to dict "{}"
+minor_changes:
+  - Added requirements.txt to collection root to be used with Ansible Builder.
+    See https://ansible-builder.readthedocs.io/en/latest/collection_metadata.html
+  - Enabled the usage of environment variables in zabbix inventory plugin
