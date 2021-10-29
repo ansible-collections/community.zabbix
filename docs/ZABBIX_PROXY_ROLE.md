@@ -326,10 +326,10 @@ When `zabbix_api_create_proxy` is set to `True`, it will install on the host exe
 * `zabbix_api_server_url`: The url on which the Zabbix webpage is available. Example: http://zabbix.example.com
 * `zabbix_api_http_user`: The http user to access zabbix url with Basic Auth
 * `zabbix_api_http_password`: The http password to access zabbix url with Basic Auth
-* `zabbix_api_create_proxy`: When you want to enable the Zabbix API to create/delete the proxy. This has to be set to `True` if you want to make use of `zabbix_create_proxy`. Default: `False`
+* `zabbix_api_create_proxy`: When you want to enable the Zabbix API to create/delete the proxy. This has to be set to `True` if you want to make use of `zabbix_proxy_state`. Default: `False`
 * `zabbix_api_login_user`: Username of user which has API access.
 * `zabbix_api_login_pass`: Password for the user which has API access.
-* `zabbix_create_proxy`: present (Default) if the proxy needs to be created or absent if you want to delete it. This only works when `zabbix_api_create_proxy` is set to `True`.
+* `zabbix_proxy_state`: present (Default) if the proxy needs to be created or absent if you want to delete it. This only works when `zabbix_api_create_proxy` is set to `True`.
 * `zabbix_proxy_status`: active (Default) if the proxy needs to be active or passive.
 * `zabbix_api_timeout`: timeout for API calls (default to 30 seconds)
 

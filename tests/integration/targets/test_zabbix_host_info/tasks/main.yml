@@ -1,9 +1,9 @@
 ---
 - name: "test - Prepare host for zabbix_host_info module"
   zabbix_host:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     host_name: ExampleHostForHostInfoModule
     visible_name: ExampleHostForHostInfoModuleName
     description: Test Host
@@ -34,9 +34,9 @@
 - name: "test - Set default parameters to zabbix_host_info"
   module_defaults:
     community.zabbix.zabbix_host_info:
-      server_url: "{{ zabbix_server_url }}"
-      login_user: "{{ zabbix_login_user }}"
-      login_password: "{{ zabbix_login_password }}"
+      server_url: "{{ zabbix_api_server_url }}"
+      login_user: "{{ zabbix_api_login_user }}"
+      login_password: "{{ zabbix_api_login_pass }}"
       host_name: ExampleHostForHostInfoModule
 
   block:
