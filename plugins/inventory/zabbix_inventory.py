@@ -316,22 +316,10 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         os.environ['https_proxy'] = proxy
         os.environ['HTTPS_PROXY'] = proxy
 
-        server_url = os.environ.get('ZABBIX_SERVER')
-        if not server_url and self.has_option('server_url'):
-            server_url = self.get_option('server_url')
-
-        http_login_user = os.environ.get('ZABBIX_USERNAME')
-        if not http_login_user and self.has_option('login_user'):
-            http_login_user = self.get_option('login_user')
-
-        http_login_password = os.environ.get('ZABBIX_PASSWORD')
-        if not http_login_password and self.has_option('login_password'):
-            http_login_password = self.get_option('login_password')
-
-        validate_certs = os.environ.get('ZABBIX_VALIDATE_CERTS')
-        if not validate_certs and self.has_option('validate_certs'):
-            validate_certs = self.get_option('validate_certs')
-
+        server_url = self.get_option('server_url')
+        http_login_user = self.get_option('login_user')
+        http_login_password = self.get_option('login_password')
+        validate_certs = self.get_option('validate_certs')
         timeout = self.get_option('timeout')
         self._zapi = ZabbixAPI(server_url, timeout=timeout, user=http_login_user, passwd=http_login_password, validate_certs=validate_certs)
         self.login()
