@@ -5,9 +5,9 @@
 
 - name: test - prepare example template for zabbix_action module
   zabbix_template:
-    server_url: "{{ zabbix_server_url }} "
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }} "
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     template_name: ExampleTemplateForActionModule
     template_groups:
       - Templates
@@ -16,9 +16,9 @@
 
 - name: test - prepare example mediatype for zabbix_action module
   zabbix_mediatype:
-    server_url: "{{ zabbix_server_url }} "
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }} "
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     name: ExampleMediaTypeForActionModule
     smtp_email: zabbix@example.com
     type: email
@@ -28,9 +28,9 @@
 - name: test - simple actions
   module_defaults:
     community.zabbix.zabbix_action:
-      server_url: "{{ zabbix_server_url }}"
-      login_user: "{{ zabbix_login_user }}"
-      login_password: "{{ zabbix_login_password }}"
+      server_url: "{{ zabbix_api_server_url }}"
+      login_user: "{{ zabbix_api_login_user }}"
+      login_password: "{{ zabbix_api_login_pass }}"
       state: present
       status: enabled
       name: ExampleTriggerAction
@@ -256,9 +256,9 @@
 - name: test - trigger actions with conditions
   module_defaults:
     community.zabbix.zabbix_action:
-      server_url: "{{ zabbix_server_url }}"
-      login_user: "{{ zabbix_login_user }}"
-      login_password: "{{ zabbix_login_password }}"
+      server_url: "{{ zabbix_api_server_url }}"
+      login_user: "{{ zabbix_api_login_user }}"
+      login_password: "{{ zabbix_api_login_pass }}"
       state: present
       status: enabled
       name: ExampleTriggerActionConditions
@@ -508,9 +508,9 @@
 - name: test - trigger actions with operations
   module_defaults:
     community.zabbix.zabbix_action:
-      server_url: "{{ zabbix_server_url }}"
-      login_user: "{{ zabbix_login_user }}"
-      login_password: "{{ zabbix_login_password }}"
+      server_url: "{{ zabbix_api_server_url }}"
+      login_user: "{{ zabbix_api_login_user }}"
+      login_password: "{{ zabbix_api_login_pass }}"
       state: present
       status: enabled
       name: ExampleTriggerActionOperations
@@ -660,9 +660,9 @@
 - name: test - discovery actions
   module_defaults:
     community.zabbix.zabbix_action:
-      server_url: "{{ zabbix_server_url }}"
-      login_user: "{{ zabbix_login_user }}"
-      login_password: "{{ zabbix_login_password }}"
+      server_url: "{{ zabbix_api_server_url }}"
+      login_user: "{{ zabbix_api_login_user }}"
+      login_password: "{{ zabbix_api_login_pass }}"
       state: present
       status: enabled
       name: ExampleDiscoveryActionOperations
@@ -821,9 +821,9 @@
 - name: test - auto registration actions
   module_defaults:
     community.zabbix.zabbix_action:
-      server_url: "{{ zabbix_server_url }}"
-      login_user: "{{ zabbix_login_user }}"
-      login_password: "{{ zabbix_login_password }}"
+      server_url: "{{ zabbix_api_server_url }}"
+      login_user: "{{ zabbix_api_login_user }}"
+      login_password: "{{ zabbix_api_login_pass }}"
       state: present
       status: enabled
       name: ExampleAutoRegActionOperations
@@ -912,9 +912,9 @@
 - name: test - internal actions
   module_defaults:
     community.zabbix.zabbix_action:
-      server_url: "{{ zabbix_server_url }}"
-      login_user: "{{ zabbix_login_user }}"
-      login_password: "{{ zabbix_login_password }}"
+      server_url: "{{ zabbix_api_server_url }}"
+      login_user: "{{ zabbix_api_login_user }}"
+      login_password: "{{ zabbix_api_login_pass }}"
       state: present
       status: enabled
       name: ExampleInternalActionOperations
@@ -1016,9 +1016,9 @@
     - zabbix_version is version('3.4', '>=')
   module_defaults:
     community.zabbix.zabbix_action:
-      server_url: "{{ zabbix_server_url }}"
-      login_user: "{{ zabbix_login_user }}"
-      login_password: "{{ zabbix_login_password }}"
+      server_url: "{{ zabbix_api_server_url }}"
+      login_user: "{{ zabbix_api_login_user }}"
+      login_password: "{{ zabbix_api_login_pass }}"
       state: present
       status: enabled
       name: ExampleTriggerActionRecAckOps
@@ -1151,18 +1151,18 @@
 
 - name: test - cleanup example template for zabbix_action module
   zabbix_template:
-    server_url: "{{ zabbix_server_url }} "
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }} "
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     template_name: ExampleTemplateForActionModule
     state: absent
   register: zbxaction_prep_template
 
 - name: test - cleanup example mediatype for zabbix_action module
   zabbix_mediatype:
-    server_url: "{{ zabbix_server_url }} "
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }} "
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     name: ExampleMediaTypeForActionModule
     type: email
     state: absent

@@ -14,9 +14,9 @@
   always:
   - name: "cleanup if tests failed"
     zabbix_host:
-      server_url: "{{ zabbix_server_url }}"
-      login_user: "{{ zabbix_login_user }}"
-      login_password: "{{ zabbix_login_password }}"
+      server_url: "{{ zabbix_api_server_url }}"
+      login_user: "{{ zabbix_api_login_user }}"
+      login_password: "{{ zabbix_api_login_pass }}"
       host_name: ExampleHost
       state: absent
     ignore_errors: true

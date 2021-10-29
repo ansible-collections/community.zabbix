@@ -1,14 +1,14 @@
 ---
 - name: check login to zabbix
   uri:
-    url: "{{ zabbix_server_url }}/api_jsonrpc.php"
+    url: "{{ zabbix_api_server_url }}/api_jsonrpc.php"
     method: POST
     body:
       jsonrpc: "2.0"
       method: "user.login"
       params:
-        user: "{{ zabbix_login_user }}"
-        password: "{{ zabbix_login_password }}"
+        user: "{{ zabbix_api_login_user }}"
+        password: "{{ zabbix_api_login_pass }}"
       id: "1"
     body_format: json
     status_code: 200
@@ -19,7 +19,7 @@
 
 - name: get zabbix version
   uri:
-    url: "{{ zabbix_server_url }}/api_jsonrpc.php"
+    url: "{{ zabbix_api_server_url }}/api_jsonrpc.php"
     method: POST
     body:
       jsonrpc: "2.0"

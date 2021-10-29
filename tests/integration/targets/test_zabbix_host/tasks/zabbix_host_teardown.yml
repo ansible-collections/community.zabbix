@@ -3,8 +3,8 @@
 
 - name: remove proxy
   zabbix_proxy:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     proxy_name: ExampleProxy
     state: absent

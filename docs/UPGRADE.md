@@ -37,13 +37,23 @@ use the new ones.
 
 The following properties are renamed in the `zabbix_agent` role.
 
-| From                       | To                              |
-|----------------------------|---------------------------------|
-| zabbix_server_url          | zabbix_api_server_url           |
-| zabbix_http_user           | zabbix_api_http_user            |
-| zabbix_http_password       | zabbix_api_http_password        |
-| zabbix_login_user          | zabbix_api_login_user           |
-| zabbix_login_pass          | zabbix_api_login_pass           |
+| From                          | To                            |
+|-------------------------------|-------------------------------|
+| zabbix_url                    | zabbix_api_server_url         |
+| zabbix_agent_server_url       | zabbix_api_server_url         |
+| zabbix_http_user              | zabbix_api_http_user          |
+| zabbix_http_password          | zabbix_api_http_password      |
+| zabbix_api_user               | zabbix_api_login_user         |
+| zabbix_api_pass               | zabbix_api_login_pass         |
+| zabbix_validate_certs         | zabbix_api_validate_certs     |
+| zabbix_create_hostgroup       | zabbix_agent_hostgroups_state |
+| zabbix_macros                 | zabbix_agent_macros           |
+| zabbix_inventory_mode         | zabbix_agent_inventory_mode   |
+| zabbix_link_templates         | zabbix_agent_link_templates   |
+| zabbix_proxy                  | zabbix_agent_proxy            |
+| zabbix_update_host            | zabbix_agent_host_update      |
+| zabbix_create_host            | zabbix_agent_host_state       |
+| zabbix_visible_hostname       | zabbix_agent_visible_hostname |
 
 NOTE: the old parameters are still valid but it's suggested to update to use the
 new ones.
@@ -63,11 +73,13 @@ The following properties are renamed in the `zabbix_proxy` role.
 | zabbix_server_port         | zabbix_proxy_serverport         |
 | zabbix_proxy_localbuffer   | zabbix_proxy_proxylocalbuffer   |
 | zabbix_proxy_offlinebuffer | zabbix_proxy_proxyofflinebuffer |
-| zabbix_server_url          | zabbix_api_server_url           |
+| zabbix_create_proxy        | zabbix_proxy_state              |
+| zabbix_url                 | zabbix_api_server_url           |
 | zabbix_http_user           | zabbix_api_http_user            |
 | zabbix_http_password       | zabbix_api_http_password        |
-| zabbix_login_user          | zabbix_api_login_user           |
-| zabbix_login_pass          | zabbix_api_login_pass           |
+| zabbix_api_user            | zabbix_api_login_user           |
+| zabbix_api_pass            | zabbix_api_login_pass           |
+| zabbix_validate_certs      | zabbix_api_validate_certs       |
 
 NOTE: the old parameters are still valid but it's suggested to update to use the
 new ones.

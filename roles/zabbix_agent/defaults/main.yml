@@ -64,9 +64,13 @@ zabbix_repo_yum:
     state: present
 
 # Zabbix API stuff
+zabbix_validate_certs: true                        # Will be deprecated in 2.0.0
+zabbix_api_validate_certs: "{{ zabbix_validate_certs }}"
 zabbix_agent_server_url: http://localhost          # Will be deprecated in 2.0.0
 zabbix_url: "{{ zabbix_agent_server_url }}"        # Will be deprecated in 2.0.0
 zabbix_api_server_url: "{{ zabbix_agent_server_url }}"
+# zabbix_http_user: admin                          # Will be deprecated in 2.0.0
+# zabbix_http_password: admin                      # Will be deprecated in 2.0.0
 # zabbix_api_http_user: admin
 # zabbix_api_http_password: admin
 zabbix_api_user: Admin                             # Will be deprecated in 2.0.0
@@ -76,17 +80,23 @@ zabbix_api_login_pass: "{{ zabbix_api_pass }}"
 zabbix_api_create_hostgroup: false
 zabbix_api_create_hosts: false
 zabbix_api_timeout: 30
-zabbix_create_hostgroup: present  # or absent
-zabbix_create_host: present       # or absent
-zabbix_update_host: true
+zabbix_create_hostgroup: present  # or absent      # Will be deprecated in 2.0.0
+zabbix_agent_hostgroups_state: "{{ zabbix_create_hostgroup }}"
+zabbix_create_host: present       # or absent      # Will be deprecated in 2.0.0
+zabbix_agent_host_state: "{{ zabbix_create_host }}"
+zabbix_update_host: true                            # Will be deprecated in 2.0.0
+zabbix_agent_host_update: "{{ zabbix_update_host }}"
 zabbix_host_status: enabled       # or disabled
-zabbix_proxy: null
-zabbix_inventory_mode: disabled
+zabbix_proxy: null                                 # Will be deprecated in 2.0.0
+zabbix_agent_proxy: "{{ zabbix_proxy }}"
+zabbix_inventory_mode: disabled                    # Will be deprecated in 2.0.0
+zabbix_agent_inventory_mode: "{{ zabbix_inventory_mode }}"
 zabbix_useuip: 1
 zabbix_host_groups:
   - Linux servers
-zabbix_link_templates:
+zabbix_link_templates:                             # Will be deprecated in 2.0.0
   - Template OS Linux by Zabbix agent
+zabbix_agent_link_templates: "{{ zabbix_link_templates }}"
 
 zabbix_agent_interfaces:
   - type: 1
@@ -141,6 +151,8 @@ zabbix_agent_loadmodule:
 zabbix_agent_become_on_localhost: true
 zabbix_agent_description:
 zabbix_agent_inventory_zabbix: {}
+zabbix_macros: []                                  # Will be deprecated in 2.0.0
+zabbix_agent_macros: "{{ zabbix_macros }}"
 
 # TLS settings
 zabbix_agent_tlsconnect:

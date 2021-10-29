@@ -48,8 +48,8 @@
 - name: AutoPSK | Generate new TLS PSK identity
   set_fact:
     zabbix_agent2_tlspskidentity: >
-      zabbix_visible_hostname
-      | default(zabbix_agent_hostname)
+      zabbix_agent_visible_hostname
+      | ((zabbix_agent2 == True) | default(ternary(zabbix_agent2_hostname, zabbix_agent_hostname)))
       + '_'
       + lookup('password', '/dev/null chars=hexdigits length=4')
   when: not zabbix_agent2_tlspskidentity_check.stat.exists

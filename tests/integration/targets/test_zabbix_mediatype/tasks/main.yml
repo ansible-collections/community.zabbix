@@ -2,9 +2,9 @@
 - name: test - email mediatypes
   module_defaults:
     community.zabbix.zabbix_mediatype:
-      server_url: "{{ zabbix_server_url }}"
-      login_user: "{{ zabbix_login_user }}"
-      login_password: "{{ zabbix_login_password }}"
+      server_url: "{{ zabbix_api_server_url }}"
+      login_user: "{{ zabbix_api_login_user }}"
+      login_password: "{{ zabbix_api_login_pass }}"
       state: present
       name: Example email
       type: email
@@ -314,9 +314,9 @@
 - name: test - script mediatypes
   module_defaults:
     community.zabbix.zabbix_mediatype:
-      server_url: "{{ zabbix_server_url }}"
-      login_user: "{{ zabbix_login_user }}"
-      login_password: "{{ zabbix_login_password }}"
+      server_url: "{{ zabbix_api_server_url }}"
+      login_user: "{{ zabbix_api_login_user }}"
+      login_password: "{{ zabbix_api_login_pass }}"
       state: present
       name: Example script
       type: script
@@ -379,9 +379,9 @@
 - name: test - sms mediatypes
   module_defaults:
     community.zabbix.zabbix_mediatype:
-      server_url: "{{ zabbix_server_url }}"
-      login_user: "{{ zabbix_login_user }}"
-      login_password: "{{ zabbix_login_password }}"
+      server_url: "{{ zabbix_api_server_url }}"
+      login_user: "{{ zabbix_api_login_user }}"
+      login_password: "{{ zabbix_api_login_pass }}"
       state: present
       name: Example sms
       type: sms
@@ -449,9 +449,9 @@
   when: zabbix_version is version('4.2', '<=')
   module_defaults:
     community.zabbix.zabbix_mediatype:
-      server_url: "{{ zabbix_server_url }}"
-      login_user: "{{ zabbix_login_user }}"
-      login_password: "{{ zabbix_login_password }}"
+      server_url: "{{ zabbix_api_server_url }}"
+      login_user: "{{ zabbix_api_login_user }}"
+      login_password: "{{ zabbix_api_login_pass }}"
       state: present
       name: Example jabber
       type: jabber
@@ -487,9 +487,9 @@
   when: zabbix_version is version('4.2', '<=')
   module_defaults:
     community.zabbix.zabbix_mediatype:
-      server_url: "{{ zabbix_server_url }}"
-      login_user: "{{ zabbix_login_user }}"
-      login_password: "{{ zabbix_login_password }}"
+      server_url: "{{ zabbix_api_server_url }}"
+      login_user: "{{ zabbix_api_login_user }}"
+      login_password: "{{ zabbix_api_login_pass }}"
       state: present
       name: Example ez_texting
       type: ez_texting
@@ -537,9 +537,9 @@
   when: zabbix_version is version('4.4', '>=')
   module_defaults:
     community.zabbix.zabbix_mediatype:
-      server_url: "{{ zabbix_server_url }}"
-      login_user: "{{ zabbix_login_user }}"
-      login_password: "{{ zabbix_login_password }}"
+      server_url: "{{ zabbix_api_server_url }}"
+      login_user: "{{ zabbix_api_login_user }}"
+      login_password: "{{ zabbix_api_login_pass }}"
       state: present
       name: Example webhook
       type: webhook

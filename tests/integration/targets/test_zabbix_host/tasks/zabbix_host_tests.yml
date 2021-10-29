@@ -1,9 +1,9 @@
 ---
 - name: "test: create host with many options set"
   zabbix_host:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     timeout: 30     # slower with py2.7
     host_name: ExampleHost
     visible_name: ExampleName
@@ -66,9 +66,9 @@
 
 - name: "test: try to create the same host with the same settings"
   zabbix_host:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     timeout: 30     # slower with py2.7
     host_name: ExampleHost
     visible_name: ExampleName
@@ -132,9 +132,9 @@
 - name: "test: try to create the same host with the same settings and force false"
   zabbix_host:
     force: false
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     timeout: 30     # slower with py2.7
     host_name: ExampleHost
     visible_name: ExampleName
@@ -189,9 +189,9 @@
 - name: "test: try to create the same host changing one parameter in the inventory with force false"
   zabbix_host:
     force: false
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     timeout: 30     # slower with py2.7
     host_name: ExampleHost
     visible_name: ExampleName
@@ -245,9 +245,9 @@
 
 - name: "test: change visible_name"
   zabbix_host:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     host_name: ExampleHost
     visible_name: "ExampleName Changed"
   register: zabbix_host1
@@ -259,9 +259,9 @@
 
 - name: "test: change visible_name (again)"
   zabbix_host:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     host_name: ExampleHost
     visible_name: "ExampleName Changed"
   register: zabbix_host1
@@ -273,9 +273,9 @@
 
 - name: "test: change description"
   zabbix_host:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     host_name: ExampleHost
     description: "My ExampleHost Description Changed"
   register: zabbix_host1
@@ -287,9 +287,9 @@
 
 - name: "test: change description (again)"
   zabbix_host:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     host_name: ExampleHost
     description: "My ExampleHost Description Changed"
   register: zabbix_host1
@@ -301,9 +301,9 @@
 
 - name: "test: change host groups (adding one group)"
   zabbix_host:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     host_name: ExampleHost
     host_groups:
       - Linux servers
@@ -318,9 +318,9 @@
 
 - name: "test: change host groups (remove one group)"
   zabbix_host:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     host_name: ExampleHost
     host_groups:
       - Linux servers
@@ -334,9 +334,9 @@
 
 - name: "test: change host groups (add one group using force=no)"
   zabbix_host:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     host_name: ExampleHost
     host_groups:
       - Virtual machines
@@ -351,9 +351,9 @@
 
 - name: "test: change host groups (check whether we are at three groups)"
   zabbix_host:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     host_name: ExampleHost
     host_groups:
       - Linux servers
@@ -368,9 +368,9 @@
 
 - name: "test: change host groups (attempt to remove all host groups)"
   zabbix_host:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     host_name: ExampleHost
     # list with empty value, expected:
     host_groups:
@@ -385,9 +385,9 @@
 
 - name: "test: change host linked templates (same as before)"
   zabbix_host:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     host_name: ExampleHost
     link_templates:
       - "{{ 'IMAP Service' if zabbix_version | float >= 5.2 else 'Template App IMAP Service' }}"
@@ -401,9 +401,9 @@
 
 - name: "test: change host linked templates (add one template)"
   zabbix_host:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     host_name: ExampleHost
     link_templates:
       - "{{ 'IMAP Service' if zabbix_version | float >= 5.2 else 'Template App IMAP Service' }}"
@@ -418,9 +418,9 @@
 
 - name: "test: change host linked templates (add one template, using force=no)"
   zabbix_host:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     host_name: ExampleHost
     link_templates:
       - "{{ 'LDAP Service' if zabbix_version | float >= 5.2 else 'Template App LDAP Service' }}"
@@ -434,9 +434,9 @@
 
 - name: "test: change host linked templates (make sure we are at 4 templates)"
   zabbix_host:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     host_name: ExampleHost
     link_templates:
       - "{{ 'IMAP Service' if zabbix_version | float >= 5.2 else 'Template App IMAP Service' }}"
@@ -452,9 +452,9 @@
 
 - name: "test: change host linked templates (remove all templates)"
   zabbix_host:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     timeout: 30     # slower with py2.7
     host_name: ExampleHost
     link_templates:
@@ -468,9 +468,9 @@
 
 - name: "test: change host linked templates (check we have no templates left)"
   zabbix_host:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     host_name: ExampleHost
     link_templates:
       -
@@ -483,9 +483,9 @@
 
 - name: "test: change host status"
   zabbix_host:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     host_name: ExampleHost
     status: disabled
   register: zabbix_host1
@@ -497,9 +497,9 @@
 
 - name: "test: change host status (again)"
   zabbix_host:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     host_name: ExampleHost
     status: disabled
   register: zabbix_host1
@@ -511,9 +511,9 @@
 
 - name: "test: change host inventory mode"
   zabbix_host:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     host_name: ExampleHost
     inventory_mode: automatic
   register: zabbix_host1
@@ -525,9 +525,9 @@
 
 - name: "test: change host inventory mode"
   zabbix_host:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     host_name: ExampleHost
     inventory_mode: automatic
   register: zabbix_host1
@@ -539,9 +539,9 @@
 
 - name: "test: change host inventory data (one field)"
   zabbix_host:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     host_name: ExampleHost
     inventory_zabbix:
       tag: test-tag-two
@@ -560,9 +560,9 @@
 
 - name: "test: change host inventory data (again)"
   zabbix_host:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     host_name: ExampleHost
     inventory_zabbix:
       tag: test-tag-two
@@ -581,9 +581,9 @@
 
 - name: "test: remove host proxy"
   zabbix_host:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     host_name: ExampleHost
     proxy: ''
   register: zabbix_host1
@@ -595,9 +595,9 @@
 
 - name: "test: add host proxy"
   zabbix_host:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     host_name: ExampleHost
     proxy: ExampleProxy
   register: zabbix_host1
@@ -609,9 +609,9 @@
 
 - name: "test: add host proxy (again)"
   zabbix_host:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     host_name: ExampleHost
     proxy: ExampleProxy
   register: zabbix_host1
@@ -623,9 +623,9 @@
 
 - name: "test: change tls settings"
   zabbix_host:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     host_name: ExampleHost
     tls_psk_identity: test2
     tls_connect: 4
@@ -642,9 +642,9 @@
 
 - name: "test: change tls settings (again)"
   zabbix_host:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     host_name: ExampleHost
     tls_psk_identity: test2
     tls_connect: 4
@@ -661,9 +661,9 @@
 
 - name: "test: change interface settings (remove one)"
   zabbix_host:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     host_name: ExampleHost
     interfaces:
       - type: 1
@@ -681,9 +681,9 @@
 
 - name: "test: change interface settings (again)"
   zabbix_host:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     host_name: ExampleHost
     interfaces:
       - type: 1
@@ -701,9 +701,9 @@
 
 - name: "test: change interface settings (add one interface using force=no)"
   zabbix_host:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     host_name: ExampleHost
     interfaces:
       - type: 4
@@ -722,9 +722,9 @@
 
 - name: "test: change interface settings (verify that we are at two interfaces)"
   zabbix_host:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     host_name: ExampleHost
     interfaces:
       - type: 1
@@ -748,9 +748,9 @@
 
 - name: "test: configure interface to useip=1 but provide no ip"
   zabbix_host:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     host_name: ExampleHost
     interfaces:
       - type: 1
@@ -772,9 +772,9 @@
 
 - name: "test: configure interface to useip=0 but provide no dns"
   zabbix_host:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     host_name: ExampleHost
     interfaces:
       - type: 1
@@ -799,9 +799,9 @@
   block:
     - name: "test: configure SNMPv2 interface without details (fail)"
       zabbix_host:
-        server_url: "{{ zabbix_server_url }}"
-        login_user: "{{ zabbix_login_user }}"
-        login_password: "{{ zabbix_login_password }}"
+        server_url: "{{ zabbix_api_server_url }}"
+        login_user: "{{ zabbix_api_login_user }}"
+        login_password: "{{ zabbix_api_login_pass }}"
         host_name: ExampleHost
         interfaces:
           - type: 1
@@ -824,9 +824,9 @@
 
     - name: "test: configure details for SNMPv2 interface"
       zabbix_host:
-        server_url: "{{ zabbix_server_url }}"
-        login_user: "{{ zabbix_login_user }}"
-        login_password: "{{ zabbix_login_password }}"
+        server_url: "{{ zabbix_api_server_url }}"
+        login_user: "{{ zabbix_api_login_user }}"
+        login_password: "{{ zabbix_api_login_pass }}"
         host_name: ExampleHost
         interfaces:
           - type: 1
@@ -851,9 +851,9 @@
 
     - name: "test: configure details for SNMPv2 interface (again)"
       zabbix_host:
-        server_url: "{{ zabbix_server_url }}"
-        login_user: "{{ zabbix_login_user }}"
-        login_password: "{{ zabbix_login_password }}"
+        server_url: "{{ zabbix_api_server_url }}"
+        login_user: "{{ zabbix_api_login_user }}"
+        login_password: "{{ zabbix_api_login_pass }}"
         host_name: ExampleHost
         interfaces:
           - type: 1
@@ -878,9 +878,9 @@
 
     - name: "test: update details for SNMPv2 interface with bulk sub option"
       zabbix_host:
-        server_url: "{{ zabbix_server_url }}"
-        login_user: "{{ zabbix_login_user }}"
-        login_password: "{{ zabbix_login_password }}"
+        server_url: "{{ zabbix_api_server_url }}"
+        login_user: "{{ zabbix_api_login_user }}"
+        login_password: "{{ zabbix_api_login_pass }}"
         host_name: ExampleHost
         interfaces:
           - type: 1
@@ -906,9 +906,9 @@
 
     - name: "test: configure details for SNMPv3 interface"
       zabbix_host:
-        server_url: "{{ zabbix_server_url }}"
-        login_user: "{{ zabbix_login_user }}"
-        login_password: "{{ zabbix_login_password }}"
+        server_url: "{{ zabbix_api_server_url }}"
+        login_user: "{{ zabbix_api_login_user }}"
+        login_password: "{{ zabbix_api_login_pass }}"
         host_name: ExampleHost
         interfaces:
           - type: 1
@@ -935,9 +935,9 @@
 
     - name: "test: configure details for SNMPv3 interface (again)"
       zabbix_host:
-        server_url: "{{ zabbix_server_url }}"
-        login_user: "{{ zabbix_login_user }}"
-        login_password: "{{ zabbix_login_password }}"
+        server_url: "{{ zabbix_api_server_url }}"
+        login_user: "{{ zabbix_api_login_user }}"
+        login_password: "{{ zabbix_api_login_pass }}"
         host_name: ExampleHost
         interfaces:
           - type: 1
@@ -964,9 +964,9 @@
 
     - name: "test: update details for SNMPv3 interface"
       zabbix_host:
-        server_url: "{{ zabbix_server_url }}"
-        login_user: "{{ zabbix_login_user }}"
-        login_password: "{{ zabbix_login_password }}"
+        server_url: "{{ zabbix_api_server_url }}"
+        login_user: "{{ zabbix_api_login_user }}"
+        login_password: "{{ zabbix_api_login_pass }}"
         host_name: ExampleHost
         interfaces:
           - type: 1
@@ -998,9 +998,9 @@
 # https://github.com/ansible-collections/community.zabbix/pull/391
 - name: "reset interfaces to two of the same type"
   zabbix_host:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     host_name: ExampleHost
     interfaces:
       - type: "1"
@@ -1019,9 +1019,9 @@
 
 - name: "reset interfaces to two of the same type (again)"
   zabbix_host:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     host_name: ExampleHost
     interfaces:
       - type: "1"
@@ -1040,9 +1040,9 @@
 
 - name: "test: add IPMI settings"
   zabbix_host:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     host_name: ExampleHost
     ipmi_authtype: 2
     ipmi_privilege: 4
@@ -1057,9 +1057,9 @@
 
 - name: "test: add IPMI settings again"
   zabbix_host:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     host_name: ExampleHost
     ipmi_authtype: 2
     ipmi_privilege: 4
@@ -1074,9 +1074,9 @@
 
 - name: "test: verify that an empty change is idempotent"
   zabbix_host:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     host_name: ExampleHost
   register: zabbix_host1
 
@@ -1087,9 +1087,9 @@
 
 - name: "test: IPMI set default values"
   zabbix_host:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     host_name: ExampleHost
     ipmi_authtype: -1
     ipmi_privilege: 2
@@ -1104,9 +1104,9 @@
 
 - name: "test: IPMI set default values (again)"
   zabbix_host:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     host_name: ExampleHost
     ipmi_authtype: -1
     ipmi_privilege: 2
@@ -1121,9 +1121,9 @@
 
 - name: "test: change host inventory mode to disabled"
   zabbix_host:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     host_name: ExampleHost
     inventory_mode: disabled
   register: zabbix_host1
@@ -1135,9 +1135,9 @@
 
 - name: "test: change host inventory mode to manual"
   zabbix_host:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     host_name: ExampleHost
     inventory_mode: manual
   register: zabbix_host1
@@ -1149,9 +1149,9 @@
 
 - name: "test: add new set of user macros to the host"
   zabbix_host:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     host_name: ExampleHost
     macros:
       - macro: '{$NEWMACRO1}'
@@ -1167,9 +1167,9 @@
 
 - name: "test: add new set of user macros to the host (again - lowercase)"
   zabbix_host:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     host_name: ExampleHost
     macros:
       - macro: '{$newmacro1}'
@@ -1185,9 +1185,9 @@
 
 - name: "test: update one of the user macros present on the host"
   zabbix_host:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     host_name: ExampleHost
     macros:
       - macro: '{$NEWMACRO1}'
@@ -1206,9 +1206,9 @@
   block:
     - name: "test: update one of the user macros with description"
       zabbix_host:
-        server_url: "{{ zabbix_server_url }}"
-        login_user: "{{ zabbix_login_user }}"
-        login_password: "{{ zabbix_login_password }}"
+        server_url: "{{ zabbix_api_server_url }}"
+        login_user: "{{ zabbix_api_login_user }}"
+        login_password: "{{ zabbix_api_login_pass }}"
         host_name: ExampleHost
         macros:
           - macro: '{$NEWMACRO1}'
@@ -1225,9 +1225,9 @@
 
     - name: "test: update one of the user macros with description (again)"
       zabbix_host:
-        server_url: "{{ zabbix_server_url }}"
-        login_user: "{{ zabbix_login_user }}"
-        login_password: "{{ zabbix_login_password }}"
+        server_url: "{{ zabbix_api_server_url }}"
+        login_user: "{{ zabbix_api_login_user }}"
+        login_password: "{{ zabbix_api_login_pass }}"
         host_name: ExampleHost
         macros:
           - macro: '{$NEWMACRO1}'
@@ -1244,9 +1244,9 @@
 
     - name: "test: update one of the user macros by removing description"
       zabbix_host:
-        server_url: "{{ zabbix_server_url }}"
-        login_user: "{{ zabbix_login_user }}"
-        login_password: "{{ zabbix_login_password }}"
+        server_url: "{{ zabbix_api_server_url }}"
+        login_user: "{{ zabbix_api_login_user }}"
+        login_password: "{{ zabbix_api_login_pass }}"
         host_name: ExampleHost
         macros:
           - macro: '{$NEWMACRO1}'
@@ -1262,9 +1262,9 @@
 
 - name: "test: add user macro while keeping previous ones with force=no"
   zabbix_host:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     host_name: ExampleHost
     force: false
     macros:
@@ -1279,9 +1279,9 @@
 
 - name: "test: add the same user macros (again)"
   zabbix_host:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     host_name: ExampleHost
     macros:
       - macro: '{$NEWMACRO1}'
@@ -1302,9 +1302,9 @@
   block:
     - name: "test: add new user macro with type secret"
       zabbix_host:
-        server_url: "{{ zabbix_server_url }}"
-        login_user: "{{ zabbix_login_user }}"
-        login_password: "{{ zabbix_login_password }}"
+        server_url: "{{ zabbix_api_server_url }}"
+        login_user: "{{ zabbix_api_login_user }}"
+        login_password: "{{ zabbix_api_login_pass }}"
         host_name: ExampleHost
         macros:
           - macro: '{$NEWMACROSECRET}'
@@ -1319,9 +1319,9 @@
 
     - name: "test: add new user macro with type secret (again)"
       zabbix_host:
-        server_url: "{{ zabbix_server_url }}"
-        login_user: "{{ zabbix_login_user }}"
-        login_password: "{{ zabbix_login_password }}"
+        server_url: "{{ zabbix_api_server_url }}"
+        login_user: "{{ zabbix_api_login_user }}"
+        login_password: "{{ zabbix_api_login_pass }}"
         host_name: ExampleHost
         macros:
           - macro: '{$NEWMACROSECRET}'
@@ -1336,9 +1336,9 @@
 
 - name: "test: wipe out all of the user macros"
   zabbix_host:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     host_name: ExampleHost
     macros: []
   register: zabbix_host1
@@ -1350,9 +1350,9 @@
 
 - name: "test: wipe out all of the user macros (again)"
   zabbix_host:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     host_name: ExampleHost
     macros: []
   register: zabbix_host1
@@ -1367,9 +1367,9 @@
   block:
     - name: "test: add new set of tags to the host"
       zabbix_host:
-        server_url: "{{ zabbix_server_url }}"
-        login_user: "{{ zabbix_login_user }}"
-        login_password: "{{ zabbix_login_password }}"
+        server_url: "{{ zabbix_api_server_url }}"
+        login_user: "{{ zabbix_api_login_user }}"
+        login_password: "{{ zabbix_api_login_pass }}"
         host_name: ExampleHost
         tags:
           - tag: NEWTAG1
@@ -1384,9 +1384,9 @@
 
     - name: "test: add new set of tags to the host (again)"
       zabbix_host:
-        server_url: "{{ zabbix_server_url }}"
-        login_user: "{{ zabbix_login_user }}"
-        login_password: "{{ zabbix_login_password }}"
+        server_url: "{{ zabbix_api_server_url }}"
+        login_user: "{{ zabbix_api_login_user }}"
+        login_password: "{{ zabbix_api_login_pass }}"
         host_name: ExampleHost
         tags:
           - tag: NEWTAG1
@@ -1401,9 +1401,9 @@
 
     - name: "test: update one of the tags present on the host"
       zabbix_host:
-        server_url: "{{ zabbix_server_url }}"
-        login_user: "{{ zabbix_login_user }}"
-        login_password: "{{ zabbix_login_password }}"
+        server_url: "{{ zabbix_api_server_url }}"
+        login_user: "{{ zabbix_api_login_user }}"
+        login_password: "{{ zabbix_api_login_pass }}"
         host_name: ExampleHost
         tags:
           - tag: NEWTAG1
@@ -1418,9 +1418,9 @@
 
     - name: "test: add tag while keeping previous ones with force=no"
       zabbix_host:
-        server_url: "{{ zabbix_server_url }}"
-        login_user: "{{ zabbix_login_user }}"
-        login_password: "{{ zabbix_login_password }}"
+        server_url: "{{ zabbix_api_server_url }}"
+        login_user: "{{ zabbix_api_login_user }}"
+        login_password: "{{ zabbix_api_login_pass }}"
         host_name: ExampleHost
         force: false
         tags:
@@ -1435,9 +1435,9 @@
 
     - name: "test: add the same tags (again)"
       zabbix_host:
-        server_url: "{{ zabbix_server_url }}"
-        login_user: "{{ zabbix_login_user }}"
-        login_password: "{{ zabbix_login_password }}"
+        server_url: "{{ zabbix_api_server_url }}"
+        login_user: "{{ zabbix_api_login_user }}"
+        login_password: "{{ zabbix_api_login_pass }}"
         host_name: ExampleHost
         tags:
           - tag: NEWTAG1
@@ -1454,9 +1454,9 @@
 
     - name: "test: wipe out all of the tags"
       zabbix_host:
-        server_url: "{{ zabbix_server_url }}"
-        login_user: "{{ zabbix_login_user }}"
-        login_password: "{{ zabbix_login_password }}"
+        server_url: "{{ zabbix_api_server_url }}"
+        login_user: "{{ zabbix_api_login_user }}"
+        login_password: "{{ zabbix_api_login_pass }}"
         host_name: ExampleHost
         tags: []
       register: zabbix_host1
@@ -1468,9 +1468,9 @@
 
 - name: "test: wipe out all of the tags (again)"
   zabbix_host:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     host_name: ExampleHost
     tags: []
   register: zabbix_host1
@@ -1482,9 +1482,9 @@
 
 - name: "test: attempt to delete host created earlier"
   zabbix_host:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     host_name: ExampleHost
     state: absent
   register: zabbix_host1
@@ -1496,9 +1496,9 @@
 
 - name: "test: attempt deleting a non-existant host"
   zabbix_host:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     host_name: ExampleHost
     state: absent
   register: zabbix_host1
@@ -1512,9 +1512,9 @@
   block:
   - name: "test: create host without host interfaces"
     zabbix_host:
-      server_url: "{{ zabbix_server_url }}"
-      login_user: "{{ zabbix_login_user }}"
-      login_password: "{{ zabbix_login_password }}"
+      server_url: "{{ zabbix_api_server_url }}"
+      login_user: "{{ zabbix_api_login_user }}"
+      login_password: "{{ zabbix_api_login_pass }}"
       host_name: ExampleHost
       visible_name: ExampleName
       description: My ExampleHost Description
@@ -1530,8 +1530,8 @@
 
   - name: "cleanup"
     zabbix_host:
-      server_url: "{{ zabbix_server_url }}"
-      login_user: "{{ zabbix_login_user }}"
-      login_password: "{{ zabbix_login_password }}"
+      server_url: "{{ zabbix_api_server_url }}"
+      login_user: "{{ zabbix_api_login_user }}"
+      login_password: "{{ zabbix_api_login_pass }}"
       host_name: ExampleHost
       state: absent
