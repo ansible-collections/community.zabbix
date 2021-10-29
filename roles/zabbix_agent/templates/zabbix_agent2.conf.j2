@@ -30,8 +30,6 @@ LogType={{ zabbix_agent2_logtype }}
 # Mandatory: yes, if LogType is set to file, otherwise no
 # Default:
 
-LogFile={{ zabbix_agent2_logfile }}
-
 {% if zabbix_agent_os_family == "Windows" %}
 LogFile={{ zabbix_agent2_win_logfile }}
 {% else %}
