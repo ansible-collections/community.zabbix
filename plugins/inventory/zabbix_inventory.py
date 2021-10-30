@@ -31,6 +31,8 @@ options:
         required: true
         type: str
         aliases: [ url ]
+        env:
+          - name: ZABBIX_SERVER
     proxy:
         description: Proxy server to use for reaching zabbix API
         type: string
@@ -40,7 +42,7 @@ options:
             - API query for hosts - see zabbix documentation for more details U(https://www.zabbix.com/documentation/current/manual/api/reference/host/get)
         type: dict
         elements: dict
-        default: []
+        default: {}
         suboptions:
             selectApplications:
                 type: str
@@ -191,11 +193,15 @@ options:
             - Zabbix user name.
         type: str
         required: true
+        env:
+          - name: ZABBIX_USERNAME
     login_password:
         description:
             - Zabbix user password.
         type: str
         required: true
+        env:
+          - name: ZABBIX_PASSWORD
     http_login_user:
         description:
             - Basic Auth login
@@ -219,6 +225,8 @@ options:
        - If set to True, hosts will be added to groups based on their zabbix groups
       type: bool
       default: false
+      env:
+        - name: ZABBIX_VALIDATE_CERTS
 extends_documentation_fragment:
     - constructed
     - inventory_cache
