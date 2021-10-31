@@ -42,8 +42,8 @@
     ZABBIX_VALIDATE_CERTS: false
 
 - assert:
-  that:
-    - env_vars_usage.hosts[0].name == "ExampleHostForHostInfoModule"
+    that:
+      - env_vars_usage.hosts[0].name == "ExampleHostForHostInfoModule"
 
 - name: "test - Set default parameters to zabbix_host_info"
   module_defaults:
