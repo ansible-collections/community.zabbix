@@ -1,0 +1,4 @@
+---
+minor_changes:
+  - Enabled usage of environment variables for modules by adding a fallback
+    lookup in the module_utils/helpers.py - zabbix_common_argument_spec

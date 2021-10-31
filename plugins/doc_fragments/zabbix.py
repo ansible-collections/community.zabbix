@@ -13,17 +13,20 @@ options:
         description:
             - URL of Zabbix server, with protocol (http or https).
               C(url) is an alias for C(server_url).
+            - If not set the environment variable C(ZABBIX_SERVER) will be used.
         required: true
         type: str
         aliases: [ url ]
     login_user:
         description:
             - Zabbix user name.
+            - If not set the environment variable C(ZABBIX_USERNAME) will be used.
         type: str
         required: true
     login_password:
         description:
             - Zabbix user password.
+            - If not set the environment variable C(ZABBIX_PASSWORD) will be used.
         type: str
         required: true
     http_login_user:
@@ -42,6 +45,7 @@ options:
     validate_certs:
       description:
        - If set to False, SSL certificates will not be validated. This should only be used on personally controlled sites using self-signed certificates.
+       - If not set the environment variable C(ZABBIX_VALIDATE_CERTS) will be used.
       type: bool
       default: true
 notes:
