@@ -1,0 +1,2 @@
+minor_changes:
+  - zabbix_maintenance - added new module parameter `tags`, which allows configuring Problem Tags on maintenances.
