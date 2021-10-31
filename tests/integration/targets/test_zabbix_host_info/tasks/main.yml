@@ -43,7 +43,7 @@
 
 - assert:
     that:
-      - env_vars_usage.hosts[0].name == "ExampleHostForHostInfoModule"
+      - env_vars_usage.hosts[0].name == "ExampleHostForHostInfoModuleName"
 
 - name: "test - Set default parameters to zabbix_host_info"
   module_defaults:
