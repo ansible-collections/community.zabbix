@@ -31,6 +31,20 @@
     that:
       - prepare_host_result.changed is sameas true
 
+- name: "test - Gather zabbix host facts using environment variables"
+  community.zabbix.zabbix_host_info:
+    host_name: ExampleHostForHostInfoModule
+  register: env_vars_usage
+  environment:
+    ZABBIX_SERVER: "{{ zabbix_api_server_url }}"
+    ZABBIX_USERNAME: "{{ zabbix_api_login_user }}"
+    ZABBIX_PASSWORD: "{{ zabbix_api_login_pass }}"
+    ZABBIX_VALIDATE_CERTS: false
+
+- assert:
+    that:
+      - env_vars_usage.hosts[0].name == "ExampleHostForHostInfoModuleName"
+
 - name: "test - Set default parameters to zabbix_host_info"
   module_defaults:
     community.zabbix.zabbix_host_info:
