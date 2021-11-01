@@ -220,13 +220,13 @@ options:
        - If set to False, SSL certificates will not be validated. This should only be used on personally controlled sites using self-signed certificates.
       type: bool
       default: true
+      env:
+        - name: ZABBIX_VALIDATE_CERTS
     add_zabbix_groups:
       description:
        - If set to True, hosts will be added to groups based on their zabbix groups
       type: bool
       default: false
-      env:
-        - name: ZABBIX_VALIDATE_CERTS
 extends_documentation_fragment:
     - constructed
     - inventory_cache
