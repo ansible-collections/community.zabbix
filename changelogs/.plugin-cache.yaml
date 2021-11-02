@@ -1,5 +1,5 @@
----
-objects: {}
+objects:
+  role: {}
 plugins:
   become: {}
   cache: {}
@@ -79,6 +79,11 @@ plugins:
       name: zabbix_proxy
       namespace: ''
       version_added: null
+    zabbix_proxy_info:
+      description: Gather information about Zabbix proxy
+      name: zabbix_proxy_info
+      namespace: ''
+      version_added: 1.5.0
     zabbix_screen:
       description: Create/update/delete Zabbix screens
       name: zabbix_screen
@@ -123,4 +128,4 @@ plugins:
   shell: {}
   strategy: {}
   vars: {}
-version: 1.4.0
+version: 1.5.0

@@ -1,4 +1,3 @@
----
 ancestor: null
 releases:
   0.1.0:
@@ -425,3 +424,68 @@ releases:
         name: zabbix_inventory
         namespace: null
     release_date: '2021-06-29'
+  1.5.0:
+    changes:
+      breaking_changes:
+      - all roles now reference other roles and modules via their fully qualified
+        collection names, which makes Ansible 2.10 minimum supported version for roles
+        (See https://github.com/ansible-collections/community.zabbix/pull/477).
+      bugfixes:
+      - all roles now support installing zabbix 4.0 version on Ubuntu 20.04.
+      - all roles now supports installations on Debian 11.
+      - zabbix inventory - Change default value for host_zapi_query from list "[]"
+        to dict "{}".
+      - zabbix_action - should no longer fail with Zabbix version 5.4.
+      - zabbix_agent - `zabbix_win_install_dir` no longer ignored for zabbix_agentd.d
+        and zabbix log directories.
+      - zabbix_agent - auto-recovery for Windows installation has been fixed (https://github.com/ansible-collections/community.zabbix/pull/470).
+      - zabbix_agent - deploying zabbix_agent2 under Windows should now be possible
+        (Thanks to https://github.com/ansible-collections/community.zabbix/pull/433
+        and https://github.com/ansible-collections/community.zabbix/pull/453).
+      - zabbix_agent - fixed AutoPSK for Windows deployments (https://github.com/ansible-collections/community.zabbix/pull/450).
+      - zabbix_host - Fix error when updating hosts caused by Zabbix bug not returning
+        the inventory_mode field for hosts(https://github.com/ansible-collections/community.zabbix/issues/385).
+      - zabbix_host - will not break when `tls_psk*` parameters are set with Zabbix
+        version 5.4.
+      - zabbix_proxy (module) - now supports configuring `tls_psk*` parameters.
+      - zabbix_proxy (role) - TLS config should now properly configure certificates.
+      - zabbix_proxy (role) - should no longer fail on permission problems wren configured
+        to use SQLite database and now installs correct package sqlite3 on Debian
+        systems.
+      - zabbix_web - `zabbix_nginx_vhost_*` parameters are no longer ignored.
+      - zabbix_web - executing role with `--tags` should now correctly include distribution
+        specific variables (https://github.com/ansible-collections/community.zabbix/pull/448).
+      - zabbix_web - now correctly restarts php-fpm service (https://github.com/ansible-collections/community.zabbix/pull/427).
+      - zabbix_web - permissions for accesing php-fpm socket has been fixed (See https://github.com/ansible-collections/community.zabbix/pull/426).
+      minor_changes:
+      - Added requirements.txt to collection root to be used with Ansible Builder.
+        See https://ansible-builder.readthedocs.io/en/latest/collection_metadata.html
+      - some roles are now using new naming for API connection parameters (https://github.com/ansible-collections/community.zabbix/pull/492
+        and https://github.com/ansible-collections/community.zabbix/pull/495).
+      - some roles can now utilize an option `zabbix_repo_yum_gpgcheck` to enable/disable
+        GPG check for YUM repository (https://github.com/ansible-collections/community.zabbix/pull/438).
+      - zabbix inventory - Enabled the usage of environment variables in zabbix inventory
+        plugin.
+      - zabbix inventory plugin - can now use environment variables ZABBIX_SERVER,
+        ZABBIX_USERNAME and ZABBIX_PASSWORD for connection purposes to the Zabbix
+        API.
+      - zabbix_agent - `zabbix_agent_loadmodule` can also be configured with a list.
+      - zabbix_agent - new `zabbix_api_timeout` option.
+      - zabbix_agent - now supports DenyKeys configuration.
+      - zabbix_hostmacro - now supports creating macros of type secret and vault.
+      - zabbix_proxy (role) - new `zabbix_api_timeout` option.
+      - zabbix_proxy_info - new module that allows to retrieve information about configured
+        Zabbix Proxies.
+      - zabbix_server - added support for TimescaleDB (https://github.com/ansible-collections/community.zabbix/pull/428).
+    fragments:
+    - 0-copy_ignore_txt.yml
+    - 415-inventory_mode-fix.yaml
+    - 456-zabbix-hostmacro-secret-vault.yml
+    - 505-awx_compatibility-fixes.yml
+    - zbx-missing-1.5.0.yml
+    - zbx-proxy-info.yaml
+    modules:
+    - description: Gather information about Zabbix proxy
+      name: zabbix_proxy_info
+      namespace: ''
+    release_date: '2021-11-02'

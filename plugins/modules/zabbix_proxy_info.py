@@ -11,6 +11,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
 module: zabbix_proxy_info
 short_description: Gather information about Zabbix proxy
+version_added: 1.5.0
 author:
     - Dusan Matejka (@D3DeFi)
 description:
