@@ -16,7 +16,7 @@ Table of content
 
 This document provides an overview of all the changes that are needed to be applied to have a correctly working environment per version. If a version is not part of this document, then there are no changes needed to apply.
 
-## 1.4.1
+## 1.5.0
 
 ### Roles
 
