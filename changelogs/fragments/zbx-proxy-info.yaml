@@ -1,3 +1,0 @@
----
-minor_changes:
-  - zabbix_proxy_info - new module that allows to retrieve information about configured Zabbix Proxies.
