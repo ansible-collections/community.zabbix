@@ -274,12 +274,11 @@
       - Linux servers
       - Hypervisors
     desc: "test description"
-    collect_data: no
+    collect_data: yes  # required for tags
     minutes: 90
     state: present
     tags:
       - tag: ExampleHostsTag
-        value: areyouproblem
       - tag: ExampleHostsTag2
         value: ExampleTagValue
       - tag: ExampleHostsTag3
@@ -304,12 +303,11 @@
       - Linux servers
       - Hypervisors
     desc: "test description"
-    collect_data: no
+    collect_data: yes
     minutes: 90
     state: present
     tags:
       - tag: ExampleHostsTag
-        value: areyouproblem
       - tag: ExampleHostsTag2
         value: ExampleTagValue
       - tag: ExampleHostsTag3

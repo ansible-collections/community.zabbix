@@ -68,7 +68,8 @@ options:
         version_added: '2.0.0'
     tags:
         description:
-            - List of  tags to assign to the hosts in maintenance.
+            - List of tags to assign to the hosts in maintenance.
+            - Requires I(collect_data=yes).
         type: list
         elements: dict
         suboptions:
@@ -366,6 +367,8 @@ def main():
         maintenance_type = 0
     else:
         maintenance_type = 1
+        if tags is not None:
+            module.fail_json(msg="Tags cannot be provided for maintenance without data collection.")
 
     if visible_name:
         zabbix_host = "name"
