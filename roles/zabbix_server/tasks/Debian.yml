@@ -6,10 +6,7 @@
 - name: "Set some variables"
   set_fact:
     zabbix_short_version: "{{ zabbix_version | regex_replace('\\.', '') }}"
-    zabbix_server_apt_repository:
-      - "http://repo.zabbix.com/zabbix/{{ zabbix_version }}/{{ ansible_distribution.lower() }}/"
-      - "{{ ansible_distribution_release }}"
-      - "main"
+    zabbix_server_repo_deb_url: "http://repo.zabbix.com/zabbix/{{ zabbix_version }}/{{ ansible_distribution.lower() }}/pool/main/z/zabbix-release/zabbix-release_{{ zabbix_version }}-1+{{ ansible_distribution.lower() }}{{ ansible_distribution_version }}_all.deb"
     zabbix_underscore_version: "{{ zabbix_version | regex_replace('\\.', '_') }}"
     zabbix_python_prefix: "python{% if ansible_python_version is version('3', '>=') %}3{% endif %}"
   when:
@@ -18,10 +15,7 @@
 - name: "Set some variables"
   set_fact:
     zabbix_short_version: "{{ zabbix_version | regex_replace('\\.', '') }}"
-    zabbix_server_apt_repository:
-      - "http://repo.zabbix.com/zabbix/{{ zabbix_version }}/{{ ansible_distribution.lower() }}-arm64/"
-      - "{{ ansible_distribution_release }}"
-      - "main"
+    zabbix_server_repo_deb_url: "http://repo.zabbix.com/zabbix/{{ zabbix_version }}/{{ ansible_distribution.lower() }}-arm64/pool/main/z/zabbix-release/zabbix-release_{{ zabbix_version }}-1+{{ ansible_distribution.lower() }}{{ ansible_distribution_version }}_all.deb"
     zabbix_underscore_version: "{{ zabbix_version | regex_replace('\\.', '_') }}"
     zabbix_python_prefix: "python{% if ansible_python_version is version('3', '>=') %}3{% endif %}"
   when:
@@ -75,8 +69,10 @@
 
 - name: "Debian | Install gpg key"
   apt_key:
-    id: "{{ sign_keys[zabbix_short_version][ansible_distribution_release]['sign_key'] }}"
     url: http://repo.zabbix.com/zabbix-official-repo.key
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   register: zabbix_server_repo_files_installed
   until: zabbix_server_repo_files_installed is succeeded
   when:
@@ -87,14 +83,14 @@
     - init
 
 - name: "Debian | Installing repository {{ ansible_distribution }}"
-  apt_repository:
-    repo: "{{ item }} {{ zabbix_server_apt_repository | join(' ') }}"
-    state: present
+  apt:
+   deb: "{{ zabbix_server_repo_deb_url }}"
+   state: present
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   when: zabbix_repo == "zabbix"
   become: true
-  with_items:
-    - deb-src
-    - deb
   tags:
     - zabbix-server
     - init
