@@ -94,10 +94,6 @@
     state: absent
   become: true
 
-- name: Debug
-  debug:
-    var: zabbix_repo_yum_gpg_key
-
 - name: "RedHat | Install gpg key"
   rpm_key:
     key: "{{ zabbix_repo_yum_gpg_key }}"
