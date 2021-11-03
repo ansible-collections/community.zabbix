@@ -14,25 +14,10 @@ zabbix_server_conf_mode: 0640
 zabbix_service_state: started
 zabbix_service_enabled: true
 
-zabbix_repo_yum_gpgcheck: 0
-zabbix_repo_yum_schema: https
+zabbix_repo_yum_gpg_key: https://repo.zabbix.com/RPM-GPG-KEY-ZABBIX
 zabbix_repo_yum_disabled: "*"
 zabbix_repo_yum_enabled: []
-zabbix_repo_yum:
-  - name: zabbix
-    description: Zabbix Official Repository - $basearch
-    baseurl: "{{ zabbix_repo_yum_schema }}://repo.zabbix.com/zabbix/{{ zabbix_version }}/rhel/{{ ansible_distribution_major_version }}/$basearch/"
-    gpgcheck: "{{ zabbix_repo_yum_gpgcheck }}"
-    mode: '0644'
-    gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-ZABBIX
-    state: present
-  - name: zabbix-non-supported
-    description: Zabbix Official Repository non-supported - $basearch
-    baseurl: "{{ zabbix_repo_yum_schema }}://repo.zabbix.com/non-supported/rhel/{{ ansible_distribution_major_version }}/$basearch/"
-    mode: '0644'
-    gpgcheck: "{{ zabbix_repo_yum_gpgcheck }}"
-    gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-ZABBIX
-    state: present
+zabbix_repo_yum: "https://repo.zabbix.com/zabbix/{{ zabbix_version }}/rhel/{{ ansible_distribution_major_version }}/x86_64/zabbix-release-{{ zabbix_version }}-1.el{{ ansible_distribution_major_version }}.noarch.rpm"
 
 # User (EPEL specific)
 zabbix_server_username: zabbix
