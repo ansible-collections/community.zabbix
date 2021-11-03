@@ -5,6 +5,12 @@
   set_fact:
     zabbix_short_version: "{{ zabbix_version | regex_replace('\\.', '') }}"
 
+- name: "RedHat | Legacy fallback Zabbix server version 5.0 EL7"
+  set_fact:
+    zabbix_server_version: 5.0
+    zabbix_repo_yum_gpg_key: https://repo.zabbix.com/RPM-GPG-KEY-ZABBIX-79EA5ED4
+  when: ansible_distribution_major_version | int == 7
+
 - name: "RedHat | Use Zabbix package name"
   set_fact:
     zabbix_server_package: "zabbix-server-{{ zabbix_server_database }}"
@@ -88,9 +94,13 @@
     state: absent
   become: true
 
+- name: Debug
+  debug:
+    var: zabbix_repo_yum_gpg_key
+
 - name: "RedHat | Install gpg key"
   rpm_key:
-    key: http://repo.zabbix.com/zabbix-official-repo.key
+    key: "{{ zabbix_repo_yum_gpg_key }}"
     state: present
   environment:
     http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
