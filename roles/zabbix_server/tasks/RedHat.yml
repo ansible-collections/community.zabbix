@@ -88,24 +88,32 @@
     state: absent
   become: true
 
+- name: "RedHat | Install gpg key"
+  rpm_key:
+    key: http://repo.zabbix.com/zabbix-official-repo.key
+    state: present
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
+  register: zabbix_server_repo_files_installed
+  until: zabbix_server_repo_files_installed is succeeded
+  when:
+    - zabbix_repo == "zabbix"
+  become: true
+  tags:
+    - zabbix-server
+
 - name: "RedHat | Install basic repo file"
-  yum_repository:
-    name: "{{ item.name }}"
-    description: "{{ item.description }}"
-    baseurl: "{{ item.baseurl }}"
-    gpgcheck: "{{ item.gpgcheck }}"
-    gpgkey: "{{ item.gpgkey }}"
-    mode: "{{ item.mode | default('0644') }}"
-    priority: "{{ item.priority | default('99') }}"
-    state: "{{ item.state | default('present') }}"
-    proxy: "{{ zabbix_http_proxy | default(omit) }}"
-  with_items: "{{ zabbix_repo_yum }}"
+  package:
+    name: "{{ zabbix_repo_yum }}"
+    state: present
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   register: yum_repo_installed
   become: true
   when:
     zabbix_repo == "zabbix"
-  notify:
-    - "clean repo files from proxy creds"
   tags:
     - zabbix-server
 
