@@ -5,10 +5,10 @@
 
 - name: test - Zabbix user group
   module_defaults:
-    zabbix_usergroup:
-      server_url: "{{ zabbix_server_url }}"
-      login_user: "{{ zabbix_login_user }}"
-      login_password: "{{ zabbix_login_password }}"
+    community.zabbix.zabbix_usergroup:
+      server_url: "{{ zabbix_api_server_url }}"
+      login_user: "{{ zabbix_api_login_user }}"
+      login_password: "{{ zabbix_api_login_pass }}"
       name: ACME
 
   block:

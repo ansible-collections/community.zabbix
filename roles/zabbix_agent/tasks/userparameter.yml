@@ -1,15 +1,15 @@
 ---
 - block:
   - name: "Windows | Installing user-defined userparameters"
-    win_template:
+    ansible.windows.win_template:
       src: "{{ zabbix_agent_userparameters_templates_src }}/{{ item.name }}.j2"
       dest: '{{ zabbix_agent_win_include }}\{{ item.name }}.conf'
     notify:
       - restart win zabbix agent
     with_items: "{{ zabbix_agent_userparameters }}"
-  
+
   - name: "Windows | Installing user-defined scripts"
-    win_copy:
+    ansible.windows.win_copy:
       src: "{{ zabbix_agent_userparameters_scripts_src }}/{{ item.scripts_dir }}"
       dest: '{{ zabbix_win_install_dir }}\scripts\'
     notify:
@@ -31,9 +31,9 @@
     notify:
       - restart zabbix-agent
       - restart mac zabbix agent
-    become: yes
+    become: true
     with_items: "{{ zabbix_agent_userparameters }}"
-  
+
   - name: "Installing user-defined scripts"
     copy:
       src: "{{ zabbix_agent_userparameters_scripts_src }}/{{ item.scripts_dir }}"
@@ -44,7 +44,7 @@
     notify:
       - restart zabbix-agent
       - restart mac zabbix agent
-    become: yes
+    become: true
     with_items: "{{ zabbix_agent_userparameters }}"
     when: item.scripts_dir is defined
 
@@ -63,9 +63,9 @@
     notify:
       - restart zabbix-agent
       - restart mac zabbix agent
-    become: yes
+    become: true
     with_items: "{{ zabbix_agent_userparameters }}"
-  
+
   - name: "Installing user-defined scripts"
     copy:
       src: "{{ zabbix_agent_userparameters_scripts_src }}/{{ item.scripts_dir }}"
@@ -76,7 +76,7 @@
     notify:
       - restart zabbix-agent
       - restart mac zabbix agent
-    become: yes
+    become: true
     with_items: "{{ zabbix_agent_userparameters }}"
     when: item.scripts_dir is defined
 

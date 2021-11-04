@@ -9,7 +9,7 @@
         name: mysql-host
         image: mysql:5.7
         state: started
-        recreate: yes
+        recreate: true
         networks:
           - name: zabbix
         env:
@@ -22,9 +22,9 @@
     - name: "Create postgresql Container"
       docker_container:
         name: postgresql-host
-        image: postgres
+        image: postgres:13
         state: started
-        recreate: yes
+        recreate: true
         networks:
           - name: zabbix
         env:
@@ -44,7 +44,7 @@
         groups:
           - mysql
           - postgresql
-      changed_when: False
+      changed_when: false
 
     - name: "Installing packages on CentOS"
       yum:
@@ -72,7 +72,7 @@
     - name: "Apt update"
       shell: "apt-get update && echo exit 0 > /usr/sbin/policy-rc.d"
       args:
-        warn: False
+        warn: false
       register: installation_dependencies
       until: installation_dependencies is succeeded
       when:
@@ -86,7 +86,7 @@
           - python3-pip
           - gpg-agent
           - sudo
-        update_cache: True
+        update_cache: true
         state: present
       register: installation_dependencies
       until: installation_dependencies is succeeded

@@ -50,6 +50,7 @@ Click on the name of a plugin or module to view that content's documentation:
     - [zabbix_map](https://docs.ansible.com/ansible/2.10/collections/community/zabbix/zabbix_map_module.html)
     - [zabbix_mediatype](https://docs.ansible.com/ansible/2.10/collections/community/zabbix/zabbix_mediatype_module.html)
     - [zabbix_proxy](https://docs.ansible.com/ansible/2.10/collections/community/zabbix/zabbix_proxy_module.html)
+    - [zabbix_proxy_info](https://docs.ansible.com/ansible/latest/collections/community/zabbix/zabbix_proxy_info_module.html)
     - [zabbix_screen](https://docs.ansible.com/ansible/2.10/collections/community/zabbix/zabbix_screen_module.html)
     - [zabbix_service](https://docs.ansible.com/ansible/2.10/collections/community/zabbix/zabbix_service_module.html)
     - [zabbix_template_info](https://docs.ansible.com/ansible/2.10/collections/community/zabbix/zabbix_template_info_module.html)
@@ -78,7 +79,14 @@ For the majority of modules, however, you can get away with just:
 ```bash
 pip install zabbix-api
 ```
+#### Ansible 2.10 and higher
 
+With the release of Ansible 2.10, modules have been moved into collections.  With the exception of ansible.builtin modules, this means additonal collections must be installed in order to use modules such as seboolean (now ansible.posix.seboolean).  The following collections are now frequently required: `ansible.posix` and `community.general`.  Installing the collections:
+
+```bash
+ansible-galaxy collection install ansible.posix
+ansible-galaxy collection install community.general
+```
 ### Installing the Collection from Ansible Galaxy
 
 Before using the Zabbix collection, you need to install it with the Ansible Galaxy CLI:
@@ -87,13 +95,17 @@ Before using the Zabbix collection, you need to install it with the Ansible Gala
 ansible-galaxy collection install community.zabbix
 ```
 
-You can also include it in a `requirements.yml` file and install it via `ansible-galaxy collection install -r requirements.yml`, using the format:
+You can also include it in a `requirements.yml` file along with other required collections and install them via `ansible-galaxy collection install -r requirements.yml`, using the format:
 
 ```yaml
 ---
 collections:
   - name: community.zabbix
-    version: 1.4.0
+    version: 1.5.0
+  - name: ansible.posix
+    version: 1.3.0
+  - name: community.general
+    version: 3.7.0
 ```
 
 ### Upgrading collection

@@ -5,10 +5,10 @@
 
 - name: test - Zabbix discovery rule
   module_defaults:
-    zabbix_discovery_rule:
-      server_url: "{{ zabbix_server_url }}"
-      login_user: "{{ zabbix_login_user }}"
-      login_password: "{{ zabbix_login_password }}"
+    community.zabbix.zabbix_discovery_rule:
+      server_url: "{{ zabbix_api_server_url }}"
+      login_user: "{{ zabbix_api_login_user }}"
+      login_password: "{{ zabbix_api_login_pass }}"
       name: ACME
       state: present
       iprange: 192.168.1.1-255
@@ -19,7 +19,7 @@
   block:
   - name: test - create new Zabbix discovery rule (checkmode)
     zabbix_discovery_rule:
-    check_mode: True
+    check_mode: true
     register: drule_new_checkmode
 
   - name: assert that drule will be created (checkmode)
@@ -47,7 +47,7 @@
       iprange:
         - 192.168.1.1-255
         - 10.0.0.1-255
-    check_mode: True
+    check_mode: true
     register: drule_iprange_update_checkmode
 
   - name: assert that iprange will be changed
@@ -97,7 +97,7 @@
         - type: Zabbix
           key: "system.hostname"
           ports: "10050"
-          uniq: yes
+          uniq: true
           host_source: discovery
     register: drule_dchecks_update
 
@@ -182,7 +182,7 @@
           snmp_community: CUSTOMER@snmp-readonly
           ports: "161"
           key: iso.3.6.1.2.1.1.1.0
-          uniq: no
+          uniq: false
           host_source: discovery
           name_source: discovery
     register: drule_snmp_update
@@ -205,7 +205,7 @@
           snmpv3_authpassphrase: "SeCrEt"
           snmpv3_privprotocol: AES
           snmpv3_privpassphrase: "TopSecret"
-          uniq: no
+          uniq: false
           host_source: DNS
           name_source: None
     register: drule_snmp3_update
@@ -224,9 +224,9 @@
 
   - name: test - create new active Zabbix proxy server
     zabbix_proxy:
-      server_url: "{{ zabbix_server_url }}"
-      login_user: "{{ zabbix_login_user }}"
-      login_password: "{{ zabbix_login_password }}"
+      server_url: "{{ zabbix_api_server_url }}"
+      login_user: "{{ zabbix_api_login_user }}"
+      login_password: "{{ zabbix_api_login_pass }}"
       proxy_name: ACME_proxy
       status: active
       state: present
@@ -256,9 +256,9 @@
 
 - name: test - delete Zabbix discovery rule
   zabbix_discovery_rule:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     name: ACME
     state: absent
   register: drule_delete
@@ -269,9 +269,9 @@
 
 - name: test - delete Zabbix discovery rule (again)
   zabbix_discovery_rule:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     name: ACME
     state: absent
   register: drule_delete_again
@@ -283,9 +283,9 @@
 # Cleanup
 - name: delete active Zabbix proxy server
   zabbix_proxy:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     proxy_name: ACME_proxy
     state: absent
   register: zbxproxy_delete

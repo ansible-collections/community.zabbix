@@ -42,7 +42,7 @@ See the following list of supported Operating systems with the Zabbix releases.
 | Red Hat Fam 6       |  V  |  V  |     |           | V         |
 | Red Hat Fam 5       |  V  |  V  |     |           | V         |
 | Fedora              |     |     | V   | V         |           |
-| Ubuntu 20.04 focal  |  V  |  V  |     |           |           |
+| Ubuntu 20.04 focal  |  V  |  V  |     | V         |           |
 | Ubuntu 19.10 eoan   |     |     |     |           |           |
 | Ubuntu 18.04 bionic |  V  |  V  | V   | V         |           |
 | Ubuntu 16.04 xenial |  V  |  V  | V   | V         |           |
@@ -103,7 +103,7 @@ or when using the zabbix-proxy:
 ```yaml
   roles:
     - role: community.zabbix.zabbix_proxy
-      zabbix_server_host: 192.168.1.1
+      zabbix_proxy_server: 192.168.1.1
       zabbix_proxy_javagateway: 192.168.1.2
 ```
 

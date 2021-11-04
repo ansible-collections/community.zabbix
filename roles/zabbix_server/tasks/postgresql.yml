@@ -28,13 +28,13 @@
         port: "{{ zabbix_server_dbport }}"
         priv: ALL
         state: present
-        encrypted: yes
+        encrypted: true
     - name: "PostgreSQL | Delegated | Create timescaledb extension"
       community.postgresql.postgresql_ext:
         db: "{{ zabbix_server_dbname }}"
         name: timescaledb
       when: zabbix_database_timescaledb
-  become: yes
+  become: true
   become_user: postgres
   delegate_to: "{{ delegated_dbhost }}"
   when:
@@ -66,7 +66,7 @@
         port: "{{ zabbix_server_dbport }}"
         priv: ALL
         state: present
-        encrypted: yes
+        encrypted: true
     - name: "PostgreSQL | Remote | Create timescaledb extension"
       community.postgresql.postgresql_ext:
         login_host: "{{ zabbix_server_pgsql_login_host | default(omit) }}"
@@ -94,7 +94,7 @@
     -f create.sql && touch /etc/zabbix/schema.done
   args:
     creates: /etc/zabbix/schema.done
-    warn: no
+    warn: false
   environment:
     PGPASSWORD: "{{ zabbix_server_dbpassword }}"
   when:
@@ -115,7 +115,7 @@
     -f timescaledb.sql && touch /etc/zabbix/timescaledb.done
   args:
     creates: /etc/zabbix/timescaledb.done
-    warn: no
+    warn: false
   environment:
     PGPASSWORD: "{{ zabbix_server_dbpassword }}"
   when:
@@ -128,7 +128,7 @@
 - name: "Get complete path"
   shell: ls -d {{ datafiles_path }}
   register: datafiles_path_full
-  changed_when: False
+  changed_when: false
   when:
     - (zabbix_version is version('3.0', '<') and zabbix_database_sqlload) or (zabbix_repo == "epel" and zabbix_database_sqlload)
   tags:
@@ -160,7 +160,7 @@
     -f schema.sql && touch /etc/zabbix/schema.done
   args:
     creates: /etc/zabbix/schema.done
-    warn: no
+    warn: false
   environment:
     PGPASSWORD: "{{ zabbix_server_dbpassword }}"
   when:
@@ -179,7 +179,7 @@
     -f images.sql && touch /etc/zabbix/images.done
   args:
     creates: /etc/zabbix/images.done
-    warn: no
+    warn: false
   environment:
     PGPASSWORD: "{{ zabbix_server_dbpassword }}"
   when: (zabbix_version is version('3.0', '<') and zabbix_database_sqlload) or (zabbix_repo == "epel" and zabbix_database_sqlload)
@@ -197,7 +197,7 @@
     -f data.sql && touch /etc/zabbix/data.done
   args:
     creates: /etc/zabbix/data.done
-    warn: no
+    warn: false
   environment:
     PGPASSWORD: "{{ zabbix_server_dbpassword }}"
   when: (zabbix_version is version('3.0', '<') and zabbix_database_sqlload) or (zabbix_repo == "epel" and zabbix_database_sqlload)

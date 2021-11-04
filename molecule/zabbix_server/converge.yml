@@ -1,5 +1,5 @@
 ---
 - hosts: all
-  become: True
+  become: true
   roles:
     - role: zabbix_server

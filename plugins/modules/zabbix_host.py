@@ -588,6 +588,38 @@ class Host(ZabbixBase):
         if LooseVersion(self._zbx_api_version) >= LooseVersion('4.2.0'):
             params.update({'selectTags': 'extend'})
 
+        if LooseVersion(self._zbx_api_version) >= LooseVersion('5.4.0'):
+            params.update({
+                'output': [
+                    "inventory_mode",
+                    "hostid",
+                    "proxy_hostid",
+                    "host",
+                    "status",
+                    "lastaccess",
+                    "ipmi_authtype",
+                    "ipmi_privilege",
+                    "ipmi_username",
+                    "ipmi_password",
+                    "maintenanceid",
+                    "maintenance_status",
+                    "maintenance_type",
+                    "maintenance_from",
+                    "name",
+                    "flags",
+                    "templateid",
+                    "description",
+                    "tls_connect",
+                    "tls_accept",
+                    "tls_issuer",
+                    "tls_subject",
+                    "proxy_address",
+                    "auto_compress",
+                    "custom_interfaces",
+                    "uuid"
+                ]
+            })
+
         host_list = self._zapi.host.get(params)
         if len(host_list) < 1:
             self._module.fail_json(msg="Host not found: %s" % host_name)
@@ -795,13 +827,15 @@ class Host(ZabbixBase):
             if int(host['tls_accept']) != tls_accept:
                 return True
 
-        if tls_psk_identity is not None and 'tls_psk_identity' in host:
-            if host['tls_psk_identity'] != tls_psk_identity:
-                return True
+        if LooseVersion(self._zbx_api_version) <= LooseVersion('5.4.0'):
+            if tls_psk_identity is not None and 'tls_psk_identity' in host:
+                if host['tls_psk_identity'] != tls_psk_identity:
+                    return True
 
-        if tls_psk is not None and 'tls_psk' in host:
-            if host['tls_psk'] != tls_psk:
-                return True
+        if LooseVersion(self._zbx_api_version) <= LooseVersion('5.4.0'):
+            if tls_psk is not None and 'tls_psk' in host:
+                if host['tls_psk'] != tls_psk:
+                    return True
 
         if tls_issuer is not None and 'tls_issuer' in host:
             if host['tls_issuer'] != tls_issuer:
@@ -1161,8 +1195,8 @@ def main():
             # update host
             if host.check_all_properties(
                     host_id, group_ids, status, interfaces, template_ids, exist_interfaces, zabbix_host_obj, proxy_id,
-                    visible_name, description, host_name, inventory_mode, inventory_zabbix, tls_accept,
-                    tls_psk_identity, tls_psk, tls_issuer, tls_subject, tls_connect, ipmi_authtype, ipmi_privilege,
+                    visible_name, description, host_name, inventory_mode, inventory_zabbix, tls_accept, tls_psk_identity, tls_psk,
+                    tls_issuer, tls_subject, tls_connect, ipmi_authtype, ipmi_privilege,
                     ipmi_username, ipmi_password, macros, tags):
 
                 host.update_host(

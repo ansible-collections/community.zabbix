@@ -37,7 +37,7 @@ $DB['DOUBLE_IEEE754']   = true;
 {% endif %}
 
 {% if zabbix_web_env is defined %}
-{% for env,val in zabbix_web_env.iteritems() %}
+{% for env,val in zabbix_web_env.items() %}
 putenv("{{env}}={{val}}");
 {% endfor %}
 {% endif %}

@@ -1,0 +1,17 @@
+---
+- name: AutoPSK | Set default path variables for Linux
+  set_fact:
+    zabbix_agent2_tlspskfile: "/etc/zabbix/tls_psk_auto.secret"
+    zabbix_agent2_tlspskidentity_file: "/etc/zabbix/tls_psk_auto.identity"
+
+- name: AutoPSK | Check for existing TLS PSK file (Linux)
+  stat:
+    path: "{{ zabbix_agent2_tlspskfile }}"
+  register: zabbix_agent2_tlspskcheck
+  become: true
+
+- name: AutoPSK | Check for existing TLS PSK identity (Linux)
+  stat:
+    path: "{{ zabbix_agent2_tlspskidentity_file }}"
+  register: zabbix_agent2_tlspskidentity_check
+  become: true

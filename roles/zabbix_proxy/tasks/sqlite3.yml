@@ -10,18 +10,19 @@
 - name: "Sqlite3 | Create database"
   file:
     name: "{{ zabbix_proxy_dbname | dirname }}"
+    mode: 0744
     owner: zabbix
     group: zabbix
     seuser: system_u
     serole: object_r
     setype: zabbix_var_lib_t
     state: directory
-  become: yes
+  become: true
   when:
     - zabbix_database_creation
 
 - name: "Sqlite3 | Importing schema file"
-  become: yes
+  become: true
   become_user: zabbix
   shell: |
     set -o pipefail
@@ -41,7 +42,7 @@
     seuser: system_u
     serole: object_r
     setype: zabbix_var_lib_t
-  become: yes
+  become: true
   when:
     - ansible_selinux.status == "enabled"
     - zabbix_database_creation

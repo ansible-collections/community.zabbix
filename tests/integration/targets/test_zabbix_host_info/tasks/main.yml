@@ -1,9 +1,9 @@
 ---
 - name: "test - Prepare host for zabbix_host_info module"
   zabbix_host:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     host_name: ExampleHostForHostInfoModule
     visible_name: ExampleHostForHostInfoModuleName
     description: Test Host
@@ -31,12 +31,26 @@
     that:
       - prepare_host_result.changed is sameas true
 
+- name: "test - Gather zabbix host facts using environment variables"
+  community.zabbix.zabbix_host_info:
+    host_name: ExampleHostForHostInfoModule
+  register: env_vars_usage
+  environment:
+    ZABBIX_SERVER: "{{ zabbix_api_server_url }}"
+    ZABBIX_USERNAME: "{{ zabbix_api_login_user }}"
+    ZABBIX_PASSWORD: "{{ zabbix_api_login_pass }}"
+    ZABBIX_VALIDATE_CERTS: false
+
+- assert:
+    that:
+      - env_vars_usage.hosts[0].name == "ExampleHostForHostInfoModuleName"
+
 - name: "test - Set default parameters to zabbix_host_info"
   module_defaults:
-    zabbix_host_info:
-      server_url: "{{ zabbix_server_url }}"
-      login_user: "{{ zabbix_login_user }}"
-      login_password: "{{ zabbix_login_password }}"
+    community.zabbix.zabbix_host_info:
+      server_url: "{{ zabbix_api_server_url }}"
+      login_user: "{{ zabbix_api_login_user }}"
+      login_password: "{{ zabbix_api_login_pass }}"
       host_name: ExampleHostForHostInfoModule
 
   block:
@@ -106,7 +120,7 @@
           - gather_all_facts_result.hosts.0.hostinterfaces.0.port == "10050"
           - gather_all_facts_result.hosts.0.hostinterfaces.0.type == "1"
           - gather_all_facts_result.hosts.0.hostinterfaces.0.useip == "1"
-    
+
     - name: "test - Gather facts of zabbix host with host_inventory"
       zabbix_host_info:
         host_inventory:
@@ -131,16 +145,16 @@
     - name: "test - Partial match of zabbix host name"
       zabbix_host_info:
         host_name: HostForHostInfo
-        exact_match: no
+        exact_match: false
       register: partial_match_result
-    
+
     - assert:
         that:
           - partial_match_result.hosts | length == 1
 
     - name: "test - Exact match of zabbix host name"
       zabbix_host_info:
-        exact_match: yes
+        exact_match: true
       register: exact_match_result
 
     - assert:
@@ -150,9 +164,9 @@
     - name: "test - Exact match of zabbix host name(expectations - host not found)"
       zabbix_host_info:
         host_name: HostForHostInfo
-        exact_match: yes
+        exact_match: true
       register: exact_match_host_not_found_result
-      ignore_errors: yes
+      ignore_errors: true
 
     - assert:
         that:

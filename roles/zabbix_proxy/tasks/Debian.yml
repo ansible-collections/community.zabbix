@@ -45,16 +45,16 @@
 - name: "Debian | Installing gnupg"
   apt:
     pkg: gnupg
-    update_cache: yes
+    update_cache: true
     cache_valid_time: 3600
-    force: yes
+    force: true
     state: present
   environment:
     http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
     https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   register: gnupg_installed
   until: gnupg_installed is succeeded
-  become: yes
+  become: true
 
 - name: "Debian | Install gpg key"
   apt_key:
@@ -64,7 +64,7 @@
   until: are_zabbix_proxy_dependency_packages_installed is succeeded
   when:
     - zabbix_repo == "zabbix"
-  become: yes
+  become: true
   tags:
     - zabbix-proxy
     - init
@@ -74,7 +74,7 @@
     repo: "{{ item }} http://repo.zabbix.com/zabbix/{{ zabbix_version }}/{{ ansible_distribution.lower() }}/ {{ ansible_distribution_release }} main"
     state: present
   when: zabbix_repo == "zabbix"
-  become: yes
+  become: true
   with_items:
     - deb-src
     - deb
@@ -85,7 +85,7 @@
 - name: "Debian | Select Zabbix proxy version"
   set_fact:
     zabbix_proxy_deb_version: "{{ zabbix_proxy_debian_version }}"
-    cacheable: yes
+    cacheable: true
   when:
     - ansible_distribution == "Debian"
     - zabbix_proxy_debian_version is defined
@@ -93,7 +93,7 @@
 - name: "Ubuntu | Select Zabbix proxy version"
   set_fact:
     zabbix_proxy_deb_version: "{{ zabbix_proxy_ubuntu_version }}"
-    cacheable: yes
+    cacheable: true
   when:
     - ansible_distribution == "Ubuntu"
     - zabbix_proxy_ubuntu_version is defined
@@ -101,14 +101,14 @@
 - name: "Debian | Define package with version"
   set_fact:
     deb_pkg: "zabbix-proxy-{{ zabbix_proxy_database }}={{ zabbix_proxy_deb_version }}"
-    cacheable: yes
+    cacheable: true
   when:
     zabbix_proxy_deb_version is defined
 
 - name: "Debian | Define package without version"
   set_fact:
     deb_pkg: "zabbix-proxy-{{ zabbix_proxy_database }}"
-    cacheable: yes
+    cacheable: true
   when:
     zabbix_proxy_deb_version is not defined
 
@@ -116,9 +116,10 @@
   file:
     path: /etc/apt/preferences.d/
     state: directory
+    mode: '0755'
   when:
     - zabbix_proxy_apt_priority | int
-  become: yes
+  become: true
 
 - name: "Debian | Configuring the weight for APT"
   copy:
@@ -128,16 +129,17 @@
       Pin: origin repo.zabbix.com
       Pin-Priority: {{ zabbix_proxy_apt_priority }}
     owner: root
+    mode: '0644'
   when:
     - zabbix_proxy_apt_priority | int
-  become: yes
+  become: true
 
 - name: "Debian | Installing zabbix-proxy-{{ zabbix_proxy_database }}"
   apt:
     pkg: "{{ deb_pkg }}"
-    update_cache: yes
+    update_cache: true
     cache_valid_time: 3600
-    force: yes
+    force: true
     state: "{{ zabbix_proxy_package_state }}"
     default_release: "{{ ansible_distribution_release }}"
   environment:
@@ -145,13 +147,13 @@
     https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   register: is_zabbix_proxy_package_installed
   until: is_zabbix_proxy_package_installed is succeeded
-  become: yes
+  become: true
 
 - name: "Debian | Installing zabbix-sql-scripts"
   apt:
     pkg: zabbix-sql-scripts
     state: "{{ zabbix_proxy_package_state }}"
-    update_cache: yes
+    update_cache: true
     cache_valid_time: 0
     default_release: "{{ ansible_distribution_release }}"
   environment:
@@ -161,7 +163,7 @@
   until: zabbix_proxy_package_sql_installed is succeeded
   when:
     - zabbix_version is version('5.4', '>=')
-  become: yes
+  become: true
   tags:
     - zabbix-server
     - init
@@ -175,7 +177,7 @@
     https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   register: zabbix_proxy_dependencies_installed
   until: zabbix_proxy_dependencies_installed is succeeded
-  become: yes
+  become: true
   when:
     - zabbix_database_creation
   tags:
@@ -193,7 +195,7 @@
     https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   register: zabbix_proxy_dependencies_installed
   until: zabbix_proxy_dependencies_installed is succeeded
-  become: yes
+  become: true
   when:
     - zabbix_proxy_database == 'mysql'
     - zabbix_proxy_install_database_client
@@ -214,7 +216,7 @@
     https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   register: zabbix_proxy_dependencies_installed
   until: zabbix_proxy_dependencies_installed is succeeded
-  become: yes
+  become: true
   when:
     - zabbix_proxy_database == 'mysql'
     - zabbix_proxy_install_database_client
@@ -233,7 +235,7 @@
     https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   register: are_zabbix_proxy_dependency_packages_installed
   until: are_zabbix_proxy_dependency_packages_installed is succeeded
-  become: yes
+  become: true
   when:
     - zabbix_database_creation or zabbix_database_sqlload
     - zabbix_proxy_database == 'pgsql'
@@ -245,14 +247,14 @@
 
 - name: "Debian | Install sqlite3"
   apt:
-    name: sqlite
+    name: sqlite3
     state: present
   environment:
     http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
     https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   register: are_zabbix_proxy_dependency_packages_installed
   until: are_zabbix_proxy_dependency_packages_installed is succeeded
-  become: yes
+  become: true
   when:
     - zabbix_proxy_database == 'sqlite3'
   tags:

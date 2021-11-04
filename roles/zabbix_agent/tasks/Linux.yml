@@ -19,6 +19,8 @@
     zabbix_agent_ip: "{{ ansible_all_ipv4_addresses | ipaddr('public') | first }}"
     zabbix_agent_server: "{{ zabbix_agent_server_public_ip | default(zabbix_agent_server) }}"
     zabbix_agent_serveractive: "{{ zabbix_agent_serveractive_public_ip | default(zabbix_agent_serveractive) }}"
+    zabbix_agent2_server: "{{ zabbix_agent_server_public_ip | default(zabbix_agent2_server) }}"
+    zabbix_agent2_serveractive: "{{ zabbix_agent_serveractive_public_ip | default(zabbix_agent2_serveractive) }}"
   when:
     - zabbix_agent_ip is not defined
     - total_private_ip_addresses is defined
@@ -52,7 +54,6 @@
 - name: "Get IP of agent_listeninterface when no agent_listenip specified"
   set_fact:
     zabbix_agent_listenip: "{{ hostvars[inventory_hostname][network_interface]['ipv4'].address | default('0.0.0.0') }}"
-    zabbix_agent_ip: "{{ hostvars[inventory_hostname][network_interface]['ipv4'].address | default('0.0.0.0') }}"
   when:
     - (zabbix_agent_listeninterface)
     - not zabbix_agent_listenip
@@ -91,7 +92,7 @@
     name: zabbix
     state: present
     gid: "{{ zabbix_agent_docker_user_gid | default(omit) }}"
-  become: yes
+  become: true
   when:
     - zabbix_agent_docker | bool
 
@@ -100,11 +101,11 @@
     name: zabbix
     group: zabbix
     state: present
-    create_home: False
+    create_home: false
     home: /etc/zabbix
     uid: "{{ zabbix_agent_docker_user_uid | default(omit) }}"
-    system: True
-  become: yes
+    system: true
+  become: true
   when:
     - zabbix_agent_docker | bool
 
@@ -117,7 +118,7 @@
     mode: "{{ zabbix_agent_conf_mode }}"
   notify:
     - restart zabbix-agent
-  become: yes
+  become: true
   when:
     - not (zabbix_agent_docker | bool)
   tags:
@@ -130,7 +131,7 @@
     path: "{{ zabbix_agent_tlspskfile | dirname }}"
     mode: 0755
     state: directory
-  become: yes
+  become: true
   when:
     - zabbix_agent_tlspskfile is defined
     - not zabbix_agent2
@@ -140,7 +141,7 @@
     path: "{{ zabbix_agent2_tlspskfile | dirname }}"
     mode: 0755
     state: directory
-  become: yes
+  become: true
   when:
     - zabbix_agent2_tlspskfile is defined
     - zabbix_agent2
@@ -152,7 +153,7 @@
     owner: zabbix
     group: zabbix
     mode: 0400
-  become: yes
+  become: true
   when:
     - zabbix_agent_tlspskfile is defined
     - zabbix_agent_tlspsk_secret is defined
@@ -167,7 +168,7 @@
     owner: zabbix
     group: zabbix
     mode: 0400
-  become: yes
+  become: true
   when:
     - zabbix_agent2_tlspskfile is defined
     - zabbix_agent2_tlspsk_secret is defined
@@ -182,7 +183,7 @@
     group: zabbix
     mode: "{{ zabbix_agent_include_mode if not zabbix_agent2 else zabbix_agent2_include_mode }}"
     state: directory
-  become: yes
+  become: true
   tags:
     - config
     - include
@@ -207,8 +208,8 @@
   service:
     name: "{{ zabbix_agent_service }}"
     state: started
-    enabled: yes
-  become: yes
+    enabled: true
+  become: true
   when:
     - not (zabbix_agent_docker | bool)
   tags:

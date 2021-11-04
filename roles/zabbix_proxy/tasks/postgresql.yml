@@ -16,7 +16,7 @@
 - name: "PostgreSQL | Delegated"
   block:
     - name: "PostgreSQL | Delegated | Create database"
-      postgresql_db:
+      community.postgresql.postgresql_db:
         name: "{{ zabbix_proxy_dbname }}"
         port: "{{ zabbix_proxy_dbport }}"
         state: present
@@ -28,8 +28,8 @@
         port: "{{ zabbix_proxy_dbport }}"
         priv: ALL
         state: present
-        encrypted: yes
-  become: yes
+        encrypted: true
+  become: true
   become_user: postgres
   delegate_to: "{{ delegated_dbhost }}"
   when:
@@ -42,7 +42,7 @@
 - name: "PostgreSQL | Remote"
   block:
     - name: "PostgreSQL | Remote | Create database"
-      postgresql_db:
+      community.postgresql.postgresql_db:
         login_host: "{{ zabbix_proxy_pgsql_login_host | default(omit) }}"
         login_user: "{{ zabbix_proxy_pgsql_login_user | default(omit) }}"
         login_password: "{{ zabbix_proxy_pgsql_login_password | default(omit) }}"
@@ -61,7 +61,7 @@
         port: "{{ zabbix_proxy_dbport }}"
         priv: ALL
         state: present
-        encrypted: yes
+        encrypted: true
   when:
     - zabbix_database_creation
     - zabbix_proxy_pgsql_login_host is defined

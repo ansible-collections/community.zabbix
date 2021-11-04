@@ -42,6 +42,31 @@ This role will work on the following operating systems:
 So, you'll need one of those operating systems.. :-)
 Please send Pull Requests or suggestions when you want to use this role for other Operating systems.
 
+# Requirements
+## Ansible 2.10 and higher
+
+With the release of Ansible 2.10, modules have been moved into collections.  With the exception of ansible.builtin modules, this means additonal collections must be installed in order to use modules such as seboolean (now ansible.posix.seboolean).  The following collection is now required: `ansible.posix`.  Installing the collection:
+
+```sh
+ansible-galaxy collection install ansible.posix
+```
+
+### MySQL
+
+When you are a MySQL user and using Ansible 2.10 or newer, then there is a dependency on the collection named `community.mysql`. This collections are needed as the `mysql_` modules are now part of collections and not standard in Ansible anymmore. Installing the collection:
+
+```sh
+ansible-galaxy collection install community.mysql
+```
+
+### PostgreSQL
+
+When you are a PostgreSQL user and using Ansible 2.10 or newer, then there is a dependency on the collection named `community.postgresql`. This collections are needed as the `postgresql_` modules are now part of collections and not standard in Ansible anymmore. Installing the collection:
+
+```sh
+ansible-galaxy collection install community.mysql
+```
+
 ## Zabbix Versions
 
 See the following list of supported Operating systems with the Zabbix releases.
@@ -53,7 +78,7 @@ See the following list of supported Operating systems with the Zabbix releases.
 | Red Hat Fam 6       |  V  |  V  |     |           | V         |
 | Red Hat Fam 5       |  V  |  V  |     |           | V         |
 | Fedora              |     |     | V   | V         |           |
-| Ubuntu 20.04 focal  |  V  |  V  |     |           |           |
+| Ubuntu 20.04 focal  |  V  |  V  |     | V         |           |
 | Ubuntu 19.10 eoan   |     |     |     |           |           |
 | Ubuntu 18.04 bionic |  V  |  V  | V   | V         |           |
 | Ubuntu 16.04 xenial |  V  |  V  | V   | V         |           |
@@ -90,8 +115,8 @@ The following is an overview of all available configuration default for this rol
 ### Zabbix Proxy
 
 * `zabbix_proxy_ip`: The IP address of the host. When not provided, it will be determined via the `ansible_default_ipv4` fact.
-* `zabbix_server_host`: The ip or dns name for the zabbix-server machine.
-* `zabbix_server_port`: The port on which the zabbix-server is running. Default: 10051
+* `zabbix_proxy_server`: The ip or dns name for the zabbix-server machine.
+* `zabbix_proxy_serverport`: The port on which the zabbix-server is running. Default: 10051
 * `*zabbix_proxy_package_state`: Default: `present`. Can be overridden to `latest` to update packages
 * `zabbix_proxy_install_database_client`: Default: `True`. False does not install database client.
 * `zabbix_proxy_become_on_localhost`: Default: `True`. Set to `False` if you don't need to elevate privileges on localhost to install packages locally with pip.
@@ -298,14 +323,15 @@ These variables need to be overridden when you want to make use of the zabbix-ap
 
 When `zabbix_api_create_proxy` is set to `True`, it will install on the host executing the Ansible playbook the `zabbix-api` python module.
 
-* `zabbix_url`: The url on which the Zabbix webpage is available. Example: http://zabbix.example.com
+* `zabbix_api_server_url`: The url on which the Zabbix webpage is available. Example: http://zabbix.example.com
 * `zabbix_api_http_user`: The http user to access zabbix url with Basic Auth
 * `zabbix_api_http_password`: The http password to access zabbix url with Basic Auth
-* `zabbix_api_create_proxy`: When you want to enable the Zabbix API to create/delete the proxy. This has to be set to `True` if you want to make use of `zabbix_create_proxy`. Default: `False`
-* `zabbix_api_user`: Username of user which has API access.
-* `zabbix_api_pass`: Password for the user which has API access.
-* `zabbix_create_proxy`: present (Default) if the proxy needs to be created or absent if you want to delete it. This only works when `zabbix_api_create_proxy` is set to `True`.
+* `zabbix_api_create_proxy`: When you want to enable the Zabbix API to create/delete the proxy. This has to be set to `True` if you want to make use of `zabbix_proxy_state`. Default: `False`
+* `zabbix_api_login_user`: Username of user which has API access.
+* `zabbix_api_login_pass`: Password for the user which has API access.
+* `zabbix_proxy_state`: present (Default) if the proxy needs to be created or absent if you want to delete it. This only works when `zabbix_api_create_proxy` is set to `True`.
 * `zabbix_proxy_status`: active (Default) if the proxy needs to be active or passive.
+* `zabbix_api_timeout`: timeout for API calls (default to 30 seconds)
 
 # Example Playbook
 
@@ -315,7 +341,7 @@ Including an example of how to use your role (for instance, with variables passe
   - hosts: zabbix-proxy
     roles:
       - role: community.zabbix.zabbix_proxy
-        zabbix_server_host: 192.168.1.1
+        zabbix_proxy_server: 192.168.1.1
         zabbix_proxy_database: mysql
         zabbix_proxy_database_long: mysql
 ```
