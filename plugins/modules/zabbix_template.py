@@ -352,7 +352,7 @@ class Template(ZabbixBase):
                 continue
             else:
                 template_id = template_list[0]['templateid']
-                template_ids.append(template_id)
+                template_ids.append({'templateid': template_id})
         return template_ids
 
     def add_template(self, template_name, group_ids, link_template_ids, macros):
