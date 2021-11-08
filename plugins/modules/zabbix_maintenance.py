@@ -44,6 +44,12 @@ options:
             - Length of maintenance window in minutes.
         default: 10
         type: int
+    start_time:
+        description:
+            - Time the maintenance starts in format YYYY-mm-dd HH:MM
+            - If None the default start time is now()
+        default: None
+        type: str
     name:
         description:
             - Unique name of maintenance window.
@@ -74,7 +80,7 @@ extends_documentation_fragment:
 notes:
     - Useful for setting hosts in maintenance mode before big update,
       and removing maintenance window after update.
-    - Module creates maintenance window from now() to now() + minutes,
+    - Module creates maintenance window from start_time to start_time + minutes,
       so if Zabbix server's time and host's time are not synchronized,
       you will get strange results.
     - Install required module with 'pip install zabbix-api' command.
@@ -274,6 +280,7 @@ def main():
         desc=dict(type='str', required=False, default="Created by Ansible"),
         collect_data=dict(type='bool', required=False, default=True),
         visible_name=dict(type='bool', required=False, default=True),
+        start_time=dict(type='str', required=False, default=None),
     ))
     module = AnsibleModule(
         argument_spec=argument_spec,
@@ -290,6 +297,7 @@ def main():
     desc = module.params['desc']
     collect_data = module.params['collect_data']
     visible_name = module.params['visible_name']
+    start_time = module.params['start_time']
 
     if collect_data:
         maintenance_type = 0
@@ -307,8 +315,15 @@ def main():
         if not host_names and not host_groups:
             module.fail_json(msg="At least one host_name or host_group must be defined for each created maintenance.")
 
-        now = datetime.datetime.now().replace(second=0)
-        start_time = time.mktime(now.timetuple())
+        if start_time:
+            try:
+                time_obj = datetime.datetime.strptime(start_time, '%Y-%m-%d %H:%M')
+            except:
+                module.fail_json(msg="Failed to parse start_time: expected format is YYYY-mm-dd HH:MM")
+        else:
+            time_obj = datetime.datetime.now().replace(second=0)
+
+        start_time = time.mktime(time_obj.timetuple())
         period = 60 * int(minutes)  # N * 60 seconds
 
         if host_groups:
