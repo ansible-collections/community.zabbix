@@ -46,8 +46,8 @@ options:
         type: int
     start_time:
         description:
-            - Time the maintenance starts in format YYYY-mm-dd HH:MM
-            - If None the default start time is now()
+            - Time the maintenance window starts in format YYYY-mm-dd HH:MM
+            - If None the default start_time is now()
         default: None
         type: str
     name:
