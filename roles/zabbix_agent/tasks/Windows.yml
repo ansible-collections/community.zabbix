@@ -212,7 +212,7 @@
   register: zabbix_windows_service
 
 - name: "Windows | Register Service"
-  ansible.windows.win_command: '"{{ zabbix_win_exe_path }}" --config "{{ zabbix_win_install_dir }}\{{ zabbix_win_config_name }}" --install'
+  ansible.windows.win_command: '"{{ zabbix_win_exe_path }}" --config "{{ zabbix_win_install_dir }}\conf\{{ zabbix_win_config_name }}" --install'
   when: not zabbix_windows_service.exists
 
 - name: "Windows | Set service startup mode to auto, ensure it is started and set auto-recovery"
