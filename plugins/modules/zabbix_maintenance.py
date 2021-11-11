@@ -53,7 +53,7 @@ options:
     name:
         description:
             - Unique name of maintenance window.
-        required: true
+        required: false
         type: str
     desc:
         description:
@@ -276,7 +276,7 @@ def main():
         host_names=dict(type='list', required=False, default=None, aliases=['host_name']),
         minutes=dict(type='int', required=False, default=10),
         host_groups=dict(type='list', required=False, default=None, aliases=['host_group']),
-        name=dict(type='str', required=True),
+        name=dict(type='str', required=False, default=None),
         desc=dict(type='str', required=False, default="Created by Ansible"),
         collect_data=dict(type='bool', required=False, default=True),
         visible_name=dict(type='bool', required=False, default=True),
@@ -298,6 +298,7 @@ def main():
     collect_data = module.params['collect_data']
     visible_name = module.params['visible_name']
     start_time = module.params['start_time']
+    now = datetime.datetime.now()
 
     if collect_data:
         maintenance_type = 0
@@ -308,6 +309,9 @@ def main():
         zabbix_host = "name"
     else:
         zabbix_host = "host"
+
+    if not name:
+        name = f"Created at {now.strftime('%Y-%m-%d %H:%M')}"
 
     changed = False
 
@@ -321,7 +325,7 @@ def main():
             except:
                 module.fail_json(msg="Failed to parse start_time: expected format is YYYY-mm-dd HH:MM")
         else:
-            time_obj = datetime.datetime.now().replace(second=0)
+            time_obj = now.replace(second=0)
 
         start_time = time.mktime(time_obj.timetuple())
         period = 60 * int(minutes)  # N * 60 seconds
