@@ -55,6 +55,7 @@ options:
             - Unique name of maintenance window.
         required: false
         type: str
+        default: 'Created at now.strftime('%Y-%m-%d %H:%M')'
     desc:
         description:
             - Short description of maintenance window.
@@ -391,7 +392,7 @@ def main():
                 else:
                     module.fail_json(msg="Failed to remove maintenance: %s" % error)
 
-    module.exit_json(changed=changed)
+    module.exit_json(changed=changed, name=name)
 
 
 if __name__ == '__main__':
