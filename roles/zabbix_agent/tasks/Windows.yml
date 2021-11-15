@@ -206,6 +206,12 @@
   when:
     - zabbix_agent_win_download_zip.changed
 
+- name: "Windows | Configure zabbix-agent"
+  win_template:
+    src:  "{{ zabbix_win_config_name }}.j2"
+    dest: "{{ zabbix_win_install_dir }}\\{{ zabbix_win_config_name }}"
+  notify: restart win zabbix agent
+
 - name: "Windows | Check if windows service exist"
   ansible.windows.win_service:
     name: "{{ zabbix_win_svc_name }}"
