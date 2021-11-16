@@ -7,15 +7,6 @@
     - zabbix_agent_ip is not defined
     - "'ansible_ip_addresses' in hostvars[inventory_hostname]"
 
-- name: "Windows | Place TLS-PSK file"
-  ansible.windows.win_copy:
-    content: "{{ zabbix_agent_tlspsk_secret }}"
-    dest: "{{ zabbix_agent_tlspskfile }}"
-  when:
-    - zabbix_agent_tlspskfile is defined
-    - zabbix_agent_tlspsk_secret is defined
-  notify: restart win zabbix agent
-
 - name: "Windows | Configure zabbix-agent"
   ansible.windows.win_template:
     src: "{{ zabbix_win_config_name }}.j2"
