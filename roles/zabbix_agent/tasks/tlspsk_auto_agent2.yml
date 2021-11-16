@@ -73,7 +73,7 @@
     - restart win zabbix agent
     - restart mac zabbix agent
     
- - name: AutoPSK | Template TLS PSK secret in file
+- name: AutoPSK | Template TLS PSK secret in file
   copy:
     dest: "{{ zabbix_agent2_tlspskfile }}"
     content: "{{ zabbix_agent2_tlspsk_secret }}"
