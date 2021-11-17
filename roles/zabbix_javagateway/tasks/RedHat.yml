@@ -1,24 +1,31 @@
 ---
 # Tasks specific for RedHat systems
+- name: "RedHat | Import Zabbix gpg key"
+  rpm_key:
+    key: "{{ zabbix_repo_yum_gpg_key }}"
+    state: present
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
+  register: zabbix_web_repo_files_installed
+  until: zabbix_web_repo_files_installed is succeeded
+  become: true
+  when:
+    - zabbix_repo == "zabbix"
+  tags:
+    - zabbix-web
 
-- name: "RedHat | Install basic repo file"
-  yum_repository:
-    name: "{{ item.name }}"
-    description: "{{ item.description }}"
-    baseurl: "{{ item.baseurl }}"
-    gpgcheck: "{{ item.gpgcheck }}"
-    gpgkey: "{{ item.gpgkey }}"
-    mode: "{{ item.mode | default('0644') }}"
-    priority: "{{ item.priority | default('99') }}"
-    state: "{{ item.state | default('present') }}"
-    proxy: "{{ zabbix_http_proxy | default(omit) }}"
-  with_items: "{{ zabbix_repo_yum }}"
+- name: "RedHat | Add repo"
+  package:
+    name: "{{ zabbix_repo_yum_url }}"
+    state: present
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   register: yum_repo_installed
   become: true
   when:
     zabbix_repo == "zabbix"
-  notify:
-    - "clean repo files from proxy creds"
 
 - name: "RedHat | Installing zabbix-java-gateway"
   package:
