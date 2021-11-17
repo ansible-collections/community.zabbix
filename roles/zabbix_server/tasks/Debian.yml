@@ -1,8 +1,5 @@
 ---
 
-- name: "Include Zabbix gpg ids"
-  include_vars: zabbix.yml
-
 - name: "Set some variables"
   set_fact:
     zabbix_short_version: "{{ zabbix_version | regex_replace('\\.', '') }}"
@@ -20,7 +17,6 @@
     zabbix_python_prefix: "python{% if ansible_python_version is version('3', '>=') %}3{% endif %}"
   when:
     - ansible_machine == "aarch64"
-
 
 - name: "Debian | Set some facts"
   set_fact:
