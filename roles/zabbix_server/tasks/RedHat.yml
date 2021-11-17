@@ -88,7 +88,7 @@
     state: absent
   become: true
 
-- name: "RedHat | Install gpg key"
+- name: "RedHat | Import gpg key"
   rpm_key:
     key: "{{ zabbix_repo_yum_gpg_key }}"
     state: present
@@ -103,7 +103,7 @@
   tags:
     - zabbix-server
 
-- name: "RedHat | Install basic repo file"
+- name: "RedHat | Add repo"
   package:
     name: "{{ zabbix_server_repo_yum_url }}"
     state: present
