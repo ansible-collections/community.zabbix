@@ -64,13 +64,30 @@
   until: zabbix_repo_files_installed is succeeded
   when:
     - zabbix_repo == "zabbix"
+    - ansible_distribution_major_version | int != 7
+  become: true
+  tags:
+    - zabbix-agent
+
+- name: "RedHat | Import gpg key (EL 7)"
+  rpm_key:
+    key: "{{ zabbix_repo_yum_gpg_key_el7 }}"
+    state: present
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
+  register: zabbix_repo_files_installed
+  until: zabbix_repo_files_installed is succeeded
+  when:
+    - zabbix_repo == "zabbix"
+    - ansible_distribution_major_version | int == 7
   become: true
   tags:
     - zabbix-agent
 
 - name: "RedHat | Add repo"
   package:
-    name: "{{ zabbix_repo_yum_url }}"
+    name: "https://repo.zabbix.com/zabbix/{{ zabbix_version }}/rhel/{{ zabbix_agent_distribution_major_version }}/x86_64/zabbix-release-{{ zabbix_version }}-1.el{{ zabbix_agent_distribution_major_version }}.noarch.rpm"
     state: present
   environment:
     http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
