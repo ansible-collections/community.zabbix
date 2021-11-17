@@ -31,6 +31,21 @@
   until: gnupg_installed is succeeded
   become: true
 
+- name: "Debian | Installing apt-transport-https"
+  apt:
+    pkg: apt-transport-https
+    update_cache: true
+    cache_valid_time: 3600
+    force: true
+    state: present
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
+  register: gnupg_installed
+  until: gnupg_installed is succeeded
+  become: true
+  when: ansible_distribution_major_version | int < 10
+
 - name: "Debian | Install gpg key"
   apt_key:
     url: http://repo.zabbix.com/zabbix-official-repo.key
