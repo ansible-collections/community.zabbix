@@ -1,10 +1,22 @@
 ---
 
-- name: "Set short version name"
+- name: "Set some variables"
   set_fact:
     zabbix_short_version: "{{ zabbix_version | regex_replace('\\.', '') }}"
     zabbix_python_prefix: "python{% if ansible_python_version is version('3', '>=') %}3{% endif %}"
     zabbix_underscore_version: "{{ zabbix_version | regex_replace('\\.', '_') }}"
+    zabbix_server_repo_deb_url: "http://repo.zabbix.com/zabbix/{{ zabbix_version }}/{{ ansible_distribution.lower() }}/pool/main/z/zabbix-release/zabbix-release_{{ zabbix_version }}-1+{{ ansible_distribution.lower() }}{{ ansible_distribution_version }}_all.deb"
+  when:
+    - ansible_machine != "aarch64"
+
+- name: "Set some variables"
+  set_fact:
+    zabbix_short_version: "{{ zabbix_version | regex_replace('\\.', '') }}"
+    zabbix_python_prefix: "python{% if ansible_python_version is version('3', '>=') %}3{% endif %}"
+    zabbix_underscore_version: "{{ zabbix_version | regex_replace('\\.', '_') }}"
+    zabbix_server_repo_deb_url: "http://repo.zabbix.com/zabbix/{{ zabbix_version }}/{{ ansible_distribution.lower() }}-arm64/pool/main/z/zabbix-release/zabbix-release_{{ zabbix_version }}-1+{{ ansible_distribution.lower() }}{{ ansible_distribution_version }}_all.deb"
+  when:
+    - ansible_machine == "aarch64"
 
 - name: "Debian | Set some facts"
   set_fact:
