@@ -44,9 +44,9 @@ zabbix_agent_distribution_major_version: "{{ ansible_distribution_major_version 
 zabbix_agent_distribution_release: "{{ ansible_distribution_release }}"
 zabbix_agent_os_family: "{{ ansible_os_family }}"
 zabbix_repo_yum_gpg_key: https://repo.zabbix.com/zabbix-official-repo.key
+zabbix_repo_yum_gpg_key_el7: https://repo.zabbix.com/RPM-GPG-KEY-ZABBIX-A14FE591
 zabbix_repo_yum_disabled: "*"
 zabbix_repo_yum_enabled: []
-zabbix_repo_yum_url: "https://repo.zabbix.com/zabbix/{{ zabbix_version }}/rhel/{{ ansible_distribution_major_version }}/x86_64/zabbix-release-{{ zabbix_version }}-1.el{{ ansible_distribution_major_version }}.noarch.rpm"
 
 
 # Zabbix API stuff
