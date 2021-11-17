@@ -112,7 +112,7 @@
 
 - name: "RedHat | Add repo"
   package:
-    name: "{{ zabbix_server_repo_yum_url }}"
+    name: "{{ zabbix_repo_yum_url }}"
     state: present
   environment:
     http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
