@@ -97,8 +97,8 @@ The following is an overview of all available configuration defaults for this ro
   * `epel`: install agent from EPEL repo
   * `zabbix`: (default) install agent from Zabbix repo
   * `other`: install agent from pre-existing or other repo
-* `zabbix_repo_yum`: A list with Yum repository configuration.
-* `zabbix_repo_yum_schema`: Default: `https`. Option to change the web schema for the yum repository(http/https)
+* `zabbix_repo_yum_gpg_key`: A string with the repository GPG signing key/bundle.
+* `zabbix_server_repo_yum_url`: A string with the repository configuration RPM URL.
 * `zabbix_repo_yum_disabled`: A string with repository names that should be disabled when installing Zabbix component specific packages. Is only used when `zabbix_repo_yum_enabled` contains 1 or more repositories. Default `*`.
 * `zabbix_repo_yum_enabled`: A list with repository names that should be enabled when installing Zabbix component specific packages.
 
@@ -109,6 +109,8 @@ The following is an overview of all available configuration defaults for this ro
 * `zabbix_web_conf_mode`: Default: `0644`. The "mode" for the Zabbix configuration file.
 
 ### Zabbix Web specific
+
+* `centos_scl_repo_yum_gpg_key`: A string with the software collection (SCL) repository GPG signing key/bundle.
 
 * `zabbix_api_server_url`: This is the url on which the zabbix web interface is available. Default is zabbix.example.com, you should override it. For example, see "Example Playbook"
 * `zabbix_url_aliases`: A list with Aliases for the Apache Virtual Host configuration.
