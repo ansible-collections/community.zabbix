@@ -1,6 +1,8 @@
 ---
 # defaults file for zabbix-web
 
+centos_scl_repo_yum_gpg_key: https://www.centos.org/keys/RPM-GPG-KEY-CentOS-SIG-SCLo
+
 zabbix_web_version: 5.4
 zabbix_version: "{{ zabbix_web_version }}"
 zabbix_repo: zabbix
@@ -60,34 +62,10 @@ zabbix_nginx_tls_ciphers: ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA
 zabbix_letsencrypt: false
 zabbix_letsencrypt_webroot_path: /var/www/letsencrypt
 
-zabbix_repo_yum_gpgcheck: 0
-zabbix_repo_yum_schema: https
+zabbix_repo_yum_gpg_key: https://repo.zabbix.com/zabbix-official-repo.key
 zabbix_repo_yum_disabled: "*"
 zabbix_repo_yum_enabled: []
-zabbix_repo_yum:
-  - name: zabbix
-    description: Zabbix Official Repository - $basearch
-    baseurl: "{{ zabbix_repo_yum_schema }}://repo.zabbix.com/zabbix/{{ zabbix_version }}/rhel/{{ ansible_distribution_major_version }}/$basearch/"
-    gpgcheck: "{{ zabbix_repo_yum_gpgcheck }}"
-    mode: '0644'
-    gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-ZABBIX
-    state: present
-  - name: zabbix-non-supported
-    description: Zabbix Official Repository non-supported - $basearch
-    baseurl: "{{ zabbix_repo_yum_schema }}://repo.zabbix.com/non-supported/rhel/{{ ansible_distribution_major_version }}/$basearch/"
-    mode: '0644'
-    gpgcheck: "{{ zabbix_repo_yum_gpgcheck }}"
-    gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-ZABBIX
-    state: present
-
-zabbix_5_repo_yum:
-  - name: zabbix-frontend
-    description: Zabbix Official Repository - $basearch
-    baseurl: "{{ zabbix_repo_yum_schema }}://repo.zabbix.com/zabbix/{{ zabbix_version }}/rhel/{{ ansible_distribution_major_version }}/$basearch/frontend/"
-    mode: '0644'
-    gpgcheck: "{{ zabbix_repo_yum_gpgcheck }}"
-    gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-ZABBIX
-    state: present
+zabbix_server_repo_yum_url: "https://repo.zabbix.com/zabbix/{{ zabbix_version }}/rhel/{{ ansible_distribution_major_version }}/x86_64/zabbix-release-{{ zabbix_version }}-1.el{{ ansible_distribution_major_version }}.noarch.rpm"
 
 zabbix_web_max_execution_time: 300
 zabbix_web_memory_limit: 128M
