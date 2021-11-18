@@ -553,7 +553,7 @@ LoadModulePath={{ zabbix_server_loadmodulepath }}
 #	it is allowed to include multiple loadmodule parameters.
 #
 {% if zabbix_server_loadmodule is defined and zabbix_server_loadmodule %}
-LoadModule = {{ loadmodule }}
+LoadModule = {{ zabbix_server_loadmodule }}
 {% endif %}
 
 {% if zabbix_version is version('3.0', '>=') %}

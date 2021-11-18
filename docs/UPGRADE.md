@@ -16,6 +16,74 @@ Table of content
 
 This document provides an overview of all the changes that are needed to be applied to have a correctly working environment per version. If a version is not part of this document, then there are no changes needed to apply.
 
+## 1.5.0
+
+### Roles
+
+#### Agent
+
+The following properties are added in the `zabbix_agent` role.
+
+* `zabbix_api_timeout = 30`
+* `zabbix_agent_tls_subject = "{{ zabbix_agent_tlsservercertsubject }}"`
+* `zabbix_agent2_server = "{{ zabbix_agent_server }}"`
+* `zabbix_agent2_serveractive = "{{ zabbix_agent_serveractive }}"`
+* `zabbix_agent2_allow_key = "{{ zabbix_agent_allow_key }}"`
+* `zabbix_agent2_deny_key = "{{ zabbix_agent_deny_key }}"`
+* `zabbix_agent2_tls_subject = "{{ zabbix_agent2_tlsservercertsubject }}"`
+
+NOTE: The original properties can still be used but it's suggested to update to
+use the new ones.
+
+The following properties are renamed in the `zabbix_agent` role.
+
+| From                          | To                            |
+|-------------------------------|-------------------------------|
+| zabbix_url                    | zabbix_api_server_url         |
+| zabbix_agent_server_url       | zabbix_api_server_url         |
+| zabbix_http_user              | zabbix_api_http_user          |
+| zabbix_http_password          | zabbix_api_http_password      |
+| zabbix_api_user               | zabbix_api_login_user         |
+| zabbix_api_pass               | zabbix_api_login_pass         |
+| zabbix_validate_certs         | zabbix_api_validate_certs     |
+| zabbix_create_hostgroup       | zabbix_agent_hostgroups_state |
+| zabbix_macros                 | zabbix_agent_macros           |
+| zabbix_inventory_mode         | zabbix_agent_inventory_mode   |
+| zabbix_link_templates         | zabbix_agent_link_templates   |
+| zabbix_proxy                  | zabbix_agent_proxy            |
+| zabbix_update_host            | zabbix_agent_host_update      |
+| zabbix_create_host            | zabbix_agent_host_state       |
+| zabbix_visible_hostname       | zabbix_agent_visible_hostname |
+
+NOTE: the old parameters are still valid but it's suggested to update to use the
+new ones.
+
+#### Proxy
+
+The following properties are added in the `zabbix_proxy` role.
+
+* `zabbix_api_timeout = 30`
+* `zabbix_proxy_tls_subject = "{{ zabbix_proxy_tlsservercertsubject }}"`
+
+The following properties are renamed in the `zabbix_proxy` role.
+
+| From                       | To                              |
+|----------------------------|---------------------------------|
+| zabbix_server_host         | zabbix_proxy_server             |
+| zabbix_server_port         | zabbix_proxy_serverport         |
+| zabbix_proxy_localbuffer   | zabbix_proxy_proxylocalbuffer   |
+| zabbix_proxy_offlinebuffer | zabbix_proxy_proxyofflinebuffer |
+| zabbix_create_proxy        | zabbix_proxy_state              |
+| zabbix_url                 | zabbix_api_server_url           |
+| zabbix_http_user           | zabbix_api_http_user            |
+| zabbix_http_password       | zabbix_api_http_password        |
+| zabbix_api_user            | zabbix_api_login_user           |
+| zabbix_api_pass            | zabbix_api_login_pass           |
+| zabbix_validate_certs      | zabbix_api_validate_certs       |
+
+NOTE: the old parameters are still valid but it's suggested to update to use the
+new ones.
+
 ## 1.0.0
 
 ### Roles
@@ -85,7 +153,7 @@ Example of using the role in this collection::
 - hosts: zabbix-proxy
   roles:
     - role: community.zabbix.zabbix_proxy
-      zabbix_server_host: 192.168.1.1
+      zabbix_proxy_server: 192.168.1.1
       zabbix_server_database: mysql
       zabbix_server_database_long: mysql
       zabbix_server_dbport: 3306

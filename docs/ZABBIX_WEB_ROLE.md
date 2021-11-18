@@ -41,6 +41,15 @@ This role will work on the following operating systems:
 So, you'll need one of those operating systems.. :-)
 Please send Pull Requests or suggestions when you want to use this role for other Operating systems.
 
+## Ansible 2.10 and higher
+
+With the release of Ansible 2.10, modules have been moved into collections.  With the exception of ansible.builtin modules, this means additonal collections must be installed in order to use modules such as seboolean (now ansible.posix.seboolean).  The following collections are now required: `ansible.posix`.  The `community.general` collection is required when defining the `zabbix_web_htpasswd` variable (see variable section below).  Installing the collections:
+
+```sh
+ansible-galaxy collection install ansible.posix
+ansible-galaxy collection install community.general
+```
+
 ## Zabbix Versions
 
 See the following list of supported Operating Systems with the Zabbix releases.
@@ -52,7 +61,7 @@ See the following list of supported Operating Systems with the Zabbix releases.
 | Red Hat Fam 6       |  V  |  V  |     |           | V         |
 | Red Hat Fam 5       |  V  |  V  |     |           | V         |
 | Fedora              |     |     | V   | V         |           |
-| Ubuntu 20.04 focal  |  V  |  V  |     |           |           |
+| Ubuntu 20.04 focal  |  V  |  V  | V   |           |           |
 | Ubuntu 19.10 eoan   |     |     |     |           |           |
 | Ubuntu 18.04 bionic |  V  |  V  | V   | V         |           |
 | Ubuntu 16.04 xenial |  V  |  V  | V   | V         |           |
@@ -101,7 +110,7 @@ The following is an overview of all available configuration defaults for this ro
 
 ### Zabbix Web specific
 
-* `zabbix_url`: This is the url on which the zabbix web interface is available. Default is zabbix.example.com, you should override it. For example, see "Example Playbook"
+* `zabbix_api_server_url`: This is the url on which the zabbix web interface is available. Default is zabbix.example.com, you should override it. For example, see "Example Playbook"
 * `zabbix_url_aliases`: A list with Aliases for the Apache Virtual Host configuration.
 * `zabbix_timezone`: Default: `Europe/Amsterdam`. This is the timezone. The Apache Virtual Host needs this parameter.
 * `zabbix_vhost`: Default: `true`. When you don't want to create an Apache Virtual Host configuration, you can set it to False.
@@ -226,7 +235,7 @@ When there is one host running both Zabbix Server and the Zabbix Web (Running My
       zabbix_server_database_long: mysql
       zabbix_server_dbport: 3306
     - role: community.zabbix.zabbix_web
-      zabbix_url: zabbix.mydomain.com
+      zabbix_api_server_url: zabbix.mydomain.com
       zabbix_server_database: mysql
       zabbix_server_database_long: mysql
       zabbix_server_dbport: 3306
@@ -250,7 +259,7 @@ This is a two host setup. On one host (Named: "zabbix-server") the Zabbix Server
   roles:
     - role: geerlingguy.apache
     - role: community.zabbix.zabbix_web
-      zabbix_url: zabbix.mydomain.com
+      zabbix_api_server_url: zabbix.mydomain.com
       zabbix_server_hostname: zabbix-server
       zabbix_server_database: mysql
       zabbix_server_database_long: mysql
@@ -277,7 +286,7 @@ zabbix.conf.php, for example to add LDAP CA certificates. To do this add a `zabb
         - php-acpu
     - role: geerlingguy.apache-php-fpm
     - role: community.zabbix.zabbix_web
-      zabbix_url: zabbix.mydomain.com
+      zabbix_api_server_url: zabbix.mydomain.com
       zabbix_server_hostname: zabbix-server
       zabbix_server_database: mysql
       zabbix_server_database_long: mysql

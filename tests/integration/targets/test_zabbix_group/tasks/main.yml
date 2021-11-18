@@ -1,9 +1,9 @@
 ---
 - name: test - create new Zabbix group
   zabbix_group:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     host_groups:
       - zbxgrp_example_group01
     state: present
@@ -15,9 +15,9 @@
 
 - name: test - create simple zabbix host to assign to group
   zabbix_host:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     host_name: zbxgrp_example_host01
     host_groups:
       - zbxgrp_example_group01
@@ -34,9 +34,9 @@
 
 - name: test - create same Zabbix group once again
   zabbix_group:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     host_groups:
       - zbxgrp_example_group01
     state: present
@@ -48,9 +48,9 @@
 
 - name: test - attempt to create new Zabbix group matching name of default Zabbix group
   zabbix_group:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     host_groups:
       - Linux servers
     state: present
@@ -62,14 +62,14 @@
 
 - name: test - attempt to delete host group while its only group host has assigned
   zabbix_group:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     host_groups:
       - zbxgrp_example_group01
     state: absent
   register: zbxgrp_existing_delete_failed
-  ignore_errors: True
+  ignore_errors: true
 
 - name: assert that group deletion failed
   assert:
@@ -77,17 +77,17 @@
 
 - name: delete helper zabbix host
   zabbix_host:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     host_name: zbxgrp_example_host01
     state: absent
 
 - name: test - attempt to delete previously created zabbix group
   zabbix_group:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     host_groups:
       - zbxgrp_example_group01
     state: absent
@@ -99,9 +99,9 @@
 
 - name: test - attempt to delete non-existing zabbix group
   zabbix_group:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     host_groups:
       - zbxgrp_example_group01
     state: absent

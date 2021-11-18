@@ -31,6 +31,8 @@ options:
         required: true
         type: str
         aliases: [ url ]
+        env:
+          - name: ZABBIX_SERVER
     proxy:
         description: Proxy server to use for reaching zabbix API
         type: string
@@ -40,7 +42,7 @@ options:
             - API query for hosts - see zabbix documentation for more details U(https://www.zabbix.com/documentation/current/manual/api/reference/host/get)
         type: dict
         elements: dict
-        default: []
+        default: {}
         suboptions:
             selectApplications:
                 type: str
@@ -191,11 +193,15 @@ options:
             - Zabbix user name.
         type: str
         required: true
+        env:
+          - name: ZABBIX_USERNAME
     login_password:
         description:
             - Zabbix user password.
         type: str
         required: true
+        env:
+          - name: ZABBIX_PASSWORD
     http_login_user:
         description:
             - Basic Auth login
@@ -213,7 +219,9 @@ options:
       description:
        - If set to False, SSL certificates will not be validated. This should only be used on personally controlled sites using self-signed certificates.
       type: bool
-      default: yes
+      default: true
+      env:
+        - name: ZABBIX_VALIDATE_CERTS
     add_zabbix_groups:
       description:
        - If set to True, hosts will be added to groups based on their zabbix groups
@@ -236,7 +244,7 @@ host_zapi_query:
   selectApplications: ['name', 'applicationid']
   selectParentTemplates: ['name']
   selectGroups: ['name']
-validate_certs: no
+validate_certs: false
 groups:
   enabled: zbx_status == "0"
   disabled: zbx_status == "1"
@@ -247,7 +255,7 @@ plugin: community.zabbix.zabbix_inventory
 server_url: https://zabbix.com
 login_user: Admin
 login_password: password
-validate_certs: no
+validate_certs: false
 keyed_groups:
   - key: zbx_status | lower
     prefix: 'env'
@@ -261,22 +269,22 @@ server_url: https://zabbix.com
 proxy: http://someproxy:8080
 login_user: Admin
 login_password: password
-validate_certs: no
+validate_certs: false
 
 #Organize inventory groups based on zabbix host groups
 plugin: community.zabbix.zabbix_inventory
 server_url: https://zabbix.com
-add_zabbix_groups: True
+add_zabbix_groups: true
 login_user: Admin
 login_password: password
-validate_certs: no
+validate_certs: false
 
 #Using compose to modify vars
 plugin: community.zabbix.zabbix_inventory
 server_url: https://zabbix.com
 login_user: Admin
 login_password: password
-validate_certs: no
+validate_certs: false
 compose:
   zbx_testvar: zbx_status.replace("1", "Disabled")
 

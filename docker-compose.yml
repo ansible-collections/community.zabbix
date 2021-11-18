@@ -2,7 +2,7 @@
 version: '3.7'
 services:
   zabbix-db:
-    image: postgres:latest
+    image: postgres:13
     environment:
       POSTGRES_DB: "zabbix"
       POSTGRES_USER: "zabbix"

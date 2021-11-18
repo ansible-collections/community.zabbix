@@ -8,7 +8,7 @@
 
 - name: "Set the correct delegated_dbhost (to support MySQL db deployment on a remote dbhost)"
   set_fact:
-    delegated_dbhost:  "{{ inventory_hostname }}"
+    delegated_dbhost: "{{ inventory_hostname }}"
   when:
     - not zabbix_proxy_dbhost_run_install
 
@@ -18,7 +18,7 @@
   when: zabbix_proxy_real_dbhost | default(false)
 
 - name: "MySQL | Create database"
-  mysql_db:
+  community.mysql.mysql_db:
     name: "{{ zabbix_proxy_dbname }}"
     encoding: "{{ zabbix_proxy_dbencoding }}"
     collation: "{{ zabbix_proxy_dbcollation }}"
@@ -37,7 +37,7 @@
     - skip_ansible_lint
 
 - name: "MySQL | Create database user"
-  mysql_user:
+  community.mysql.mysql_user:
     login_host: "{{ zabbix_proxy_mysql_login_host | default(omit) }}"
     login_user: "{{ zabbix_proxy_mysql_login_user | default(omit) }}"
     login_password: "{{ zabbix_proxy_mysql_login_password | default(omit) }}"
@@ -56,7 +56,7 @@
 
 - name: "Get the file for schema.sql"
   shell: ls -1 {{ datafiles_path }}/schema.sq*
-  changed_when: False
+  changed_when: false
   when:
     - zabbix_database_sqlload
     - zabbix_repo != "epel"
@@ -81,13 +81,13 @@
     -e 'SHOW VARIABLES;' 2>&1 | grep innodb_default_row_format \
     | awk '{print $2}' | tr [:upper:] [:lower:]
   register: mysql_innodb_default_row_format
-  changed_when: False
+  changed_when: false
   args:
     executable: /bin/bash
   become: true
 
 - name: "MySQL | Set innodb_default_row_format to dynamic"
-  mysql_variables:
+  community.mysql.mysql_variables:
     variable: innodb_default_row_format
     value: dynamic
     login_host: "{{ zabbix_proxy_mysql_login_host | default(omit) }}"
@@ -107,7 +107,7 @@
     - database
 
 - name: "MySQL | Create database and import file"
-  mysql_db:
+  community.mysql.mysql_db:
     login_host: "{{ zabbix_proxy_mysql_login_host | default(omit) }}"
     login_user: "{{ zabbix_proxy_mysql_login_user | default(omit) }}"
     login_password: "{{ zabbix_proxy_mysql_login_password | default(omit) }}"
@@ -128,7 +128,7 @@
     - database
 
 - name: "MySQL | Revert innodb_default_row_format to previous value"
-  mysql_variables:
+  community.mysql.mysql_variables:
     variable: innodb_default_row_format
     value: '{{ mysql_innodb_default_row_format.stdout }}'
     login_host: "{{ zabbix_proxy_mysql_login_host | default(omit) }}"
@@ -151,6 +151,7 @@
   file:
     path: /etc/zabbix/schema.done
     state: touch
+    mode: '0644'
   when:
     - zabbix_database_sqlload
     - zabbix_repo != "epel"

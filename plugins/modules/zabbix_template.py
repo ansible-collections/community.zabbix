@@ -174,7 +174,7 @@ EXAMPLES = r'''
     server_url: http://127.0.0.1
     login_user: username
     login_password: password
-    template_xml: "{{ lookup('file', 'zabbix_apache2.json') }}"
+    template_xml: "{{ lookup('file', 'zabbix_apache2.xml') }}"
     state: present
 
 - name: Import Zabbix template from Ansible dict variable

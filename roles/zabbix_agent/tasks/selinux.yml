@@ -4,7 +4,7 @@
   apt:
     pkg: policycoreutils-python-utils
     state: present
-    update_cache: yes
+    update_cache: true
     cache_valid_time: 0
     force_apt_get: "{{ zabbix_apt_force_apt_get }}"
     install_recommends: "{{ zabbix_apt_install_recommends }}"
@@ -13,7 +13,7 @@
     https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   register: zabbix_agent_policycoreutils_installed
   until: zabbix_agent_package_installed is succeeded
-  become: yes
+  become: true
   when:
     - zabbix_agent_os_family == "Debian"
 
@@ -29,7 +29,7 @@
   when:
     - zabbix_agent_os_family == "RedHat"
     - (zabbix_agent_distribution_major_version == "6" or zabbix_agent_distribution_major_version == "7")
-  become: yes
+  become: true
   tags:
     - init
     - zabbix-agent
@@ -46,7 +46,7 @@
   when:
     - zabbix_agent_os_family == "RedHat"
     - ansible_distribution_major_version == "8"
-  become: yes
+  become: true
   tags:
     - init
     - zabbix-agent
@@ -59,7 +59,7 @@
   until: zabbix_agent_selinuxpolicytargeted_installed is succeeded
   when:
     - zabbix_agent_os_family == "RedHat"
-  become: yes
+  become: true
   tags:
     - init
     - zabbix-agent
@@ -69,15 +69,15 @@
   stat:
     path: /usr/sbin/getenforce
   register: getenforce_bin
-  become: yes
+  become: true
 
 - name: "SELinux | Collect getenforce output"
   command: /usr/sbin/getenforce
   register: sestatus
   when: 'getenforce_bin.stat.exists'
   changed_when: false
-  become: yes
-  check_mode: no
+  become: true
+  check_mode: false
 
 - name: "SELinux | Set zabbix_selinux to true if getenforce returns Enforcing or Permissive"
   set_fact:
@@ -86,16 +86,16 @@
     - 'getenforce_bin.stat.exists and ("Enforcing" in sestatus.stdout or "Permissive" in sestatus.stdout)'
 
 - name: "SELinux | Allow zabbix_agent to start (SELinux)"
-  selinux_permissive:
+  community.general.selinux_permissive:
     name: zabbix_agent_t
     permissive: true
-  become: yes
+  become: true
 
 - name: "SELinux | Allow zabbix to run sudo commands (SELinux)"
-  seboolean:
+  ansible.posix.seboolean:
     name: zabbix_run_sudo
-    persistent: yes
-    state: yes
+    persistent: true
+    state: true
   when:
     - ansible_selinux.status == "enabled"
     - selinux_allow_zabbix_run_sudo|bool

@@ -5,15 +5,15 @@
   stat:
     path: /usr/sbin/getenforce
   register: getenforce_bin
-  become: yes
+  become: true
 
 - name: "Collect getenforce output"
   command: getenforce
   register: sestatus
   when: 'getenforce_bin.stat.exists'
   changed_when: false
-  become: yes
-  check_mode: no
+  become: true
+  check_mode: false
 
 - name: "Set zabbix_selinux to true if getenforce returns Enforcing or Permissive"
   set_fact:
@@ -32,7 +32,7 @@
     https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   register: zabbix_server_dependencies_installed
   until: zabbix_server_dependencies_installed is succeeded
-  become: yes
+  become: true
   when:
     - ansible_os_family == "RedHat"
     - selinux_allow_zabbix_can_network
@@ -50,7 +50,7 @@
     https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   register: zabbix_server_dependencies_installed
   until: zabbix_server_dependencies_installed is succeeded
-  become: yes
+  become: true
   when:
     - ansible_os_family == "RedHat"
     - selinux_allow_zabbix_can_network
@@ -59,22 +59,22 @@
     - zabbix-server
 
 - name: "SELinux | RedHat | Enable httpd_can_connect_zabbix SELinux boolean"
-  seboolean:
+  ansible.posix.seboolean:
     name: httpd_can_connect_zabbix
-    state: yes
-    persistent: yes
-  become: yes
+    state: true
+    persistent: true
+  become: true
   when:
     - selinux_allow_zabbix_can_http
   tags:
     - zabbix-server
 
 - name: "SELinux | RedHat | Enable zabbix_can_network SELinux boolean"
-  seboolean:
+  ansible.posix.seboolean:
     name: zabbix_can_network
-    state: yes
-    persistent: yes
-  become: yes
+    state: true
+    persistent: true
+  become: true
   when:
     - selinux_allow_zabbix_can_network
   tags:
@@ -90,7 +90,7 @@
     https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   register: zabbix_server_dependencies_installed
   until: zabbix_server_dependencies_installed is succeeded
-  become: yes
+  become: true
   when:
     - ansible_os_family == "RedHat"
     - ansible_distribution_major_version == "7" or ansible_distribution_major_version == "6"
@@ -109,7 +109,7 @@
     https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   register: zabbix_server_dependencies_installed
   until: zabbix_server_dependencies_installed is succeeded
-  become: yes
+  become: true
   when:
     - ansible_os_family == "RedHat"
     - ansible_distribution_major_version == "8"
@@ -121,4 +121,4 @@
     cmd: files/install_semodule.bsx
   args:
     creates: /etc/selinux/targeted/active/modules/400/zabbix_server_add/cil
-    become: yes
+    become: true

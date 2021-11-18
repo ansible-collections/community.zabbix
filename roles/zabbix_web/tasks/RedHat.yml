@@ -8,13 +8,13 @@
     baseurl: "{{ item.baseurl }}"
     gpgcheck: "{{ item.gpgcheck }}"
     gpgkey: "{{ item.gpgkey }}"
-    mode:  "{{ item.mode | default('0644') }}"
+    mode: "{{ item.mode | default('0644') }}"
     priority: "{{ item.priority | default('99') }}"
     state: "{{ item.state | default('present') }}"
     proxy: "{{ zabbix_http_proxy | default(omit) }}"
   with_items: "{{ zabbix_repo_yum }}"
   register: yum_repo_installed
-  become: yes
+  become: true
   when:
     zabbix_repo == "zabbix"
   notify:
@@ -29,12 +29,12 @@
     baseurl: "{{ item.baseurl }}"
     gpgcheck: "{{ item.gpgcheck }}"
     gpgkey: "{{ item.gpgkey }}"
-    mode:  "{{ item.mode | default('0644') }}"
+    mode: "{{ item.mode | default('0644') }}"
     priority: "{{ item.priority | default('99') }}"
     state: "{{ item.state | default('present') }}"
     proxy: "{{ zabbix_http_proxy | default(omit) }}"
   with_items: "{{ zabbix_5_repo_yum }}"
-  become: yes
+  become: true
   when:
     - zabbix_repo == "zabbix"
     - zabbix_version is version('5.0', '>=')
@@ -49,7 +49,7 @@
     pkg:
       - centos-release-scl
     state: "{{ zabbix_web_package_state }}"
-    update_cache: yes
+    update_cache: true
     disablerepo: "{{ '*' if (zabbix_repo_yum_enabled | length>0) else omit }}"
     enablerepo: "{{ zabbix_repo_yum_enabled if zabbix_repo_yum_enabled is iterable and (zabbix_repo_yum_enabled | length>0) else omit }}"
   environment:
@@ -57,7 +57,7 @@
     https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   register: zabbix_web_dependency_package_install
   until: zabbix_web_dependency_package_install is succeeded
-  become: yes
+  become: true
   when:
     - zabbix_version is version('5.0', '>=')
     - zabbix_web_centos_release
@@ -72,7 +72,7 @@
       - scl-utils
       - scl-utils-build
     state: "{{ zabbix_web_package_state }}"
-    update_cache: yes
+    update_cache: true
     disablerepo: "{{ '*' if (zabbix_repo_yum_enabled | length>0) else omit }}"
     enablerepo: "{{ zabbix_repo_yum_enabled if zabbix_repo_yum_enabled is iterable and (zabbix_repo_yum_enabled | length>0) else omit }}"
   environment:
@@ -80,7 +80,7 @@
     https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   register: zabbix_web_dependency_package_install
   until: zabbix_web_dependency_package_install is succeeded
-  become: yes
+  become: true
   when:
     - zabbix_version is version('5.0', '>=')
     - zabbix_web_centos_release
@@ -94,7 +94,7 @@
     pkg:
       - zabbix-apache-conf-scl
     state: "{{ zabbix_web_package_state }}"
-    update_cache: yes
+    update_cache: true
     disablerepo: "{{ '*' if (zabbix_repo_yum_enabled | length>0) else omit }}"
     enablerepo: "{{ zabbix_repo_yum_enabled if zabbix_repo_yum_enabled is iterable and (zabbix_repo_yum_enabled | length>0) else omit }}"
   environment:
@@ -102,7 +102,7 @@
     https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   register: zabbix_web_package_install
   until: zabbix_web_package_install is succeeded
-  become: yes
+  become: true
   when:
     - zabbix_version is version('5.0', '>=')
     - ansible_distribution_major_version != '8'
@@ -114,7 +114,7 @@
   yum:
     pkg: zabbix-web-{{ zabbix_server_database }}{{ '-scl' if zabbix_version is version('5.0', '>=') and ansible_distribution_major_version != '8' else '' }}
     state: "{{ zabbix_web_package_state }}"
-    update_cache: yes
+    update_cache: true
     disablerepo: "{{ '*' if (zabbix_repo_yum_enabled | length>0) else omit }}"
     enablerepo: "{{ zabbix_repo_yum_enabled if zabbix_repo_yum_enabled is iterable and (zabbix_repo_yum_enabled | length>0) else omit }}"
   environment:
@@ -122,7 +122,7 @@
     https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   register: zabbix_web_package_install
   until: zabbix_web_package_install is succeeded
-  become: yes
+  become: true
   tags:
     - zabbix-web
 
@@ -133,7 +133,7 @@
     owner: "{{ zabbix_web_conf_web_user }}"
     group: "{{ zabbix_web_conf_web_group }}"
     mode: 0644
-  become: yes
+  become: true
   when:
     - zabbix_vhost
   notify:
@@ -155,7 +155,7 @@
   when:
     - zabbix_vhost
     - zabbix_websrv == 'nginx'
-  become: yes
+  become: true
   notify:
     - restart nginx
   tags:

@@ -1,0 +1,80 @@
+---
+- name: test - Create new Zabbix proxy
+  zabbix_proxy:
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
+    state: present
+    proxy_name: ExampleProxy
+    description: ExampleProxy
+    status: passive
+    interface:
+      useip: 1
+      ip: 10.1.1.2
+      port: 10051
+      dns: ExampleProxy.local
+  register: create_proxy_result
+
+- assert:
+    that:
+      - create_proxy_result.changed is sameas true
+
+- name: test - Create new Zabbix host monitored by the proxy
+  zabbix_host:
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
+    state: present
+    host_name: ExampleHost
+    host_groups:
+      - Linux servers
+    status: enabled
+    proxy: ExampleProxy
+    interfaces:
+      - type: 1
+        main: 1
+        useip: 1
+        ip: 10.1.1.3
+        dns: ""
+        port: "10050"
+  register: create_host_result
+
+- assert:
+    that:
+      - create_host_result.changed is sameas true
+
+- name: test - Get zabbix proxy information
+  zabbix_proxy_info:
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
+    proxy_name: ExampleProxy
+    proxy_hosts: true
+  register: get_proxy_info_result
+
+- assert:
+    that:
+    - get_proxy_info_result["zabbix_proxy"].host == "ExampleProxy"
+    - get_proxy_info_result["zabbix_proxy"].hosts | length > 0
+    - get_proxy_info_result["zabbix_proxy"].hosts[0].host == "ExampleHost"
+    - get_proxy_info_result["zabbix_proxy"].interface | length > 0
+    - get_proxy_info_result["zabbix_proxy"].interface.ip == "10.1.1.2"
+    - get_proxy_info_result["zabbix_proxy"].interface.useip == "1"
+    - get_proxy_info_result["zabbix_proxy"].interface.port == "10051"
+    - get_proxy_info_result["zabbix_proxy"].interface.dns == "ExampleProxy.local"
+
+- name: test - cleanup test Zabbix host
+  zabbix_host:
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
+    state: absent
+    host_name: ExampleHost
+
+- name: test - cleanup test Zabbix proxy
+  zabbix_proxy:
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
+    state: absent
+    proxy_name: ExampleProxy

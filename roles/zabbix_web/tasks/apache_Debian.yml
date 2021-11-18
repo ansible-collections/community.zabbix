@@ -2,11 +2,11 @@
 - name: "Debian | Install legacy PHP integration for Apache"
   apt:
     state: present
-    update_cache: yes
+    update_cache: true
     cache_valid_time: 3600
     name:
       - libapache2-mod-php
-  become: yes
+  become: true
 
 - name: "Debian | install apache vhost"
   template:
@@ -16,7 +16,7 @@
     group: "{{ zabbix_web_conf_web_group }}"
     mode: 0644
   when: zabbix_vhost
-  become: yes
+  become: true
   notify:
     - restart apache
   tags:
@@ -30,7 +30,7 @@
     path: "{{ item }}"
     state: absent
   when: zabbix_vhost
-  become: yes
+  become: true
   with_items:
     - /etc/apache2/conf-available/zabbix.conf
     - /etc/apache2/conf-enabled/zabbix.conf
@@ -43,7 +43,7 @@
     group: "{{ zabbix_web_conf_web_group }}"
     state: link
   when: zabbix_vhost
-  become: yes
+  become: true
   notify:
     - restart apache
   tags:

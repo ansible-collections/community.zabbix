@@ -1,9 +1,9 @@
 ---
 - name: test - attempt to create new global macro
   zabbix_globalmacro:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     macro_name: zbxgmacro_test01
     macro_value: 123
     macro_type: text
@@ -16,9 +16,9 @@
 
 - name: test - attempt to create same global macro
   zabbix_globalmacro:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     macro_name: zbxgmacro_test01
     macro_value: 123
     macro_type: text
@@ -31,9 +31,9 @@
 
 - name: test - attempt to create same global macro in zabbix native format
   zabbix_globalmacro:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     macro_name: "{$zbxgmacro_test01}"
     macro_value: 123
     macro_type: text
@@ -46,9 +46,9 @@
 
 - name: test - attempt to create new global macro in zabbix native format
   zabbix_globalmacro:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     macro_name: "{$ZBXGMACRO_TEST02}"
     macro_value: abcd
     macro_type: text
@@ -60,13 +60,13 @@
 
 - name: test - attempt to update global macro with string value while force=no
   zabbix_globalmacro:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     macro_name: zbxgmacro_test01
     macro_value: abc
     macro_type: text
-    force: no
+    force: false
   register: zbxgmacro_update_noforce
 
 - name: assert that nothing has been changed
@@ -75,9 +75,9 @@
 
 - name: test - attempt to update global macro with string value
   zabbix_globalmacro:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     macro_name: zbxgmacro_test01
     macro_value: abc
     macro_type: text
@@ -89,9 +89,9 @@
 
 - name: test - attempt to create global macro with context
   zabbix_globalmacro:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     macro_name: low_space_limit:/home
     macro_value: 10
     macro_type: text
@@ -103,9 +103,9 @@
 
 - name: test - attempt to create same global macro with context and verify that it was converted to uppercase
   zabbix_globalmacro:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     macro_name: LOW_SPACE_LIMIT:/home
     macro_value: 10
     macro_type: text
@@ -117,9 +117,9 @@
 
 - name: test - attempt to delete all global macros
   zabbix_globalmacro:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     macro_name: "{{ item }}"
     state: absent
   loop:
@@ -135,9 +135,9 @@
 
 - name: test - attempt to delete non-existing global macro
   zabbix_globalmacro:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     macro_name: zbxgmacro_test01
     state: absent
   register: zbxgmacro_delete_missing

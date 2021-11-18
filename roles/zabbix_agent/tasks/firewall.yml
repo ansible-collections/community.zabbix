@@ -8,7 +8,7 @@
     protocol: tcp
     chain: "{{ zabbix_agent_firewall_chain }}"
     jump: ACCEPT
-  become: yes
+  become: true
   when:
     - zabbix_agent_firewall_enable | bool
 
@@ -20,18 +20,18 @@
     protocol: tcp
     chain: "{{ zabbix_agent_firewall_chain }}"
     jump: ACCEPT
-  become: yes
+  become: true
   when:
     - zabbix_agent_firewall_enable | bool
     - zabbix_agent_jmx_listenport | bool
 
 - name: "Firewall | Configure firewalld (zabbix_agent_listenport)"
-  firewalld:
+  ansible.posix.firewalld:
     rich_rule: 'rule family="ipv4" source address="{{ zabbix_agent_firewalld_source }}" port protocol="tcp" port="{{ zabbix_agent_listenport }}" accept'
     zone: "{{ zabbix_agent_firewalld_zone }}"
     permanent: true
     state: enabled
-  become: yes
+  become: true
   when:
     - zabbix_agent_firewalld_enable | bool
   notify:
@@ -39,12 +39,12 @@
   tags: zabbix_agent_firewalld_enable
 
 - name: "Firewall | Configure firewalld (zabbix_agent_jmx_listenport)"
-  firewalld:
+  ansible.posix.firewalld:
     rich_rule: 'rule family="ipv4" source address="{{ zabbix_agent_firewalld_source }}" port protocol="tcp" port="{{ zabbix_agent_jmx_listenport }}" accept'
     zone: "{{ zabbix_agent_firewalld_zone }}"
     permanent: true
     state: enabled
-  become: yes
+  become: true
   when:
     - zabbix_agent_firewalld_enable | bool
     - zabbix_agent_jmx_listenport | bool

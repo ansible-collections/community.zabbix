@@ -12,7 +12,7 @@ platforms:
     groups:
       - zabbix_server
       - mysql
-    privileged: True
+    privileged: true
     networks:
       - name: zabbix
     published_ports:
@@ -21,7 +21,7 @@ platforms:
     image: milcom/centos7-systemd:latest
     groups:
       - zabbix_agent
-    privileged: True
+    privileged: true
     networks:
       - name: zabbix
   - name: zabbix-agent-debian
@@ -29,14 +29,14 @@ platforms:
     command: /sbin/init
     groups:
       - zabbix_agent
-    privileged: True
+    privileged: true
     networks:
       - name: zabbix
   - name: zabbix-agent-ubuntu
     image: solita/ubuntu-systemd:bionic
     groups:
       - zabbix_agent
-    privileged: True
+    privileged: true
     networks:
       - name: zabbix
 
@@ -51,10 +51,10 @@ provisioner:
   inventory:
     group_vars:
       all:
-        zabbix_agent_src_reinstall: False
-        zabbix_api_create_hosts: True
-        zabbix_api_create_hostgroup: True
-        zabbix_url: http://zabbix-server-centos
+        zabbix_agent_src_reinstall: false
+        zabbix_api_create_hosts: true
+        zabbix_api_create_hostgroup: true
+        zabbix_api_server_url: http://zabbix-server-centos
         zabbix_apache_servername: zabbix-server-centos
       mysql:
         zabbix_server_database: mysql

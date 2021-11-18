@@ -68,7 +68,7 @@
     name: "{{ zabbix_server_groupname | default('zabbix') }}"
     gid: "{{ zabbix_server_groupid | default(omit) }}"
     state: present
-  become: yes
+  become: true
   when:
     - zabbix_repo == "epel"
 
@@ -78,7 +78,7 @@
     comment: Zabbix Monitoring System
     uid: "{{ zabbix_server_userid | default(omit) }}"
     group: zabbix
-  become: yes
+  become: true
   when:
     - zabbix_repo == "epel"
 
@@ -86,7 +86,7 @@
   file:
     path: /etc/yum.repos.d/zabbix-supported.repo
     state: absent
-  become: yes
+  become: true
 
 - name: "RedHat | Install basic repo file"
   yum_repository:
@@ -95,13 +95,13 @@
     baseurl: "{{ item.baseurl }}"
     gpgcheck: "{{ item.gpgcheck }}"
     gpgkey: "{{ item.gpgkey }}"
-    mode:  "{{ item.mode | default('0644') }}"
+    mode: "{{ item.mode | default('0644') }}"
     priority: "{{ item.priority | default('99') }}"
     state: "{{ item.state | default('present') }}"
     proxy: "{{ zabbix_http_proxy | default(omit) }}"
   with_items: "{{ zabbix_repo_yum }}"
   register: yum_repo_installed
-  become: yes
+  become: true
   when:
     zabbix_repo == "zabbix"
   notify:
@@ -120,7 +120,7 @@
     https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   register: zabbix_server_package_installed
   until: zabbix_server_package_installed is succeeded
-  become: yes
+  become: true
   tags:
     - zabbix-server
 
@@ -137,7 +137,7 @@
   until: zabbix_server_sql_package_installed is succeeded
   when:
     - zabbix_version is version('5.4', '>=')
-  become: yes
+  become: true
   tags:
     - zabbix-server
 
@@ -150,7 +150,7 @@
     https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   register: zabbix_server_dependencies_installed
   until: zabbix_server_dependencies_installed is succeeded
-  become: yes
+  become: true
   when:
     - zabbix_database_creation
     - zabbix_server_database == 'pgsql'
@@ -167,7 +167,7 @@
     https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   register: zabbix_server_dependencies_installed
   until: zabbix_server_dependencies_installed is succeeded
-  become: yes
+  become: true
   when:
     - zabbix_database_creation
     - zabbix_server_database == 'pgsql'
@@ -186,7 +186,7 @@
     https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   register: zabbix_server_dependencies_installed
   until: zabbix_server_dependencies_installed is succeeded
-  become: yes
+  become: true
   when:
     - zabbix_server_database == 'mysql'
     - ansible_distribution_major_version == "8"
@@ -204,7 +204,7 @@
     https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   register: zabbix_server_dependencies_installed
   until: zabbix_server_dependencies_installed is succeeded
-  become: yes
+  become: true
   when:
     - zabbix_server_database == 'mysql'
     - ansible_distribution_major_version == "7"
@@ -222,7 +222,7 @@
     https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   register: zabbix_server_dependencies_installed
   until: zabbix_server_dependencies_installed is succeeded
-  become: yes
+  become: true
   when:
     - zabbix_server_database == 'mysql'
     - ansible_distribution_major_version == "6" or ansible_distribution_major_version == "5"
@@ -238,7 +238,7 @@
     https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   register: zabbix_server_dependencies_installed
   until: zabbix_server_dependencies_installed is succeeded
-  become: yes
+  become: true
   when:
     - zabbix_server_database == 'pgsql'
   tags:

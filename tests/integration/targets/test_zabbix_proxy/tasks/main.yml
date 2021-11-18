@@ -1,9 +1,9 @@
 ---
 - name: test - create new passive Zabbix proxy server
   zabbix_proxy:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     proxy_name: zbxproxy_example01
     description: Example Zabbix Proxy
     state: present
@@ -21,9 +21,9 @@
 
 - name: test - create same passive Zabbix proxy server
   zabbix_proxy:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     proxy_name: zbxproxy_example01
     description: Example Zabbix Proxy
     state: present
@@ -41,9 +41,9 @@
 
 - name: test - update Zabbix proxy server description
   zabbix_proxy:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     proxy_name: zbxproxy_example01
     description: Example Zabbix Proxy desc
     state: present
@@ -61,9 +61,9 @@
 
 - name: test - update Zabbix proxy server interface
   zabbix_proxy:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     proxy_name: zbxproxy_example01
     description: Example Zabbix Proxy desc
     state: present
@@ -81,9 +81,9 @@
 
 - name: test - update Zabbix proxy server description & interface (again)
   zabbix_proxy:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     proxy_name: zbxproxy_example01
     description: Example Zabbix Proxy desc
     state: present
@@ -101,9 +101,9 @@
 
 - name: test - update Zabbix proxy server interface to use only ip
   zabbix_proxy:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     proxy_name: zbxproxy_example01
     description: Example Zabbix Proxy desc
     state: present
@@ -120,9 +120,9 @@
 
 - name: test - update Zabbix proxy server interface to use only ip again
   zabbix_proxy:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     proxy_name: zbxproxy_example01
     description: Example Zabbix Proxy desc
     state: present
@@ -139,9 +139,9 @@
 
 - name: test - update Zabbix proxy server interface to use only dns
   zabbix_proxy:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     proxy_name: zbxproxy_example01
     description: Example Zabbix Proxy desc
     state: present
@@ -158,9 +158,9 @@
 
 - name: test - update Zabbix proxy server interface to use only dns again
   zabbix_proxy:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     proxy_name: zbxproxy_example01
     description: Example Zabbix Proxy desc
     state: present
@@ -177,9 +177,9 @@
 
 - name: test - update Zabbix proxy server interface to fail
   zabbix_proxy:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     proxy_name: zbxproxy_example01
     description: Example Zabbix Proxy desc
     state: present
@@ -189,7 +189,7 @@
       dns: zbxproxy_example01
       port: 10051
   register: zbxproxy_interface_fail
-  ignore_errors: True
+  ignore_errors: true
 
 - name: assert that module has failed
   assert:
@@ -197,9 +197,9 @@
 
 - name: test - update Zabbix proxy server to be active
   zabbix_proxy:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     proxy_name: zbxproxy_example01
     description: Example Zabbix Proxy
     state: present
@@ -212,9 +212,9 @@
 
 - name: test - update Zabbix proxy server to be active (again)
   zabbix_proxy:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     proxy_name: zbxproxy_example01
     description: Example Zabbix Proxy
     state: present
@@ -229,9 +229,9 @@
 - block:
     - name: test - update Zabbix proxy server to be active and use proxy_address
       zabbix_proxy:
-        server_url: "{{ zabbix_server_url }}"
-        login_user: "{{ zabbix_login_user }}"
-        login_password: "{{ zabbix_login_password }}"
+        server_url: "{{ zabbix_api_server_url }}"
+        login_user: "{{ zabbix_api_login_user }}"
+        login_password: "{{ zabbix_api_login_pass }}"
         proxy_name: zbxproxy_example01
         description: Example Zabbix Proxy
         state: present
@@ -245,9 +245,9 @@
 
     - name: test - update Zabbix proxy server to be active use proxy_address (again)
       zabbix_proxy:
-        server_url: "{{ zabbix_server_url }}"
-        login_user: "{{ zabbix_login_user }}"
-        login_password: "{{ zabbix_login_password }}"
+        server_url: "{{ zabbix_api_server_url }}"
+        login_user: "{{ zabbix_api_login_user }}"
+        login_password: "{{ zabbix_api_login_pass }}"
         proxy_name: zbxproxy_example01
         description: Example Zabbix Proxy
         state: present
@@ -263,9 +263,9 @@
 
 - name: test - update Zabbix proxy server to use encryption
   zabbix_proxy:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     proxy_name: zbxproxy_example01
     description: Example Zabbix Proxy
     state: present
@@ -282,9 +282,9 @@
 
 - name: test - update Zabbix proxy server to use encryption (again)
   zabbix_proxy:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     proxy_name: zbxproxy_example01
     description: Example Zabbix Proxy
     state: present
@@ -301,9 +301,9 @@
 
 - name: test - update Zabbix proxy server encryption settings
   zabbix_proxy:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     proxy_name: zbxproxy_example01
     description: Example Zabbix Proxy
     state: present
@@ -320,9 +320,9 @@
 
 - name: test - update Zabbix proxy server back to being passive
   zabbix_proxy:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     proxy_name: zbxproxy_example01
     description: Example Zabbix Proxy
     state: present
@@ -340,9 +340,9 @@
 
 - name: test - delete Zabbix proxy server
   zabbix_proxy:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     proxy_name: zbxproxy_example01
     state: absent
   register: zbxproxy_delete
@@ -353,9 +353,9 @@
 
 - name: test - delete Zabbix proxy server (again)
   zabbix_proxy:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     proxy_name: zbxproxy_example01
     state: absent
   register: zbxproxy_delete_again
