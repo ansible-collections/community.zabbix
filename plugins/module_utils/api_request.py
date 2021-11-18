@@ -10,7 +10,7 @@ from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
 
-import uuid
+from uuid import uuid4
 
 from ansible.module_utils.urls import CertificateError
 from ansible.module_utils.six.moves.urllib.parse import urlencode
@@ -60,7 +60,7 @@ class ZabbixApiRequest(object):
 
     @staticmethod
     def payload_builder(method_, **kwargs):
-      reqid = str(uuid.uuid4())
+      reqid = str(uuid4())
       req = {'jsonrpc': '2.0', 'method': method_, 'id': reqid}
       req['params'] = (kwargs)
 
