@@ -57,10 +57,13 @@ def main():
     )
 
     api_request = ZabbixApiRequest(module)
-    v = api_request.get_api_version()
+    v = api_request.api_version()
+    #alias = "Admin"
+    #v = api_request.user.get({'output': 'extend', 'filter': {'alias': alias},
+    #                                           'getAccess': True, 'selectMedias': 'extend',
+    #                                           'selectUsrgrps': 'extend'})
 
     module.exit_json(changed=False, response=v)
-
 
 if __name__ == '__main__':
     main()

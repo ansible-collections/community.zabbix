@@ -43,75 +43,56 @@ BASE_HEADERS = {
 }
 
 
-import debugpy
-
 class HttpApi(HttpApiBase):
-    fuck = False
+    zbx_api_version = None
+
+    def __open_debug(self):
+        import debugpy
+        if not debugpy.is_client_connected():
+            debugpy.listen(5678)
+            print("Waiting for debugger attach")
+            debugpy.wait_for_client()
+        debugpy.breakpoint()
 
     def set_become(self, become_context):
-      """As this is an http rpc call there is no elevation available
-      """
-      pass
+        """As this is an http rpc call there is no elevation available
+        """
+        pass
 
     def update_auth(self, response, response_text):
-      return None
+        return None
 
     def login(self, username, password):
-      debugpy.breakpoint()
-      payload = self.payload_builder("user.login", username=username, password=password)
-      code, response = self.send_request(payload=payload)
+        payload = self.payload_builder("user.login", username=username, password=password)
+        code, response = self.send_request(payload=payload)
 
-      if code == 200 and response != '':
-          self.connection._auth = {
-            "zabbix_token": response
-          }
-          self.connection._token = response
+        if code == 200 and response != '':
+            self.connection._auth = response
+            self.connection._token = response
 
-      # {
-      #     "jsonrpc": "2.0",
-      #     "method": "user.login",
-      #     "params": {
-      #         "username": "Admin",
-      #         "password": "zabbix"
-      #     },
-      #     "id": 1
-      # }
-      # Response:
+        # {
+        #     "jsonrpc": "2.0",
+        #     "method": "user.login",
+        #     "params": {
+        #         "username": "Admin",
+        #         "password": "zabbix"
+        #     },
+        #     "id": 1
+        # }
+        # Response:
 
-      # {
-      #     "jsonrpc": "2.0",
-      #     "result": "0424bd59b807674191e7d77572075f33",
-      #     "id": 1
-      # }
+        # {
+        #     "jsonrpc": "2.0",
+        #     "result": "0424bd59b807674191e7d77572075f33",
+        #     "id": 1
+        # }
 
     def logout(self):
-      # logout_path = '/my/logout/path'
-      # self.send_request(None, path=logout_path)
-      # # Clean up tokens
-      # self.connection._auth = None
-      debugpy.breakpoint()
-      if not self.connection._token:
-        return
+        if not self.connection._token:
+            return
 
-      payload = self.payload_builder("user.logout", self.connection._token)
-      code, response = self.send_request(payload=payload)
-
-    # Request:
-
-    # {
-    #     "jsonrpc": "2.0",
-    #     "method": "user.logout",
-    #     "params": [],
-    #     "id": 1,
-    #     "auth": "16a46baf181ef9602e1687f3110abf8a"
-    # }
-    # Response:
-
-    # {
-    #     "jsonrpc": "2.0",
-    #     "result": true,
-    #     "id": 1
-    # }
+        payload = self.payload_builder("user.logout", self.connection._token)
+        self.send_request(payload=payload)
 
     def handle_httperror(self, exc):
         """Overridable method for dealing with HTTP codes.
@@ -129,30 +110,34 @@ class HttpApi(HttpApiBase):
             server without making another request. In many cases, this can just
             be the original exception.
             """
-        debugpy.breakpoint()
         if exc.code == 401:
             if self.connection._auth:
                 # Stored auth appears to be invalid, clear and retry
                 self.connection._auth = None
                 self.login(self.connection.get_option('remote_user'), self.connection.get_option('password'))
                 return True
-            else:
-                # Unauthorized and there's no token. Return an error
-                return False
+
+            # Unauthorized and there's no token. Return an error
+            return False
 
         return exc
 
+    def api_version(self):
+        # self.__open_debug()
+        if not self.zbx_api_version:
+            if not hasattr(self.connection, 'zbx_api_version'):
+                code, version = self.send_request(payload=self.payload_builder('apiinfo.version'))
+                #self.__open_debug()
+                if code == 200 and version != '':
+                    self.connection.zbx_api_version = version
+            self.zbx_api_version = self.connection.zbx_api_version
+        return self.zbx_api_version
+
     def send_request(self, request_method="POST", path="/api_jsonrpc.php", payload=None):
-        payload = json.dumps(payload) if payload else '{}'
+        if not payload:
+            payload = {}
 
-        if self.fuck == False:
-          import debugpy
-          debugpy.listen(5678)
-          print("Waiting for debugger attach")
-          debugpy.wait_for_client()
-          debugpy.breakpoint()
-
-        self.fuck = True
+        # self.__open_debug()
 
         try:
             self._display_request(request_method, path)
@@ -165,12 +150,12 @@ class HttpApi(HttpApiBase):
             value = to_text(response_data.getvalue())
 
             try:
-              json_data = json.loads(value) if value else {}
-              if "result" in json_data:
-                json_data = json_data["result"]
+                json_data = json.loads(value) if value else {}
+                if "result" in json_data:
+                    json_data = json_data["result"]
             # JSONDecodeError only available on Python 3.5+
             except ValueError:
-              raise ConnectionError("Invalid JSON response: %s" % value)
+                raise ConnectionError("Invalid JSON response: %s" % value)
 
             return response.getcode(), json_data
         except AnsibleConnectionFailure as e:
@@ -183,7 +168,6 @@ class HttpApi(HttpApiBase):
                 return 404, "Object not found"
         except Exception as e:
             raise e
-
 
     def _display_request(self, request_method, path):
         self.connection.queue_message(
@@ -203,10 +187,10 @@ class HttpApi(HttpApiBase):
 
     @staticmethod
     def payload_builder(method_, auth_=None, **kwargs):
-      reqid = str(uuid4())
-      req = {'jsonrpc': '2.0', 'method': method_, 'id': reqid}
-      if auth_:
-        req['auth'] = auth_
-      req['params'] = (kwargs)
+        reqid = str(uuid4())
+        req = {'jsonrpc': '2.0', 'method': method_, 'id': reqid}
+        if auth_:
+            req['auth'] = auth_
+        req['params'] = (kwargs)
 
-      return req
+        return req

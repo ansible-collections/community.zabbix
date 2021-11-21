@@ -7,25 +7,25 @@
 
 
 from __future__ import absolute_import, division, print_function
+from sys import prefix
 
 __metaclass__ = type
 
 from uuid import uuid4
 
 from ansible.module_utils.urls import CertificateError
-from ansible.module_utils.six.moves.urllib.parse import urlencode
 from ansible.module_utils.connection import ConnectionError, request_builder
 from ansible.module_utils.connection import Connection
 from ansible.module_utils._text import to_text
 
 
 class ZabbixApiRequest(object):
-    def __init__(self, module, headers=None, keymap=None):
+
+    def __init__(self, module):
         self.module = module
         self.connection = Connection(self.module._socket_path)
 
-    def _httpapi_error_handle(self, method, payload=None):
-
+    def _httpapi_error_handle(self, payload=None):
         try:
             code, response = self.connection.send_request(payload=payload)
         except ConnectionError as e:
@@ -50,18 +50,33 @@ class ZabbixApiRequest(object):
 
         return response
 
-    def post(self, **kwargs):
-        return self._httpapi_error_handle("POST", **kwargs)
-
-    def get_api_version(self):
-      payload = self.payload_builder("apiinfo.version")
-      response = self.post(payload=payload)
-      return response
+    def api_version(self):
+        return self.connection.api_version()
 
     @staticmethod
-    def payload_builder(method_, **kwargs):
-      reqid = str(uuid4())
-      req = {'jsonrpc': '2.0', 'method': method_, 'id': reqid}
-      req['params'] = (kwargs)
+    def payload_builder(method_, jsonrpc_version='2.0', reqid=str(uuid4()), **kwargs):
+        req = {'jsonrpc': jsonrpc_version, 'method': method_, 'id': reqid}
+        req['params'] = (kwargs)
+        return req
 
-      return req
+    def __getattr__(self, name):
+        return ZabbixApiSection(self, name)
+
+
+class ZabbixApiSection(object):
+    parent = None
+    name = None
+
+    def __init__(self, parent, name):
+        self.name = name
+        self.parent = parent
+
+    def __getattr__(self, name):
+        def method(opts=None):
+            _method = f"{self.name}.{name}"
+            if not opts:
+                opts = {}
+            payload = ZabbixApiRequest.payload_builder(_method, **opts)
+            return self.parent._httpapi_error_handle(payload=payload)
+
+        return method
