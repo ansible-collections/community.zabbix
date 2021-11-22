@@ -3,7 +3,7 @@
   when: (zabbix_agent_os_family != "Windows") or (zabbix_agent_docker | bool)
 
 - include_tasks: tlspsk_auto_agent2_windows.yml
-  when: (zabbix_agent_os_family == "Windows") or (zabbix_agent_docker | bool)
+  when: zabbix_agent_os_family == "Windows"
 
 - name: AutoPSK | Default tlsaccept and tlsconnect to enforce PSK
   set_fact:
