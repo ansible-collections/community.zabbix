@@ -17,9 +17,9 @@
 - name: AutoPSK | Generate new TLS PSK secret
   set_fact:
     zabbix_agent2_tlspsk_secret: "{{ lookup('password', '/dev/null chars=hexdigits length=64') }}"
-  when: 
+  when:
     - not zabbix_agent2_tlspskcheck.stat.exists
-    - zabbix_agent2_tlspsk_read|length < 32
+    - (zabbix_agent2_tlspsk_read is not defined) or (zabbix_agent2_tlspsk_read|length < 32)
   no_log: "{{ ansible_verbosity < 3 }}"
 
 
