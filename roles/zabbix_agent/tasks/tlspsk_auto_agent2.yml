@@ -47,10 +47,10 @@
 
 - name: AutoPSK | Generate new TLS PSK identity
   set_fact:
-    zabbix_agent2_tlspskidentity: >
+    zabbix_agent2_tlspskidentity: >-
       {{
         zabbix_agent_visible_hostname
-        | ((zabbix_agent2 == True) | default(ternary(zabbix_agent2_hostname, zabbix_agent_hostname)))
+        | default(((zabbix_agent2 == True) | ternary(zabbix_agent2_hostname, zabbix_agent_hostname)))
         + '_'
         + lookup('password', '/dev/null chars=hexdigits length=4')
       }}
@@ -72,7 +72,7 @@
     - restart zabbix-agent
     - restart win zabbix agent
     - restart mac zabbix agent
-    
+
 - name: AutoPSK | Template TLS PSK secret in file
   copy:
     dest: "{{ zabbix_agent2_tlspskfile }}"
