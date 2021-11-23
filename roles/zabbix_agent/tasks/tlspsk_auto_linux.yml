@@ -33,7 +33,7 @@
   when: zabbix_agent_tlspskidentity_check.stat.exists
   no_log: "{{ ansible_verbosity < 3 }}"
 
-- include_tasks: tlspsk_auto_agent_common.yml
+- include_tasks: tlspsk_auto_common.yml
 
 - name: AutoPSK | Template TLS PSK identity in file (Linux)
   copy:
