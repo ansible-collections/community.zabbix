@@ -36,7 +36,7 @@
     zabbix_agent_tlspskidentity: >-
       {{
         zabbix_agent_visible_hostname
-        | default(((zabbix_agent == True) | ternary(zabbix_agent_hostname, zabbix_agent_hostname)))
+        | default(((zabbix_agent2 != True) | ternary(zabbix_agent_hostname, zabbix_agent_hostname)))
         + '_'
         + lookup('password', '/dev/null chars=hexdigits length=4')
       }}
