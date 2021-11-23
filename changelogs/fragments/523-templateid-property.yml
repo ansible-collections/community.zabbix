@@ -1,0 +1,4 @@
+---
+bugfixes:
+  - template - use templateid property when linking templates for ``template.create``
+    and ``template.update`` API calls.
