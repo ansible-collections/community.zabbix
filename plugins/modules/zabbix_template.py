@@ -352,7 +352,7 @@ class Template(ZabbixBase):
                 continue
             else:
                 template_id = template_list[0]['templateid']
-                template_ids.append(template_id)
+                template_ids.append({'templateid': template_id})
         return template_ids
 
     def add_template(self, template_name, group_ids, link_template_ids, macros):
@@ -444,13 +444,15 @@ class Template(ZabbixBase):
 
         if template_changes:
             # If we got here we know that only one template was provided via template_name
-            template_changes.update({'templateid': template_ids[0]})
+            template_changes.update(template_ids[0])
             self._zapi.template.update(template_changes)
 
     def delete_template(self, templateids):
         if self._module.check_mode:
             self._module.exit_json(changed=True)
-        self._zapi.template.delete(templateids)
+
+        templateids_list = [t.get('templateid') for t in templateids]
+        self._zapi.template.delete(templateids_list)
 
     def ordered_json(self, obj):
         # Deep sort json dicts for comparison
@@ -462,8 +464,9 @@ class Template(ZabbixBase):
             return obj
 
     def dump_template(self, template_ids, template_type='json', omit_date=False):
+        template_ids_list = [t.get('templateid') for t in template_ids]
         try:
-            dump = self._zapi.configuration.export({'format': template_type, 'options': {'templates': template_ids}})
+            dump = self._zapi.configuration.export({'format': template_type, 'options': {'templates': template_ids_list}})
             if template_type == 'xml':
                 xmlroot = ET.fromstring(dump.encode('utf-8'))
                 # remove date field if requested
