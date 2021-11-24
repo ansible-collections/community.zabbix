@@ -118,13 +118,13 @@
     - zabbix_agent_2_service_exist | default(false)
 
 - name: "Windows | Uninstall Zabbix v1"
-  ansible.windows.win_command: '"{{ zabbix_win_exe_path }}" --config "{{ zabbix_win_install_dir }}\{{ zabbix_win_config_name }}" --uninstall'
+  ansible.windows.win_command: '"{{ zabbix_win_exe_path }}" --config "{{ zabbix_win_install_dir }}\conf\{{ zabbix_win_config_name }}" --uninstall'
   when:
     - zabbix_agent_version_change | default(false) or zabbix_agent2
     - zabbix_agent_1_service_exist | default(false)
 
 - name: "Windows | Uninstall Zabbix v2"
-  ansible.windows.win_command: '"{{ zabbix2_win_exe_path }}" --config "{{ zabbix_win_install_dir }}\{{ zabbix2_win_config_name }}" --uninstall'
+  ansible.windows.win_command: '"{{ zabbix2_win_exe_path }}" --config "{{ zabbix_win_install_dir }}\conf\{{ zabbix2_win_config_name }}" --uninstall'
   when:
     - zabbix_agent_version_change | default(false) or not zabbix_agent2
     - zabbix_agent_2_service_exist | default(false)
@@ -206,19 +206,13 @@
   when:
     - zabbix_agent_win_download_zip.changed
 
-- name: "Windows | Configure zabbix-agent"
-  win_template:
-    src:  "{{ zabbix_win_config_name }}.j2"
-    dest: "{{ zabbix_win_install_dir }}\\{{ zabbix_win_config_name }}"
-  notify: restart win zabbix agent
-
 - name: "Windows | Check if windows service exist"
   ansible.windows.win_service:
     name: "{{ zabbix_win_svc_name }}"
   register: zabbix_windows_service
 
 - name: "Windows | Register Service"
-  ansible.windows.win_command: '"{{ zabbix_win_exe_path }}" --config "{{ zabbix_win_install_dir }}\{{ zabbix_win_config_name }}" --install'
+  ansible.windows.win_command: '"{{ zabbix_win_exe_path }}" --config "{{ zabbix_win_install_dir }}\conf\{{ zabbix_win_config_name }}" --install'
   when: not zabbix_windows_service.exists
 
 - name: "Windows | Set service startup mode to auto, ensure it is started and set auto-recovery"
