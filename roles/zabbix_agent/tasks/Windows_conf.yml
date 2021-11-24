@@ -13,6 +13,12 @@
     dest: "{{ zabbix_win_install_dir }}\\conf\\{{ zabbix_win_config_name }}"
   notify: restart win zabbix agent
 
+- name: "Windows | Configure zabbix-agent in install_dir root"
+  ansible.windows.win_template:
+    src: "{{ zabbix_win_config_name }}.j2"
+    dest: "{{ zabbix_win_install_dir }}\\{{ zabbix_win_config_name }}"
+  notify: restart win zabbix agent
+
 - name: "Windows | Set service startup mode to auto, ensure it is started and set auto-recovery"
   ansible.windows.win_service:
     name: "{{ zabbix_win_svc_name }}"
