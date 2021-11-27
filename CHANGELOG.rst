@@ -23,6 +23,7 @@ Minor Changes
 - zabbix_proxy (role) - new `zabbix_api_timeout` option.
 - zabbix_proxy_info - new module that allows to retrieve information about configured Zabbix Proxies.
 - zabbix_server - added support for TimescaleDB (https://github.com/ansible-collections/community.zabbix/pull/428).
+- zabbix_maintenance - now allows to set start time in the future via `start_time` parameter
 
 Breaking Changes / Porting Guide
 --------------------------------
@@ -303,7 +304,7 @@ v0.2.0
 Release Summary
 ---------------
 
-| Release date: 2020-06-15 
+| Release date: 2020-06-15
 
 Minor Changes
 -------------

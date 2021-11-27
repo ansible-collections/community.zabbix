@@ -312,7 +312,7 @@ def main():
         zabbix_host = "host"
 
     if not name:
-        name = f"Created at {now.strftime('%Y-%m-%d %H:%M')}"
+        name = "Created at " + now.strftime('%Y-%m-%d %H:%M')
 
     changed = False
 
@@ -323,7 +323,7 @@ def main():
         if start_time:
             try:
                 time_obj = datetime.datetime.strptime(start_time, '%Y-%m-%d %H:%M')
-            except:
+            except (Exception, ValueError) as e:
                 module.fail_json(msg="Failed to parse start_time: expected format is YYYY-mm-dd HH:MM")
         else:
             time_obj = now.replace(second=0)
