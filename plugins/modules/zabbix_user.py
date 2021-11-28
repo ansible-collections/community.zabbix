@@ -306,13 +306,13 @@ class User(ZabbixBase):
         res = self._zapi.usergroup.get(params)
         if res:
             ids = [{'usrgrpid': g['usrgrpid']} for g in res]
-            # User can be created password-less only when all groups are LDAP
-            # Verify there are no groups with different access methods
-            not_ldap = bool([g for g in res if g['gui_access'] != '2'])
+            # User can be created password-less only when all groups are of non-internal
+            # authentication types
+            internal_auth = bool([g for g in res if g['gui_access'] == '1'])
             not_found_groups = set(usrgrps) - set([g['name'] for g in res])
             if not_found_groups:
                 self._module.fail_json(msg='User groups not found: %s' % not_found_groups)
-            return ids, not_ldap
+            return ids, internal_auth
         else:
             self._module.fail_json(msg='No user groups found')
 
@@ -444,7 +444,7 @@ class User(ZabbixBase):
         return user_parameter_difference_check_result, diff_params
 
     def add_user(self, alias, name, surname, user_group_ids, passwd, lang, theme, autologin, autologout, refresh,
-                 rows_per_page, url, user_medias, user_type, not_ldap, timezone, role_name):
+                 rows_per_page, url, user_medias, user_type, internal_auth, timezone, role_name):
 
         if role_name is None and LooseVersion(self._zbx_api_version) >= LooseVersion('5.2'):
             # This variable is to set the default value because the module must have a backward-compatible.
@@ -473,7 +473,7 @@ class User(ZabbixBase):
         if user_medias:
             request_data['user_medias'] = user_medias
 
-        if LooseVersion(self._zbx_api_version) < LooseVersion('4.0') or not_ldap:
+        if LooseVersion(self._zbx_api_version) < LooseVersion('4.0') or internal_auth:
             request_data['passwd'] = passwd
 
         # The type key has changed to roleid key since Zabbix 5.2
@@ -667,8 +667,8 @@ def main():
     user_ids = {}
     zbx_user = user.check_user_exist(alias)
     if state == 'present':
-        user_group_ids, not_ldap = user.get_usergroups_by_name(usrgrps)
-        if LooseVersion(user._zbx_api_version) < LooseVersion('4.0') or not_ldap:
+        user_group_ids, internal_auth = user.get_usergroups_by_name(usrgrps)
+        if LooseVersion(user._zbx_api_version) < LooseVersion('4.0') or internal_auth:
             if passwd is None:
                 module.fail_json(msg='User password is required. One or more groups are not LDAP based.')
 
@@ -688,7 +688,7 @@ def main():
             diff_check_result = True
             user_ids, diff_params = user.add_user(alias, name, surname, user_group_ids, passwd, lang, theme, autologin,
                                                   autologout, refresh, rows_per_page, after_login_url, user_medias,
-                                                  user_type, not_ldap, timezone, role_name)
+                                                  user_type, internal_auth, timezone, role_name)
 
     if state == 'absent':
         if zbx_user:
