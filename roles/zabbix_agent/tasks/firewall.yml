@@ -25,29 +25,61 @@
     - zabbix_agent_firewall_enable | bool
     - zabbix_agent_jmx_listenport | bool
 
-- name: "Firewall | Configure firewalld (zabbix_agent_listenport)"
+- name: "Firewall | Create firewall zone if absent"
   firewalld:
-    rich_rule: 'rule family="ipv4" source address="{{ zabbix_agent_firewalld_source }}" port protocol="tcp" port="{{ zabbix_agent_listenport }}" accept'
     zone: "{{ zabbix_agent_firewalld_zone }}"
-    permanent: true
-    state: enabled
-  become: yes
-  when:
-    - zabbix_agent_firewalld_enable | bool
-  notify:
-    - firewalld-reload
+    state: present
+    permanent: yes
+  register: zabbix_agent_firewalld_zone_added
   tags: zabbix_agent_firewalld_enable
 
-- name: "Firewall | Configure firewalld (zabbix_agent_jmx_listenport)"
+- name: "Firewall | Remove default port from service"
+  command: '/usr/bin/firewall-offline-cmd --service=zabbix-agent --remove-port="10050/tcp"'
+  register: zabbix_agent_firewalld_port_removed
+  failed_when: zabbix_agent_firewalld_port_removed.rc > 0 and zabbix_agent_firewalld_port_removed.rc != 26
+  changed_when: zabbix_agent_firewalld_port_removed.rc != 26
+  when: zabbix_agent_listenport != 10050
+  tags: zabbix_agent_firewalld_enable
+
+- name: "Firewall | Add port to service"
+  command: '/usr/bin/firewall-offline-cmd --service=zabbix-agent --add-port="{{ zabbix_agent_listenport }}/tcp"'
+  register: zabbix_agent_firewalld_port_added
+  failed_when: zabbix_agent_firewalld_port_added.rc > 0 and zabbix_agent_firewalld_port_added.rc != 26
+  changed_when: zabbix_agent_firewalld_port_added.rc != 26
+  when: zabbix_agent_listenport != 10050
+  tags: zabbix_agent_firewalld_enable
+
+- name: "Firewall | Add JMX port to service"
+  command: '/usr/bin/firewall-offline-cmd --service=zabbix-agent --add-port="{{ zabbix_agent_jmx_listenport }}/tcp"'
+  register: zabbix_agent_firewalld_jmx_port_added
+  failed_when: zabbix_agent_firewalld_jmx_port_added.rc > 0 and zabbix_agent_firewalld_jmx_port_added.rc != 26
+  changed_when: zabbix_agent_firewalld_jmx_port_added.rc != 26
+  when: zabbix_agent_jmx_listenport | bool
+  tags: zabbix_agent_firewalld_enable
+
+- name: "Firewall | Reload firewalld immediately"
+  service:
+    name: "firewalld"
+    state: reloaded
+  when: zabbix_agent_firewalld_zone_added.changed or zabbix_agent_firewalld_port_added.changed
+  tags: zabbix_agent_firewalld_enable
+
+- name: "Firewall | Configure firewalld (zabbix_agent_firewalld_zone)"
   firewalld:
-    rich_rule: 'rule family="ipv4" source address="{{ zabbix_agent_firewalld_source }}" port protocol="tcp" port="{{ zabbix_agent_jmx_listenport }}" accept'
     zone: "{{ zabbix_agent_firewalld_zone }}"
-    permanent: true
+    service: "zabbix-agent"
     state: enabled
-  become: yes
-  when:
-    - zabbix_agent_firewalld_enable | bool
-    - zabbix_agent_jmx_listenport | bool
-  notify:
-    - firewalld-reload
+    permanent: yes
+    immediate: yes
+  when: zabbix_agent_firewalld_enable | bool
+  tags: zabbix_agent_firewalld_enable
+
+- name: "Firewall | Configure firewalld (zabbix_agent_firewalld_source)"
+  firewalld:
+    zone: "{{ zabbix_agent_firewalld_zone }}"
+    source: "{{ zabbix_agent_firewalld_source }}"
+    state: enabled
+    permanent: yes
+    immediate: yes
+  when: zabbix_agent_firewalld_enable | bool
   tags: zabbix_agent_firewalld_enable
