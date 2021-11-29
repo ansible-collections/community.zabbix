@@ -1,5 +1,5 @@
 ---
-# tasks file for dj-wasabi.zabbix-proxy
+# tasks file for zabbix_proxy
 
 - name: "Set default ip address for zabbix_proxy_ip"
   set_fact:
@@ -34,7 +34,7 @@
     group: zabbix
     mode: "{{ zabbix_proxy_include_mode }}"
     state: directory
-  become: yes
+  become: true
 
 - name: "Create module dir zabbix-proxy"
   file:
@@ -42,14 +42,15 @@
     owner: zabbix
     group: zabbix
     state: directory
-  become: yes
+    mode: '0755'
+  become: true
 
 - name: "Create directory for PSK file if not exist."
   file:
     path: "{{ zabbix_proxy_tlspskfile | dirname }}"
     mode: 0755
     state: directory
-  become: yes
+  become: true
   when:
     - zabbix_proxy_tlspskfile is defined
 
@@ -60,7 +61,7 @@
     owner: zabbix
     group: zabbix
     mode: 0400
-  become: yes
+  become: true
   when:
     - zabbix_proxy_tlspskfile is defined
     - zabbix_proxy_tlspsk_secret is defined
@@ -68,20 +69,20 @@
     - restart zabbix-proxy
 
 - name: "Allow zabbix-proxy to open connections (SELinux)"
-  seboolean:
+  ansible.posix.seboolean:
     name: zabbix_can_network
-    persistent: yes
-    state: yes
-  become: yes
+    persistent: true
+    state: true
+  become: true
   when: ansible_selinux.status == "enabled"
   tags: selinux
 
 - name: "Allow zabbix-proxy to connect to zabbix_proxy_preprocessing.sock (SELinux)"
-  seboolean:
+  ansible.posix.seboolean:
     name: daemons_enable_cluster_mode
-    persistent: yes
-    state: yes
-  become: yes
+    persistent: true
+    state: true
+  become: true
   when: ansible_selinux.status == "enabled"
   tags: selinux
 
@@ -93,7 +94,7 @@
     group: zabbix
     mode: "{{ zabbix_proxy_conf_mode }}"
   notify: restart zabbix-proxy
-  become: yes
+  become: true
 
 - name: "Installing the Zabbix-api package on localhost"
   pip:
@@ -102,6 +103,7 @@
   register: zabbix_api_package_installed
   until: zabbix_api_package_installed is succeeded
   delegate_to: localhost
+  run_once: true
   become: "{{ zabbix_proxy_become_on_localhost }}"
   when:
     - zabbix_install_pip_packages | bool
@@ -109,28 +111,29 @@
   tags:
     - api
 
-- name: "Create proxy"
+- name: Ensure proxy definition is up-to-date (added/updated/removed)
   zabbix_proxy:
-    server_url: "{{ zabbix_url }}"
-    http_login_user: "{{ zabbix_api_http_user | default(omit) }}"
-    http_login_password: "{{ zabbix_api_http_password | default(omit) }}"
-    login_user: "{{ zabbix_api_user }}"
-    login_password: "{{ zabbix_api_pass }}"
-    state: "{{ zabbix_create_proxy }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    http_login_user: "{{ zabbix_api_http_user | default(zabbix_http_user | default(omit)) }}"
+    http_login_password: "{{ zabbix_api_http_password | default(zabbix_http_password | default(omit)) }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
+    state: "{{ zabbix_proxy_state }}"
     status: "{{ zabbix_proxy_status }}"
     proxy_name: "{{ zabbix_proxy_name }}"
     description: "{{ zabbix_proxy_description | default(omit) }}"
     interface: "{{ zabbix_proxy_interface }}"
     tls_psk: "{{ zabbix_proxy_tlspsk_secret | default(omit) }}"
     tls_psk_identity: "{{ zabbix_proxy_tlspskidentity | default(omit) }}"
-    tls_subject: "{{ zabbix_proxy_tlsservercertsubject | default(omit) }}"
+    tls_subject: "{{ zabbix_proxy_tls_subject | default(omit) }}"
     tls_accept: "{{ zabbix_proxy_tls_config[zabbix_proxy_tlsaccept if zabbix_proxy_tlsaccept else 'no_encryption'] }}"
     tls_connect: "{{ zabbix_proxy_tls_config[zabbix_proxy_tlsconnect if zabbix_proxy_tlsconnect else 'no_encryption'] }}"
-    validate_certs: "{{ zabbix_validate_certs | default(omit) }}"
+    validate_certs: "{{ zabbix_api_validate_certs | default(omit) }}"
+    timeout: "{{ zabbix_api_timeout }}"
   when:
     - zabbix_api_create_proxy | bool
   delegate_to: localhost
-  become: no
+  become: false
   tags:
     - api
 
@@ -138,6 +141,6 @@
   service:
     name: zabbix-proxy
     state: started
-    enabled: yes
-  become: yes
+    enabled: true
+  become: true
   when: zabbix_proxy_manage_service | bool

@@ -5,7 +5,7 @@
     set -o pipefail
     pkgutil --pkg-info 'com.zabbix.pkg.ZabbixAgent' | grep 'version:' | cut -d ' ' -f 2
   register: pkgutil_version
-  check_mode: no
+  check_mode: false
   changed_when: false
   failed_when: pkgutil_version.rc == 2
 

@@ -3,9 +3,9 @@
 
 - name: Create a new host or update an existing host's info
   zabbix_host:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     host_name: ExampleHost1
     visible_name: ExampleName
     description: My ExampleHost Description
@@ -57,9 +57,9 @@
 
 - name: Update an existing host's tls settings
   zabbix_host:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     host_name: ExampleHost2
     visible_name: ExampleName2
     interfaces:
@@ -78,6 +78,6 @@
 
 - name: expect both to succeed
   assert:
-      that:
-          - "zabbix_host1 is changed"
-          - "zabbix_host2 is changed"
+    that:
+      - "zabbix_host1 is changed"
+      - "zabbix_host2 is changed"

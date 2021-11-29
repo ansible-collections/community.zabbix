@@ -8,7 +8,7 @@
     protocol: tcp
     chain: "{{ zabbix_agent_firewall_chain }}"
     jump: ACCEPT
-  become: yes
+  become: true
   when:
     - zabbix_agent_firewall_enable | bool
 
@@ -20,7 +20,7 @@
     protocol: tcp
     chain: "{{ zabbix_agent_firewall_chain }}"
     jump: ACCEPT
-  become: yes
+  become: true
   when:
     - zabbix_agent_firewall_enable | bool
     - zabbix_agent_jmx_listenport | bool

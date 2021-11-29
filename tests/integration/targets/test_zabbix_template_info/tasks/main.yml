@@ -1,9 +1,9 @@
 ---
 - name: "test - Prepare integration tests for zabbix_template_info module"
   zabbix_template:
-    server_url: "{{ zabbix_server_url }} "
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }} "
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     template_name: ExampleTemplateForTempleteInfoModule
     template_groups:
       - Templates
@@ -16,9 +16,9 @@
 
 - name: "test - Fetch template info as a JSON format from Zabbix Server"
   zabbix_template_info:
-    server_url: "{{ zabbix_server_url }} "
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }} "
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     template_name: ExampleTemplateForTempleteInfoModule
     format: json
   register: fetch_template_json_format_result
@@ -39,12 +39,12 @@
 
 - name: "test - Fetch template info as a JSON format with omit_date parameter from Zabbix Server"
   zabbix_template_info:
-    server_url: "{{ zabbix_server_url }} "
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }} "
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     template_name: ExampleTemplateForTempleteInfoModule
     format: json
-    omit_date: yes
+    omit_date: true
   register: fetch_template_json_format_omit_date_result
 
 - assert:
@@ -56,9 +56,9 @@
 
 - name: "test - Fetch template info as a XML format from Zabbix Server"
   zabbix_template_info:
-    server_url: "{{ zabbix_server_url }} "
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }} "
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     template_name: ExampleTemplateForTempleteInfoModule
     format: xml
   register: fetch_template_xml_format_result
@@ -71,12 +71,12 @@
 
 - name: "test - Fetch template info as a XML format with omit_date parameter from Zabbix Server"
   zabbix_template_info:
-    server_url: "{{ zabbix_server_url }} "
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }} "
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     template_name: ExampleTemplateForTempleteInfoModule
     format: xml
-    omit_date: yes
+    omit_date: true
   register: fetch_template_xml_format_omit_date_result
 
 - assert:

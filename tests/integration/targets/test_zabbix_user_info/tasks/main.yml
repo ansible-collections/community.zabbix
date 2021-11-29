@@ -4,9 +4,9 @@
   block:
     - name: test - Create a new Zabbix user
       zabbix_user:
-        server_url: "{{ zabbix_server_url }}"
-        login_user: "{{ zabbix_login_user }}"
-        login_password: "{{ zabbix_login_password }}"
+        server_url: "{{ zabbix_api_server_url }}"
+        login_user: "{{ zabbix_api_login_user }}"
+        login_password: "{{ zabbix_api_login_pass }}"
         alias: example
         name: user name
         surname: user surname
@@ -16,7 +16,7 @@
         passwd: password
         lang: en_GB
         theme: blue-theme
-        autologin: no
+        autologin: false
         autologout: '0'
         refresh: '30'
         rows_per_page: '200'
@@ -26,17 +26,17 @@
             sendto: example@example.com
             period: 1-7,00:00-24:00
             severity:
-              not_classified: no
-              information: yes
-              warning: yes
-              average: yes
-              high: yes
-              disaster: yes
-            active: no
+              not_classified: false
+              information: true
+              warning: true
+              average: true
+              high: true
+              disaster: true
+            active: false
         type: Zabbix super admin
         state: present
       register: create_zabbix_user_result
-    
+
     - assert:
         that:
           - create_zabbix_user_result.changed is sameas true
@@ -79,9 +79,9 @@
   block:
     - name: test - Create a new Zabbix user
       zabbix_user:
-        server_url: "{{ zabbix_server_url }}"
-        login_user: "{{ zabbix_login_user }}"
-        login_password: "{{ zabbix_login_password }}"
+        server_url: "{{ zabbix_api_server_url }}"
+        login_user: "{{ zabbix_api_login_user }}"
+        login_password: "{{ zabbix_api_login_pass }}"
         alias: example
         name: user name
         surname: user surname
@@ -91,7 +91,7 @@
         passwd: password
         lang: en_GB
         theme: blue-theme
-        autologin: no
+        autologin: false
         autologout: '0'
         refresh: '30'
         rows_per_page: '200'
@@ -101,18 +101,18 @@
             sendto: example@example.com
             period: 1-7,00:00-24:00
             severity:
-              not_classified: no
-              information: yes
-              warning: yes
-              average: yes
-              high: yes
-              disaster: yes
-            active: no
+              not_classified: false
+              information: true
+              warning: true
+              average: true
+              high: true
+              disaster: true
+            active: false
         role_name: Super admin role
         timezone: Asia/Tokyo
         state: present
       register: create_zabbix_user_result
-    
+
     - assert:
         that:
           - create_zabbix_user_result.changed is sameas true
@@ -154,9 +154,9 @@
 
 - name: "test - Get a zabbix user information"
   zabbix_user_info:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     alias: example
   register: get_user_info_result
 
@@ -173,9 +173,9 @@
 
 - name: test - Create a new Zabbix user
   zabbix_user:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     alias: example2
     usrgrps:
       - Guests
@@ -190,9 +190,9 @@
 
 - name: "test - Get a zabbix user information"
   zabbix_user_info:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     alias: example2
   register: get_user_info_result2
 

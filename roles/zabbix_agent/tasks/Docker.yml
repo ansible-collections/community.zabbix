@@ -16,7 +16,7 @@
     - zabbix_agent_tlspskfile is defined
 
 - name: "Ensure Zabbix Docker container is running"
-  docker_container:
+  community.docker.docker_container:
     name: "{{ zabbix_agent_docker_name }}"
     image: "{{ zabbix_agent_docker_image }}:{{ zabbix_agent_docker_image_tag }}"
     state: "{{ zabbix_agent_docker_state }}"
@@ -30,4 +30,4 @@
   environment:
     http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
     https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
-  become: yes
+  become: true

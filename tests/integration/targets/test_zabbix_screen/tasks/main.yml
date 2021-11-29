@@ -2,17 +2,17 @@
 
 - name: ensure zabbix server is being monitored
   community.zabbix.zabbix_host:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     host_name: Zabbix server
     status: enabled
 
 - name: test - delete the screen again
   community.zabbix.zabbix_screen:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     screens:
       - screen_name: TestScreen1
         state: absent
@@ -24,9 +24,9 @@
 
 - name: test - Create a new screen
   community.zabbix.zabbix_screen:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     screens:
       - screen_name: TestScreen1
         host_group: Zabbix servers
@@ -45,9 +45,9 @@
 
 - name: test - Create a new screen again
   community.zabbix.zabbix_screen:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     screens:
       - screen_name: TestScreen1
         host_group: Zabbix servers
@@ -70,9 +70,9 @@
 
 - name: test - Adding new graph
   community.zabbix.zabbix_screen:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     screens:
       - screen_name: TestScreen1
         host_group: Zabbix servers
@@ -94,9 +94,9 @@
 
 - name: test - Removing graph
   community.zabbix.zabbix_screen:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     screens:
       - screen_name: TestScreen1
         host_group: Zabbix servers
@@ -119,9 +119,9 @@
 
 - name: test - delete the screen
   community.zabbix.zabbix_screen:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     screens:
       - screen_name: TestScreen1
         state: absent
@@ -133,9 +133,9 @@
 
 - name: test - delete the screen again
   community.zabbix.zabbix_screen:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     screens:
       - screen_name: TestScreen1
         state: absent

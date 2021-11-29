@@ -47,6 +47,30 @@ This role will work on the following operating systems:
 So, you'll need one of those operating systems.. :-)
 Please send Pull Requests or suggestions when you want to use this role for other Operating systems.
 
+## Ansible 2.10 and higher
+
+With the release of Ansible 2.10, modules have been moved into collections.  With the exception of ansible.builtin modules, this means additonal collections must be installed in order to use modules such as seboolean (now ansible.posix.seboolean).  The following collection is now required: `ansible.posix`.  Installing the collection:
+
+```sh
+ansible-galaxy collection install ansible.posix
+```
+
+### MySQL
+
+When you are a MySQL user and using Ansible 2.10 or newer, then there is a dependency on the collection named `community.mysql`. This collections are needed as the `mysql_` modules are now part of collections and not standard in Ansible anymmore. Installing the collection:
+
+```sh
+ansible-galaxy collection install community.mysql
+```
+
+### PostgreSQL
+
+When you are a PostgreSQL user and using Ansible 2.10 or newer, then there is a dependency on the collection named `community.postgresql`. This collections are needed as the `postgresql_` modules are now part of collections and not standard in Ansible anymmore. Installing the collection:
+
+```sh
+ansible-galaxy collection install community.mysql
+```
+
 ## Zabbix Versions
 
 See the following list of supported Operating systems with the Zabbix releases:
@@ -58,7 +82,7 @@ See the following list of supported Operating systems with the Zabbix releases:
 | Red Hat Fam 6       |  V  |  V  |     |           | V         |
 | Red Hat Fam 5       |  V  |  V  |     |           | V         |
 | Fedora              |     |     | V   | V         |           |
-| Ubuntu 20.04 focal  |  V  |  V  |     |           |           |
+| Ubuntu 20.04 focal  |  V  |  V  |     | V         |           |
 | Ubuntu 19.10 eoan   |     |     |     |           |           |
 | Ubuntu 18.04 bionic |  V  |  V  | V   | V         |           |
 | Ubuntu 16.04 xenial |  V  |  V  | V   | V         |           |

@@ -5,13 +5,13 @@
     zabbix_agent2_tlspskidentity_file: "{{ zabbix_win_install_dir }}\\tls_psk_auto.identity.txt"
 
 - name: AutoPSK | Check for existing TLS PSK file (Windows)
-  win_stat:
+  ansible.windows.win_stat:
     path: "{{ zabbix_agent2_tlspskfile }}"
   register: zabbix_agent2_tlspskcheck
-  become: yes
+  become: true
 
 - name: AutoPSK | Check for existing TLS PSK identity (Windows)
-  win_stat:
+  ansible.windows.win_stat:
     path: "{{ zabbix_agent2_tlspskidentity_file }}"
   register: zabbix_agent2_tlspskidentity_check
-  become: yes
+  become: true

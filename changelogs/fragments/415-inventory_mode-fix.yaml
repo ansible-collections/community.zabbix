@@ -1,3 +1,0 @@
-bugfixes:
-  - zabbix_host - Fix error when updating hosts caused by Zabbix bug not returning
-    the inventory_mode field for hosts(https://github.com/ansible-collections/community.zabbix/issues/385).

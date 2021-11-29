@@ -1,10 +1,10 @@
 ---
-# defaults file for dj-wasabi.zabbix-javagateway
+# defaults file for zabbix_javagateway
 
 zabbix_javagateway_version: 5.4
 zabbix_version: "{{ zabbix_javagateway_version }}"
 zabbix_javagateway_package_state: present
-zabbix_selinux: False
+zabbix_selinux: false
 zabbix_repo: zabbix
 zabbix_repo_yum_schema: https
 zabbix_java_gateway_conf_mode: "0644"
