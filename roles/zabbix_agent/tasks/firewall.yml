@@ -61,7 +61,7 @@
   service:
     name: "firewalld"
     state: reloaded
-  when: zabbix_agent_firewalld_zone_added.changed or zabbix_agent_firewalld_port_added.changed
+  when: zabbix_agent_firewalld_zone_added.changed or zabbix_agent_firewalld_port_added.changed or (zabbix_agent_jmx_listenport | bool)
   tags: zabbix_agent_firewalld_enable
 
 - name: "Firewall | Configure firewalld (zabbix_agent_firewalld_zone)"
