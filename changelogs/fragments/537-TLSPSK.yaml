@@ -1,0 +1,3 @@
+---
+bugfixes:
+  - zabbix_agent - tlspsk_auto to support become on Linux and ignore on windows

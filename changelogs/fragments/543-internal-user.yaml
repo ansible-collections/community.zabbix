@@ -1,0 +1,3 @@
+---
+bugfixes:
+  - zabbix_user - fix: zabbix_user require password only on internal.

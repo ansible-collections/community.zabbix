@@ -4,7 +4,6 @@ community.zabbix Release Notes
 
 .. contents:: Topics
 
-
 v1.5.0
 ======
 

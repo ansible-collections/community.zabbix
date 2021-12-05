@@ -1,0 +1,3 @@
+---
+bugfixes:
+  - zabbix_agent - Create the actual configuration file for Windows setups.
