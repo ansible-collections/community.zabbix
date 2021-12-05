@@ -1,3 +1,0 @@
----
-bugfixes:
-  - zabbix_agent - Fix typo for correct using the zabbix_windows_service.exists
