@@ -1,3 +1,0 @@
----
-bugfixes:
-  - zabbix inventory - Moved ZABBIX_VALIDATE_CERTS to correct option, validate_certs.
