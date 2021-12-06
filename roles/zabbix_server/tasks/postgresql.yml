@@ -87,7 +87,7 @@
   shell: |
     set -euxo pipefail
     cd {{ datafiles_path }}
-    if [ -f create.sql.gz ]; then zcat create.sql.gz > /tmp/create.sql ; fi
+    if [ -f create.sql.gz ]; then zcat create.sql.gz > /tmp/create.sql ; else cp -p create.sql /tmp/create.sql ; fi
     cat /tmp/create.sql | psql -h '{{ zabbix_server_dbhost }}' \
     -U '{{ zabbix_server_dbuser }}' \
     -d '{{ zabbix_server_dbname }}' \
@@ -111,8 +111,8 @@
   shell: |
     set -euxo pipefail
     cd {{ datafiles_path }} &&
-    if [ -f timescaledb.sql.gz ]; then zcat timescaledb.sql.gz > /etc/timescaledb.sql ; fi
-    cat  /etc/timescaledb.sql | psql -h '{{ zabbix_server_dbhost }}' \
+    if [ -f timescaledb.sql.gz ]; then zcat timescaledb.sql.gz > /etc/timescaledb.sql ; else cp -p timescaledb.sql /etc/timescaledb.sql ; fi
+    cat /etc/timescaledb.sql | psql -h '{{ zabbix_server_dbhost }}' \
     -U '{{ zabbix_server_dbuser }}' \
     -d '{{ zabbix_server_dbname }}' \
     -p '{{ zabbix_server_dbport }}'
@@ -159,7 +159,7 @@
   shell: |
     set -euxo pipefail
     cd {{ datafiles_path }}
-    if [ -f schema.sql.gz ]; then zcat schema.sql.gz > /tmp/schema.sql ; fi
+    if [ -f schema.sql.gz ]; then zcat schema.sql.gz > /tmp/schema.sql ; else cp -p schema.sql /tmp/schema.sql ;fi
     cat /tmp/schema.sql | psql -h '{{ zabbix_server_dbhost }}' \
     -U '{{ zabbix_server_dbuser }}' \
     -d '{{ zabbix_server_dbname }}' \
