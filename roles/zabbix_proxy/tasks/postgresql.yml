@@ -80,6 +80,7 @@
     rm -f /tmp/schema.sql
   args:
     creates: /etc/zabbix/schema.done
+    executable: /bin/bash
   environment:
     PGPASSWORD: '{{ zabbix_proxy_dbpassword }}'
   when:

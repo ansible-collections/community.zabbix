@@ -96,6 +96,7 @@
     rm -f /tmp/create.sql
   args:
     creates: /etc/zabbix/schema.done
+    executable: /bin/bash
     warn: false
   environment:
     PGPASSWORD: "{{ zabbix_server_dbpassword }}"
@@ -119,6 +120,7 @@
     rm -f /tmp/timescaledb.sql
   args:
     creates: /etc/zabbix/timescaledb.done
+    executable: /bin/bash
     warn: false
   environment:
     PGPASSWORD: "{{ zabbix_server_dbpassword }}"
@@ -166,6 +168,7 @@
     rm -f /etc/schema.sql
   args:
     creates: /etc/zabbix/schema.done
+    executable: /bin/bash
     warn: false
   environment:
     PGPASSWORD: "{{ zabbix_server_dbpassword }}"
