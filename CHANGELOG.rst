@@ -5,6 +5,24 @@ community.zabbix Release Notes
 .. contents:: Topics
 
 
+v1.5.1
+======
+
+Minor Changes
+-------------
+
+- Enabled usage of environment variables for modules by adding a fallback lookup in the module_utils/helpers.py - zabbix_common_argument_spec
+
+Bugfixes
+--------
+
+- template - use templateid property when linking templates for ``template.create`` and ``template.update`` API calls.
+- zabbix inventory - Moved ZABBIX_VALIDATE_CERTS to correct option, validate_certs.
+- zabbix_agent - Create the actual configuration file for Windows setups.
+- zabbix_agent - Fix typo for correct using the zabbix_windows_service.exists
+- zabbix_agent - tlspsk_auto to support become on Linux and ignore on windows
+- zabbix_user - fix zabbix_user require password only on internal.
+
 v1.5.0
 ======
 
