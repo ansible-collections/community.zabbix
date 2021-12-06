@@ -71,7 +71,7 @@
 
 - name: "PostgreSQL | Importing schema file"
   shell: |
-    set -o pipefail
+    set -euxo pipefail
     cd {{ datafiles_path }}
     if [ -f create.sql.gz ]; then zcat create.sql.gz > /tmp/create.sql ; fi
     cat /tmp/schema.sql | psql -h '{{ zabbix_proxy_dbhost }}' -U '{{ zabbix_proxy_dbuser }}' \

@@ -4,3 +4,5 @@ bugfixes:
   - zabbix_web - Specified the correct versions for php.
   - zabbix_server - 'zcat' the zipped sql files to /tmp before executing it.
   - zabbix_proxy - 'zcat' the zipped sql files to /tmp before executing it.
+  - zabbix_agent - Using the correct hostgroup as default now.
+  - zabbix_host - Added small notification that an user should have read access to get hostgroups overview.

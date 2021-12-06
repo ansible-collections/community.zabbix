@@ -85,7 +85,7 @@
 
 - name: "PostgreSQL | Create schema"
   shell: |
-    set -o pipefail
+    set -euxo pipefail
     cd {{ datafiles_path }}
     if [ -f create.sql.gz ]; then zcat create.sql.gz > /tmp/create.sql ; fi
     cat /tmp/create.sql | psql -h '{{ zabbix_server_dbhost }}' \
@@ -108,7 +108,7 @@
 
 - name: "PostgreSQL | Create TimescaleDB hypertables"
   shell: |
-    set -o pipefail
+    set -euxo pipefail
     cd {{ datafiles_path }} &&
     if [ -f timescaledb.sql.gz ]; then zcat timescaledb.sql.gz > /etc/timescaledb.sql ; fi
     cat  /etc/timescaledb.sql | psql -h '{{ zabbix_server_dbhost }}' \
@@ -155,6 +155,7 @@
 
 - name: "PostgreSQL | Importing schema file"
   shell: |
+    set -euxo pipefail
     cd {{ datafiles_path }}
     if [ -f schema.sql.gz ]; then zcat schema.sql.gz > /tmp/schema.sql ; fi
     cat /tmp/schema.sql | psql -h '{{ zabbix_server_dbhost }}' \
