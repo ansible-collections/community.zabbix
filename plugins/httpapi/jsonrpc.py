@@ -16,14 +16,7 @@ httpapi : zabbix
 short_description: HttpApi Plugin for Zabbix
 description:
   - This HttpApi plugin provides methods to connect to Zabbix over their HTTP(S)-based api.
-version_added: "1.0"
-options:
-  zabbix_token:
-    type: str
-    description:
-      - Specifies the api token path of the FTD device
-    vars:
-      - name: ansible_httpapi_zabbix_token
+version_added: "1.5.1"
 """
 
 import json
@@ -46,14 +39,6 @@ BASE_HEADERS = {
 class HttpApi(HttpApiBase):
     zbx_api_version = None
 
-    def __open_debug(self):
-        import debugpy
-        if not debugpy.is_client_connected():
-            debugpy.listen(5678)
-            print("Waiting for debugger attach")
-            debugpy.wait_for_client()
-        debugpy.breakpoint()
-
     def set_become(self, become_context):
         """As this is an http rpc call there is no elevation available
         """
@@ -68,30 +53,9 @@ class HttpApi(HttpApiBase):
 
         if code == 200 and response != '':
             self.connection._auth = response
-            self.connection._token = response
-
-        # {
-        #     "jsonrpc": "2.0",
-        #     "method": "user.login",
-        #     "params": {
-        #         "username": "Admin",
-        #         "password": "zabbix"
-        #     },
-        #     "id": 1
-        # }
-        # Response:
-
-        # {
-        #     "jsonrpc": "2.0",
-        #     "result": "0424bd59b807674191e7d77572075f33",
-        #     "id": 1
-        # }
 
     def logout(self):
-        if not self.connection._token:
-            return
-
-        payload = self.payload_builder("user.logout", self.connection._token)
+        payload = self.payload_builder("user.logout", self.connection._auth)
         self.send_request(payload=payload)
 
     def handle_httperror(self, exc):
@@ -123,11 +87,9 @@ class HttpApi(HttpApiBase):
         return exc
 
     def api_version(self):
-        # self.__open_debug()
         if not self.zbx_api_version:
             if not hasattr(self.connection, 'zbx_api_version'):
                 code, version = self.send_request(payload=self.payload_builder('apiinfo.version'))
-                #self.__open_debug()
                 if code == 200 and version != '':
                     self.connection.zbx_api_version = version
             self.zbx_api_version = self.connection.zbx_api_version
@@ -136,8 +98,6 @@ class HttpApi(HttpApiBase):
     def send_request(self, request_method="POST", path="/api_jsonrpc.php", payload=None):
         if not payload:
             payload = {}
-
-        # self.__open_debug()
 
         try:
             self._display_request(request_method, path)

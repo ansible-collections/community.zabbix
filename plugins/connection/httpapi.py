@@ -6,13 +6,14 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 DOCUMENTATION = """
-author: Ansible Networking Team
-connection: httpapi
+author: fischbacher.markus@gmail.com
+connection: zabbix
 short_description: Use httpapi to run command on network appliances
 description:
-- This connection plugin provides a connection to remote devices over a HTTP(S)-based
-  api.
-version_added: 1.0.0
+- This connection plugin provides a connection to Zabbix jsonrpc api over a HTTP(S).
+- The connection plugin is basically just a copy of ansible.netcommon.httpapi with
+  some changes around auth to Zabbix API.
+version_added: 1.5.1
 extends_documentation_fragment:
 - ansible.netcommon.connection_persistent
 options:

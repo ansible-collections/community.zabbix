@@ -53,6 +53,9 @@ class ZabbixApiRequest(object):
     def api_version(self):
         return self.connection.api_version()
 
+    def _zbx_api_version(self):
+        return self.connection.api_version()
+
     @staticmethod
     def payload_builder(method_, jsonrpc_version='2.0', reqid=str(uuid4()), **kwargs):
         req = {'jsonrpc': jsonrpc_version, 'method': method_, 'id': reqid}
