@@ -7,14 +7,13 @@
 
 
 from __future__ import absolute_import, division, print_function
-from sys import prefix
 
 __metaclass__ = type
 
 from uuid import uuid4
 
 from ansible.module_utils.urls import CertificateError
-from ansible.module_utils.connection import ConnectionError, request_builder
+from ansible.module_utils.connection import ConnectionError
 from ansible.module_utils.connection import Connection
 from ansible.module_utils._text import to_text
 
@@ -76,7 +75,7 @@ class ZabbixApiSection(object):
 
     def __getattr__(self, name):
         def method(opts=None):
-            _method = f"{self.name}.{name}"
+            _method = "%s.%s" % (self.name, name)
             if not opts:
                 opts = {}
             payload = ZabbixApiRequest.payload_builder(_method, **opts)

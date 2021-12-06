@@ -5,8 +5,6 @@
 
 from __future__ import absolute_import, division, print_function
 
-from ansible.plugins import AnsiblePlugin
-
 __metaclass__ = type
 
 DOCUMENTATION = """
@@ -24,8 +22,7 @@ import json
 from uuid import uuid4
 
 from ansible.module_utils.basic import to_text
-from ansible.errors import AnsibleAction, AnsibleConnectionFailure
-from ansible.module_utils.six.moves.urllib.error import HTTPError
+from ansible.errors import AnsibleConnectionFailure
 from ansible.plugins.httpapi import HttpApiBase
 from ansible.module_utils.connection import ConnectionError
 
