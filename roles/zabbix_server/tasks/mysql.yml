@@ -82,18 +82,35 @@
   set_fact:
     mysql_schema_empty: "{{ mysql_db_version is failed }}"
 
+- name: "MySQL | Get version_comment"
+  community.mysql.mysql_variables:
+    variable: version
+    login_host: "{{ zabbix_server_mysql_login_host | default(omit) }}"
+    login_user: "{{ zabbix_server_mysql_login_user | default(omit) }}"
+    login_password: "{{ zabbix_server_mysql_login_password | default(omit) }}"
+    login_port: "{{ zabbix_server_mysql_login_port | default(omit) }}"
+    login_unix_socket: "{{ zabbix_server_mysql_login_unix_socket | default(omit) }}"
+  delegate_to: "{{ delegated_dbhost }}"
+  register: install_mysql_version
+  tags:
+    - zabbix-server
+    - database
+
 - name: "MySQL | Get current value for innodb_default_row_format"
-  shell: |
-    set -euo pipefail
-    mysql -h {{ zabbix_server_dbhost }} -u{{ zabbix_server_dbuser }} \
-    -p'{{ zabbix_server_dbpassword }}' \
-    -e 'SHOW VARIABLES;' 2>&1 | grep innodb_default_row_format \
-    | awk '{print $2}' | tr [:upper:] [:lower:]
+  community.mysql.mysql_variables:
+    variable: innodb_default_row_format
+    login_host: "{{ zabbix_server_mysql_login_host | default(omit) }}"
+    login_user: "{{ zabbix_server_mysql_login_user | default(omit) }}"
+    login_password: "{{ zabbix_server_mysql_login_password | default(omit) }}"
+    login_port: "{{ zabbix_server_mysql_login_port | default(omit) }}"
+    login_unix_socket: "{{ zabbix_server_mysql_login_unix_socket | default(omit) }}"
+  delegate_to: "{{ delegated_dbhost }}"
   register: mysql_innodb_default_row_format
-  args:
-    executable: /bin/bash
-  changed_when: false
-  become: true
+  when:
+    - install_mysql_version.msg is version('5.6', '>=')
+  tags:
+    - zabbix-server
+    - database
 
 - name: "MySQL | Set innodb_default_row_format to dynamic"
   community.mysql.mysql_variables:
@@ -109,7 +126,8 @@
     - zabbix_database_sqlload | bool
     - zabbix_repo != "epel"
     - mysql_schema_empty
-    - mysql_innodb_default_row_format.stdout != 'dynamic'
+    - install_mysql_version.msg is version('5.6', '>=')
+    - mysql_innodb_default_row_format.msg != 'dynamic'
   delegate_to: "{{ delegated_dbhost }}"
   tags:
     - zabbix-server
@@ -129,6 +147,7 @@
     - zabbix_database_sqlload | bool
     - zabbix_repo != "epel"
     - mysql_schema_empty
+    - install_mysql_version.msg is version('5.6', '>=')
     - ansible_distribution_release == "buster"
   delegate_to: "{{ delegated_dbhost }}"
   tags:
