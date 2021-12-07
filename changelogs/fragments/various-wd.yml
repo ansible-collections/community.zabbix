@@ -9,3 +9,6 @@ bugfixes:
   - zabbix_server - Check MySQL version before settings mysql_innodb_default_row_format value.
   - zabbix_proxy - Check MySQL version before settings mysql_innodb_default_row_format value.
   - zabbix_web - Added some default variables if the geerlingguys apache role is not used.
+  - zabbix_agent - Install Zabbix packages when zabbix_repo == other is used with yum.
+  - zabbix_server - Install Zabbix packages when zabbix_repo == other is used with yum.
+  - zabbix_proxy - Install Zabbix packages when zabbix_repo == other is used with yum.
