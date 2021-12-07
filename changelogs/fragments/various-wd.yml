@@ -6,3 +6,6 @@ bugfixes:
   - zabbix_proxy - 'zcat' the zipped sql files to /tmp before executing it.
   - zabbix_agent - Using the correct hostgroup as default now.
   - zabbix_host - Added small notification that an user should have read access to get hostgroups overview.
+  - zabbix_server - Check MySQL version before settings mysql_innodb_default_row_format value.
+  - zabbix_proxy - Check MySQL version before settings mysql_innodb_default_row_format value.
+  - zabbix_web - Added some default variables if the geerlingguys apache role is not used.

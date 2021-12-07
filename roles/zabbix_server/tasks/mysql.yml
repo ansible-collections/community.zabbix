@@ -202,7 +202,7 @@
 - name: "MySQL | Revert innodb_default_row_format to previous value"
   community.mysql.mysql_variables:
     variable: innodb_default_row_format
-    value: '{{ mysql_innodb_default_row_format.stdout }}'
+    value: '{{ mysql_innodb_default_row_format.msg }}'
     login_host: "{{ zabbix_server_mysql_login_host | default(omit) }}"
     login_user: "{{ zabbix_server_mysql_login_user | default(omit) }}"
     login_password: "{{ zabbix_server_mysql_login_password | default(omit) }}"
@@ -213,7 +213,7 @@
     - zabbix_database_sqlload | bool
     - zabbix_repo != "epel"
     - mysql_schema_empty
-    - mysql_innodb_default_row_format.stdout != 'dynamic'
+    - mysql_innodb_default_row_format.msg != 'dynamic'
   delegate_to: "{{ delegated_dbhost }}"
   tags:
     - zabbix-server
