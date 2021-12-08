@@ -73,18 +73,35 @@
     - zabbix_database_sqlload
     - zabbix_repo != "epel"
 
+- name: "MySQL | Get version_comment"
+  community.mysql.mysql_variables:
+    variable: version
+    login_host: "{{ zabbix_proxy_mysql_login_host | default(omit) }}"
+    login_user: "{{ zabbix_proxy_mysql_login_user | default(omit) }}"
+    login_password: "{{ zabbix_proxy_mysql_login_password | default(omit) }}"
+    login_port: "{{ zabbix_proxy_mysql_login_port | default(omit) }}"
+    login_unix_socket: "{{ zabbix_proxy_mysql_login_unix_socket | default(omit) }}"
+  delegate_to: "{{ delegated_dbhost }}"
+  register: install_mysql_version
+  tags:
+    - zabbix-proxy
+    - database
+
 - name: "MySQL | Get current value for innodb_default_row_format"
-  shell: |
-    set -euo pipefail
-    mysql -h {{ zabbix_proxy_dbhost }} -u{{ zabbix_proxy_dbuser }} \
-    -p'{{ zabbix_proxy_dbpassword }}' \
-    -e 'SHOW VARIABLES;' 2>&1 | grep innodb_default_row_format \
-    | awk '{print $2}' | tr [:upper:] [:lower:]
+  community.mysql.mysql_variables:
+    variable: innodb_default_row_format
+    login_host: "{{ zabbix_proxy_mysql_login_host | default(omit) }}"
+    login_user: "{{ zabbix_proxy_mysql_login_user | default(omit) }}"
+    login_password: "{{ zabbix_proxy_mysql_login_password | default(omit) }}"
+    login_port: "{{ zabbix_proxy_mysql_login_port | default(omit) }}"
+    login_unix_socket: "{{ zabbix_proxy_mysql_login_unix_socket | default(omit) }}"
+  delegate_to: "{{ delegated_dbhost }}"
   register: mysql_innodb_default_row_format
-  changed_when: false
-  args:
-    executable: /bin/bash
-  become: true
+  when:
+    - install_mysql_version.msg is version('5.6', '>=')
+  tags:
+    - zabbix-proxy
+    - database
 
 - name: "MySQL | Set innodb_default_row_format to dynamic"
   community.mysql.mysql_variables:
@@ -100,7 +117,8 @@
     - zabbix_database_sqlload | bool
     - zabbix_repo != "epel"
     - not done_file.stat.exists
-    - mysql_innodb_default_row_format.stdout != 'dynamic'
+    - install_mysql_version.msg is version('5.6', '>=')
+    - mysql_innodb_default_row_format.msg != 'dynamic'
   delegate_to: "{{ delegated_dbhost }}"
   tags:
     - zabbix-proxy
@@ -130,7 +148,7 @@
 - name: "MySQL | Revert innodb_default_row_format to previous value"
   community.mysql.mysql_variables:
     variable: innodb_default_row_format
-    value: '{{ mysql_innodb_default_row_format.stdout }}'
+    value: '{{ mysql_innodb_default_row_format.msg }}'
     login_host: "{{ zabbix_proxy_mysql_login_host | default(omit) }}"
     login_user: "{{ zabbix_proxy_mysql_login_user | default(omit) }}"
     login_password: "{{ zabbix_proxy_mysql_login_password | default(omit) }}"
@@ -141,7 +159,7 @@
     - zabbix_database_sqlload | bool
     - zabbix_repo != "epel"
     - not done_file.stat.exists
-    - mysql_innodb_default_row_format.stdout != 'dynamic'
+    - mysql_innodb_default_row_format.msg != 'dynamic'
   delegate_to: "{{ delegated_dbhost }}"
   tags:
     - zabbix-proxy

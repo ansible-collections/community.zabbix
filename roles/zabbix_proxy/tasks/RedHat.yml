@@ -132,6 +132,18 @@
     http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
     https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   become: true
+  when:
+    zabbix_repo != "other"
+  register: is_zabbix_proxy_package_installed
+  until: is_zabbix_proxy_package_installed is succeeded
+
+- name: "RedHat | Installing zabbix-proxy-{{ zabbix_proxy_database }} (When zabbix_repo == other)"
+  package:
+    pkg: "{{ zabbix_proxy_package }}"
+    state: "{{ zabbix_proxy_package_state }}"
+  become: true
+  when:
+    zabbix_repo == "other"
   register: is_zabbix_proxy_package_installed
   until: is_zabbix_proxy_package_installed is succeeded
 
@@ -148,6 +160,20 @@
   until: zabbix_proxy_sql_package_installed is succeeded
   when:
     - zabbix_version is version('5.4', '>=')
+    - zabbix_repo != "other"
+  become: true
+  tags:
+    - zabbix-server
+
+- name: "RedHat | Installing zabbix-sql-scripts (When zabbix_repo == other)"
+  package:
+    pkg: "zabbix-sql-scripts"
+    state: "{{ zabbix_proxy_package_state }}"
+  register: zabbix_proxy_sql_package_installed
+  until: zabbix_proxy_sql_package_installed is succeeded
+  when:
+    - zabbix_version is version('5.4', '>=')
+    - zabbix_repo == "other"
   become: true
   tags:
     - zabbix-server

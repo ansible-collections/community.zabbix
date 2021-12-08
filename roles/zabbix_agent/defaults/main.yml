@@ -95,7 +95,7 @@ zabbix_useuip: 1
 zabbix_host_groups:
   - Linux servers
 zabbix_link_templates:                             # Will be deprecated in 2.0.0
-  - Template OS Linux by Zabbix agent
+  - Template Linux by Zabbix agent
 zabbix_agent_link_templates: "{{ zabbix_link_templates }}"
 
 zabbix_agent_interfaces:
