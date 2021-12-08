@@ -41,6 +41,7 @@ options:
     host_groups:
         description:
             - List of host groups the host is part of.
+            - Make sure the Zabbix user used for Ansible can read these groups.
         type: list
         elements: str
     link_templates:
