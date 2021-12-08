@@ -9,24 +9,10 @@ zabbix_repo: zabbix
 zabbix_repo_yum_schema: https
 zabbix_java_gateway_conf_mode: "0644"
 
-zabbix_repo_yum_gpgcheck: 0
+zabbix_repo_yum_gpg_key: https://repo.zabbix.com/zabbix-official-repo.key
 zabbix_repo_yum_disabled: "*"
 zabbix_repo_yum_enabled: []
-zabbix_repo_yum:
-  - name: zabbix
-    description: Zabbix Official Repository - $basearch
-    baseurl: "{{ zabbix_repo_yum_schema }}://repo.zabbix.com/zabbix/{{ zabbix_javagateway_version }}/rhel/{{ ansible_distribution_major_version }}/$basearch/"
-    gpgcheck: "{{ zabbix_repo_yum_gpgcheck }}"
-    mode: '0644'
-    gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-ZABBIX
-    state: present
-  - name: zabbix-non-supported
-    description: Zabbix Official Repository non-supported - $basearch
-    baseurl: "{{ zabbix_repo_yum_schema }}://repo.zabbix.com/non-supported/rhel/{{ ansible_distribution_major_version }}/$basearch/"
-    mode: '0644'
-    gpgcheck: "{{ zabbix_repo_yum_gpgcheck }}"
-    gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-ZABBIX
-    state: present
+zabbix_repo_yum_url: "https://repo.zabbix.com/zabbix/{{ zabbix_javagateway_version }}/rhel/{{ ansible_distribution_major_version }}/x86_64/zabbix-release-{{ zabbix_version }}-1.el{{ ansible_distribution_major_version }}.noarch.rpm"
 
 zabbix_javagateway_pidfile: /run/zabbix/zabbix_java_gateway.pid
 zabbix_javagateway_listenip: 0.0.0.0

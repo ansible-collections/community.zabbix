@@ -43,25 +43,11 @@ zabbix_apt_install_recommends: false
 zabbix_agent_distribution_major_version: "{{ ansible_distribution_major_version }}"
 zabbix_agent_distribution_release: "{{ ansible_distribution_release }}"
 zabbix_agent_os_family: "{{ ansible_os_family }}"
-zabbix_repo_yum_gpgcheck: 0
-zabbix_repo_yum_schema: https
+zabbix_repo_yum_gpg_key: https://repo.zabbix.com/zabbix-official-repo.key
+zabbix_repo_yum_gpg_key_el7: https://repo.zabbix.com/RPM-GPG-KEY-ZABBIX-A14FE591
 zabbix_repo_yum_disabled: "*"
 zabbix_repo_yum_enabled: []
-zabbix_repo_yum:
-  - name: zabbix
-    description: Zabbix Official Repository - $basearch
-    baseurl: "{{ zabbix_repo_yum_schema }}://repo.zabbix.com/zabbix/{{ zabbix_version }}/rhel/{{ zabbix_agent_distribution_major_version }}/$basearch/"
-    mode: '0644'
-    gpgcheck: "{{ zabbix_repo_yum_gpgcheck }}"
-    gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-ZABBIX
-    state: present
-  - name: zabbix-non-supported
-    description: Zabbix Official Repository non-supported - $basearch
-    baseurl: "{{ zabbix_repo_yum_schema }}://repo.zabbix.com/non-supported/rhel/{{ zabbix_agent_distribution_major_version }}/$basearch/"
-    mode: '0644'
-    gpgcheck: "{{ zabbix_repo_yum_gpgcheck }}"
-    gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-ZABBIX
-    state: present
+
 
 # Zabbix API stuff
 zabbix_validate_certs: true                        # Will be deprecated in 2.0.0
