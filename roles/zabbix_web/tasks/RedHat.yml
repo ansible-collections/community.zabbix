@@ -92,7 +92,7 @@
 - name: "RedHat | Install zabbix-web (Zabbix 5.x)"
   yum:
     pkg:
-      - zabbix-apache-conf-scl
+      - zabbix-apache-conf-scl-{{ zabbix_web_version }}.{{ zabbix_web_version_minor }}
     state: "{{ zabbix_web_package_state }}"
     update_cache: true
     disablerepo: "{{ '*' if (zabbix_repo_yum_enabled | length>0) else omit }}"
@@ -112,7 +112,7 @@
 
 - name: "RedHat | Install zabbix-web-{{ zabbix_server_database }}"
   yum:
-    pkg: zabbix-web-{{ zabbix_server_database }}{{ '-scl' if zabbix_version is version('5.0', '>=') and ansible_distribution_major_version != '8' else '' }}
+    pkg: zabbix-web-{{ zabbix_server_database }}{{ '-scl' if zabbix_version is version('5.0', '>=') and ansible_distribution_major_version != '8' else '' }}-{{ zabbix_web_version }}.{{ zabbix_web_version_minor }}
     state: "{{ zabbix_web_package_state }}"
     update_cache: true
     disablerepo: "{{ '*' if (zabbix_repo_yum_enabled | length>0) else omit }}"

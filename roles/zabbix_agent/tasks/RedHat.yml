@@ -86,7 +86,7 @@
 - name: "RedHat | Installing zabbix-agent"
   package:
     pkg:
-      - "{{ zabbix_agent_package }}-{{ zabbix_agent_version }}.*"
+      - "{{ zabbix_agent_package }}-{{ zabbix_agent_version }}.{{ zabbix_agent_version_minor }}"
     disablerepo: "{{ '*' if (zabbix_repo_yum_enabled | length>0) else omit }}"
     enablerepo: "{{ zabbix_repo_yum_enabled if zabbix_repo_yum_enabled is iterable and (zabbix_repo_yum_enabled | length>0) else omit }}"
     state: "{{ zabbix_agent_package_state }}"
@@ -105,7 +105,7 @@
 - name: "RedHat | Installing zabbix-agent (When zabbix_repo == other)"
   package:
     pkg:
-      - "{{ zabbix_agent_package }}-{{ zabbix_agent_version }}.*"
+      - "{{ zabbix_agent_package }}-{{ zabbix_agent_version }}.{{ zabbix_agent_version_minor }}"
     state: "{{ zabbix_agent_package_state }}"
   register: zabbix_agent_package_installed
   until: zabbix_agent_package_installed is succeeded
@@ -119,8 +119,8 @@
 - name: "RedHat | Installing zabbix-{sender,get}"
   package:
     pkg:
-      - "{{ zabbix_sender_package }}-{{ zabbix_agent_version }}.*"
-      - "{{ zabbix_get_package }}-{{ zabbix_agent_version }}.*"
+      - "{{ zabbix_sender_package }}-{{ zabbix_agent_version }}.{{ zabbix_agent_version_minor }}"
+      - "{{ zabbix_get_package }}-{{ zabbix_agent_version }}.{{ zabbix_agent_version_minor }}"
     disablerepo: "{{ '*' if (zabbix_repo_yum_enabled | length>0) else omit }}"
     enablerepo: "{{ zabbix_repo_yum_enabled if zabbix_repo_yum_enabled is iterable and (zabbix_repo_yum_enabled | length>0) else omit }}"
     state: "{{ zabbix_agent_package_state }}"
@@ -140,8 +140,8 @@
 - name: "RedHat | Installing zabbix-{sender,get} (When zabbix_repo == other)"
   package:
     pkg:
-      - "{{ zabbix_sender_package }}-{{ zabbix_agent_version }}.*"
-      - "{{ zabbix_get_package }}-{{ zabbix_agent_version }}.*"
+      - "{{ zabbix_sender_package }}-{{ zabbix_agent_version }}.{{ zabbix_agent_version_minor }}"
+      - "{{ zabbix_get_package }}-{{ zabbix_agent_version }}.{{ zabbix_agent_version_minor }}"
     state: "{{ zabbix_agent_package_state }}"
   register: zabbix_agent_package_installed
   until: zabbix_agent_package_installed is succeeded

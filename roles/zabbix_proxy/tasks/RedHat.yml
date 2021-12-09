@@ -124,7 +124,7 @@
 
 - name: "RedHat | Installing zabbix-proxy-{{ zabbix_proxy_database }}"
   package:
-    pkg: "{{ zabbix_proxy_package }}"
+    pkg: "{{ zabbix_proxy_package }}-{{ zabbix_proxy_version }}.{{ zabbix_proxy_version_minor }}"
     state: "{{ zabbix_proxy_package_state }}"
     disablerepo: "{{ '*' if (zabbix_repo_yum_enabled | length>0) else omit }}"
     enablerepo: "{{ zabbix_repo_yum_enabled if zabbix_repo_yum_enabled is iterable and (zabbix_repo_yum_enabled | length>0) else omit }}"
@@ -139,7 +139,7 @@
 
 - name: "RedHat | Installing zabbix-proxy-{{ zabbix_proxy_database }} (When zabbix_repo == other)"
   package:
-    pkg: "{{ zabbix_proxy_package }}"
+    pkg: "{{ zabbix_proxy_package }}-{{ zabbix_proxy_version }}.{{ zabbix_proxy_version_minor }}"
     state: "{{ zabbix_proxy_package_state }}"
   become: true
   when:
@@ -149,7 +149,7 @@
 
 - name: "RedHat | Installing zabbix-sql-scripts"
   package:
-    pkg: "zabbix-sql-scripts"
+    pkg: "zabbix-sql-scripts-{{ zabbix_proxy_version }}.{{ zabbix_proxy_version_minor }}"
     state: "{{ zabbix_proxy_package_state }}"
     disablerepo: "{{ '*' if (zabbix_repo_yum_enabled | length>0) else omit }}"
     enablerepo: "{{ zabbix_repo_yum_enabled if zabbix_repo_yum_enabled is iterable and (zabbix_repo_yum_enabled | length>0) else omit }}"
@@ -167,7 +167,7 @@
 
 - name: "RedHat | Installing zabbix-sql-scripts (When zabbix_repo == other)"
   package:
-    pkg: "zabbix-sql-scripts"
+    pkg: "zabbix-sql-scripts-{{ zabbix_proxy_version }}.{{ zabbix_proxy_version_minor }}"
     state: "{{ zabbix_proxy_package_state }}"
   register: zabbix_proxy_sql_package_installed
   until: zabbix_proxy_sql_package_installed is succeeded

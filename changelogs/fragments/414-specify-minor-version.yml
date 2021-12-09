@@ -1,0 +1,7 @@
+---
+
+minor_changes:
+  - zabbix_agent - Specify a minor version with zabbix_agent_version_minor for RH systems.
+  - zabbix_server - Specify a minor version with zabbix_server_version_minor for RH systems.
+  - zabbix_proxy - Specify a minor version with zabbix_proxy_version_minor for RH systems.
+  - zabbix_web - Specify a minor version with zabbix_web_version_minor for RH systems.
