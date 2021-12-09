@@ -3,6 +3,7 @@
 
 zabbix_agent2: false
 zabbix_agent_version: 5.4
+zabbix_agent_version_minor: "*"
 zabbix_version: "{{ zabbix_agent_version }}"
 zabbix_version_patch: 0
 zabbix_repo: zabbix
