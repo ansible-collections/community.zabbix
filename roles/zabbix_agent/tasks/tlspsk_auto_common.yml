@@ -1,5 +1,5 @@
 ---
-# Process PSK Secret 
+# Process PSK Secret
 - name: AutoPSK | Save existing TLS PSK secret
   set_fact:
     zabbix_agent_tlspsk_read: "{{ zabbix_agent_tlspsk_base64['content'] | b64decode | trim }}"
@@ -9,17 +9,16 @@
 - name: AutoPSK | Use existing TLS PSK secret
   set_fact:
     zabbix_agent_tlspsk_secret: "{{ zabbix_agent_tlspsk_read }}"
-  when: 
-    - zabbix_agent_tlspskcheck.stat.exists 
+  when:
+    - zabbix_agent_tlspskcheck.stat.exists
     - zabbix_agent_tlspsk_read|length >= 32
   no_log: "{{ ansible_verbosity < 3 }}"
 
 - name: AutoPSK | Generate new TLS PSK secret
   set_fact:
     zabbix_agent_tlspsk_secret: "{{ lookup('password', '/dev/null chars=hexdigits length=64') }}"
-  when: 
-    - not zabbix_agent_tlspskcheck.stat.exists
-    - zabbix_agent_tlspsk_read|length < 32
+  when:
+    - (not zabbix_agent_tlspskcheck.stat.exists) or (zabbix_agent_tlspsk_read|length < 32)
   no_log: "{{ ansible_verbosity < 3 }}"
 
 
