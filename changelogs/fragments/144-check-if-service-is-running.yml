@@ -1,0 +1,6 @@
+---
+
+minor_changes:
+  - zabbix_agent - Check if 'firewalld' exist and is running when handler is executed. 
+  - zabbix_web - Check if 'apache' exist and is running when handler is executed.
+  - zabbix_web - Check if 'nginx' exist and is running when handler is executed.

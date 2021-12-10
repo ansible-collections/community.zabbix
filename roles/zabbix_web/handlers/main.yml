@@ -8,6 +8,8 @@
   become: true
   when:
     - zabbix_websrv == 'apache'
+    - ansible_facts.services[_apache_service] is defined
+    - ansible_facts.services[_apache_service].state == "running"
 
 - name: test nginx config
   listen: restart nginx
@@ -27,6 +29,8 @@
   when:
     - zabbix_websrv == 'nginx'
     - zabbix_nginx_cfg_check.rc == 0
+    - ansible_facts.services["nginx"] is defined
+    - ansible_facts.services["nginx"].state == "running"
 
 - name: restart redhat-php-fpm
   service:
