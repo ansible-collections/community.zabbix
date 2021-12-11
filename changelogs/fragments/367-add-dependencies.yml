@@ -1,0 +1,4 @@
+---
+
+minor_changes:
+  - collection - Add dependencies to other collections. This helps Ansible Galaxy automatically downloading collections that this collection relies on to run.
