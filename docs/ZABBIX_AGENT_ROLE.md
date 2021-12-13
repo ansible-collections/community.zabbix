@@ -243,7 +243,9 @@ These variables are specific for Zabbix 3.0 and higher. When `(2)` is used in th
 * `zabbix_agent(2)_tlspskidentity_file`: Full pathname of a file containing the pre-shared key identity.
 * `zabbix_agent(2)_tlspskfile`: Full pathname of a file containing the pre-shared key.
 * `zabbix_agent(2)_tlspsk_secret`: The pre-shared secret key that should be placed in the file configured with `agent_tlspskfile`.
-* `zabbix_agent(2)_tlspsk_auto`: Enables auto generation and storing of individual pre-shared keys and identities on clients.
+* `zabbix_agent(2)_tlspsk_auto`: Enables auto generation and storing of individual pre-shared keys and identities on clients. Is false by default. If set to true and if `zabbix_agent_tlspskfile` and `zabbix_agent_tlspsk_secret` are undefined, it generates the files `/etc/zabbix/tls_psk_auto.identity` and `/etc/zabbix/tls_psk_auto.secret`, which are populated by values automatically (identity is set to hostname, underscore and 4 random alphanumeric digits; secret is 64 random alphanumeric digits) in such a way that the values are generated once and are never overwritten.
+
+The results are stored in the Ansible variables `zabbix_agent_tlspskidentity` and `zabbix_agent_tlspsk_secret`, so that they may be used later in the code, for example with [zabbix_host](https://docs.ansible.com/ansible/latest/collections/community/zabbix/zabbix_host_module.html) to configure the Zabbix server or with `debug: msg:` to display them to the user.
 
 ## Zabbix API variables
 
