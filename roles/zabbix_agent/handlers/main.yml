@@ -13,6 +13,10 @@
 
 - name: firewalld-reload
   command: "firewall-cmd --reload"
+  become: true
+  when:
+    - ansible_facts.services["firewalld"] is defined
+    - ansible_facts.services["firewalld"].state == "running"
 
 - name: restart win zabbix agent
   win_service:
