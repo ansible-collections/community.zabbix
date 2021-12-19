@@ -1,0 +1,4 @@
+---
+
+bugfixes:
+  - zabbix_agent - Use the correct URL with correct version.
