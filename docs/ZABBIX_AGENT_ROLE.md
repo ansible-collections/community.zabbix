@@ -286,7 +286,7 @@ When `(2)` is used in the name of the property, like `zabbix_agent(2)_win_logfil
 Otherwise it just for the Zabbix Agent or for the Zabbix Agent 2.
 
 * `zabbix(2)_win_package`: file name pattern (zip only). This will be used to generate the `zabbix(2)_win_download_link` variable.
-* `zabbix_version_long`: The long (major.minor.patch) version of the Zabbix Agent. This will be used to generate the `zabbix(2)_win_package` and `zabbix(2)_win_download_link` variables.
+* `zabbix_version_long`: The long (major.minor.patch) version of the Zabbix Agent. This will be used to generate the `zabbix(2)_win_package` and `zabbix(2)_win_download_link` variables. This takes precedence over `zabbix_agent_version`.
 * `zabbix(2)_win_download_link`: The download url to the `win.zip` file.
 * `zabbix_win_install_dir`: The directory where Zabbix needs to be installed.
 * `zabbix_agent(2)_win_logfile`: The full path to the logfile for the Zabbix Agent.
