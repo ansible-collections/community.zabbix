@@ -1166,8 +1166,16 @@ def main():
                         elif index == 'details' and not interface[index]:
                             interface[index] = {}
 
+                    for key in interface.copy():
+                        if key not in [ "type", "dns", "main", "useip", "ip", "port", "details" ]:
+                            module.warn("removing %s from %s" % (key, interface))
+                            del interface[key]
+                      
                     if interface not in interfaces:
+                        module.warn("adding %s" % (interface))
                         interfaces.append(interface)
+                    else:
+                        module.warn("skpping %s" % (interface))
 
             if not force or link_templates is None:
                 template_ids = list(set(template_ids + host.get_host_templates_by_host_id(host_id)))
