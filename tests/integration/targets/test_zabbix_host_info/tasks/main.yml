@@ -11,7 +11,7 @@
       - Linux servers
       - Hypervisors
     link_templates:
-      - "{{ 'Zabbix Server' if zabbix_version | float >= 5.2 else 'Template App Zabbix Server' }}"
+      - "{{ 'Zabbix Server' if zabbix_version | float >= 5.4 else 'Zabbix server health' }}"
     status: enabled
     inventory_mode: manual
     inventory_zabbix:
@@ -67,7 +67,7 @@
           - gather_all_facts_result.hosts.0.description == "Test Host"
           - gather_all_facts_result.hosts.0.groups.0.name == "Linux servers"
           - gather_all_facts_result.hosts.0.groups.1.name == "Hypervisors"
-          - gather_all_facts_result.hosts.0.parentTemplates.0.name == "Template App Zabbix Server"
+          - gather_all_facts_result.hosts.0.parentTemplates.0.name == "Zabbix server health"
           - gather_all_facts_result.hosts.0.status == "0"
           - gather_all_facts_result.hosts.0.inventory.inventory_mode == "0"
           - gather_all_facts_result.hosts.0.inventory.tag == "tag1"
@@ -88,7 +88,7 @@
           - gather_all_facts_result.hosts.0.description == "Test Host"
           - gather_all_facts_result.hosts.0.groups.0.name == "Linux servers"
           - gather_all_facts_result.hosts.0.groups.1.name == "Hypervisors"
-          - gather_all_facts_result.hosts.0.parentTemplates.0.name == "Template App Zabbix Server"
+          - gather_all_facts_result.hosts.0.parentTemplates.0.name == "Zabbix server health"
           - gather_all_facts_result.hosts.0.status == "0"
           - gather_all_facts_result.hosts.0.inventory_mode == "0"
           - gather_all_facts_result.hosts.0.inventory.tag == "tag1"
