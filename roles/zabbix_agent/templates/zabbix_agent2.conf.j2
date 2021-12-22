@@ -312,7 +312,9 @@ PersistentBufferFile={{ zabbix_agent2_persistentbufferfile }}
 # Range:
 # Default:
 {% if zabbix_agent2_zabbix_alias is defined and zabbix_agent2_zabbix_alias %}
-Alias={{ zabbix_agent2_zabbix_alias }}
+{% for alias in zabbix_agent2_zabbix_alias %}
+Alias={{ alias }}
+{% endfor %}
 {% endif %}
 
 ### Option: Timeout
