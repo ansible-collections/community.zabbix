@@ -217,7 +217,9 @@ MaxLinesPerSecond={{ zabbix_agent_maxlinespersecond }}
 #       sets an alias for parameter. it can be useful to substitute long and complex parameter name with a smaller and simpler one.
 #
 {% if zabbix_agent_zabbix_alias is defined and zabbix_agent_zabbix_alias %}
-Alias={{ zabbix_agent_zabbix_alias }}
+{% for alias in zabbix_agent_zabbix_alias %}
+Alias={{ alias }}
+{% endfor %}
 {% endif %}
 
 ### option: timeout
