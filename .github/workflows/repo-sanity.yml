@@ -10,8 +10,8 @@ jobs:
     strategy:
       matrix:
         python:
-          - 2.7
-          - 3.8
+          - 2.7 # required by Ansible see https://github.com/ansible-collections/overview/blob/main/collection_requirements.rst#python-compatibility
+          - 3.6 # required by Ansible see https://github.com/ansible-collections/overview/blob/main/collection_requirements.rst#python-compatibility
           - 3.9
     runs-on: ubuntu-latest
     steps:
