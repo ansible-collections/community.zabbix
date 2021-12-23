@@ -1158,7 +1158,7 @@ def main():
                 for interface in copy.deepcopy(exist_interfaces):
                     # remove values not used during hostinterface.add/update calls
                     for key in tuple(interface.keys()):
-                        if key in ['interfaceid', 'hostid']:
+                        if key not in ["type", "dns", "main", "useip", "ip", "port", "details"]:
                             interface.pop(key, None)
 
                     for index in interface.keys():
