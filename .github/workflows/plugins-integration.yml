@@ -22,6 +22,7 @@ jobs:
         zabbix_container:
           - version: "4.0"
           - version: "5.0"
+          - version: "5.4"
         ansible:
           - stable-2.10
           - stable-2.11
