@@ -1155,16 +1155,15 @@ def main():
             # Do the same with templates and host groups.
             if not force or not interfaces:
                 for interface in copy.deepcopy(exist_interfaces):
-                    # remove values not used during hostinterface.add/update calls
                     for key in tuple(interface.keys()):
-                        if key not in ["type", "dns", "main", "useip", "ip", "port", "details"]:
+                        # remove values not used during hostinterface.add/update calls
+                        if key not in ["type", "dns", "main", "useip", "ip", "port", "details", "bulk"]:
                             interface.pop(key, None)
-
-                    for index in interface.keys():
-                        if index in ['useip', 'main', 'type', 'bulk']:
-                            interface[index] = int(interface[index])
-                        elif index == 'details' and not interface[index]:
-                            interface[index] = {}
+                        # fix values for properties
+                        if key in ['useip', 'main', 'type', 'bulk']:
+                            interface[key] = int(interface[key])
+                        elif key == 'details' and not interface[key]:
+                            interface[key] = {}
 
                     if interface not in interfaces:
                         interfaces.append(interface)
