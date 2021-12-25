@@ -12,8 +12,8 @@ $DB['PORT']        = '{{ zabbix_server_dbport                               }}';
 $DB['DATABASE']    = '{{ zabbix_server_dbname                               }}';
 $DB['USER']        = '{{ zabbix_server_dbuser                               }}';
 $DB['PASSWORD']    = '{{ zabbix_server_dbpassword                           }}';
-$DB['ENCRYPTION']  = '{{ 'true' if zabbix_server_dbencryption else 'false'  }}';
-$DB['VERIFY_HOST'] = '{{ 'true' if zabbix_server_dbverifyhost else 'false'  }}';
+$DB['ENCRYPTION']  = {{ 'true' if zabbix_server_dbencryption else 'false'  }};
+$DB['VERIFY_HOST'] = {{ 'true' if zabbix_server_dbverifyhost else 'false'  }};
 
 // Schema name. Used for IBM DB2 and PostgreSQL.
 $DB['SCHEMA'] = '{{ zabbix_server_dbschema }}';
