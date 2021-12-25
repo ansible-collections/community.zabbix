@@ -47,10 +47,6 @@
   when:
     - zabbix_websrv == 'apache'
 
-- include_tasks: apache.yml
-  when:
-    - zabbix_websrv == 'apache'
-
 - include_tasks: nginx.yml
   when:
     - zabbix_websrv == 'nginx'
