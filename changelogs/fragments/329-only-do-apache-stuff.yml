@@ -1,4 +1,4 @@
 ---
 
 minor_changes:
-  - zabbix_agent - Only execute some Apache commands when Apache is installed and zabbix_vhost is set to true.
+  - zabbix_agent - Move inclusion of the apache.yml tasks to later stage during execution of role.
