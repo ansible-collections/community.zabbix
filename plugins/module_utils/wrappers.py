@@ -57,6 +57,7 @@ class ZapiWrapper(object):
             except Exception as e:
                 self._module.fail_json(msg="Failed to connect to Zabbix server: %s" % e)
 
+
 class ScreenItem(object):
     @staticmethod
     def create(zapi_wrapper, data, ignoreExists=False):
