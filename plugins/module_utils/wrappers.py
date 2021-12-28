@@ -44,7 +44,7 @@ class ZapiWrapper(object):
 
         self.login()
 
-        self._zbx_api_version = self._zapi.api_version()[:5]
+        self._zbx_api_version = self._zapi.api_version()
 
     def login(self):
         # check if api already logged in
@@ -56,7 +56,6 @@ class ZapiWrapper(object):
                 atexit.register(self._zapi.logout)
             except Exception as e:
                 self._module.fail_json(msg="Failed to connect to Zabbix server: %s" % e)
-
 
 class ScreenItem(object):
     @staticmethod
