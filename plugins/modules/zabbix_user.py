@@ -276,11 +276,12 @@ user_ids:
 
 import copy
 
-from distutils.version import LooseVersion
 from ansible.module_utils.basic import AnsibleModule
 
 from ansible_collections.community.zabbix.plugins.module_utils.base import ZabbixBase
 from ansible_collections.community.zabbix.plugins.module_utils.helpers import helper_normalize_data
+from ansible_collections.community.zabbix.plugins.module_utils.version import LooseVersion
+
 import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabbix_utils
 
 
