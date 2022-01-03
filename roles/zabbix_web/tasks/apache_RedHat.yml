@@ -1,5 +1,7 @@
 ---
 
+- include_tasks: apache.yml
+
 - name: "RedHat | Install apache vhost"
   template:
     src: apache_vhost.conf.j2
