@@ -1,5 +1,9 @@
 ---
 
+- include_tasks: apache.yml
+  when:
+    - zabbix_websrv == 'apache'
+
 # This obviously needs to have some improvements.. :)
 
 - name: "Debian | Determine php prefix for packages installations (legacy php5)"
