@@ -1,0 +1,4 @@
+---
+
+bugfixes:
+  - zabbix_agent - Install the Agent for MacOSX sooner than its configuration.

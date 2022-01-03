@@ -89,13 +89,6 @@
   tags:
     - always
 
-- name: "Configure Agent"
-  include_tasks: macOS.yml
-  when:
-    - zabbix_agent_os_family == "Darwin"
-  tags:
-    - always
-
 - name: "Run the API calls to Zabbix Server"
   include_tasks: api.yml
   when:

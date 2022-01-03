@@ -82,6 +82,11 @@
     - zabbix-agent
     - config
 
+- name: "Installing Agent"
+  include_tasks: macOS.yml
+  tags:
+    - always
+
 - name: "Configure zabbix-agent"
   template:
     src: zabbix_agentd.conf.j2
