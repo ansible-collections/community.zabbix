@@ -87,7 +87,13 @@
   shell: |
     set -euxo pipefail
     cd {{ datafiles_path }}
-    if [ -f create.sql.gz ]; then zcat create.sql.gz > /tmp/create.sql ; else cp -p create.sql /tmp/create.sql ; fi
+    if [ -f create.sql.gz ]
+      then zcat create.sql.gz > /tmp/create.sql
+    elif [ -f server.sql.gz ]
+      then zcat server.sql.gz > /tmp/create.sql
+    else
+      cp {create,server}.sql /tmp/create.sql
+    fi
     cat /tmp/create.sql | psql -h '{{ zabbix_server_dbhost }}' \
     -U '{{ zabbix_server_dbuser }}' \
     -d '{{ zabbix_server_dbname }}' \

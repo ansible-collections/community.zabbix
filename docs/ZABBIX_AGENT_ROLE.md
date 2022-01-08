@@ -218,6 +218,7 @@ Otherwise it just for the Zabbix Agent or for the Zabbix Agent 2.
 * `zabbix_agent2_controlsocket`: The control socket, used to send runtime commands with '-R' option.
 * `zabbix_agent_allowroot`:  Allow the agent to run as 'root'. 0 - do not allow, 1 - allow
 * `zabbix_agent2_plugins`: A list containing plugin configuration.
+* `zabbix_agent(2)_listenbacklog`: The maximum number of pending connections in the queue.
 
 ## TLS Specific configuration
 

@@ -72,6 +72,7 @@ zabbix_server_dbpassword: zabbix-server
 zabbix_server_dbsocket:
 zabbix_server_dbport: 5432
 zabbix_server_dbhost_run_install: true
+zabbix_server_allowunsupporteddbversions: 0
 zabbix_server_privileged_host: localhost
 zabbix_server_historystorageurl:
 zabbix_server_historystoragetypes: uint,dbl,str,log,text
@@ -106,6 +107,7 @@ zabbix_server_startdbsyncers: 4
 zabbix_server_historycachesize: 8M
 zabbix_server_historyindexcachesize: 4M
 zabbix_server_trendcachesize: 4M
+zabbix_server_trendfunctioncachesize: 4M
 zabbix_server_historytextcachesize: 16M
 zabbix_server_valuecachesize: 8M
 zabbix_server_nodenoevents: 0
@@ -142,6 +144,16 @@ zabbix_server_startescalators: 1
 zabbix_server_vmwareperffrequency: 60
 zabbix_server_vmwaretimeout: 10
 zabbix_server_manage_service: true
+zabbix_server_vaulttoken:
+zabbix_server_vaulturl: https://127.0.0.1:8200
+zabbix_server_vaultdbpath:
+zabbix_server_startreportwriters: 0
+zabbix_server_webserviceurl:
+zabbix_server_servicemanagersyncfrequency: 60
+zabbix_server_problemhousekeepingfrequency: 60
+zabbix_server_listenbacklog:
+zabbix_server_hanodename:
+zabbix_server_nodeaddress:
 
 # SELinux specific
 zabbix_selinux: false

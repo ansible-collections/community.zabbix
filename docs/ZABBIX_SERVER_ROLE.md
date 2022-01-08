@@ -142,6 +142,21 @@ The following is an overview of all available configuration default for this rol
 * `zabbix_server_groupid`: The GID of the group on the host. Will only be used when `zabbix_repo: epel` is used.
 * `zabbix_server_include_mode`: Default: `0755`. The "mode" for the directory configured with `zabbix_server_include`.
 * `zabbix_server_conf_mode`: Default: `0640`. The "mode" for the Zabbix configuration file.
+* `zabbix_server_listenbacklog`: The maximum number of pending connections in the queue.
+* `zabbix_server_trendcachesize`: Size of trend cache, in bytes.
+* `zabbix_server_trendfunctioncachesize`: Size of trend function cache, in bytes.
+* `zabbix_server_vaulttoken`: Vault authentication token that should have been generated exclusively for Zabbix server with read only permission
+* `zabbix_server_vaulturl`: Vault server HTTP[S] URL. System-wide CA certificates directory will be used if SSLCALocation is not specified.
+* `zabbix_server_vaultdbpath`: Vault path from where credentials for database will be retrieved by keys 'password' and 'username'.
+* `zabbix_server_startreportwriters`: Number of pre-forked report writer instances.
+* `zabbix_server_webserviceurl`: URL to Zabbix web service, used to perform web related tasks.
+* `zabbix_server_servicemanagersyncfrequency`: How often Zabbix will synchronize configuration of a service manager (in seconds).
+* `zabbix_server_problemhousekeepingfrequency`: How often Zabbix will delete problems for deleted triggers (in seconds).
+
+### High Availability
+
+* `zabbix_server_hanodename`: The high availability cluster node name. When empty, server is working in standalone mode; a node with empty name is registered with address for the frontend to connect to. (Default: empty)
+* `zabbix_server_nodeaddress`: IP or hostname with optional port to specify how frontend should connect to the server.
 
 ### Database specific
 
@@ -160,6 +175,7 @@ The following is an overview of all available configuration default for this rol
 * `zabbix_database_timescaledb`:False / True. When you want to use timescaledb extension into the database, you can set it to True (this option only works for postgreSQL database).
 * `zabbix_server_dbencoding`: Default: `utf8`. The encoding for the MySQL database.
 * `zabbix_server_dbcollation`: Default: `utf8_bin`. The collation for the MySQL database.
+* `zabbix_server_allowunsupporteddbversions`: Allow server to work with unsupported database versions.
 
 ### TLS Specific configuration
 
