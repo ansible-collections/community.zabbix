@@ -75,24 +75,24 @@ ansible-galaxy collection install community.mysql
 
 See the following list of supported Operating systems with the Zabbix releases:
 
-| Zabbix              | 5.2 | 5.0 | 4.4 | 4.0 (LTS) | 3.0 (LTS) |
-|---------------------|-----|-----|-----|-----------|-----------|
-| Red Hat Fam 8       |  V  |  V  | V   |           |           |
-| Red Hat Fam 7       |     |  V  | V   | V         | V         |
-| Red Hat Fam 6       |  V  |  V  |     |           | V         |
-| Red Hat Fam 5       |  V  |  V  |     |           | V         |
-| Fedora              |     |     | V   | V         |           |
-| Ubuntu 20.04 focal  |  V  |  V  |     | V         |           |
-| Ubuntu 19.10 eoan   |     |     |     |           |           |
-| Ubuntu 18.04 bionic |  V  |  V  | V   | V         |           |
-| Ubuntu 16.04 xenial |  V  |  V  | V   | V         |           |
-| Ubuntu 14.04 trusty |  V  |  V  | V   | V         | V         |
-| Debian 10 buster    |  V  |  V  | V   |           |           |
-| Debian 9 stretch    |  V  |  V  | V   | V         |           |
-| Debian 8 jessie     |  V  |  V  | V   | V         | V         |
-| Debian 7 wheezy     |     |     |     | V         | V         |
-| macOS 10.15         |     |     | V   | V         |           |
-| macOS 10.14         |     |     | V   | V         |           |
+| Zabbix              | 6.0 | 5.4 | 5.2 | 5.0 (LTS) | 4.4 | 4.0 (LTS) | 3.0 (LTS) |
+|---------------------|-----|-----|-----|-----------|-----|-----------|-----------|
+| Red Hat Fam 8       |  V  |  V  |  V  |  V        | V   |           |           |
+| Red Hat Fam 7       |     |     |     |  V        | V   | V         | V         |
+| Red Hat Fam 6       |     |     |  V  |  V        |     |           | V         |
+| Red Hat Fam 5       |     |     |  V  |  V        |     |           | V         |
+| Fedora              |     |     |     |           | V   | V         |           |
+| Ubuntu 20.04 focal  |  V  |  V  |  V  |  V        |     | V         |           |
+| Ubuntu 19.10 eoan   |     |     |     |           |     |           |           |
+| Ubuntu 18.04 bionic |  V  |  V  |  V  |  V        | V   | V         |           |
+| Ubuntu 16.04 xenial |     |     |  V  |  V        | V   | V         |           |
+| Ubuntu 14.04 trusty |     |     |  V  |  V        | V   | V         | V         |
+| Debian 10 buster    |  V  |  V  |  V  |  V        | V   |           |           |
+| Debian 9 stretch    |  V  |  V  |  V  |  V        | V   | V         |           |
+| Debian 8 jessie     |     |     |  V  |  V        | V   | V         | V         |
+| Debian 7 wheezy     |     |     |     |           |     | V         | V         |
+| macOS 10.15         |     |     |     |           | V   | V         |           |
+| macOS 10.14         |     |     |     |           | V   | V         |           |
 
 See https://support.zabbix.com/browse/ZBX-18790 why RHEL7 is not supported anymore.
 
@@ -154,6 +154,8 @@ The following is an overview of all available configuration default for this rol
 * `zabbix_server_problemhousekeepingfrequency`: How often Zabbix will delete problems for deleted triggers (in seconds).
 
 ### High Availability
+
+These variables are specific for Zabbix 6.0 and higher:
 
 * `zabbix_server_hanodename`: The high availability cluster node name. When empty, server is working in standalone mode; a node with empty name is registered with address for the frontend to connect to. (Default: empty)
 * `zabbix_server_nodeaddress`: IP or hostname with optional port to specify how frontend should connect to the server.

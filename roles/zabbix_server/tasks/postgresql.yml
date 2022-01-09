@@ -91,8 +91,10 @@
       then zcat create.sql.gz > /tmp/create.sql
     elif [ -f server.sql.gz ]
       then zcat server.sql.gz > /tmp/create.sql
+    elif [ -f create.sql ]
+      then create.sql /tmp/create.sql
     else
-      cp {create,server}.sql /tmp/create.sql
+      cp server.sql /tmp/create.sql
     fi
     cat /tmp/create.sql | psql -h '{{ zabbix_server_dbhost }}' \
     -U '{{ zabbix_server_dbuser }}' \

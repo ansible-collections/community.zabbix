@@ -73,7 +73,15 @@
   shell: |
     set -euxo pipefail
     cd {{ datafiles_path }}
-    if [ -f schema.sql.gz ]; then zcat schema.sql.gz > /tmp/schema.sql ; else cp -p schema.sql /tmp/schema.sql; fi
+    if [ -f schema.sql.gz ]
+      then zcat schema.sql.gz > /tmp/schema.sql
+    elif [ -f proxy.sql.gz ]
+      then zcat proxy.sql.gz > /tmp/schema.sql
+    elif [ -f schema.sql ]
+      then cp -p schema.sql /tmp/schema.sql
+    else
+      cp -p proxy.sql /tmp/schema.sql
+    fi
     cat /tmp/schema.sql | psql -h '{{ zabbix_proxy_dbhost }}' -U '{{ zabbix_proxy_dbuser }}' \
     -d '{{ zabbix_proxy_dbname }}'
     touch /etc/zabbix/schema.done
