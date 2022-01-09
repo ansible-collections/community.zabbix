@@ -1,0 +1,6 @@
+---
+
+minor_changes:
+  - zabbix_agent - Prepare for Zabbix 6.0.
+  - zabbix_proxy - Prepare for Zabbix 6.0.
+  - zabbix_server - Prepare for Zabbix 6.0.
