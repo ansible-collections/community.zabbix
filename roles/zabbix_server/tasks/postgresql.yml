@@ -86,15 +86,12 @@
 - name: "PostgreSQL | Create schema"
   shell: |
     set -euxo pipefail
+    FILE={{ 'create.sql' if zabbix_version is version('6.0', '<') else 'server.sql' }}
     cd {{ datafiles_path }}
-    if [ -f create.sql.gz ]
-      then zcat create.sql.gz > /tmp/create.sql
-    elif [ -f server.sql.gz ]
-      then zcat server.sql.gz > /tmp/create.sql
-    elif [ -f create.sql ]
-      then create.sql /tmp/create.sql
+    if [ -f ${FILE}.gz ]
+      then zcat ${FILE}.gz > /tmp/create.sql
     else
-      cp server.sql /tmp/create.sql
+      cp ${FILE} /tmp/create.sql
     fi
     cat /tmp/create.sql | psql -h '{{ zabbix_server_dbhost }}' \
     -U '{{ zabbix_server_dbuser }}' \
