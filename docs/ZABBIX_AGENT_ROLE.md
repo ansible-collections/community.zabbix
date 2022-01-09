@@ -208,7 +208,7 @@ Otherwise it just for the Zabbix Agent or for the Zabbix Agent 2.
 * `zabbix_agent2_persistentbufferfile`: Zabbix Agent2 will keep SQLite database in this file	* n is valid if `EnablePersistentBuffer=1`
 * `zabbix_agent_maxlinespersecond`: maximum number of new lines the agent will send per second to zabbix server or proxy processing 'log' and 'logrt' active checks.
 * `zabbix_agent_allowroot`: allow the agent to run as 'root'. if disabled and the agent is started by 'root', the agent will try to switch to user 'zabbix' instead. has no effect if started under a regular user.
-* `zabbix_agent(2)_zabbix_alias`: sets an alias for parameter. it can be useful to substitute long and complex parameter name with a smaller and simpler one.
+* `zabbix_agent(2)_zabbix_alias`: sets an alias for parameter. it can be useful to substitute long and complex parameter name with a smaller and simpler one. Can be both a string as an list.
 * `zabbix_agent(2)_timeout`: spend no more than timeout seconds on processing
 * `zabbix_agent(2)_include`: you may include individual files or all files in a directory in the configuration file.
 * `zabbix_agent(2)_include_mode`: The mode for the directory mentioned above.
