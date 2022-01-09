@@ -297,6 +297,15 @@ class User(ZabbixBase):
 
         return 'alias'
 
+    def get_default_authentication(self):
+        auth = self._zapi.authentication.get({'output': 'extend'})
+        if auth.authentication_type == 0:
+            return "internal"
+        elif auth.authentication_type == 1:
+            return "LDAP"
+        else:
+            self._module.fail_json(msg="Failed to query authentication type. Unknown authentication type %s" % auth)
+
     def get_usergroups_by_name(self, usrgrps):
         params = {
             'output': ['usrgrpid', 'name', 'gui_access'],
@@ -309,11 +318,29 @@ class User(ZabbixBase):
             ids = [{'usrgrpid': g['usrgrpid']} for g in res]
             # User can be created password-less only when all groups are of non-internal
             # authentication types
-            internal_auth = bool([g for g in res if g['gui_access'] == '1'])
+            # 0 = use system default authentication method
+            # 1 = use internal authentication
+            # 2 = use LDAP authentication
+            # 3 = disable access to the frontend
+
+            if bool([g for g in res if g['gui_access'] == '1']):
+                require_password = True
+            elif bool([g for g in res if g['gui_access'] == '2' or g['gui_access'] == '3']):
+                require_password = False
+            elif bool([g for g in res if g['gui_access'] == '0']):
+                # Zabbix API for versions < 5.2 does not have a way to query the default auth type
+                # so we must assume its set to internal
+                if LooseVersion(self._zbx_api_version) >= LooseVersion('5.2'):
+                    default_authentication = self.get_default_authentication()
+                    require_password = True if default_authentication == 'internal' else False
+                else:
+                    default_authentication = "internal"
+                    require_password = True
+
             not_found_groups = set(usrgrps) - set([g['name'] for g in res])
             if not_found_groups:
                 self._module.fail_json(msg='User groups not found: %s' % not_found_groups)
-            return ids, internal_auth
+            return ids, require_password
         else:
             self._module.fail_json(msg='No user groups found')
 
@@ -445,7 +472,7 @@ class User(ZabbixBase):
         return user_parameter_difference_check_result, diff_params
 
     def add_user(self, alias, name, surname, user_group_ids, passwd, lang, theme, autologin, autologout, refresh,
-                 rows_per_page, url, user_medias, user_type, internal_auth, timezone, role_name):
+                 rows_per_page, url, user_medias, user_type, require_password, timezone, role_name):
 
         if role_name is None and LooseVersion(self._zbx_api_version) >= LooseVersion('5.2'):
             # This variable is to set the default value because the module must have a backward-compatible.
@@ -474,7 +501,7 @@ class User(ZabbixBase):
         if user_medias:
             request_data['user_medias'] = user_medias
 
-        if LooseVersion(self._zbx_api_version) < LooseVersion('4.0') or internal_auth:
+        if LooseVersion(self._zbx_api_version) < LooseVersion('4.0') or require_password:
             request_data['passwd'] = passwd
 
         # The type key has changed to roleid key since Zabbix 5.2
@@ -668,8 +695,8 @@ def main():
     user_ids = {}
     zbx_user = user.check_user_exist(alias)
     if state == 'present':
-        user_group_ids, internal_auth = user.get_usergroups_by_name(usrgrps)
-        if LooseVersion(user._zbx_api_version) < LooseVersion('4.0') or internal_auth:
+        user_group_ids, require_password = user.get_usergroups_by_name(usrgrps)
+        if LooseVersion(user._zbx_api_version) < LooseVersion('4.0') or require_password:
             if passwd is None:
                 module.fail_json(msg='User password is required. One or more groups are not LDAP based.')
 
@@ -689,7 +716,7 @@ def main():
             diff_check_result = True
             user_ids, diff_params = user.add_user(alias, name, surname, user_group_ids, passwd, lang, theme, autologin,
                                                   autologout, refresh, rows_per_page, after_login_url, user_medias,
-                                                  user_type, internal_auth, timezone, role_name)
+                                                  user_type, require_password, timezone, role_name)
 
     if state == 'absent':
         if zbx_user:
