@@ -54,6 +54,7 @@ zabbix_proxy_dbtlscertfile:
 zabbix_proxy_dbtlskeyfile:
 zabbix_proxy_dbtlscipher:
 zabbix_proxy_dbtlscipher13:
+zabbix_proxy_allowunsupporteddbversions: 0
 
 # Some role specific vars
 zabbix_proxy_database: mysql
@@ -68,6 +69,7 @@ zabbix_proxy_mode: 0
 zabbix_proxy_hostname: "{{ inventory_hostname }}"
 zabbix_proxy_listenport: 10051
 zabbix_proxy_sourceip:
+zabbix_proxy_logtype: file
 zabbix_proxy_logfile: /var/log/zabbix/zabbix_proxy.log
 zabbix_proxy_logfilesize: 10
 zabbix_proxy_enableremotecommands: 0
@@ -133,6 +135,10 @@ zabbix_proxy_libdir: /usr/lib/zabbix
 zabbix_proxy_loadmodulepath: "{{ zabbix_proxy_libdir }}/modules"
 zabbix_proxy_manage_service: true
 zabbix_proxy_statsallowedip: '127.0.0.1'
+zabbix_proxy_vaulttoken:
+zabbix_proxy_vaulturl: https://127.0.0.1:8200
+zabbix_proxy_vaultdbpath:
+zabbix_proxy_listenbacklog:
 
 # TLS settings
 zabbix_proxy_tlsconnect:

@@ -55,7 +55,7 @@
     - database
 
 - name: "Get the file for create.sql >= 3.0"
-  shell: ls -1 {{ datafiles_path }}/create.sq*
+  shell: ls -1 {{ datafiles_path }}/{{ 'create' if zabbix_version is version('6.0', '<') else 'server' }}.sq*
   changed_when: false
   when:
     - zabbix_version is version('3.0', '>=')

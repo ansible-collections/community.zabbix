@@ -71,24 +71,24 @@ ansible-galaxy collection install community.mysql
 
 See the following list of supported Operating systems with the Zabbix releases.
 
-| Zabbix              | 5.2 | 5.0 | 4.4 | 4.0 (LTS) | 3.0 (LTS) |
-|---------------------|-----|-----|-----|-----------|-----------|
-| Red Hat Fam 8       |  V  |  V  | V   |           |           |
-| Red Hat Fam 7       |  V  |  V  | V   | V         | V         |
-| Red Hat Fam 6       |  V  |  V  |     |           | V         |
-| Red Hat Fam 5       |  V  |  V  |     |           | V         |
-| Fedora              |     |     | V   | V         |           |
-| Ubuntu 20.04 focal  |  V  |  V  |     | V         |           |
-| Ubuntu 19.10 eoan   |     |     |     |           |           |
-| Ubuntu 18.04 bionic |  V  |  V  | V   | V         |           |
-| Ubuntu 16.04 xenial |  V  |  V  | V   | V         |           |
-| Ubuntu 14.04 trusty |  V  |  V  | V   | V         | V         |
-| Debian 10 buster    |  V  |  V  | V   |           |           |
-| Debian 9 stretch    |  V  |  V  | V   | V         |           |
-| Debian 8 jessie     |  V  |  V  | V   | V         | V         |
-| Debian 7 wheezy     |     |     |     | V         | V         |
-| macOS 10.15         |     |     | V   | V         |           |
-| macOS 10.14         |     |     | V   | V         |           |
+| Zabbix              | 6.0 | 5.4 | 5.2 | 5.0  (LTS)| 4.4 | 4.0 (LTS) | 3.0 (LTS) |
+|---------------------|-----|-----|-----|-----------|-----|-----------|-----------|
+| Red Hat Fam 8       |  V  |  V  |  V  |  V        | V   |           |           |
+| Red Hat Fam 7       |  V  |  V  |  V  |  V        | V   | V         | V         |
+| Red Hat Fam 6       |     |     |  V  |  V        |     |           | V         |
+| Red Hat Fam 5       |     |     |  V  |  V        |     |           | V         |
+| Fedora              |     |     |     |           | V   | V         |           |
+| Ubuntu 20.04 focal  |  V  |  V  |  V  |  V        |     | V         |           |
+| Ubuntu 19.10 eoan   |     |     |     |           |     |           |           |
+| Ubuntu 18.04 bionic |  V  |  V  |  V  |  V        | V   | V         |           |
+| Ubuntu 16.04 xenial |     |     |  V  |  V        | V   | V         |           |
+| Ubuntu 14.04 trusty |     |     |  V  |  V        | V   | V         | V         |
+| Debian 10 buster    |  V  |  V  |  V  |  V        | V   |           |           |
+| Debian 9 stretch    |  V  |  V  |  V  |  V        | V   | V         |           |
+| Debian 8 jessie     |     |     |  V  |  V        | V   | V         | V         |
+| Debian 7 wheezy     |     |     |     |           |     | V         | V         |
+| macOS 10.15         |     |     |     |           | V   | V         |           |
+| macOS 10.14         |     |     |     |           | V   | V         |           |
 
 # Role Variables
 
@@ -125,12 +125,18 @@ The following is an overview of all available configuration default for this rol
 * `zabbix_install_pip_packages`: Default: `True`. Set to `False` if you don't want to install the required pip packages. Useful when you control your environment completely.
 * `zabbix_proxy_startpreprocessors`: Number of pre-forked instances of preprocessing workers. The preprocessing manager process is automatically started when a preprocessor worker is started.This parameter is supported since Zabbix 4.2.0.
 * `zabbix_proxy_username`: Default: `zabbix`. The name of the account on the host. Will only be used when `zabbix_repo: epel` is used.
+* `zabbix_proxy_logtype`: Specifies where log messages are written to: system, file, console.
+* `zabbix_proxy_logfile`: Name of log file.
 * `zabbix_proxy_userid`: The UID of the account on the host. Will only be used when `zabbix_repo: epel` is used.
 * `zabbix_proxy_groupname`: Default: `zabbix`. The name of the group of the user on the host. Will only be used when `zabbix_repo: epel` is used.
 * `zabbix_proxy_groupid`: The GID of the group on the host. Will only be used when `zabbix_repo: epel` is used.
 * `zabbix_proxy_include_mode`: Default: `0755`. The "mode" for the directory configured with `zabbix_proxy_include`.
 * `zabbix_proxy_conf_mode`: Default: `0644`. The "mode" for the Zabbix configuration file.
 * `zabbix_proxy_statsallowedip`: Default: `127.0.0.1`. Allowed IP foe remote gathering of the ZabbixPorixy internal metrics.
+* `zabbix_proxy_vaulttoken`: Vault authentication token that should have been generated exclusively for Zabbix server with read only permission
+* `zabbix_proxy_vaulturl`: Vault server HTTP[S] URL. System-wide CA certificates directory will be used if SSLCALocation is not specified.
+* `zabbix_proxy_vaultdbpath`: Vault path from where credentials for database will be retrieved by keys 'password' and 'username'.
+* `zabbix_proxy_listenbacklog`: The maximum number of pending connections in the queue.
 
 ### Database specific
 
@@ -148,6 +154,7 @@ The following is an overview of all available configuration default for this rol
 * `zabbix_database_sqlload`:True / False. When you don't want to load the sql files into the database, you can set it to False.
 * `zabbix_proxy_dbencoding`: Default: `utf8`. The encoding for the MySQL database.
 * `zabbix_proxy_dbcollation`: Default: `utf8_bin`. The collation for the MySQL database.zabbix_proxy_
+* `zabbix_server_allowunsupporteddbversions`: Allow proxy to work with unsupported database versions.
 
 ### TLS Specific configuration
 
