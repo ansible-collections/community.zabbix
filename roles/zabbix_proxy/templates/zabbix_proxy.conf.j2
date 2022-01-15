@@ -55,6 +55,15 @@ ListenPort={{ zabbix_proxy_listenport }}
 SourceIP={{ zabbix_proxy_sourceip }}
 {% endif %}
 
+{% if zabbix_version is version('6.0', '>=') %}
+### Option: LogType
+#       Specifies where log messages are written to:
+#               system  - syslog
+#               file    - file specified with LogFile parameter
+#               console - standard output
+LogType={{ zabbix_proxy_logtype }}
+{% endif %}
+
 ### Option: LogFile
 #	Name of log file.
 #	If not set, syslog is used.
@@ -134,6 +143,18 @@ DBPassword={{ zabbix_proxy_dbpassword }}
 #	Database port when not using local socket. Ignored for SQLite.
 #
 DBPort={{ zabbix_proxy_dbport }}
+
+{% if zabbix_version is version('6.0', '>=') %}
+### Option: AllowUnsupportedDBVersions
+#       Allow server to work with unsupported database versions.
+#       0 - do not allow
+#       1 - allow
+#
+# Mandatory: no
+# Default:
+# AllowUnsupportedDBVersions=0
+AllowUnsupportedDBVersions={{ zabbix_proxy_allowunsupporteddbversions }}
+{% endif %}
 
 ######### PROXY SPECIFIC PARAMETERS #############
 
@@ -617,4 +638,53 @@ DBTLSCipher={{ zabbix_proxy_dbtlscipher }}
 # DBTLSCipher13=
 {% if zabbix_proxy_dbtlscipher13 is defined and zabbix_proxy_dbtlscipher13 is not none %}
 DBTLSCipher13={{ zabbix_proxy_dbtlscipher13 }}
+{% endif %}
+
+{% if zabbix_version is version('6.0', '>=') %}
+### Option: VaultToken
+#       Vault authentication token that should have been generated exclusively for Zabbix server with read only permission
+#       to paths specified in Vault macros and read only permission to path specified in optional VaultDBPath
+#       configuration parameter.
+#       It is an error if VaultToken and VAULT_TOKEN environment variable are defined at the same time.
+#
+# Mandatory: no
+# Default:
+# VaultToken=
+{% if zabbix_proxy_vaulttoken is defined and zabbix_proxy_vaulttoken is not none %}
+VaultToken={{ zabbix_proxy_vaulttoken }}
+{% endif %}
+
+### Option: VaultURL
+#       Vault server HTTP[S] URL. System-wide CA certificates directory will be used if SSLCALocation is not specified.
+#
+# Mandatory: no
+# Default:
+# VaultURL=https://127.0.0.1:8200
+{% if zabbix_proxy_vaulturl is defined and zabbix_proxy_vaulturl is not none %}
+VaultURL={{ zabbix_proxy_vaulturl }}
+{% endif %}
+
+### Option: VaultDBPath
+#       Vault path from where credentials for database will be retrieved by keys 'password' and 'username'.
+#       Example: secret/zabbix/database
+#       This option can only be used if DBUser and DBPassword are not specified.
+#
+# Mandatory: no
+# Default:
+# VaultDBPath=
+{% if zabbix_proxy_vaultdbpath is defined and zabbix_proxy_vaultdbpath is not none %}
+VaultDBPath={{ zabbix_proxy_vaultdbpath }}
+{% endif %}
+
+####### For advanced users - TCP-related fine-tuning parameters #######
+
+## Option: ListenBacklog
+#       The maximum number of pending connections in the queue. This parameter is passed to
+#       listen() function as argument 'backlog' (see "man listen").
+#
+# Mandatory: no
+# Range: 0 - INT_MAX (depends on system, too large values may be silently truncated to implementation-specified maximum)
+{% if zabbix_proxy_listenbacklog is defined and zabbix_proxy_listenbacklog is not none %}
+ListenBacklog={{ zabbix_proxy_listenbacklog }}
+{% endif %}
 {% endif %}
