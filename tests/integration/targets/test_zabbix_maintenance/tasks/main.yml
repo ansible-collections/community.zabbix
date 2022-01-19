@@ -261,6 +261,66 @@
 #     that:
 #       - update_maintenance_host_names_again_result.changed is sameas false
 
+- name: "test - Update maintenance with tags"
+  zabbix_maintenance:
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
+    name: maintenance
+    host_names:
+      - example
+      - Zabbix server
+    host_groups:
+      - Linux servers
+      - Hypervisors
+    desc: "test description"
+    collect_data: yes  # required for tags
+    minutes: 90
+    state: present
+    tags:
+      - tag: ExampleHostsTag
+      - tag: ExampleHostsTag2
+        value: ExampleTagValue
+      - tag: ExampleHostsTag3
+        value: ExampleTagValue
+        operator: 0
+  register: update_maintenance_host_tags
+
+- assert:
+    that:
+      - update_maintenance_host_tags.changed is sameas true
+
+- name: "test - Update maintenance with tags (again)"
+  zabbix_maintenance:
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
+    name: maintenance
+    host_names:
+      - example
+      - Zabbix server
+    host_groups:
+      - Linux servers
+      - Hypervisors
+    desc: "test description"
+    collect_data: yes
+    minutes: 90
+    state: present
+    tags:
+      - tag: ExampleHostsTag
+      - tag: ExampleHostsTag2
+        value: ExampleTagValue
+      - tag: ExampleHostsTag3
+        value: ExampleTagValue
+        operator: 0
+  register: update_maintenance_host_tags
+
+# BUGGED: sometimes when test "lags" and some time passes since previous tasks,
+# maintenance_start will not match and be updated, thus resulting in changed
+#- assert:
+#    that:
+#      - update_maintenance_host_tags.changed is sameas false
+
 - name: "test - Delete maintenance"
   zabbix_maintenance:
     server_url: "{{ zabbix_api_server_url }}"
@@ -270,6 +330,8 @@
     host_name: example
     state: absent
   register: delete_maintenance_result
+  tags:
+    - cleanup
 
 - assert:
     that:
@@ -288,3 +350,13 @@
 - assert:
     that:
       - delete_maintenance_again_result.changed is sameas false
+
+- name: "test - Delete testing host"
+  zabbix_host:
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
+    host_name: example
+    state: absent
+  tags:
+    - cleanup
