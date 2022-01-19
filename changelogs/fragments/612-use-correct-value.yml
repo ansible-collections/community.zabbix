@@ -1,0 +1,4 @@
+---
+
+bugfixes:
+  - zabbix_agent - Use the correct path to determine Zabbix Agent 2 installation on Windows.
