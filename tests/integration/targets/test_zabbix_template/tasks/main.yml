@@ -202,6 +202,10 @@
     that:
       - update_zabbix_template_result.changed is sameas false
 
+# ####
+# Import template tests
+# ####
+
 - name: Gather Zabbix template infomation.
   zabbix_template_info:
     server_url: "{{ zabbix_api_server_url }}"
@@ -239,7 +243,7 @@
 
 - when: zabbix_version is version('5.4', '<')
   block:
-    - name: Import Zabbix template from JSON file with matching values (idempotency check).
+    - name: Import Zabbix template from JSON file with matching values (idempotency check) - < Zabbix 5.4.
       zabbix_template:
         server_url: "{{ zabbix_api_server_url }}"
         login_user: "{{ zabbix_api_login_user }}"
@@ -248,13 +252,14 @@
         state: present
       register: import_template_json
 
-    - assert:
+    - name: Assert Zabbix template from JSON file with matching values (idempotency check) - < Zabbix 5.4.
+      assert:
         that:
           - import_template_json.changed is sameas false
 
 - when: zabbix_version is version('5.4', '>=')
   block:
-    - name: Import Zabbix template from JSON file with matching values (idempotency check).
+    - name: Import Zabbix template from JSON file with matching values (idempotency check) - >= Zabbix 5.4.
       zabbix_template:
         server_url: "{{ zabbix_api_server_url }}"
         login_user: "{{ zabbix_api_login_user }}"
@@ -263,7 +268,8 @@
         state: present
       register: import_template_json
 
-    - assert:
+    - name: Assert Zabbix template from JSON file with matching values (idempotency check) - >= Zabbix 5.4.
+      assert:
         that:
           - import_template_json.changed is sameas false
 
