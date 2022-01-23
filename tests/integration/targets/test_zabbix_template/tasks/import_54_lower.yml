@@ -1,0 +1,144 @@
+---
+
+#
+# For Zabbix lower than 5.4 we test against the ExampleHost which was created in the
+# main.yml tests. Due to changes in the Zabbix API (mainly because UUIDs) this is
+# not possible for 5.4 onwards - so there we first delete the Example host.
+#
+
+#
+# JSON Tests
+#
+
+- name: Gather Zabbix template infomation.
+  zabbix_template_info:
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
+    template_name: ExampleHost
+    format: json
+  register: gather_template_result
+
+- block:
+    - assert:
+        that:
+          - gather_template_result.template_json[template_export_key].groups.0.name == 'Linux servers'
+          - gather_template_result.template_json[template_export_key].groups.1.name == 'Templates'
+          - gather_template_result.template_json[template_export_key].templates.0.templates.0.name == 'Template App FTP Service'
+          - gather_template_result.template_json[template_export_key].templates.0.templates.1.name == 'Template App Zabbix Proxy'
+          - gather_template_result.template_json[template_export_key].templates.0.macros.0.macro == '{$EXAMPLE_MACRO1}'
+          - gather_template_result.template_json[template_export_key].templates.0.macros.0.value == '1000'
+          - gather_template_result.template_json[template_export_key].templates.0.macros.1.macro == '{$EXAMPLE_MACRO2}'
+          - gather_template_result.template_json[template_export_key].templates.0.macros.1.value == 'text'
+
+- block:
+    - name: Import Zabbix template from JSON file with matching values (idempotency check) - < Zabbix 5.4.
+      zabbix_template:
+        server_url: "{{ zabbix_api_server_url }}"
+        login_user: "{{ zabbix_api_login_user }}"
+        login_password: "{{ zabbix_api_login_pass }}"
+        template_json: "{{ lookup('file', 'template1_50_lower.json') }}"
+        state: present
+      register: import_template_json
+
+    - name: Assert Zabbix template from JSON file with matching values (idempotency check) - < Zabbix 5.4.
+      assert:
+        that:
+          - import_template_json.changed is sameas false
+
+- block:
+    - name: Import Zabbix template from JSON file with updated values.
+      zabbix_template:
+        server_url: "{{ zabbix_api_server_url }}"
+        login_user: "{{ zabbix_api_login_user }}"
+        login_password: "{{ zabbix_api_login_pass }}"
+        template_json: "{{ lookup('file', 'template1-changed_50_lower.json') }}"
+        state: present
+      register: import_template_json
+
+    - assert:
+        that:
+          - import_template_json.changed is sameas true
+
+- name: Gather Zabbix template infomation.
+  zabbix_template_info:
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
+    template_name: ExampleHost
+    format: json
+  register: gather_template_result
+
+- assert:
+    that:
+      - gather_template_result.template_json[template_export_key].templates.0.macros.0.macro == '{$EXAMPLE_MACRO1}'
+      - gather_template_result.template_json[template_export_key].templates.0.macros.0.value == '1000'
+      - gather_template_result.template_json[template_export_key].templates.0.macros.1.macro == '{$EXAMPLE_MACRO2}'
+      - gather_template_result.template_json[template_export_key].templates.0.macros.1.value == 'text'
+      - gather_template_result.template_json[template_export_key].templates.0.macros.2.macro == '{$EXAMPLE_MACRO3}'
+      - gather_template_result.template_json[template_export_key].templates.0.macros.2.value == 'text2'
+
+- name: Dump Zabbix template to JSON format.
+  zabbix_template:
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
+    template_name: ExampleHost
+    dump_format: json
+    state: dump
+  register: template_dump_result
+
+- assert:
+    that:
+      - template_dump_result.deprecations is defined
+      - template_dump_result.deprecations.0.version == '3.0.0'
+
+#
+# XML Tests
+#
+
+- block:
+    - name: Import Zabbix template from XML file with updated values.
+      zabbix_template:
+        server_url: "{{ zabbix_api_server_url }}"
+        login_user: "{{ zabbix_api_login_user }}"
+        login_password: "{{ zabbix_api_login_pass }}"
+        template_xml: "{{ lookup('file', 'template2_50_lower.xml') }}"
+        state: present
+      register: import_template_xml
+
+    - assert:
+        that:
+          - import_template_xml.changed is sameas true
+
+- name: Gather Zabbix template infomation.
+  zabbix_template_info:
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
+    template_name: ExampleHost
+    format: json
+  register: gather_template_result
+
+# zabbix returns values sorted alphabetically so HTTP Service template comes before Zabbix Proxy template
+- block:
+    - assert:
+        that:
+          - gather_template_result.template_json[template_export_key].templates.0.templates.0.name == 'Template App FTP Service'
+          - gather_template_result.template_json[template_export_key].templates.0.templates.1.name == 'Template App HTTP Service'
+          - gather_template_result.template_json[template_export_key].templates.0.templates.2.name == 'Template App Zabbix Proxy'
+
+- name: Dump Zabbix template to XML format.
+  zabbix_template:
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
+    template_name: ExampleHost
+    dump_format: xml
+    state: dump
+  register: template_dump_result
+
+- assert:
+    that:
+      - template_dump_result.deprecations is defined
+      - template_dump_result.deprecations.0.version == '3.0.0'
