@@ -29,7 +29,7 @@
             "name": "FTP Service"
           },
           {
-            "name": "Zabbix Proxy"
+            "name": "Zabbix proxy health"
           }
         ]
       }

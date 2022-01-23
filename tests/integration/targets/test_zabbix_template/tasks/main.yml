@@ -259,7 +259,7 @@
         server_url: "{{ zabbix_api_server_url }}"
         login_user: "{{ zabbix_api_login_user }}"
         login_password: "{{ zabbix_api_login_pass }}"
-        template_json: "{{ lookup('file', 'template1_52_higher.json') }}"
+        template_json: "{{ lookup('file', 'template1_54_higher.json') }}"
         state: present
       register: import_template_json
 
@@ -289,7 +289,7 @@
         server_url: "{{ zabbix_api_server_url }}"
         login_user: "{{ zabbix_api_login_user }}"
         login_password: "{{ zabbix_api_login_pass }}"
-        template_json: "{{ lookup('file', 'template1-changed_52_higher.json') }}"
+        template_json: "{{ lookup('file', 'template1-changed_54_higher.json') }}"
         state: present
       register: import_template_json
 
@@ -337,7 +337,7 @@
         server_url: "{{ zabbix_api_server_url }}"
         login_user: "{{ zabbix_api_login_user }}"
         login_password: "{{ zabbix_api_login_pass }}"
-        template_xml: "{{ lookup('file', 'template2_52_higher.xml') }}"
+        template_xml: "{{ lookup('file', 'template2_54_higher.xml') }}"
         state: present
       register: import_template_xml
 

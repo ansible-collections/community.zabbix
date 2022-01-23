@@ -33,7 +33,7 @@
           <name>FTP Service</name>
         </template>
         <template>
-          <name>Zabbix Proxy</name>
+          <name>Zabbix proxy health</name>
         </template>
         <template>
           <name>HTTP Service</name>
