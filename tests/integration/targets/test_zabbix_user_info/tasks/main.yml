@@ -1,6 +1,6 @@
 ---
 # New user create test from here
-- when: zabbix_version is version('5.2', '<')
+- when: zabbix_version is version('5.4', '<')
   block:
     - name: test - Create a new Zabbix user
       zabbix_user:
@@ -75,7 +75,7 @@
           - get_user_info_result[user_info_key].usrgrps.1.users_status is defined
           - get_user_info_result[user_info_key].usrgrps.1.usrgrpid is defined
 
-- when: zabbix_version is version('5.2', '>=')
+- when: zabbix_version is version('5.4', '>=')
   block:
     - name: test - Create a new Zabbix user
       zabbix_user:
@@ -117,7 +117,7 @@
         that:
           - create_zabbix_user_result.changed is sameas true
 
-    - name: test - Set definition_of_results variable of Zabbix 5.2 and higher
+    - name: test - Set definition_of_results variable of Zabbix 5.4 and higher
       set_fact:
         definition_of_results:
           - get_user_info_result[user_info_key].alias == "example"
@@ -206,3 +206,9 @@
 - assert:
     that:
       - get_user_info_result2[user_info_key].alias == "example2"
+  when: zabbix_version is version('5.4', '<')
+
+- assert:
+    that:
+      - get_user_info_result2[user_info_key].username == "example2"
+  when: zabbix_version is version('5.4', '>=')

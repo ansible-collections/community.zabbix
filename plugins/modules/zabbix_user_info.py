@@ -19,9 +19,12 @@ requirements:
     - "python >= 2.6"
     - "zabbix-api >= 0.5.4"
 options:
-    alias:
+    username:
         description:
             - Name of the user alias in Zabbix.
+            - username is the unique identifier used and cannot be updated using this module.
+            - alias should be replaced with username
+        aliases: [ alias ]
         required: true
         type: str
 extends_documentation_fragment:
@@ -35,7 +38,7 @@ EXAMPLES = '''
     server_url: "http://zabbix.example.com/zabbix/"
     login_user: admin
     login_password: secret
-    alias: example
+    username: example
 '''
 
 RETURN = '''
@@ -44,7 +47,7 @@ zabbix_user:
   returned: always
   type: dict
   sample: {
-  "alias": "example",
+  "username": "example",
   "attempt_clock": "0",
   "attempt_failed": "0",
   "attempt_ip": "",
@@ -87,18 +90,25 @@ zabbix_user:
 
 
 from ansible.module_utils.basic import AnsibleModule
+from ansible_collections.community.zabbix.plugins.module_utils.version import LooseVersion
 
 from ansible_collections.community.zabbix.plugins.module_utils.base import ZabbixBase
 import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabbix_utils
 
 
 class User(ZabbixBase):
-    def get_user_by_user_alias(self, alias):
+    def get_user_by_user_username(self, username):
         zabbix_user = ""
         try:
-            zabbix_user = self._zapi.user.get({'output': 'extend', 'filter': {'alias': alias},
-                                               'getAccess': True, 'selectMedias': 'extend',
-                                               'selectUsrgrps': 'extend'})
+            data = {'output': 'extend', 'filter': {},
+                    'getAccess': True, 'selectMedias': 'extend',
+                    'selectUsrgrps': 'extend'}
+            if LooseVersion(self._zbx_api_version) >= LooseVersion('5.4'):
+                data['filter']['username'] = username
+            else:
+                data['filter']['alias'] = username
+
+            zabbix_user = self._zapi.user.get(data)
         except Exception as e:
             self._zapi.logout()
             self._module.fail_json(msg="Failed to get user information: %s" % e)
@@ -114,17 +124,17 @@ class User(ZabbixBase):
 def main():
     argument_spec = zabbix_utils.zabbix_common_argument_spec()
     argument_spec.update(dict(
-        alias=dict(type='str', required=True),
+        username=dict(type='str', required=True, aliases=['alias']),
     ))
     module = AnsibleModule(
         argument_spec=argument_spec,
         supports_check_mode=True
     )
 
-    alias = module.params['alias']
+    username = module.params['username']
 
     user = User(module)
-    zabbix_user = user.get_user_by_user_alias(alias)
+    zabbix_user = user.get_user_by_user_username(username)
     module.exit_json(changed=False, zabbix_user=zabbix_user)
 
 

@@ -19,11 +19,12 @@ requirements:
     - "python >= 2.6"
     - "zabbix-api >= 0.5.4"
 options:
-    alias:
+    username:
         description:
             - Name of the user alias in Zabbix.
-            - alias is the unique identifier used and cannot be updated using this module.
-        aliases: [ username ]
+            - username is the unique identifier used and cannot be updated using this module.
+            - alias should be replaced with username
+        aliases: [ alias ]
         required: true
         type: str
     name:
@@ -222,7 +223,7 @@ EXAMPLES = r'''
     server_url: "http://zabbix.example.com/zabbix/"
     login_user: Admin
     login_password: secret
-    alias: example
+    username: example
     name: user name
     surname: user surname
     usrgrps:
@@ -256,7 +257,7 @@ EXAMPLES = r'''
     server_url: "http://zabbix.example.com/zabbix/"
     login_user: admin
     login_password: secret
-    alias: example
+    username: example
     usrgrps:
       - Guests
     passwd: password
@@ -287,15 +288,13 @@ import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabb
 
 class User(ZabbixBase):
 
-    def alias_key(self):
-        """ Returns the key name for 'alias', which has been renamed to
-        'username' in Zabbix 5.4.
-
+    def username_key(self):
+        """ Returns the key name for 'username', which was 'alias'
+        before Zabbix 5.4.
         """
-        if LooseVersion(self._zbx_api_version) >= LooseVersion('5.4'):
-            return 'username'
-
-        return 'alias'
+        if LooseVersion(self._zbx_api_version) < LooseVersion('5.4'):
+            return 'alias'
+        return 'username'
 
     def get_usergroups_by_name(self, usrgrps):
         params = {
@@ -317,8 +316,8 @@ class User(ZabbixBase):
         else:
             self._module.fail_json(msg='No user groups found')
 
-    def check_user_exist(self, alias):
-        zbx_user = self._zapi.user.get({'output': 'extend', 'filter': {self.alias_key(): alias},
+    def check_user_exist(self, username):
+        zbx_user = self._zapi.user.get({'output': 'extend', 'filter': {self.username_key(): username},
                                         'getAccess': True, 'selectMedias': 'extend',
                                         'selectUsrgrps': 'extend'})
 
@@ -366,7 +365,7 @@ class User(ZabbixBase):
 
         self._module.fail_json(msg="Role not found: %s" % role_name)
 
-    def user_parameter_difference_check(self, zbx_user, alias, name, surname, user_group_ids, passwd, lang, theme,
+    def user_parameter_difference_check(self, zbx_user, username, name, surname, user_group_ids, passwd, lang, theme,
                                         autologin, autologout, refresh, rows_per_page, url, user_medias, user_type,
                                         timezone, role_name, override_passwd):
 
@@ -402,7 +401,7 @@ class User(ZabbixBase):
         # request data
         request_data = {
             'userid': zbx_user[0]['userid'],
-            self.alias_key(): alias,
+            self.username_key(): username,
             'name': name,
             'surname': surname,
             'usrgrps': sorted(user_group_ids, key=lambda x: x['usrgrpid']),
@@ -444,7 +443,7 @@ class User(ZabbixBase):
 
         return user_parameter_difference_check_result, diff_params
 
-    def add_user(self, alias, name, surname, user_group_ids, passwd, lang, theme, autologin, autologout, refresh,
+    def add_user(self, username, name, surname, user_group_ids, passwd, lang, theme, autologin, autologout, refresh,
                  rows_per_page, url, user_medias, user_type, internal_auth, timezone, role_name):
 
         if role_name is None and LooseVersion(self._zbx_api_version) >= LooseVersion('5.2'):
@@ -459,7 +458,7 @@ class User(ZabbixBase):
         user_ids = {}
 
         request_data = {
-            self.alias_key(): alias,
+            self.username_key(): username,
             'name': name,
             'surname': surname,
             'usrgrps': user_group_ids,
@@ -491,7 +490,7 @@ class User(ZabbixBase):
             try:
                 user_ids = self._zapi.user.create(request_data)
             except Exception as e:
-                self._module.fail_json(msg="Failed to create user %s: %s" % (alias, e))
+                self._module.fail_json(msg="Failed to create user %s: %s" % (username, e))
         else:
             diff_params = {
                 "before": "",
@@ -500,7 +499,7 @@ class User(ZabbixBase):
 
         return user_ids, diff_params
 
-    def update_user(self, zbx_user, alias, name, surname, user_group_ids, passwd, lang, theme, autologin, autologout,
+    def update_user(self, zbx_user, username, name, surname, user_group_ids, passwd, lang, theme, autologin, autologout,
                     refresh, rows_per_page, url, user_medias, user_type, timezone, role_name, override_passwd):
 
         if user_medias:
@@ -510,7 +509,7 @@ class User(ZabbixBase):
 
         request_data = {
             'userid': zbx_user[0]['userid'],
-            self.alias_key(): alias,
+            self.username_key(): username,
             'name': name,
             'surname': surname,
             'usrgrps': user_group_ids,
@@ -540,7 +539,7 @@ class User(ZabbixBase):
             try:
                 user_ids = self._zapi.user.update(request_data)
             except Exception as e:
-                self._module.fail_json(msg="Failed to update user %s: %s" % (alias, e))
+                self._module.fail_json(msg="Failed to update user %s: %s" % (username, e))
 
             try:
                 if user_medias:
@@ -549,7 +548,7 @@ class User(ZabbixBase):
                         'medias': user_medias
                     })
             except Exception as e:
-                self._module.fail_json(msg="Failed to update user medias %s: %s" % (alias, e))
+                self._module.fail_json(msg="Failed to update user medias %s: %s" % (username, e))
 
         if LooseVersion(self._zbx_api_version) >= LooseVersion('3.4'):
             try:
@@ -557,11 +556,11 @@ class User(ZabbixBase):
                     request_data['user_medias'] = user_medias
                 user_ids = self._zapi.user.update(request_data)
             except Exception as e:
-                self._module.fail_json(msg="Failed to update user %s: %s" % (alias, e))
+                self._module.fail_json(msg="Failed to update user %s: %s" % (username, e))
 
         return user_ids
 
-    def delete_user(self, zbx_user, alias):
+    def delete_user(self, zbx_user, username):
         user_ids = {}
         diff_params = {}
 
@@ -569,7 +568,7 @@ class User(ZabbixBase):
             try:
                 user_ids = self._zapi.user.delete([zbx_user[0]['userid']])
             except Exception as e:
-                self._module.fail_json(msg="Failed to delete user %s: %s" % (alias, e))
+                self._module.fail_json(msg="Failed to delete user %s: %s" % (username, e))
         else:
             diff_params = {
                 "before": zbx_user[0],
@@ -582,7 +581,7 @@ class User(ZabbixBase):
 def main():
     argument_spec = zabbix_utils.zabbix_common_argument_spec()
     argument_spec.update(dict(
-        alias=dict(type='str', required=True, aliases=['username']),
+        username=dict(type='str', required=True, aliases=['alias']),
         name=dict(type='str'),
         surname=dict(type='str'),
         usrgrps=dict(type='list'),
@@ -631,7 +630,7 @@ def main():
         supports_check_mode=True
     )
 
-    alias = module.params['alias']
+    username = module.params['username']
     name = module.params['name']
     surname = module.params['surname']
     usrgrps = module.params['usrgrps']
@@ -666,7 +665,7 @@ def main():
     user = User(module)
 
     user_ids = {}
-    zbx_user = user.check_user_exist(alias)
+    zbx_user = user.check_user_exist(username)
     if state == 'present':
         user_group_ids, internal_auth = user.get_usergroups_by_name(usrgrps)
         if LooseVersion(user._zbx_api_version) < LooseVersion('4.0') or internal_auth:
@@ -674,7 +673,7 @@ def main():
                 module.fail_json(msg='User password is required. One or more groups are not LDAP based.')
 
         if zbx_user:
-            diff_check_result, diff_params = user.user_parameter_difference_check(zbx_user, alias, name, surname,
+            diff_check_result, diff_params = user.user_parameter_difference_check(zbx_user, username, name, surname,
                                                                                   user_group_ids, passwd, lang, theme,
                                                                                   autologin, autologout, refresh,
                                                                                   rows_per_page, after_login_url,
@@ -682,19 +681,19 @@ def main():
                                                                                   role_name, override_passwd)
 
             if not module.check_mode and diff_check_result:
-                user_ids = user.update_user(zbx_user, alias, name, surname, user_group_ids, passwd, lang,
+                user_ids = user.update_user(zbx_user, username, name, surname, user_group_ids, passwd, lang,
                                             theme, autologin, autologout, refresh, rows_per_page, after_login_url,
                                             user_medias, user_type, timezone, role_name, override_passwd)
         else:
             diff_check_result = True
-            user_ids, diff_params = user.add_user(alias, name, surname, user_group_ids, passwd, lang, theme, autologin,
+            user_ids, diff_params = user.add_user(username, name, surname, user_group_ids, passwd, lang, theme, autologin,
                                                   autologout, refresh, rows_per_page, after_login_url, user_medias,
                                                   user_type, internal_auth, timezone, role_name)
 
     if state == 'absent':
         if zbx_user:
             diff_check_result = True
-            user_ids, diff_params = user.delete_user(zbx_user, alias)
+            user_ids, diff_params = user.delete_user(zbx_user, username)
         else:
             diff_check_result = False
             diff_params = {}
