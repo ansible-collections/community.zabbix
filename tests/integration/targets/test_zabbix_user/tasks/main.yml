@@ -4,7 +4,7 @@
   when:
     - zabbix_version | float <= 5.0
 
-- name: Execute the integration test for Zabbix 5.2 and higher
-  include_tasks: for_zabbix_52_higher.yml
+- name: Execute the integration test for Zabbix 5.4 and higher
+  include_tasks: for_zabbix_54_higher.yml
   when:
-    - zabbix_version | float >= 5.2
+    - zabbix_version | float >= 5.4
