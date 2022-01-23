@@ -18,3 +18,4 @@ venv.bak/
 
 # ignore dev stuff
 .devcontainer
+local_play.yml
