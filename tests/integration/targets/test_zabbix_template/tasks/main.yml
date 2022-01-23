@@ -1,4 +1,5 @@
 ---
+
 - name: Create a new Zabbix template (check mode).
   zabbix_template:
     server_url: "{{ zabbix_api_server_url }}"

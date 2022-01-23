@@ -360,8 +360,13 @@ class Template(ZabbixBase):
         if self._module.check_mode:
             self._module.exit_json(changed=True)
 
-        self._zapi.template.create({'host': template_name, 'groups': group_ids, 'templates': link_template_ids,
-                                    'macros': macros})
+        new_template = {'host': template_name, 'groups': group_ids, 'templates': link_template_ids, 'macros': macros}
+        if macros is None:
+            new_template.update({'macros': []})
+        if link_template_ids is None:
+            new_template.update({'templates': []})
+
+        self._zapi.template.create(new_template)
 
     def check_template_changed(self, template_ids, template_groups, link_templates, clear_templates,
                                template_macros, template_content, template_type):
@@ -442,6 +447,8 @@ class Template(ZabbixBase):
 
         if template_macros is not None:
             template_changes.update({'macros': template_macros})
+        else:
+            template_changes.update({'macros': []})
 
         if template_changes:
             # If we got here we know that only one template was provided via template_name
