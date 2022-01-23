@@ -159,7 +159,9 @@ Or you include collection name `community.zabbix` in the playbook's `collections
 
 Main priority is to support Zabbix releases which have official full support from Zabbix LLC. Please checkout the versions at [Zabbix Life Cycle & Release Policy](https://www.zabbix.com/life_cycle_and_release_policy) page.
 
-Support for Zabbix versions will be dropped with Major releases of the collection and mostly affect modules. Each role is following its unique support matrix. You should always consult documentation of roles in *docs/* directory.
+> We aim to cover at least two LTS releases. For example, currently we support LTS 4.0 + 5.0 and with LTS 6.0 we will drop 4.0. But we do our best to also include the latest point releases - for example currently this is 5.4 which should be supperseeded by 6.2 then.
+
+Support for Zabbix LTS versions will be dropped with Major releases of the collection and mostly affect modules. Each role is following its unique support matrix. You should always consult documentation of roles in *docs/* directory.
 
 If you find any inconsistencies with the version of Zabbix you are using, feel free to open a pull request or an issue and we will try to address it as soon as possible. In case of pull requests, please make sure that your changes will not break any existing functionality for currently supported Zabbix releases.
 
