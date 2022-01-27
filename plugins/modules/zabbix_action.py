@@ -1080,7 +1080,7 @@ class Operations(Zapi):
         if operation.get('run_on_groups') is None:
             return None
         return [{
-            'groupid': self._zapi_wrapper.get_hostgroup_by_hostgroup_name(_group)['hostid']
+            'groupid': self._zapi_wrapper.get_hostgroup_by_hostgroup_name(_group)['groupid']
         } for _group in operation.get('run_on_groups')]
 
     def _construct_opgroup(self, operation):
