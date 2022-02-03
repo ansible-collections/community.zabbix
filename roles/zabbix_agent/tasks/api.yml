@@ -125,6 +125,7 @@
     host_name: "{{ (zabbix_agent2 | bool) | ternary(zabbix_agent2_hostname, zabbix_agent_hostname) }}"
     macro_name: "{{ item.macro_key }}"
     macro_value: "{{ item.macro_value }}"
+    macro_type: "{{ item.macro_type|default('text') }}"
     validate_certs: "{{ zabbix_api_validate_certs | default(omit) }}"
     timeout: "{{ zabbix_api_timeout }}"
   with_items: "{{ zabbix_agent_macros | default([]) }}"

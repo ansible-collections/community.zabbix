@@ -442,6 +442,7 @@ Including an example of how to use your role (for instance, with variables passe
            zabbix_agent_macros:
              - macro_key: apache_type
                macro_value: reverse_proxy
+               macro_type: text
 ```
 
 ## Combination of group_vars and playbook
