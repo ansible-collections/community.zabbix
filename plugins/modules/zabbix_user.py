@@ -308,18 +308,6 @@ class User(ZabbixBase):
         except Exception as e:
             self._module.fail_json(msg="Unhandled error while querying authentication type. %s" % (e))
 
-    def get_default_authentication(self):
-        auth = self._zapi.authentication.get({'output': 'extend'})
-        try:
-            if auth["authentication_type"] == "0":
-                return "internal"
-            elif auth["authentication_type"] == "1":
-                return "LDAP"
-            else:
-                self._module.fail_json(msg="Failed to query authentication type. Unknown authentication type %s" % auth)
-        except Exception as e:
-            self._module.fail_json(msg="Unhandled error while querying authentication type. %s" % (e))
-
     def get_usergroups_by_name(self, usrgrps):
         params = {
             'output': ['usrgrpid', 'name', 'gui_access'],
