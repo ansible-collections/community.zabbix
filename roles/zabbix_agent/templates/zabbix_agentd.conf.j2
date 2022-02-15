@@ -217,7 +217,13 @@ MaxLinesPerSecond={{ zabbix_agent_maxlinespersecond }}
 #       sets an alias for parameter. it can be useful to substitute long and complex parameter name with a smaller and simpler one.
 #
 {% if zabbix_agent_zabbix_alias is defined and zabbix_agent_zabbix_alias %}
+{% if zabbix_agent_zabbix_alias is string %}
 Alias={{ zabbix_agent_zabbix_alias }}
+{% else %}
+{% for item in zabbix_agent_zabbix_alias %}
+Alias={{ item }}
+{% endfor %}
+{% endif %}
 {% endif %}
 
 ### option: timeout
@@ -414,5 +420,19 @@ TLSPSKIdentity={{ zabbix_agent_tlspskidentity }}
 # TLSPSKFile=
 {% if zabbix_agent_tlspskfile is defined and zabbix_agent_tlspskfile %}
 TLSPSKFile={{ zabbix_agent_tlspskfile }}
+{% endif %}
+{% endif %}
+
+{% if zabbix_version is version('6.0', '>=') %}
+####### For advanced users - TCP-related fine-tuning parameters #######
+
+## Option: ListenBacklog
+#       The maximum number of pending connections in the queue. This parameter is passed to
+#       listen() function as argument 'backlog' (see "man listen").
+#
+# Mandatory: no
+# Range: 0 - INT_MAX (depends on system, too large values may be silently truncated to implementation-specified maximum)
+{% if zabbix_agent_listenbacklog is defined and zabbix_agent_listenbacklog %}
+ListenBacklog={{ zabbix_agent_listenbacklog }}
 {% endif %}
 {% endif %}

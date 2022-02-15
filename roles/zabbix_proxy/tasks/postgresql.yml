@@ -72,8 +72,13 @@
 - name: "PostgreSQL | Importing schema file"
   shell: |
     set -euxo pipefail
+    FILE={{ 'schema.sql' if zabbix_version is version('6.0', '<') else 'proxy.sql' }}
     cd {{ datafiles_path }}
-    if [ -f schema.sql.gz ]; then zcat schema.sql.gz > /tmp/schema.sql ; else cp -p schema.sql /tmp/schema.sql; fi
+    if [ -f ${FILE}.gz ]
+      then zcat ${FILE}.gz > /tmp/schema.sql
+    else
+      cp ${FILE} /tmp/schema.sql
+    fi
     cat /tmp/schema.sql | psql -h '{{ zabbix_proxy_dbhost }}' -U '{{ zabbix_proxy_dbuser }}' \
     -d '{{ zabbix_proxy_dbname }}'
     touch /etc/zabbix/schema.done

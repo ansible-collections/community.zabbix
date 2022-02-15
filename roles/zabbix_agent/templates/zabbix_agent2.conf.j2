@@ -312,7 +312,13 @@ PersistentBufferFile={{ zabbix_agent2_persistentbufferfile }}
 # Range:
 # Default:
 {% if zabbix_agent2_zabbix_alias is defined and zabbix_agent2_zabbix_alias %}
+{% if zabbix_agent2_zabbix_alias is string %}
 Alias={{ zabbix_agent2_zabbix_alias }}
+{% else %}
+{% for item in zabbix_agent2_zabbix_alias %}
+Alias={{ item }}
+{% endfor %}
+{% endif %}
 {% endif %}
 
 ### Option: Timeout
@@ -491,4 +497,18 @@ TLSPSKFile={{ zabbix_agent2_tlspskfile }}
 Plugins.{{ my_name }}.{{ param }}={{ value }}
 {% endfor %}
 {% endfor %}
+{% endif %}
+
+{% if zabbix_version is version('6.0', '>=') %}
+####### For advanced users - TCP-related fine-tuning parameters #######
+
+## Option: ListenBacklog
+#       The maximum number of pending connections in the queue. This parameter is passed to
+#       listen() function as argument 'backlog' (see "man listen").
+#
+# Mandatory: no
+# Range: 0 - INT_MAX (depends on system, too large values may be silently truncated to implementation-specified maximum)
+{% if zabbix_agent2_listenbacklog is defined and zabbix_agent2_listenbacklog %}
+ListenBacklog={{ zabbix_agent2_listenbacklog }}
+{% endif %}
 {% endif %}

@@ -57,7 +57,7 @@
   when:
     - zabbix_win_exe_info.results[1] is defined
     - zabbix_win_exe_info.results[1].item.stat.exists
-    - zabbix_win_exe_info.results[1].item.stat.path == zabbix_win_exe_path
+    - zabbix_win_exe_info.results[1].item.stat.path == zabbix2_win_exe_path
     - zabbix_win_exe_info.results[1].win_file_version.product_version
 
 - name: "Windows | Check Zabbix service"

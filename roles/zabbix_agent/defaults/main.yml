@@ -229,8 +229,8 @@ zabbix_version_long: 5.2.4
 zabbix_win_package: zabbix_agent-{{ zabbix_version_long }}-windows-amd64-openssl.zip
 zabbix2_win_package: zabbix_agent2-{{ zabbix_version_long }}-windows-amd64-openssl-static.zip
 zabbix_win_download_url: https://cdn.zabbix.com/zabbix/binaries/stable
-zabbix_win_download_link: "{{ zabbix_win_download_url }}/{{ zabbix_version_long | regex_findall('[0-9]\\.[0-9]') }}/{{ zabbix_version_long }}/{{ zabbix_win_package }}"
-zabbix2_win_download_link: "{{ zabbix_win_download_url }}/{{ zabbix_version_long | regex_findall('[0-9]\\.[0-9]') }}/{{ zabbix_version_long }}/{{ zabbix2_win_package }}"
+zabbix_win_download_link: "{{ zabbix_win_download_url }}/{{ zabbix_version_long | regex_search('^\\d+\\.\\d+') }}/{{ zabbix_version_long }}/{{ zabbix_win_package }}"
+zabbix2_win_download_link: "{{ zabbix_win_download_url }}/{{ zabbix_version_long | regex_search('^\\d+\\.\\d+') }}/{{ zabbix_version_long }}/{{ zabbix2_win_package }}"
 zabbix_win_install_dir: 'C:\Zabbix'
 zabbix_agent_win_logfile: "{{ zabbix_win_install_dir }}\\zabbix_agentd.log"
 zabbix_agent_win_include: "{{ zabbix_win_install_dir }}\\zabbix_agent.d\\"

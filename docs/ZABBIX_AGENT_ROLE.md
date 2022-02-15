@@ -90,24 +90,24 @@ To successfully complete the install the role requires `python-netaddr` on the c
 
 See the following list of supported Operating systems with the Zabbix releases:
 
-| Zabbix              | 5.2 | 5.0 | 4.4 | 4.0 (LTS) | 3.0 (LTS) |
-|---------------------|-----|-----|-----|-----------|-----------|
-| Red Hat Fam 8       |  V  |  V  | V   |           |           |
-| Red Hat Fam 7       |  V  |  V  | V   | V         | V         |
-| Red Hat Fam 6       |  V  |  V  |     |           | V         |
-| Red Hat Fam 5       |  V  |  V  |     |           | V         |
-| Fedora              |     |     | V   | V         |           |
-| Ubuntu 20.04 focal  |  V  |  V  |     | V         |           |
-| Ubuntu 19.10 eoan   |     |     |     |           |           |
-| Ubuntu 18.04 bionic |  V  |  V  | V   | V         |           |
-| Ubuntu 16.04 xenial |  V  |  V  | V   | V         |           |
-| Ubuntu 14.04 trusty |  V  |  V  | V   | V         | V         |
-| Debian 10 buster    |  V  |  V  | V   |           |           |
-| Debian 9 stretch    |  V  |  V  | V   | V         |           |
-| Debian 8 jessie     |  V  |  V  | V   | V         | V         |
-| Debian 7 wheezy     |     |     |     | V         | V         |
-| macOS 10.15         |     |     | V   | V         |           |
-| macOS 10.14         |     |     | V   | V         |           |
+| Zabbix              | 6.0 | 5.4 | 5.2 | 5.0 (LTS)| 4.4 | 4.0 (LTS) | 3.0 (LTS) |
+|---------------------|-----|-----|-----|----------|-----|-----------|-----------|
+| Red Hat Fam 8       |  V  |  V  |  V  |  V       | V   |           |           |
+| Red Hat Fam 7       |  V  |  V  |  V  |  V       | V   | V         | V         |
+| Red Hat Fam 6       |  V  |  V  |  V  |  V       |     |           | V         |
+| Red Hat Fam 5       |  V  |  V  |  V  |  V       |     |           | V         |
+| Fedora              |     |     |     |          | V   | V         |           |
+| Ubuntu 20.04 focal  |  V  |  V  |  V  |  V       |     | V         |           |
+| Ubuntu 19.10 eoan   |     |     |     |          |     |           |           |
+| Ubuntu 18.04 bionic |  V  |  V  |  V  |  V       | V   | V         |           |
+| Ubuntu 16.04 xenial |     |     |  V  |  V       | V   | V         |           |
+| Ubuntu 14.04 trusty |     |     |  V  |  V       | V   | V         | V         |
+| Debian 10 buster    |  V  |  V  |  V  |  V       | V   |           |           |
+| Debian 9 stretch    |     |  V  |  V  |  V       | V   | V         |           |
+| Debian 8 jessie     |     |     |  V  |  V       | V   | V         | V         |
+| Debian 7 wheezy     |     |     |     |          |     | V         | V         |
+| macOS 10.15         |     |     |     |          | V   | V         |           |
+| macOS 10.14         |     |     |     |          | V   | V         |           |
 
 # Getting started
 
@@ -208,7 +208,7 @@ Otherwise it just for the Zabbix Agent or for the Zabbix Agent 2.
 * `zabbix_agent2_persistentbufferfile`: Zabbix Agent2 will keep SQLite database in this file	* n is valid if `EnablePersistentBuffer=1`
 * `zabbix_agent_maxlinespersecond`: maximum number of new lines the agent will send per second to zabbix server or proxy processing 'log' and 'logrt' active checks.
 * `zabbix_agent_allowroot`: allow the agent to run as 'root'. if disabled and the agent is started by 'root', the agent will try to switch to user 'zabbix' instead. has no effect if started under a regular user.
-* `zabbix_agent(2)_zabbix_alias`: sets an alias for parameter. it can be useful to substitute long and complex parameter name with a smaller and simpler one.
+* `zabbix_agent(2)_zabbix_alias`: sets an alias for parameter. it can be useful to substitute long and complex parameter name with a smaller and simpler one. Can be both a string as an list.
 * `zabbix_agent(2)_timeout`: spend no more than timeout seconds on processing
 * `zabbix_agent(2)_include`: you may include individual files or all files in a directory in the configuration file.
 * `zabbix_agent(2)_include_mode`: The mode for the directory mentioned above.
@@ -218,6 +218,7 @@ Otherwise it just for the Zabbix Agent or for the Zabbix Agent 2.
 * `zabbix_agent2_controlsocket`: The control socket, used to send runtime commands with '-R' option.
 * `zabbix_agent_allowroot`:  Allow the agent to run as 'root'. 0 - do not allow, 1 - allow
 * `zabbix_agent2_plugins`: A list containing plugin configuration.
+* `zabbix_agent(2)_listenbacklog`: The maximum number of pending connections in the queue.
 
 ## TLS Specific configuration
 
@@ -441,6 +442,7 @@ Including an example of how to use your role (for instance, with variables passe
            zabbix_agent_macros:
              - macro_key: apache_type
                macro_value: reverse_proxy
+               macro_type: text
 ```
 
 ## Combination of group_vars and playbook

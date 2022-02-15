@@ -1,0 +1,4 @@
+---
+
+minor_changes:
+  - zabbix_agent - There was no way to configure a specific type for the macro.

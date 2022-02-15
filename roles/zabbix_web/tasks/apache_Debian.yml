@@ -1,4 +1,5 @@
 ---
+
 - name: "Debian | Install legacy PHP integration for Apache"
   apt:
     state: present
