@@ -22,7 +22,7 @@ jobs:
         zabbix_container:
           - version: "4.0"
           - version: "5.0"
-          - version: "5.4"
+          # - version: "5.4" # only activate after basic compatibility
         ansible:
           - stable-2.10
           - stable-2.11
