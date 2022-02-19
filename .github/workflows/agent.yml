@@ -34,8 +34,6 @@ jobs:
             image: geerlingguy/docker-debian10-ansible
           - container: debian9
             image: geerlingguy/docker-debian9-ansible
-          - container: debian8
-            image: geerlingguy/docker-debian8-ansible
         scenario_name:
           - default
           - autopsk

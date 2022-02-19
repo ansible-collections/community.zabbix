@@ -26,7 +26,15 @@
   become_user: zabbix
   shell: |
     set -o pipefail
-    zcat {{ datafiles_path }}/schema.sql.gz | sqlite3 {{ zabbix_proxy_dbname }}
+    FILE={{ 'schema.sql' if zabbix_version is version('6.0', '<') else 'proxy.sql' }}
+    cd {{ datafiles_path }}
+    if [ -f ${FILE}.gz ]
+      then zcat ${FILE}.gz > /tmp/schema.sql
+    else
+      cp ${FILE} /tmp/schema.sql
+    fi
+    cat /tmp/schema.sql | sqlite3 {{ zabbix_proxy_dbname }}
+    rm -f /tmp/schema.sql
   args:
     creates: "{{ zabbix_proxy_dbname }}"
     executable: /bin/bash
