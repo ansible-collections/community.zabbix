@@ -1,0 +1,4 @@
+---
+
+minor_changes:
+  - test_zabbix_host_info - fix Template/Group names for 5.4
