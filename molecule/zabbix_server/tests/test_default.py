@@ -26,11 +26,10 @@ def test_zabbix_package(host, server):
     zabbixhost = zabbixhost.replace("-ubuntu", "")
 
     if zabbixhost == server:
+        zabbix_server = host.package(server)
         if host.system_info.distribution in ['debian', 'ubuntu']:
-            zabbix_server = host.package(server)
             assert zabbix_server.version.startswith("1:6.0")
         elif host.system_info.distribution == 'centos':
-            zabbix_server = host.package(server)
             assert zabbix_server.version.startswith("6.0")
         assert zabbix_server.is_installed
 
