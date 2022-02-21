@@ -1,0 +1,4 @@
+---
+
+bugfixes:
+  - zabbix_template - setting correct null values to fix unintentional changes

@@ -15,3 +15,7 @@ venv.bak/
 
 # unit test
 .tox/
+
+# ignore dev stuff
+.devcontainer
+local_play.yml

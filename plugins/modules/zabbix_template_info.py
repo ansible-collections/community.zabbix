@@ -39,6 +39,9 @@ options:
 extends_documentation_fragment:
 - community.zabbix.zabbix
 
+notes:
+- there where breaking changes in the Zabbix API with version 5.4 onwards (especially UUIDs) which may
+  require you to export the templates again (see version tag >= 5.4 in the resulting file/data).
 '''
 
 EXAMPLES = '''

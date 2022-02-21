@@ -1,0 +1,5 @@
+---
+
+minor_changes:
+  - zabbix_user - change alias property to username (changed in 5.4) (alias is now an alias for username)
+  - zabbix_user_info - change alias property to username (changed in 5.4) (alias is now an alias for username)
