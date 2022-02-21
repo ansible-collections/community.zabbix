@@ -7,35 +7,35 @@
   name: Unsupport Zabbix version (<4.4)
   block:
     - name: test fail to update autoregistration
-      community.zabbix.zabbix_autoregistration:
+      community.zabbix.zabbix_autoregister:
         server_url: "{{ zabbix_api_server_url }}"
         login_user: "{{ zabbix_api_login_user }}"
         login_password: "{{ zabbix_api_login_pass }}"
         tls_accept: "tls_with_psk"
         tls_psk_identity: 'PSK 001'
         tls_psk: "11111595725ac58dd977beef14b97461a7c1045b9a1c923453302c5473193478"
-      register: zbxautoregistration_update_result
+      register: zbxautoregister_update_result
       ignore_errors: true
 
     - assert:
-        that: zbxautoregistration_update_result.failed is sameas True
+        that: zbxautoregister_update_result.failed is sameas True
 
 - when: zabbix_version is version('4.4', '>=')
   name: Support Zabbix version (>=4.4)
   block:
     - name: test update autoregistration with no parameter
-      community.zabbix.zabbix_autoregistration:
+      community.zabbix.zabbix_autoregister:
         server_url: "{{ zabbix_api_server_url }}"
         login_user: "{{ zabbix_api_login_user }}"
         login_password: "{{ zabbix_api_login_pass }}"
-      register: zbxautoregistration_update_result
+      register: zbxautoregister_update_result
       ignore_errors: true
 
     - assert:
-        that: zbxautoregistration_update_result.failed is sameas True
+        that: zbxautoregister_update_result.failed is sameas True
 
     - name: test update autoregistration with all parameters
-      community.zabbix.zabbix_autoregistration:
+      community.zabbix.zabbix_autoregister:
         server_url: "{{ zabbix_api_server_url }}"
         login_user: "{{ zabbix_api_login_user }}"
         login_password: "{{ zabbix_api_login_pass }}"
@@ -44,13 +44,13 @@
           - tls_with_psk
         tls_psk_identity: 'PSK 001'
         tls_psk: "11111595725ac58dd977beef14b97461a7c1045b9a1c923453302c5473193478"
-      register: zbxautoregistration_update_result
+      register: zbxautoregister_update_result
 
     - assert:
-        that: zbxautoregistration_update_result.changed is sameas True
+        that: zbxautoregister_update_result.changed is sameas True
 
     - name: test update autoregistration with all parameters (again)
-      community.zabbix.zabbix_autoregistration:
+      community.zabbix.zabbix_autoregister:
         server_url: "{{ zabbix_api_server_url }}"
         login_user: "{{ zabbix_api_login_user }}"
         login_password: "{{ zabbix_api_login_pass }}"
@@ -59,81 +59,80 @@
           - tls_with_psk
         tls_psk_identity: 'PSK 001'
         tls_psk: "11111595725ac58dd977beef14b97461a7c1045b9a1c923453302c5473193478"
-      register: zbxautoregistration_update_result
+      register: zbxautoregister_update_result
 
     - assert:
-        that: zbxautoregistration_update_result.changed is sameas True
+        that: zbxautoregister_update_result.changed is sameas True
 
     - name: test update autoregistration with only tls_accept
-      community.zabbix.zabbix_autoregistration:
+      community.zabbix.zabbix_autoregister:
         server_url: "{{ zabbix_api_server_url }}"
         login_user: "{{ zabbix_api_login_user }}"
         login_password: "{{ zabbix_api_login_pass }}"
         tls_accept: "tls_with_psk"
-      register: zbxautoregistration_update_result
+      register: zbxautoregister_update_result
 
     - assert:
-        that: zbxautoregistration_update_result.changed is sameas True
+        that: zbxautoregister_update_result.changed is sameas True
 
     - name: test update autoregistration with only tls_accept (again)
-      community.zabbix.zabbix_autoregistration:
+      community.zabbix.zabbix_autoregister:
         server_url: "{{ zabbix_api_server_url }}"
         login_user: "{{ zabbix_api_login_user }}"
         login_password: "{{ zabbix_api_login_pass }}"
         tls_accept:
           - tls_with_psk
-      register: zbxautoregistration_update_result
+      register: zbxautoregister_update_result
 
     - assert:
-        that: zbxautoregistration_update_result.changed is sameas False
-
+        that: zbxautoregister_update_result.changed is sameas False
 
     - name: test update autoregistration with only tls_accept (unsecure)
-      community.zabbix.zabbix_autoregistration:
+      community.zabbix.zabbix_autoregister:
         server_url: "{{ zabbix_api_server_url }}"
         login_user: "{{ zabbix_api_login_user }}"
         login_password: "{{ zabbix_api_login_pass }}"
         tls_accept:
           - unsecure
-      register: zbxautoregistration_update_result
+      register: zbxautoregister_update_result
 
     - assert:
-        that: zbxautoregistration_update_result.changed is sameas True
+        that: zbxautoregister_update_result.changed is sameas True
 
     - name: test fail to update autoregistration with only tls_accept (tls_with_psk)
-      community.zabbix.zabbix_autoregistration:
+      community.zabbix.zabbix_autoregister:
         server_url: "{{ zabbix_api_server_url }}"
         login_user: "{{ zabbix_api_login_user }}"
         login_password: "{{ zabbix_api_login_pass }}"
         tls_accept: "tls_with_psk"
-      register: zbxautoregistration_update_result
+      register: zbxautoregister_update_result
       ignore_errors: true
 
     - assert:
-        that: zbxautoregistration_update_result.failed is sameas True
+        that: zbxautoregister_update_result.failed is sameas True
 
     - name: test fail to update autoregistration with only tls_accept and tls_psk_identity (tls_with_psk)
-      community.zabbix.zabbix_autoregistration:
+      community.zabbix.zabbix_autoregister:
         server_url: "{{ zabbix_api_server_url }}"
         login_user: "{{ zabbix_api_login_user }}"
         login_password: "{{ zabbix_api_login_pass }}"
         tls_accept: "tls_with_psk"
         tls_psk_identity: 'PSK 001'
-      register: zbxautoregistration_update_result
+      register: zbxautoregister_update_result
       ignore_errors: true
 
     - assert:
-        that: zbxautoregistration_update_result.failed is sameas True
+        that: zbxautoregister_update_result.failed is sameas True
 
     - name: test fail to update autoregistration with only tls_accept and tls_psk (tls_with_psk)
-      community.zabbix.zabbix_autoregistration:
+      community.zabbix.zabbix_autoregister:
         server_url: "{{ zabbix_api_server_url }}"
         login_user: "{{ zabbix_api_login_user }}"
         login_password: "{{ zabbix_api_login_pass }}"
         tls_accept: "tls_with_psk"
         tls_psk: "11111595725ac58dd977beef14b97461a7c1045b9a1c923453302c5473193478"
-      register: zbxautoregistration_update_result
+      register: zbxautoregister_update_result
       ignore_errors: true
 
     - assert:
-        that: zbxautoregistration_update_result.failed is sameas True
+        that: zbxautoregister_update_result.failed is sameas True

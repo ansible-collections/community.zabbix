@@ -10,7 +10,7 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
 ---
-module: zabbix_autoregistration
+module: zabbix_autoregister
 
 short_description: Update Zabbix autoregistration
 
@@ -34,19 +34,23 @@ options:
         required: true
     tls_psk_identity:
         description:
-            - TLS connection use this PSK identity string.
-            - The PSK identity string will be transmitted unencrypted over the network. Therefore, you should not put sensitive information.
-            - It is required if you set C(tls_with_psk) to I(tls_accept) and current tls_accept is C(unsecure).
+            - TLS connection uses this PSK identity string.
+            - The PSK identity string will be transmitted unencrypted over the network. Therefore, you should not put any sensitive information here.
+            - This setting requires I(tls_accept=tls_with_psk) if current value of I(tls_accept) is C(unsecure).
         type: str
     tls_psk:
         description:
-            - TLS connection use this PSK value.
-            - It is required if you set C(tls_with_psk) to I(tls_accept) and current tls_accept is C(unsecure).
+            - TLS connection uses this PSK value.
+            - This setting requires I(tls_accept=tls_with_psk) if current value of I(tls_accept) is C(unsecure).
         type: str
 
 notes:
     - Only Zabbix >= 4.4 is supported.
-    - This module returns state of changed is true when you set values to I(tls_psk_identity) and I(tls_psk).
+    - This module returns changed=true when any value is set in I(tls_psk_identity) or I(tls_psk) as Zabbix API
+      will not return any sensitive information back for module to compare.
+    - Please note that this module configures B(global Zabbix Server settings).
+      If you want to create autoregistration action so your hosts can automatically add themselves
+      to the monitoring have a look at M(community.zabbix.zabbix_action).
 
 extends_documentation_fragment:
 - community.zabbix.zabbix
@@ -55,7 +59,7 @@ extends_documentation_fragment:
 
 EXAMPLES = '''
 - name: Update autoregistration
-  community.zabbix.zabbix_autoregistration:
+  community.zabbix.zabbix_autoregister:
     server_url: "http://zabbix.example.com/zabbix/"
     login_user: Admin
     login_password: secret
@@ -66,7 +70,7 @@ EXAMPLES = '''
     tls_psk: "11111595725ac58dd977beef14b97461a7c1045b9a1c923453302c5473193478"
 
 - name: Set unsecure to tls_accept
-  community.zabbix.zabbix_autoregistration:
+  community.zabbix.zabbix_autoregister:
     server_url: "http://zabbix.example.com/zabbix/"
     login_user: Admin
     login_password: secret
@@ -78,7 +82,7 @@ msg:
     description: The result of the operation
     returned: success
     type: str
-    sample: 'Successfully update autoregistration'
+    sample: 'Successfully updated global autoregistration setting'
 '''
 
 
@@ -93,9 +97,8 @@ import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabb
 class Autoregistration(ZabbixBase):
     def __init__(self, module, zbx=None, zapi_wrapper=None):
         super(Autoregistration, self).__init__(module, zbx, zapi_wrapper)
-        self.existing_data = None
         if LooseVersion(self._zbx_api_version) < LooseVersion('4.4.0'):
-            module.fail_json(msg="This module unsuport Zabbix %s" % self._zbx_api_version)
+            module.fail_json(msg="This module doesn't support Zabbix versions lower than 4.4.0")
 
     # get autoregistration
     def get_autoregistration(self):
@@ -145,7 +148,7 @@ class Autoregistration(ZabbixBase):
             if self._module.check_mode:
                 self._module.exit_json(changed=True)
             self._zapi.autoregistration.update(params)
-            self._module.exit_json(changed=True, result="Successfully update autoregistration")
+            self._module.exit_json(changed=True, result="Successfully updated global autoregistration setting")
         except Exception as e:
             self._module.fail_json(msg="Failed to update autoregistration: %s" % e)
 
@@ -161,8 +164,8 @@ def main():
             elements='str',
             required=True
         ),
-        tls_psk_identity=dict(type='str', required=False),
-        tls_psk=dict(type='str', required=False),
+        tls_psk_identity=dict(type='str', required=False, no_log=True),
+        tls_psk=dict(type='str', required=False, no_log=True),
     ))
     module = AnsibleModule(
         argument_spec=argument_spec,
