@@ -1,0 +1,53 @@
+{
+  "zabbix_export": {
+      "date": "2022-01-23T15:13:26Z",
+      "groups": [
+          {
+              "name": "Linux servers",
+              "uuid": "dc579cd7a1a34222933f24f52a68bcd8"
+          },
+          {
+              "name": "Templates",
+              "uuid": "7df96b18c230490a9a0a9e2307226338"
+          }
+      ],
+      "templates": [
+          {
+              "groups": [
+                  {
+                      "name": "Linux servers"
+                  },
+                  {
+                      "name": "Templates"
+                  }
+              ],
+              "macros": [
+                  {
+                      "macro": "{$EXAMPLE_MACRO1}",
+                      "value": "1000"
+                  },
+                  {
+                      "macro": "{$EXAMPLE_MACRO2}",
+                      "value": "text"
+                  },
+                  {
+                      "macro": "{$EXAMPLE_MACRO3}",
+                      "value": "text2"
+                  }
+              ],
+              "name": "ExampleHost",
+              "template": "ExampleHost",
+              "templates": [
+                  {
+                      "name": "FTP Service"
+                  },
+                  {
+                      "name": "Zabbix proxy health"
+                  }
+              ],
+              "uuid": "cd837ef0edb14e4e875f409bc90af546"
+          }
+      ],
+      "version": "5.4"
+  }
+}

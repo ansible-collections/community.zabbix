@@ -455,7 +455,7 @@
     server_url: "{{ zabbix_api_server_url }}"
     login_user: "{{ zabbix_api_login_user }}"
     login_password: "{{ zabbix_api_login_pass }}"
-    timeout: 30     # slower with py2.7
+    timeout: 60     # slower with py2.7
     host_name: ExampleHost
     link_templates:
       -

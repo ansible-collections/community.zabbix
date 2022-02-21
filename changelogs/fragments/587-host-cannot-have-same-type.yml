@@ -1,0 +1,4 @@
+---
+
+bugfixes:
+  - zabbix_host - adapter changed properties for interface comparisson

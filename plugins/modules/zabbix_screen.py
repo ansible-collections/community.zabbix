@@ -21,6 +21,7 @@ author:
 requirements:
     - "python >= 2.6"
     - "zabbix-api >= 0.5.4"
+    - "Zabbix <= 5.2"
 options:
     screens:
         description:
@@ -83,9 +84,12 @@ extends_documentation_fragment:
 
 notes:
     - Too many concurrent updates to the same screen may cause Zabbix to return errors, see examples for a workaround if needed.
+    - Screens where removed from Zabbix with Version 5.4
 '''
 
 EXAMPLES = r'''
+# Screens where removed from Zabbix with Version 5.4
+
 # Create/update a screen.
 - name: Create a new screen or update an existing screen's items 5 in a row
   local_action:
@@ -173,6 +177,8 @@ from ansible.module_utils.basic import AnsibleModule
 
 from ansible_collections.community.zabbix.plugins.module_utils.base import ZabbixBase
 from ansible_collections.community.zabbix.plugins.module_utils.wrappers import ScreenItem
+from ansible_collections.community.zabbix.plugins.module_utils.version import LooseVersion
+
 import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabbix_utils
 
 
@@ -372,6 +378,11 @@ def main():
     screens = module.params['screens']
 
     screen = Screen(module)
+    if LooseVersion(screen._zbx_api_version) >= LooseVersion('5.4'):
+        module.fail_json(msg="Zabbix 5.4 removed the Screens feature see (%s)." % (
+            "https://www.zabbix.com/documentation/current/en/manual/api/changes_5.2_-_5.4"
+        ))
+
     created_screens = []
     changed_screens = []
     deleted_screens = []
