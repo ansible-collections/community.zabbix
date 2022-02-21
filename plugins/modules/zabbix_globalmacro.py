@@ -63,6 +63,10 @@ options:
             - Only updates an existing macro if set to C(yes).
         default: 'yes'
         type: bool
+
+notes:
+    - This module returns changed=true when I(macro_type=secret) with Zabbix >= 5.0.
+
 extends_documentation_fragment:
 - community.zabbix.zabbix
 '''
@@ -135,7 +139,7 @@ class GlobalMacro(ZabbixBase):
                 self._module.exit_json(changed=True, result="Successfully added global macro %s" % macro_name)
             if LooseVersion(self._zbx_api_version) >= LooseVersion('4.4.0'):
                 if LooseVersion(self._zbx_api_version) >= LooseVersion('5.0.0'):
-                    if LooseVersion(self._zbx_api_version) >= LooseVersion('5.0.0') and LooseVersion(self._zbx_api_version) < LooseVersion('5.4.0'):
+                    if LooseVersion(self._zbx_api_version) < LooseVersion('5.2.0'):
                         if macro_type == '2':
                             macro_type = '0'
                     self._zapi.usermacro.createglobal({'macro': macro_name, 'value': macro_value, 'type': macro_type, 'description': macro_description})
@@ -158,11 +162,8 @@ class GlobalMacro(ZabbixBase):
                 self._zapi.usermacro.updateglobal({'globalmacroid': global_macro_id, 'macro': macro_name, 'value': macro_value})
                 self._module.exit_json(changed=True, result="Successfully updated global macro %s" % macro_name)
             elif LooseVersion(self._zbx_api_version) >= LooseVersion('5.0.0'):
-                if LooseVersion(self._zbx_api_version) >= LooseVersion('5.4.0'):
-                    if macro_type == '1':
-                        macro_type = '0'
-                if LooseVersion(self._zbx_api_version) >= LooseVersion('5.0.0') and LooseVersion(self._zbx_api_version) < LooseVersion('5.4.0'):
-                    if macro_type == '2' or macro_type == '1':
+                if LooseVersion(self._zbx_api_version) < LooseVersion('5.2.0'):
+                    if macro_type == '2':
                         macro_type = '0'
                 if global_macro_obj['type'] == '0' or global_macro_obj['type'] == '2':
                     if (global_macro_obj['macro'] == macro_name and global_macro_obj['value'] == macro_value
@@ -217,7 +218,7 @@ def main():
     argument_spec = zabbix_utils.zabbix_common_argument_spec()
     argument_spec.update(dict(
         macro_name=dict(type='str', required=True),
-        macro_value=dict(type='str', required=False),
+        macro_value=dict(type='str', required=False, no_log=True),
         macro_type=dict(type='str', default='text', choices=['text', 'secret', 'vault']),
         macro_description=dict(type='str', default=''),
         state=dict(type='str', default='present', choices=['present', 'absent']),
