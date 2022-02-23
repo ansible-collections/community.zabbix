@@ -7,7 +7,7 @@
     - name: "Create MySQL Container"
       docker_container:
         name: mysql-host
-        image: mysql:5.7
+        image: mysql:8.0
         state: started
         recreate: true
         networks:

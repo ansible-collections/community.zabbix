@@ -21,13 +21,13 @@ jobs:
       matrix:
         molecule_distro:
           - container: mysql-centos
-            image: geerlingguy/docker-centos8-ansible:latest
+            image: geerlingguy/docker-rockylinux8-ansible:latest
             group: mysql
           - container: pgsql-centos
-            image: geerlingguy/docker-centos8-ansible:latest
+            image: geerlingguy/docker-rockylinux8-ansible:latest
             group: postgresql
           - container: sqlite-centos
-            image: geerlingguy/docker-centos8-ansible:latest
+            image: geerlingguy/docker-rockylinux8-ansible:latest
             group: sqlite3
           - container: mysql-ubuntu
             image: geerlingguy/docker-ubuntu2004-ansible

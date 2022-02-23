@@ -1,7 +1,7 @@
 ---
 # defaults file for zabbix_javagateway
 
-zabbix_javagateway_version: 5.4
+zabbix_javagateway_version: 6.0
 zabbix_version: "{{ zabbix_javagateway_version }}"
 zabbix_javagateway_package_state: present
 zabbix_selinux: false

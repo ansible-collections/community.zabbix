@@ -21,7 +21,7 @@ jobs:
       matrix:
         molecule_distro:
           - container: centos8
-            image: geerlingguy/docker-centos8-ansible:latest
+            image: geerlingguy/docker-rockylinux8-ansible:latest
           - container: centos7
             image: geerlingguy/docker-centos7-ansible:latest
           - container: fedora32
@@ -34,8 +34,6 @@ jobs:
             image: geerlingguy/docker-debian10-ansible
           - container: debian9
             image: geerlingguy/docker-debian9-ansible
-          - container: debian8
-            image: geerlingguy/docker-debian8-ansible
         scenario_name:
           - default
           - autopsk
