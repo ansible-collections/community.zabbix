@@ -145,3 +145,75 @@
 - name: assert that nothing has been changed
   assert:
     that: not zbxgmacro_delete_missing is changed
+
+- name: test - attempt to create secret global macro
+  zabbix_globalmacro:
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
+    macro_name: zbxgmacro_test_secret
+    macro_value: 123
+    macro_type: secret
+    macro_description: Global Macro description
+  register: zbxgmacro_secret
+
+- assert:
+    that: zbxgmacro_secret.changed is sameas True
+
+- name: test - attempt to create same global macro
+  zabbix_globalmacro:
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
+    macro_name: zbxgmacro_test_secret
+    macro_value: 123
+    macro_type: secret
+    macro_description: Global Macro description
+  register: zbxgmacro_secret
+
+- assert:
+    that: zbxgmacro_secret.changed is sameas True
+  when: zabbix_version is version('5.0', '>=')
+
+- assert:
+    that: zbxgmacro_secret.changed is sameas False
+  when: zabbix_version is version('5.0', '<')
+
+- name: test - attempt to create vault global macro
+  zabbix_globalmacro:
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
+    macro_name: zbxgmacro_test_vault
+    macro_value: /path/to/vault.txt
+    macro_type: vault
+    macro_description: Global Macro description
+  register: zbxgmacro_vault
+
+- assert:
+    that: zbxgmacro_vault.changed is sameas True
+
+- name: test - attempt to create same global macro
+  zabbix_globalmacro:
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
+    macro_name: zbxgmacro_test_vault
+    macro_value: /path/to/vault.txt
+    macro_type: vault
+    macro_description: Global Macro description
+  register: zbxgmacro_vault
+
+- assert:
+    that: zbxgmacro_vault.changed is sameas False
+
+- name: delete all global macros
+  zabbix_globalmacro:
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
+    macro_name: "{{ item }}"
+    state: absent
+  loop:
+    - zbxgmacro_test_secret
+    - zbxgmacro_test_vault
