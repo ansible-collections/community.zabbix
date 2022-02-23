@@ -1,0 +1,3 @@
+---
+minor_changes:
+- new module zabbix_autoregister for configuring global autoregistration settings in Zabbix Server's Settings section of GUI.
