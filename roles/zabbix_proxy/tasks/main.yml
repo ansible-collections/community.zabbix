@@ -1,6 +1,12 @@
 ---
 # tasks file for zabbix_proxy
 
+- name: "Replace Sangoma with RedHat task"
+  set_fact:
+    ansible_os_family: 'RedHat'
+  when:
+    - ansible_os_family == 'Sangoma'
+
 - name: "Set default ip address for zabbix_proxy_ip"
   set_fact:
     zabbix_proxy_ip: "{{ hostvars[inventory_hostname]['ansible_default_ipv4'].address }}"
