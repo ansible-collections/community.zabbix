@@ -206,7 +206,7 @@
 - name: "Debian | Install Mysql Client package"
   apt:
     name:
-      - mysql-client
+      - default-mysql-client
       - "{{ zabbix_python_prefix }}-mysqldb"
     state: present
   environment:
