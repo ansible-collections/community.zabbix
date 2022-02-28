@@ -72,6 +72,7 @@ options:
             type:
                 description:
                     - Type (label) of the condition.
+                    - C(application) is available only with <= Zabbix 5.2.
                     - 'Possible values when I(event_source=trigger):'
                     - ' - C(host_group)'
                     - ' - C(host)'
@@ -1383,6 +1384,11 @@ class Filter(Zapi):
         Returns:
             str: constructed condition type data
         """
+        # application is disabled is disabled for condition type since 5.4 version.
+        if (LooseVersion(self._zbx_api_version) >= LooseVersion('5.4')
+                and _condition['type'] == 'application'):
+            self._module.fail_json(msg="'%s' is disabled for condition type since 5.4 version." % _condition['type'])
+
         try:
             return to_numeric_value([
                 "host_group",

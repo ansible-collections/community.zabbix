@@ -282,9 +282,6 @@
         - type: trigger_severity
           operator: '>='
           value: Average
-        - type: application
-          operator: like
-          value: AnsibleTest
         - type: event_tag_value
           value: MyTag
           operator: '='
@@ -306,9 +303,6 @@
         - type: trigger_severity
           operator: '>='
           value: Average
-        - type: application
-          operator: like
-          value: AnsibleTest
         - type: event_tag_value
           value: MyTag
           operator: '='
@@ -327,9 +321,6 @@
         - type: host_group
           operator: '='
           value: Linux servers
-        - type: application
-          operator: like
-          value: AnsibleTest
         - type: event_tag_value
           value: MyTag
           operator: '='
@@ -351,9 +342,6 @@
         - type: host_group
           operator: '='
           value: Linux servers
-        - type: application
-          operator: like
-          value: AnsibleTest
         - type: event_tag_value
           value: MyTag
           operator: '='
@@ -372,9 +360,6 @@
         - type: host_group
           operator: '<>'
           value: Linux servers
-        - type: application
-          operator: not like
-          value: AnsibleTest
         - type: event_tag_value
           value: MyTag
           operator: '<>'
@@ -393,9 +378,6 @@
         - type: host_group
           operator: '<>'
           value: Linux servers
-        - type: application
-          operator: not like
-          value: AnsibleTest
         - type: event_tag_value
           value: MyTag
           operator: '<>'
@@ -415,9 +397,6 @@
         - type: host_group
           operator: '<>'
           value: Linux servers
-        - type: application
-          operator: not like
-          value: AnsibleTest
         - type: event_tag_value
           value: MyTag
           operator: '<>'
@@ -932,9 +911,6 @@
   - name: test - create new internal action
     zabbix_action:
       conditions:
-        - type: application
-          operator: like
-          value: zabbix
         - type: host_template
           operator: '='
           value: ExampleTemplateForActionModule
@@ -949,9 +925,6 @@
   - name: test - create new internal action (again)
     zabbix_action:
       conditions:
-        - type: application
-          operator: like
-          value: zabbix
         - type: host_template
           operator: '='
           value: ExampleTemplateForActionModule
@@ -966,9 +939,6 @@
   - name: test - update internal action conditions
     zabbix_action:
       conditions:
-        - type: application
-          operator: like
-          value: zabbix
         - type: host_template
           operator: '='
           value: ExampleTemplateForActionModule
@@ -986,9 +956,6 @@
   - name: test - update internal action conditions (again)
     zabbix_action:
       conditions:
-        - type: application
-          operator: like
-          value: zabbix
         - type: host_template
           operator: '='
           value: ExampleTemplateForActionModule
@@ -1148,6 +1115,46 @@
 
   - assert:
       that: zbxaction_delete.changed is sameas True
+
+- name: test - Output error message when user sets application to conditions with >= Zabbix 5.4
+  community.zabbix.zabbix_action:
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
+    name: ExampleApplicationAction
+    event_source: trigger
+    esc_period: 60
+    conditions:
+      - type: application
+        operator: like
+        value: AnsibleTest
+    operations:
+      - type: send_message
+        subject: ExampleSubject
+        message: ExampleMessage
+        media_type: ExampleMediaTypeForActionModule
+        send_to_users:
+          - Admin
+  ignore_errors: true
+  register: zbxaction_application
+
+- assert:
+    that: zbxaction_delete.changed is sameas True
+  when: zabbix_version is version('5.4', '<')
+
+- assert:
+    that:
+      - zbxaction_application.failed is sameas True
+      - zbxaction_application.msg == "'application' is disabled for condition type since 5.4 version."
+  when: zabbix_version is version('5.4', '>=')
+
+- name: delete ExampleApplicationAction action
+  community.zabbix.zabbix_action:
+    server_url: "{{ zabbix_api_server_url }} "
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
+    name: ExampleApplicationAction
+    state: absent
 
 - name: test - cleanup example template for zabbix_action module
   zabbix_template:
