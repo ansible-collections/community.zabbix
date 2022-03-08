@@ -6,7 +6,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 DOCUMENTATION = """
-name: zabbix
+name: httpapi
 author: Markus Fischbacher (@rockaut)
 short_description: Use httpapi to run command on network appliances
 description:
