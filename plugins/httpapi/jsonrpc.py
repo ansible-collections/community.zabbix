@@ -9,8 +9,8 @@ __metaclass__ = type
 
 DOCUMENTATION = """
 ---
-author: fischbacher.markus@gmail.com
-httpapi : zabbix
+name: zabbix
+author: Markus Fischbacher (@rockaut)
 short_description: HttpApi Plugin for Zabbix
 description:
   - This HttpApi plugin provides methods to connect to Zabbix over their HTTP(S)-based api.

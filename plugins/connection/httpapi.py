@@ -6,8 +6,8 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 DOCUMENTATION = """
-author: fischbacher.markus@gmail.com
-connection: zabbix
+name: zabbix
+author: Markus Fischbacher (@rockaut)
 short_description: Use httpapi to run command on network appliances
 description:
 - This connection plugin provides a connection to Zabbix jsonrpc api over a HTTP(S).
