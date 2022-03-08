@@ -24,6 +24,8 @@ author:
 requirements:
     - "zabbix-api >= 0.5.4"
 
+version_added: 1.6.0
+
 options:
     tls_accept:
         description:
