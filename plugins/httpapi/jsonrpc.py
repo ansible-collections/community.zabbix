@@ -9,7 +9,7 @@ __metaclass__ = type
 
 DOCUMENTATION = """
 ---
-name: zabbix
+name: jsonrpc
 author: Markus Fischbacher (@rockaut)
 short_description: HttpApi Plugin for Zabbix
 description:
