@@ -6,15 +6,15 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 DOCUMENTATION = """
-author: fischbacher.markus@gmail.com
-connection: zabbix
+name: httpapi
+author: Markus Fischbacher (@rockaut)
 short_description: Use httpapi to run command on network appliances
 description:
 - This connection plugin provides a connection to Zabbix jsonrpc api over a HTTP(S).
 notes:
 - The connection plugin is basically just a copy of ansible.netcommon.httpapi with
   some changes around auth to Zabbix API.
-version_added: 1.5.1
+version_added: 1.6.0
 extends_documentation_fragment:
 - community.zabbix.connection_persistent
 options:
