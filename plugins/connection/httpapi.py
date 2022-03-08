@@ -14,7 +14,7 @@ description:
 notes:
 - The connection plugin is basically just a copy of ansible.netcommon.httpapi with
   some changes around auth to Zabbix API.
-version_added: 1.5.0
+version_added: 1.6.0
 extends_documentation_fragment:
 - community.zabbix.connection_persistent
 options:

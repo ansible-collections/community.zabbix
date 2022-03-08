@@ -14,7 +14,7 @@ author: Markus Fischbacher (@rockaut)
 short_description: HttpApi Plugin for Zabbix
 description:
   - This HttpApi plugin provides methods to connect to Zabbix over their HTTP(S)-based api.
-version_added: "1.5.0"
+version_added: 1.6.0
 """
 
 import json
