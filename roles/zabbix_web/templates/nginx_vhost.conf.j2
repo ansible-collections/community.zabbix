@@ -31,7 +31,7 @@ server {
     ssl_session_cache {{ zabbix_nginx_tls_session_cache }};
     ssl_session_tickets {{ zabbix_nginx_tls_session_tickets }};
     ssl_dhparam {{ zabbix_nginx_tls_dhparam }};
- 
+
     ssl_protocols {{ zabbix_nginx_tls_protocols }};
     ssl_ciphers {{ zabbix_nginx_tls_ciphers }};
     ssl_prefer_server_ciphers off;
@@ -43,7 +43,7 @@ server {
 {% if zabbix_web_allowlist_ips is defined and zabbix_web_allowlist_ips %}
     # Allow list IPs via zabbix_web_allowlist_ips
     satisfy any;
-{% for ip in zabbix_web_allowlist_ips | ipaddr %}
+{% for ip in zabbix_web_allowlist_ips | ansible.netcommon.ipaddr %}
     allow {{ ip }};
 {% endfor %}
     deny all;
