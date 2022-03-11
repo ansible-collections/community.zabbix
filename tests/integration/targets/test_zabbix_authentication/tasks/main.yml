@@ -1,0 +1,186 @@
+---
+- name: test - do not run tests with < Zabbix 4.0
+  meta: end_play
+  when: zabbix_version is version('4.0', '<')
+
+- when: zabbix_version is version('5.4', '<')
+  name: Unsupport Zabbix version (<5.4)
+  block:
+    - name: test - fail to update authentication setting
+      zabbix_authentication:
+        server_url: "{{ zabbix_api_server_url }}"
+        login_user: "{{ zabbix_api_login_user }}"
+        login_password: "{{ zabbix_api_login_pass }}"
+        authentication_type: internal
+      ignore_errors: true
+      register: zbxauth_update
+
+    - assert:
+        that: zbxauth_update.failed is sameas True
+
+- when: zabbix_version is version('5.4', '>=')
+  name: support Zabbix version (>=5.4)
+  block:
+    - name: test - update ldap_configured without mandatory paramters 
+      zabbix_authentication:
+        server_url: "{{ zabbix_api_server_url }}"
+        login_user: "{{ zabbix_api_login_user }}"
+        login_password: "{{ zabbix_api_login_pass }}"
+        ldap_configured: true
+      ignore_errors: true
+      register: zbxauth_update
+
+    - name: assert that authentication was NOT updated
+      assert:
+        that:
+          - zbxauth_update.failed is sameas True
+          - zbxauth_update.msg == "Please set ldap_host, ldap_search_attribute and ldap_base_dn when you change a value of ldap_configured to true."
+
+    - name: test - update ldap_configured without mandatory paramters 
+      zabbix_authentication:
+        server_url: "{{ zabbix_api_server_url }}"
+        login_user: "{{ zabbix_api_login_user }}"
+        login_password: "{{ zabbix_api_login_pass }}"
+        saml_auth_enabled: true
+      ignore_errors: true
+      register: zbxauth_update
+
+    - name: assert that authentication was NOT updated
+      assert:
+        that:
+          - zbxauth_update.failed is sameas True
+          - zbxauth_update.msg == "Please set saml_idp_entityid, saml_sso_url, saml_username_attribute and saml_sp_entityid when you change a value of saml_auth_enabled to true."
+
+    - name: test - update all authentication setting
+      zabbix_authentication:
+        server_url: "{{ zabbix_api_server_url }}"
+        login_user: "{{ zabbix_api_login_user }}"
+        login_password: "{{ zabbix_api_login_pass }}"
+        authentication_type: internal
+        http_auth_enabled: true
+        http_login_form: zabbix_login_form
+        http_strip_domains: 'comp,any'
+        http_case_sensitive: true
+        ldap_configured: true
+        ldap_host: 'ldap://localhost'
+        ldap_port: 389
+        ldap_base_dn: 'ou=Users,ou=system'
+        ldap_search_attribute: 'uid'
+        ldap_bind_dn: 'uid=ldap_search,ou=system'
+        ldap_case_sensitive: true
+        ldap_bind_password: 'password'
+        saml_auth_enabled: true
+        saml_idp_entityid: ''
+        saml_sso_url: 'https://localhost/SAML2/SSO'
+        saml_slo_url: 'https://localhost/SAML2/SLO'
+        saml_username_attribute: 'uid'
+        saml_sp_entityid: 'https://localhost'
+        saml_nameid_format: 'urn:oasis:names:tc:SAML:2.0:nameid-format:entity'
+        saml_sign_messages: true
+        saml_sign_assertions: true
+        saml_sign_authn_requests: true
+        saml_sign_logout_requests: true
+        saml_sign_logout_responses: true
+        saml_encrypt_nameid: true
+        saml_encrypt_assertions: true
+        saml_case_sensitive: true
+        passwd_min_length: 70
+        passwd_check_rules:
+          - contain_uppercase_and_lowercase_letters
+          - contain_digits
+          - contain_special_characters
+          - avoid_easy_to_guess
+      register: zbxauth_update
+
+    - name: assert that authentication was updated
+      assert:
+        that: zbxauth_update.changed is sameas True
+
+    - name: test - update all authentication setting (again)
+      zabbix_authentication:
+        server_url: "{{ zabbix_api_server_url }}"
+        login_user: "{{ zabbix_api_login_user }}"
+        login_password: "{{ zabbix_api_login_pass }}"
+        authentication_type: internal
+        http_auth_enabled: true
+        http_login_form: zabbix_login_form
+        http_strip_domains:
+          - comp
+          - any
+        http_case_sensitive: true
+        ldap_configured: true
+        ldap_host: 'ldap://localhost'
+        ldap_port: 389
+        ldap_base_dn: 'ou=Users,ou=system'
+        ldap_search_attribute: 'uid'
+        ldap_bind_dn: 'uid=ldap_search,ou=system'
+        ldap_case_sensitive: true
+        ldap_bind_password: 'password'
+        saml_auth_enabled: true
+        saml_idp_entityid: ''
+        saml_sso_url: 'https://localhost/SAML2/SSO'
+        saml_slo_url: 'https://localhost/SAML2/SLO'
+        saml_username_attribute: 'uid'
+        saml_sp_entityid: 'https://localhost'
+        saml_nameid_format: 'urn:oasis:names:tc:SAML:2.0:nameid-format:entity'
+        saml_sign_messages: true
+        saml_sign_assertions: true
+        saml_sign_authn_requests: true
+        saml_sign_logout_requests: true
+        saml_sign_logout_responses: true
+        saml_encrypt_nameid: true
+        saml_encrypt_assertions: true
+        saml_case_sensitive: true
+        passwd_min_length: 70
+        passwd_check_rules:
+          - contain_uppercase_and_lowercase_letters
+          - contain_digits
+          - contain_special_characters
+          - avoid_easy_to_guess
+      register: zbxauth_update
+
+    - name: assert that authentication was NOT updated
+      assert:
+        that: zbxauth_update.changed is sameas False
+
+    - name: test - initialize all authentication setting
+      zabbix_authentication:
+        server_url: "{{ zabbix_api_server_url }}"
+        login_user: "{{ zabbix_api_login_user }}"
+        login_password: "{{ zabbix_api_login_pass }}"
+        authentication_type: internal
+        http_auth_enabled: false
+        http_login_form: zabbix_login_form
+        http_strip_domains: []
+        http_case_sensitive: true
+        ldap_configured: false
+        ldap_host: ''
+        ldap_port: 389
+        ldap_base_dn: ''
+        ldap_search_attribute: ''
+        ldap_bind_dn: ''
+        ldap_case_sensitive: true
+        ldap_bind_password: ''
+        saml_auth_enabled: false
+        saml_idp_entityid: ''
+        saml_sso_url: ''
+        saml_slo_url: ''
+        saml_username_attribute: ''
+        saml_sp_entityid: ''
+        saml_nameid_format: ''
+        saml_sign_messages: false
+        saml_sign_assertions: false
+        saml_sign_authn_requests: false
+        saml_sign_logout_requests: false
+        saml_sign_logout_responses: false
+        saml_encrypt_nameid: false
+        saml_encrypt_assertions: false
+        saml_case_sensitive: false
+        passwd_min_length: 8
+        passwd_check_rules:
+          - avoid_easy_to_guess
+      register: zbxauth_update
+
+    - name: assert that authentication was updated
+      assert:
+        that: zbxauth_update.changed is sameas True
