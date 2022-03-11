@@ -518,13 +518,16 @@ class Zapi(ZapiWrapper):
 
         """
         try:
-            _action = self._zapi.action.get({
+            _params = {
                 "selectOperations": "extend",
                 "selectRecoveryOperations": "extend",
                 "selectAcknowledgeOperations": "extend",
                 "selectFilter": "extend",
                 'filter': {'name': [name]}
-            })
+            }
+            if LooseVersion(self._zbx_api_version) >= LooseVersion('6.0'):
+                _params['selectUpdateOperations'] = _params.pop('selectAcknowledgeOperations', 'extend')
+            _action = self._zapi.action.get(_params)
             if len(_action) > 0:
                 _action[0]['recovery_operations'] = _action[0].pop('recoveryOperations', [])
                 _action[0]['acknowledge_operations'] = _action[0].pop('acknowledgeOperations', [])
@@ -868,6 +871,15 @@ class Action(ZabbixBase):
                 or LooseVersion(self._zbx_api_version) >= LooseVersion('5.0')):
             _params.pop('ack_longdata', None)
             _params.pop('ack_shortdata', None)
+
+        if LooseVersion(self._zbx_api_version) >= LooseVersion('6.0'):
+            if 'update_operations' in _params and not isinstance(_params.get('update_operations', None), type(None)):
+                _params.pop('acknowledge_operations', None)
+            elif isinstance(_params.get('acknowledge_operations', None), list):
+                _params['update_operations'] = _params.pop('acknowledge_operations', [])
+            else:
+                _params['update_operations'] = []
+                _params.pop('acknowledge_operations', None)
 
         return _params
 
@@ -2010,7 +2022,7 @@ def main():
             result = action.delete_action(action_id)
             module.exit_json(changed=True, msg="Action Deleted: %s, ID: %s" % (name, result))
         else:
-            difference = action.check_difference(
+            kwargs = dict(
                 action_id=action_id,
                 name=name,
                 event_source=event_source,
@@ -2025,9 +2037,15 @@ def main():
                 acknowledge_default_subject=acknowledge_default_subject,
                 operations=ops.construct_the_data(operations),
                 recovery_operations=recovery_ops.construct_the_data(recovery_operations),
-                acknowledge_operations=acknowledge_ops.construct_the_data(acknowledge_operations),
                 conditions=fltr.construct_the_data(eval_type, formula, conditions)
             )
+
+            if LooseVersion(zapi_wrapper._zbx_api_version) >= LooseVersion('6.0'):
+                kwargs[argument_spec['acknowledge_operations']['aliases'][0]] = acknowledge_ops.construct_the_data(acknowledge_operations)
+            else:
+                kwargs['acknowledge_operations'] = acknowledge_ops.construct_the_data(acknowledge_operations)
+
+            difference = action.check_difference(**kwargs)
 
             if difference == {}:
                 module.exit_json(changed=False, msg="Action is up to date: %s" % (name))
@@ -2041,7 +2059,7 @@ def main():
         if state == "absent":
             module.exit_json(changed=False)
         else:
-            action_id = action.add_action(
+            kwargs = dict(
                 name=name,
                 event_source=event_source,
                 esc_period=esc_period,
@@ -2055,9 +2073,15 @@ def main():
                 acknowledge_default_subject=acknowledge_default_subject,
                 operations=ops.construct_the_data(operations),
                 recovery_operations=recovery_ops.construct_the_data(recovery_operations),
-                acknowledge_operations=acknowledge_ops.construct_the_data(acknowledge_operations),
                 conditions=fltr.construct_the_data(eval_type, formula, conditions)
             )
+
+            if LooseVersion(zapi_wrapper._zbx_api_version) >= LooseVersion('6.0'):
+                kwargs[argument_spec['acknowledge_operations']['aliases'][0]] = acknowledge_ops.construct_the_data(acknowledge_operations)
+            else:
+                kwargs['acknowledge_operations'] = acknowledge_ops.construct_the_data(acknowledge_operations)
+
+            action_id = action.add_action(**kwargs)
             module.exit_json(changed=True, msg="Action created: %s, ID: %s" % (name, action_id))
 
 
