@@ -185,7 +185,7 @@
     login_user: "{{ zabbix_api_login_user }}"
     login_password: "{{ zabbix_api_login_pass }}"
     macro_name: zbxgmacro_test_vault
-    macro_value: /path/to/vault.txt
+    macro_value: path/to/vault:zabbix
     macro_type: vault
     macro_description: Global Macro description
   register: zbxgmacro_vault
@@ -199,7 +199,7 @@
     login_user: "{{ zabbix_api_login_user }}"
     login_password: "{{ zabbix_api_login_pass }}"
     macro_name: zbxgmacro_test_vault
-    macro_value: /path/to/vault.txt
+    macro_value: path/to/vault:zabbix
     macro_type: vault
     macro_description: Global Macro description
   register: zbxgmacro_vault
