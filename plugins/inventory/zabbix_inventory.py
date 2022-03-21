@@ -40,7 +40,6 @@ options:
         description:
             - API query for hosts - see zabbix documentation for more details U(https://www.zabbix.com/documentation/current/manual/api/reference/host/get)
         type: dict
-        elements: dict
         default: {}
         suboptions:
             selectApplications:
