@@ -881,6 +881,17 @@ class Action(ZabbixBase):
                 _params['update_operations'] = []
                 _params.pop('acknowledge_operations', None)
 
+            if 'esc_period' in _params and isinstance(_params.get('esc_period', None), type(None)):
+                _params.pop('esc_period')
+
+            if 'recovery_operations' in _params:
+                if isinstance(_params.get('recovery_operations', None), type(None)) or len(_params.get('recovery_operations', [])) == 0:
+                    _params.pop('recovery_operations')
+
+            if 'update_operations' in _params:
+                if isinstance(_params.get('update_operations', None), type(None)) or len(_params.get('update_operations', [])) == 0:
+                    _params.pop('update_operations')
+
         return _params
 
     def check_difference(self, **kwargs):
@@ -1183,7 +1194,9 @@ class Operations(Zapi):
                 constructed_operation['opmessage'] = self._construct_opmessage(op)
                 constructed_operation['opmessage_usr'] = self._construct_opmessage_usr(op)
                 constructed_operation['opmessage_grp'] = self._construct_opmessage_grp(op)
-                constructed_operation['opconditions'] = self._construct_opconditions(op)
+
+                if LooseVersion(self._zbx_api_version) < LooseVersion('6.0'):
+                    constructed_operation['opconditions'] = self._construct_opconditions(op)
 
             # Send Command type
             if constructed_operation['operationtype'] == '1':
@@ -1203,6 +1216,11 @@ class Operations(Zapi):
             # Set inventory mode
             if constructed_operation['operationtype'] == '10':
                 constructed_operation['opinventory'] = self._construct_opinventory(op)
+
+            # Remove escalation params when escalation period is None (null)
+            if isinstance(constructed_operation.get('esc_period'), type(None)):
+                constructed_operation.pop('esc_step_from')
+                constructed_operation.pop('esc_step_to')
 
             constructed_data.append(constructed_operation)
 
@@ -1981,7 +1999,6 @@ def main():
         argument_spec=argument_spec,
         required_if=[
             ['state', 'present', [
-                'esc_period',
                 'event_source'
             ]]
         ],
