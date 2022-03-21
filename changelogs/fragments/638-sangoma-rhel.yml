@@ -1,2 +1,0 @@
-minor_changes:
-  - zabbix_proxy - Support for Sangoma and treat it like a RHEL system.

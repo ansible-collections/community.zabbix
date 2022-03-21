@@ -1,4 +1,0 @@
----
-
-minor_changes:
-  - test_zabbix_screen - disable testing for screen in 5.4 (deprecated)

@@ -5,6 +5,82 @@ community.zabbix Release Notes
 .. contents:: Topics
 
 
+v1.6.0
+======
+
+Minor Changes
+-------------
+
+- all modules - prepare for deprecation of distutils LooseVersion.
+- collection - Add dependencies to other collections. This helps Ansible Galaxy automatically downloading collections that this collection relies on to run.
+- connection.httpapi (plugin) - add initial httpapi connection plugin.
+- httpapi.jsonrpc (plugin) - add initial httpapi for future handling of json-rpc.
+- new module zabbix authentication for configuring global authentication settings in Zabbix Server's Settings section of GUI.
+- new module zabbix_autoregister for configuring global autoregistration settings in Zabbix Server's Settings section of GUI.
+- new module zabbix_housekeeping for configuring global housekeeping settings in Zabbix Server's Settings section of GUI.
+- test_zabbix_host_info - fix Template/Group names for 5.4
+- test_zabbix_screen - disable testing for screen in 5.4 (deprecated)
+- zabbix_agent - Check if 'firewalld' exist and is running when handler is executed.
+- zabbix_agent - Move inclusion of the apache.yml tasks to later stage during execution of role.
+- zabbix_agent - Prepare for Zabbix 6.0.
+- zabbix_agent - Specify a minor version with zabbix_agent_version_minor for RH systems.
+- zabbix_agent - There was no way to configure a specific type for the macro.
+- zabbix_agent - Use multiple aliases in the configuration file with ``zabbix_agent_zabbix_alias`` or ``zabbix_agent2_zabbix_alias``.
+- zabbix_maintenance - added new module parameter `tags`, which allows configuring Problem Tags on maintenances.
+- zabbix_proxy - Prepare for Zabbix 6.0.
+- zabbix_proxy - Specify a minor version with zabbix_proxy_version_minor for RH systems.
+- zabbix_proxy - Support for Sangoma and treat it like a RHEL system.
+- zabbix_server - Prepare for Zabbix 6.0.
+- zabbix_server - Specify a minor version with zabbix_server_version_minor for RH systems.
+- zabbix_user - change alias property to username (changed in 5.4) (alias is now an alias for username)
+- zabbix_user_info - change alias property to username (changed in 5.4) (alias is now an alias for username)
+- zabbix_web - Change format ENCRYPTION, VERIFY_HOST from string to boolean.
+- zabbix_web - Specify a minor version with zabbix_web_version_minor for RH systems.
+
+Bugfixes
+--------
+
+- Various modules and plugins - use vendored version of ``distutils.version`` instead of the deprecated Python standard library ``distutils`` (https://github.com/ansible-collections/community.zabbix/pull/603). This superseedes #597.
+- ZapiWrapper (module_utils) - fix only partial zabbix version is returned.
+- zabbix_agent - Install Zabbix packages when zabbix_repo == other is used with yum.
+- zabbix_agent - Install the Agent for MacOSX sooner than its configuration.
+- zabbix_agent - The ``Install gpg key`` task for Debian did not work when a http proxy is configured.
+- zabbix_agent - Use the correct URL with correct version.
+- zabbix_agent - Use the correct path to determine Zabbix Agent 2 installation on Windows.
+- zabbix_agent - Using the correct hostgroup as default now.
+- zabbix_agent - fix for the autopsk, incl. tests with Molecule.
+- zabbix_host - Added small notification that an user should have read access to get hostgroups overview.
+- zabbix_host - adapter changed properties for interface comparisson
+- zabbix_proxy - 'zcat' the zipped sql files to /tmp before executing it.
+- zabbix_proxy - Check MySQL version before settings mysql_innodb_default_row_format value.
+- zabbix_proxy - Install Zabbix packages when zabbix_repo == other is used with yum.
+- zabbix_server - 'zcat' the zipped sql files to /tmp before executing it.
+- zabbix_server - Check MySQL version before settings mysql_innodb_default_row_format value.
+- zabbix_server - Install Zabbix packages when zabbix_repo == other is used with yum.
+- zabbix_template - setting correct null values to fix unintentional changes
+- zabbix_web - Added some default variables if the geerlingguys apache role is not used.
+- zabbix_web - Specified the correct versions for php.
+
+New Plugins
+-----------
+
+Connection
+~~~~~~~~~~
+
+- community.zabbix.httpapi - Use httpapi to run command on network appliances
+
+Httpapi
+~~~~~~~
+
+- community.zabbix.jsonrpc - HttpApi Plugin for Zabbix
+
+New Modules
+-----------
+
+- community.zabbix.zabbix_authentication - Update Zabbix authentication
+- community.zabbix.zabbix_autoregister - Update Zabbix autoregistration
+- community.zabbix.zabbix_housekeeping - Update Zabbix housekeeping
+
 v1.5.1
 ======
 

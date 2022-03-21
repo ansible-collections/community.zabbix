@@ -1,4 +1,0 @@
----
-
-minor_changes:
-  - zabbix_web - Change format ENCRYPTION, VERIFY_HOST from string to boolean.
