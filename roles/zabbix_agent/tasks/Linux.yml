@@ -134,8 +134,7 @@
   become: true
   when:
     - zabbix_agent_tlspskfile is defined
-    - zabbix_agent_tlspskfile
-    - not zabbix_agent2
+    - not (zabbix_agent2 | bool)
 
 - name: "Create directory for PSK file if not exist (zabbix-agent2)"
   file:
@@ -145,8 +144,7 @@
   become: true
   when:
     - zabbix_agent2_tlspskfile is defined
-    - zabbix_agent2_tlspskfile
-    - zabbix_agent2
+    - zabbix_agent2 | bool
 
 - name: "Place TLS PSK File"
   copy:
@@ -158,9 +156,8 @@
   become: true
   when:
     - zabbix_agent_tlspskfile is defined
-    - zabbix_agent_tlspskfile
     - zabbix_agent_tlspsk_secret is defined
-    - not zabbix_agent2
+    - not (zabbix_agent2 | bool)
   notify:
     - restart zabbix-agent
 
@@ -174,9 +171,8 @@
   become: true
   when:
     - zabbix_agent2_tlspskfile is defined
-    - zabbix_agent2_tlspskfile
     - zabbix_agent2_tlspsk_secret is defined
-    - zabbix_agent2
+    - zabbix_agent2 | bool
   notify:
     - restart zabbix-agent
 
@@ -205,7 +201,7 @@
 - name: "Remove zabbix-agent installation when zabbix-agent2 is used."
   include: remove.yml
   when:
-    - zabbix_agent2
+    - zabbix_agent2 | bool
     - zabbix_agent_package_remove
 
 - name: "Make sure the zabbix-agent service is running"
