@@ -1200,7 +1200,7 @@ class Operations(Zapi):
             }]
         return []
 
-    def construct_the_data(self, operations):
+    def construct_the_data(self, operations, event_source):
         """Construct the operation data using helper methods.
 
         Args:
@@ -1227,12 +1227,17 @@ class Operations(Zapi):
                 if LooseVersion(self._zbx_api_version) < LooseVersion('6.0'):
                     constructed_operation['opconditions'] = self._construct_opconditions(op)
 
+
             # Send Command type
             if constructed_operation['operationtype'] == '1':
                 constructed_operation['opcommand'] = self._construct_opcommand(op)
                 constructed_operation['opcommand_hst'] = self._construct_opcommand_hst(op)
                 constructed_operation['opcommand_grp'] = self._construct_opcommand_grp(op)
-                constructed_operation['opconditions'] = self._construct_opconditions(op)
+                if LooseVersion(self._zbx_api_version) < LooseVersion('6.0'):
+                    constructed_operation['opconditions'] = self._construct_opconditions(op)
+                elif event_source == 'trigger':
+                    # opconditions valid only for 'trigger' action
+                    constructed_operation['opconditions'] = self._construct_opconditions(op)
 
             # Add to/Remove from host group
             if constructed_operation['operationtype'] in ('4', '5'):
@@ -2081,7 +2086,7 @@ def main():
                 recovery_default_subject=recovery_default_subject,
                 acknowledge_default_message=acknowledge_default_message,
                 acknowledge_default_subject=acknowledge_default_subject,
-                operations=ops.construct_the_data(operations),
+                operations=ops.construct_the_data(operations, event_source),
                 recovery_operations=recovery_ops.construct_the_data(recovery_operations),
                 conditions=fltr.construct_the_data(eval_type, formula, conditions)
             )
