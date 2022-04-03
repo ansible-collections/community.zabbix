@@ -2133,7 +2133,7 @@ def main():
                 recovery_default_subject=recovery_default_subject,
                 acknowledge_default_message=acknowledge_default_message,
                 acknowledge_default_subject=acknowledge_default_subject,
-                operations=ops.construct_the_data(operations),
+                operations=ops.construct_the_data(operations, event_source),
                 recovery_operations=recovery_ops.construct_the_data(recovery_operations),
                 conditions=fltr.construct_the_data(eval_type, formula, conditions)
             )
