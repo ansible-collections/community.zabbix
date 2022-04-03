@@ -1078,31 +1078,42 @@ class Operations(Zapi):
             list: constructed operation command
         """
         try:
-            return {
-                'type': to_numeric_value([
-                    'custom_script',
-                    'ipmi',
-                    'ssh',
-                    'telnet',
-                    'global_script'], operation.get('command_type', 'custom_script')),
-                'command': operation.get('command'),
-                'execute_on': to_numeric_value([
-                    'agent',
-                    'server',
-                    'proxy'], operation.get('execute_on', 'server')),
-                'scriptid': self._zapi_wrapper.get_script_by_script_name(
-                    operation.get('script_name')
-                ).get('scriptid'),
-                'authtype': to_numeric_value([
-                    'password',
-                    'public_key'
-                ], operation.get('ssh_auth_type')),
-                'privatekey': operation.get('ssh_privatekey_file'),
-                'publickey': operation.get('ssh_publickey_file'),
-                'username': operation.get('username'),
-                'password': operation.get('password'),
-                'port': operation.get('port')
-            }
+            if LooseVersion(self._zbx_api_version) < LooseVersion('6.0'):
+                opcommand = {
+                    'type': to_numeric_value([
+                        'custom_script',
+                        'ipmi',
+                        'ssh',
+                        'telnet',
+                        'global_script'], operation.get('command_type', 'custom_script')),
+                    'command': operation.get('command'),
+                    'execute_on': to_numeric_value([
+                        'agent',
+                        'server',
+                        'proxy'], operation.get('execute_on', 'server')),
+                    'scriptid': self._zapi_wrapper.get_script_by_script_name(
+                        operation.get('script_name')
+                    ).get('scriptid'),
+                    'authtype': to_numeric_value([
+                        'password',
+                        'public_key'
+                    ], operation.get('ssh_auth_type')),
+                    'privatekey': operation.get('ssh_privatekey_file'),
+                    'publickey': operation.get('ssh_publickey_file'),
+                    'username': operation.get('username'),
+                    'password': operation.get('password'),
+                    'port': operation.get('port')
+                }
+            else:
+                # In 6.0 opcommand is an opbject with just one key 'scriptid'
+                command = {
+                    'scriptid': self._zapi_wrapper.get_script_by_script_name(
+                        operation.get('script_name')
+                    ).get('scriptid')
+                }
+
+            return command
+
         except Exception as e:
             self._module.fail_json(msg="Failed to construct operation command. The error was: %s" % e)
 
