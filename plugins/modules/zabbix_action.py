@@ -1240,7 +1240,6 @@ class Operations(Zapi):
                 if LooseVersion(self._zbx_api_version) < LooseVersion('6.0'):
                     constructed_operation['opconditions'] = self._construct_opconditions(op)
 
-
             # Send Command type
             if constructed_operation['operationtype'] == '1':
                 constructed_operation['opcommand'] = self._construct_opcommand(op)
