@@ -223,6 +223,7 @@
   become: true
   when:
     - zabbix_server_database == 'mysql'
+    - zabbix_server_install_database_client
     - ansible_distribution_major_version == "8"
   tags:
     - zabbix-server
@@ -241,6 +242,7 @@
   become: true
   when:
     - zabbix_server_database == 'mysql'
+    - zabbix_server_install_database_client
     - ansible_distribution_major_version == "7"
   tags:
     - zabbix-server
@@ -259,6 +261,7 @@
   become: true
   when:
     - zabbix_server_database == 'mysql'
+    - zabbix_server_install_database_client
     - ansible_distribution_major_version == "6" or ansible_distribution_major_version == "5"
   tags:
     - zabbix-server
@@ -275,6 +278,7 @@
   become: true
   when:
     - zabbix_server_database == 'pgsql'
+    - zabbix_server_install_database_client
   tags:
     - zabbix-server
 
