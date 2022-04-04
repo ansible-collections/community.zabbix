@@ -1106,13 +1106,13 @@ class Operations(Zapi):
                 }
             else:
                 # In 6.0 opcommand is an opbject with just one key 'scriptid'
-                command = {
+                opcommand = {
                     'scriptid': self._zapi_wrapper.get_script_by_script_name(
                         operation.get('script_name')
                     ).get('scriptid')
                 }
 
-            return command
+            return opcommand
 
         except Exception as e:
             self._module.fail_json(msg="Failed to construct operation command. The error was: %s" % e)
