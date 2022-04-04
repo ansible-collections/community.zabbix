@@ -681,22 +681,22 @@ class Zapi(ZapiWrapper):
         try:
             discovery_rule_name, dcheck_type = discovery_check_name.split(': ')
             dcheck_type_to_number = {
-              'SSH': '0',
-              'LDAP': '1',
-              'SMTP': '2',
-              'FTP': '3',
-              'HTTP': '4',
-              'POP': '5',
-              'NNTP': '6',
-              'IMAP': '7',
-              'TCP': '8',
-              'Zabbix agent': '9',
-              'SNMPv1 agent': '10',
-              'SNMPv2 agent': '11',
-              'ICMP ping': '12',
-              'SNMPv3 agent': '13',
-              'HTTPS': '14',
-              'Telnet': '15'
+                'SSH': '0',
+                'LDAP': '1',
+                'SMTP': '2',
+                'FTP': '3',
+                'HTTP': '4',
+                'POP': '5',
+                'NNTP': '6',
+                'IMAP': '7',
+                'TCP': '8',
+                'Zabbix agent': '9',
+                'SNMPv1 agent': '10',
+                'SNMPv2 agent': '11',
+                'ICMP ping': '12',
+                'SNMPv3 agent': '13',
+                'HTTPS': '14',
+                'Telnet': '15'
             }
             if dcheck_type not in dcheck_type_to_number:
                 self._module.fail_json(msg="Discovery check type: %s does not exist" % dcheck_type)
@@ -1237,7 +1237,6 @@ class Operations(Zapi):
 
                 if LooseVersion(self._zbx_api_version) < LooseVersion('6.0'):
                     constructed_operation['opconditions'] = self._construct_opconditions(op)
-
 
             # Send Command type
             if constructed_operation['operationtype'] == '1':
