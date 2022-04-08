@@ -679,14 +679,40 @@ class Zapi(ZapiWrapper):
 
         """
         try:
-            discovery_check_list = self._zapi.dcheck.get({
-                'output': 'extend',
-                'filter': {'key_': [discovery_check_name]}
+            discovery_rule_name, dcheck_type = discovery_check_name.split(': ')
+            dcheck_type_to_number = {
+                'SSH': '0',
+                'LDAP': '1',
+                'SMTP': '2',
+                'FTP': '3',
+                'HTTP': '4',
+                'POP': '5',
+                'NNTP': '6',
+                'IMAP': '7',
+                'TCP': '8',
+                'Zabbix agent': '9',
+                'SNMPv1 agent': '10',
+                'SNMPv2 agent': '11',
+                'ICMP ping': '12',
+                'SNMPv3 agent': '13',
+                'HTTPS': '14',
+                'Telnet': '15'
+            }
+            if dcheck_type not in dcheck_type_to_number:
+                self._module.fail_json(msg="Discovery check type: %s does not exist" % dcheck_type)
+
+            discovery_rule_list = self._zapi.drule.get({
+                'output': ['dchecks'],
+                'filter': {'name': [discovery_rule_name]},
+                'selectDChecks': 'extend'
             })
-            if len(discovery_check_list) < 1:
+            if len(discovery_rule_list) < 1:
                 self._module.fail_json(msg="Discovery check not found: %s" % discovery_check_name)
-            else:
-                return discovery_check_list[0]
+
+            for dcheck in discovery_rule_list[0]['dchecks']:
+                if dcheck_type_to_number[dcheck_type] == dcheck['type']:
+                    return dcheck
+            self._module.fail_json(msg="Discovery check not found: %s" % discovery_check_name)
         except Exception as e:
             self._module.fail_json(msg="Failed to get discovery check '%s': %s" % (discovery_check_name, e))
 
@@ -892,6 +918,9 @@ class Action(ZabbixBase):
                 if isinstance(_params.get('update_operations', None), type(None)) or len(_params.get('update_operations', [])) == 0:
                     _params.pop('update_operations')
 
+            if _params['eventsource'] not in ['trigger', 'internal']:
+                _params.pop('esc_period')
+
         return _params
 
     def check_difference(self, **kwargs):
@@ -1049,31 +1078,42 @@ class Operations(Zapi):
             list: constructed operation command
         """
         try:
-            return {
-                'type': to_numeric_value([
-                    'custom_script',
-                    'ipmi',
-                    'ssh',
-                    'telnet',
-                    'global_script'], operation.get('command_type', 'custom_script')),
-                'command': operation.get('command'),
-                'execute_on': to_numeric_value([
-                    'agent',
-                    'server',
-                    'proxy'], operation.get('execute_on', 'server')),
-                'scriptid': self._zapi_wrapper.get_script_by_script_name(
-                    operation.get('script_name')
-                ).get('scriptid'),
-                'authtype': to_numeric_value([
-                    'password',
-                    'public_key'
-                ], operation.get('ssh_auth_type')),
-                'privatekey': operation.get('ssh_privatekey_file'),
-                'publickey': operation.get('ssh_publickey_file'),
-                'username': operation.get('username'),
-                'password': operation.get('password'),
-                'port': operation.get('port')
-            }
+            if LooseVersion(self._zbx_api_version) < LooseVersion('6.0'):
+                opcommand = {
+                    'type': to_numeric_value([
+                        'custom_script',
+                        'ipmi',
+                        'ssh',
+                        'telnet',
+                        'global_script'], operation.get('command_type', 'custom_script')),
+                    'command': operation.get('command'),
+                    'execute_on': to_numeric_value([
+                        'agent',
+                        'server',
+                        'proxy'], operation.get('execute_on', 'server')),
+                    'scriptid': self._zapi_wrapper.get_script_by_script_name(
+                        operation.get('script_name')
+                    ).get('scriptid'),
+                    'authtype': to_numeric_value([
+                        'password',
+                        'public_key'
+                    ], operation.get('ssh_auth_type')),
+                    'privatekey': operation.get('ssh_privatekey_file'),
+                    'publickey': operation.get('ssh_publickey_file'),
+                    'username': operation.get('username'),
+                    'password': operation.get('password'),
+                    'port': operation.get('port')
+                }
+            else:
+                # In 6.0 opcommand is an opbject with just one key 'scriptid'
+                opcommand = {
+                    'scriptid': self._zapi_wrapper.get_script_by_script_name(
+                        operation.get('script_name')
+                    ).get('scriptid')
+                }
+
+            return opcommand
+
         except Exception as e:
             self._module.fail_json(msg="Failed to construct operation command. The error was: %s" % e)
 
@@ -1171,7 +1211,7 @@ class Operations(Zapi):
             }]
         return []
 
-    def construct_the_data(self, operations):
+    def construct_the_data(self, operations, event_source):
         """Construct the operation data using helper methods.
 
         Args:
@@ -1203,7 +1243,11 @@ class Operations(Zapi):
                 constructed_operation['opcommand'] = self._construct_opcommand(op)
                 constructed_operation['opcommand_hst'] = self._construct_opcommand_hst(op)
                 constructed_operation['opcommand_grp'] = self._construct_opcommand_grp(op)
-                constructed_operation['opconditions'] = self._construct_opconditions(op)
+                if LooseVersion(self._zbx_api_version) < LooseVersion('6.0'):
+                    constructed_operation['opconditions'] = self._construct_opconditions(op)
+                elif event_source == 'trigger':
+                    # opconditions valid only for 'trigger' action
+                    constructed_operation['opconditions'] = self._construct_opconditions(op)
 
             # Add to/Remove from host group
             if constructed_operation['operationtype'] in ('4', '5'):
@@ -2052,7 +2096,7 @@ def main():
                 recovery_default_subject=recovery_default_subject,
                 acknowledge_default_message=acknowledge_default_message,
                 acknowledge_default_subject=acknowledge_default_subject,
-                operations=ops.construct_the_data(operations),
+                operations=ops.construct_the_data(operations, event_source),
                 recovery_operations=recovery_ops.construct_the_data(recovery_operations),
                 conditions=fltr.construct_the_data(eval_type, formula, conditions)
             )
@@ -2088,7 +2132,7 @@ def main():
                 recovery_default_subject=recovery_default_subject,
                 acknowledge_default_message=acknowledge_default_message,
                 acknowledge_default_subject=acknowledge_default_subject,
-                operations=ops.construct_the_data(operations),
+                operations=ops.construct_the_data(operations, event_source),
                 recovery_operations=recovery_ops.construct_the_data(recovery_operations),
                 conditions=fltr.construct_the_data(eval_type, formula, conditions)
             )
