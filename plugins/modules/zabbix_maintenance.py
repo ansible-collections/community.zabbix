@@ -383,7 +383,7 @@ def main():
                 msg="At least one host_name or host_group must be defined for each created maintenance.")
 
         now = datetime.datetime.now().replace(second=0)
-        start_time = time.mktime(now.timetuple())
+        start_time = int(time.mktime(now.timetuple()))
         period = 60 * int(minutes)  # N * 60 seconds
 
         if host_groups:
