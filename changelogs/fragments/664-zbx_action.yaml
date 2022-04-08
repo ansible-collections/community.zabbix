@@ -1,0 +1,2 @@
+minor_changes:
+- zabbix_action - additional fixes to make module work with Zabbix 6.0 (https://github.com/ansible-collections/community.zabbix/pull/664)
