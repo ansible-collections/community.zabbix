@@ -531,6 +531,8 @@ releases:
       - zabbix_host - Added small notification that an user should have read access
         to get hostgroups overview.
       - zabbix_host - adapter changed properties for interface comparisson
+      - zabbix_maintenance - should now work when creating maintenace on Zabbix 6.0
+        server
       - zabbix_proxy - 'zcat' the zipped sql files to /tmp before executing it.
       - zabbix_proxy - Check MySQL version before settings mysql_innodb_default_row_format
         value.
@@ -559,6 +561,9 @@ releases:
         in Zabbix Server's Settings section of GUI.
       - test_zabbix_host_info - fix Template/Group names for 5.4
       - test_zabbix_screen - disable testing for screen in 5.4 (deprecated)
+      - zabbix_action - additional fixes to make module work with Zabbix 6.0 (https://github.com/ansible-collections/community.zabbix/pull/664)
+      - zabbix_action - module ported to work with Zabbix 6.0 (https://github.com/ansible-collections/community.zabbix/pull/648,
+        https://github.com/ansible-collections/community.zabbix/pull/653)
       - zabbix_agent - Check if 'firewalld' exist and is running when handler is executed.
       - zabbix_agent - Move inclusion of the apache.yml tasks to later stage during
         execution of role.
@@ -574,6 +579,8 @@ releases:
       - zabbix_proxy - Specify a minor version with zabbix_proxy_version_minor for
         RH systems.
       - zabbix_proxy - Support for Sangoma and treat it like a RHEL system.
+      - zabbix_server - Check the 'zabbix_server_install_database_client' variable
+        in RedHat tasks.
       - zabbix_server - Prepare for Zabbix 6.0.
       - zabbix_server - Specify a minor version with zabbix_server_version_minor for
         RH systems.
@@ -611,6 +618,10 @@ releases:
     - 638-sangoma-rhel.yml
     - 645-zabbix-authentication.yml
     - 647-zabbix-housekeeping.yml
+    - 648-653-zbx_action.yaml
+    - 654-check-zabbix_server_install_database_client-rhel.yml
+    - 664-zbx_action.yaml
+    - 665-zbx_maint.yaml
     - various-wd.yml
     modules:
     - description: Update Zabbix authentication

@@ -1,2 +1,0 @@
-bugfixes:
-- zabbix_maintenance - should now work when creating maintenace on Zabbix 6.0 server
