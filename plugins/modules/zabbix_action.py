@@ -530,9 +530,6 @@ class Zapi(ZapiWrapper):
             if LooseVersion(self._zbx_api_version) >= LooseVersion('6.0'):
                 _params['selectUpdateOperations'] = _params.pop('selectAcknowledgeOperations', 'extend')
             _action = self._zapi.action.get(_params)
-            if len(_action) > 0:
-                _action[0]['recovery_operations'] = _action[0].pop('recoveryOperations', [])
-                _action[0]['acknowledge_operations'] = _action[0].pop('acknowledgeOperations', [])
             return _action
         except Exception as e:
             self._module.fail_json(msg="Failed to check if action '%s' exists: %s" % (name, e))
