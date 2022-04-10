@@ -144,18 +144,20 @@ options:
                     - When I(type) is set to C(time_period), the choices are C(in), C(not in).
                     - C(matches), C(does not match), C(Yes) and C(No) condition operators work only with >= Zabbix 4.0
                 choices:
-                    - '='
-                    - '<>'
-                    - 'like'
-                    - 'not like'
-                    - 'in'
-                    - '>='
-                    - '<='
-                    - 'not in'
-                    - 'matches'
-                    - 'does not match'
-                    - 'Yes'
-                    - 'No'
+                    - 'When I(type!=maintenance_status), the choices are in (for Zabbix >= 6.0):'
+                      - '='
+                      - '<>'
+                      - 'like'
+                      - 'not like'
+                      - 'in'
+                      - '>='
+                      - '<='
+                      - 'not in'
+                      - 'matches'
+                      - 'does not match'
+                    - 'When I(type=maintenance_status), the choices are in (for Zabbix >= 6.0):'
+                      - 'Yes'
+                      - 'No'
             formulaid:
                 description:
                     - Arbitrary unique ID that is used to reference the condition from a custom expression.
@@ -1594,6 +1596,13 @@ class Filter(Zapi):
                 )
             if conditiontype == '13':
                 return self._zapi_wrapper.get_template_by_template_name(value)['templateid']
+            if LooseVersion(self._zapi_wrapper._zbx_api_version) >= LooseVersion('6.0'):
+                # maintenance_status
+                if conditiontype == '16':
+                    return to_numeric_value([
+                        "Yes",
+                        "No"], value
+                    )
             if conditiontype == '18':
                 return self._zapi_wrapper.get_discovery_rule_by_discovery_rule_name(value)['druleid']
             if conditiontype == '19':
@@ -1802,7 +1811,7 @@ def main():
                 formulaid=dict(type='str', required=False),
                 operator=dict(type='str', required=True),
                 type=dict(type='str', required=True),
-                value=dict(type='str', required=True),
+                value=dict(type='str', required=False),
                 value2=dict(type='str', required=False)
             ),
             required_if=[
