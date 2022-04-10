@@ -143,21 +143,20 @@ options:
                     - Condition operator.
                     - When I(type) is set to C(time_period), the choices are C(in), C(not in).
                     - C(matches), C(does not match), C(Yes) and C(No) condition operators work only with >= Zabbix 4.0
+                    - When I(type) is set to C(maintenance_status), the choices are C(Yes) and C(No) for Zabbix >= 6.0
                 choices:
-                    - 'When I(type!=maintenance_status), the choices are in (for Zabbix >= 6.0):'
-                      - '='
-                      - '<>'
-                      - 'like'
-                      - 'not like'
-                      - 'in'
-                      - '>='
-                      - '<='
-                      - 'not in'
-                      - 'matches'
-                      - 'does not match'
-                    - 'When I(type=maintenance_status), the choices are in (for Zabbix >= 6.0):'
-                      - 'Yes'
-                      - 'No'
+                    - '='
+                    - '<>'
+                    - 'like'
+                    - 'not like'
+                    - 'in'
+                    - '>='
+                    - '<='
+                    - 'not in'
+                    - 'matches'
+                    - 'does not match'
+                    - 'Yes'
+                    - 'No'
             formulaid:
                 description:
                     - Arbitrary unique ID that is used to reference the condition from a custom expression.
