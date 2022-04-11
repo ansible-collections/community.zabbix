@@ -1,4 +1,4 @@
 ---
 
-minor_change:
+minor_changes:
   - zabbix_agent - Install the correct Python libxml2 package on SLES15
