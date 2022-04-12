@@ -143,6 +143,7 @@ options:
                     - Condition operator.
                     - When I(type) is set to C(time_period), the choices are C(in), C(not in).
                     - C(matches), C(does not match), C(Yes) and C(No) condition operators work only with >= Zabbix 4.0
+                    - When I(type) is set to C(maintenance_status), the choices are C(Yes) and C(No) for Zabbix >= 6.0
                 choices:
                     - '='
                     - '<>'
@@ -528,7 +529,7 @@ class Zapi(ZapiWrapper):
             if LooseVersion(self._zbx_api_version) >= LooseVersion('6.0'):
                 _params['selectUpdateOperations'] = _params.pop('selectAcknowledgeOperations', 'extend')
             _action = self._zapi.action.get(_params)
-            if len(_action) > 0:
+            if len(_action) > 0 and LooseVersion(self._zbx_api_version) < LooseVersion('6.0'):
                 _action[0]['recovery_operations'] = _action[0].pop('recoveryOperations', [])
                 _action[0]['acknowledge_operations'] = _action[0].pop('acknowledgeOperations', [])
             return _action
@@ -1594,6 +1595,13 @@ class Filter(Zapi):
                 )
             if conditiontype == '13':
                 return self._zapi_wrapper.get_template_by_template_name(value)['templateid']
+            if LooseVersion(self._zapi_wrapper._zbx_api_version) >= LooseVersion('6.0'):
+                # maintenance_status
+                if conditiontype == '16':
+                    return to_numeric_value([
+                        "Yes",
+                        "No"], value
+                    )
             if conditiontype == '18':
                 return self._zapi_wrapper.get_discovery_rule_by_discovery_rule_name(value)['druleid']
             if conditiontype == '19':
@@ -1802,7 +1810,7 @@ def main():
                 formulaid=dict(type='str', required=False),
                 operator=dict(type='str', required=True),
                 type=dict(type='str', required=True),
-                value=dict(type='str', required=True),
+                value=dict(type='str', required=False),
                 value2=dict(type='str', required=False)
             ),
             required_if=[
