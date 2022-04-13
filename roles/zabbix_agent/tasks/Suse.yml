@@ -6,7 +6,9 @@
 
 - name: "Install zypper repo dependency"
   community.general.zypper:
-    name: ["python-libxml2", "python-xml"]
+    name:
+      - python-xml
+      - "{{ suse[ansible_distribution][zabbix_agent_distribution_major_version]['python_libxml2_package'] }}"
     state: present
   environment:
     http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"

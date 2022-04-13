@@ -209,14 +209,22 @@ suse:
     "42":
       name: server:monitoring
       url: http://download.opensuse.org/repositories/server:/monitoring/openSUSE_Leap_{{ ansible_distribution_version }}/
+      python_libxml2_package: python-libxml2
   "openSUSE":
     "12":
       name: server_monitoring
       url: http://download.opensuse.org/repositories/server:/monitoring/openSUSE_{{ ansible_distribution_version }}
+      python_libxml2_package: python-libxml2
   "SLES":
     "11":
       name: server_monitoring
       url: http://download.opensuse.org/repositories/server:/monitoring/SLE_11_SP3/
+      python_libxml2_package: python-libxml2
     "12":
       name: server_monitoring
-      url: http://download.opensuse.org/repositories/server:/monitoring/SLE_12_SP3/
+      url: http://download.opensuse.org/repositories/server:/monitoring/SLE_12_SP5/
+      python_libxml2_package: python-libxml2
+    "15":
+      name: server_monitoring
+      url: http://download.opensuse.org/repositories/server:/monitoring/SLE_15_SP3/
+      python_libxml2_package: python3-libxml2-python
