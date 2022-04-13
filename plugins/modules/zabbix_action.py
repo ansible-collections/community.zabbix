@@ -1320,10 +1320,17 @@ class RecoveryOperations(Operations):
             }
 
             # Send Message type
-            if constructed_operation['operationtype'] in ('0', '11'):
+            if constructed_operation['operationtype'] == '0':
                 constructed_operation['opmessage'] = self._construct_opmessage(op)
                 constructed_operation['opmessage_usr'] = self._construct_opmessage_usr(op)
                 constructed_operation['opmessage_grp'] = self._construct_opmessage_grp(op)
+                if LooseVersion(self._zbx_api_version) >= LooseVersion('6.0'):
+                    constructed_operation['opmessage'].pop('mediatypeid')
+
+            if constructed_operation['operationtype'] == '11':
+                constructed_operation['opmessage'] = self._construct_opmessage(op)
+                if LooseVersion(self._zbx_api_version) >= LooseVersion('6.0'):
+                    constructed_operation['opmessage'].pop('mediatypeid')
 
             # Send Command type
             if constructed_operation['operationtype'] == '1':
