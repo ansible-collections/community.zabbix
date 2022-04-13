@@ -900,6 +900,7 @@ class Action(ZabbixBase):
             _params.pop('ack_shortdata', None)
 
         if LooseVersion(self._zbx_api_version) >= LooseVersion('6.0'):
+            _params['update_operations'] = kwargs.get('update_operations')
             if 'update_operations' in _params and not isinstance(_params.get('update_operations', None), type(None)):
                 _params.pop('acknowledge_operations', None)
             elif isinstance(_params.get('acknowledge_operations', None), list):
@@ -1320,10 +1321,17 @@ class RecoveryOperations(Operations):
             }
 
             # Send Message type
-            if constructed_operation['operationtype'] in ('0', '11'):
+            if constructed_operation['operationtype'] == '0':
                 constructed_operation['opmessage'] = self._construct_opmessage(op)
                 constructed_operation['opmessage_usr'] = self._construct_opmessage_usr(op)
                 constructed_operation['opmessage_grp'] = self._construct_opmessage_grp(op)
+                if LooseVersion(self._zbx_api_version) >= LooseVersion('6.0'):
+                    constructed_operation['opmessage'].pop('mediatypeid')
+
+            if constructed_operation['operationtype'] == '11':
+                constructed_operation['opmessage'] = self._construct_opmessage(op)
+                if LooseVersion(self._zbx_api_version) >= LooseVersion('6.0'):
+                    constructed_operation['opmessage'].pop('mediatypeid')
 
             # Send Command type
             if constructed_operation['operationtype'] == '1':
@@ -1385,10 +1393,17 @@ class AcknowledgeOperations(Operations):
             }
 
             # Send Message type
-            if constructed_operation['operationtype'] in ('0', '11'):
+            if constructed_operation['operationtype'] == '0':
                 constructed_operation['opmessage'] = self._construct_opmessage(op)
                 constructed_operation['opmessage_usr'] = self._construct_opmessage_usr(op)
                 constructed_operation['opmessage_grp'] = self._construct_opmessage_grp(op)
+                if LooseVersion(self._zbx_api_version) >= LooseVersion('6.0'):
+                    constructed_operation['opmessage'].pop('mediatypeid')
+
+            if constructed_operation['operationtype'] == '12':
+                constructed_operation['opmessage'] = self._construct_opmessage(op)
+                if LooseVersion(self._zbx_api_version) >= LooseVersion('6.0'):
+                    constructed_operation['opmessage'].pop('mediatypeid')
 
             # Send Command type
             if constructed_operation['operationtype'] == '1':
