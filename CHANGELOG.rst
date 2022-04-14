@@ -23,6 +23,7 @@ Minor Changes
 - zabbix_action - additional fixes to make module work with Zabbix 6.0 (https://github.com/ansible-collections/community.zabbix/pull/664)
 - zabbix_action - module ported to work with Zabbix 6.0 (https://github.com/ansible-collections/community.zabbix/pull/648, https://github.com/ansible-collections/community.zabbix/pull/653)
 - zabbix_agent - Check if 'firewalld' exist and is running when handler is executed.
+- zabbix_agent - Install the correct Python libxml2 package on SLES15
 - zabbix_agent - Move inclusion of the apache.yml tasks to later stage during execution of role.
 - zabbix_agent - Prepare for Zabbix 6.0.
 - zabbix_agent - Specify a minor version with zabbix_agent_version_minor for RH systems.
