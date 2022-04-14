@@ -1,4 +1,0 @@
----
-
-minor_changes:
-  - zabbix_agent - Use multiple aliases in the configuration file with ``zabbix_agent_zabbix_alias`` or ``zabbix_agent2_zabbix_alias``.

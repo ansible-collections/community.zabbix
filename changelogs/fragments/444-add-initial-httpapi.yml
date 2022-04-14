@@ -1,5 +1,0 @@
----
-
-minor_changes:
-  - connection.httpapi (plugin) - add initial httpapi connection plugin.
-  - httpapi.jsonrpc (plugin) - add initial httpapi for future handling of json-rpc.

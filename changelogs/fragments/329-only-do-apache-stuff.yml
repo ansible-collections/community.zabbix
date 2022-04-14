@@ -1,4 +1,0 @@
----
-
-minor_changes:
-  - zabbix_agent - Move inclusion of the apache.yml tasks to later stage during execution of role.

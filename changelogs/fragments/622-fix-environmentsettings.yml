@@ -1,4 +1,0 @@
----
-
-bugfixes:
-  - zabbix_agent - The ``Install gpg key`` task for Debian did not work when a http proxy is configured.

@@ -5,8 +5,16 @@ plugins:
   cache: {}
   callback: {}
   cliconf: {}
-  connection: {}
-  httpapi: {}
+  connection:
+    httpapi:
+      description: Use httpapi to run command on network appliances
+      name: httpapi
+      version_added: 1.6.0
+  httpapi:
+    jsonrpc:
+      description: HttpApi Plugin for Zabbix
+      name: jsonrpc
+      version_added: 1.6.0
   inventory:
     zabbix_inventory:
       description: Zabbix Inventory Plugin
@@ -17,115 +25,130 @@ plugins:
     zabbix_action:
       description: Create/Delete/Update Zabbix actions
       name: zabbix_action
-      namespace: private.var.folders.yy.9r83940d7xbb5_t4_h03cpt80000gn.T.antsibull-changelogqoenfa_b.collections.ansible_collections.community.zabbix.plugins.modules
+      namespace: ''
       version_added: null
+    zabbix_authentication:
+      description: Update Zabbix authentication
+      name: zabbix_authentication
+      namespace: ''
+      version_added: 1.6.0
+    zabbix_autoregister:
+      description: Update Zabbix autoregistration
+      name: zabbix_autoregister
+      namespace: ''
+      version_added: 1.6.0
     zabbix_discovery_rule:
       description: Create/delete/update Zabbix discovery rules
       name: zabbix_discovery_rule
-      namespace: private.var.folders.yy.9r83940d7xbb5_t4_h03cpt80000gn.T.antsibull-changelogqoenfa_b.collections.ansible_collections.community.zabbix.plugins.modules
+      namespace: ''
       version_added: null
     zabbix_globalmacro:
       description: Create/update/delete Zabbix Global macros
       name: zabbix_globalmacro
-      namespace: private.var.folders.yy.9r83940d7xbb5_t4_h03cpt80000gn.T.antsibull-changelogqoenfa_b.collections.ansible_collections.community.zabbix.plugins.modules
+      namespace: ''
       version_added: 1.4.0
     zabbix_group:
       description: Create/delete Zabbix host groups
       name: zabbix_group
-      namespace: private.var.folders.yy.9r83940d7xbb5_t4_h03cpt80000gn.T.antsibull-changelogqoenfa_b.collections.ansible_collections.community.zabbix.plugins.modules
+      namespace: ''
       version_added: null
     zabbix_group_info:
       description: Gather information about Zabbix hostgroup
       name: zabbix_group_info
-      namespace: private.var.folders.yy.9r83940d7xbb5_t4_h03cpt80000gn.T.antsibull-changelogqoenfa_b.collections.ansible_collections.community.zabbix.plugins.modules
+      namespace: ''
       version_added: null
     zabbix_host:
       description: Create/update/delete Zabbix hosts
       name: zabbix_host
-      namespace: private.var.folders.yy.9r83940d7xbb5_t4_h03cpt80000gn.T.antsibull-changelogqoenfa_b.collections.ansible_collections.community.zabbix.plugins.modules
+      namespace: ''
       version_added: null
     zabbix_host_events_info:
       description: Get all triggers about a Zabbix host
       name: zabbix_host_events_info
-      namespace: private.var.folders.yy.9r83940d7xbb5_t4_h03cpt80000gn.T.antsibull-changelogqoenfa_b.collections.ansible_collections.community.zabbix.plugins.modules
+      namespace: ''
       version_added: null
     zabbix_host_info:
       description: Gather information about Zabbix host
       name: zabbix_host_info
-      namespace: private.var.folders.yy.9r83940d7xbb5_t4_h03cpt80000gn.T.antsibull-changelogqoenfa_b.collections.ansible_collections.community.zabbix.plugins.modules
+      namespace: ''
       version_added: null
     zabbix_hostmacro:
       description: Create/update/delete Zabbix host macros
       name: zabbix_hostmacro
-      namespace: private.var.folders.yy.9r83940d7xbb5_t4_h03cpt80000gn.T.antsibull-changelogqoenfa_b.collections.ansible_collections.community.zabbix.plugins.modules
+      namespace: ''
       version_added: null
+    zabbix_housekeeping:
+      description: Update Zabbix housekeeping
+      name: zabbix_housekeeping
+      namespace: ''
+      version_added: 1.6.0
     zabbix_maintenance:
       description: Create Zabbix maintenance windows
       name: zabbix_maintenance
-      namespace: private.var.folders.yy.9r83940d7xbb5_t4_h03cpt80000gn.T.antsibull-changelogqoenfa_b.collections.ansible_collections.community.zabbix.plugins.modules
+      namespace: ''
       version_added: null
     zabbix_map:
       description: Create/update/delete Zabbix maps
       name: zabbix_map
-      namespace: private.var.folders.yy.9r83940d7xbb5_t4_h03cpt80000gn.T.antsibull-changelogqoenfa_b.collections.ansible_collections.community.zabbix.plugins.modules
+      namespace: ''
       version_added: null
     zabbix_mediatype:
       description: Create/Update/Delete Zabbix media types
       name: zabbix_mediatype
-      namespace: private.var.folders.yy.9r83940d7xbb5_t4_h03cpt80000gn.T.antsibull-changelogqoenfa_b.collections.ansible_collections.community.zabbix.plugins.modules
+      namespace: ''
       version_added: null
     zabbix_proxy:
       description: Create/delete/get/update Zabbix proxies
       name: zabbix_proxy
-      namespace: private.var.folders.yy.9r83940d7xbb5_t4_h03cpt80000gn.T.antsibull-changelogqoenfa_b.collections.ansible_collections.community.zabbix.plugins.modules
+      namespace: ''
       version_added: null
     zabbix_proxy_info:
       description: Gather information about Zabbix proxy
       name: zabbix_proxy_info
-      namespace: private.var.folders.yy.9r83940d7xbb5_t4_h03cpt80000gn.T.antsibull-changelogqoenfa_b.collections.ansible_collections.community.zabbix.plugins.modules
+      namespace: ''
       version_added: 1.5.0
     zabbix_screen:
       description: Create/update/delete Zabbix screens
       name: zabbix_screen
-      namespace: private.var.folders.yy.9r83940d7xbb5_t4_h03cpt80000gn.T.antsibull-changelogqoenfa_b.collections.ansible_collections.community.zabbix.plugins.modules
+      namespace: ''
       version_added: null
     zabbix_service:
       description: Create/update/delete Zabbix service
       name: zabbix_service
-      namespace: private.var.folders.yy.9r83940d7xbb5_t4_h03cpt80000gn.T.antsibull-changelogqoenfa_b.collections.ansible_collections.community.zabbix.plugins.modules
+      namespace: ''
       version_added: null
     zabbix_template:
       description: Create/update/delete/dump Zabbix template
       name: zabbix_template
-      namespace: private.var.folders.yy.9r83940d7xbb5_t4_h03cpt80000gn.T.antsibull-changelogqoenfa_b.collections.ansible_collections.community.zabbix.plugins.modules
+      namespace: ''
       version_added: null
     zabbix_template_info:
       description: Gather information about Zabbix template
       name: zabbix_template_info
-      namespace: private.var.folders.yy.9r83940d7xbb5_t4_h03cpt80000gn.T.antsibull-changelogqoenfa_b.collections.ansible_collections.community.zabbix.plugins.modules
+      namespace: ''
       version_added: null
     zabbix_user:
       description: Create/update/delete Zabbix users
       name: zabbix_user
-      namespace: private.var.folders.yy.9r83940d7xbb5_t4_h03cpt80000gn.T.antsibull-changelogqoenfa_b.collections.ansible_collections.community.zabbix.plugins.modules
+      namespace: ''
       version_added: null
     zabbix_user_info:
       description: Gather information about Zabbix user
       name: zabbix_user_info
-      namespace: private.var.folders.yy.9r83940d7xbb5_t4_h03cpt80000gn.T.antsibull-changelogqoenfa_b.collections.ansible_collections.community.zabbix.plugins.modules
+      namespace: ''
       version_added: null
     zabbix_usergroup:
       description: Create/delete/update Zabbix user groups
       name: zabbix_usergroup
-      namespace: private.var.folders.yy.9r83940d7xbb5_t4_h03cpt80000gn.T.antsibull-changelogqoenfa_b.collections.ansible_collections.community.zabbix.plugins.modules
+      namespace: ''
       version_added: null
     zabbix_valuemap:
       description: Create/update/delete Zabbix value maps
       name: zabbix_valuemap
-      namespace: private.var.folders.yy.9r83940d7xbb5_t4_h03cpt80000gn.T.antsibull-changelogqoenfa_b.collections.ansible_collections.community.zabbix.plugins.modules
+      namespace: ''
       version_added: null
   netconf: {}
   shell: {}
   strategy: {}
   vars: {}
-version: 1.5.1
+version: 1.6.0

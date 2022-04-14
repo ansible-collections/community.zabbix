@@ -1,4 +1,0 @@
----
-
-minor_changes:
-  - zabbix_server - Check the 'zabbix_server_install_database_client' variable in RedHat tasks.

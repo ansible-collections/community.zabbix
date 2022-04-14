@@ -1,3 +1,0 @@
----
-minor_changes:
-- new module zabbix_housekeeping for configuring global housekeeping settings in Zabbix Server's Settings section of GUI.
