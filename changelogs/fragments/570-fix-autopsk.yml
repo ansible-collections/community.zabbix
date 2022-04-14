@@ -1,4 +1,0 @@
----
-
-bugfixes:
-  - zabbix_agent - fix for the autopsk, incl. tests with Molecule.

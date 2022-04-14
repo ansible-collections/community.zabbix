@@ -1,7 +1,0 @@
----
-
-minor_changes:
-  - all modules - prepare for deprecation of distutils LooseVersion.
-
-bugfixes:
-  - ZapiWrapper (module_utils) - fix only partial zabbix version is returned.

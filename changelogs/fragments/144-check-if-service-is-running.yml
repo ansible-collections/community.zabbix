@@ -1,4 +1,0 @@
----
-
-minor_changes:
-  - zabbix_agent - Check if 'firewalld' exist and is running when handler is executed. 
