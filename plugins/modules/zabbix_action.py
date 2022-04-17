@@ -1734,8 +1734,13 @@ def compare_lists(l1, l2, diff_dict):
         return diff_dict
     for i, item in enumerate(l1):
         if isinstance(item, dict):
-            diff_dict.insert(i, {})
-            diff_dict[i] = compare_dictionaries(item, l2[i], diff_dict[i])
+            for i2, item2 in enumerate(l2):
+                diff_dict2 = {}
+                diff_dict2 = compare_dictionaries(item, item2, diff_dict2)
+                if len(diff_dict2) == 0:
+                    break
+            if len(diff_dict2) != 0:
+                diff_dict.insert(i, item)
         else:
             if item != l2[i]:
                 diff_dict.append(item)

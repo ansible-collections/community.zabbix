@@ -335,6 +335,13 @@
 
   - assert:
       that: zbxaction_conditions_reorder.changed is sameas True
+    when:
+      - zabbix_version is version('6.0', '<')
+
+  - assert:
+      that: zbxaction_conditions_reorder.changed is sameas False
+    when:
+      - zabbix_version is version('6.0', '>=')
 
   - name: test - update action with multiple conditions by removing one condition
     zabbix_action:
