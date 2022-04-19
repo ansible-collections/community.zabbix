@@ -491,7 +491,7 @@
   - assert:
       that: zbxaction_delete.changed is sameas True
 
-- name: test - trigger actions with operations
+- name: test - trigger actions with message operations
   module_defaults:
     community.zabbix.zabbix_action:
       server_url: "{{ zabbix_api_server_url }}"
@@ -562,6 +562,32 @@
   - assert:
       that: zbxaction_ops.changed is sameas False
 
+  - name: test - delete action
+    zabbix_action:
+      state: absent
+    register: zbxaction_delete
+
+  - assert:
+      that: zbxaction_delete.changed is sameas True
+
+- name: test - trigger actions with remote_script operations with < Zabbix 6.0
+  when: zabbix_version is version('6.0', '<')
+  module_defaults:
+    community.zabbix.zabbix_action:
+      server_url: "{{ zabbix_api_server_url }}"
+      login_user: "{{ zabbix_api_login_user }}"
+      login_password: "{{ zabbix_api_login_pass }}"
+      state: present
+      status: enabled
+      name: ExampleTriggerActionOperations
+      event_source: trigger
+      esc_period: 60
+      conditions:
+        - type: trigger_severity
+          operator: '>='
+          value: Average
+
+  block:
   - name: test - create new action with remote_command operations
     zabbix_action:
       operations:
@@ -985,9 +1011,10 @@
   - assert:
       that: zbxaction_delete.changed is sameas True
 
-- name: test - actions with recovery and acknowledge operations
+- name: test - actions with recovery and acknowledge operations with < Zabbix 6.0
   when:
     - zabbix_version is version('3.4', '>=')
+    - zabbix_version is version('6.0', '<')
   module_defaults:
     community.zabbix.zabbix_action:
       server_url: "{{ zabbix_api_server_url }}"
@@ -1106,6 +1133,96 @@
           command_type: global_script
           script_name: Ping
           run_on_hosts: 0
+        - type: notify_all_involved
+          subject: RecoverySubject
+          message: RecoveryMessage
+          media_type: ExampleMediaTypeForActionModule
+    register: zbxaction_recack_new
+
+  - assert:
+      that: zbxaction_recack_new.changed is sameas False
+
+  - name: test - delete action
+    zabbix_action:
+      state: absent
+    register: zbxaction_delete
+
+  - assert:
+      that: zbxaction_delete.changed is sameas True
+
+- name: test - actions with recovery and acknowledge operations with >= Zabbx 6.0
+  when:
+    - zabbix_version is version('6.0', '>=')
+  module_defaults:
+    community.zabbix.zabbix_action:
+      server_url: "{{ zabbix_api_server_url }}"
+      login_user: "{{ zabbix_api_login_user }}"
+      login_password: "{{ zabbix_api_login_pass }}"
+      state: present
+      status: enabled
+      name: ExampleTriggerActionRecAckOps
+      event_source: trigger
+      esc_period: 60
+      conditions:
+        - type: trigger_severity
+          operator: '>='
+          value: Information
+      operations:
+        - type: send_message
+          subject: ExampleSubject
+          message: ExampleMessage
+          media_type: ExampleMediaTypeForActionModule
+          send_to_users:
+            - Admin
+
+  block:
+  - name: test - create new action with recovery and acknowledge operations
+    zabbix_action:
+      recovery_operations:
+        - type: send_message
+          subject: ExampleSubject
+          message: ExampleMessage
+          media_type: ExampleMediaTypeForActionModule
+          send_to_users:
+            - Admin
+        - type: notify_all_involved
+          subject: RecoverySubject
+          message: RecoveryMessage
+      acknowledge_operations:
+        - type: send_message
+          subject: ExampleSubject
+          message: ExampleMessage
+          media_type: ExampleMediaTypeForActionModule
+          send_to_users:
+            - Admin
+        - type: notify_all_involved
+          subject: RecoverySubject
+          message: RecoveryMessage
+          media_type: ExampleMediaTypeForActionModule
+    register: zbxaction_recack_new
+
+  - assert:
+      that: zbxaction_recack_new.changed is sameas True
+
+  - name: test - create new action with recovery and acknowledge operations (again)
+    zabbix_action:
+      recovery_operations:
+        - type: send_message
+          subject: ExampleSubject
+          message: ExampleMessage
+          media_type: ExampleMediaTypeForActionModule
+          send_to_users:
+            - Admin
+        - type: notify_all_involved
+          subject: RecoverySubject
+          message: RecoveryMessage
+      acknowledge_operations:
+        - type: send_message
+          subject: ExampleSubject
+          message: ExampleMessage
+          media_type: ExampleMediaTypeForActionModule
+          send_to_users:
+            - Admin
         - type: notify_all_involved
           subject: RecoverySubject
           message: RecoveryMessage
