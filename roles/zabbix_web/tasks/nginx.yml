@@ -73,6 +73,15 @@
   failed_when: false
   when: zabbix_letsencrypt
 
+- name: "Let's Encrypt | Create directory for certbot webroot if not exist"
+  file:
+    path: "{{ zabbix_letsencrypt_webroot_path }}"
+    mode: 0755
+    state: directory
+  when:
+    - zabbix_letsencrypt
+  become: true
+
 - name: "Nginx | Install vhost in conf.d"
   template:
     src: nginx_vhost.conf.j2
