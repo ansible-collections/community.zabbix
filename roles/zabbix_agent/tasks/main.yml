@@ -11,6 +11,15 @@
   tags:
     - always
 
+- name: "Reset zabbix_agent_version for Ubuntu 22.03 to 6.0"
+  set_fact:
+    zabbix_version: 6.0
+    zabbix_agent_version: 6.0
+  when:
+    - ansible_distribution_release == "jammy"
+    - ( zabbix_agent_version is version ('6.0','lt') or
+        zabbix_version is version ('6.0','lt') )
+
 - name: "Fix facts for linuxmint - distribution release"
   set_fact:
     zabbix_agent_distribution_release: xenial
