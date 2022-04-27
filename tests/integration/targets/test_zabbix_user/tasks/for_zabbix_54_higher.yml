@@ -10,7 +10,7 @@
     surname: test
     usrgrps:
       - Guests
-    passwd: password
+    passwd: G$jd_79!jw
   check_mode: true
   diff: true
   register: create_zabbix_user_result
@@ -29,7 +29,7 @@
     surname: test
     usrgrps:
       - Guests
-    passwd: password
+    passwd: G$jd_79!jw
   register: create_zabbix_user_result
 
 - assert:
@@ -46,7 +46,7 @@
     surname: test
     usrgrps:
       - Guests
-    passwd: password
+    passwd: G$jd_79!jw
   register: create_zabbix_user_result
 
 - assert:
@@ -65,7 +65,7 @@
     usrgrps:
       - Guests
       - Zabbix administrators
-    passwd: password
+    passwd: G$jd_79!jw
   register: add_usergroup_to_existing_user_result
 
 - assert:
@@ -83,7 +83,7 @@
     usrgrps:
       - Guests
       - Zabbix administrators
-    passwd: password
+    passwd: G$jd_79!jw
     user_medias:
       - mediatype: Email
         sendto: example@example.com
@@ -113,7 +113,7 @@
     usrgrps:
       - Guests
       - Zabbix administrators
-    passwd: password
+    passwd: G$jd_79!jw
     user_medias:
       - mediatype: Email
         sendto: example@example.com
@@ -668,7 +668,7 @@
     theme: dark-theme
     role_name: Admin role
     timezone: Asia/Tokyo
-    lang: en_GB
+    lang: fr_FR
     user_medias:
       - mediatype: Email
         sendto: example@example.com
@@ -719,7 +719,7 @@
     theme: dark-theme
     role_name: Admin role
     timezone: Asia/Tokyo
-    lang: en_GB
+    lang: fr_FR
     user_medias:
       - mediatype: Email
         sendto: example@example.com
@@ -768,7 +768,7 @@
     theme: dark-theme
     role_name: Admin role
     timezone: Asia/Tokyo
-    lang: en_GB
+    lang: fr_FR
     user_medias:
       - mediatype: Email
         sendto: example@example.com
@@ -818,7 +818,7 @@
     theme: dark-theme
     role_name: Admin role
     timezone: Asia/Tokyo
-    lang: en_GB
+    lang: fr_FR
     user_medias:
       - mediatype: Email
         sendto: example@example.com
@@ -858,7 +858,7 @@
     theme: dark-theme
     role_name: Admin role
     timezone: Asia/Tokyo
-    lang: en_GB
+    lang: fr_FR
     user_medias:
       - mediatype: Email
         sendto: example@example.com
@@ -895,7 +895,7 @@
     theme: dark-theme
     role_name: Admin role
     timezone: Asia/Tokyo
-    lang: en_GB
+    lang: fr_FR
     user_medias:
       - mediatype: Email
         sendto: example@example.com
@@ -932,7 +932,7 @@
     theme: dark-theme
     role_name: Admin role
     timezone: Asia/Tokyo
-    lang: en_GB
+    lang: fr_FR
   register: update_user_optional_user_medias_existing_user_result
 
 - assert:
@@ -1086,7 +1086,7 @@
     alias: example2
     usrgrps:
       - Guests
-    passwd: password
+    passwd: G$jd_79!jw
     role_name: "User role"
   register: create_zabbix_user_with_minimum_params_result
 
@@ -1102,7 +1102,7 @@
     alias: example2
     usrgrps:
       - Guests
-    passwd: password
+    passwd: G$jd_79!jw
     role_name: "User role"
   register: create_zabbix_user_with_minimum_params_result
 
@@ -1120,7 +1120,7 @@
     surname: test
     usrgrps:
       - Guests
-    passwd: password
+    passwd: G$jd_79!jw
   register: update_params_without_role_name_result
 
 - assert:
@@ -1137,7 +1137,7 @@
     surname: test
     usrgrps:
       - Guests
-    passwd: password
+    passwd: G$jd_79!jw
   register: update_params_without_role_name_result
 
 - assert:
