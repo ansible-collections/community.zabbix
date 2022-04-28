@@ -1006,8 +1006,3 @@
         name: ExampleServiceForServiceModule
         state: absent
       register: delete_service_result
-
-
-
-
-    - meta: end_play

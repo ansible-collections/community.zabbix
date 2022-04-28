@@ -50,17 +50,15 @@ options:
             - Algorithm used to calculate the sla with < Zabbix 6.0
             - ' - C(no), sla is not calculated'
             - ' - C(one_child), problem if at least one child has a problem'
-            - C(all_children), problem if all children have problems'
+            - ' - C(all_children), problem if all children have problems'
             - Status calculation rule. Only applicable if child services exists with >= Zabbix 6.0
             - ' - C(status_to_ok), set status to OK with'
             - ' - C(most_crit_if_all_children), most critical if all children have problems'
             - ' - C(most_crit_of_child_serv), most critical of child services with'
         required: false
         type: str
-        choices with < Zabbix 6.0: ["no", "one_child", "all_children"]
-        choices with >= Zabbix 6.0: ["status_to_ok", "most_crit_if_all_children", "most_crit_of_child_serv"]
-        default: one_child (with < Zabbix 6.0)
-        default: status_to_ok (with >= Zabbix 6.0)
+        choices: ["no", "one_child", "all_children", "status_to_ok", "most_crit_if_all_children", "most_crit_of_child_serv"]
+        default: one_child
     trigger_name:
         description:
             - Name of trigger linked to the service.
@@ -75,7 +73,7 @@ options:
         type: str
     state:
         description:
-            - State: present - create/update service; absent - delete service.
+            - 'State: present - create/update service; absent - delete service.'
         required: false
         choices: [present, absent]
         default: "present"
@@ -84,14 +82,14 @@ options:
         description:
             - Position of the service used for sorting.
         required: true
-        type: int
+        type: str
     weight:
         description:
             - Service weight.
             - New field with >= Zabbix 6.0.
         required: false
-        default: 0
-        type: int
+        default: '0'
+        type: str
     description:
         description:
             - Description of the service.
@@ -134,6 +132,7 @@ options:
                     - Mapping condition operator.
                     - C(equals)
                     - C(like)
+                choices: ['equals', 'like']
                 required: false
                 default: "equals"
                 type: str
@@ -148,12 +147,14 @@ options:
             - New field with >= Zabbix 6.0.
         required: false
         type: list
+        elements: str
     children:
         description:
             - Child services to be linked to the service.
             - New field with >= Zabbix 6.0.
         required: false
         type: list
+        elements: str
     propagation_rule:
         description:
             - Status propagation value. Must be set together with propagation_rule.
@@ -164,7 +165,6 @@ options:
             - C(ignore) ignore this service - the status is not propagated to the parent service at all
             - C(fixed) set fixed service status using a given propagation_value
             - Required with C(propagation_value)
-        choices: ['as_is', 'increase', 'decrease', 'ignore', 'fixed']
         required: false
         type: str
         default: as_is
@@ -189,14 +189,13 @@ options:
             - ' - C(high)'
             - ' - C(disaster)'
             - Required with C(propagation_rule)
-        choices: ['ok', 'not_classified', 'information', 'warning', 'average', 'high', 'disaster']
         required: false
         type: str
     status_rules:
         description:
             - Status rules for the service.
             - New field with >= Zabbix 6.0.
-        required: true
+        required: false
         type: list
         elements: dict
         suboptions:
@@ -215,8 +214,8 @@ options:
                 type: str
             limit_value:
                 description:
-                    - Limit value: N, N% or W
-                    - Possible values: 1-100000 for N and W;, 1-100 for N%
+                    - 'Limit value: N, N% or W'
+                    - 'Possible values: 1-100000 for N and W, 1-100 for N%'
                 required: true
                 type: int
             limit_status:
@@ -243,7 +242,6 @@ options:
                 required: true
                 type: str
 
-
 extends_documentation_fragment:
 - community.zabbix.zabbix
 
@@ -253,7 +251,7 @@ EXAMPLES = '''
 ---
 # Creates a new Zabbix service with Zabbix < 6.0
 - name: Manage services
-  community.zabbix.zabbix_service
+  community.zabbix.zabbix_service:
     server_url: "http://zabbix.example.com/zabbix/"
     login_user: username
     login_password: password
@@ -267,7 +265,7 @@ EXAMPLES = '''
 
 # Creates a new Zabbix service with Zabbix >= 6.0
 - name: Create Zabbix service monitoring Apache2 in DCs in Toronto area
-  community.zabbix.zabbix_service
+  community.zabbix.zabbix_service:
     server_url: "zabbix.example.com/zabbix/"
     login_user: username
     login_password: password
@@ -289,8 +287,6 @@ EXAMPLES = '''
       - tag: area
         operator: like
         value: toronto
-    propagation_rule: increase
-    propagation_value: warning
     status_rules:
       - type: at_least_n_child_services_have_status_or_above
         limit_value: 4242
@@ -298,7 +294,7 @@ EXAMPLES = '''
         new_status: average
 
 - name: Create Zabbix service monitoring all Apache2 services
-  community.zabbix.zabbix_service
+  community.zabbix.zabbix_service:
     server_url: "zabbix.example.com/zabbix/"
     login_user: username
     login_password: password
@@ -343,7 +339,7 @@ class Service(ZabbixBase):
             services = self._zapi.service.get({'output': 'extend', 'filter': {'serviceid': service_ids}, 'selectParent': '1'})
         else:
             services = self._zapi.service.get({'output': 'extend', 'filter': {'serviceid': service_ids}, 'selectParents': 'extend',
-                                               'selectTags': 'extend', 'selectProblemTags': 'extend', 'selectParents': 'extend', 'selectChildren': 'extend',
+                                               'selectTags': 'extend', 'selectProblemTags': 'extend', 'selectChildren': 'extend',
                                                'selectStatusRules': 'extend'})
 
         return services
@@ -448,7 +444,7 @@ class Service(ZabbixBase):
                                 self._module.fail_json(msg="'limit_value' for N and W must be between 1 and 100000 but provided %s" % lv)
                         else:
                             if int(lv) < 1 or int(lv) > 100:
-                                self._module.fail_json(msg="'limit_value' for N% must be between 1 and 100 but provided %s" % lv)
+                                self._module.fail_json(msg="'limit_value' for N%% must be between 1 and 100 but provided %s" % lv)
                         status_rule['limit_value'] = str(lv)
                     else:
                         self._module.fail_json(msg="'limit_value' is mandatory paremeter for status rule.")
@@ -475,7 +471,7 @@ class Service(ZabbixBase):
 
             request['propagation_rule'] = '0'
             if propagation_rule:
-                if propagation_value == None:
+                if propagation_value is None:
                     self._module.fail_json(msg="If 'propagation_rule' is provided then 'propagation_value' must be provided too.")
                 pr_map = {'as_is': '0', 'increase': '1', 'decrease': '2', 'ignore': '3', 'fixed': '4'}
                 if propagation_rule not in pr_map:
@@ -485,7 +481,7 @@ class Service(ZabbixBase):
 
             request['propagation_value'] = '0'
             if propagation_value:
-                if propagation_rule == None:
+                if propagation_rule is None:
                     self._module.fail_json(msg="If 'propagation_value' is provided then 'propagation_rule' must be provided too.")
                 pv_map = {'ok': '-1', 'not_classified': '0', 'information': '1', 'warning': '2',
                           'average': '3', 'high': '4', 'disaster': '5'}
@@ -582,13 +578,72 @@ def main():
         weight=dict(default='0', type='str', required=False),
         state=dict(default="present", choices=['present', 'absent']),
         description=dict(type='str', required=False),
-        tags=dict(type='list', required=False),
-        problem_tags=dict(type='list', required=False),
-        parents=dict(type='list', required=False),
-        children=dict(type='list', required=False),
-        propagation_rule=dict(type='str', required=False),
+        tags=dict(
+            type='list',
+            required=False,
+            elements='dict',
+            options=dict(
+                tag=dict(
+                    type='str',
+                    required=True
+                ),
+                value=dict(
+                    type='str',
+                    required=False
+                )
+            )
+        ),
+        problem_tags=dict(
+            type='list',
+            required=False,
+            elements='dict',
+            options=dict(
+                tag=dict(
+                    type='str',
+                    required=True
+                ),
+                operator=dict(
+                    type='str',
+                    required=False,
+                    choices=[
+                        'equals',
+                        'like'
+                    ],
+                    default='equals'
+                ),
+                value=dict(
+                    type='str',
+                    required=False
+                )
+            )
+        ),
+        parents=dict(type='list', required=False, elements='str'),
+        children=dict(type='list', required=False, elements='str'),
+        propagation_rule=dict(default='as_is', type='str', required=False),
         propagation_value=dict(type='str', required=False),
-        status_rules=dict(type='list', required=False),
+        status_rules=dict(
+            type='list',
+            required=False,
+            elements='dict',
+            options=dict(
+                type=dict(
+                    type='str',
+                    required=True
+                ),
+                limit_value=dict(
+                    type='int',
+                    required=True
+                ),
+                limit_status=dict(
+                    type='str',
+                    required=True
+                ),
+                new_status=dict(
+                    type='str',
+                    required=True
+                )
+            )
+        )
     ))
     module = AnsibleModule(
         argument_spec=argument_spec,
@@ -602,14 +657,14 @@ def main():
     algorithm = module.params['algorithm']
     trigger_name = module.params['trigger_name']
     trigger_host = module.params['trigger_host']
-    sortorder= module.params['sortorder']
+    sortorder = module.params['sortorder']
     weight = module.params['weight']
     state = module.params['state']
     description = module.params['description']
     tags = module.params['tags']
     problem_tags = module.params['problem_tags']
     parents = module.params['parents']
-    children= module.params['children']
+    children = module.params['children']
     propagation_rule = module.params['propagation_rule']
     propagation_value = module.params['propagation_value']
     status_rules = module.params['status_rules']
