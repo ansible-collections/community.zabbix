@@ -23,6 +23,7 @@ jobs:
           - version: "4.0"
           - version: "5.0"
           # - version: "5.4" # only activate after basic compatibility
+          - version: "6.0"
         ansible:
           - stable-2.10
           - stable-2.11
