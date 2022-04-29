@@ -140,6 +140,7 @@ options:
                 description:
                     - Problem tag value.
                 required: false
+                default: ""
                 type: str
     parents:
         description:
@@ -613,7 +614,8 @@ def main():
                 ),
                 value=dict(
                     type='str',
-                    required=False
+                    required=False,
+                    default=''
                 )
             )
         ),
