@@ -7,6 +7,8 @@ sign_keys:
       sign_key: E709712C
     stretch:
       sign_key: E709712C
+    jammy:
+      sign_key: E709712C
     focal:
       sign_key: E709712C
     bionic:
@@ -23,6 +25,8 @@ sign_keys:
     jessie:
       sign_key: E709712C
     stretch:
+      sign_key: E709712C
+    jammy:
       sign_key: E709712C
     focal:
       sign_key: E709712C
@@ -42,6 +46,8 @@ sign_keys:
       sign_key: E709712C
     stretch:
       sign_key: E709712C
+    jammy:
+      sign_key: E709712C
     focal:
       sign_key: E709712C
     bionic:
@@ -60,6 +66,8 @@ sign_keys:
     jessie:
       sign_key: E709712C
     stretch:
+      sign_key: E709712C
+    jammy:
       sign_key: E709712C
     focal:
       sign_key: E709712C
