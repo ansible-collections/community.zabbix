@@ -17,9 +17,10 @@ $DB['VERIFY_HOST'] = {{ 'true' if zabbix_server_dbverifyhost else 'false'  }};
 
 // Schema name. Used for IBM DB2 and PostgreSQL.
 $DB['SCHEMA'] = '{{ zabbix_server_dbschema }}';
-
+{% if not zabbix_web_connect_ha_backend %}
 $ZBX_SERVER      = '{{ zabbix_server_hostname }}';
 $ZBX_SERVER_PORT = '{{ zabbix_server_listenport }}';
+{% endif %}
 $ZBX_SERVER_NAME = '{{ zabbix_server_name }}';
 
 $IMAGE_FORMAT_DEFAULT = IMAGE_FORMAT_PNG;
