@@ -11,6 +11,7 @@ zabbix_web_rhel_release: true
 zabbix_selinux: false
 zabbix_web_doubleprecision: false
 zabbix_web_conf_mode: "0640"
+zabbix_web_connect_ha_backend: false 
 
 zabbix_url: zabbix.example.com                 # Will be deprecated in 2.0.0
 zabbix_api_server_url: "{{ zabbix_url }}"
