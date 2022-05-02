@@ -76,7 +76,7 @@
 - name: "Let's Encrypt | Create directory for certbot webroot if not exist"
   file:
     path: "{{ zabbix_letsencrypt_webroot_path }}"
-    mode: 0755
+    mode: "{{ zabbix_letsencrypt_webroot_mode }}"
     state: directory
   when:
     - zabbix_letsencrypt
