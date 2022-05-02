@@ -357,7 +357,7 @@ class Service(ZabbixBase):
             else:
                 calculate_sla = 0
         else:
-          sla = 0 # Parameter does not exist in >= 6.0 but we needed for format() function constructing request
+            sla = 0  # Parameter does not exist in >= 6.0 but we needed for format() function constructing request
 
         # Zabbix api return when no trigger
         trigger_id = 0
