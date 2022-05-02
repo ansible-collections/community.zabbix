@@ -61,6 +61,7 @@ zabbix_nginx_tls_ciphers: ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA
 
 zabbix_letsencrypt: false
 zabbix_letsencrypt_webroot_path: /var/www/letsencrypt
+zabbix_letsencrypt_webroot_mode: 0755
 
 zabbix_repo_yum_gpgcheck: 0
 zabbix_repo_yum_schema: https
