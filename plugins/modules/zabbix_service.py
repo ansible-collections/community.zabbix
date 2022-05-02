@@ -356,6 +356,8 @@ class Service(ZabbixBase):
                 calculate_sla = 1
             else:
                 calculate_sla = 0
+        else:
+          sla = 0 # Parameter does not exist in >= 6.0 but we needed for format() function constructing request
 
         # Zabbix api return when no trigger
         trigger_id = 0
@@ -376,12 +378,14 @@ class Service(ZabbixBase):
             'algorithm': algorithm,
             'showsla': calculate_sla,
             'sortorder': sortorder,
+            'goodsla': format(sla, '.4f'),  # Sla has 4 decimals
             'triggerid': trigger_id
         }
 
         if LooseVersion(self._zbx_api_version) >= LooseVersion('6.0'):
             request.pop('showsla')
             request.pop('triggerid')
+            request.pop('goodsla')
             request['description'] = description
             request['weight'] = weight
 
@@ -491,9 +495,6 @@ class Service(ZabbixBase):
                 else:
                     request['propagation_value'] = pv_map[propagation_value]
         else:
-            if sla:
-                request['goodsla'] = format(sla, '.4f'),  # Sla has 4 decimals
-
             if parent:
                 parent_ids = self.get_service_ids(parent)
                 if not parent_ids:
@@ -514,23 +515,23 @@ class Service(ZabbixBase):
         generated_config = self.generate_service_config(name, parent, sla, calculate_sla, trigger_name, trigger_host, sortorder, weight, algorithm,
                                                         description, tags, problem_tags, parents, children, propagation_rule, propagation_value, status_rules)
         live_config = self.dump_services(service_id)[0]
-        if len(live_config['parents']) > 0:
-            # Need to rewrite parents list to only service ids
-            new_parents = []
-            for parent in live_config['parents']:
-                new_parents.append({'serviceid': parent['serviceid']})
-            live_config['parents'] = new_parents
-
-        if len(live_config['children']) > 0:
-            # Need to rewrite children list to only service ids
-            new_children = []
-            for child in live_config['children']:
-                new_children.append({'serviceid': child['serviceid']})
-            live_config['children'] = new_children
 
         if LooseVersion(self._zbx_api_version) < LooseVersion('6.0'):
             item_to_check = ['name', 'showsla', 'algorithm', 'triggerid', 'sortorder', 'goodsla']
         else:
+            if len(live_config['parents']) > 0:
+                # Need to rewrite parents list to only service ids
+                new_parents = []
+                for parent in live_config['parents']:
+                    new_parents.append({'serviceid': parent['serviceid']})
+                    live_config['parents'] = new_parents
+
+            if len(live_config['children']) > 0:
+                # Need to rewrite children list to only service ids
+                new_children = []
+                for child in live_config['children']:
+                    new_children.append({'serviceid': child['serviceid']})
+                    live_config['children'] = new_children
             item_to_check = ['name', 'algorithm', 'sortorder', 'weight', 'description', 'tags', 'problem_tags',
                              'parents', 'children', 'propagation_rule', 'propagation_value', 'status_rules']
         change = False
