@@ -322,6 +322,93 @@ import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabb
 from ansible_collections.community.zabbix.plugins.module_utils.version import LooseVersion
 
 
+def compare_lists(l1, l2, diff_dict):
+    """
+    Compares l1 and l2 lists and adds the items that are different
+    to the diff_dict dictionary.
+    Used in recursion with compare_dictionaries() function.
+    Args:
+        l1: first list to compare
+        l2: second list to compare
+        diff_dict: dictionary to store the difference
+
+    Returns:
+        dict: items that are different
+    """
+    if len(l1) != len(l2):
+        diff_dict.append(l1)
+        return diff_dict
+    for i, item in enumerate(l1):
+        if isinstance(item, dict):
+            for i2, item2 in enumerate(l2):
+                diff_dict2 = {}
+                diff_dict2 = compare_dictionaries(item, item2, diff_dict2)
+                if len(diff_dict2) == 0:
+                    break
+            if len(diff_dict2) != 0:
+                diff_dict.insert(i, item)
+        else:
+            if item != l2[i]:
+                diff_dict.append(item)
+    while {} in diff_dict:
+        diff_dict.remove({})
+    return diff_dict
+
+
+def compare_dictionaries(d1, d2, diff_dict):
+    """
+    Compares d1 and d2 dictionaries and adds the items that are different
+    to the diff_dict dictionary.
+    Used in recursion with compare_lists() function.
+    Args:
+        d1: first dictionary to compare
+        d2: second dictionary to compare
+        diff_dict: dictionary to store the difference
+
+    Returns:
+        dict: items that are different
+    """
+    for k, v in d1.items():
+        if k not in d2:
+            diff_dict[k] = v
+            continue
+        if isinstance(v, dict):
+            diff_dict[k] = {}
+            compare_dictionaries(v, d2[k], diff_dict[k])
+            if diff_dict[k] == {}:
+                del diff_dict[k]
+            else:
+                diff_dict[k] = v
+        elif isinstance(v, list):
+            diff_dict[k] = []
+            compare_lists(v, d2[k], diff_dict[k])
+            if diff_dict[k] == []:
+                del diff_dict[k]
+            else:
+                diff_dict[k] = v
+        else:
+            if v != d2[k]:
+                diff_dict[k] = v
+    return diff_dict
+
+
+def cleanup_data(obj):
+    """Removes the None values from the object and returns the object
+    Args:
+        obj: object to cleanup
+
+    Returns:
+       object: cleaned object
+    """
+    if isinstance(obj, (list, tuple, set)):
+        return type(obj)(cleanup_data(x) for x in obj if x is not None)
+    elif isinstance(obj, dict):
+        return type(obj)((cleanup_data(k), cleanup_data(v))
+                         for k, v in obj.items() if k is not None and v is not None)
+    else:
+        return obj
+
+
 class Service(ZabbixBase):
     def get_service_ids(self, service_name):
         service_ids = []
@@ -376,10 +463,10 @@ class Service(ZabbixBase):
         request = {
             'name': name,
             'algorithm': algorithm,
-            'showsla': calculate_sla,
+            'showsla': str(calculate_sla),
             'sortorder': sortorder,
             'goodsla': format(sla, '.4f'),  # Sla has 4 decimals
-            'triggerid': trigger_id
+            'triggerid': str(trigger_id)
         }
 
         if LooseVersion(self._zbx_api_version) >= LooseVersion('6.0'):
@@ -516,46 +603,33 @@ class Service(ZabbixBase):
                                                         description, tags, problem_tags, parents, children, propagation_rule, propagation_value, status_rules)
         live_config = self.dump_services(service_id)[0]
 
-        if LooseVersion(self._zbx_api_version) < LooseVersion('6.0'):
-            item_to_check = ['name', 'showsla', 'algorithm', 'triggerid', 'sortorder', 'goodsla']
-        else:
+        if LooseVersion(self._zbx_api_version) >= LooseVersion('6.0'):
             if len(live_config['parents']) > 0:
                 # Need to rewrite parents list to only service ids
                 new_parents = []
                 for parent in live_config['parents']:
                     new_parents.append({'serviceid': parent['serviceid']})
-                    live_config['parents'] = new_parents
+                live_config['parents'] = new_parents
 
             if len(live_config['children']) > 0:
                 # Need to rewrite children list to only service ids
                 new_children = []
                 for child in live_config['children']:
                     new_children.append({'serviceid': child['serviceid']})
-                    live_config['children'] = new_children
-            item_to_check = ['name', 'algorithm', 'sortorder', 'weight', 'description', 'tags', 'problem_tags',
-                             'parents', 'children', 'propagation_rule', 'propagation_value', 'status_rules']
-        change = False
-        for item in item_to_check:
-            if item == 'goodsla':
-                live_config[item] = format(float(live_config[item]), '.4f')
+                live_config['children'] = new_children
 
-            if str(generated_config[item]) != str(live_config[item]):
-                change = True
+        else:
+            if 'goodsla' in live_config:
+                live_config['goodsla'] = format(float(live_config['goodsla']), '.4f')
 
-        if LooseVersion(self._zbx_api_version) < LooseVersion('6.0'):
-            # In Zabbix 4.0
-            # No parent returns : "parent": []
-            # A parent returns : "parent": { "serviceid": 12 }
             if 'parentid' in generated_config:
                 if 'serviceid' in live_config['parent']:
-                    if generated_config['parentid'] != live_config['parent']['serviceid']:
-                        change = True
-                else:
-                    change = True
-            elif 'serviceid' in live_config['parent']:
-                change = True
+                    live_config['parentid'] = live_config['parent']['serviceid']
 
-        if not change:
+        change_parameters = {}
+        difference = cleanup_data(compare_dictionaries(generated_config, live_config, change_parameters))
+
+        if difference == {}:
             self._module.exit_json(changed=False, msg="Service %s up to date" % name)
 
         if self._module.check_mode:
