@@ -920,7 +920,7 @@ class Action(ZabbixBase):
                 if isinstance(_params.get('update_operations', None), type(None)) or len(_params.get('update_operations', [])) == 0:
                     _params.pop('update_operations')
 
-            if _params['eventsource'] not in ['0', '3']:
+            if _params['eventsource'] not in [0, 3]:
                 _params.pop('esc_period')
 
         return _params
