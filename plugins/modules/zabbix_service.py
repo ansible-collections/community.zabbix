@@ -322,93 +322,6 @@ import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabb
 from ansible_collections.community.zabbix.plugins.module_utils.version import LooseVersion
 
 
-def compare_lists(l1, l2, diff_dict):
-    """
-    Compares l1 and l2 lists and adds the items that are different
-    to the diff_dict dictionary.
-    Used in recursion with compare_dictionaries() function.
-    Args:
-        l1: first list to compare
-        l2: second list to compare
-        diff_dict: dictionary to store the difference
-
-    Returns:
-        dict: items that are different
-    """
-    if len(l1) != len(l2):
-        diff_dict.append(l1)
-        return diff_dict
-    for i, item in enumerate(l1):
-        if isinstance(item, dict):
-            for i2, item2 in enumerate(l2):
-                diff_dict2 = {}
-                diff_dict2 = compare_dictionaries(item, item2, diff_dict2)
-                if len(diff_dict2) == 0:
-                    break
-            if len(diff_dict2) != 0:
-                diff_dict.insert(i, item)
-        else:
-            if item != l2[i]:
-                diff_dict.append(item)
-    while {} in diff_dict:
-        diff_dict.remove({})
-    return diff_dict
-
-
-def compare_dictionaries(d1, d2, diff_dict):
-    """
-    Compares d1 and d2 dictionaries and adds the items that are different
-    to the diff_dict dictionary.
-    Used in recursion with compare_lists() function.
-    Args:
-        d1: first dictionary to compare
-        d2: second dictionary to compare
-        diff_dict: dictionary to store the difference
-
-    Returns:
-        dict: items that are different
-    """
-    for k, v in d1.items():
-        if k not in d2:
-            diff_dict[k] = v
-            continue
-        if isinstance(v, dict):
-            diff_dict[k] = {}
-            compare_dictionaries(v, d2[k], diff_dict[k])
-            if diff_dict[k] == {}:
-                del diff_dict[k]
-            else:
-                diff_dict[k] = v
-        elif isinstance(v, list):
-            diff_dict[k] = []
-            compare_lists(v, d2[k], diff_dict[k])
-            if diff_dict[k] == []:
-                del diff_dict[k]
-            else:
-                diff_dict[k] = v
-        else:
-            if v != d2[k]:
-                diff_dict[k] = v
-    return diff_dict
-
-
-def cleanup_data(obj):
-    """Removes the None values from the object and returns the object
-    Args:
-        obj: object to cleanup
-
-    Returns:
-       object: cleaned object
-    """
-    if isinstance(obj, (list, tuple, set)):
-        return type(obj)(cleanup_data(x) for x in obj if x is not None)
-    elif isinstance(obj, dict):
-        return type(obj)((cleanup_data(k), cleanup_data(v))
-                         for k, v in obj.items() if k is not None and v is not None)
-    else:
-        return obj
-
-
 class Service(ZabbixBase):
     def get_service_ids(self, service_name):
         service_ids = []
@@ -627,7 +540,7 @@ class Service(ZabbixBase):
                     live_config['parentid'] = live_config['parent']['serviceid']
 
         change_parameters = {}
-        difference = cleanup_data(compare_dictionaries(generated_config, live_config, change_parameters))
+        difference = zabbix_utils.helper_cleanup_data(zabbix_utils.helper_compare_dictionaries(generated_config, live_config, change_parameters))
 
         if difference == {}:
             self._module.exit_json(changed=False, msg="Service %s up to date" % name)
