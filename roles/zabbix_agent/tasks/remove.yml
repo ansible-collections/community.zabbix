@@ -2,7 +2,7 @@
 - name: Pull service facts
   service_facts:
 
-- name: "Remove | Make sure the \"old\" zabbix-agent service is running"
+- name: "Remove | Make sure the \"old\" zabbix-agent service stopped"
   service:
     name: "zabbix-agent"
     state: stopped
@@ -12,7 +12,7 @@
     ansible_facts.services["zabbix-agent.service"] is defined or
     ansible_facts.services["zabbix-agent"] is defined
 
-- name: "Remove | package removal"
+- name: "Remove | Package removal"
   package:
     name: "zabbix-agent"
     state: absent
