@@ -129,7 +129,7 @@ def helper_compare_lists(l1, l2, diff_dict):
         return diff_dict
     for i, item in enumerate(l1):
         if isinstance(item, dict):
-            for i2, item2 in enumerate(l2):
+            for item2 in l2:
                 diff_dict2 = {}
                 diff_dict2 = helper_compare_dictionaries(item, item2, diff_dict2)
                 if len(diff_dict2) == 0:
