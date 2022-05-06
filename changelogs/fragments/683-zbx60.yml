@@ -1,5 +1,5 @@
 ---
 minor_changes:
-  - zabbix_action, zabbix_maintenance, zabbix_mediatype, zabbix_proxy, zabbix_service - updated to work with Zabbix 6.0. 
-  - ``helpers.helper_compare_lists()`` changed logic to not consider the order of elements in lists
+  - zabbix_action, zabbix_maintenance, zabbix_mediatype, zabbix_proxy, zabbix_service - updated to work with Zabbix 6.0.
+  - helpers.helper_compare_lists() changed logic to not consider the order of elements in lists.
   - (https://github.com/ansible-collections/community.zabbix/pull/683)
