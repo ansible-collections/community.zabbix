@@ -242,6 +242,10 @@ class Proxy(ZabbixBase):
 
             if 'interface' in data and data['status'] != '6':
                 parameters.pop('interface', False)
+            else:
+                if LooseVersion(self._zbx_api_version) >= LooseVersion('6.0'):
+                    parameters['interface'].pop('type')
+                    parameters['interface'].pop('main')
 
             proxy_ids_list = self._zapi.proxy.create(parameters)
             self._module.exit_json(changed=True,

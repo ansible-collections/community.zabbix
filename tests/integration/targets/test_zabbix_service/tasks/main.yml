@@ -1,402 +1,906 @@
 ---
-- name: "test - Create a new service with check_mode"
-  zabbix_service:
-    server_url: "{{ zabbix_api_server_url }}"
-    login_user: "{{ zabbix_api_login_user }}"
-    login_password: "{{ zabbix_api_login_pass }}"
-    name: ExampleServiceForServiceModule
-    sla: 99.99
-    state: present
-  check_mode: true
-  register: create_service_check_mode_result
+- when: zabbix_version is version('6.0', '<')
+  module_defaults:
+    community.zabbix.zabbix_service:
+      server_url: "{{ zabbix_api_server_url }}"
+      login_user: "{{ zabbix_api_login_user }}"
+      login_password: "{{ zabbix_api_login_pass }}"
+      name: ExampleServiceForServiceModule
+      sla: 99.99
+      sortorder: 0
+      state: present
 
-- assert:
-    that:
-      - create_service_check_mode_result.changed is sameas true
+  block:
+  - name: "test - Create a new service with check_mode"
+    zabbix_service:
+    check_mode: true
+    register: create_service_check_mode_result
 
-- name: "test - Create a new service"
-  zabbix_service:
-    server_url: "{{ zabbix_api_server_url }}"
-    login_user: "{{ zabbix_api_login_user }}"
-    login_password: "{{ zabbix_api_login_pass }}"
-    name: ExampleServiceForServiceModule
-    sla: 99.99
-    state: present
-  register: create_service_result
+  - assert:
+      that:
+        - create_service_check_mode_result.changed is sameas true
 
-- assert:
-    that:
-      - create_service_result.changed is sameas true
+  - name: "test - Create a new service"
+    zabbix_service:
+    register: create_service_result
 
-- name: "test - Create a new service (idempotency check)"
-  zabbix_service:
-    server_url: "{{ zabbix_api_server_url }}"
-    login_user: "{{ zabbix_api_login_user }}"
-    login_password: "{{ zabbix_api_login_pass }}"
-    name: ExampleServiceForServiceModule
-    sla: 99.99
-    state: present
-  register: create_service_idempotency_check_result
+  - assert:
+      that:
+        - create_service_result.changed is sameas true
 
-- assert:
-    that:
-      - create_service_idempotency_check_result.changed is sameas false
+  - name: "test - Create a new service (idempotency check)"
+    zabbix_service:
+    register: create_service_idempotency_check_result
 
-- name: "test - Update a sla with check_mode"
-  zabbix_service:
-    server_url: "{{ zabbix_api_server_url }}"
-    login_user: "{{ zabbix_api_login_user }}"
-    login_password: "{{ zabbix_api_login_pass }}"
-    name: ExampleServiceForServiceModule
-    sla: 99.999
-    state: present
-  check_mode: true
-  register: update_sla_check_mode_result
+  - assert:
+      that:
+        - create_service_idempotency_check_result.changed is sameas false
 
-- assert:
-    that:
-      - update_sla_check_mode_result.changed is sameas true
+  - name: "test - Update a sla with check_mode"
+    zabbix_service:
+      sla: 99.999
+    check_mode: true
+    register: update_sla_check_mode_result
 
-- name: "test - Update a sla"
-  zabbix_service:
-    server_url: "{{ zabbix_api_server_url }}"
-    login_user: "{{ zabbix_api_login_user }}"
-    login_password: "{{ zabbix_api_login_pass }}"
-    name: ExampleServiceForServiceModule
-    sla: 99.999
-    state: present
-  register: update_sla_result
+  - assert:
+      that:
+        - update_sla_check_mode_result.changed is sameas true
 
-- assert:
-    that:
-      - update_sla_result.changed is sameas true
+  - name: "test - Update a sla"
+    zabbix_service:
+      sla: 99.999
+    register: update_sla_result
 
-- name: "test - Update a sla (idempotency check)"
-  zabbix_service:
-    server_url: "{{ zabbix_api_server_url }}"
-    login_user: "{{ zabbix_api_login_user }}"
-    login_password: "{{ zabbix_api_login_pass }}"
-    name: ExampleServiceForServiceModule
-    sla: 99.999
-    state: present
-  register: update_sla_idempotency_check_result
+  - assert:
+      that:
+        - update_sla_result.changed is sameas true
 
-- assert:
-    that:
-      - update_sla_idempotency_check_result.changed is sameas false
+  - name: "test - Update a sla (idempotency check)"
+    zabbix_service:
+      sla: 99.999
+    register: update_sla_idempotency_check_result
 
-- name: "test - Update a calculate_sla with check_mode"
-  zabbix_service:
-    server_url: "{{ zabbix_api_server_url }}"
-    login_user: "{{ zabbix_api_login_user }}"
-    login_password: "{{ zabbix_api_login_pass }}"
-    name: ExampleServiceForServiceModule
-    sla: 99.999
-    calculate_sla: true
-    state: present
-  check_mode: true
-  register: update_calculate_sla_check_mode_result
+  - assert:
+      that:
+        - update_sla_idempotency_check_result.changed is sameas false
 
-- assert:
-    that:
-      - update_calculate_sla_check_mode_result.changed is sameas true
+  - name: "test - Update a calculate_sla with check_mode"
+    zabbix_service:
+      sla: 99.999
+      calculate_sla: true
+    check_mode: true
+    register: update_calculate_sla_check_mode_result
+  
+  - assert:
+      that:
+        - update_calculate_sla_check_mode_result.changed is sameas true
 
-- name: "test - Update a calculate_sla"
-  zabbix_service:
-    server_url: "{{ zabbix_api_server_url }}"
-    login_user: "{{ zabbix_api_login_user }}"
-    login_password: "{{ zabbix_api_login_pass }}"
-    name: ExampleServiceForServiceModule
-    sla: 99.999
-    calculate_sla: true
-    state: present
-  register: update_calculate_sla_result
+  - name: "test - Update a calculate_sla"
+    zabbix_service:
+      sla: 99.999
+      calculate_sla: true
+    register: update_calculate_sla_result
 
-- assert:
-    that:
-      - update_calculate_sla_result.changed is sameas true
+  - assert:
+      that:
+        - update_calculate_sla_result.changed is sameas true
 
-- name: "test - Update a calculate_sla (idempotency check)"
-  zabbix_service:
-    server_url: "{{ zabbix_api_server_url }}"
-    login_user: "{{ zabbix_api_login_user }}"
-    login_password: "{{ zabbix_api_login_pass }}"
-    name: ExampleServiceForServiceModule
-    sla: 99.999
-    calculate_sla: true
-    state: present
-  register: update_calculate_sla_idempotency_check_result
+  - name: "test - Update a calculate_sla (idempotency check)"
+    zabbix_service:
+      sla: 99.999
+      calculate_sla: true
+    register: update_calculate_sla_idempotency_check_result
 
-- assert:
-    that:
-      - update_calculate_sla_idempotency_check_result.changed is sameas false
+  - assert:
+      that:
+        - update_calculate_sla_idempotency_check_result.changed is sameas false
 
-- name: "Override trigger_name for different version of Zabbix"
-  set_fact:
-    service_example_trigger: "Zabbix server: Utilization of http poller processes over 75%"
-  when: zabbix_version is version("5.0", "==")
+  - name: "Override trigger_name for different version of Zabbix"
+    set_fact:
+      service_example_trigger: "Zabbix server: Utilization of http poller processes over 75%"
+    when: zabbix_version is version("5.0", "==")
 
-- name: "test - Update trigger_host and trigger_name with check_mode"
-  zabbix_service:
-    server_url: "{{ zabbix_api_server_url }}"
-    login_user: "{{ zabbix_api_login_user }}"
-    login_password: "{{ zabbix_api_login_pass }}"
-    name: ExampleServiceForServiceModule
-    sla: 99.999
-    calculate_sla: true
-    trigger_host: "Zabbix server"
-    trigger_name: "{{ service_example_trigger }}"
-    state: present
-  check_mode: true
-  register: update_trigger_name_check_mode_result
+  - name: "test - Update trigger_host and trigger_name with check_mode"
+    zabbix_service:
+      sla: 99.999
+      calculate_sla: true
+      trigger_host: "Zabbix server"
+      trigger_name: "{{ service_example_trigger }}"
+    check_mode: true
+    register: update_trigger_name_check_mode_result
 
-- assert:
-    that:
-      - update_trigger_name_check_mode_result.changed is sameas true
+  - assert:
+      that:
+        - update_trigger_name_check_mode_result.changed is sameas true
 
-- name: "test - Update trigger_host and trigger_name"
-  zabbix_service:
-    server_url: "{{ zabbix_api_server_url }}"
-    login_user: "{{ zabbix_api_login_user }}"
-    login_password: "{{ zabbix_api_login_pass }}"
-    name: ExampleServiceForServiceModule
-    sla: 99.999
-    calculate_sla: true
-    trigger_host: "Zabbix server"
-    trigger_name: "{{ service_example_trigger }}"
-    state: present
-  register: update_trigger_name_result
+  - name: "test - Update trigger_host and trigger_name"
+    zabbix_service:
+      sla: 99.999
+      calculate_sla: true
+      trigger_host: "Zabbix server"
+      trigger_name: "{{ service_example_trigger }}"
+    register: update_trigger_name_result
 
-- assert:
-    that:
-      - update_trigger_name_result.changed is sameas true
+  - assert:
+      that:
+        - update_trigger_name_result.changed is sameas true
 
-- name: "test - Update trigger_host and trigger_name (idempotency check)"
-  zabbix_service:
-    server_url: "{{ zabbix_api_server_url }}"
-    login_user: "{{ zabbix_api_login_user }}"
-    login_password: "{{ zabbix_api_login_pass }}"
-    name: ExampleServiceForServiceModule
-    sla: 99.999
-    calculate_sla: true
-    trigger_host: "Zabbix server"
-    trigger_name: "{{ service_example_trigger }}"
-    state: present
-  register: update_trigger_name_idempotency_check_result
+  - name: "test - Update trigger_host and trigger_name (idempotency check)"
+    zabbix_service:
+      sla: 99.999
+      calculate_sla: true
+      trigger_host: "Zabbix server"
+      trigger_name: "{{ service_example_trigger }}"
+    register: update_trigger_name_idempotency_check_result
 
-- assert:
-    that:
-      - update_trigger_name_idempotency_check_result.changed is sameas false
+  - assert:
+      that:
+        - update_trigger_name_idempotency_check_result.changed is sameas false
 
-- name: "test - Update a algorithm of service with check_mode"
-  zabbix_service:
-    server_url: "{{ zabbix_api_server_url }}"
-    login_user: "{{ zabbix_api_login_user }}"
-    login_password: "{{ zabbix_api_login_pass }}"
-    name: ExampleServiceForServiceModule
-    sla: 99.999
-    calculate_sla: true
-    trigger_host: "Zabbix server"
-    trigger_name: "{{ service_example_trigger }}"
-    algorithm: all_children
-    state: present
-  check_mode: true
-  register: update_algorithm_check_mode_result
+  - name: "test - Update a algorithm of service with check_mode"
+    zabbix_service:
+      sla: 99.999
+      calculate_sla: true
+      trigger_host: "Zabbix server"
+      trigger_name: "{{ service_example_trigger }}"
+      algorithm: all_children
+    check_mode: true
+    register: update_algorithm_check_mode_result
 
-- assert:
-    that:
-      - update_algorithm_check_mode_result.changed is sameas true
+  - assert:
+      that:
+        - update_algorithm_check_mode_result.changed is sameas true
 
-- name: "test - Update a algorithm of service"
-  zabbix_service:
-    server_url: "{{ zabbix_api_server_url }}"
-    login_user: "{{ zabbix_api_login_user }}"
-    login_password: "{{ zabbix_api_login_pass }}"
-    name: ExampleServiceForServiceModule
-    sla: 99.999
-    calculate_sla: true
-    trigger_host: "Zabbix server"
-    trigger_name: "{{ service_example_trigger }}"
-    algorithm: all_children
-    state: present
-  register: update_algorithm_result
+  - name: "test - Update a algorithm of service"
+    zabbix_service:
+      sla: 99.999
+      calculate_sla: true
+      trigger_host: "Zabbix server"
+      trigger_name: "{{ service_example_trigger }}"
+      algorithm: all_children
+    register: update_algorithm_result
 
-- assert:
-    that:
-      - update_algorithm_result.changed is sameas true
+  - assert:
+      that:
+        - update_algorithm_result.changed is sameas true
 
-- name: "test - Update a algorithm of service (idempotency check)"
-  zabbix_service:
-    server_url: "{{ zabbix_api_server_url }}"
-    login_user: "{{ zabbix_api_login_user }}"
-    login_password: "{{ zabbix_api_login_pass }}"
-    name: ExampleServiceForServiceModule
-    sla: 99.999
-    calculate_sla: true
-    trigger_host: "Zabbix server"
-    trigger_name: "{{ service_example_trigger }}"
-    algorithm: all_children
-    state: present
-  register: update_algorithm_idempotency_check_result
+  - name: "test - Update a algorithm of service (idempotency check)"
+    zabbix_service:
+      sla: 99.999
+      calculate_sla: true
+      trigger_host: "Zabbix server"
+      trigger_name: "{{ service_example_trigger }}"
+      algorithm: all_children
+    register: update_algorithm_idempotency_check_result
 
-- assert:
-    that:
-      - update_algorithm_idempotency_check_result.changed is sameas false
+  - assert:
+      that:
+        - update_algorithm_idempotency_check_result.changed is sameas false
 
-- name: "test - Create a new root service for parent test"
-  zabbix_service:
-    server_url: "{{ zabbix_api_server_url }}"
-    login_user: "{{ zabbix_api_login_user }}"
-    login_password: "{{ zabbix_api_login_pass }}"
-    name: ExampleServiceForServiceModuleRoot
-    sla: 99.99
-    state: present
-  register: create_child_service_result
+  - name: "test - Create a new root service for parent test"
+    zabbix_service:
+      name: ExampleServiceForServiceModuleRoot
+      sla: 99.99
+    register: create_child_service_result
+  
+  - assert:
+      that:
+        - create_child_service_result.changed is sameas true
 
-- assert:
-    that:
-      - create_child_service_result.changed is sameas true
+  - name: "test - Update a parent of child service with check_mode"
+    zabbix_service:
+      name: ExampleServiceForServiceModule
+      sla: 99.999
+      calculate_sla: true
+      trigger_host: "Zabbix server"
+      trigger_name: "{{ service_example_trigger }}"
+      algorithm: all_children
+      parent: ExampleServiceForServiceModuleRoot
+    check_mode: true
+    register: create_parent_child_service_check_mode_result
 
-- name: "test - Update a parent of child service with check_mode"
-  zabbix_service:
-    server_url: "{{ zabbix_api_server_url }}"
-    login_user: "{{ zabbix_api_login_user }}"
-    login_password: "{{ zabbix_api_login_pass }}"
-    name: ExampleServiceForServiceModule
-    sla: 99.999
-    calculate_sla: true
-    trigger_host: "Zabbix server"
-    trigger_name: "{{ service_example_trigger }}"
-    algorithm: all_children
-    parent: ExampleServiceForServiceModuleRoot
-    state: present
-  check_mode: true
-  register: create_parent_child_service_check_mode_result
+  - assert:
+      that:
+        - create_parent_child_service_check_mode_result.changed is sameas true
 
-- assert:
-    that:
-      - create_parent_child_service_check_mode_result.changed is sameas true
+  - name: "test - Update a parent of child service"
+    zabbix_service:
+      name: ExampleServiceForServiceModule
+      sla: 99.999
+      calculate_sla: true
+      trigger_host: "Zabbix server"
+      trigger_name: "{{ service_example_trigger }}"
+      algorithm: all_children
+      parent: ExampleServiceForServiceModuleRoot
+    register: create_parent_child_service_result
 
-- name: "test - Update a parent of child service"
-  zabbix_service:
-    server_url: "{{ zabbix_api_server_url }}"
-    login_user: "{{ zabbix_api_login_user }}"
-    login_password: "{{ zabbix_api_login_pass }}"
-    name: ExampleServiceForServiceModule
-    sla: 99.999
-    calculate_sla: true
-    trigger_host: "Zabbix server"
-    trigger_name: "{{ service_example_trigger }}"
-    algorithm: all_children
-    parent: ExampleServiceForServiceModuleRoot
-    state: present
-  register: create_parent_child_service_result
+  - assert:
+      that:
+        - create_parent_child_service_result.changed is sameas true
 
-- assert:
-    that:
-      - create_parent_child_service_result.changed is sameas true
+  - name: "test - Update a parent of child service (idempotency check)"
+    zabbix_service:
+      name: ExampleServiceForServiceModule
+      sla: 99.999
+      calculate_sla: true
+      trigger_host: "Zabbix server"
+      trigger_name: "{{ service_example_trigger }}"
+      algorithm: all_children
+      parent: ExampleServiceForServiceModuleRoot
+    register: create_parent_child_service_idempotency_check_result
 
-- name: "test - Update a parent of child service (idempotency check)"
-  zabbix_service:
-    server_url: "{{ zabbix_api_server_url }}"
-    login_user: "{{ zabbix_api_login_user }}"
-    login_password: "{{ zabbix_api_login_pass }}"
-    name: ExampleServiceForServiceModule
-    sla: 99.999
-    calculate_sla: true
-    trigger_host: "Zabbix server"
-    trigger_name: "{{ service_example_trigger }}"
-    algorithm: all_children
-    parent: ExampleServiceForServiceModuleRoot
-    state: present
-  register: create_parent_child_service_idempotency_check_result
+  - assert:
+      that:
+        - create_parent_child_service_idempotency_check_result.changed is sameas false
 
-- assert:
-    that:
-      - create_parent_child_service_idempotency_check_result.changed is sameas false
+  - name: "test - Remove ExampleServiceForServiceModule service with check_mode"
+    zabbix_service:
+      name: ExampleServiceForServiceModule
+      sla: 99.999
+      state: absent
+    check_mode: true
+    register: remove_service_with_check_mode_result
 
-- name: "test - Remove ExampleServiceForServiceModule service with check_mode"
-  zabbix_service:
-    server_url: "{{ zabbix_api_server_url }}"
-    login_user: "{{ zabbix_api_login_user }}"
-    login_password: "{{ zabbix_api_login_pass }}"
-    name: ExampleServiceForServiceModule
-    sla: 99.999
-    state: absent
-  check_mode: true
-  register: remove_service_with_check_mode_result
+  - assert:
+      that:
+        - remove_service_with_check_mode_result.changed is sameas true
 
-- assert:
-    that:
-      - remove_service_with_check_mode_result.changed is sameas true
+  - name: "test - Remove ExampleServiceForServiceModule service"
+    zabbix_service:
+      name: ExampleServiceForServiceModule
+      sla: 99.999
+      state: absent
+    register: remove_service_result
+  
+  - assert:
+      that:
+        - remove_service_result.changed is sameas true
 
-- name: "test - Remove ExampleServiceForServiceModule service"
-  zabbix_service:
-    server_url: "{{ zabbix_api_server_url }}"
-    login_user: "{{ zabbix_api_login_user }}"
-    login_password: "{{ zabbix_api_login_pass }}"
-    name: ExampleServiceForServiceModule
-    sla: 99.999
-    state: absent
-  register: remove_service_result
+  - name: "test - Remove ExampleServiceForServiceModule service (idempotency check)"
+    zabbix_service:
+      name: ExampleServiceForServiceModule
+      sla: 99.999
+      state: absent
+    register: remove_service_idempotency_check_result
+  
+  - assert:
+      that:
+        - remove_service_idempotency_check_result.changed is sameas false
 
-- assert:
-    that:
-      - remove_service_result.changed is sameas true
+  - name: "test - Remove ExampleServiceForServiceModuleRoot service with check_mode"
+    zabbix_service:
+      name: ExampleServiceForServiceModuleRoot
+      sla: 99.999
+      state: absent
+    check_mode: true
+    register: remove_root_service_with_check_mode_result
 
-- name: "test - Remove ExampleServiceForServiceModule service (idempotency check)"
-  zabbix_service:
-    server_url: "{{ zabbix_api_server_url }}"
-    login_user: "{{ zabbix_api_login_user }}"
-    login_password: "{{ zabbix_api_login_pass }}"
-    name: ExampleServiceForServiceModule
-    sla: 99.999
-    state: absent
-  register: remove_service_idempotency_check_result
+  - assert:
+      that:
+        - remove_root_service_with_check_mode_result.changed is sameas true
 
-- assert:
-    that:
-      - remove_service_idempotency_check_result.changed is sameas false
+  - name: "test - Remove ExampleServiceForServiceModuleRoot service"
+    zabbix_service:
+      name: ExampleServiceForServiceModuleRoot
+      sla: 99.999
+      state: absent
+    register: remove_root_service_result
+  
+  - assert:
+      that:
+        - remove_root_service_result.changed is sameas true
 
-- name: "test - Remove ExampleServiceForServiceModuleRoot service with check_mode"
-  zabbix_service:
-    server_url: "{{ zabbix_api_server_url }}"
-    login_user: "{{ zabbix_api_login_user }}"
-    login_password: "{{ zabbix_api_login_pass }}"
-    name: ExampleServiceForServiceModuleRoot
-    sla: 99.999
-    state: absent
-  check_mode: true
-  register: remove_root_service_with_check_mode_result
+  - name: "test - Remove ExampleServiceForServiceModuleRoot service (idempotency check)"
+    zabbix_service:
+      name: ExampleServiceForServiceModuleRoot
+      sla: 99.999
+      state: absent
+    register: remove_root_service_idempotency_check_result
+  
+  - assert:
+      that:
+        - remove_root_service_idempotency_check_result.changed is sameas false
 
-- assert:
-    that:
-      - remove_root_service_with_check_mode_result.changed is sameas true
+- name: test - service for Zabbix >= 6.0
+  when: zabbix_version is version('6.0', '>=')
+  module_defaults:
+    community.zabbix.zabbix_service:
+      server_url: "{{ zabbix_api_server_url }}"
+      login_user: "{{ zabbix_api_login_user }}"
+      login_password: "{{ zabbix_api_login_pass }}"
+      description: "Example Service for Service Module"
+      sortorder: 0
+      propagation_rule: increase
+      propagation_value: warning
+      state: present
 
-- name: "test - Remove ExampleServiceForServiceModuleRoot service"
-  zabbix_service:
-    server_url: "{{ zabbix_api_server_url }}"
-    login_user: "{{ zabbix_api_login_user }}"
-    login_password: "{{ zabbix_api_login_pass }}"
-    name: ExampleServiceForServiceModuleRoot
-    sla: 99.999
-    state: absent
-  register: remove_root_service_result
+  block:
+    - name: "test - Create a new service with check_mode"
+      zabbix_service:
+        name: ExampleServiceForServiceModule
+      check_mode: true
+      register: create_service_check_mode_result
 
-- assert:
-    that:
-      - remove_root_service_result.changed is sameas true
+    - assert:
+        that:
+          - create_service_check_mode_result.changed is sameas true
 
-- name: "test - Remove ExampleServiceForServiceModuleRoot service (idempotency check)"
-  zabbix_service:
-    server_url: "{{ zabbix_api_server_url }}"
-    login_user: "{{ zabbix_api_login_user }}"
-    login_password: "{{ zabbix_api_login_pass }}"
-    name: ExampleServiceForServiceModuleRoot
-    sla: 99.999
-    state: absent
-  register: remove_root_service_idempotency_check_result
+    - name: "test - Create a new service"
+      zabbix_service:
+        name: ExampleServiceForServiceModule
+      register: create_service_result
 
-- assert:
-    that:
-      - remove_root_service_idempotency_check_result.changed is sameas false
+    - assert:
+        that:
+          - create_service_result.changed is sameas true
+
+    - name: "test - Create a new service (idempotency check)"
+      zabbix_service:
+        name: ExampleServiceForServiceModule
+      register: create_service_idempotency_check_result
+
+    - assert:
+        that:
+          - create_service_idempotency_check_result.changed is sameas false
+
+    - name: "test - Update service add service tags"
+      zabbix_service:
+        name: ExampleServiceForServiceModule
+        tags:
+          - tag: TagName1
+            value: TagValue1
+      register: update_service_stags_result
+
+    - assert:
+        that:
+          - update_service_stags_result.changed is sameas true
+
+    - name: "test - Update service with service tags (idempotency check)"
+      zabbix_service:
+        name: ExampleServiceForServiceModule
+        tags:
+          - tag: TagName1
+            value: TagValue1
+      register: update_service_stags_idempotency_check_result
+
+    - assert:
+        that:
+          - update_service_stags_idempotency_check_result.changed is sameas false
+
+    - name: "test - Update service add more service tags"
+      zabbix_service:
+        name: ExampleServiceForServiceModule
+        tags:
+          - tag: TagName1
+            value: TagValue1
+          - tag: TagName2
+            value: TagValue2
+      register: update_service_more_stags_result
+
+    - assert:
+        that:
+          - update_service_more_stags_result.changed is sameas true
+
+    - name: "test - Update service add more service tags (idempotency check)"
+      zabbix_service:
+        name: ExampleServiceForServiceModule
+        tags:
+          - tag: TagName1
+            value: TagValue1
+          - tag: TagName2
+            value: TagValue2
+      register: update_service_more_stags_idempotency_check_result
+
+    - assert:
+        that:
+          - update_service_more_stags_idempotency_check_result.changed is sameas false
+
+    - name: "test - Update service remove service tags"
+      zabbix_service:
+        name: ExampleServiceForServiceModule
+        tags:
+          - tag: TagName2
+            value: TagValue2
+      register: update_service_less_stags_result
+
+    - assert:
+        that:
+          - update_service_less_stags_result.changed is sameas true
+
+    - name: "test - Update service remove service tags (idempotency check)"
+      zabbix_service:
+        name: ExampleServiceForServiceModule
+        tags:
+          - tag: TagName2
+            value: TagValue2
+      register: update_service_less_stags_idempotency_check_result
+
+    - assert:
+        that:
+          - update_service_less_stags_idempotency_check_result.changed is sameas false
+
+    - name: "test - Delete service"
+      zabbix_service:
+        name: ExampleServiceForServiceModule
+        state: absent
+
+    - name: "test - Create service with one problem tag"
+      zabbix_service:
+        name: ExampleServiceForServiceModule
+        problem_tags:
+          - tag: TagName1
+            operator: equals
+            value: TagValue1
+      register: create_service_with_ptag_result
+
+    - assert:
+        that:
+          - create_service_with_ptag_result.changed is sameas true
+
+    - name: "test - Create service with one problem tag (idempotency check)"
+      zabbix_service:
+        name: ExampleServiceForServiceModule
+        problem_tags:
+          - tag: TagName1
+            operator: equals
+            value: TagValue1
+      register: create_service_with_ptag_idempotency_check_result
+
+    - name: "test - Update service with problem tag without operator"
+      zabbix_service:
+        name: ExampleServiceForServiceModule
+        problem_tags:
+          - tag: TagName1
+            operator: equals
+            value: TagValue1
+          - tag: TagName2
+            value: TagValue2
+      register: update_service_with_ptag_woop_result
+
+    - assert:
+        that:
+          - update_service_with_ptag_woop_result.changed is sameas true
+
+    - name: "test - Update service with problem tag without operator (idempotency check)"
+      zabbix_service:
+        name: ExampleServiceForServiceModule
+        problem_tags:
+          - tag: TagName1
+            operator: equals
+            value: TagValue1
+          - tag: TagName2
+            value: TagValue2
+      register: update_service_with_ptag_woop_idempotency_check_result
+
+    - assert:
+        that:
+          - update_service_with_ptag_woop_idempotency_check_result.changed is sameas false
+
+    - name: "test - Update service with problem tag with like operator"
+      zabbix_service:
+        name: ExampleServiceForServiceModule
+        problem_tags:
+          - tag: TagName1
+            operator: equals
+            value: TagValue1
+          - tag: TagName2
+            value: TagValue2
+          - tag: TagName3
+            operator: like
+            value: TagValue3
+      register: update_service_with_ptag_wlikeop_result
+
+    - assert:
+        that:
+          - update_service_with_ptag_wlikeop_result.changed is sameas true
+
+    - name: "test - Update service with problem tag with like operator (idempotency check)"
+      zabbix_service:
+        name: ExampleServiceForServiceModule
+        problem_tags:
+          - tag: TagName1
+            operator: equals
+            value: TagValue1
+          - tag: TagName2
+            value: TagValue2
+          - tag: TagName3
+            operator: like
+            value: TagValue3
+      register: update_service_with_ptag_wlikeop_idempotency_check_result
+
+    - assert:
+        that:
+          - update_service_with_ptag_wlikeop_idempotency_check_result.changed is sameas false
+
+    - name: "test - Update service with problem tag without operator and without value"
+      zabbix_service:
+        name: ExampleServiceForServiceModule
+        problem_tags:
+          - tag: TagName1
+            operator: equals
+            value: TagValue1
+          - tag: TagName2
+            value: TagValue2
+          - tag: TagName3
+            operator: like
+            value: TagValue3
+          - tag: TagName4
+      register: update_service_with_ptag_woov_result
+
+    - assert:
+        that:
+          - update_service_with_ptag_woov_result.changed is sameas true
+
+    - name: "test - Update service with problem tag without operator and without value (idempotency check)"
+      zabbix_service:
+        name: ExampleServiceForServiceModule
+        problem_tags:
+          - tag: TagName1
+            operator: equals
+            value: TagValue1
+          - tag: TagName2
+            value: TagValue2
+          - tag: TagName3
+            operator: like
+            value: TagValue3
+          - tag: TagName4
+      register: update_service_with_ptag_woov_idempotency_check_result
+
+    - assert:
+        that:
+          - update_service_with_ptag_woov_idempotency_check_result.changed is sameas false
+
+    - name: "test - Update service remove problem tags"
+      zabbix_service:
+        name: ExampleServiceForServiceModule
+        problem_tags:
+          - tag: TagName1
+            operator: equals
+            value: TagValue1
+          - tag: TagName3
+            operator: like
+            value: TagValue3
+      register: update_service_remove_tags_result
+
+    - assert:
+        that:
+          - update_service_remove_tags_result.changed is sameas true
+
+    - name: "test - Update service remove problem tags (idempotency check)"
+      zabbix_service:
+        name: ExampleServiceForServiceModule
+        problem_tags:
+          - tag: TagName1
+            operator: equals
+            value: TagValue1
+          - tag: TagName3
+            operator: like
+            value: TagValue3
+      register: update_service_remove_tags_idempotency_check_result
+
+    - assert:
+        that:
+          - update_service_remove_tags_idempotency_check_result.changed is sameas false
+
+    - name: "test - Update service remove all problem tags"
+      zabbix_service:
+        name: ExampleServiceForServiceModule
+      register: update_service_remove_all_tags_result
+
+    - assert:
+        that:
+          - update_service_remove_all_tags_result.changed is sameas true
+
+    - name: "test - Update service remove all problem tags (idempotency check)"
+      zabbix_service:
+        name: ExampleServiceForServiceModule
+      register: update_service_remove_all_tags_idempotency_check_result
+
+    - assert:
+        that:
+          - update_service_remove_all_tags_idempotency_check_result.changed is sameas false
+
+    - name: "test - Create a new child service"
+      zabbix_service:
+        name: ExampleChildServiceForServiceModule
+        sortorder: 10
+        parents:
+          - ExampleServiceForServiceModule
+      register: create_child_service_result
+
+    - assert:
+        that:
+          - create_child_service_result.changed is sameas true
+
+    - name: "test - Create a new child service (idempotency check)"
+      zabbix_service:
+        name: ExampleChildServiceForServiceModule
+        sortorder: 10
+        parents:
+          - ExampleServiceForServiceModule
+      register: create_child_service_idempotency_check_result
+
+    - assert:
+        that:
+          - create_child_service_idempotency_check_result.changed is sameas false
+
+    - name: "test - Update child service to remove parent"
+      zabbix_service:
+        name: ExampleChildServiceForServiceModule
+        parents: []
+      register: update_child_service_delete_parent_result
+
+    - assert:
+        that:
+          - update_child_service_delete_parent_result.changed is sameas true
+
+    - name: "test - Create a new parent service"
+      zabbix_service:
+        name: ExampleParentServiceForServiceModule
+
+    - name: "test - Delete child service"
+      zabbix_service:
+        name: ExampleChildServiceForServiceModule
+        state: absent
+
+    - name: "test - Create a new child service with two parents"
+      zabbix_service:
+        name: ExampleChildServiceForServiceModule
+        parents:
+          - ExampleServiceForServiceModule
+          - ExampleParentServiceForServiceModule
+      register: create_child_service_two_parents_result
+
+    - assert:
+        that:
+          - create_child_service_two_parents_result.changed is sameas true
+
+    - name: "test - Create a new child service with two parents (idempotency check)"
+      zabbix_service:
+        name: ExampleChildServiceForServiceModule
+        parents:
+          - ExampleServiceForServiceModule
+          - ExampleParentServiceForServiceModule
+      register: create_child_service_two_parents_idempotency_check_result
+
+    - assert:
+        that:
+          - create_child_service_two_parents_idempotency_check_result.changed is sameas false
+
+    - name: "test - Remove one parent from new child service"
+      zabbix_service:
+        name: ExampleChildServiceForServiceModule
+        parents:
+          - ExampleParentServiceForServiceModule
+      register: update_child_service_remove_parent_result
+
+    - assert:
+        that:
+          - update_child_service_remove_parent_result.changed is sameas true
+
+    - name: "test - Remove one parent from new child service (idempotency check)"
+      zabbix_service:
+        name: ExampleChildServiceForServiceModule
+        parents:
+          - ExampleParentServiceForServiceModule
+      register: update_child_service_remove_parent_idempotency_check_result
+
+    - assert:
+        that:
+          - update_child_service_remove_parent_idempotency_check_result.changed is sameas false
+
+    - name: "test - Delete parent service 2"
+      zabbix_service:
+        name: ExampleParentServiceForServiceModule
+        state: absent
+
+    - name: "test - Create parent service with child service"
+      zabbix_service:
+        name: ExampleParentServiceForServiceModule
+        children:
+          - ExampleChildServiceForServiceModule
+      register: create_parent_service_with_child_result
+
+    - assert:
+        that:
+          - create_parent_service_with_child_result.changed is sameas true
+
+    - name: "test - Create parent service with child service (idempotency check)"
+      zabbix_service:
+        name: ExampleParentServiceForServiceModule
+        children:
+          - ExampleChildServiceForServiceModule
+      register: create_parent_service_with_child_result_idempotency_check_result
+
+    - assert:
+        that:
+          - create_parent_service_with_child_result_idempotency_check_result.changed is sameas false
+
+    - name: "test - Create second chile service"
+      zabbix_service:
+        name: ExampleChildServiceForServiceModule2
+
+    - name: "test - Update parent service with the second child service"
+      zabbix_service:
+        name: ExampleParentServiceForServiceModule
+        children:
+          - ExampleChildServiceForServiceModule
+          - ExampleChildServiceForServiceModule2
+      register: update_parent_service_with_second_child_result
+
+    - assert:
+        that:
+          - update_parent_service_with_second_child_result.changed is sameas true
+
+    - name: "test - Update parent service with the second child service (idempotency check)"
+      zabbix_service:
+        name: ExampleParentServiceForServiceModule
+        children:
+          - ExampleChildServiceForServiceModule
+          - ExampleChildServiceForServiceModule2
+      register: update_parent_service_with_second_child_result_idempotency_check_result
+
+    - assert:
+        that:
+          - update_parent_service_with_second_child_result_idempotency_check_result.changed is sameas false
+
+    - name: "test - Delete parent service"
+      zabbix_service:
+        name: ExampleParentServiceForServiceModule
+        state: absent
+
+    - name: "test - Create parent service with two child services"
+      zabbix_service:
+        name: ExampleParentServiceForServiceModule
+        children:
+          - ExampleChildServiceForServiceModule
+          - ExampleChildServiceForServiceModule2
+      register: create_parent_service_with_two_children_result
+
+    - assert:
+        that:
+          - create_parent_service_with_two_children_result.changed is sameas true
+
+    - name: "test - Create parent service with child services (idempotency check)"
+      zabbix_service:
+        name: ExampleParentServiceForServiceModule
+        children:
+          - ExampleChildServiceForServiceModule
+          - ExampleChildServiceForServiceModule2
+      register: create_parent_service_with_two_children_idempotency_check_result
+
+    - assert:
+        that:
+          - create_parent_service_with_two_children_idempotency_check_result.changed is sameas false
+
+    - name: "test - Delete parent service"
+      zabbix_service:
+        name: ExampleParentServiceForServiceModule
+        state: absent
+
+    - name: "test - Delete child service"
+      zabbix_service:
+        name: ExampleChildServiceForServiceModule
+        state: absent
+    - name: "test - Delete child servicei 2"
+      zabbix_service:
+        name: ExampleChildServiceForServiceModule2
+        state: absent
+
+    - name: "test - Delete new service"
+      zabbix_service:
+        name: ExampleServiceForServiceModule
+        state: absent
+      register: delete_service_result
+
+    - assert:
+        that:
+          - delete_service_result.changed is sameas true
+
+    - name: "test - Delete new service (idempotency check)"
+      zabbix_service:
+        name: ExampleServiceForServiceModule
+        state: absent
+      register: delete_service_idempotency_check_result
+
+    - assert:
+        that:
+          - delete_service_idempotency_check_result.changed is sameas false
+
+    - name: "test - Create a new service with status rule"
+      zabbix_service:
+        name: ExampleServiceForServiceModule
+        status_rules:
+          - type: at_least_n_child_services_have_status_or_above
+            limit_value: 4242
+            limit_status: ok
+            new_status: not_classified
+      register: create_service_sr_result
+
+    - assert:
+        that:
+          - create_service_sr_result.changed is sameas true
+
+    - name: "test - Create a new service with status rule (idempotency check)"
+      zabbix_service:
+        name: ExampleServiceForServiceModule
+        status_rules:
+          - type: at_least_n_child_services_have_status_or_above
+            limit_value: 4242
+            limit_status: ok
+            new_status: not_classified
+      register: create_service_sr_idempotency_check_result
+
+    - assert:
+        that:
+          - create_service_sr_idempotency_check_result.changed is sameas false
+
+    - name: "test - Update service with the second status rule"
+      zabbix_service:
+        name: ExampleServiceForServiceModule
+        status_rules:
+          - type: at_least_n_child_services_have_status_or_above
+            limit_value: 4242
+            limit_status: ok
+            new_status: not_classified
+          - type: at_least_npct_child_services_have_status_or_above
+            limit_value: 42
+            limit_status: information
+            new_status: warning
+      register: update_service_add_sr_result
+
+    - assert:
+        that:
+          - update_service_add_sr_result.changed is sameas true
+
+    - name: "test - Update service with the second status rule (idempotency check)"
+      zabbix_service:
+        name: ExampleServiceForServiceModule
+        status_rules:
+          - type: at_least_n_child_services_have_status_or_above
+            limit_value: 4242
+            limit_status: ok
+            new_status: not_classified
+          - type: at_least_npct_child_services_have_status_or_above
+            limit_value: 42
+            limit_status: information
+            new_status: warning
+      register: update_service_add_sr_idempotency_check_result
+
+    - assert:
+        that:
+          - update_service_add_sr_idempotency_check_result.changed is sameas false
+
+    - name: "test - Update service remove status rule"
+      zabbix_service:
+        name: ExampleServiceForServiceModule
+        status_rules:
+          - type: at_least_npct_child_services_have_status_or_above
+            limit_value: 42
+            limit_status: information
+            new_status: warning
+      register: update_service_remove_sr_result
+
+    - assert:
+        that:
+          - update_service_remove_sr_result.changed is sameas true
+
+    - name: "test - Update service remove status rule (idempotency check)"
+      zabbix_service:
+        name: ExampleServiceForServiceModule
+        status_rules:
+          - type: at_least_npct_child_services_have_status_or_above
+            limit_value: 42
+            limit_status: information
+            new_status: warning
+      register: update_service_remove_sr_idempotency_check_result
+
+    - assert:
+        that:
+          - update_service_remove_sr_idempotency_check_result.changed is sameas false
+
+    - name: "test - Delete new service"
+      zabbix_service:
+        name: ExampleServiceForServiceModule
+        state: absent
+      register: delete_service_result

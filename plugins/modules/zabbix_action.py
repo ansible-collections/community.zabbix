@@ -859,7 +859,7 @@ class Action(ZabbixBase):
 
         _params = {
             'name': kwargs['name'],
-            'eventsource': to_numeric_value([
+            'eventsource': zabbix_utils.helper_to_numeric_value([
                 'trigger',
                 'discovery',
                 'auto_registration',
@@ -875,7 +875,7 @@ class Action(ZabbixBase):
             'operations': kwargs['operations'],
             'recovery_operations': kwargs.get('recovery_operations'),
             'acknowledge_operations': kwargs.get('acknowledge_operations'),
-            'status': to_numeric_value([
+            'status': zabbix_utils.helper_to_numeric_value([
                 'enabled',
                 'disabled'], kwargs['status'])
         }
@@ -920,7 +920,7 @@ class Action(ZabbixBase):
                 if isinstance(_params.get('update_operations', None), type(None)) or len(_params.get('update_operations', [])) == 0:
                     _params.pop('update_operations')
 
-            if _params['eventsource'] not in ['trigger', 'internal']:
+            if _params['eventsource'] not in [0, 3]:
                 _params.pop('esc_period')
 
         return _params
@@ -934,10 +934,10 @@ class Action(ZabbixBase):
         Returns:
             dict: dictionary of differences
         """
-        existing_action = convert_unicode_to_str(self._zapi_wrapper.check_if_action_exists(kwargs['name'])[0])
-        parameters = convert_unicode_to_str(self._construct_parameters(**kwargs))
+        existing_action = zabbix_utils.helper_convert_unicode_to_str(self._zapi_wrapper.check_if_action_exists(kwargs['name'])[0])
+        parameters = zabbix_utils.helper_convert_unicode_to_str(self._construct_parameters(**kwargs))
         change_parameters = {}
-        _diff = cleanup_data(compare_dictionaries(parameters, existing_action, change_parameters))
+        _diff = zabbix_utils.helper_cleanup_data(zabbix_utils.helper_compare_dictionaries(parameters, existing_action, change_parameters))
         return _diff
 
     def update_action(self, **kwargs):
@@ -1003,7 +1003,7 @@ class Operations(Zapi):
             str: constructed operation
         """
         try:
-            return to_numeric_value([
+            return zabbix_utils.helper_to_numeric_value([
                 "send_message",
                 "remote_command",
                 "add_host",
@@ -1082,21 +1082,21 @@ class Operations(Zapi):
         try:
             if LooseVersion(self._zbx_api_version) < LooseVersion('6.0'):
                 opcommand = {
-                    'type': to_numeric_value([
+                    'type': zabbix_utils.helper_to_numeric_value([
                         'custom_script',
                         'ipmi',
                         'ssh',
                         'telnet',
                         'global_script'], operation.get('command_type', 'custom_script')),
                     'command': operation.get('command'),
-                    'execute_on': to_numeric_value([
+                    'execute_on': zabbix_utils.helper_to_numeric_value([
                         'agent',
                         'server',
                         'proxy'], operation.get('execute_on', 'server')),
                     'scriptid': self._zapi_wrapper.get_script_by_script_name(
                         operation.get('script_name')
                     ).get('scriptid'),
-                    'authtype': to_numeric_value([
+                    'authtype': zabbix_utils.helper_to_numeric_value([
                         'password',
                         'public_key'
                     ], operation.get('ssh_auth_type')),
@@ -1185,7 +1185,7 @@ class Operations(Zapi):
             dict: constructed operation inventory
         """
         return {
-            'inventory_mode': to_numeric_value([
+            'inventory_mode': zabbix_utils.helper_to_numeric_value([
                 'manual',
                 'automatic'
             ], operation.get('inventory'))
@@ -1232,7 +1232,7 @@ class Operations(Zapi):
                 'esc_step_to': op.get('esc_step_to')
             }
             # Send Message type
-            if constructed_operation['operationtype'] == '0':
+            if constructed_operation['operationtype'] == 0:
                 constructed_operation['opmessage'] = self._construct_opmessage(op)
                 constructed_operation['opmessage_usr'] = self._construct_opmessage_usr(op)
                 constructed_operation['opmessage_grp'] = self._construct_opmessage_grp(op)
@@ -1241,7 +1241,7 @@ class Operations(Zapi):
                     constructed_operation['opconditions'] = self._construct_opconditions(op)
 
             # Send Command type
-            if constructed_operation['operationtype'] == '1':
+            if constructed_operation['operationtype'] == 1:
                 constructed_operation['opcommand'] = self._construct_opcommand(op)
                 constructed_operation['opcommand_hst'] = self._construct_opcommand_hst(op)
                 constructed_operation['opcommand_grp'] = self._construct_opcommand_grp(op)
@@ -1252,15 +1252,15 @@ class Operations(Zapi):
                     constructed_operation['opconditions'] = self._construct_opconditions(op)
 
             # Add to/Remove from host group
-            if constructed_operation['operationtype'] in ('4', '5'):
+            if constructed_operation['operationtype'] in (4, 5):
                 constructed_operation['opgroup'] = self._construct_opgroup(op)
 
             # Link/Unlink template
-            if constructed_operation['operationtype'] in ('6', '7'):
+            if constructed_operation['operationtype'] in (6, 7):
                 constructed_operation['optemplate'] = self._construct_optemplate(op)
 
             # Set inventory mode
-            if constructed_operation['operationtype'] == '10':
+            if constructed_operation['operationtype'] == 10:
                 constructed_operation['opinventory'] = self._construct_opinventory(op)
 
             # Remove escalation params when escalation period is None (null)
@@ -1270,7 +1270,7 @@ class Operations(Zapi):
 
             constructed_data.append(constructed_operation)
 
-        return cleanup_data(constructed_data)
+        return zabbix_utils.helper_cleanup_data(constructed_data)
 
 
 class RecoveryOperations(Operations):
@@ -1287,7 +1287,7 @@ class RecoveryOperations(Operations):
             str: constructed operation type
         """
         try:
-            return to_numeric_value([
+            return zabbix_utils.helper_to_numeric_value([
                 "send_message",
                 "remote_command",
                 None,
@@ -1321,27 +1321,27 @@ class RecoveryOperations(Operations):
             }
 
             # Send Message type
-            if constructed_operation['operationtype'] == '0':
+            if constructed_operation['operationtype'] == 0:
                 constructed_operation['opmessage'] = self._construct_opmessage(op)
                 constructed_operation['opmessage_usr'] = self._construct_opmessage_usr(op)
                 constructed_operation['opmessage_grp'] = self._construct_opmessage_grp(op)
                 if LooseVersion(self._zbx_api_version) >= LooseVersion('6.0'):
                     constructed_operation['opmessage'].pop('mediatypeid')
 
-            if constructed_operation['operationtype'] == '11':
+            if constructed_operation['operationtype'] == 11:
                 constructed_operation['opmessage'] = self._construct_opmessage(op)
                 if LooseVersion(self._zbx_api_version) >= LooseVersion('6.0'):
                     constructed_operation['opmessage'].pop('mediatypeid')
 
             # Send Command type
-            if constructed_operation['operationtype'] == '1':
+            if constructed_operation['operationtype'] == 1:
                 constructed_operation['opcommand'] = self._construct_opcommand(op)
                 constructed_operation['opcommand_hst'] = self._construct_opcommand_hst(op)
                 constructed_operation['opcommand_grp'] = self._construct_opcommand_grp(op)
 
             constructed_data.append(constructed_operation)
 
-        return cleanup_data(constructed_data)
+        return zabbix_utils.helper_cleanup_data(constructed_data)
 
 
 class AcknowledgeOperations(Operations):
@@ -1358,7 +1358,7 @@ class AcknowledgeOperations(Operations):
             str: constructed operation type
         """
         try:
-            return to_numeric_value([
+            return zabbix_utils.helper_to_numeric_value([
                 "send_message",
                 "remote_command",
                 None,
@@ -1393,27 +1393,27 @@ class AcknowledgeOperations(Operations):
             }
 
             # Send Message type
-            if constructed_operation['operationtype'] == '0':
+            if constructed_operation['operationtype'] == 0:
                 constructed_operation['opmessage'] = self._construct_opmessage(op)
                 constructed_operation['opmessage_usr'] = self._construct_opmessage_usr(op)
                 constructed_operation['opmessage_grp'] = self._construct_opmessage_grp(op)
                 if LooseVersion(self._zbx_api_version) >= LooseVersion('6.0'):
                     constructed_operation['opmessage'].pop('mediatypeid')
 
-            if constructed_operation['operationtype'] == '12':
+            if constructed_operation['operationtype'] == 12:
                 constructed_operation['opmessage'] = self._construct_opmessage(op)
                 if LooseVersion(self._zbx_api_version) >= LooseVersion('6.0'):
                     constructed_operation['opmessage'].pop('mediatypeid')
 
             # Send Command type
-            if constructed_operation['operationtype'] == '1':
+            if constructed_operation['operationtype'] == 1:
                 constructed_operation['opcommand'] = self._construct_opcommand(op)
                 constructed_operation['opcommand_hst'] = self._construct_opcommand_hst(op)
                 constructed_operation['opcommand_grp'] = self._construct_opcommand_grp(op)
 
             constructed_data.append(constructed_operation)
 
-        return cleanup_data(constructed_data)
+        return zabbix_utils.helper_cleanup_data(constructed_data)
 
 
 class Filter(Zapi):
@@ -1480,7 +1480,7 @@ class Filter(Zapi):
             self._module.fail_json(msg="'%s' is disabled for condition type since 5.4 version." % _condition['type'])
 
         try:
-            return to_numeric_value([
+            return zabbix_utils.helper_to_numeric_value([
                 "host_group",
                 "host",
                 "trigger",
@@ -1522,7 +1522,7 @@ class Filter(Zapi):
             str: constructed operator
         """
         try:
-            return to_numeric_value([
+            return zabbix_utils.helper_to_numeric_value([
                 "=",
                 "<>",
                 "like",
@@ -1551,18 +1551,18 @@ class Filter(Zapi):
         """
         try:
             # Host group
-            if conditiontype == '0':
+            if conditiontype == 0:
                 return self._zapi_wrapper.get_hostgroup_by_hostgroup_name(value)['groupid']
             # Host
-            if conditiontype == '1':
+            if conditiontype == 1:
                 return self._zapi_wrapper.get_host_by_host_name(value)['hostid']
             # Trigger
-            if conditiontype == '2':
+            if conditiontype == 2:
                 return self._zapi_wrapper.get_trigger_by_trigger_name(value)['triggerid']
             # Trigger name: return as is
             # Trigger severity
-            if conditiontype == '4':
-                return to_numeric_value([
+            if conditiontype == 4:
+                return zabbix_utils.helper_to_numeric_value([
                     "not classified",
                     "information",
                     "warning",
@@ -1572,16 +1572,16 @@ class Filter(Zapi):
                 )
 
             # Trigger value
-            if conditiontype == '5':
-                return to_numeric_value([
+            if conditiontype == 5:
+                return zabbix_utils.helper_to_numeric_value([
                     "ok",
                     "problem"], value or "ok"
                 )
             # Time period: return as is
             # Host IP: return as is
             # Discovered service type
-            if conditiontype == '8':
-                return to_numeric_value([
+            if conditiontype == 8:
+                return zabbix_utils.helper_to_numeric_value([
                     "SSH",
                     "LDAP",
                     "SMTP",
@@ -1601,36 +1601,36 @@ class Filter(Zapi):
                 )
             # Discovered service port: return as is
             # Discovery status
-            if conditiontype == '10':
-                return to_numeric_value([
+            if conditiontype == 10:
+                return zabbix_utils.helper_to_numeric_value([
                     "up",
                     "down",
                     "discovered",
                     "lost"], value
                 )
-            if conditiontype == '13':
+            if conditiontype == 13:
                 return self._zapi_wrapper.get_template_by_template_name(value)['templateid']
             if LooseVersion(self._zapi_wrapper._zbx_api_version) >= LooseVersion('6.0'):
                 # maintenance_status
-                if conditiontype == '16':
-                    return to_numeric_value([
+                if conditiontype == 16:
+                    return zabbix_utils.helper_to_numeric_value([
                         "Yes",
                         "No"], value
                     )
-            if conditiontype == '18':
+            if conditiontype == 18:
                 return self._zapi_wrapper.get_discovery_rule_by_discovery_rule_name(value)['druleid']
-            if conditiontype == '19':
+            if conditiontype == 19:
                 return self._zapi_wrapper.get_discovery_check_by_discovery_check_name(value)['dcheckid']
-            if conditiontype == '20':
+            if conditiontype == 20:
                 return self._zapi_wrapper.get_proxy_by_proxy_name(value)['proxyid']
-            if conditiontype == '21':
-                return to_numeric_value([
+            if conditiontype == 21:
+                return zabbix_utils.helper_to_numeric_value([
                     "pchldrfor0",
                     "host",
                     "service"], value
                 )
-            if conditiontype == '23':
-                return to_numeric_value([
+            if conditiontype == 23:
+                return zabbix_utils.helper_to_numeric_value([
                     "item in not supported state",
                     "item in normal state",
                     "LLD rule in not supported state",
@@ -1678,124 +1678,7 @@ class Filter(Zapi):
         )
         constructed_data['evaltype'] = _constructed_evaltype['evaltype']
         constructed_data['formula'] = _constructed_evaltype['formula']
-        return cleanup_data(constructed_data)
-
-
-def convert_unicode_to_str(data):
-    """Converts unicode objects to strings in dictionary
-    args:
-        data: unicode object
-
-    Returns:
-        dict: strings in dictionary
-    """
-    if isinstance(data, dict):
-        return dict(map(convert_unicode_to_str, data.items()))
-    elif isinstance(data, (list, tuple, set)):
-        return type(data)(map(convert_unicode_to_str, data))
-    elif data is None:
-        return data
-    else:
-        return str(data)
-
-
-def to_numeric_value(strs, value):
-    """Converts string values to integers
-    Args:
-        value: string value
-
-    Returns:
-        int: converted integer
-    """
-    if value is None:
-        return value
-
-    strs = [s.lower() if isinstance(s, str) else s for s in strs]
-    value = value.lower()
-    tmp_dict = dict(zip(strs, list(range(len(strs)))))
-    return str(tmp_dict[value])
-
-
-def compare_lists(l1, l2, diff_dict):
-    """
-    Compares l1 and l2 lists and adds the items that are different
-    to the diff_dict dictionary.
-    Used in recursion with compare_dictionaries() function.
-    Args:
-        l1: first list to compare
-        l2: second list to compare
-        diff_dict: dictionary to store the difference
-
-    Returns:
-        dict: items that are different
-    """
-    if len(l1) != len(l2):
-        diff_dict.append(l1)
-        return diff_dict
-    for i, item in enumerate(l1):
-        if isinstance(item, dict):
-            diff_dict.insert(i, {})
-            diff_dict[i] = compare_dictionaries(item, l2[i], diff_dict[i])
-        else:
-            if item != l2[i]:
-                diff_dict.append(item)
-    while {} in diff_dict:
-        diff_dict.remove({})
-    return diff_dict
-
-
-def compare_dictionaries(d1, d2, diff_dict):
-    """
-    Compares d1 and d2 dictionaries and adds the items that are different
-    to the diff_dict dictionary.
-    Used in recursion with compare_lists() function.
-    Args:
-        d1: first dictionary to compare
-        d2: second dictionary to compare
-        diff_dict: dictionary to store the difference
-
-    Returns:
-        dict: items that are different
-    """
-    for k, v in d1.items():
-        if k not in d2:
-            diff_dict[k] = v
-            continue
-        if isinstance(v, dict):
-            diff_dict[k] = {}
-            compare_dictionaries(v, d2[k], diff_dict[k])
-            if diff_dict[k] == {}:
-                del diff_dict[k]
-            else:
-                diff_dict[k] = v
-        elif isinstance(v, list):
-            diff_dict[k] = []
-            compare_lists(v, d2[k], diff_dict[k])
-            if diff_dict[k] == []:
-                del diff_dict[k]
-            else:
-                diff_dict[k] = v
-        else:
-            if v != d2[k]:
-                diff_dict[k] = v
-    return diff_dict
-
-
-def cleanup_data(obj):
-    """Removes the None values from the object and returns the object
-    Args:
-        obj: object to cleanup
-
-    Returns:
-       object: cleaned object
-    """
-    if isinstance(obj, (list, tuple, set)):
-        return type(obj)(cleanup_data(x) for x in obj if x is not None)
-    elif isinstance(obj, dict):
-        return type(obj)((cleanup_data(k), cleanup_data(v))
-                         for k, v in obj.items() if k is not None and v is not None)
-    else:
-        return obj
+        return zabbix_utils.helper_cleanup_data(constructed_data)
 
 
 def main():
