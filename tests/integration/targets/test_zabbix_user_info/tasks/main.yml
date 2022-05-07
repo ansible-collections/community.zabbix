@@ -13,8 +13,8 @@
         usrgrps:
           - Guests
           - Disabled
-        passwd: password
-        lang: en_GB
+        passwd: G$jd_79!jw
+        lang: en_US
         theme: blue-theme
         autologin: false
         autologout: '0'
@@ -88,8 +88,8 @@
         usrgrps:
           - Guests
           - Disabled
-        passwd: password
-        lang: en_GB
+        passwd: G$jd_79!jw
+        lang: en_US
         theme: blue-theme
         autologin: false
         autologout: '0'
@@ -180,7 +180,7 @@
     usrgrps:
       - Guests
       - Disabled
-    passwd: password
+    passwd: G$jd_79!jw
     state: present
   register: create_zabbix_user_result2
 

@@ -498,6 +498,10 @@ class MediaTypeModule(ZabbixBase):
                 username=self._module.params['username'],
                 passwd=self._module.params['password']
             ))
+            if LooseVersion(self._zbx_api_version) >= LooseVersion('6.0'):
+                if parameters['smtp_authentication'] == '0':
+                    parameters.pop('username')
+                    parameters.pop('passwd')
             return parameters
 
         elif self._module.params['type'] == 'script':
