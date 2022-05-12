@@ -298,7 +298,6 @@ class Script(ZabbixBase):
                                                        confirmation, script_timeout, parameters, description)
         live_config = self._zapi.script.get({'filter': {'name': name}})[0]
 
-        changed = False
         change_parameters = {}
         difference = zabbix_utils.helper_cleanup_data(zabbix_utils.helper_compare_dictionaries(generated_config, live_config, change_parameters))
 
@@ -337,9 +336,9 @@ def main():
             required=False,
             choices=['password', 'public_key']),
         username=dict(type='str', required=False),
-        password=dict(type='str', required=False),
+        password=dict(type='str', required=False, no_log=True),
         publickey=dict(type='str', required=False),
-        privatekey=dict(type='str', required=False),
+        privatekey=dict(type='str', required=False, no_log=True),
         port=dict(type='str', required=False),
         host_group=dict(type='str', required=False, default='all'),
         user_group=dict(type='str', required=False, default='all'),
