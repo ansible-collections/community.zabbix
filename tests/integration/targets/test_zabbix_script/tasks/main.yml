@@ -1,0 +1,532 @@
+---
+- name: test - do not run tests for Zabbix < 6.0
+  meta: end_play
+  when: zabbix_version is version('6.0', '<')
+
+- name: test - Test action operation script
+  module_defaults:
+    community.zabbix.zabbix_script:
+      server_url: "{{ zabbix_api_server_url }}"
+      login_user: "{{ zabbix_api_login_user }}"
+      login_password: "{{ zabbix_api_login_pass }}"
+      name: Test action operation script
+      scope: action_operation
+      script_type: webhook
+      command: 'return 0'
+      description: "Test action operation script"
+      state: present
+
+  block:
+  - name: test - Create new action operation script to execute webhook check mode
+    zabbix_script:
+    check_mode: true
+    register: create_action_check_mode_result
+
+  - assert:
+      that:
+        - create_action_check_mode_result.changed is sameas true
+
+  - name: test - Create new action operation script to execute webhook 
+    zabbix_script:
+    register: create_action_result
+
+  - assert:
+      that:
+        - create_action_result.changed is sameas true
+
+  - name: test - Create new action operation script to execute webhook again 
+    zabbix_script:
+    register: create_action_again_result
+
+  - assert:
+      that:
+        - create_action_again_result.changed is sameas false
+
+  - name: test - Update action operation script to execute webhook with host group
+    zabbix_script:
+      host_group: 'Discovered hosts'
+    register: update_action_host_group_result
+
+  - assert:
+      that:
+        - update_action_host_group_result.changed is sameas true
+
+  - name: test - Update action operation script to execute webhook with host group again
+    zabbix_script:
+      host_group: 'Discovered hosts'
+    register: update_action_host_group_again_result
+
+  - assert:
+      that:
+        - update_action_host_group_again_result.changed is sameas false
+
+  - name: test - Update action operation script to execute webhook with parameters
+    zabbix_script:
+      host_group: 'Discovered hosts'
+      parameters:
+        - name: param_name1
+    register: update_action_param_result
+
+  - assert:
+      that:
+        - update_action_param_result.changed is sameas true
+
+  - name: test - Update action operation script to execute webhook with parameters again
+    zabbix_script:
+      host_group: 'Discovered hosts'
+      parameters:
+        - name: param_name1
+    register: update_action_param_again_result
+
+  - assert:
+      that:
+        - update_action_param_again_result.changed is sameas false
+
+  - name: test - Update action operation script to execute webhook with parameters and value
+    zabbix_script:
+      host_group: 'Discovered hosts'
+      parameters:
+        - name: param_name1
+        - name: param_name2
+          value: value2
+    register: update_action_param_value_result
+
+  - assert:
+      that:
+        - update_action_param_value_result.changed is sameas true
+
+  - name: test - Update action operation script to execute webhook with parameters and value again
+    zabbix_script:
+      host_group: 'Discovered hosts'
+      parameters:
+        - name: param_name1
+        - name: param_name2
+          value: value2
+    register: update_action_param_value_again_result
+
+  - assert:
+      that:
+        - update_action_param_value_again_result.changed is sameas false
+
+  - name: test - Update action operation script remove host group
+    zabbix_script:
+      parameters:
+        - name: param_name1
+        - name: param_name2
+          value: value2
+    register: update_action_no_host_group_result
+
+  - assert:
+      that:
+        - update_action_no_host_group_result.changed is sameas true
+
+  - name: test - Update action operation script remove host group again
+    zabbix_script:
+      parameters:
+        - name: param_name1
+        - name: param_name2
+          value: value2
+    register: update_action_no_host_group_again_result
+
+  - assert:
+      that:
+        - update_action_no_host_group_again_result.changed is sameas false
+
+  - name: test - Update action operation script to type Script
+    zabbix_script:
+      script_type: script
+      execute_on: zabbix_agent
+      command: echo 1
+    register: update_action_script_result
+
+  - assert:
+      that:
+        - update_action_script_result.changed is sameas true
+
+  - name: test - Update action operation script to type Script again
+    zabbix_script:
+      script_type: script
+      execute_on: zabbix_agent
+      command: echo 1
+    register: update_action_script_again_result
+
+  - assert:
+      that:
+        - update_action_script_again_result.changed is sameas false
+
+  - name: test - Update action operation script to execute on server
+    zabbix_script:
+      script_type: script
+      execute_on: zabbix_server
+      command: echo 1
+    register: update_action_script_server_result
+
+  - assert:
+      that:
+        - update_action_script_server_result.changed is sameas true
+
+  - name: test - Update action operation script to execute on server again
+    zabbix_script:
+      script_type: script
+      execute_on: zabbix_server
+      command: echo 1
+    register: update_action_script_server_again_result
+
+  - assert:
+      that:
+        - update_action_script_server_again_result.changed is sameas false
+
+  - name: test - Update action operation script to execute on server or proxy
+    zabbix_script:
+      script_type: script
+      execute_on: zabbix_server_proxy
+      command: echo 1
+    register: update_action_script_server_proxy_result
+
+  - assert:
+      that:
+        - update_action_script_server_proxy_result.changed is sameas true
+
+  - name: test - Update action operation script to execute on server or proxy again
+    zabbix_script:
+      script_type: script
+      execute_on: zabbix_server_proxy
+      command: echo 1
+    register: update_action_script_server_proxy_again_result
+
+  - assert:
+      that:
+        - update_action_script_server_proxy_again_result.changed is sameas false
+
+  - name: test - Update action operation script to type SSH
+    zabbix_script:
+      script_type: ssh
+      authtype: password
+      username: bla
+      password: blabla
+      command: echo 2
+    register: update_action_script_ssh_result
+
+  - assert:
+      that:
+        - update_action_script_ssh_result.changed is sameas true
+
+  - name: test - Update action operation script to type SSH again
+    zabbix_script:
+      script_type: ssh
+      authtype: password
+      username: bla
+      password: blabla
+      command: echo 2
+    register: update_action_script_ssh_again_result
+
+  - assert:
+      that:
+        - update_action_script_ssh_again_result.changed is sameas false
+
+  - name: test - Update action operation script type SSH key auth
+    zabbix_script:
+      script_type: ssh
+      authtype: public_key
+      username: bla
+      publickey: blabla
+      privatekey: blablabla
+      command: echo 3
+    register: update_action_script_ssh_authkey_result
+
+  - assert:
+      that:
+        - update_action_script_ssh_authkey_result.changed is sameas true
+
+  - name: test - Update action operation script type SSH key auth again
+    zabbix_script:
+      script_type: ssh
+      authtype: public_key
+      username: bla
+      publickey: blabla
+      privatekey: blablabla
+      command: echo 3
+    register: update_action_script_ssh_authkey_again_result
+
+  - assert:
+      that:
+        - update_action_script_ssh_authkey_again_result.changed is sameas false
+
+  - name: test - Update action operation script type SSH add port
+    zabbix_script:
+      script_type: ssh
+      authtype: public_key
+      username: bla
+      publickey: blabla
+      privatekey: blablabla
+      command: echo 3
+      port: 222
+    register: update_action_script_ssh_port_result
+
+  - assert:
+      that:
+        - update_action_script_ssh_port_result.changed is sameas true
+
+  - name: test - Update action operation script type SSH add port again
+    zabbix_script:
+      script_type: ssh
+      authtype: public_key
+      username: bla
+      publickey: blabla
+      privatekey: blablabla
+      command: echo 3
+      port: 222
+    register: update_action_script_ssh_port_again_result
+
+  - assert:
+      that:
+        - update_action_script_ssh_port_again_result.changed is sameas false
+
+  - name: test - Update action operation script to type Telnet
+    zabbix_script:
+      script_type: telnet
+      username: bla1
+      password: blabla1
+      command: echo 4
+      port: 223
+    register: update_action_script_telnet_result
+
+  - assert:
+      that:
+        - update_action_script_telnet_result.changed is sameas true
+
+  - name: test - Update action operation script to type Telnet again
+    zabbix_script:
+      script_type: telnet
+      username: bla1
+      password: blabla1
+      command: echo 4
+      port: 223
+    register: update_action_script_telnet_again_result
+
+  - assert:
+      that:
+        - update_action_script_telnet_again_result.changed is sameas false
+
+  - name: test - Update action operation script to type IPMI
+    zabbix_script:
+      script_type: ipmi
+      command: echo 5
+    register: update_action_script_ipmi_result
+
+  - assert:
+      that:
+        - update_action_script_ipmi_result.changed is sameas true
+
+  - name: test - Update action operation script to type IPMI again
+    zabbix_script:
+      script_type: ipmi
+      command: echo 5
+    register: update_action_script_ipmi_again_result
+
+  - assert:
+      that:
+        - update_action_script_ipmi_again_result.changed is sameas false
+
+  - name: test - Delete action operation script
+    zabbix_script:
+      state: absent
+    register: delete_action_result
+
+  - assert:
+      that:
+        - delete_action_result.changed is sameas true
+
+  - name: test - Delete action operation script again
+    zabbix_script:
+      state: absent
+    register: delete_action_again_result
+
+  - assert:
+      that:
+        - delete_action_again_result.changed is sameas false
+
+- name: test - Test manual host action script
+  module_defaults:
+    community.zabbix.zabbix_script:
+      server_url: "{{ zabbix_api_server_url }}"
+      login_user: "{{ zabbix_api_login_user }}"
+      login_password: "{{ zabbix_api_login_pass }}"
+      name: Test manual host action script
+      scope: manual_host_action
+      script_type: webhook
+      command: 'return 0'
+      description: "Test manual host action script"
+      state: present
+
+  block:
+  - name: test - Create new manual host action script to execute webhook check mode
+    zabbix_script:
+      parameters:
+        - name: param_name1
+        - name: param_name2
+          value: value2
+    check_mode: true
+    register: create_action_check_mode_result
+
+  - assert:
+      that:
+        - create_action_check_mode_result.changed is sameas true
+
+  - name: test - Create new manual host action script to execute webhook
+    zabbix_script:
+      parameters:
+        - name: param_name1
+        - name: param_name2
+          value: value2
+    register: create_action_result
+
+  - assert:
+      that:
+        - create_action_result.changed is sameas true
+
+  - name: test - Create new manual host action script to execute webhook again
+    zabbix_script:
+      parameters:
+        - name: param_name1
+        - name: param_name2
+          value: value2
+    register: create_action_again_result
+
+  - assert:
+      that:
+        - create_action_again_result.changed is sameas false
+
+  - name: test - Update manual host action script with menu path
+    zabbix_script:
+      menu_path: menu/submenu
+    register: update_action_result
+
+  - assert:
+      that:
+        - update_action_result.changed is sameas true
+
+  - name: test - Update manual host action script with menu path again
+    zabbix_script:
+      menu_path: menu/submenu
+    register: update_action_again_result
+
+  - assert:
+      that:
+        - update_action_again_result.changed is sameas false
+
+  - name: test - Update manual host action script with user group
+    zabbix_script:
+      menu_path: menu/submenu
+      user_group: Guests
+    register: update_action_usrgrp_result
+
+  - assert:
+      that:
+        - update_action_usrgrp_result.changed is sameas true
+
+  - name: test - Update manual host action script with user group again
+    zabbix_script:
+      menu_path: menu/submenu
+      user_group: Guests
+    register: update_action_usrgrp_again_result
+
+  - assert:
+      that:
+        - update_action_usrgrp_again_result.changed is sameas false
+
+  - name: test - Update manual host action script with Write permissions
+    zabbix_script:
+      host_access: write
+    register: update_action_host_perms_result
+
+  - assert:
+      that:
+        - update_action_host_perms_result.changed is sameas true
+
+  - name: test - Update manual host action script with Write permissions again
+    zabbix_script:
+      host_access: write
+    register: update_action_host_perms_again_result
+
+  - assert:
+      that:
+        - update_action_host_perms_again_result.changed is sameas false
+
+  - name: test - Update manual host action script with confirmation
+    zabbix_script:
+      confirmation: 'Are you sure?' 
+    register: update_action_host_confirm_result
+
+  - assert:
+      that:
+        - update_action_host_confirm_result.changed is sameas true
+
+  - name: test - Update manual host action script with confirmation again
+    zabbix_script:
+      confirmation: 'Are you sure?' 
+    register: update_action_host_confirm_again_result
+
+  - assert:
+      that:
+        - update_action_host_confirm_again_result.changed is sameas false
+
+  - name: test - Delete manual host action script
+    zabbix_script:
+      state: absent
+
+- name: test - Test manual event action script
+  module_defaults:
+    community.zabbix.zabbix_script:
+      server_url: "{{ zabbix_api_server_url }}"
+      login_user: "{{ zabbix_api_login_user }}"
+      login_password: "{{ zabbix_api_login_pass }}"
+      name: Test manual event action script
+      scope: manual_event_action
+      script_type: webhook
+      command: 'return 0'
+      description: "Test manual event action script"
+      state: present
+
+  block:
+  - name: test - Create new manual event action script to execute webhook check mode
+    zabbix_script:
+      parameters:
+        - name: param_name1
+        - name: param_name2
+          value: value2
+    check_mode: true
+    register: create_action_check_mode_result
+
+  - assert:
+      that:
+        - create_action_check_mode_result.changed is sameas true
+
+  - name: test - Create new manual event action script to execute webhook
+    zabbix_script:
+      parameters:
+        - name: param_name1
+        - name: param_name2
+          value: value2
+    register: create_action_result
+
+  - assert:
+      that:
+        - create_action_result.changed is sameas true
+
+  - name: test - Create new manual event action script to execute webhook again
+    zabbix_script:
+      parameters:
+        - name: param_name1
+        - name: param_name2
+          value: value2
+    diff: true
+    register: create_action_again_result
+
+  - assert:
+      that:
+        - create_action_again_result.changed is sameas false
+
+  - name: test - Delete manual host action script
+    zabbix_script:
+      state: absent
