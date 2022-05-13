@@ -10,7 +10,7 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
 module: zabbix_script
-short_description: Gather information about Zabbix proxy
+short_description: Create/update/delete Zabbix scripts
 version_added: 1.7.0
 author:
     - Evgeny Yurchenko (@BGmot)
