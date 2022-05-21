@@ -286,8 +286,8 @@ class Proxy(ZabbixBase):
                     else:
                         parameters['interface']['type'] = '0'
                         parameters['interface']['main'] = '1'
-                        if ('interface' in self.existing_data and
-                                isinstance(self.existing_data['interface'], dict)):
+                        if ('interface' in self.existing_data
+                                and isinstance(self.existing_data['interface'], dict)):
                             new_interface = self.existing_data['interface'].copy()
                             new_interface.update(parameters['interface'])
                             parameters['interface'] = new_interface
