@@ -563,6 +563,70 @@
   - assert:
       that: zbxaction_delete.changed is sameas True
 
+  - name: test - create new action with escalation steps 1-1
+    zabbix_action:
+      operations:
+        - type: send_message
+          send_to_users:
+            - Admin
+          media_type: ExampleMediaTypeForActionModule
+          esc_step_from: 1
+          esc_step_to: 1
+    register: zbxaction_esc11
+
+  - assert:
+      that: zbxaction_esc11.changed is sameas True
+
+  - name: test - create new action with escalation steps 1-1 (again)
+    zabbix_action:
+      operations:
+        - type: send_message
+          send_to_users:
+            - Admin
+          media_type: ExampleMediaTypeForActionModule
+          esc_step_from: 1
+          esc_step_to: 1
+    register: zbxaction_esc11_again
+
+  - assert:
+      that: zbxaction_esc11_again.changed is sameas False
+
+
+  - name: test - update action with escalation steps 2-2
+    zabbix_action:
+      operations:
+        - type: send_message
+          send_to_users:
+            - Admin
+          media_type: ExampleMediaTypeForActionModule
+          esc_step_from: 2
+          esc_step_to: 2
+    register: zbxaction_esc22
+
+  - assert:
+      that: zbxaction_esc22.changed is sameas True
+
+  - name: test - create new action with escalation steps 2-2 (again)
+    zabbix_action:
+      operations:
+        - type: send_message
+          send_to_users:
+            - Admin
+          media_type: ExampleMediaTypeForActionModule
+          esc_step_from: 2
+          esc_step_to: 2
+    register: zbxaction_esc22_again
+
+  - assert:
+      that: zbxaction_esc11_again.changed is sameas False
+
+  - name: test - delete action
+    zabbix_action:
+      state: absent
+    register: zbxaction_delete
+
+  - assert:
+      that: zbxaction_delete.changed is sameas True
 - name: test - trigger actions with remote_script operations with < Zabbix 6.0
   when: zabbix_version is version('6.0', '<')
   module_defaults:

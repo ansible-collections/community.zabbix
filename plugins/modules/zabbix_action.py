@@ -1263,8 +1263,12 @@ class Operations(Zapi):
             if constructed_operation['operationtype'] == 10:
                 constructed_operation['opinventory'] = self._construct_opinventory(op)
 
-            # Remove escalation params when escalation period is None (null)
-            if isinstance(constructed_operation.get('esc_period'), type(None)):
+            # Remove escalation params when for event sources where they are not applicable
+            if event_source in ['trigger', 'internal']:
+                if isinstance(constructed_operation.get('esc_period'), type(None)):
+                    constructed_operation['esc_period'] = 0
+            else:
+                constructed_operation.pop('esc_period')
                 constructed_operation.pop('esc_step_from')
                 constructed_operation.pop('esc_step_to')
 
