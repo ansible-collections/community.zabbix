@@ -1,0 +1,2 @@
+bugfixes:
+- zabbix_proxy (role) - fixed accidental regression of TLS psk file being generated for passive agent (#528) caused in (#663) (https://github.com/ansible-collections/community.zabbix/issues/680)
