@@ -5,6 +5,30 @@ community.zabbix Release Notes
 .. contents:: Topics
 
 
+v1.7.0
+======
+
+Minor Changes
+-------------
+
+- helpers.helper_compare_lists() changed logic to not consider the order of elements in lists. (https://github.com/ansible-collections/community.zabbix/pull/683)
+- zabbix_action, zabbix_maintenance, zabbix_mediatype, zabbix_proxy, zabbix_service - updated to work with Zabbix 6.0. (https://github.com/ansible-collections/community.zabbix/pull/683)
+- zabbix_script module added (https://github.com/ansible-collections/community.zabbix/issues/634)
+
+Bugfixes
+--------
+
+- Include ``PSF-license.txt`` file for ``plugins/module_utils/_version.py``.
+- zabbix_action - will no longer wipe `esc_step_to` and `esc_step_from` (https://github.com/ansible-collections/community.zabbix/issues/692)
+- zabbix_agent - added support for zabbix-agent on Ubuntu 22.04 (https://github.com/ansible-collections/community.zabbix/pull/681)
+- zabbix_agent - now properly creates webroot for issuing LE certificates (https://github.com/ansible-collections/community.zabbix/pull/677, https://github.com/ansible-collections/community.zabbix/pull/682)
+- zabbix_proxy (module) - passive proxy should be now correctly created in Zabbix 6.0 (https://github.com/ansible-collections/community.zabbix/pull/697)
+
+New Modules
+-----------
+
+- community.zabbix.zabbix_script - Create/update/delete Zabbix scripts
+
 v1.6.0
 ======
 
@@ -22,7 +46,9 @@ Minor Changes
 - test_zabbix_screen - disable testing for screen in 5.4 (deprecated)
 - zabbix_action - additional fixes to make module work with Zabbix 6.0 (https://github.com/ansible-collections/community.zabbix/pull/664)
 - zabbix_action - module ported to work with Zabbix 6.0 (https://github.com/ansible-collections/community.zabbix/pull/648, https://github.com/ansible-collections/community.zabbix/pull/653)
+- zabbix_action - should now correctly actions with maintenance_status conditions (https://github.com/ansible-collections/community.zabbix/pull/667)
 - zabbix_agent - Check if 'firewalld' exist and is running when handler is executed.
+- zabbix_agent - Fixed use of bare variables in conditions (https://github.com/ansible-collections/community.zabbix/pull/663)
 - zabbix_agent - Install the correct Python libxml2 package on SLES15
 - zabbix_agent - Move inclusion of the apache.yml tasks to later stage during execution of role.
 - zabbix_agent - Prepare for Zabbix 6.0.
@@ -30,6 +56,7 @@ Minor Changes
 - zabbix_agent - There was no way to configure a specific type for the macro.
 - zabbix_agent - Use multiple aliases in the configuration file with ``zabbix_agent_zabbix_alias`` or ``zabbix_agent2_zabbix_alias``.
 - zabbix_maintenance - added new module parameter `tags`, which allows configuring Problem Tags on maintenances.
+- zabbix_maintenance - fixed to work with Zabbix 6.0+ and Python 3.9+ (https://github.com/ansible-collections/community.zabbix/pull/665)
 - zabbix_proxy - Prepare for Zabbix 6.0.
 - zabbix_proxy - Specify a minor version with zabbix_proxy_version_minor for RH systems.
 - zabbix_proxy - Support for Sangoma and treat it like a RHEL system.

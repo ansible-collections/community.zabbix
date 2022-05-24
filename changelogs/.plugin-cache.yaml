@@ -112,6 +112,11 @@ plugins:
       name: zabbix_screen
       namespace: ''
       version_added: null
+    zabbix_script:
+      description: Create/update/delete Zabbix scripts
+      name: zabbix_script
+      namespace: ''
+      version_added: 1.7.0
     zabbix_service:
       description: Create/update/delete Zabbix service
       name: zabbix_service
@@ -151,4 +156,4 @@ plugins:
   shell: {}
   strategy: {}
   vars: {}
-version: 1.6.0
+version: 1.7.0
