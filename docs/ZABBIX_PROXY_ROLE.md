@@ -64,7 +64,7 @@ ansible-galaxy collection install community.mysql
 When you are a PostgreSQL user and using Ansible 2.10 or newer, then there is a dependency on the collection named `community.postgresql`. This collections are needed as the `postgresql_` modules are now part of collections and not standard in Ansible anymmore. Installing the collection:
 
 ```sh
-ansible-galaxy collection install community.mysql
+ansible-galaxy collection install community.postgresql
 ```
 
 ## Zabbix Versions
