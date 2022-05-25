@@ -1,3 +1,0 @@
----
-minor_changes:
-  - zabbix_script module added (https://github.com/ansible-collections/community.zabbix/issues/634)
