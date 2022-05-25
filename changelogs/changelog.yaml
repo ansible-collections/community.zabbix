@@ -659,6 +659,8 @@ releases:
         https://github.com/ansible-collections/community.zabbix/pull/682)
       - zabbix_proxy (module) - passive proxy should be now correctly created in Zabbix
         6.0 (https://github.com/ansible-collections/community.zabbix/pull/697)
+      - zabbix_proxy (role) - fixed accidental regression of TLS psk file being generated
+        for passive agent (#528) caused in (#663) (https://github.com/ansible-collections/community.zabbix/issues/680)
       minor_changes:
       - helpers.helper_compare_lists() changed logic to not consider the order of
         elements in lists. (https://github.com/ansible-collections/community.zabbix/pull/683)
@@ -669,6 +671,7 @@ releases:
     - 1.7.0-missing-fragments.yml
     - 683-zbx60.yml
     - 685-zabbix-script.yml
+    - 699-proxy-role-regression.yml
     - psf-license.yml
     modules:
     - description: Create/update/delete Zabbix scripts
