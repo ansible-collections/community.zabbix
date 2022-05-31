@@ -158,7 +158,6 @@
   register: zabbix_agent_package_installed
   until: zabbix_agent_package_installed is succeeded
   become: yes
-  check_mode: no
   tags:
     - zabbix-agent
     - init
