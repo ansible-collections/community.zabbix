@@ -1,14 +1,17 @@
+---
 name: "community.zabbix.zabbix_javagateway"
 on:
   push:
     paths:
       - 'roles/zabbix_javagateway/**'
       - 'molecule/zabbix_javagateway/**'
+      - 'molecule/requirements.txt'
       - '.github/workflows/javagateway.yml'
   pull_request:
     paths:
       - 'roles/zabbix_javagateway/**'
       - 'molecule/zabbix_javagateway/**'
+      - 'molecule/requirements.txt'
       - '.github/workflows/javagateway.yml'
 jobs:
   molecule:
@@ -22,7 +25,7 @@ jobs:
           - container: ubuntu
             image: geerlingguy/docker-ubuntu2004-ansible
           - container: debian
-            image: geerlingguy/docker-debian9-ansible
+            image: geerlingguy/docker-debian10-ansible
         collection_role:
           - zabbix_javagateway
     steps:
@@ -42,7 +45,7 @@ jobs:
       - name: Build the collection
         run: |
           collection_file=$( basename $(ansible-galaxy collection build -f | awk -F" " '{print $NF}'))
-          echo "::set-env name=COLLECTION_FILE::$collection_file"
+          echo "COLLECTION_FILE=$collection_file" >> $GITHUB_ENV
 
       - name: Install the collection
         run: ansible-galaxy collection install $COLLECTION_FILE

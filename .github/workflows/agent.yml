@@ -1,14 +1,17 @@
+---
 name: "community.zabbix.zabbix_agent"
 on:
   push:
     paths:
       - 'roles/zabbix_agent/**'
       - 'molecule/zabbix_agent/**'
+      - 'molecule/requirements.txt'
       - '.github/workflows/agent.yml'
   pull_request:
     paths:
       - 'roles/zabbix_agent/**'
       - 'molecule/zabbix_agent/**'
+      - 'molecule/requirements.txt'
       - '.github/workflows/agent.yml'
 jobs:
   molecule:
@@ -17,33 +20,33 @@ jobs:
       fail-fast: false
       matrix:
         molecule_distro:
-          - container: centos
-            image: geerlingguy/docker-centos8-ansible:latest
-            group: agent
-          - container: centos2
-            image: geerlingguy/docker-centos8-ansible:latest
-            group: agent2
-          - container: centos
+          - container: centos8
+            image: geerlingguy/docker-rockylinux8-ansible:latest
+          - container: centos7
             image: geerlingguy/docker-centos7-ansible:latest
-            group: agent
-          - container: ubuntu
+          - container: fedora32
+            image: geerlingguy/docker-fedora32-ansible:latest
+          - container: ubuntu2004
             image: geerlingguy/docker-ubuntu2004-ansible
-            group: agent
-          - container: pgsql-ubuntu
+          - container: pgsql-ubuntu1804
             image: geerlingguy/docker-ubuntu1804-ansible
-            group: agent
-          - container: debian
+          - container: debian10
+            image: geerlingguy/docker-debian10-ansible
+          - container: debian9
             image: geerlingguy/docker-debian9-ansible
-            group: agent
-          - container: debian
-            image: geerlingguy/docker-debian8-ansible
-            group: agent
-          - container: mint
-            image: wdijkerman/mint19.3-amd64
-            command: /sbin/init
-            group: agent
-        collection_role:
-          - zabbix_agent
+        scenario_name:
+          - default
+          - autopsk
+          - agent2
+          - agent2autopsk
+        exclude: # zabbix-agent2 is not supported on debian8
+          - molecule_distro:
+              container: debian8
+            scenario_name: agent2
+          - molecule_distro:
+              container: debian8
+            scenario_name: agent2autopsk
+
     steps:
       - name: Check out code
         uses: actions/checkout@v1
@@ -61,15 +64,15 @@ jobs:
       - name: Build the collection
         run: |
           collection_file=$( basename $(ansible-galaxy collection build -f | awk -F" " '{print $NF}'))
-          echo "::set-env name=COLLECTION_FILE::$collection_file"
+          echo "COLLECTION_FILE=$collection_file" >> $GITHUB_ENV
 
       - name: Install the collection
         run: ansible-galaxy collection install $COLLECTION_FILE
 
       - name: Run role tests
+        working-directory: molecule/zabbix_agent_tests
         run: >-
           MY_MOLECULE_CONTAINER=${{ matrix.molecule_distro.container }}
           MY_MOLECULE_IMAGE=${{ matrix.molecule_distro.image }}
-          MY_MOLECULE_GROUP=${{ matrix.molecule_distro.group }}
           MY_MOLECULE_DOCKER_COMMAND=${{ matrix.molecule_distro.command }}
-          molecule test -s ${{ matrix.collection_role }}
+          molecule -c common/molecule.yml test -s ${{ matrix.scenario_name }}

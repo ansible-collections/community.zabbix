@@ -1,0 +1,108 @@
+---
+- name: test - do not run tests with < Zabbix 4.0
+  meta: end_play
+  when: zabbix_version is version('4.0', '<')
+
+- when: zabbix_version is version('5.2', '<')
+  name: Unsupport Zabbix version (<5.2)
+  block:
+    - name: test fail to update housekeeping
+      community.zabbix.zabbix_housekeeping:
+        server_url: "{{ zabbix_api_server_url }}"
+        login_user: "{{ zabbix_api_login_user }}"
+        login_password: "{{ zabbix_api_login_pass }}"
+        hk_events_mode: true
+      register: zbxhk_update_result
+      ignore_errors: true
+
+    - assert:
+        that: zbxhk_update_result.failed is sameas True
+
+- when: zabbix_version is version('5.2', '>=')
+  name: Support Zabbix version (>=5.2)
+  block:
+    - name: test update housekeeping parameters.
+      community.zabbix.zabbix_housekeeping:
+        server_url: "{{ zabbix_api_server_url }}"
+        login_user: "{{ zabbix_api_login_user }}"
+        login_password: "{{ zabbix_api_login_pass }}"
+        hk_events_mode: yes
+        hk_events_trigger: 365d
+        hk_events_service: 1w
+        hk_events_internal: 86400s
+        hk_events_discovery: 48h
+        hk_events_autoreg: 1440m
+        hk_services_mode: yes
+        hk_services: 365d
+        hk_audit_mode: yes
+        hk_audit: 365d
+        hk_sessions_mode: yes
+        hk_sessions: 365d
+        hk_history_mode: yes
+        hk_history_global: yes
+        hk_history: 365d
+        hk_trends_mode: yes
+        hk_trends_global: yes
+        hk_trends: 365d
+        compression_status: off
+        compress_older: 7d
+      register: zbxhk_update_result
+
+    - assert:
+        that: zbxhk_update_result.changed is sameas True
+
+    - name: test update housekeeping parameters (again).
+      community.zabbix.zabbix_housekeeping:
+        server_url: "{{ zabbix_api_server_url }}"
+        login_user: "{{ zabbix_api_login_user }}"
+        login_password: "{{ zabbix_api_login_pass }}"
+        hk_events_mode: yes
+        hk_events_trigger: 365d
+        hk_events_service: 1w
+        hk_events_internal: 86400s
+        hk_events_discovery: 48h
+        hk_events_autoreg: 1440m
+        hk_services_mode: yes
+        hk_services: 365d
+        hk_audit_mode: yes
+        hk_audit: 365d
+        hk_sessions_mode: yes
+        hk_sessions: 365d
+        hk_history_mode: yes
+        hk_history_global: yes
+        hk_history: 365d
+        hk_trends_mode: yes
+        hk_trends_global: yes
+        hk_trends: 365d
+        compression_status: off
+        compress_older: 7d
+      register: zbxhk_update_result
+
+    - assert:
+        that: zbxhk_update_result.changed is sameas False
+
+    - name: initialize housekeeping setting.
+      community.zabbix.zabbix_housekeeping:
+        server_url: "{{ zabbix_api_server_url }}"
+        login_user: "{{ zabbix_api_login_user }}"
+        login_password: "{{ zabbix_api_login_pass }}"
+        hk_events_mode: yes
+        hk_events_trigger: 365d
+        hk_events_service: 1d
+        hk_events_internal: 1d
+        hk_events_discovery: 1d
+        hk_events_autoreg: 1d
+        hk_services_mode: yes
+        hk_services: 365d
+        hk_audit_mode: yes
+        hk_audit: 365d
+        hk_sessions_mode: yes
+        hk_sessions: 365d
+        hk_history_mode: yes
+        hk_history_global: no
+        hk_history: 365d
+        hk_trends_mode: yes
+        hk_trends_global: no
+        hk_trends: 365d
+        compression_status: off
+        compress_older: 7d

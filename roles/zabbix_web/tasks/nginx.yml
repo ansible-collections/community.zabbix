@@ -1,0 +1,153 @@
+---
+- name: "Nginx | Set websrv specific variables"
+  set_fact:
+    zabbix_web_conf_web_user: "{{ zabbix_web_conf_web_user if zabbix_web_conf_web_user is defined else _nginx_user }}"
+    zabbix_web_conf_web_group: "{{ zabbix_web_conf_web_group if zabbix_web_conf_web_group is defined else _nginx_group }}"
+    zabbix_nginx_config_path: "{{ zabbix_nginx_config_path if zabbix_nginx_config_path is defined else _nginx_config_path }}"
+    zabbix_nginx_log_path: "{{ zabbix_nginx_log_path if zabbix_nginx_log_path is defined else _nginx_log_path }}"
+    zabbix_nginx_service: "{{ zabbix_nginx_service if zabbix_nginx_service is defined else _nginx_service }}"
+    zabbix_nginx_tls_crt: "{{ zabbix_nginx_tls_crt if zabbix_nginx_tls_crt is defined else _nginx_tls_crt }}"
+    zabbix_nginx_tls_key: "{{ zabbix_nginx_tls_key if zabbix_nginx_tls_key is defined else _nginx_tls_key }}"
+    zabbix_nginx_tls_dhparam: "{{ zabbix_nginx_tls_dhparam if zabbix_nginx_tls_dhparam is defined else _nginx_tls_dhparam }}"
+    zabbix_apache_service: "{{ zabbix_apache_service if zabbix_apache_service is defined else _apache_service }}"
+
+- name: "Nginx | Check Apache service if same ports"
+  command: systemctl status "{{ zabbix_apache_service }}"
+  failed_when: false
+  register: zabbix_apache_service_check
+  changed_when: zabbix_apache_service_check.rc == 0
+  check_mode: false
+  when:
+    - zabbix_apache_vhost_port == zabbix_nginx_vhost_port
+    - zabbix_apache_vhost_tls_port == zabbix_nginx_vhost_tls_port
+
+- name: "Nginx | Stop Apache running on same ports"
+  service:
+    name: "{{ zabbix_apache_service }}"
+    state: stopped
+    enabled: false
+  tags:
+    - zabbix-web
+  when:
+    - zabbix_apache_vhost_port == zabbix_nginx_vhost_port
+    - zabbix_apache_vhost_tls_port == zabbix_nginx_vhost_tls_port
+    - zabbix_apache_service_check.rc == 0
+
+- name: "Nginx | Debian | Install Nginx and ssl-cert packages"
+  # README don't go for HTTP2 with nginx-full yet due to:
+  # https://support.zabbix.com/browse/ZBXNEXT-4670
+  apt:
+    state: present
+    name:
+      - nginx-light
+      - ssl-cert
+  when: ansible_os_family == "Debian"
+
+- name: "Nginx | RedHat | Install Nginx packages"
+  yum:
+    state: present
+    name:
+      - nginx
+  when: ansible_os_family == "RedHat"
+
+- name: "Nginx | Start and enable service"
+  service:
+    name: "{{ zabbix_nginx_service }}"
+    state: started
+    enabled: true
+
+- name: "Nginx | Install OpenSSL package for DH parameters"
+  package:
+    name: openssl
+    state: present
+
+- name: "Nginx | Generate SSL DH parameters"
+  command: "openssl dhparam -out {{ zabbix_nginx_tls_dhparam }} {{ zabbix_nginx_tls_dhparam_bits | default('2048') }}"
+  args:
+    creates: "{{ zabbix_nginx_tls_dhparam }}"
+
+- name: "Let's Encrypt | check for certificate created by certbot"
+  stat:
+    path: "/etc/letsencrypt/live/{{ zabbix_websrv_servername }}/fullchain.pem"
+  register: zabbix_letsencrypt_cert
+  failed_when: false
+  when: zabbix_letsencrypt
+
+- name: "Let's Encrypt | Create directory for certbot webroot if not exist"
+  file:
+    path: "{{ zabbix_letsencrypt_webroot_path }}"
+    mode: "{{ zabbix_letsencrypt_webroot_mode }}"
+    state: directory
+  when:
+    - zabbix_letsencrypt
+  become: true
+
+- name: "Nginx | Install vhost in conf.d"
+  template:
+    src: nginx_vhost.conf.j2
+    dest: "{{ zabbix_nginx_config_path }}/zabbix.conf"
+    owner: root
+    group: root
+    mode: 0644
+  when:
+    - zabbix_vhost
+  become: true
+  notify:
+    - restart nginx
+
+- name: "Let's Encrypt | Check if zabbix_websrv_servername is resolvable"
+  set_fact:
+    zabbix_websrv_servername_ip: "{{ lookup('dig', 'qtype=A', zabbix_websrv_servername) }}"
+  changed_when: zabbix_websrv_servername_ip != ansible_default_ipv4.address
+  register: zabbix_letsencrypt_resolve
+  when: zabbix_letsencrypt
+
+- name: "Let's Encrypt | check if certbot CLI is present"
+  shell: "certbot --version"
+  register: zabbix_cerbot_check
+  changed_when: zabbix_cerbot_check.rc != 0
+  check_mode: false
+  when: zabbix_letsencrypt
+
+- name: "Let's Encrypt | flash all handlers before certbot"
+  meta: flush_handlers
+  when:
+    - zabbix_letsencrypt
+    - zabbix_letsencrypt_resolve is not changed
+    - zabbix_cerbot_check.rc == 0
+
+- name: "Let's Encrypt | generate certs with certbot CLI"
+  command: >
+    certbot --non-interactive certonly --expand
+    -a webroot --webroot-path={{ zabbix_letsencrypt_webroot_path }}
+    --email {{ zabbix_letsencrypt_account_email }} --agree-tos
+    --cert-name {{ zabbix_websrv_servername }}
+    -d {{ zabbix_websrv_servername }}
+  args:
+    creates: "/etc/letsencrypt/live/{{ zabbix_websrv_servername }}/fullchain.pem"
+  when:
+    - zabbix_letsencrypt
+    - zabbix_letsencrypt_resolve is not changed
+    - zabbix_cerbot_check.rc == 0
+
+- name: "Let's Encrypt | Check for certificate created by certbot"
+  stat:
+    path: "/etc/letsencrypt/live/{{ zabbix_websrv_servername }}/fullchain.pem"
+  register: zabbix_letsencrypt_cert
+  failed_when: false
+  when: zabbix_letsencrypt
+
+- name: "Let's Encrypt | Reinstall Nginx vhost"
+  template:
+    src: nginx_vhost.conf.j2
+    dest: /etc/nginx/conf.d/zabbix.conf
+    owner: root
+    group: root
+    mode: 0644
+  when:
+    - zabbix_letsencrypt
+    - zabbix_letsencrypt_resolve is not changed
+    - zabbix_cerbot_check.rc == 0
+  become: true
+  notify:
+    - restart nginx

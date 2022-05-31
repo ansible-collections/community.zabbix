@@ -1,0 +1,17 @@
+---
+scenario:
+  name: agent2autopsk
+provisioner:
+  name: ansible
+  inventory:
+    group_vars:
+      all:
+        zabbix_agent2: true
+        zabbix_agent2_tlsconnect: psk
+        zabbix_agent2_tlsaccept: psk
+        zabbix_agent2_tlspsk_auto: True
+        zabbix_agent2_plugins:
+          - name: SystemRun
+            options:
+              - parameter: LogRemoteCommands
+                value: 0

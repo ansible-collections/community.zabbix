@@ -1,9 +1,9 @@
 ---
 - name: create helper zabbix host
   zabbix_host:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     host_name: zbx_hmacro_host01
     host_groups:
       - Linux servers
@@ -14,9 +14,9 @@
 
 - name: test - attempt to create new host macro
   zabbix_hostmacro:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     host_name: zbx_hmacro_host01
     macro_name: zbxhmacro_test01
     macro_value: 123
@@ -28,9 +28,9 @@
 
 - name: test - attempt to create same host macro
   zabbix_hostmacro:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     host_name: zbx_hmacro_host01
     macro_name: zbxhmacro_test01
     macro_value: 123
@@ -42,9 +42,9 @@
 
 - name: test - attempt to create same host macro in zabbix native format
   zabbix_hostmacro:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     host_name: zbx_hmacro_host01
     macro_name: "{$ZBXHMACRO_TEST01}"
     macro_value: 123
@@ -56,9 +56,9 @@
 
 - name: test - attempt to create new host macro in zabbix native format
   zabbix_hostmacro:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     host_name: zbx_hmacro_host01
     macro_name: "{$ZBXHMACRO_TEST02}"
     macro_value: abcd
@@ -70,13 +70,13 @@
 
 - name: test - attempt to update host macro with string value while force=no
   zabbix_hostmacro:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     host_name: zbx_hmacro_host01
     macro_name: zbxhmacro_test01
     macro_value: abc
-    force: no
+    force: false
   register: zbxhmacro_update_noforce
 
 - name: assert that nothing has been changed
@@ -85,14 +85,14 @@
 
 - name: test - attempt to update host macro with string value
   zabbix_hostmacro:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     host_name: zbx_hmacro_host01
     macro_name: zbxhmacro_test01
     macro_value: abc
   register: zbxhmacro_update
-  ignore_errors: True
+  ignore_errors: true
 
 - name: assert that host macro was updated
   assert:
@@ -100,9 +100,9 @@
 
 - name: test - attempt to create host macro with context
   zabbix_hostmacro:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     host_name: zbx_hmacro_host01
     macro_name: low_space_limit:/home
     macro_value: 10
@@ -114,9 +114,9 @@
 
 - name: test - attempt to create same host macro with context and verify that it was converted to uppercase
   zabbix_hostmacro:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     host_name: zbx_hmacro_host01
     macro_name: LOW_SPACE_LIMIT:/home
     macro_value: 10
@@ -128,9 +128,9 @@
 
 - name: test - attempt to delete all host macros
   zabbix_hostmacro:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     host_name: zbx_hmacro_host01
     macro_name: "{{ item }}"
     state: absent
@@ -147,9 +147,9 @@
 
 - name: test - attempt to delete non-existing host macro
   zabbix_hostmacro:
-    server_url: "{{ zabbix_server_url }}"
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     host_name: zbx_hmacro_host01
     macro_name: zbxhmacro_test01
     state: absent
@@ -158,3 +158,56 @@
 - name: assert that nothing has been changed
   assert:
     that: not zbxhmacro_delete_missing is changed
+
+- name: test - do not run host macro secret tests for Zabbix < 5.0
+  meta: end_play
+  when: zabbix_version is version('5.0', '<')
+
+- name: test - attempt to create host macro with type secret
+  zabbix_hostmacro:
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
+    host_name: zbx_hmacro_host01
+    macro_name: zbxhmacro_test03
+    macro_value: abcd
+    macro_type: secret
+  register: zbxhmacro_update
+  ignore_errors: true
+
+- name: assert that host macro was updated
+  assert:
+    that: zbxhmacro_update is changed
+
+- name: test - attempt to update host macro with type secret with same value
+  zabbix_hostmacro:
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
+    host_name: zbx_hmacro_host01
+    macro_name: zbxhmacro_test03
+    macro_value: abcd
+    macro_type: secret
+  register: zbxhmacro_update
+  ignore_errors: true
+
+- name: assert that host macro was updated
+  assert:
+    that: zbxhmacro_update is changed
+
+- name: test - attempt to delete host macros type secret
+  zabbix_hostmacro:
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
+    host_name: zbx_hmacro_host01
+    macro_name: "{{ item }}"
+    state: absent
+  loop:
+    - zbxhmacro_test03
+  register: zbxhmacro_delete_existing
+
+- name: assert that all macros have been deleted
+  assert:
+    that: item.changed is sameas True
+  loop: "{{ zbxhmacro_delete_existing.results }}"

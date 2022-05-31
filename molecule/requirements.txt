@@ -1,10 +1,12 @@
 # Install CI dependencies for the Zabbix Roles
-ansible==2.9.11
-ansible-lint==4.2.0
-docker==4.2.1
-molecule==3.0.4
-netaddr==0.7.19
-testinfra==5.2.1
+ansible==4.6.0
+ansible-compat==0.5.0
+ansible-core==2.11.5
+docker==5.0.2
+molecule==3.5.1
+molecule-docker==1.0.2
+netaddr==0.8.0
+pytest-testinfra==6.1.0
 zabbix-api==0.5.4
 ipaddr==2.2.0
 ipaddress==1.0.23

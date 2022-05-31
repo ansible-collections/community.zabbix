@@ -110,6 +110,18 @@ DBSocket={{ zabbix_server_dbsocket }}
 DBPort={{ zabbix_server_dbport }}
 {% endif %}
 
+{% if zabbix_version is version('6.0', '>=') %}
+### Option: AllowUnsupportedDBVersions
+#       Allow server to work with unsupported database versions.
+#       0 - do not allow
+#       1 - allow
+#
+# Mandatory: no
+# Default:
+# AllowUnsupportedDBVersions=0
+AllowUnsupportedDBVersions={{ zabbix_server_allowunsupporteddbversions }}
+{% endif %}
+
 ### Option: HistoryStorageURL
 #	History storage HTTP[S] URL.
 #
@@ -172,6 +184,15 @@ StartPollers={{ zabbix_server_startpollers }}
 #	number of pre-forked instances of ipmi pollers.
 #
 StartIPMIPollers={{ zabbix_server_startipmipollers }}
+
+{% if zabbix_version is version('4.2', '>=') %}
+### option: StartLLDProcessors
+#	Number of pre-forked instances of low-level discovery (LLD) workers.
+# The LLD manager process is automatically started when an LLD worker is started.
+# This parameter is supported since Zabbix 4.2.0.
+# 
+StartLLDProcessors={{ zabbix_server_startlldprocessors }}
+{% endif %}
 
 {% if zabbix_version is version('4.2', '>=') %}
 ### Option: StartPreprocessors
@@ -364,6 +385,14 @@ HistoryIndexCacheSize={{ zabbix_server_historyindexcachesize }}
 #
 TrendCacheSize={{ zabbix_server_trendcachesize }}
 
+{% if zabbix_version is version('6.0', '>=') %}
+### Option: TrendFunctionCacheSize
+#       Size of trend function cache, in bytes.
+#       Shared memory size for caching calculated trend function data.
+#
+TrendFunctionCacheSize={{ zabbix_server_trendfunctioncachesize }}
+{% endif %}
+
 {% if zabbix_version is version('3.0', '<') %}
     ### option: historytextcachesize
 #	size of text history cache, in bytes.
@@ -544,7 +573,7 @@ LoadModulePath={{ zabbix_server_loadmodulepath }}
 #	it is allowed to include multiple loadmodule parameters.
 #
 {% if zabbix_server_loadmodule is defined and zabbix_server_loadmodule %}
-LoadModule = {{ loadmodule }}
+LoadModule = {{ zabbix_server_loadmodule }}
 {% endif %}
 
 {% if zabbix_version is version('3.0', '>=') %}
@@ -660,4 +689,124 @@ DBTLSCipher={{ zabbix_server_dbtlscipher }}
 # DBTLSCipher13=
 {% if zabbix_server_dbtlscipher13 is defined and zabbix_server_dbtlscipher13 is not none %}
 DBTLSCipher13={{ zabbix_server_dbtlscipher13 }}
+{% endif %}
+
+{% if zabbix_version is version('6.0', '>=') %}
+### Option: VaultToken
+#       Vault authentication token that should have been generated exclusively for Zabbix server with read only permission
+#       to paths specified in Vault macros and read only permission to path specified in optional VaultDBPath
+#       configuration parameter.
+#       It is an error if VaultToken and VAULT_TOKEN environment variable are defined at the same time.
+#
+# Mandatory: no
+# Default:
+# VaultToken=
+{% if zabbix_server_vaulttoken is defined and zabbix_server_vaulttoken is not none %}
+VaultToken={{ zabbix_server_vaulttoken }}
+{% endif %}
+
+### Option: VaultURL
+#       Vault server HTTP[S] URL. System-wide CA certificates directory will be used if SSLCALocation is not specified.
+#
+# Mandatory: no
+# Default:
+# VaultURL=https://127.0.0.1:8200
+{% if zabbix_server_vaulturl is defined and zabbix_server_vaulturl is not none %}
+VaultURL={{ zabbix_server_vaulturl }}
+{% endif %}
+
+### Option: VaultDBPath
+#       Vault path from where credentials for database will be retrieved by keys 'password' and 'username'.
+#       Example: secret/zabbix/database
+#       This option can only be used if DBUser and DBPassword are not specified.
+#
+# Mandatory: no
+# Default:
+# VaultDBPath=
+{% if zabbix_server_vaultdbpath is defined and zabbix_server_vaultdbpath is not none %}
+VaultDBPath={{ zabbix_server_vaultdbpath }}
+{% endif %}
+
+### Option: StartReportWriters
+#       Number of pre-forked report writer instances.
+#
+# Mandatory: no
+# Range: 0-100
+# Default:
+# StartReportWriters=0
+{% if zabbix_server_startreportwriters is defined and zabbix_server_startreportwriters is not none %}
+StartReportWriters={{ zabbix_server_startreportwriters }}
+{% endif %}
+
+### Option: WebServiceURL
+#       URL to Zabbix web service, used to perform web related tasks.
+#       Example: http://localhost:10053/report
+#
+# Mandatory: no
+# Default:
+# WebServiceURL=
+{% if zabbix_server_webserviceurl is defined and zabbix_server_webserviceurl is not none %}
+WebServiceURL={{ zabbix_server_webserviceurl }}
+{% endif %}
+
+### Option: ServiceManagerSyncFrequency
+#       How often Zabbix will synchronize configuration of a service manager (in seconds).
+#
+# Mandatory: no
+# Range: 1-3600
+# Default:
+# ServiceManagerSyncFrequency=60
+{% if zabbix_server_servicemanagersyncfrequency is defined and zabbix_server_servicemanagersyncfrequency is not none %}
+ServiceManagerSyncFrequency={{ zabbix_server_servicemanagersyncfrequency }}
+{% endif %}
+
+### Option: ProblemHousekeepingFrequency
+#       How often Zabbix will delete problems for deleted triggers (in seconds).
+#
+# Mandatory: no
+# Range: 1-3600
+# Default:
+# ProblemHousekeepingFrequency=60
+{% if zabbix_server_problemhousekeepingfrequency is defined and zabbix_server_problemhousekeepingfrequency is not none %}
+ProblemHousekeepingFrequency={{ zabbix_server_problemhousekeepingfrequency }}
+{% endif %}
+
+
+####### For advanced users - TCP-related fine-tuning parameters #######
+
+## Option: ListenBacklog
+#       The maximum number of pending connections in the queue. This parameter is passed to
+#       listen() function as argument 'backlog' (see "man listen").
+#
+# Mandatory: no
+# Range: 0 - INT_MAX (depends on system, too large values may be silently truncated to implementation-specified maximum)
+{% if zabbix_server_listenbacklog is defined and zabbix_server_listenbacklog is not none %}
+ListenBacklog={{ zabbix_server_listenbacklog }}
+{% endif %}
+
+####### High availability cluster parameters #######
+
+## Option: HANodeName
+#       The high availability cluster node name.
+#       When empty, server is working in standalone mode; a node with empty name is registered with address for the frontend to connect to.
+#
+# Mandatory: no
+# Default:
+# HANodeName=
+{% if zabbix_server_hanodename is defined and zabbix_server_hanodename is not none %}
+HANodeName={{ zabbix_server_hanodename }}
+{% endif %}
+
+## Option: NodeAddress
+#       IP or hostname with optional port to specify how frontend should connect to the server.
+#       Format: <address>[:port]
+#
+#       This option can be overridden by address specified in frontend configuration.
+#
+# Mandatory: no
+# Default:
+# NodeAddress=localhost:10051
+{% if zabbix_server_nodeaddress is defined and zabbix_server_nodeaddress is not none %}
+NodeAddress={{ zabbix_server_nodeaddress }}
+{% endif %}
 {% endif %}

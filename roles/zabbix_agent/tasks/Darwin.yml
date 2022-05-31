@@ -9,15 +9,17 @@
 
 - name: "Get Total Private IP Addresses"
   set_fact:
-    total_private_ip_addresses: "{{ ansible_all_ipv4_addresses | ipaddr('private') | length }}"
+    total_private_ip_addresses: "{{ ansible_all_ipv4_addresses | ansible.netcommon.ipaddr('private') | length }}"
   when:
     - ansible_all_ipv4_addresses is defined
 
 - name: "Set first public ip address for zabbix_agent_ip"
   set_fact:
-    zabbix_agent_ip: "{{ ansible_all_ipv4_addresses | ipaddr('public') | first }}"
+    zabbix_agent_ip: "{{ ansible_all_ipv4_addresses | ansible.netcommon.ipaddr('public') | first }}"
     zabbix_agent_server: "{{ zabbix_agent_server_public_ip | default(zabbix_agent_server) }}"
     zabbix_agent_serveractive: "{{ zabbix_agent_serveractive_public_ip | default(zabbix_agent_serveractive) }}"
+    zabbix_agent2_server: "{{ zabbix_agent_server_public_ip | default(zabbix_agent2_server) }}"
+    zabbix_agent2_serveractive: "{{ zabbix_agent_serveractive_public_ip | default(zabbix_agent2_serveractive) }}"
   when:
     - zabbix_agent_ip is not defined
     - total_private_ip_addresses is defined
@@ -25,7 +27,7 @@
 
 - name: "Set first private ip address for zabbix_agent_ip"
   set_fact:
-    zabbix_agent_ip: "{{ ansible_all_ipv4_addresses | ipaddr('private') | first }}"
+    zabbix_agent_ip: "{{ ansible_all_ipv4_addresses | ansible.netcommon.ipaddr('private') | first }}"
   when:
     - zabbix_agent_ip is not defined
     - total_private_ip_addresses is defined
@@ -80,6 +82,11 @@
     - zabbix-agent
     - config
 
+- name: "Installing Agent"
+  include_tasks: macOS.yml
+  tags:
+    - always
+
 - name: "Configure zabbix-agent"
   template:
     src: zabbix_agentd.conf.j2
@@ -89,7 +96,7 @@
     mode: 0644
   notify:
     - restart mac zabbix agent
-  become: yes
+  become: true
   when:
     - not (zabbix_agent_docker | bool)
   tags:
@@ -102,7 +109,7 @@
     path: "{{ zabbix_agent_tlspskfile | dirname }}"
     mode: 0755
     state: directory
-  become: yes
+  become: true
   when:
     - zabbix_agent_tlspskfile is defined
 
@@ -113,7 +120,7 @@
     owner: zabbix
     group: zabbix
     mode: 0400
-  become: yes
+  become: true
   when:
     - zabbix_agent_tlspskfile is defined
     - zabbix_agent_tlspsk_secret is defined
@@ -127,7 +134,7 @@
     group: zabbix
     mode: 0750
     state: directory
-  become: yes
+  become: true
   tags:
     - config
     - include
@@ -139,7 +146,7 @@
     owner: zabbix
     group: zabbix
     mode: 0755
-  become: yes
+  become: true
 
 - name: "Install the Docker container"
   include: Docker.yml
@@ -151,17 +158,17 @@
     set -o pipefail
     launchctl list | grep com.zabbix.zabbix_agentd | awk '{print $1}'
   register: launchctl_pid
-  check_mode: no
+  check_mode: false
   changed_when: false
   failed_when: launchctl_pid.rc == 2
-  become: yes
+  become: true
   tags:
     - init
     - service
 
 - name: "Make sure the zabbix-agent service is running"
   command: launchctl start com.zabbix.zabbix_agentd
-  become: yes
+  become: true
   when:
     - not (zabbix_agent_docker | bool)
     - launchctl_pid.stdout == "-"

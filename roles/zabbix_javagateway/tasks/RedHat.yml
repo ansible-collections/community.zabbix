@@ -8,22 +8,27 @@
     baseurl: "{{ item.baseurl }}"
     gpgcheck: "{{ item.gpgcheck }}"
     gpgkey: "{{ item.gpgkey }}"
-    mode:  "{{ item.mode | default('0644') }}"
+    mode: "{{ item.mode | default('0644') }}"
     priority: "{{ item.priority | default('99') }}"
     state: "{{ item.state | default('present') }}"
     proxy: "{{ zabbix_http_proxy | default(omit) }}"
   with_items: "{{ zabbix_repo_yum }}"
   register: yum_repo_installed
-  become: yes
+  become: true
   when:
     zabbix_repo == "zabbix"
   notify:
     - "clean repo files from proxy creds"
 
 - name: "RedHat | Installing zabbix-java-gateway"
-  yum:
+  package:
     pkg: zabbix-java-gateway
     state: "{{ zabbix_javagateway_package_state }}"
+    disablerepo: "{{ '*' if (zabbix_repo_yum_enabled | length>0) else omit }}"
+    enablerepo: "{{ zabbix_repo_yum_enabled if zabbix_repo_yum_enabled is iterable and (zabbix_repo_yum_enabled | length>0) else omit }}"
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   register: zabbix_java_gateway_install
   until: zabbix_java_gateway_install is succeeded
-  become: yes
+  become: true

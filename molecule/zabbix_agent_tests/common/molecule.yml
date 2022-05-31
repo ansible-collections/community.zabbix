@@ -1,0 +1,58 @@
+---
+driver:
+  name: docker
+
+platforms:
+  - name: zabbix-agent-${MY_MOLECULE_CONTAINER:-centos}
+    image: ${MY_MOLECULE_IMAGE:-"geerlingguy/docker-centos8-ansible"}
+    command: ${MY_MOLECULE_DOCKER_COMMAND:-""}
+    privileged: true
+    pre_build_image: true
+    networks:
+      - name: zabbix
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    groups:
+      - agent
+
+provisioner:
+  name: ansible
+  lint:
+    name: ansible-lint
+  playbooks:
+    prepare: ../../common/playbooks/prepare.yml
+    converge: ../../common/playbooks/converge.yml
+  env:
+    ANSIBLE_REMOTE_TMP: /tmp/
+    ANSIBLE_COLLECTIONS_PATHS: $HOME/.ansible/collections/ansible_collections/community/zabbix
+    ANSIBLE_ROLES_PATH: $HOME/.ansible/collections/ansible_collections/community/zabbix/roles
+  inventory:
+    group_vars:
+      all:
+        zabbix_agent_src_reinstall: false
+        zabbix_install_pip_packages: false
+        zabbix_agent_server: 192.168.3.33
+        zabbix_agent_serveractive: 192.168.3.33
+        zabbix_agent_listenip: 0.0.0.0
+        zabbix_agent_tlsconnect: psk
+        zabbix_agent_tlsaccept: psk
+
+scenario:
+  test_sequence:
+    - dependency
+    - lint
+    - cleanup
+    - destroy
+    - syntax
+    - create
+    - prepare
+    - converge
+    - idempotence
+    - side_effect
+    - verify
+    - cleanup
+    - destroy
+verifier:
+  name: testinfra
+  lint:
+    name: flake8

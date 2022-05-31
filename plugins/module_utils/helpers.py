@@ -7,6 +7,8 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
+from ansible.module_utils.basic import env_fallback
+
 
 def zabbix_common_argument_spec():
     """
@@ -14,13 +16,43 @@ def zabbix_common_argument_spec():
     The options are commonly used by most of Zabbix modules.
     """
     return dict(
-        server_url=dict(type='str', required=True, aliases=['url']),
-        login_user=dict(type='str', required=True),
-        login_password=dict(type='str', required=True, no_log=True),
-        http_login_user=dict(type='str', required=False, default=None),
-        http_login_password=dict(type='str', required=False, default=None, no_log=True),
-        timeout=dict(type='int', default=10),
-        validate_certs=dict(type='bool', required=False, default=True),
+        server_url=dict(
+            type='str',
+            required=True,
+            aliases=['url'],
+            fallback=(env_fallback, ['ZABBIX_SERVER'])
+        ),
+        login_user=dict(
+            type='str', required=True,
+            fallback=(env_fallback, ['ZABBIX_USERNAME'])
+        ),
+        login_password=dict(
+            type='str',
+            required=True,
+            no_log=True,
+            fallback=(env_fallback, ['ZABBIX_PASSWORD'])
+        ),
+        http_login_user=dict(
+            type='str',
+            required=False,
+            default=None
+        ),
+        http_login_password=dict(
+            type='str',
+            required=False,
+            default=None,
+            no_log=True
+        ),
+        timeout=dict(
+            type='int',
+            default=10
+        ),
+        validate_certs=dict(
+            type='bool',
+            required=False,
+            default=True,
+            fallback=(env_fallback, ['ZABBIX_VALIDATE_CERTS'])
+        ),
     )
 
 
@@ -97,8 +129,13 @@ def helper_compare_lists(l1, l2, diff_dict):
         return diff_dict
     for i, item in enumerate(l1):
         if isinstance(item, dict):
-            diff_dict.insert(i, {})
-            diff_dict[i] = helper_compare_dictionaries(item, l2[i], diff_dict[i])
+            for item2 in l2:
+                diff_dict2 = {}
+                diff_dict2 = helper_compare_dictionaries(item, item2, diff_dict2)
+                if len(diff_dict2) == 0:
+                    break
+            if len(diff_dict2) != 0:
+                diff_dict.insert(i, item)
         else:
             if item != l2[i]:
                 diff_dict.append(item)
@@ -143,3 +180,28 @@ def helper_compare_dictionaries(d1, d2, diff_dict):
             if v != d2[k]:
                 diff_dict[k] = v
     return diff_dict
+
+
+def helper_normalize_data(data, del_keys=None):
+    """
+    Delete None parameter or specified keys from data.
+
+    Parameters:
+        data: dictionary
+
+    Returns:
+        data: falsene parameter removed data
+        del_keys: deleted keys
+    """
+    if del_keys is None:
+        del_keys = []
+
+    for key, value in data.items():
+        if value is None:
+            del_keys.append(key)
+
+    for key in del_keys:
+        if key in data.keys():
+            del data[key]
+
+    return data, del_keys

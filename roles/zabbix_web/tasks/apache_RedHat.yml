@@ -1,5 +1,7 @@
 ---
 
+- include_tasks: apache.yml
+
 - name: "RedHat | Install apache vhost"
   template:
     src: apache_vhost.conf.j2
@@ -8,7 +10,7 @@
     group: "{{ zabbix_web_conf_web_group }}"
     mode: 0644
   when: zabbix_vhost
-  become: yes
+  become: true
   notify:
     - restart apache
   tags:

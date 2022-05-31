@@ -39,6 +39,9 @@ options:
 extends_documentation_fragment:
 - community.zabbix.zabbix
 
+notes:
+- there where breaking changes in the Zabbix API with version 5.4 onwards (especially UUIDs) which may
+  require you to export the templates again (see version tag >= 5.4 in the resulting file/data).
 '''
 
 EXAMPLES = '''
@@ -149,6 +152,7 @@ import xml.etree.ElementTree as ET
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils._text import to_native
+from ansible.module_utils.six import PY2
 
 from ansible_collections.community.zabbix.plugins.module_utils.base import ZabbixBase
 import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabbix_utils
@@ -188,7 +192,10 @@ class TemplateInfo(ZabbixBase):
                     date = xmlroot.find(".date")
                     if date is not None:
                         xmlroot.remove(date)
-                return str(ET.tostring(xmlroot, encoding='utf-8').decode('utf-8'))
+                if PY2:
+                    return str(ET.tostring(xmlroot, encoding='utf-8'))
+                else:
+                    return str(ET.tostring(xmlroot, encoding='utf-8').decode('utf-8'))
             else:
                 return self.load_json_template(dump, omit_date)
         except Exception as e:
@@ -204,7 +211,7 @@ def main():
     ))
     module = AnsibleModule(
         argument_spec=argument_spec,
-        supports_check_mode=False
+        supports_check_mode=True
     )
 
     template_name = module.params['template_name']

@@ -5,20 +5,23 @@
   service:
     name: "{{ zabbix_agent_service }}"
     state: restarted
-    enabled: yes
-  become: yes
+    enabled: true
+  become: true
   when:
     - not zabbix_agent_docker
     - zabbix_agent_os_family != "Windows" and zabbix_agent_os_family != "Darwin"
 
 - name: firewalld-reload
   command: "firewall-cmd --reload"
+  become: true
+  when:
+    - ansible_facts.services["firewalld"] is defined
+    - ansible_facts.services["firewalld"].state == "running"
 
 - name: restart win zabbix agent
   win_service:
-    name: "{{ zabbix_win_agent_service }}"
+    name: "{{ zabbix_win_svc_name }}"
     state: restarted
-    enabled: yes
   when:
     - zabbix_agent_os_family == "Windows"
 
@@ -31,7 +34,7 @@
 
 - name: "clean repo files from proxy creds"
   shell: ls /etc/yum.repos.d/zabbix* && sed -i 's/^proxy =.*//' /etc/yum.repos.d/zabbix* || true
-  become: yes
+  become: true
   when:
     - ansible_os_family == 'RedHat'
     - zabbix_http_proxy is defined or zabbix_https_proxy is defined

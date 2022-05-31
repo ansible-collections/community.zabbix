@@ -6,18 +6,21 @@ global $DB, $HISTORY;
 global $DB;
 {% endif %}
 
-$DB['TYPE']     = '{{ zabbix_server_database_long|upper() }}';
-$DB['SERVER']   = '{{ zabbix_server_dbhost }}';
-$DB['PORT']     = '{{ zabbix_server_dbport }}';
-$DB['DATABASE'] = '{{ zabbix_server_dbname }}';
-$DB['USER']     = '{{ zabbix_server_dbuser }}';
-$DB['PASSWORD'] = '{{ zabbix_server_dbpassword }}';
+$DB['TYPE']        = '{{ zabbix_server_database_long | upper()              }}';
+$DB['SERVER']      = '{{ zabbix_server_dbhost                               }}';
+$DB['PORT']        = '{{ zabbix_server_dbport                               }}';
+$DB['DATABASE']    = '{{ zabbix_server_dbname                               }}';
+$DB['USER']        = '{{ zabbix_server_dbuser                               }}';
+$DB['PASSWORD']    = '{{ zabbix_server_dbpassword                           }}';
+$DB['ENCRYPTION']  = {{ 'true' if zabbix_server_dbencryption else 'false'  }};
+$DB['VERIFY_HOST'] = {{ 'true' if zabbix_server_dbverifyhost else 'false'  }};
 
 // Schema name. Used for IBM DB2 and PostgreSQL.
 $DB['SCHEMA'] = '{{ zabbix_server_dbschema }}';
-
+{% if not zabbix_web_connect_ha_backend %}
 $ZBX_SERVER      = '{{ zabbix_server_hostname }}';
 $ZBX_SERVER_PORT = '{{ zabbix_server_listenport }}';
+{% endif %}
 $ZBX_SERVER_NAME = '{{ zabbix_server_name }}';
 
 $IMAGE_FORMAT_DEFAULT = IMAGE_FORMAT_PNG;
@@ -35,8 +38,18 @@ $DB['DOUBLE_IEEE754']   = true;
 {% endif %}
 
 {% if zabbix_web_env is defined %}
-{% for env,val in zabbix_web_env.iteritems() %}
+{% for env,val in zabbix_web_env.items() %}
 putenv("{{env}}={{val}}");
 {% endfor %}
+{% endif %}
+
+{% if zabbix_saml_idp_crt is defined %}
+$SSO['IDP_CERT'] = '{{ zabbix_saml_idp_crt }}';
+{% endif %}
+{% if zabbix_saml_sp_crt is defined %}
+$SSO['SP_CERT'] = '{{ zabbix_saml_sp_crt }}';
+{% endif %}
+{% if zabbix_saml_sp_key is defined %}
+$SSO['SP_KEY'] = '{{ zabbix_saml_sp_key }}';
 {% endif %}
 ?>

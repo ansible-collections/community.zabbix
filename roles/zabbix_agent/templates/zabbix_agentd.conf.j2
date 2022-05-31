@@ -11,6 +11,19 @@
 PidFile={{ zabbix_agent_pidfile }}
 {% endif %}
 
+{% if zabbix_agent_version is version('3.0', '>=') %}
+### Option: LogType
+#	Specifies where log messages are written to:
+#		system  - syslog
+#		file    - file specified with LogFile parameter
+#		console - standard output
+#
+# Mandatory: no
+# Default:
+
+LogType={{ zabbix_agent_logtype }}
+{% endif %}
+
 ### option: logfile
 #       name of log file.
 #       if not set, syslog is used.
@@ -141,6 +154,39 @@ HostMetadata={{ zabbix_agent_hostmetadata }}
 HostMetadataItem={{ zabbix_agent_hostmetadataitem }}
 {% endif %}
 
+
+
+### Option: AllowKey
+# 	Optional parameter that defines AllowKey
+# 	Allow execution of those item keys that match a pattern.
+# 	Key pattern is a wildcard expression that supports "*" character to match any number of any characters.
+# 	Multiple key matching rules may be defined in combination with DenyKey.
+# 	The parameters are processed one by one according to their appearance order.
+
+{% if zabbix_agent_allow_key is defined and zabbix_agent_allow_key %}
+{% for item in zabbix_agent_allow_key %}
+AllowKey={{ item }}
+{% endfor %}
+{% endif %}
+
+### Option: DenyKey
+#   Deny execution of items keys matching pattern.
+#   Multiple keys matching rules may be defined in combination with AllowKey.
+#   Key pattern is wildcard expression, which support "*" character to match any number of any characters in certain position. It might be used in both key name and key arguments.
+#   Parameters are processed one by one according their appearance order.
+#   If no AllowKey or DenyKey rules defined, all keys are allowed.
+#       Unless another system.run[*] rule is specified DenyKey=system.run[*] is added by default.
+#
+# Mandatory: no
+# Default:
+# DenyKey=system.run[*]
+
+{% if zabbix_agent_deny_key is defined and zabbix_agent_deny_key %}
+{% for item in zabbix_agent_deny_key %}
+DenyKey={{ item }}
+{% endfor %}
+{% endif %}
+
 ### option: refreshactivechecks
 #       how often list of active checks is refreshed, in seconds.
 #
@@ -171,7 +217,13 @@ MaxLinesPerSecond={{ zabbix_agent_maxlinespersecond }}
 #       sets an alias for parameter. it can be useful to substitute long and complex parameter name with a smaller and simpler one.
 #
 {% if zabbix_agent_zabbix_alias is defined and zabbix_agent_zabbix_alias %}
+{% if zabbix_agent_zabbix_alias is string %}
 Alias={{ zabbix_agent_zabbix_alias }}
+{% else %}
+{% for item in zabbix_agent_zabbix_alias %}
+Alias={{ item }}
+{% endfor %}
+{% endif %}
 {% endif %}
 
 ### option: timeout
@@ -249,7 +301,13 @@ LoadModulePath={{ zabbix_agent_loadmodulepath }}
 #       It is allowed to include multiple LoadModule parameters.
 #
 {% if zabbix_agent_loadmodule is defined and zabbix_agent_loadmodule %}
+{% if zabbix_agent_loadmodule is string %}
 LoadModule={{ zabbix_agent_loadmodule }}
+{% else %}
+{% for module in zabbix_agent_loadmodule %}
+LoadModule={{ module }}
+{% endfor %}
+{% endif %}
 {% endif %}
 
 {% if zabbix_version is version_compare('3.0', '>=') %}
@@ -362,5 +420,19 @@ TLSPSKIdentity={{ zabbix_agent_tlspskidentity }}
 # TLSPSKFile=
 {% if zabbix_agent_tlspskfile is defined and zabbix_agent_tlspskfile %}
 TLSPSKFile={{ zabbix_agent_tlspskfile }}
+{% endif %}
+{% endif %}
+
+{% if zabbix_version is version('6.0', '>=') %}
+####### For advanced users - TCP-related fine-tuning parameters #######
+
+## Option: ListenBacklog
+#       The maximum number of pending connections in the queue. This parameter is passed to
+#       listen() function as argument 'backlog' (see "man listen").
+#
+# Mandatory: no
+# Range: 0 - INT_MAX (depends on system, too large values may be silently truncated to implementation-specified maximum)
+{% if zabbix_agent_listenbacklog is defined and zabbix_agent_listenbacklog %}
+ListenBacklog={{ zabbix_agent_listenbacklog }}
 {% endif %}
 {% endif %}

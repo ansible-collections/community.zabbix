@@ -16,13 +16,13 @@ ProxyMode={{ zabbix_proxy_mode }}
 #	Active proxy will get configuration data from the server.
 #	For a proxy in the passive mode this parameter will be ignored.
 #
-Server={{ zabbix_server_host }}
+Server={{ zabbix_proxy_server }}
 
 ### Option: ServerPort
 #	Port of Zabbix trapper on Zabbix server.
 #	For a proxy in the passive mode this parameter will be ignored.
 #
-ServerPort={{ zabbix_server_port }}
+ServerPort={{ zabbix_proxy_serverport }}
 
 ### Option: Hostname
 #	Unique, case sensitive Proxy name. Make sure the Proxy name is known to the server!
@@ -53,6 +53,15 @@ ListenPort={{ zabbix_proxy_listenport }}
 #
 {% if zabbix_proxy_sourceip is defined and zabbix_proxy_sourceip %}
 SourceIP={{ zabbix_proxy_sourceip }}
+{% endif %}
+
+{% if zabbix_version is version('6.0', '>=') %}
+### Option: LogType
+#       Specifies where log messages are written to:
+#               system  - syslog
+#               file    - file specified with LogFile parameter
+#               console - standard output
+LogType={{ zabbix_proxy_logtype }}
 {% endif %}
 
 ### Option: LogFile
@@ -135,19 +144,31 @@ DBPassword={{ zabbix_proxy_dbpassword }}
 #
 DBPort={{ zabbix_proxy_dbport }}
 
+{% if zabbix_version is version('6.0', '>=') %}
+### Option: AllowUnsupportedDBVersions
+#       Allow server to work with unsupported database versions.
+#       0 - do not allow
+#       1 - allow
+#
+# Mandatory: no
+# Default:
+# AllowUnsupportedDBVersions=0
+AllowUnsupportedDBVersions={{ zabbix_proxy_allowunsupporteddbversions }}
+{% endif %}
+
 ######### PROXY SPECIFIC PARAMETERS #############
 
 ### Option: ProxyLocalBuffer
 #	Proxy will keep data locally for N hours, even if the data have already been synced with the server.
 #	This parameter may be used if local data will be used by third party applications.
 #
-ProxyLocalBuffer={{ zabbix_proxy_localbuffer }}
+ProxyLocalBuffer={{ zabbix_proxy_proxylocalbuffer }}
 
 ### Option: ProxyOfflineBuffer
 #	Proxy will keep data for N hours in case if no connectivity with Zabbix Server.
 #	Older data will be lost.
 #
-ProxyOfflineBuffer={{ zabbix_proxy_offlinebuffer }}
+ProxyOfflineBuffer={{ zabbix_proxy_proxyofflinebuffer }}
 
 ### Option: HeartbeatFrequency
 #	Frequency of heartbeat messages in seconds.
@@ -416,6 +437,22 @@ LoadModulePath={{ zabbix_proxy_loadmodulepath }}
 LoadModule={{ zabbix_proxy_loadmodule }}
 {% endif %}
 
+{% if zabbix_version is version_compare('4.0', '>=') %}
+### Option: StatsAllowedIP
+#       List of comma delimited IP addresses, optionally in CIDR notation, or DNS names of external Zabbix instances.
+#       Stats request will be accepted only from the addresses listed here. If this parameter is not set no stats requests
+#       will be accepted.
+#       If IPv6 support is enabled then '127.0.0.1', '::127.0.0.1', '::ffff:127.0.0.1' are treated equally
+#       and '::/0' will allow any IPv4 or IPv6 address.
+#       '0.0.0.0/0' can be used to allow any IPv4 address.
+#       Example: StatsAllowedIP=127.0.0.1,192.168.1.0/24,::1,2001:db8::/32,zabbix.example.com
+#
+# Mandatory: no
+# Default:
+# StatsAllowedIP=
+StatsAllowedIP={{ zabbix_proxy_statsallowedip }}
+{% endif %}
+
 {% if zabbix_version is version_compare('3.0', '>=') %}
 ####### TLS-RELATED PARAMETERS #######
 
@@ -601,4 +638,53 @@ DBTLSCipher={{ zabbix_proxy_dbtlscipher }}
 # DBTLSCipher13=
 {% if zabbix_proxy_dbtlscipher13 is defined and zabbix_proxy_dbtlscipher13 is not none %}
 DBTLSCipher13={{ zabbix_proxy_dbtlscipher13 }}
+{% endif %}
+
+{% if zabbix_version is version('6.0', '>=') %}
+### Option: VaultToken
+#       Vault authentication token that should have been generated exclusively for Zabbix server with read only permission
+#       to paths specified in Vault macros and read only permission to path specified in optional VaultDBPath
+#       configuration parameter.
+#       It is an error if VaultToken and VAULT_TOKEN environment variable are defined at the same time.
+#
+# Mandatory: no
+# Default:
+# VaultToken=
+{% if zabbix_proxy_vaulttoken is defined and zabbix_proxy_vaulttoken is not none %}
+VaultToken={{ zabbix_proxy_vaulttoken }}
+{% endif %}
+
+### Option: VaultURL
+#       Vault server HTTP[S] URL. System-wide CA certificates directory will be used if SSLCALocation is not specified.
+#
+# Mandatory: no
+# Default:
+# VaultURL=https://127.0.0.1:8200
+{% if zabbix_proxy_vaulturl is defined and zabbix_proxy_vaulturl is not none %}
+VaultURL={{ zabbix_proxy_vaulturl }}
+{% endif %}
+
+### Option: VaultDBPath
+#       Vault path from where credentials for database will be retrieved by keys 'password' and 'username'.
+#       Example: secret/zabbix/database
+#       This option can only be used if DBUser and DBPassword are not specified.
+#
+# Mandatory: no
+# Default:
+# VaultDBPath=
+{% if zabbix_proxy_vaultdbpath is defined and zabbix_proxy_vaultdbpath is not none %}
+VaultDBPath={{ zabbix_proxy_vaultdbpath }}
+{% endif %}
+
+####### For advanced users - TCP-related fine-tuning parameters #######
+
+## Option: ListenBacklog
+#       The maximum number of pending connections in the queue. This parameter is passed to
+#       listen() function as argument 'backlog' (see "man listen").
+#
+# Mandatory: no
+# Range: 0 - INT_MAX (depends on system, too large values may be silently truncated to implementation-specified maximum)
+{% if zabbix_proxy_listenbacklog is defined and zabbix_proxy_listenbacklog is not none %}
+ListenBacklog={{ zabbix_proxy_listenbacklog }}
+{% endif %}
 {% endif %}

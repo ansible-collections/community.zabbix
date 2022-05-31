@@ -1,0 +1,53 @@
+---
+- name: AutoPSK | Set default path variables for Windows
+  set_fact:
+    zabbix_agent_tlspskfile: "{{ zabbix_win_install_dir }}\\tls_psk_auto.secret.txt"
+    zabbix_agent_tlspskidentity_file: "{{ zabbix_win_install_dir }}\\tls_psk_auto.identity.txt"
+
+- name: AutoPSK | Check for existing TLS PSK file (Windows)
+  ansible.windows.win_stat:
+    path: "{{ zabbix_agent_tlspskfile }}"
+  register: zabbix_agent_tlspskcheck
+
+- name: AutoPSK | Check for existing TLS PSK identity (Windows)
+  ansible.windows.win_stat:
+    path: "{{ zabbix_agent_tlspskidentity_file }}"
+  register: zabbix_agent_tlspskidentity_check
+
+- name: AutoPSK | read existing TLS PSK file (Windows)
+  slurp:
+    src: "{{ zabbix_agent_tlspskfile }}"
+  register: zabbix_agent_tlspsk_base64
+  when: 
+    - zabbix_agent_tlspskcheck.stat.exists
+  no_log: "{{ ansible_verbosity < 3 }}"
+
+- name: AutoPSK | Read existing TLS PSK identity file (Windows)
+  slurp:
+    src: "{{ zabbix_agent_tlspskidentity_file }}"
+  register: zabbix_agent_tlspskidentity_base64
+  when: zabbix_agent_tlspskidentity_check.stat.exists
+  no_log: "{{ ansible_verbosity < 3 }}"
+
+- include_tasks: tlspsk_auto_common.yml
+
+- name: AutoPSK | Template TLS PSK identity in file (Windows)
+  win_copy:
+    dest: "{{ zabbix_agent_tlspskidentity_file }}"
+    content: "{{ zabbix_agent_tlspskidentity }}"
+  when:
+    - zabbix_agent_tlspskidentity_file is defined
+    - zabbix_agent_tlspskidentity is defined
+  notify:
+    - restart win zabbix agent
+    
+- name: AutoPSK | Template TLS PSK secret in file (Windows)
+  win_copy:
+    dest: "{{ zabbix_agent_tlspskfile }}"
+    content: "{{ zabbix_agent_tlspsk_secret }}"
+  when:
+    - zabbix_agent_tlspskfile is defined
+    - zabbix_agent_tlspsk_secret is defined
+    - zabbix_agent_os_family == "Windows"
+  notify:
+    - restart win zabbix agent

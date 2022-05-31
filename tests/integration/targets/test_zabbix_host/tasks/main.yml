@@ -1,12 +1,22 @@
 ---
-# setup stuff not testing zabbix_host
-- include: zabbix_host_setup.yml
+- block:
+    # setup stuff not testing zabbix_host
+    - include: zabbix_host_setup.yml
 
-# zabbix_host module tests
-- include: zabbix_host_tests.yml
+    # zabbix_host module tests
+    - include: zabbix_host_tests.yml
 
-# documentation example tests
-- include: zabbix_host_doc.yml
+    # documentation example tests
+    - include: zabbix_host_doc.yml
 
-# tear down stuff set up earlier
-- include: zabbix_host_teardown.yml
+    # tear down stuff set up earlier
+    - include: zabbix_host_teardown.yml
+  always:
+  - name: "cleanup if tests failed"
+    zabbix_host:
+      server_url: "{{ zabbix_api_server_url }}"
+      login_user: "{{ zabbix_api_login_user }}"
+      login_password: "{{ zabbix_api_login_pass }}"
+      host_name: ExampleHost
+      state: absent
+    ignore_errors: true

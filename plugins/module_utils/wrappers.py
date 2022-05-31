@@ -44,7 +44,7 @@ class ZapiWrapper(object):
 
         self.login()
 
-        self._zbx_api_version = self._zapi.api_version()[:5]
+        self._zbx_api_version = self._zapi.api_version()
 
     def login(self):
         # check if api already logged in

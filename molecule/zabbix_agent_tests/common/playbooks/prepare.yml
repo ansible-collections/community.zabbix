@@ -1,0 +1,86 @@
+---
+
+- name: Prepare
+  hosts: all
+  tasks:
+    - name: "Installing packages on CentOS family"
+      package:
+        pkg:
+          - net-tools
+          - which
+        state: present
+      register: zabbix_agent_prepare_packages_install
+      until: zabbix_agent_prepare_packages_install is succeeded
+      when:
+        - ansible_os_family == 'RedHat'
+
+    - name: "Installing packages on CentOS (Sangoma) family"
+      package:
+        pkg:
+          - net-tools
+          - which
+        state: present
+      register: zabbix_agent_prepare_packages_install
+      until: zabbix_agent_prepare_packages_install is succeeded
+      when:
+        - ansible_os_family == 'Sangoma'
+
+    - name: "Installing packages on Debian family"
+      apt:
+        name:
+          - "{{ 'net-tools' if ansible_distribution_major_version not in ['10','18', '20'] else 'iproute2' }}"
+        state: present
+      register: zabbix_agent_prepare_packages_install
+      until: zabbix_agent_prepare_packages_install is succeeded
+      when:
+        - ansible_os_family == 'Debian'
+
+    - name: "Installing packages on Suse family"
+      shell: zypper install -y python-xml python-libxml2 net-tools which
+      register: zabbix_agent_prepare_packages_install
+      until: zabbix_agent_prepare_packages_install is succeeded
+      when: ansible_os_family == 'Suse'
+      tags:
+        - skip_ansible_lint
+
+- name: Prepare
+  hosts: docker
+  tasks:
+    - name: "Download Docker CE repo file"
+      get_url:
+        url: https://download.docker.com/linux/centos/docker-ce.repo
+        dest: /etc/yum.repos.d/docker-ce.repo
+        mode: 0644
+      register: zabbix_agent_prepare_docker_repo
+      until: zabbix_agent_prepare_docker_repo is succeeded
+
+    - name: "Installing Epel"
+      package:
+        pkg:
+          - epel-release
+        state: present
+      register: zabbix_agent_prepare_docker_install
+      until: zabbix_agent_prepare_docker_install is succeeded
+
+    - name: "Installing Docker"
+      package:
+        pkg:
+          - docker-ce
+          - python-pip
+          - python-setuptools
+        state: present
+      register: zabbix_agent_prepare_docker_install
+      until: zabbix_agent_prepare_docker_install is succeeded
+
+    - name: "Installing Docker Python"
+      pip:
+        name:
+          - docker
+        state: present
+      register: zabbix_agent_prepare_docker_install
+      until: zabbix_agent_prepare_docker_install is succeeded
+
+    - name: "Starting Docker service"
+      service:
+        name: docker
+        state: started

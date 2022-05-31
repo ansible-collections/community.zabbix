@@ -1,0 +1,66 @@
+---
+- name: AutoPSK | Set default path variables (Linux)
+  set_fact:
+    zabbix_agent2_tlspskfile: "/etc/zabbix/tls_psk_auto.secret"
+    zabbix_agent2_tlspskidentity_file: "/etc/zabbix/tls_psk_auto.identity"
+
+- name: AutoPSK | Check for existing TLS PSK file (Linux)
+  stat:
+    path: "{{ zabbix_agent2_tlspskfile }}"
+  register: zabbix_agent2_tlspskcheck
+  become: true
+
+- name: AutoPSK | Check for existing TLS PSK identity (Linux)
+  stat:
+    path: "{{ zabbix_agent2_tlspskidentity_file }}"
+  register: zabbix_agent2_tlspskidentity_check
+  become: true
+
+- name: AutoPSK | read existing TLS PSK file (Linux)
+  slurp:
+    src: "{{ zabbix_agent2_tlspskfile }}"
+  register: zabbix_agent2_tlspsk_base64
+  become: true
+  when: 
+    - zabbix_agent2_tlspskcheck.stat.exists
+  no_log: "{{ ansible_verbosity < 3 }}"
+
+- name: AutoPSK | Read existing TLS PSK identity file (Linux)
+  slurp:
+    src: "{{ zabbix_agent2_tlspskidentity_file }}"
+  register: zabbix_agent2_tlspskidentity_base64
+  become: true
+  when: zabbix_agent2_tlspskidentity_check.stat.exists
+  no_log: "{{ ansible_verbosity < 3 }}"
+
+- include_tasks: tlspsk_auto_agent2_common.yml
+
+- name: AutoPSK | Template TLS PSK identity in file (Linux)
+  copy:
+    dest: "{{ zabbix_agent2_tlspskidentity_file }}"
+    content: "{{ zabbix_agent2_tlspskidentity }}"
+    owner: zabbix
+    group: zabbix
+    mode: 0400
+  become: true
+  when:
+    - zabbix_agent2_tlspskidentity_file is defined
+    - zabbix_agent2_tlspskidentity is defined
+  notify:
+    - restart zabbix-agent
+    - restart mac zabbix agent
+    
+- name: AutoPSK | Template TLS PSK secret in file (Linux)
+  copy:
+    dest: "{{ zabbix_agent2_tlspskfile }}"
+    content: "{{ zabbix_agent2_tlspsk_secret }}"
+    owner: zabbix
+    group: zabbix
+    mode: 0400
+  become: true
+  when:
+    - zabbix_agent2_tlspskfile is defined
+    - zabbix_agent2_tlspsk_secret is defined
+  notify:
+    - restart zabbix-agent
+    - restart mac zabbix agent

@@ -1,0 +1,219 @@
+---
+- name: test - attempt to create new global macro
+  zabbix_globalmacro:
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
+    macro_name: zbxgmacro_test01
+    macro_value: 123
+    macro_type: text
+    macro_description: Global Macro description
+  register: zbxgmacro_new
+
+- name: assert that macro was created
+  assert:
+    that: zbxgmacro_new is changed
+
+- name: test - attempt to create same global macro
+  zabbix_globalmacro:
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
+    macro_name: zbxgmacro_test01
+    macro_value: 123
+    macro_type: text
+    macro_description: Global Macro description
+  register: zbxgmacro_existing
+
+- name: assert that nothing has been changed
+  assert:
+    that: not zbxgmacro_existing is changed
+
+- name: test - attempt to create same global macro in zabbix native format
+  zabbix_globalmacro:
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
+    macro_name: "{$zbxgmacro_test01}"
+    macro_value: 123
+    macro_type: text
+    macro_description: Global Macro description
+  register: zbxgmacro_existing_native
+
+- name: assert that nothing has been changed
+  assert:
+    that: not zbxgmacro_existing_native is changed
+
+- name: test - attempt to create new global macro in zabbix native format
+  zabbix_globalmacro:
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
+    macro_name: "{$ZBXGMACRO_TEST02}"
+    macro_value: abcd
+    macro_type: text
+  register: zbxgmacro_new_native
+
+- name: assert that nothing macro was created
+  assert:
+    that: zbxgmacro_new_native is changed
+
+- name: test - attempt to update global macro with string value while force=no
+  zabbix_globalmacro:
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
+    macro_name: zbxgmacro_test01
+    macro_value: abc
+    macro_type: text
+    force: false
+  register: zbxgmacro_update_noforce
+
+- name: assert that nothing has been changed
+  assert:
+    that: not zbxgmacro_update_noforce is changed
+
+- name: test - attempt to update global macro with string value
+  zabbix_globalmacro:
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
+    macro_name: zbxgmacro_test01
+    macro_value: abc
+    macro_type: text
+  register: zbxgmacro_update
+
+- name: assert that global macro was updated
+  assert:
+    that: zbxgmacro_update is changed
+
+- name: test - attempt to create global macro with context
+  zabbix_globalmacro:
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
+    macro_name: low_space_limit:/home
+    macro_value: 10
+    macro_type: text
+  register: zbxgmacro_context_new
+
+- name: assert that macro was created
+  assert:
+    that: zbxgmacro_context_new is changed
+
+- name: test - attempt to create same global macro with context and verify that it was converted to uppercase
+  zabbix_globalmacro:
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
+    macro_name: LOW_SPACE_LIMIT:/home
+    macro_value: 10
+    macro_type: text
+  register: zbxgmacro_context_existing
+
+- name: assert that nothing has been changed
+  assert:
+    that: not zbxgmacro_context_existing is changed
+
+- name: test - attempt to delete all global macros
+  zabbix_globalmacro:
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
+    macro_name: "{{ item }}"
+    state: absent
+  loop:
+    - zbxgmacro_test01
+    - LOW_SPACE_LIMIT:/home
+    - "{$ZBXGMACRO_TEST02}"
+  register: zbxgmacro_delete_existing
+
+- name: assert that all macros have been deleted
+  assert:
+    that: item.changed is sameas True
+  loop: "{{ zbxgmacro_delete_existing.results }}"
+
+- name: test - attempt to delete non-existing global macro
+  zabbix_globalmacro:
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
+    macro_name: zbxgmacro_test01
+    state: absent
+  register: zbxgmacro_delete_missing
+
+- name: assert that nothing has been changed
+  assert:
+    that: not zbxgmacro_delete_missing is changed
+
+- name: test - attempt to create secret global macro
+  zabbix_globalmacro:
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
+    macro_name: zbxgmacro_test_secret
+    macro_value: 123
+    macro_type: secret
+    macro_description: Global Macro description
+  register: zbxgmacro_secret
+
+- assert:
+    that: zbxgmacro_secret.changed is sameas True
+
+- name: test - attempt to create same global macro
+  zabbix_globalmacro:
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
+    macro_name: zbxgmacro_test_secret
+    macro_value: 123
+    macro_type: secret
+    macro_description: Global Macro description
+  register: zbxgmacro_secret
+
+- assert:
+    that: zbxgmacro_secret.changed is sameas True
+  when: zabbix_version is version('5.0', '>=')
+
+- assert:
+    that: zbxgmacro_secret.changed is sameas False
+  when: zabbix_version is version('5.0', '<')
+
+- name: test - attempt to create vault global macro
+  zabbix_globalmacro:
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
+    macro_name: zbxgmacro_test_vault
+    macro_value: path/to/vault:zabbix
+    macro_type: vault
+    macro_description: Global Macro description
+  register: zbxgmacro_vault
+
+- assert:
+    that: zbxgmacro_vault.changed is sameas True
+
+- name: test - attempt to create same global macro
+  zabbix_globalmacro:
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
+    macro_name: zbxgmacro_test_vault
+    macro_value: path/to/vault:zabbix
+    macro_type: vault
+    macro_description: Global Macro description
+  register: zbxgmacro_vault
+
+- assert:
+    that: zbxgmacro_vault.changed is sameas False
+
+- name: delete all global macros
+  zabbix_globalmacro:
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
+    macro_name: "{{ item }}"
+    state: absent
+  loop:
+    - zbxgmacro_test_secret
+    - zbxgmacro_test_vault

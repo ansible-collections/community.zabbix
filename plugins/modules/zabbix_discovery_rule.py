@@ -256,10 +256,11 @@ msg:
 '''
 
 
-from distutils.version import LooseVersion
 from ansible.module_utils.basic import AnsibleModule
 
 from ansible_collections.community.zabbix.plugins.module_utils.base import ZabbixBase
+from ansible_collections.community.zabbix.plugins.module_utils.version import LooseVersion
+
 import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabbix_utils
 
 
@@ -586,12 +587,12 @@ def main():
                     'Telnet']
                 ),
                 ports=dict(type='str'),
-                key=dict(type='str'),
+                key=dict(type='str', no_log=False),
                 snmp_community=dict(type='str'),
-                snmpv3_authpassphrase=dict(type='str'),
+                snmpv3_authpassphrase=dict(type='str', no_log=True),
                 snmpv3_authprotocol=dict(type='str', choices=['MD5', 'SHA']),
                 snmpv3_contextname=dict(type='str'),
-                snmpv3_privpassphrase=dict(type='str'),
+                snmpv3_privpassphrase=dict(type='str', no_log=True),
                 snmpv3_privprotocol=dict(type='str', choices=['DES', 'AES']),
                 snmpv3_securitylevel=dict(type='str', choices=['noAuthNoPriv', 'authNoPriv', 'authPriv']),
                 snmpv3_securityname=dict(type='str'),

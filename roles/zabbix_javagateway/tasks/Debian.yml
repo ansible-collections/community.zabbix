@@ -11,13 +11,13 @@
   apt_key:
     id: "{{ sign_keys[zabbix_short_version][ansible_distribution_release]['sign_key'] }}"
     url: http://repo.zabbix.com/zabbix-official-repo.key
-  become: yes
+  become: true
 
 - name: "Debian | Installing repository Debian"
   apt_repository:
     repo: "deb http://repo.zabbix.com/zabbix/{{ zabbix_javagateway_version }}/debian/ {{ ansible_distribution_release }} main"
     state: present
-  become: yes
+  become: true
   when:
     - ansible_distribution == "Debian"
     - zabbix_repo == "zabbix"
@@ -26,25 +26,49 @@
   apt_repository:
     repo: "deb-src http://repo.zabbix.com/zabbix/{{ zabbix_javagateway_version }}/debian/ {{ ansible_distribution_release }} main"
     state: present
-  become: yes
+  become: true
   when:
     - ansible_distribution == "Debian"
+    - ansible_machine == "aarch64"
     - zabbix_repo == "zabbix"
+
+- name: "Debian | Installing repository Ubuntu"
+  apt_repository:
+    repo: "deb http://repo.zabbix.com/zabbix/{{ zabbix_javagateway_version }}/ubuntu-arm64/ {{ ansible_distribution_release }} main"
+    state: present
+  become: true
+  when:
+    - ansible_distribution == "Ubuntu"
+    - ansible_machine == "aarch64"
+    - zabbix_repo == "zabbix"
+
 
 - name: "Debian | Installing repository Ubuntu"
   apt_repository:
     repo: "deb http://repo.zabbix.com/zabbix/{{ zabbix_javagateway_version }}/ubuntu/ {{ ansible_distribution_release }} main"
     state: present
-  become: yes
+  become: true
   when:
     - ansible_distribution == "Ubuntu"
+    - ansible_machine != "aarch64"
     - zabbix_repo == "zabbix"
+
+- name: "Debian | Installing repository Ubuntu"
+  apt_repository:
+    repo: "deb-src http://repo.zabbix.com/zabbix/{{ zabbix_javagateway_version }}/ubuntu-arm64/ {{ ansible_distribution_release }} main"
+    state: present
+  become: true
+  when:
+    - ansible_distribution == "Ubuntu"
+    - ansible_machine == "aarch64"
+    - zabbix_repo == "zabbix"
+
 
 - name: "Debian | Installing repository Ubuntu"
   apt_repository:
     repo: "deb-src http://repo.zabbix.com/zabbix/{{ zabbix_javagateway_version }}/ubuntu/ {{ ansible_distribution_release }} main"
     state: present
-  become: yes
+  become: true
   when:
     - ansible_distribution == "Ubuntu"
     - zabbix_repo == "zabbix"
@@ -53,9 +77,21 @@
   apt:
     pkg: zabbix-java-gateway
     state: "{{ zabbix_javagateway_package_state }}"
-    update_cache: yes
-    force: yes
+    update_cache: true
+    force: true
     cache_valid_time: 3600
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   register: zabbix_java_gateway_install
   until: zabbix_java_gateway_install is succeeded
-  become: yes
+  become: true
+
+- name: "Make sure Zabbix Java Gateway is not yet running"
+  systemd:
+    name: zabbix-java-gateway
+    state: stopped
+    enabled: true
+    daemon_reload: true
+  when:
+    - zabbix_java_gateway_install.changed

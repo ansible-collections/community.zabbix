@@ -5,9 +5,9 @@
 
 - name: test - prepare example template for zabbix_action module
   zabbix_template:
-    server_url: "{{ zabbix_server_url }} "
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }} "
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     template_name: ExampleTemplateForActionModule
     template_groups:
       - Templates
@@ -16,9 +16,9 @@
 
 - name: test - prepare example mediatype for zabbix_action module
   zabbix_mediatype:
-    server_url: "{{ zabbix_server_url }} "
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }} "
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     name: ExampleMediaTypeForActionModule
     smtp_email: zabbix@example.com
     type: email
@@ -27,10 +27,10 @@
 
 - name: test - simple actions
   module_defaults:
-    zabbix_action:
-      server_url: "{{ zabbix_server_url }}"
-      login_user: "{{ zabbix_login_user }}"
-      login_password: "{{ zabbix_login_password }}"
+    community.zabbix.zabbix_action:
+      server_url: "{{ zabbix_api_server_url }}"
+      login_user: "{{ zabbix_api_login_user }}"
+      login_password: "{{ zabbix_api_login_pass }}"
       state: present
       status: enabled
       name: ExampleTriggerAction
@@ -116,7 +116,7 @@
   - name: test - update action with pause_in_maintenance
     zabbix_action:
       esc_period: 120
-      pause_in_maintenance: False
+      pause_in_maintenance: false
     register: zbxaction_maintpause
 
   - assert:
@@ -125,7 +125,7 @@
   - name: test - update action with pause_in_maintenance (again)
     zabbix_action:
       esc_period: 120
-      pause_in_maintenance: False
+      pause_in_maintenance: false
     register: zbxaction_maintpause
 
   - assert:
@@ -255,10 +255,10 @@
 
 - name: test - trigger actions with conditions
   module_defaults:
-    zabbix_action:
-      server_url: "{{ zabbix_server_url }}"
-      login_user: "{{ zabbix_login_user }}"
-      login_password: "{{ zabbix_login_password }}"
+    community.zabbix.zabbix_action:
+      server_url: "{{ zabbix_api_server_url }}"
+      login_user: "{{ zabbix_api_login_user }}"
+      login_password: "{{ zabbix_api_login_pass }}"
       state: present
       status: enabled
       name: ExampleTriggerActionConditions
@@ -282,9 +282,6 @@
         - type: trigger_severity
           operator: '>='
           value: Average
-        - type: application
-          operator: like
-          value: AnsibleTest
         - type: event_tag_value
           value: MyTag
           operator: '='
@@ -306,9 +303,6 @@
         - type: trigger_severity
           operator: '>='
           value: Average
-        - type: application
-          operator: like
-          value: AnsibleTest
         - type: event_tag_value
           value: MyTag
           operator: '='
@@ -327,9 +321,6 @@
         - type: host_group
           operator: '='
           value: Linux servers
-        - type: application
-          operator: like
-          value: AnsibleTest
         - type: event_tag_value
           value: MyTag
           operator: '='
@@ -343,7 +334,7 @@
     register: zbxaction_conditions_reorder
 
   - assert:
-      that: zbxaction_conditions_reorder.changed is sameas True
+      that: zbxaction_conditions_reorder.changed is sameas False
 
   - name: test - update action with multiple conditions by removing one condition
     zabbix_action:
@@ -351,9 +342,6 @@
         - type: host_group
           operator: '='
           value: Linux servers
-        - type: application
-          operator: like
-          value: AnsibleTest
         - type: event_tag_value
           value: MyTag
           operator: '='
@@ -372,9 +360,6 @@
         - type: host_group
           operator: '<>'
           value: Linux servers
-        - type: application
-          operator: not like
-          value: AnsibleTest
         - type: event_tag_value
           value: MyTag
           operator: '<>'
@@ -393,9 +378,6 @@
         - type: host_group
           operator: '<>'
           value: Linux servers
-        - type: application
-          operator: not like
-          value: AnsibleTest
         - type: event_tag_value
           value: MyTag
           operator: '<>'
@@ -415,9 +397,6 @@
         - type: host_group
           operator: '<>'
           value: Linux servers
-        - type: application
-          operator: not like
-          value: AnsibleTest
         - type: event_tag_value
           value: MyTag
           operator: '<>'
@@ -505,12 +484,12 @@
   - assert:
       that: zbxaction_delete.changed is sameas True
 
-- name: test - trigger actions with operations
+- name: test - trigger actions with message operations
   module_defaults:
-    zabbix_action:
-      server_url: "{{ zabbix_server_url }}"
-      login_user: "{{ zabbix_login_user }}"
-      login_password: "{{ zabbix_login_password }}"
+    community.zabbix.zabbix_action:
+      server_url: "{{ zabbix_api_server_url }}"
+      login_user: "{{ zabbix_api_login_user }}"
+      login_password: "{{ zabbix_api_login_pass }}"
       state: present
       status: enabled
       name: ExampleTriggerActionOperations
@@ -576,6 +555,96 @@
   - assert:
       that: zbxaction_ops.changed is sameas False
 
+  - name: test - delete action
+    zabbix_action:
+      state: absent
+    register: zbxaction_delete
+
+  - assert:
+      that: zbxaction_delete.changed is sameas True
+
+  - name: test - create new action with escalation steps 1-1
+    zabbix_action:
+      operations:
+        - type: send_message
+          send_to_users:
+            - Admin
+          media_type: ExampleMediaTypeForActionModule
+          esc_step_from: 1
+          esc_step_to: 1
+    register: zbxaction_esc11
+
+  - assert:
+      that: zbxaction_esc11.changed is sameas True
+
+  - name: test - create new action with escalation steps 1-1 (again)
+    zabbix_action:
+      operations:
+        - type: send_message
+          send_to_users:
+            - Admin
+          media_type: ExampleMediaTypeForActionModule
+          esc_step_from: 1
+          esc_step_to: 1
+    register: zbxaction_esc11_again
+
+  - assert:
+      that: zbxaction_esc11_again.changed is sameas False
+
+
+  - name: test - update action with escalation steps 2-2
+    zabbix_action:
+      operations:
+        - type: send_message
+          send_to_users:
+            - Admin
+          media_type: ExampleMediaTypeForActionModule
+          esc_step_from: 2
+          esc_step_to: 2
+    register: zbxaction_esc22
+
+  - assert:
+      that: zbxaction_esc22.changed is sameas True
+
+  - name: test - create new action with escalation steps 2-2 (again)
+    zabbix_action:
+      operations:
+        - type: send_message
+          send_to_users:
+            - Admin
+          media_type: ExampleMediaTypeForActionModule
+          esc_step_from: 2
+          esc_step_to: 2
+    register: zbxaction_esc22_again
+
+  - assert:
+      that: zbxaction_esc11_again.changed is sameas False
+
+  - name: test - delete action
+    zabbix_action:
+      state: absent
+    register: zbxaction_delete
+
+  - assert:
+      that: zbxaction_delete.changed is sameas True
+- name: test - trigger actions with remote_script operations with < Zabbix 6.0
+  when: zabbix_version is version('6.0', '<')
+  module_defaults:
+    community.zabbix.zabbix_action:
+      server_url: "{{ zabbix_api_server_url }}"
+      login_user: "{{ zabbix_api_login_user }}"
+      login_password: "{{ zabbix_api_login_pass }}"
+      state: present
+      status: enabled
+      name: ExampleTriggerActionOperations
+      event_source: trigger
+      esc_period: 60
+      conditions:
+        - type: trigger_severity
+          operator: '>='
+          value: Average
+
+  block:
   - name: test - create new action with remote_command operations
     zabbix_action:
       operations:
@@ -659,10 +728,10 @@
 
 - name: test - discovery actions
   module_defaults:
-    zabbix_action:
-      server_url: "{{ zabbix_server_url }}"
-      login_user: "{{ zabbix_login_user }}"
-      login_password: "{{ zabbix_login_password }}"
+    community.zabbix.zabbix_action:
+      server_url: "{{ zabbix_api_server_url }}"
+      login_user: "{{ zabbix_api_login_user }}"
+      login_password: "{{ zabbix_api_login_pass }}"
       state: present
       status: enabled
       name: ExampleDiscoveryActionOperations
@@ -820,10 +889,10 @@
 
 - name: test - auto registration actions
   module_defaults:
-    zabbix_action:
-      server_url: "{{ zabbix_server_url }}"
-      login_user: "{{ zabbix_login_user }}"
-      login_password: "{{ zabbix_login_password }}"
+    community.zabbix.zabbix_action:
+      server_url: "{{ zabbix_api_server_url }}"
+      login_user: "{{ zabbix_api_login_user }}"
+      login_password: "{{ zabbix_api_login_pass }}"
       state: present
       status: enabled
       name: ExampleAutoRegActionOperations
@@ -911,10 +980,10 @@
 
 - name: test - internal actions
   module_defaults:
-    zabbix_action:
-      server_url: "{{ zabbix_server_url }}"
-      login_user: "{{ zabbix_login_user }}"
-      login_password: "{{ zabbix_login_password }}"
+    community.zabbix.zabbix_action:
+      server_url: "{{ zabbix_api_server_url }}"
+      login_user: "{{ zabbix_api_login_user }}"
+      login_password: "{{ zabbix_api_login_pass }}"
       state: present
       status: enabled
       name: ExampleInternalActionOperations
@@ -932,9 +1001,6 @@
   - name: test - create new internal action
     zabbix_action:
       conditions:
-        - type: application
-          operator: like
-          value: zabbix
         - type: host_template
           operator: '='
           value: ExampleTemplateForActionModule
@@ -949,9 +1015,6 @@
   - name: test - create new internal action (again)
     zabbix_action:
       conditions:
-        - type: application
-          operator: like
-          value: zabbix
         - type: host_template
           operator: '='
           value: ExampleTemplateForActionModule
@@ -966,9 +1029,6 @@
   - name: test - update internal action conditions
     zabbix_action:
       conditions:
-        - type: application
-          operator: like
-          value: zabbix
         - type: host_template
           operator: '='
           value: ExampleTemplateForActionModule
@@ -986,9 +1046,6 @@
   - name: test - update internal action conditions (again)
     zabbix_action:
       conditions:
-        - type: application
-          operator: like
-          value: zabbix
         - type: host_template
           operator: '='
           value: ExampleTemplateForActionModule
@@ -1011,14 +1068,15 @@
   - assert:
       that: zbxaction_delete.changed is sameas True
 
-- name: test - actions with recovery and acknowledge operations
+- name: test - actions with recovery and acknowledge operations with < Zabbix 6.0
   when:
     - zabbix_version is version('3.4', '>=')
+    - zabbix_version is version('6.0', '<')
   module_defaults:
-    zabbix_action:
-      server_url: "{{ zabbix_server_url }}"
-      login_user: "{{ zabbix_login_user }}"
-      login_password: "{{ zabbix_login_password }}"
+    community.zabbix.zabbix_action:
+      server_url: "{{ zabbix_api_server_url }}"
+      login_user: "{{ zabbix_api_login_user }}"
+      login_password: "{{ zabbix_api_login_pass }}"
       state: present
       status: enabled
       name: ExampleTriggerActionRecAckOps
@@ -1149,20 +1207,146 @@
   - assert:
       that: zbxaction_delete.changed is sameas True
 
+- name: test - actions with recovery and acknowledge operations with >= Zabbx 6.0
+  when:
+    - zabbix_version is version('6.0', '>=')
+  module_defaults:
+    community.zabbix.zabbix_action:
+      server_url: "{{ zabbix_api_server_url }}"
+      login_user: "{{ zabbix_api_login_user }}"
+      login_password: "{{ zabbix_api_login_pass }}"
+      state: present
+      status: enabled
+      name: ExampleTriggerActionRecAckOps
+      event_source: trigger
+      esc_period: 60
+      conditions:
+        - type: trigger_severity
+          operator: '>='
+          value: Information
+      operations:
+        - type: send_message
+          subject: ExampleSubject
+          message: ExampleMessage
+          media_type: ExampleMediaTypeForActionModule
+          send_to_users:
+            - Admin
+
+  block:
+  - name: test - create new action with recovery and acknowledge operations
+    zabbix_action:
+      recovery_operations:
+        - type: send_message
+          subject: ExampleSubject
+          message: ExampleMessage
+          media_type: ExampleMediaTypeForActionModule
+          send_to_users:
+            - Admin
+        - type: notify_all_involved
+          subject: RecoverySubject
+          message: RecoveryMessage
+      acknowledge_operations:
+        - type: send_message
+          subject: ExampleSubject
+          message: ExampleMessage
+          media_type: ExampleMediaTypeForActionModule
+          send_to_users:
+            - Admin
+        - type: notify_all_involved
+          subject: RecoverySubject
+          message: RecoveryMessage
+          media_type: ExampleMediaTypeForActionModule
+    register: zbxaction_recack_new
+
+  - assert:
+      that: zbxaction_recack_new.changed is sameas True
+
+  - name: test - create new action with recovery and acknowledge operations (again)
+    zabbix_action:
+      recovery_operations:
+        - type: send_message
+          subject: ExampleSubject
+          message: ExampleMessage
+          media_type: ExampleMediaTypeForActionModule
+          send_to_users:
+            - Admin
+        - type: notify_all_involved
+          subject: RecoverySubject
+          message: RecoveryMessage
+      acknowledge_operations:
+        - type: send_message
+          subject: ExampleSubject
+          message: ExampleMessage
+          media_type: ExampleMediaTypeForActionModule
+          send_to_users:
+            - Admin
+        - type: notify_all_involved
+          subject: RecoverySubject
+          message: RecoveryMessage
+          media_type: ExampleMediaTypeForActionModule
+    register: zbxaction_recack_new
+
+  - assert:
+      that: zbxaction_recack_new.changed is sameas False
+
+  - name: test - delete action
+    zabbix_action:
+      state: absent
+    register: zbxaction_delete
+
+  - assert:
+      that: zbxaction_delete.changed is sameas True
+
+- name: test - Output error message when user sets application to conditions with >= Zabbix 5.4
+  community.zabbix.zabbix_action:
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
+    name: ExampleApplicationAction
+    event_source: trigger
+    esc_period: 60
+    conditions:
+      - type: application
+        operator: like
+        value: AnsibleTest
+    operations:
+      - type: send_message
+        subject: ExampleSubject
+        message: ExampleMessage
+        media_type: ExampleMediaTypeForActionModule
+        send_to_users:
+          - Admin
+  ignore_errors: true
+  register: zbxaction_application
+
+- assert:
+    that:
+      - zbxaction_application.failed is sameas True
+      - zbxaction_application.msg == "'application' is disabled for condition type since 5.4 version."
+  when: zabbix_version is version('5.4', '>=')
+
+- name: delete ExampleApplicationAction action
+  community.zabbix.zabbix_action:
+    server_url: "{{ zabbix_api_server_url }} "
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
+    name: ExampleApplicationAction
+    state: absent
+
 - name: test - cleanup example template for zabbix_action module
   zabbix_template:
-    server_url: "{{ zabbix_server_url }} "
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }} "
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     template_name: ExampleTemplateForActionModule
     state: absent
   register: zbxaction_prep_template
 
 - name: test - cleanup example mediatype for zabbix_action module
   zabbix_mediatype:
-    server_url: "{{ zabbix_server_url }} "
-    login_user: "{{ zabbix_login_user }}"
-    login_password: "{{ zabbix_login_password }}"
+    server_url: "{{ zabbix_api_server_url }} "
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
     name: ExampleMediaTypeForActionModule
     type: email
     state: absent

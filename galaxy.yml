@@ -1,6 +1,7 @@
+---
 namespace: community
 name: zabbix
-version: 1.0.0
+version: 1.7.0
 readme: README.md
 authors:
 - Dusan Matejka (@D3DeFi)
@@ -15,3 +16,10 @@ repository: https://github.com/ansible-collections/community.zabbix.git
 documentation: https://github.com/ansible-collections/community.zabbix.git
 homepage: https://github.com/ansible-collections/community.zabbix
 issues: https://github.com/ansible-collections/community.zabbix/issues
+dependencies:
+  ansible.windows: "*"
+  ansible.netcommon: "*"
+  ansible.posix: "*"
+  community.general: "*"
+  community.mysql: "*"
+  community.postgresql: "*"

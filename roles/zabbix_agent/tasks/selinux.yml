@@ -1,0 +1,102 @@
+---
+
+- name: "SELinux | Debian | Install policycoreutils-python"
+  apt:
+    pkg: policycoreutils-python-utils
+    state: present
+    update_cache: true
+    cache_valid_time: 0
+    force_apt_get: "{{ zabbix_apt_force_apt_get }}"
+    install_recommends: "{{ zabbix_apt_install_recommends }}"
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
+  register: zabbix_agent_policycoreutils_installed
+  until: zabbix_agent_package_installed is succeeded
+  become: true
+  when:
+    - zabbix_agent_os_family == "Debian"
+
+- name: "SELinux | RedHat | Install policycoreutils-python"
+  package:
+    name: policycoreutils-python
+    state: installed
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
+  register: zabbix_agent_policycoreutils_installed
+  until: zabbix_agent_policycoreutils_installed is succeeded
+  when:
+    - zabbix_agent_os_family == "RedHat"
+    - (zabbix_agent_distribution_major_version == "6" or zabbix_agent_distribution_major_version == "7")
+  become: true
+  tags:
+    - init
+    - zabbix-agent
+
+- name: "SELinux | RedHat | Install python3-policycoreutils on RHEL8"
+  package:
+    name: python3-policycoreutils
+    state: installed
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
+  register: zabbix_agent_policycoreutils_installed
+  until: zabbix_agent_policycoreutils_installed is succeeded
+  when:
+    - zabbix_agent_os_family == "RedHat"
+    - ansible_distribution_major_version == "8"
+  become: true
+  tags:
+    - init
+    - zabbix-agent
+
+- name: "SELinux | RedHat | Install selinux-policy-targeted"
+  package:
+    name: selinux-policy-targeted
+    state: installed
+  register: zabbix_agent_selinuxpolicytargeted_installed
+  until: zabbix_agent_selinuxpolicytargeted_installed is succeeded
+  when:
+    - zabbix_agent_os_family == "RedHat"
+  become: true
+  tags:
+    - init
+    - zabbix-agent
+
+# straight to getenforce binary , workaround for missing python_selinux library
+- name: "SELinux | Get getenforce binary"
+  stat:
+    path: /usr/sbin/getenforce
+  register: getenforce_bin
+  become: true
+
+- name: "SELinux | Collect getenforce output"
+  command: /usr/sbin/getenforce
+  register: sestatus
+  when: 'getenforce_bin.stat.exists'
+  changed_when: false
+  become: true
+  check_mode: false
+
+- name: "SELinux | Set zabbix_selinux to true if getenforce returns Enforcing or Permissive"
+  set_fact:
+    zabbix_selinux: "{{ true }}"
+  when:
+    - 'getenforce_bin.stat.exists and ("Enforcing" in sestatus.stdout or "Permissive" in sestatus.stdout)'
+
+- name: "SELinux | Allow zabbix_agent to start (SELinux)"
+  community.general.selinux_permissive:
+    name: zabbix_agent_t
+    permissive: true
+  become: true
+
+- name: "SELinux | Allow zabbix to run sudo commands (SELinux)"
+  ansible.posix.seboolean:
+    name: zabbix_run_sudo
+    persistent: true
+    state: true
+  when:
+    - ansible_selinux.status == "enabled"
+    - selinux_allow_zabbix_run_sudo|bool
+  tags: selinux

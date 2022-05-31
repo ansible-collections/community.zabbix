@@ -1,2 +1,0 @@
-bugfixes:
-    - "Some OS related tasks where missing the option ``become: true`` and has been added to all the roles on tasks that needs 'admin' rights."

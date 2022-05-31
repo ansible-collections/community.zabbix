@@ -1,10 +1,10 @@
 ---
 - name: test - email mediatypes
   module_defaults:
-    zabbix_mediatype:
-      server_url: "{{ zabbix_server_url }}"
-      login_user: "{{ zabbix_login_user }}"
-      login_password: "{{ zabbix_login_password }}"
+    community.zabbix.zabbix_mediatype:
+      server_url: "{{ zabbix_api_server_url }}"
+      login_user: "{{ zabbix_api_login_user }}"
+      login_password: "{{ zabbix_api_login_pass }}"
       state: present
       name: Example email
       type: email
@@ -54,17 +54,17 @@
 
   - name: test - update email mediatype with authentication without credentials (fail)
     zabbix_mediatype:
-      smtp_authentication: yes
+      smtp_authentication: true
       smtp_security: STARTTLS
     register: zbxmediatype_auth_fail
-    ignore_errors: True
+    ignore_errors: true
 
   - assert:
       that: zbxmediatype_auth_fail.failed is sameas True
 
   - name: test - update email mediatype with authentication
     zabbix_mediatype:
-      smtp_authentication: yes
+      smtp_authentication: true
       smtp_security: STARTTLS
       username: zabbix
       password: Ex4mP!3
@@ -75,7 +75,7 @@
 
   - name: test - update email mediatype with authentication (again)
     zabbix_mediatype:
-      smtp_authentication: yes
+      smtp_authentication: true
       smtp_security: STARTTLS
       username: zabbix
       password: Ex4mP!3
@@ -86,10 +86,10 @@
 
   - name: test - update email mediatype with SSL/TLS and host/peer verification
     zabbix_mediatype:
-      smtp_authentication: yes
+      smtp_authentication: true
       smtp_security: SSL/TLS
-      smtp_verify_host: yes
-      smtp_verify_peer: yes
+      smtp_verify_host: true
+      smtp_verify_peer: true
       username: zabbix
       password: Ex4mP!3
     register: zbxmediatype_verif
@@ -99,10 +99,10 @@
 
   - name: test - update email mediatype with SSL/TLS and host/peer verification (again)
     zabbix_mediatype:
-      smtp_authentication: yes
+      smtp_authentication: true
       smtp_security: SSL/TLS
-      smtp_verify_host: yes
-      smtp_verify_peer: yes
+      smtp_verify_host: true
+      smtp_verify_peer: true
       username: zabbix
       password: Ex4mP!3
     register: zbxmediatype_verif
@@ -145,7 +145,7 @@
         max_attempts: 11
         attempt_interval: 61
       register: zbxmediatype_concur_fail
-      ignore_errors: True
+      ignore_errors: true
 
     - assert:
         that: zbxmediatype_concur_fail.failed is sameas True
@@ -313,10 +313,10 @@
 
 - name: test - script mediatypes
   module_defaults:
-    zabbix_mediatype:
-      server_url: "{{ zabbix_server_url }}"
-      login_user: "{{ zabbix_login_user }}"
-      login_password: "{{ zabbix_login_password }}"
+    community.zabbix.zabbix_mediatype:
+      server_url: "{{ zabbix_api_server_url }}"
+      login_user: "{{ zabbix_api_login_user }}"
+      login_password: "{{ zabbix_api_login_pass }}"
       state: present
       name: Example script
       type: script
@@ -378,10 +378,10 @@
 
 - name: test - sms mediatypes
   module_defaults:
-    zabbix_mediatype:
-      server_url: "{{ zabbix_server_url }}"
-      login_user: "{{ zabbix_login_user }}"
-      login_password: "{{ zabbix_login_password }}"
+    community.zabbix.zabbix_mediatype:
+      server_url: "{{ zabbix_api_server_url }}"
+      login_user: "{{ zabbix_api_login_user }}"
+      login_password: "{{ zabbix_api_login_pass }}"
       state: present
       name: Example sms
       type: sms
@@ -432,7 +432,7 @@
         gsm_modem: /dev/ttyS0
         max_sessions: 2
       register: zbxmediatype_sms_fail
-      ignore_errors: True
+      ignore_errors: true
 
     - assert:
         that: zbxmediatype_sms_fail.failed is sameas True
@@ -448,10 +448,10 @@
 - name: test - jabber mediatypes
   when: zabbix_version is version('4.2', '<=')
   module_defaults:
-    zabbix_mediatype:
-      server_url: "{{ zabbix_server_url }}"
-      login_user: "{{ zabbix_login_user }}"
-      login_password: "{{ zabbix_login_password }}"
+    community.zabbix.zabbix_mediatype:
+      server_url: "{{ zabbix_api_server_url }}"
+      login_user: "{{ zabbix_api_login_user }}"
+      login_password: "{{ zabbix_api_login_pass }}"
       state: present
       name: Example jabber
       type: jabber
@@ -486,10 +486,10 @@
 - name: test - ez_texting mediatypes
   when: zabbix_version is version('4.2', '<=')
   module_defaults:
-    zabbix_mediatype:
-      server_url: "{{ zabbix_server_url }}"
-      login_user: "{{ zabbix_login_user }}"
-      login_password: "{{ zabbix_login_password }}"
+    community.zabbix.zabbix_mediatype:
+      server_url: "{{ zabbix_api_server_url }}"
+      login_user: "{{ zabbix_api_login_user }}"
+      login_password: "{{ zabbix_api_login_pass }}"
       state: present
       name: Example ez_texting
       type: ez_texting
@@ -536,10 +536,10 @@
 - name: test - email mediatypes
   when: zabbix_version is version('4.4', '>=')
   module_defaults:
-    zabbix_mediatype:
-      server_url: "{{ zabbix_server_url }}"
-      login_user: "{{ zabbix_login_user }}"
-      login_password: "{{ zabbix_login_password }}"
+    community.zabbix.zabbix_mediatype:
+      server_url: "{{ zabbix_api_server_url }}"
+      login_user: "{{ zabbix_api_login_user }}"
+      login_password: "{{ zabbix_api_login_pass }}"
       state: present
       name: Example webhook
       type: webhook
@@ -562,7 +562,7 @@
 
   - name: test - update webhook mediatype with process_tags
     zabbix_mediatype:
-      process_tags: True
+      process_tags: true
     register: zbxmediatype_webhook_tags
 
   - assert:
@@ -570,7 +570,7 @@
 
   - name: test - update webhook mediatype with process_tags (again)
     zabbix_mediatype:
-      process_tags: True
+      process_tags: true
     register: zbxmediatype_webhook_tags
 
   - assert:
@@ -579,7 +579,7 @@
   # supported since 4.4
   - name: test - update webhook mediatype with description
     zabbix_mediatype:
-      process_tags: True
+      process_tags: true
       description: My custom webhook mediatype
     register: zbxmediatype_webhook_desc
 
@@ -588,7 +588,7 @@
 
   - name: test - update webhook mediatype with description (again)
     zabbix_mediatype:
-      process_tags: True
+      process_tags: true
       description: My custom webhook mediatype
     register: zbxmediatype_webhook_desc
 
@@ -597,20 +597,20 @@
 
   - name: test - update webhook mediatype with event_menu without name and url (fail)
     zabbix_mediatype:
-      process_tags: True
+      process_tags: true
       description: My custom webhook mediatype
-      event_menu: True
+      event_menu: true
     register: zbxmediatype_webhook_eventmenu
-    ignore_errors: True
+    ignore_errors: true
 
   - assert:
       that: zbxmediatype_webhook_eventmenu.failed is sameas True
 
   - name: test - update webhook mediatype with event_menu
     zabbix_mediatype:
-      process_tags: True
+      process_tags: true
       description: My custom webhook mediatype
-      event_menu: True
+      event_menu: true
       event_menu_name: Example entry name
       event_menu_url: '{EVENT.TAGS.__message_link}'
     register: zbxmediatype_webhook_eventmenu
@@ -620,9 +620,9 @@
 
   - name: test - update webhook mediatype with event_menu (again)
     zabbix_mediatype:
-      process_tags: True
+      process_tags: true
       description: My custom webhook mediatype
-      event_menu: True
+      event_menu: true
       event_menu_name: Example entry name
       event_menu_url: '{EVENT.TAGS.__message_link}'
     register: zbxmediatype_webhook_eventmenu

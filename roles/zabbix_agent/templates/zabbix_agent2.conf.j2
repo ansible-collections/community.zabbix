@@ -6,10 +6,12 @@
 ### Option: PidFile
 #	Name of PID file.
 #
-# Mandatory: no
+# Mandatory: false
 # Default:
 
+{% if zabbix_agent_os_family != "Windows" %}
 PidFile={{ zabbix_agent2_pidfile }}
+{% endif %}
 
 ### Option: LogType
 #	Specifies where log messages are written to:
@@ -28,7 +30,11 @@ LogType={{ zabbix_agent2_logtype }}
 # Mandatory: yes, if LogType is set to file, otherwise no
 # Default:
 
+{% if zabbix_agent_os_family == "Windows" %}
+LogFile={{ zabbix_agent2_win_logfile }}
+{% else %}
 LogFile={{ zabbix_agent2_logfile }}
+{% endif %}
 
 ### Option: LogFileSize
 #	Maximum size of log file in MB.
@@ -52,6 +58,7 @@ LogFileSize={{ zabbix_agent2_logfilesize }}
 # Mandatory: no
 # Range: 0-5
 # Default:
+
 DebugLevel={{ zabbix_agent2_debuglevel }}
 
 ### Option: SourceIP
@@ -59,6 +66,7 @@ DebugLevel={{ zabbix_agent2_debuglevel }}
 #
 # Mandatory: no
 # Default:
+
 {% if zabbix_agent2_sourceip is defined and zabbix_agent2_sourceip %}
 SourceIP={{ zabbix_agent2_sourceip }}
 {% endif %}
@@ -76,7 +84,7 @@ SourceIP={{ zabbix_agent2_sourceip }}
 # Mandatory: yes, if StartAgents is not explicitly set to 0
 # Default:
 
-Server={{ zabbix_agent_server }}
+Server={{ zabbix_agent2_server }}
 
 ### Option: ListenPort
 #	Agent will listen on this port for connections from the server.
@@ -104,7 +112,9 @@ ListenIP={{ zabbix_agent2_listenip }}
 # Range: 1024-32767
 # Default:
 # StatusPort=
+{% if zabbix_agent2_statusport is defined and zabbix_agent2_statusport %}
 StatusPort={{ zabbix_agent2_statusport }}
+{% endif %}
 
 ##### Active checks related
 
@@ -120,7 +130,7 @@ StatusPort={{ zabbix_agent2_statusport }}
 # Default:
 # ServerActive=
 
-ServerActive={{ zabbix_agent_serveractive }}
+ServerActive={{ zabbix_agent2_serveractive }}
 
 ### Option: Hostname
 #	Unique, case sensitive hostname.
@@ -198,6 +208,37 @@ HostInterface={{ zabbix_agent2_hostinterface }}
 HostInterfaceItem={{ zabbix_agent2_hostinterfaceitem }}
 {% endif %}
 
+### Option: AllowKey
+# 	Optional parameter that defines AllowKey
+# 	Allow execution of those item keys that match a pattern.
+# 	Key pattern is a wildcard expression that supports "*" character to match any number of any characters.
+# 	Multiple key matching rules may be defined in combination with DenyKey.
+# 	The parameters are processed one by one according to their appearance order.
+
+{% if zabbix_agent2_allow_key is defined and zabbix_agent2_allow_key %}
+{% for item in zabbix_agent2_allow_key %}
+AllowKey={{ item }}
+{% endfor %}
+{% endif %}
+
+### Option: DenyKey
+#   Deny execution of items keys matching pattern.
+#   Multiple keys matching rules may be defined in combination with AllowKey.
+#   Key pattern is wildcard expression, which support "*" character to match any number of any characters in certain position. It might be used in both key name and key arguments.
+#   Parameters are processed one by one according their appearance order.
+#   If no AllowKey or DenyKey rules defined, all keys are allowed.
+#       Unless another system.run[*] rule is specified DenyKey=system.run[*] is added by default.
+#
+# Mandatory: no
+# Default:
+# DenyKey=system.run[*]
+
+{% if zabbix_agent2_deny_key is defined and zabbix_agent2_deny_key %}
+{% for item in zabbix_agent2_deny_key %}
+DenyKey={{ item }}
+{% endfor %}
+{% endif %}
+
 ### Option: RefreshActiveChecks
 #	How often list of active checks is refreshed, in seconds.
 #
@@ -271,7 +312,13 @@ PersistentBufferFile={{ zabbix_agent2_persistentbufferfile }}
 # Range:
 # Default:
 {% if zabbix_agent2_zabbix_alias is defined and zabbix_agent2_zabbix_alias %}
+{% if zabbix_agent2_zabbix_alias is string %}
 Alias={{ zabbix_agent2_zabbix_alias }}
+{% else %}
+{% for item in zabbix_agent2_zabbix_alias %}
+Alias={{ item }}
+{% endfor %}
+{% endif %}
 {% endif %}
 
 ### Option: Timeout
@@ -288,7 +335,6 @@ Timeout={{ zabbix_agent2_timeout }}
 #
 # Mandatory: no
 # Default:
-
 {% if zabbix_agent_os_family == "Windows" %}
 Include={{ zabbix_agent_win_include }}
 {% else %}
@@ -326,8 +372,9 @@ UnsafeUserParameters={{ zabbix_agent2_unsafeuserparameters }}
 # Mandatory: no
 # Default:
 # ControlSocket=
-
+{% if zabbix_agent_os_family != "Windows" %}
 ControlSocket={{ zabbix_agent2_controlsocket }}
+{% endif %}
 
 ####### TLS-RELATED PARAMETERS #######
 
@@ -450,4 +497,18 @@ TLSPSKFile={{ zabbix_agent2_tlspskfile }}
 Plugins.{{ my_name }}.{{ param }}={{ value }}
 {% endfor %}
 {% endfor %}
+{% endif %}
+
+{% if zabbix_version is version('6.0', '>=') %}
+####### For advanced users - TCP-related fine-tuning parameters #######
+
+## Option: ListenBacklog
+#       The maximum number of pending connections in the queue. This parameter is passed to
+#       listen() function as argument 'backlog' (see "man listen").
+#
+# Mandatory: no
+# Range: 0 - INT_MAX (depends on system, too large values may be silently truncated to implementation-specified maximum)
+{% if zabbix_agent2_listenbacklog is defined and zabbix_agent2_listenbacklog %}
+ListenBacklog={{ zabbix_agent2_listenbacklog }}
+{% endif %}
 {% endif %}

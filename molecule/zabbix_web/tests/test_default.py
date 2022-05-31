@@ -21,10 +21,10 @@ def test_zabbix_package(host, server, redhat, debian):
     if host == server:
         if host.system_info.distribution in ['debian', 'ubuntu']:
             zabbix_web = host.package(debian)
-            assert zabbix_web.version.startswith("1:5.0")
+            assert zabbix_web.version.startswith("1:6.0")
         elif host.system_info.distribution == 'centos':
             zabbix_web = host.package(redhat)
-            assert zabbix_web.version.startswith("5.0")
+            assert zabbix_web.version.startswith("6.0")
         assert zabbix_web.is_installed
 
 
@@ -48,8 +48,8 @@ def test_zabbix_web(host):
 
 def test_zabbix_api(host):
     my_host = host.ansible.get_variables()
-    zabbix_url = str(my_host['zabbix_url'])
-    hostname = 'http://' + zabbix_url + '/api_jsonrpc.php'
+    zabbix_api_server_url = str(my_host['zabbix_api_server_url'])
+    hostname = 'http://' + zabbix_api_server_url + '/api_jsonrpc.php'
     post_data = '{"jsonrpc": "2.0", "method": "user.login", "params": { "user": "Admin", "password": "zabbix" }, "id": 1, "auth": null}'
     headers = 'Content-Type: application/json-rpc'
     command = "curl -XPOST -H '" + str(headers) + "' -d '" + str(post_data) + "' '" + hostname + "'"

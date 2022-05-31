@@ -3,8 +3,8 @@ dependency:
   name: galaxy
   enabled: true
   options:
-    ignore-certs: True
-    ignore-errors: True
+    ignore-certs: true
+    ignore-errors: true
     role-file: molecule/zabbix_web/requirements.yml
 
 driver:
@@ -13,8 +13,8 @@ platforms:
   - name: zabbix-web-${MY_MOLECULE_CONTAINER:-mysql-centos8}
     image: ${MY_MOLECULE_IMAGE:-"geerlingguy/docker-centos8-ansible"}
     command: ${MY_MOLECULE_DOCKER_COMMAND:-""}
-    privileged: True
-    pre_build_image: True
+    privileged: true
+    pre_build_image: true
     networks:
       - name: zabbix
     volumes:
@@ -55,56 +55,44 @@ provisioner:
     host_vars:
       zabbix-web-pgsql-debian:
         zabbix_websrv: apache
-        php_default_version_debian: 7.4
-        zabbix_url: zabbix-web-pgsql-debian
+        php_default_version_debian: 7.2
+        zabbix_php_fpm_conf_listen: false
+        zabbix_api_server_url: zabbix-web-pgsql-debian
         zabbix_websrv_servername: zabbix-web-pgsql-debian
       zabbix-web-mysql-debian:
         zabbix_websrv: apache
-        php_default_version_debian: 7.4
-        zabbix_url: zabbix-web-mysql-debian
+        php_default_version_debian: 7.2
+        zabbix_php_fpm_conf_listen: false
+        zabbix_api_server_url: zabbix-web-mysql-debian
         zabbix_websrv_servername: zabbix-web-mysql-debian
-      zabbix-web-pgsql-centos7:
+      zabbix-web-pgsql-centos8:
+        ansible_rhn_repo_disable_gpg_check: true
         zabbix_websrv: apache
-        zabbix_php_fpm: True
-        zabbix_php_fpm_conf_listen: False
-        zabbix_url: zabbix-web-pgsql-centos7
-        zabbix_websrv_servername: zabbix-web-pgsql-centos7
+        zabbix_php_fpm_conf_listen: false
+        zabbix_api_server_url: zabbix-web-pgsql-centos8
+        zabbix_websrv_servername: zabbix-web-pgsql-centos8
       zabbix-web-mysql-centos8:
-        ansible_rhn_repo_disable_gpg_check: True
+        ansible_rhn_repo_disable_gpg_check: true
         php_fpm_pool_user: nginx
         php_fpm_pool_group: nginx
         zabbix_websrv: nginx
-        zabbix_php_fpm_conf_listen: False
-        zabbix_url: zabbix-web-mysql-centos8
+        zabbix_php_fpm_conf_listen: false
+        zabbix_api_server_url: zabbix-web-mysql-centos8
         zabbix_websrv_servername: zabbix-web-mysql-centos8
       zabbix-web-mysql-ubuntu18:
         zabbix_websrv: nginx
-        zabbix_php_fpm_conf_listen: False
-        zabbix_url: zabbix-web-mysql-ubuntu18
+        zabbix_php_fpm_conf_listen: false
+        php_default_version_debian: 7.2
+        zabbix_api_server_url: zabbix-web-mysql-ubuntu18
         zabbix_websrv_servername: zabbix-web-mysql-ubuntu18
       zabbix-web-pgsql-ubuntu20:
-        zabbix_php_fpm_conf_listen: False
+        zabbix_php_fpm_conf_listen: false
         zabbix_websrv: apache
-        zabbix_url: zabbix-web-pgsql-ubuntu20
+        php_default_version_debian: 7.4
+        zabbix_api_server_url: zabbix-web-pgsql-ubuntu20
         zabbix_websrv_servername: zabbix-web-pgsql-ubuntu20
 
 verifier:
   name: testinfra
   lint:
     name: flake8
-
-scenario:
-  test_sequence:
-    - dependency
-    - lint
-    - cleanup
-    - destroy
-    - syntax
-    - create
-    - prepare
-    - converge
-    # - idempotence
-    - side_effect
-    - verify
-    - cleanup
-    - destroy

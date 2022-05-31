@@ -1,11 +1,25 @@
+objects:
+  role: {}
 plugins:
   become: {}
   cache: {}
   callback: {}
   cliconf: {}
-  connection: {}
-  httpapi: {}
-  inventory: {}
+  connection:
+    httpapi:
+      description: Use httpapi to run command on network appliances
+      name: httpapi
+      version_added: 1.6.0
+  httpapi:
+    jsonrpc:
+      description: HttpApi Plugin for Zabbix
+      name: jsonrpc
+      version_added: 1.6.0
+  inventory:
+    zabbix_inventory:
+      description: Zabbix Inventory Plugin
+      name: zabbix_inventory
+      version_added: 1.4.0
   lookup: {}
   module:
     zabbix_action:
@@ -13,11 +27,26 @@ plugins:
       name: zabbix_action
       namespace: ''
       version_added: null
+    zabbix_authentication:
+      description: Update Zabbix authentication
+      name: zabbix_authentication
+      namespace: ''
+      version_added: 1.6.0
+    zabbix_autoregister:
+      description: Update Zabbix autoregistration
+      name: zabbix_autoregister
+      namespace: ''
+      version_added: 1.6.0
     zabbix_discovery_rule:
       description: Create/delete/update Zabbix discovery rules
       name: zabbix_discovery_rule
       namespace: ''
       version_added: null
+    zabbix_globalmacro:
+      description: Create/update/delete Zabbix Global macros
+      name: zabbix_globalmacro
+      namespace: ''
+      version_added: 1.4.0
     zabbix_group:
       description: Create/delete Zabbix host groups
       name: zabbix_group
@@ -48,6 +77,11 @@ plugins:
       name: zabbix_hostmacro
       namespace: ''
       version_added: null
+    zabbix_housekeeping:
+      description: Update Zabbix housekeeping
+      name: zabbix_housekeeping
+      namespace: ''
+      version_added: 1.6.0
     zabbix_maintenance:
       description: Create Zabbix maintenance windows
       name: zabbix_maintenance
@@ -68,11 +102,21 @@ plugins:
       name: zabbix_proxy
       namespace: ''
       version_added: null
+    zabbix_proxy_info:
+      description: Gather information about Zabbix proxy
+      name: zabbix_proxy_info
+      namespace: ''
+      version_added: 1.5.0
     zabbix_screen:
       description: Create/update/delete Zabbix screens
       name: zabbix_screen
       namespace: ''
       version_added: null
+    zabbix_script:
+      description: Create/update/delete Zabbix scripts
+      name: zabbix_script
+      namespace: ''
+      version_added: 1.7.0
     zabbix_service:
       description: Create/update/delete Zabbix service
       name: zabbix_service
@@ -112,4 +156,4 @@ plugins:
   shell: {}
   strategy: {}
   vars: {}
-version: 1.0.0
+version: 1.7.0

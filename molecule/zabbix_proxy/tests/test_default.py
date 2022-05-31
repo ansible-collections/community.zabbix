@@ -16,7 +16,7 @@ def test_zabbixproxy_running_and_enabled(host):
         assert zabbix.is_running
 
 
-@pytest.mark.parametrize("proxy", [("zabbix-proxy-pgsql"), ("zabbix-proxy-mysql")])
+@pytest.mark.parametrize("proxy", [("zabbix-proxy-pgsql"), ("zabbix-proxy-mysql"), ("zabbix-proxy-sqlite3")])
 def test_zabbix_package(host, proxy):
     ansible_data = host.ansible.get_variables()
     zabbixhost = ansible_data['inventory_hostname']
@@ -26,12 +26,11 @@ def test_zabbix_package(host, proxy):
     zabbixhost = zabbixhost.replace("-ubuntu", "")
 
     if zabbixhost == proxy:
+        zabbix_proxy = host.package(proxy)
         if host.system_info.distribution in ['debian', 'ubuntu']:
-            zabbix_proxy = host.package(proxy)
-            assert zabbix_proxy.version.startswith("1:5.0")
+            assert zabbix_proxy.version.startswith("1:6.0")
         elif host.system_info.distribution == 'centos':
-            zabbix_proxy = host.package(proxy)
-            assert zabbix_proxy.version.startswith("5.0")
+            assert zabbix_proxy.version.startswith("6.0")
         assert zabbix_proxy.is_installed
 
 

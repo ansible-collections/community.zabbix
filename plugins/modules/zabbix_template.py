@@ -80,15 +80,17 @@ options:
         type: list
         elements: dict
         suboptions:
-            name:
+            macro:
                 description:
                     - Name of the macro.
                     - Must be specified in {$NAME} format.
                 type: str
+                required: true
             value:
                 description:
                     - Value of the macro.
                 type: str
+                required: true
     dump_format:
         description:
             - Format to use when dumping template with C(state=dump).
@@ -119,6 +121,9 @@ options:
 extends_documentation_fragment:
 - community.zabbix.zabbix
 
+notes:
+- there where breaking changes in the Zabbix API with version 5.4 onwards (especially UUIDs) which may
+  require you to export the templates again (see version tag >= 5.4 in the resulting file/data).
 '''
 
 EXAMPLES = r'''
@@ -172,7 +177,7 @@ EXAMPLES = r'''
     server_url: http://127.0.0.1
     login_user: username
     login_password: password
-    template_xml: "{{ lookup('file', 'zabbix_apache2.json') }}"
+    template_xml: "{{ lookup('file', 'zabbix_apache2.xml') }}"
     state: present
 
 - name: Import Zabbix template from Ansible dict variable
@@ -306,13 +311,16 @@ template_xml:
 
 import json
 import traceback
+import re
 import xml.etree.ElementTree as ET
 
-from distutils.version import LooseVersion
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils._text import to_native
+from ansible.module_utils.six import PY2
 
 from ansible_collections.community.zabbix.plugins.module_utils.base import ZabbixBase
+from ansible_collections.community.zabbix.plugins.module_utils.version import LooseVersion
+
 import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabbix_utils
 
 
@@ -348,15 +356,20 @@ class Template(ZabbixBase):
                 continue
             else:
                 template_id = template_list[0]['templateid']
-                template_ids.append(template_id)
+                template_ids.append({'templateid': template_id})
         return template_ids
 
     def add_template(self, template_name, group_ids, link_template_ids, macros):
         if self._module.check_mode:
             self._module.exit_json(changed=True)
 
-        self._zapi.template.create({'host': template_name, 'groups': group_ids, 'templates': link_template_ids,
-                                    'macros': macros})
+        new_template = {'host': template_name, 'groups': group_ids, 'templates': link_template_ids, 'macros': macros}
+        if macros is None:
+            new_template.update({'macros': []})
+        if link_template_ids is None:
+            new_template.update({'templates': []})
+
+        self._zapi.template.create(new_template)
 
     def check_template_changed(self, template_ids, template_groups, link_templates, clear_templates,
                                template_macros, template_content, template_type):
@@ -437,16 +450,20 @@ class Template(ZabbixBase):
 
         if template_macros is not None:
             template_changes.update({'macros': template_macros})
+        else:
+            template_changes.update({'macros': []})
 
         if template_changes:
             # If we got here we know that only one template was provided via template_name
-            template_changes.update({'templateid': template_ids[0]})
+            template_changes.update(template_ids[0])
             self._zapi.template.update(template_changes)
 
     def delete_template(self, templateids):
         if self._module.check_mode:
             self._module.exit_json(changed=True)
-        self._zapi.template.delete(templateids)
+
+        templateids_list = [t.get('templateid') for t in templateids]
+        self._zapi.template.delete(templateids_list)
 
     def ordered_json(self, obj):
         # Deep sort json dicts for comparison
@@ -458,8 +475,9 @@ class Template(ZabbixBase):
             return obj
 
     def dump_template(self, template_ids, template_type='json', omit_date=False):
+        template_ids_list = [t.get('templateid') for t in template_ids]
         try:
-            dump = self._zapi.configuration.export({'format': template_type, 'options': {'templates': template_ids}})
+            dump = self._zapi.configuration.export({'format': template_type, 'options': {'templates': template_ids_list}})
             if template_type == 'xml':
                 xmlroot = ET.fromstring(dump.encode('utf-8'))
                 # remove date field if requested
@@ -467,7 +485,10 @@ class Template(ZabbixBase):
                     date = xmlroot.find(".date")
                     if date is not None:
                         xmlroot.remove(date)
-                return str(ET.tostring(xmlroot, encoding='utf-8').decode('utf-8'))
+                if PY2:
+                    return str(ET.tostring(xmlroot, encoding='utf-8'))
+                else:
+                    return str(ET.tostring(xmlroot, encoding='utf-8').decode('utf-8'))
             else:
                 return self.load_json_template(dump, omit_date=omit_date)
 
@@ -610,6 +631,22 @@ class Template(ZabbixBase):
             if LooseVersion(self._zbx_api_version) >= LooseVersion('4.4.4'):
                 update_rules['templateLinkage']['deleteMissing'] = True
 
+            # templateScreens is named templateDashboards in zabbix >= 5.2
+            # https://support.zabbix.com/browse/ZBX-18677
+            if LooseVersion(self._zbx_api_version) >= LooseVersion('5.2'):
+                update_rules["templateDashboards"] = update_rules.pop("templateScreens")
+
+            # Zabbix 5.4 no longer supports applications
+            if LooseVersion(self._zbx_api_version) >= LooseVersion('5.4'):
+                update_rules.pop('applications', None)
+
+            # The loaded unicode slash of multibyte as a string is escaped when parsing JSON by json.loads in Python2.
+            # So, it is imported in the unicode string into Zabbix.
+            # The following processing is removing the unnecessary slash in escaped for decoding correctly to the multibyte string.
+            # https://github.com/ansible-collections/community.zabbix/issues/314
+            if PY2:
+                template_content = re.sub(r'\\\\u([0-9a-z]{,4})', r'\\u\1', template_content)
+
             import_data = {'format': template_type, 'source': template_content, 'rules': update_rules}
             self._zapi.configuration.import_(import_data)
         except Exception as e:
@@ -626,7 +663,14 @@ def main():
         template_groups=dict(type='list', required=False),
         link_templates=dict(type='list', required=False),
         clear_templates=dict(type='list', required=False),
-        macros=dict(type='list', required=False),
+        macros=dict(
+            type='list',
+            elements='dict',
+            options=dict(
+                macro=dict(type='str', required=True),
+                value=dict(type='str', required=True)
+            )
+        ),
         omit_date=dict(type='bool', required=False, default=False),
         dump_format=dict(type='str', required=False, default='json', choices=['json', 'xml']),
         state=dict(type='str', default="present", choices=['present', 'absent', 'dump']),

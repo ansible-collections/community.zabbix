@@ -1,14 +1,17 @@
+---
 name: "community.zabbix.zabbix_proxy"
 on:
   push:
     paths:
       - 'roles/zabbix_proxy/**'
       - 'molecule/zabbix_proxy/**'
+      - 'molecule/requirements.txt'
       - '.github/workflows/proxy.yml'
   pull_request:
     paths:
       - 'roles/zabbix_proxy/**'
       - 'molecule/zabbix_proxy/**'
+      - 'molecule/requirements.txt'
       - '.github/workflows/proxy.yml'
 jobs:
   molecule:
@@ -18,11 +21,14 @@ jobs:
       matrix:
         molecule_distro:
           - container: mysql-centos
-            image: geerlingguy/docker-centos8-ansible:latest
+            image: geerlingguy/docker-rockylinux8-ansible:latest
             group: mysql
           - container: pgsql-centos
-            image: geerlingguy/docker-centos8-ansible:latest
+            image: geerlingguy/docker-rockylinux8-ansible:latest
             group: postgresql
+          - container: sqlite-centos
+            image: geerlingguy/docker-rockylinux8-ansible:latest
+            group: sqlite3
           - container: mysql-ubuntu
             image: geerlingguy/docker-ubuntu2004-ansible
             group: mysql
@@ -30,12 +36,19 @@ jobs:
             image: geerlingguy/docker-ubuntu2004-ansible
             group: postgresql
             command: /sbin/init
+          - container: sqlite-ubuntu
+            image: geerlingguy/docker-ubuntu2004-ansible
+            group: sqlite3
+            command: /sbin/init
           - container: mysql-debian
-            image: geerlingguy/docker-debian9-ansible
+            image: geerlingguy/docker-debian10-ansible
             group: mysql
           - container: pgsql-debian
-            image: geerlingguy/docker-debian9-ansible
+            image: geerlingguy/docker-debian10-ansible
             group: postgresql
+          - container: sqlite-debian
+            image: geerlingguy/docker-debian10-ansible
+            group: sqlite3
         collection_role:
           - zabbix_proxy
     steps:
@@ -55,7 +68,7 @@ jobs:
       - name: Build the collection
         run: |
           collection_file=$( basename $(ansible-galaxy collection build -f | awk -F" " '{print $NF}'))
-          echo "::set-env name=COLLECTION_FILE::$collection_file"
+          echo "COLLECTION_FILE=$collection_file" >> $GITHUB_ENV
 
       - name: Install the collection
         run: ansible-galaxy collection install $COLLECTION_FILE

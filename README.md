@@ -1,6 +1,29 @@
 # Zabbix collection for Ansible
 
-![plugins](https://github.com/ansible-collections/community.zabbix/workflows/plugins/badge.svg)
+Plugins:
+
+![plugins](https://github.com/ansible-collections/community.zabbix/workflows/plugins-integration/badge.svg) ![repo-sanity](https://github.com/ansible-collections/community.zabbix/workflows/repo-sanity/badge.svg)
+
+Roles:
+
+![Zabbix Agent](https://github.com/ansible-collections/community.zabbix/workflows/community.zabbix.zabbix_agent/badge.svg) ![Zabbix Server](https://github.com/ansible-collections/community.zabbix/workflows/community.zabbix.zabbix_server/badge.svg) ![Zabbix Proxy](https://github.com/ansible-collections/community.zabbix/workflows/community.zabbix.zabbix_proxy/badge.svg) ![Zabbix Web](https://github.com/ansible-collections/community.zabbix/workflows/community.zabbix.zabbix_web/badge.svg) ![Zabbix Javagateway](https://github.com/ansible-collections/community.zabbix/workflows/community.zabbix.zabbix_javagateway/badge.svg)
+
+**Table of Contents**
+
+- [Zabbix collection for Ansible](#zabbix-collection-for-ansible)
+  * [Introduction](#introduction)
+  * [Included content](#included-content)
+  * [Installation](#installation)
+    + [Requirements](#requirements)
+    + [Installing the Collection from Ansible Galaxy](#installing-the-collection-from-ansible-galaxy)
+    + [Upgrading collection](#upgrading-collection)
+  * [Usage](#usage)
+  * [Supported Zabbix versions](#supported-zabbix-versions)
+  * [Collection life cycle and support](#collection-life-cycle-and-support)
+  * [Contributing](#contributing)
+  * [License](#license)
+
+## Introduction
 
 This repo hosts the `community.zabbix` Ansible Collection.
 
@@ -10,12 +33,14 @@ The collection includes a variety of Ansible content to help automate the manage
 
 Click on the name of a plugin or module to view that content's documentation:
 
-  - **Inventory Source**:
-    - [zabbix](scripts/inventory/zabbix.py)
+  - **Inventory Sources**:
+    - [zabbix](scripts/inventory/zabbix.py) - Zabbix Inventory Script 
+	- [zabbix_inventory](plugins/inventory/zabbix_inventory.py) - Zabbix Ansible Inventory Plguin 
   - **Modules**:
     - [zabbix_action](https://docs.ansible.com/ansible/2.10/collections/community/zabbix/zabbix_action_module.html)
     - [zabbix_group_info](https://docs.ansible.com/ansible/2.10/collections/community/zabbix/zabbix_group_info_module.html)
     - [zabbix_discovery_rule](https://docs.ansible.com/ansible/2.10/collections/community/zabbix/zabbix_discovery_rule_module.html)
+    - [zabbix_globalmacro](https://docs.ansible.com/ansible/2.10/collections/community/zabbix/zabbix_globalmacro_module.html)
     - [zabbix_group](https://docs.ansible.com/ansible/2.10/collections/community/zabbix/zabbix_group_module.html)
     - [zabbix_host_events_info](https://docs.ansible.com/ansible/2.10/collections/community/zabbix/zabbix_host_events_info_module.html)
     - [zabbix_host_info](https://docs.ansible.com/ansible/2.10/collections/community/zabbix/zabbix_host_info_module.html)
@@ -25,6 +50,7 @@ Click on the name of a plugin or module to view that content's documentation:
     - [zabbix_map](https://docs.ansible.com/ansible/2.10/collections/community/zabbix/zabbix_map_module.html)
     - [zabbix_mediatype](https://docs.ansible.com/ansible/2.10/collections/community/zabbix/zabbix_mediatype_module.html)
     - [zabbix_proxy](https://docs.ansible.com/ansible/2.10/collections/community/zabbix/zabbix_proxy_module.html)
+    - [zabbix_proxy_info](https://docs.ansible.com/ansible/latest/collections/community/zabbix/zabbix_proxy_info_module.html)
     - [zabbix_screen](https://docs.ansible.com/ansible/2.10/collections/community/zabbix/zabbix_screen_module.html)
     - [zabbix_service](https://docs.ansible.com/ansible/2.10/collections/community/zabbix/zabbix_service_module.html)
     - [zabbix_template_info](https://docs.ansible.com/ansible/2.10/collections/community/zabbix/zabbix_template_info_module.html)
@@ -53,7 +79,14 @@ For the majority of modules, however, you can get away with just:
 ```bash
 pip install zabbix-api
 ```
+#### Ansible 2.10 and higher
 
+With the release of Ansible 2.10, modules have been moved into collections.  With the exception of ansible.builtin modules, this means additonal collections must be installed in order to use modules such as seboolean (now ansible.posix.seboolean).  The following collections are now frequently required: `ansible.posix` and `community.general`.  Installing the collections:
+
+```bash
+ansible-galaxy collection install ansible.posix
+ansible-galaxy collection install community.general
+```
 ### Installing the Collection from Ansible Galaxy
 
 Before using the Zabbix collection, you need to install it with the Ansible Galaxy CLI:
@@ -62,13 +95,17 @@ Before using the Zabbix collection, you need to install it with the Ansible Gala
 ansible-galaxy collection install community.zabbix
 ```
 
-You can also include it in a `requirements.yml` file and install it via `ansible-galaxy collection install -r requirements.yml`, using the format:
+You can also include it in a `requirements.yml` file along with other required collections and install them via `ansible-galaxy collection install -r requirements.yml`, using the format:
 
 ```yaml
 ---
 collections:
   - name: community.zabbix
-    version: 1.0.0
+    version: 1.7.0
+  - name: ansible.posix
+    version: 1.3.0
+  - name: community.general
+    version: 3.7.0
 ```
 
 ### Upgrading collection
@@ -120,11 +157,17 @@ Or you include collection name `community.zabbix` in the playbook's `collections
 
 ## Supported Zabbix versions
 
-As a main priority, this collection aims to cover all of the currently supported Zabbix releases, which are noted on the [Zabbix Life Cycle & Release Policy](https://www.zabbix.com/life_cycle_and_release_policy) page.
-Other versions are supported too, but not as strictly (changes would not be actively tested against them).
+Main priority is to support Zabbix releases which have official full support from Zabbix LLC. Please checkout the versions at [Zabbix Life Cycle & Release Policy](https://www.zabbix.com/life_cycle_and_release_policy) page.
 
-If you find any inconsistencies with the version of Zabbix you are using, feel free to open a pull request or an issue and we will try to address it as soon as possible.
-In case of pull requests, please make sure that your changes will not break any existing functionality for currently supported Zabbix releases.
+> We aim to cover at least two LTS releases. For example, currently we support LTS 4.0 + 5.0 and with LTS 6.0 we will drop 4.0. But we do our best to also include the latest point releases - for example currently this is 5.4 which should be supperseeded by 6.2 then.
+
+Support for Zabbix LTS versions will be dropped with Major releases of the collection and mostly affect modules. Each role is following its unique support matrix. You should always consult documentation of roles in *docs/* directory.
+
+If you find any inconsistencies with the version of Zabbix you are using, feel free to open a pull request or an issue and we will try to address it as soon as possible. In case of pull requests, please make sure that your changes will not break any existing functionality for currently supported Zabbix releases.
+
+## Collection life cycle and support
+
+See [RELEASE](docs/RELEASE.md) document for more information regarding life cycle and support for the collection.
 
 ## Contributing
 

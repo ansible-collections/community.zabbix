@@ -8,13 +8,13 @@
     baseurl: "{{ item.baseurl }}"
     gpgcheck: "{{ item.gpgcheck }}"
     gpgkey: "{{ item.gpgkey }}"
-    mode:  "{{ item.mode | default('0644') }}"
+    mode: "{{ item.mode | default('0644') }}"
     priority: "{{ item.priority | default('99') }}"
     state: "{{ item.state | default('present') }}"
     proxy: "{{ zabbix_http_proxy | default(omit) }}"
   with_items: "{{ zabbix_repo_yum }}"
   register: yum_repo_installed
-  become: yes
+  become: true
   when:
     zabbix_repo == "zabbix"
   notify:
@@ -29,12 +29,12 @@
     baseurl: "{{ item.baseurl }}"
     gpgcheck: "{{ item.gpgcheck }}"
     gpgkey: "{{ item.gpgkey }}"
-    mode:  "{{ item.mode | default('0644') }}"
+    mode: "{{ item.mode | default('0644') }}"
     priority: "{{ item.priority | default('99') }}"
     state: "{{ item.state | default('present') }}"
     proxy: "{{ zabbix_http_proxy | default(omit) }}"
   with_items: "{{ zabbix_5_repo_yum }}"
-  become: yes
+  become: true
   when:
     - zabbix_repo == "zabbix"
     - zabbix_version is version('5.0', '>=')
@@ -44,31 +44,65 @@
   tags:
     - zabbix-web
 
-- name: "RedHat | Install zabbix-web dependency (Zabbix 5.x)"
+- name: "RedHat | Install zabbix-web dependency (Zabbix 5.x) (CentOS)"
   yum:
     pkg:
       - centos-release-scl
     state: "{{ zabbix_web_package_state }}"
-    update_cache: yes
+    update_cache: true
+    disablerepo: "{{ '*' if (zabbix_repo_yum_enabled | length>0) else omit }}"
+    enablerepo: "{{ zabbix_repo_yum_enabled if zabbix_repo_yum_enabled is iterable and (zabbix_repo_yum_enabled | length>0) else omit }}"
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   register: zabbix_web_dependency_package_install
   until: zabbix_web_dependency_package_install is succeeded
-  become: yes
+  become: true
   when:
     - zabbix_version is version('5.0', '>=')
     - zabbix_web_centos_release
     - ansible_distribution_major_version != '8'
+    - ansible_distribution == "CentOS"
+  tags:
+    - zabbix-web
+
+- name: "RedHat | Install zabbix-web dependency (Zabbix 5.x) (RHEL)"
+  yum:
+    pkg:
+      - scl-utils
+      - scl-utils-build
+    state: "{{ zabbix_web_package_state }}"
+    update_cache: true
+    disablerepo: "{{ '*' if (zabbix_repo_yum_enabled | length>0) else omit }}"
+    enablerepo: "{{ zabbix_repo_yum_enabled if zabbix_repo_yum_enabled is iterable and (zabbix_repo_yum_enabled | length>0) else omit }}"
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
+  register: zabbix_web_dependency_package_install
+  until: zabbix_web_dependency_package_install is succeeded
+  become: true
+  when:
+    - zabbix_version is version('5.0', '>=')
+    - zabbix_web_centos_release
+    - ansible_distribution_major_version != '8'
+    - ansible_distribution == "RedHat"
   tags:
     - zabbix-web
 
 - name: "RedHat | Install zabbix-web (Zabbix 5.x)"
   yum:
     pkg:
-      - zabbix-apache-conf-scl
+      - zabbix-apache-conf-scl-{{ zabbix_web_version }}.{{ zabbix_web_version_minor }}
     state: "{{ zabbix_web_package_state }}"
-    update_cache: yes
+    update_cache: true
+    disablerepo: "{{ '*' if (zabbix_repo_yum_enabled | length>0) else omit }}"
+    enablerepo: "{{ zabbix_repo_yum_enabled if zabbix_repo_yum_enabled is iterable and (zabbix_repo_yum_enabled | length>0) else omit }}"
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   register: zabbix_web_package_install
   until: zabbix_web_package_install is succeeded
-  become: yes
+  become: true
   when:
     - zabbix_version is version('5.0', '>=')
     - ansible_distribution_major_version != '8'
@@ -78,12 +112,17 @@
 
 - name: "RedHat | Install zabbix-web-{{ zabbix_server_database }}"
   yum:
-    pkg: zabbix-web-{{ zabbix_server_database }}{{ '-scl' if zabbix_version is version('5.0', '>=') and ansible_distribution_major_version != '8' else '' }}
+    pkg: zabbix-web-{{ zabbix_server_database }}{{ '-scl' if zabbix_version is version('5.0', '>=') and ansible_distribution_major_version != '8' else '' }}-{{ zabbix_web_version }}.{{ zabbix_web_version_minor }}
     state: "{{ zabbix_web_package_state }}"
-    update_cache: yes
+    update_cache: true
+    disablerepo: "{{ '*' if (zabbix_repo_yum_enabled | length>0) else omit }}"
+    enablerepo: "{{ zabbix_repo_yum_enabled if zabbix_repo_yum_enabled is iterable and (zabbix_repo_yum_enabled | length>0) else omit }}"
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   register: zabbix_web_package_install
   until: zabbix_web_package_install is succeeded
-  become: yes
+  become: true
   tags:
     - zabbix-web
 
@@ -94,11 +133,11 @@
     owner: "{{ zabbix_web_conf_web_user }}"
     group: "{{ zabbix_web_conf_web_group }}"
     mode: 0644
-  become: yes
+  become: true
   when:
     - zabbix_vhost
   notify:
-    - restart php-fpm
+    - restart redhat-php-fpm
 
 - include_tasks: apache_RedHat.yml
   vars:
@@ -116,7 +155,7 @@
   when:
     - zabbix_vhost
     - zabbix_websrv == 'nginx'
-  become: yes
+  become: true
   notify:
     - restart nginx
   tags:
@@ -125,41 +164,7 @@
     - config
     - nginx
 
-- name: "RedHat | Install related SELinux package"
-  yum:
-    name:
-      - libsemanage-python
-    state: present
-  register: zabbix_web_dependencies_installed
-  until: zabbix_web_dependencies_installed is succeeded
-  become: yes
+- name: "Configure SELinux when enabled"
+  include: selinux.yml
   when:
-    - selinux_allow_zabbix_can_network
-    - ansible_distribution_major_version == "7" or ansible_distribution_major_version == "6"
-  tags:
-    - zabbix-web
-
-- name: "RedHat | Install related SELinux package on RHEL8"
-  yum:
-    name:
-      - python3-libsemanage
-    state: present
-  register: zabbix_web_dependencies_installed
-  until: zabbix_web_dependencies_installed is succeeded
-  become: yes
-  when:
-    - selinux_allow_zabbix_can_network
-    - ansible_distribution_major_version == "8"
-  tags:
-    - zabbix-web
-
-- name: "RedHat | Enable zabbix_can_network SELinux boolean"
-  seboolean:
-    name: zabbix_can_network
-    state: yes
-    persistent: yes
-  become: yes
-  when:
-    - selinux_allow_zabbix_can_network
-  tags:
-    - zabbix-web
+    - zabbix_selinux | bool

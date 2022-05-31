@@ -1,0 +1,12 @@
+---
+- include_tasks: tlspsk_auto_agent2_linux.yml
+  when: (zabbix_agent_os_family != "Windows") or (zabbix_agent_docker | bool)
+
+- include_tasks: tlspsk_auto_agent2_windows.yml
+  when: zabbix_agent_os_family == "Windows"
+
+- name: AutoPSK | Default tlsaccept and tlsconnect to enforce PSK
+  set_fact:
+    zabbix_agent2_tlsaccept: psk
+    zabbix_agent2_tlsconnect: psk
+  when: zabbix_api_create_hosts

@@ -22,7 +22,7 @@ description:
     - "The following extra node attributes are supported:
         C(zbx_host) contains name of the host in Zabbix. Use this if desired type of map element is C(host).
         C(zbx_group) contains name of the host group in Zabbix. Use this if desired type of map element is C(host group).
-        C(zbx_map) contains name of the map in Zabbix. Use this if desired type of map element is C(map).
+        C(zbx_sysmap) contains name of the map in Zabbix. Use this if desired type of map element is C(map).
         C(zbx_label) contains label of map element.
         C(zbx_image) contains name of the image used to display the element in default state.
         C(zbx_image_disabled) contains name of the image used to display disabled map element.
@@ -180,10 +180,12 @@ import traceback
 
 from io import BytesIO
 from operator import itemgetter
-from distutils.version import LooseVersion
+
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 
 from ansible_collections.community.zabbix.plugins.module_utils.base import ZabbixBase
+from ansible_collections.community.zabbix.plugins.module_utils.version import LooseVersion
+
 import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabbix_utils
 
 

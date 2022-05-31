@@ -41,6 +41,7 @@ options:
     host_groups:
         description:
             - List of host groups the host is part of.
+            - Make sure the Zabbix user used for Ansible can read these groups.
         type: list
         elements: str
     link_templates:
@@ -426,10 +427,11 @@ EXAMPLES = r'''
 
 import copy
 
-from distutils.version import LooseVersion
 from ansible.module_utils.basic import AnsibleModule
 
 from ansible_collections.community.zabbix.plugins.module_utils.base import ZabbixBase
+from ansible_collections.community.zabbix.plugins.module_utils.version import LooseVersion
+
 import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabbix_utils
 
 
@@ -588,6 +590,38 @@ class Host(ZabbixBase):
         if LooseVersion(self._zbx_api_version) >= LooseVersion('4.2.0'):
             params.update({'selectTags': 'extend'})
 
+        if LooseVersion(self._zbx_api_version) >= LooseVersion('5.4.0'):
+            params.update({
+                'output': [
+                    "inventory_mode",
+                    "hostid",
+                    "proxy_hostid",
+                    "host",
+                    "status",
+                    "lastaccess",
+                    "ipmi_authtype",
+                    "ipmi_privilege",
+                    "ipmi_username",
+                    "ipmi_password",
+                    "maintenanceid",
+                    "maintenance_status",
+                    "maintenance_type",
+                    "maintenance_from",
+                    "name",
+                    "flags",
+                    "templateid",
+                    "description",
+                    "tls_connect",
+                    "tls_accept",
+                    "tls_issuer",
+                    "tls_subject",
+                    "proxy_address",
+                    "auto_compress",
+                    "custom_interfaces",
+                    "uuid"
+                ]
+            })
+
         host_list = self._zapi.host.get(params)
         if len(host_list) < 1:
             self._module.fail_json(msg="Host not found: %s" % host_name)
@@ -691,6 +725,8 @@ class Host(ZabbixBase):
         if sorted(i_ports) != sorted(exist_i_ports):
             return True
 
+        _matched_intfs = []
+
         for exist_interface in exist_interfaces:
             exist_interface_port = str(exist_interface['port'])
 
@@ -699,6 +735,10 @@ class Host(ZabbixBase):
                 exist_interface['details'] = {}
 
             for interface in interfaces:
+                # ensure one interface is not matched multiple times
+                if interface in _matched_intfs:
+                    continue
+
                 if str(interface['port']) == exist_interface_port:
                     for key in interface.keys():
                         # since 5.0, zabbix API returns details for each host interface, but only SNMP is not empty
@@ -718,6 +758,11 @@ class Host(ZabbixBase):
 
                         elif str(exist_interface[key]) != str(interface[key]):
                             return True
+
+                # if the code got here, that means interfaces did match, remove the one matched and break loop for
+                # current intf, otherwise it would start comparing to next intf of the same type and not match
+                _matched_intfs.append(interface)
+                break
 
         return False
 
@@ -784,13 +829,15 @@ class Host(ZabbixBase):
             if int(host['tls_accept']) != tls_accept:
                 return True
 
-        if tls_psk_identity is not None and 'tls_psk_identity' in host:
-            if host['tls_psk_identity'] != tls_psk_identity:
-                return True
+        if LooseVersion(self._zbx_api_version) <= LooseVersion('5.4.0'):
+            if tls_psk_identity is not None and 'tls_psk_identity' in host:
+                if host['tls_psk_identity'] != tls_psk_identity:
+                    return True
 
-        if tls_psk is not None and 'tls_psk' in host:
-            if host['tls_psk'] != tls_psk:
-                return True
+        if LooseVersion(self._zbx_api_version) <= LooseVersion('5.4.0'):
+            if tls_psk is not None and 'tls_psk' in host:
+                if host['tls_psk'] != tls_psk:
+                    return True
 
         if tls_issuer is not None and 'tls_issuer' in host:
             if host['tls_issuer'] != tls_issuer:
@@ -972,9 +1019,9 @@ def main():
                         contextname=dict(type='str', default=''),
                         securitylevel=dict(type='int', choices=[0, 1, 2], default=0),
                         authprotocol=dict(type='int', choices=[0, 1], default=0),
-                        authpassphrase=dict(type='str', default=''),
+                        authpassphrase=dict(type='str', default='', no_log=True),
                         privprotocol=dict(type='int', choices=[0, 1], default=0),
-                        privpassphrase=dict(type='str', default='')
+                        privpassphrase=dict(type='str', default='', no_log=True)
                     )
                 )
             ),
@@ -1102,22 +1149,22 @@ def main():
 
             # get existing host's interfaces
             exist_interfaces = host._zapi.hostinterface.get({'output': 'extend', 'hostids': host_id})
+            exist_interfaces.sort(key=lambda x: int(x['interfaceid']))
 
             # When force=no is specified, append existing interfaces to interfaces to update. When
             # no interfaces have been specified, copy existing interfaces as specified from the API.
             # Do the same with templates and host groups.
             if not force or not interfaces:
                 for interface in copy.deepcopy(exist_interfaces):
-                    # remove values not used during hostinterface.add/update calls
                     for key in tuple(interface.keys()):
-                        if key in ['interfaceid', 'hostid']:
+                        # remove values not used during hostinterface.add/update calls
+                        if key not in ["type", "dns", "main", "useip", "ip", "port", "details", "bulk"]:
                             interface.pop(key, None)
-
-                    for index in interface.keys():
-                        if index in ['useip', 'main', 'type', 'bulk']:
-                            interface[index] = int(interface[index])
-                        elif index == 'details' and not interface[index]:
-                            interface[index] = {}
+                        # fix values for properties
+                        if key in ['useip', 'main', 'type', 'bulk']:
+                            interface[key] = int(interface[key])
+                        elif key == 'details' and not interface[key]:
+                            interface[key] = {}
 
                     if interface not in interfaces:
                         interfaces.append(interface)
@@ -1149,8 +1196,8 @@ def main():
             # update host
             if host.check_all_properties(
                     host_id, group_ids, status, interfaces, template_ids, exist_interfaces, zabbix_host_obj, proxy_id,
-                    visible_name, description, host_name, inventory_mode, inventory_zabbix, tls_accept,
-                    tls_psk_identity, tls_psk, tls_issuer, tls_subject, tls_connect, ipmi_authtype, ipmi_privilege,
+                    visible_name, description, host_name, inventory_mode, inventory_zabbix, tls_accept, tls_psk_identity, tls_psk,
+                    tls_issuer, tls_subject, tls_connect, ipmi_authtype, ipmi_privilege,
                     ipmi_username, ipmi_password, macros, tags):
 
                 host.update_host(
@@ -1180,7 +1227,8 @@ def main():
             module.fail_json(msg="Specify at least one group for creating host '%s'." % host_name)
 
         if not interfaces or (interfaces and len(interfaces) == 0):
-            module.fail_json(msg="Specify at least one interface for creating host '%s'." % host_name)
+            if LooseVersion(host._zbx_api_version) < LooseVersion('5.2.0'):
+                module.fail_json(msg="Specify at least one interface for creating host '%s'." % host_name)
 
         # create host
         host_id = host.add_host(
