@@ -15,7 +15,7 @@
 
 - name: "Set a password fact to insure consistent usage."
   set_fact:
-    zabbix_real_dbpassword: "md5{{ (zabbix_server_dbpassword + zabbix_server_dbuser)|hash('md5') }}"
+    zabbix_real_dbpassword: "{{ (zabbix_server_dbpassword + zabbix_server_dbuser) | hash('md5') }}"
 
 - name: "PostgreSQL | Delegated"
   block:
