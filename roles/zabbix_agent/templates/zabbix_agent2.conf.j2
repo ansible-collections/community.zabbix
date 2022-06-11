@@ -4,7 +4,7 @@
 
 # This configuration file is "minimalized", which means all the original comments 
 # are removed. The full documentation for your zabbix agent2 can be found here:
-# https://www.zabbix.com/documentation/{{ zabbix_version }}/en/manual/appendix/config/zabbix_agent2{{ "_win" if zabbix_agent_os_family != "Windows" else "" }}
+# https://www.zabbix.com/documentation/{{ zabbix_version }}/en/manual/appendix/config/zabbix_agent2{{ "_win" if zabbix_agent_os_family == "Windows" else "" }}
 
 {% if zabbix_agent_os_family != "Windows" %}
 PidFile={{ zabbix_agent2_pidfile }}
