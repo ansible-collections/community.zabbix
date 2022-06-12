@@ -1339,6 +1339,7 @@
     login_user: "{{ zabbix_api_login_user }}"
     login_password: "{{ zabbix_api_login_pass }}"
     template_name: ExampleTemplateForActionModule
+    timeout: 20
     state: absent
   register: zbxaction_prep_template
 
