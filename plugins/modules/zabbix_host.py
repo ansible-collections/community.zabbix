@@ -537,34 +537,11 @@ class Host(ZabbixBase):
                 parameters['macros'] = macros
             if tags is not None:
                 parameters['tags'] = tags
+            if interfaces:
+                parameters['interfaces'] = interfaces
 
             self._zapi.host.update(parameters)
             interface_list_copy = exist_interface_list
-            if interfaces:
-                for interface in interfaces:
-                    flag = False
-                    interface_str = interface
-                    for exist_interface in exist_interface_list:
-                        interface_type = int(interface['type'])
-                        exist_interface_type = int(exist_interface['type'])
-                        if interface_type == exist_interface_type:
-                            # update
-                            interface_str['interfaceid'] = exist_interface['interfaceid']
-                            self._zapi.hostinterface.update(interface_str)
-                            flag = True
-                            interface_list_copy.remove(exist_interface)
-                            break
-                    if not flag:
-                        # add
-                        interface_str['hostid'] = host_id
-                        self._zapi.hostinterface.create(interface_str)
-                        # remove
-                remove_interface_ids = []
-                for remove_interface in interface_list_copy:
-                    interface_id = remove_interface['interfaceid']
-                    remove_interface_ids.append(interface_id)
-                if len(remove_interface_ids) > 0:
-                    self._zapi.hostinterface.delete(remove_interface_ids)
         except Exception as e:
             self._module.fail_json(msg="Failed to update host %s: %s" % (host_name, e))
 
@@ -676,6 +653,10 @@ class Host(ZabbixBase):
             if interface['type'] == 1:
                 ip = interface.get('ip', '')
 
+            for key in ['ip', 'dns']:
+                if key not in interface or interface[key] is None:
+                    interface[key] = ''
+
             if 'port' not in interface or interface['port'] is None:
                 interface['port'] = type_to_port.get(interface['type'], '')
 
@@ -704,65 +685,21 @@ class Host(ZabbixBase):
 
     # check the exist_interfaces whether it equals the interfaces or not
     def check_interface_properties(self, exist_interfaces, interfaces):
-        # hostinterface.details looks different based on the version of SNMP currently configured
-        snmp_ver_keys = {
-            1: ['version', 'bulk', 'community'],
-            2: ['version', 'bulk', 'community'],
-            3: [
-                'version', 'bulk', 'securityname', 'securitylevel', 'authprotocol',
-                'authpassphrase', 'privprotocol', 'privpassphrase', 'contextname'
-            ]
-        }
-
-        i_ports = []
-        for interface in interfaces:
-            i_ports.append(interface['port'])
-
-        exist_i_ports = []
-        for interface in exist_interfaces:
-            exist_i_ports.append(interface['port'])
-
-        if sorted(i_ports) != sorted(exist_i_ports):
+        # Find already configured interfaces in requested interfaces
+        if len(exist_interfaces) != len(interfaces):
             return True
 
-        _matched_intfs = []
+        for iface in interfaces:
+            found = False
+            for e_int in exist_interfaces:
+                diff_dict = {}
+                difference = zabbix_utils.helper_cleanup_data(zabbix_utils.helper_compare_dictionaries(iface, e_int, diff_dict))
+                if diff_dict == {}:
+                    found = True
+                    break
 
-        for exist_interface in exist_interfaces:
-            exist_interface_port = str(exist_interface['port'])
-
-            # Zabbix API should return empty dictionary instead of list, workaround:
-            if 'details' in exist_interface and not exist_interface['details']:
-                exist_interface['details'] = {}
-
-            for interface in interfaces:
-                # ensure one interface is not matched multiple times
-                if interface in _matched_intfs:
-                    continue
-
-                if str(interface['port']) == exist_interface_port:
-                    for key in interface.keys():
-                        # since 5.0, zabbix API returns details for each host interface, but only SNMP is not empty
-                        if key == 'details':
-                            if interface['details']:
-                                # only data relevant to a particular version are returned and rest should be filtered
-                                snmp_ver = int(interface['details']['version'])
-                                for dkey in list(interface['details'].keys()):
-                                    if dkey not in snmp_ver_keys[snmp_ver]:
-                                        interface['details'].pop(dkey)
-                                    else:
-                                        interface['details'][dkey] = str(interface['details'][dkey])
-
-                            # either compare empty or filtered dictionaries
-                            if interface['details'] != exist_interface['details']:
-                                return True
-
-                        elif str(exist_interface[key]) != str(interface[key]):
-                            return True
-
-                # if the code got here, that means interfaces did match, remove the one matched and break loop for
-                # current intf, otherwise it would start comparing to next intf of the same type and not match
-                _matched_intfs.append(interface)
-                break
+        if not found:
+            return True
 
         return False
 
@@ -959,6 +896,37 @@ class Host(ZabbixBase):
         except Exception as e:
             self._module.fail_json(msg="Failed to set inventory to host: %s" % e)
 
+# Add all default values to all missing parameters for existing interfaces
+def update_exist_interfaces_with_defaults(exist_interfaces):
+
+    new_exist_interfaces = []
+    default_interface = {
+        'main': '0',
+        'useip': '0',
+        'ip': '',
+        'dns': '',
+        'port': ''
+    }
+    default_interface_details = {
+        'version': 2,
+        'bulk': 1,
+        'community': '',
+        'securityname': '',
+        'contextname': '',
+        'securitylevel': 0,
+        'authprotocol': 0,
+        'authpassphrase': '',
+        'privprotocol': 0,
+        'privpassphrase': ''
+    }
+    for interface in exist_interfaces:
+        new_interface = default_interface.copy()
+        new_interface.update(interface)
+        new_interface['details'] = default_interface_details.copy()
+        new_interface['details'].update(interface['details'])
+        new_exist_interfaces.append(new_interface)
+
+    return new_exist_interfaces
 
 def normalize_macro_name(macro_name):
     # Zabbix handles macro names in upper case characters
@@ -1004,8 +972,8 @@ def main():
                 type=dict(type='str', required=True, choices=['agent', '1', 'snmp', '2', 'ipmi', '3', 'jmx', '4']),
                 main=dict(type='int', choices=[0, 1], default=0),
                 useip=dict(type='int', choices=[0, 1], default=0),
-                ip=dict(type='str', default=''),
-                dns=dict(type='str', default=''),
+                ip=dict(type='str'),
+                dns=dict(type='str'),
                 port=dict(type='str'),
                 bulk=dict(type='int', choices=[0, 1], default=1),
                 details=dict(
@@ -1014,7 +982,7 @@ def main():
                     options=dict(
                         version=dict(type='int', choices=[1, 2, 3], default=2),
                         bulk=dict(type='int', choices=[0, 1], default=1),
-                        community=dict(type='str'),
+                        community=dict(type='str', default=''),
                         securityname=dict(type='str', default=''),
                         contextname=dict(type='str', default=''),
                         securitylevel=dict(type='int', choices=[0, 1, 2], default=0),
@@ -1150,24 +1118,60 @@ def main():
             # get existing host's interfaces
             exist_interfaces = host._zapi.hostinterface.get({'output': 'extend', 'hostids': host_id})
             exist_interfaces.sort(key=lambda x: int(x['interfaceid']))
+            exist_interfaces = update_exist_interfaces_with_defaults(exist_interfaces)
 
-            # When force=no is specified, append existing interfaces to interfaces to update. When
-            # no interfaces have been specified, copy existing interfaces as specified from the API.
-            # Do the same with templates and host groups.
-            if not force or not interfaces:
-                for interface in copy.deepcopy(exist_interfaces):
-                    for key in tuple(interface.keys()):
-                        # remove values not used during hostinterface.add/update calls
-                        if key not in ["type", "dns", "main", "useip", "ip", "port", "details", "bulk"]:
-                            interface.pop(key, None)
-                        # fix values for properties
-                        if key in ['useip', 'main', 'type', 'bulk']:
-                            interface[key] = int(interface[key])
-                        elif key == 'details' and not interface[key]:
-                            interface[key] = {}
+            # Convert integer parameters from strings to ints
+            for idx, interface in enumerate(copy.deepcopy(exist_interfaces)):
+                for key in tuple(interface.keys()):
+                    # fix values for properties
+                    if key in ['useip', 'main', 'type', 'bulk']:
+                        exist_interfaces[idx][key] = int(interface[key])
+                    elif key == 'details':
+                        if not interface[key]:
+                            exist_interfaces[idx][key] = {}
+                        else:
+                            for d_key in interface[key].keys():
+                                if d_key in ['version', 'bulk', 'securitylevel', 'authprotocol', 'privprotocol']:
+                                    exist_interfaces[idx][key][d_key] = int(interface[key][d_key])
 
-                    if interface not in interfaces:
+            # 
+            interfaces_copy = copy.deepcopy(interfaces)
+            found_in_interfaces = []
+            for idx, interface in enumerate(copy.deepcopy(exist_interfaces)):
+                interfaceid = interface['interfaceid']
+                hostid = interface['hostid']
+
+                if not interfaces_copy:
+                    # Whe no interfaces specified, copy existing interfaces
+                    interfaces.append(interface)
+                    continue
+
+                # Find already configured interfaces in requested interfaces and compile final list of
+                # interfaces in 'interfaces' variable. Every element of the list defines one interface.
+                # If an element has 'interfaceid' field then Zabbix will update existing interface otherwise
+                # a new interface will be added.
+                found = False
+                for idx1, iface in enumerate(interfaces_copy):
+                    diff_dict = {}
+                    difference = zabbix_utils.helper_cleanup_data(zabbix_utils.helper_compare_dictionaries(iface, interface, diff_dict))
+                    if diff_dict == {}:
+                        found = True
+                        found_in_interfaces.append(iface)
+                        interfaces[idx1]['interfaceid'] = interfaceid
+                        interfaces[idx1]['hostid'] = hostid
+                        break
+
+                if not found:
+                    if not force:
                         interfaces.append(interface)
+                    else:
+                        # if force == True overwrite existing interfaces with provided interfaces with the same type
+                        for idx1, iface in enumerate(interfaces_copy):
+                            if interface['type'] == iface['type'] and iface not in found_in_interfaces:
+                                found_in_interfaces.append(iface)
+                                interfaces[idx1]['interfaceid'] = interfaceid
+                                interfaces[idx1]['hostid'] = hostid
+                                break
 
             if not force or link_templates is None:
                 template_ids = list(set(template_ids + host.get_host_templates_by_host_id(host_id)))
