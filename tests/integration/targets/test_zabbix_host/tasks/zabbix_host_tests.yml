@@ -876,6 +876,34 @@
         that:
           - "zabbix_host1 is not changed"
 
+    - name: "test: configure SNMPv2 interface with the same options and force=False "
+      zabbix_host:
+        server_url: "{{ zabbix_api_server_url }}"
+        login_user: "{{ zabbix_api_login_user }}"
+        login_password: "{{ zabbix_api_login_pass }}"
+        host_name: ExampleHost
+        force: False
+        interfaces:
+          - type: 1
+            main: 1
+            useip: 1
+            ip: 10.1.1.1
+            port: "10050"
+          - type: 2
+            main: 1
+            useip: 1
+            ip: 10.1.1.1
+            port: "161"
+            details:
+              version: 2
+              community: Community String
+      register: zabbix_host1
+
+    - name: expect to succeed and that things have not changed
+      assert:
+        that:
+          - "zabbix_host1 is not changed"
+
     - name: "test: update details for SNMPv2 interface with bulk sub option"
       zabbix_host:
         server_url: "{{ zabbix_api_server_url }}"
