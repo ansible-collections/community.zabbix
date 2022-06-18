@@ -541,7 +541,6 @@ class Host(ZabbixBase):
                 parameters['interfaces'] = interfaces
 
             self._zapi.host.update(parameters)
-            interface_list_copy = exist_interface_list
         except Exception as e:
             self._module.fail_json(msg="Failed to update host %s: %s" % (host_name, e))
 
@@ -693,7 +692,7 @@ class Host(ZabbixBase):
             found = False
             for e_int in exist_interfaces:
                 diff_dict = {}
-                difference = zabbix_utils.helper_cleanup_data(zabbix_utils.helper_compare_dictionaries(iface, e_int, diff_dict))
+                zabbix_utils.helper_cleanup_data(zabbix_utils.helper_compare_dictionaries(iface, e_int, diff_dict))
                 if diff_dict == {}:
                     found = True
                     break
@@ -1154,7 +1153,7 @@ def main():
                 found = False
                 for idx1, iface in enumerate(interfaces_copy):
                     diff_dict = {}
-                    difference = zabbix_utils.helper_cleanup_data(zabbix_utils.helper_compare_dictionaries(iface, interface, diff_dict))
+                    zabbix_utils.helper_cleanup_data(zabbix_utils.helper_compare_dictionaries(iface, interface, diff_dict))
                     if diff_dict == {}:
                         found = True
                         found_in_interfaces.append(iface)
