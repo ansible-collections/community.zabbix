@@ -896,6 +896,7 @@ class Host(ZabbixBase):
         except Exception as e:
             self._module.fail_json(msg="Failed to set inventory to host: %s" % e)
 
+
 # Add all default values to all missing parameters for existing interfaces
 def update_exist_interfaces_with_defaults(exist_interfaces):
 
@@ -927,6 +928,7 @@ def update_exist_interfaces_with_defaults(exist_interfaces):
         new_exist_interfaces.append(new_interface)
 
     return new_exist_interfaces
+
 
 def normalize_macro_name(macro_name):
     # Zabbix handles macro names in upper case characters
@@ -1134,7 +1136,6 @@ def main():
                                 if d_key in ['version', 'bulk', 'securitylevel', 'authprotocol', 'privprotocol']:
                                     exist_interfaces[idx][key][d_key] = int(interface[key][d_key])
 
-            # 
             interfaces_copy = copy.deepcopy(interfaces)
             found_in_interfaces = []
             for idx, interface in enumerate(copy.deepcopy(exist_interfaces)):
