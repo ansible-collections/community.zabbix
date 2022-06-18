@@ -923,7 +923,8 @@ def update_exist_interfaces_with_defaults(exist_interfaces):
         new_interface = default_interface.copy()
         new_interface.update(interface)
         new_interface['details'] = default_interface_details.copy()
-        new_interface['details'].update(interface['details'])
+        if 'details' in interface:
+            new_interface['details'].update(interface['details'])
         new_exist_interfaces.append(new_interface)
 
     return new_exist_interfaces
