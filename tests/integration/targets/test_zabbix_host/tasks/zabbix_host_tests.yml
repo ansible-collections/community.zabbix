@@ -1305,6 +1305,23 @@
     that:
       - "zabbix_host1 is changed"
 
+- name: "test: add user macro while keeping previous ones with force=no (again)"
+  zabbix_host:
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
+    host_name: ExampleHost
+    force: false
+    macros:
+      - macro: '{$NEWMACRO3}'
+        value: testing
+  register: zabbix_host1
+
+- name: expect to succeed and that things have not changed
+  assert:
+    that:
+      - "zabbix_host1 is not changed"
+
 - name: "test: add the same user macros (again)"
   zabbix_host:
     server_url: "{{ zabbix_api_server_url }}"
