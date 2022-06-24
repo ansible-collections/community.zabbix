@@ -1374,10 +1374,10 @@
             type: secret
       register: zabbix_host1
 
-    - name: expect to succeed and that things have not changed
+    - name: expect to succeed and that things have changed as it has secret value
       assert:
         that:
-          - "zabbix_host1 is not changed"
+          - "zabbix_host1 is changed"
 
 - name: "test: wipe out all of the user macros"
   zabbix_host:
