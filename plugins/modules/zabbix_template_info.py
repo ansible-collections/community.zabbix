@@ -162,7 +162,7 @@ class TemplateInfo(ZabbixBase):
     def get_template_id(self, template_name):
         template_id = []
         try:
-            template_list = self._zapi.template.get({'output': 'extend',
+            template_list = self._zapi.template.get({'output': ['templateid'],
                                                      'filter': {'host': template_name}})
         except Exception as e:
             self._module.fail_json(msg='Failed to get template: %s' % e)
