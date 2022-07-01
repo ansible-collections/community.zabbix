@@ -9,7 +9,7 @@
 
 - name: "Get Total Private IP Addresses"
   set_fact:
-    total_private_ip_addresses: "{{ ansible_all_ipv4_addresses | ansible.netcommon.ipaddr('private') | length }}"
+    total_private_ip_addresses: "{{ ansible_all_ipv4_addresses | ansible.utils.ipaddr('private') | length }}"
   when:
     - ansible_all_ipv4_addresses is defined
     - not (zabbix_agent_dont_detect_ip)
