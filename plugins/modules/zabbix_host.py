@@ -802,12 +802,9 @@ class Host(ZabbixBase):
         # hostmacroid and hostid are present in every item of host['macros'] and need to be removed
         if macros is not None and 'macros' in host:
             t_macros = copy.deepcopy(macros)  # make copy to prevent change in original data
-            existing_macros = sorted(host['macros'], key=lambda k: k['macro'])
-            for macro in existing_macros:
+            for macro in host['macros']:
                 macro.pop('hostid', False)
                 macro.pop('hostmacroid', False)
-                if 'type' in macro:
-                    macro['type'] = int(macro['type'])
 
             # 'secret' type macros don't return 'value' from API
             if LooseVersion(self._zbx_api_version) >= LooseVersion('5.0'):
@@ -815,7 +812,9 @@ class Host(ZabbixBase):
                     if macro['type'] == 1:
                         macro.pop('value', False)
 
-            if sorted(t_macros, key=lambda k: k['macro']) != existing_macros:
+            diff = []
+            zabbix_utils.helper_compare_lists(t_macros, host['macros'], diff)
+            if diff != []:
                 return True
 
         if tags is not None and 'tags' in host:
@@ -1085,9 +1084,9 @@ def main():
                     macro.pop('type')
                 else:
                     if macro['type'] == 'text':
-                        macro['type'] = 0
+                        macro['type'] = '0'
                     elif macro['type'] == 'secret':
-                        macro['type'] = 1
+                        macro['type'] = '1'
 
     # Use proxy specified, or set to 0
     if proxy:
@@ -1184,10 +1183,20 @@ def main():
 
                 # Macros not present in host.update will be removed if we dont copy them when force=no
                 if macros is not None and 'macros' in zabbix_host_obj.keys():
-                    provided_macros = [m['macro'] for m in macros]
                     existing_macros = zabbix_host_obj['macros']
                     for macro in existing_macros:
-                        if macro['macro'] not in provided_macros:
+                        macro.pop('hostmacroid', False)
+                        macro.pop('hostid')
+                        found = False
+                        for idx1, prov_macro in enumerate(macros):
+                            diff_dict = {}
+                            zabbix_utils.helper_compare_dictionaries(prov_macro, macro, diff_dict)
+                            if diff_dict == {}:
+                                found = True
+                                break
+                        if found:
+                            macros[idx1] = macro
+                        else:
                             macros.append(macro)
 
                 # Tags not present in host.update will be removed if we dont copy them when force=no
