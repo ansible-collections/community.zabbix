@@ -806,12 +806,6 @@ class Host(ZabbixBase):
                 macro.pop('hostid', False)
                 macro.pop('hostmacroid', False)
 
-            # 'secret' type macros don't return 'value' from API
-            if LooseVersion(self._zbx_api_version) >= LooseVersion('5.0'):
-                for macro in t_macros:
-                    if macro['type'] == 1:
-                        macro.pop('value', False)
-
             diff = []
             zabbix_utils.helper_compare_lists(t_macros, host['macros'], diff)
             if diff != []:
