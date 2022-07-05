@@ -233,7 +233,7 @@ class Script(ZabbixBase):
                 'manual_host_action',
                 '',
                 'manual_event_action'], scope)),
-            'groupid': groupid,
+            'groupid': groupid
         }
 
         if description:
