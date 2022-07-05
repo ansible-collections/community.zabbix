@@ -233,9 +233,11 @@ class Script(ZabbixBase):
                 'manual_host_action',
                 '',
                 'manual_event_action'], scope)),
-            'groupid': groupid,
-            'description': description
+            'groupid': groupid
         }
+
+        if description is not None:
+            request['description'] = description
 
         if script_type == 'script':
             if execute_on is None:
