@@ -236,7 +236,7 @@ class Script(ZabbixBase):
             'groupid': groupid
         }
 
-        if description:
+        if description is not None:
             request['description'] = description
 
         if script_type == 'script':
