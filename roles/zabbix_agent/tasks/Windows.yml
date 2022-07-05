@@ -206,6 +206,48 @@
   when:
     - zabbix_agent_win_download_zip.changed
 
+- name: "Create directory for PSK file if not exist."
+  win_file:
+    path: "{{ zabbix_agent_tlspskfile | win_dirname }}"
+    state: directory
+  when:
+    - zabbix_agent_tlspskfile is defined
+    - zabbix_agent_tlspskfile
+    - not (zabbix_agent2 | bool)
+
+- name: "Create directory for PSK file if not exist (zabbix-agent2)"
+  win_file:
+    path: "{{ zabbix_agent2_tlspskfile | win_dirname }}"
+    state: directory
+  when:
+    - zabbix_agent2_tlspskfile is defined
+    - zabbix_agent2_tlspskfile
+    - zabbix_agent2 | bool
+
+- name: "Place TLS PSK File"
+  win_copy:
+    dest: "{{ zabbix_agent_tlspskfile }}"
+    content: "{{ zabbix_agent_tlspsk_secret }}"
+  when:
+    - zabbix_agent_tlspskfile is defined
+    - zabbix_agent_tlspskfile
+    - zabbix_agent_tlspsk_secret is defined
+    - not (zabbix_agent2 | bool)
+  notify:
+    - restart win zabbix agent
+
+- name: "Place TLS PSK File (zabbix-agent2)"
+  win_copy:
+    dest: "{{ zabbix_agent2_tlspskfile }}"
+    content: "{{ zabbix_agent2_tlspsk_secret }}"
+  when:
+    - zabbix_agent2_tlspskfile is defined
+    - zabbix_agent2_tlspskfile
+    - zabbix_agent2_tlspsk_secret is defined
+    - zabbix_agent2 | bool
+  notify:
+    - restart win zabbix agent
+
 - name: "Windows | Check if windows service exist"
   ansible.windows.win_service:
     name: "{{ zabbix_win_svc_name }}"
