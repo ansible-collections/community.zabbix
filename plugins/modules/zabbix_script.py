@@ -269,23 +269,23 @@ class Script(ZabbixBase):
 
         if script_type == 'ssh':
             if authtype is None:
-                self._module.fail_json(change=False, msg='authtype must be provided for ssh script type')
+                self._module.fail_json(changed=False, msg='authtype must be provided for ssh script type')
             request['authtype'] = str(zabbix_utils.helper_to_numeric_value([
                 'password',
                 'public_key'], authtype))
             if authtype == 'public_key':
                 if publickey is None or privatekey is None:
-                    self._module.fail_json(change=False, msg='publickey and privatekey must be provided for ssh script type with publickey authtype')
+                    self._module.fail_json(changed=False, msg='publickey and privatekey must be provided for ssh script type with publickey authtype')
                 request['publickey'] = publickey
                 request['privatekey'] = privatekey
 
         if script_type in ['ssh', 'telnet']:
             if username is None:
-                self._module.fail_json(change=False, msg='username must be provided for "ssh" and "telnet" script types')
+                self._module.fail_json(changed=False, msg='username must be provided for "ssh" and "telnet" script types')
             request['username'] = username
             if (script_type == 'ssh' and authtype == 'password') or script_type == 'telnet':
                 if password is None:
-                    self._module.fail_json(change=False, msg='password must be provided for telnet script type or ssh script type with password autheype')
+                    self._module.fail_json(changed=False, msg='password must be provided for telnet script type or ssh script type with password autheype')
                 request['password'] = password
             if port is not None:
                 request['port'] = port
