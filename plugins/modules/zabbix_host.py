@@ -615,11 +615,11 @@ class Host(ZabbixBase):
     # get group ids by group names
     def get_group_ids_by_group_names(self, group_names):
         if self.check_host_group_exist(group_names):
-            return self._zapi.hostgroup.get({'output': 'groupid', 'filter': {'name': group_names}})
+            return self._zapi.hostgroup.get({'output': 'extend', 'filter': {'name': group_names}})
 
     # get host groups ids by host id
     def get_group_ids_by_host_id(self, host_id):
-        return self._zapi.hostgroup.get({'output': 'groupid', 'hostids': host_id})
+        return self._zapi.hostgroup.get({'output': 'extend', 'hostids': host_id})
 
     # get host templates by host id
     def get_host_templates_by_host_id(self, host_id):
