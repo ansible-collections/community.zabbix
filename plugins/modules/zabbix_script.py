@@ -28,6 +28,7 @@ options:
     script_type:
         description:
             - Script type.
+            - Types C(ssh), C(telnet) and C(webhook) works only with Zabbix >= 5.4.
         type: str
         required: true
         choices: ['script', 'ipmi', 'ssh', 'telnet', 'webhook']
@@ -39,6 +40,7 @@ options:
     scope:
         description:
             - Script scope.
+            - Works only with Zabbix >= 5.4. For lower versions is silently ignored which is equivalent of C(manual_host_action).
         type: str
         required: false
         choices: ['action_operation', 'manual_host_action', 'manual_event_action']
@@ -55,6 +57,7 @@ options:
         description:
             - Folders separated by slash that form a menu like navigation in frontend when clicked on host or event.
             - Used if scope is C(manual_host_action) or C(manual_event_action).
+            - Works only with Zabbix >= 5.4. For lower versions is silently ignored. Prepend menu path to name instead.
         type: str
         required: false
     authtype:
@@ -174,6 +177,7 @@ RETURN = '''
 from ansible.module_utils.basic import AnsibleModule
 
 from ansible_collections.community.zabbix.plugins.module_utils.base import ZabbixBase
+from ansible_collections.community.zabbix.plugins.module_utils.version import LooseVersion
 import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabbix_utils
 
 
@@ -265,23 +269,23 @@ class Script(ZabbixBase):
 
         if script_type == 'ssh':
             if authtype is None:
-                self._module.fail_json(change=False, msg='authtype must be provided for ssh script type')
+                self._module.fail_json(changed=False, msg='authtype must be provided for ssh script type')
             request['authtype'] = str(zabbix_utils.helper_to_numeric_value([
                 'password',
                 'public_key'], authtype))
             if authtype == 'public_key':
                 if publickey is None or privatekey is None:
-                    self._module.fail_json(change=False, msg='publickey and privatekey must be provided for ssh script type with publickey authtype')
+                    self._module.fail_json(changed=False, msg='publickey and privatekey must be provided for ssh script type with publickey authtype')
                 request['publickey'] = publickey
                 request['privatekey'] = privatekey
 
         if script_type in ['ssh', 'telnet']:
             if username is None:
-                self._module.fail_json(change=False, msg='username must be provided for "ssh" and "telnet" script types')
+                self._module.fail_json(changed=False, msg='username must be provided for "ssh" and "telnet" script types')
             request['username'] = username
             if (script_type == 'ssh' and authtype == 'password') or script_type == 'telnet':
                 if password is None:
-                    self._module.fail_json(change=False, msg='password must be provided for telnet script type or ssh script type with password autheype')
+                    self._module.fail_json(changed=False, msg='password must be provided for telnet script type or ssh script type with password autheype')
                 request['password'] = password
             if port is not None:
                 request['port'] = port
@@ -290,6 +294,14 @@ class Script(ZabbixBase):
             request['timeout'] = script_timeout
             if parameters:
                 request['parameters'] = parameters
+
+        if LooseVersion(self._zbx_api_version) < LooseVersion('5.4'):
+            if script_type not in ['script', 'ipmi']:
+                self._module.fail_json(changed=False, msg='script_type must be script or ipmi in version <5.4')
+            if 'scope' in request:
+                del request['scope']
+            if 'menu_path' in request:
+                del request['menu_path']
 
         return request
 
