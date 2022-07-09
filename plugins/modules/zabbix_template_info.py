@@ -27,7 +27,8 @@ options:
     format:
         description:
             - Format to use when dumping template.
-        choices: ['json', 'xml']
+            - C(yaml) works only with Zabbix >= 5.2.
+        choices: ['json', 'xml', 'yaml', 'none']
         default: json
         type: str
     omit_date:
@@ -64,10 +65,34 @@ EXAMPLES = '''
     format: xml
     omit_date: no
   register: template_json
+
+- name: Get Zabbix template as YAML
+  community.zabbix.zabbix_template_info:
+    server_url: "http://zabbix.example.com/zabbix/"
+    login_user: admin
+    login_password: secret
+    template_name: Template
+    format: yaml
+    omit_date: no
+  register: template_yaml
+
+- name: Determine if Zabbix template exists
+  community.zabbix.zabbix_template_info:
+    server_url: "http://zabbix.example.com/zabbix/"
+    login_user: admin
+    login_password: secret
+    template_name: Template
+    format: none
+  register: template
 '''
 
 RETURN = '''
 ---
+template_id:
+  description: The ID of the template
+  returned: always
+  type: str
+
 template_json:
   description: The JSON of the template
   returned: when format is json and omit_date is true
@@ -143,6 +168,28 @@ template_xml:
             </template>
         </templates>
     </zabbix_export>
+
+template_yaml:
+  description: The YAML of the template
+  returned: when format is yaml and omit_date is false
+  type: str
+  sample: >-
+    zabbix_export:
+      version: '6.0'
+      date: '2022-07-09T13:25:18Z'
+      groups:
+        -
+          uuid: 7df96b18c230490a9a0a9e2307226338
+          name: Templates
+      templates:
+        -
+          uuid: 88a9ad240f924f669eb7d4eed736320c
+          template: 'Test Template'
+          name: 'Template for Testing'
+          description: 'Testing template import'
+          groups:
+            -
+              name: Templates
 '''
 
 
@@ -182,6 +229,16 @@ class TemplateInfo(ZabbixBase):
         except ValueError as e:
             self._module.fail_json(msg='Invalid JSON provided', details=to_native(e), exception=traceback.format_exc())
 
+    def load_yaml_template(self, template_yaml, omit_date=False):
+        if omit_date:
+            yaml_lines = template_yaml.splitlines(keepends=True)
+            for index, line in enumerate(yaml_lines):
+                if 'date:' in line:
+                    del yaml_lines[index]
+                    return ''.join(yaml_lines)
+        else:
+            return template_yaml
+
     def dump_template(self, template_id, template_type='json', omit_date=False):
         try:
             dump = self._zapi.configuration.export({'format': template_type, 'options': {'templates': template_id}})
@@ -196,6 +253,8 @@ class TemplateInfo(ZabbixBase):
                     return str(ET.tostring(xmlroot, encoding='utf-8'))
                 else:
                     return str(ET.tostring(xmlroot, encoding='utf-8').decode('utf-8'))
+            elif template_type == 'yaml':
+                return self.load_yaml_template(dump, omit_date)
             else:
                 return self.load_json_template(dump, omit_date)
         except Exception as e:
@@ -207,7 +266,7 @@ def main():
     argument_spec.update(dict(
         template_name=dict(type='str', required=True),
         omit_date=dict(type='bool', required=False, default=False),
-        format=dict(type='str', choices=['json', 'xml'], default='json')
+        format=dict(type='str', choices=['json', 'xml', 'yaml', 'none'], default='json')
     ))
     module = AnsibleModule(
         argument_spec=argument_spec,
@@ -226,9 +285,13 @@ def main():
         module.fail_json(msg='Template not found: %s' % template_name)
 
     if format == 'json':
-        module.exit_json(changed=False, template_json=template_info.dump_template(template_id, template_type='json', omit_date=omit_date))
+        module.exit_json(changed=False, template_id=template_id[0], template_json=template_info.dump_template(template_id, template_type='json', omit_date=omit_date))
     elif format == 'xml':
-        module.exit_json(changed=False, template_xml=template_info.dump_template(template_id, template_type='xml', omit_date=omit_date))
+        module.exit_json(changed=False, template_id=template_id[0], template_xml=template_info.dump_template(template_id, template_type='xml', omit_date=omit_date))
+    elif format == 'yaml':
+        module.exit_json(changed=False, template_id=template_id[0], template_yaml=template_info.dump_template(template_id, template_type='yaml', omit_date=omit_date))
+    elif format == 'none':
+        module.exit_json(changed=False, template_id=template_id[0])
 
 
 if __name__ == "__main__":
