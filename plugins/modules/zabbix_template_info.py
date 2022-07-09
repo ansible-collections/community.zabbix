@@ -285,11 +285,23 @@ def main():
         module.fail_json(msg='Template not found: %s' % template_name)
 
     if format == 'json':
-        module.exit_json(changed=False, template_id=template_id[0], template_json=template_info.dump_template(template_id, template_type='json', omit_date=omit_date))
+        module.exit_json(
+            changed=False,
+            template_id=template_id[0],
+            template_json=template_info.dump_template(template_id, template_type='json', omit_date=omit_date)
+        )
     elif format == 'xml':
-        module.exit_json(changed=False, template_id=template_id[0], template_xml=template_info.dump_template(template_id, template_type='xml', omit_date=omit_date))
+        module.exit_json(
+            changed=False,
+            template_id=template_id[0],
+            template_xml=template_info.dump_template(template_id, template_type='xml', omit_date=omit_date)
+        )
     elif format == 'yaml':
-        module.exit_json(changed=False, template_id=template_id[0], template_yaml=template_info.dump_template(template_id, template_type='yaml', omit_date=omit_date))
+        module.exit_json(
+            changed=False,
+            template_id=template_id[0],
+            template_yaml=template_info.dump_template(template_id, template_type='yaml', omit_date=omit_date)
+        )
     elif format == 'none':
         module.exit_json(changed=False, template_id=template_id[0])
 
