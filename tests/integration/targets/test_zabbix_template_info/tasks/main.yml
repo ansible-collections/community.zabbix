@@ -97,9 +97,9 @@
 
 - assert:
     that:
-      - (fetch_template_yaml_format_result.template_yaml | from_yaml)[template_export_key]['date'] is defined
-      - (fetch_template_yaml_format_result.template_yaml | from_yaml)[template_export_key]['groups'][0]['name'] == 'Templates'
-      - (fetch_template_yaml_format_result.template_yaml | from_yaml)[template_export_key]['templates'][0]['template'] == 'ExampleTemplateForTempleteInfoModule'
+      - fetch_template_yaml_format_result.template_yaml | regex_search('date: .+') is defined
+      - fetch_template_yaml_format_result.template_yaml | regex_search('name: Templates') is defined
+      - fetch_template_yaml_format_result.template_yaml | regex_search('template: ExampleTemplateForTempleteInfoModule') is defined
   when: zabbix_version is version('5.2', '>=')
 
 - name: "test - Fetch template info as a YAML format with omit_date parameter from Zabbix Server"
@@ -115,9 +115,9 @@
 
 - assert:
     that:
-      - (fetch_template_yaml_format_omit_date_result.template_yaml | from_yaml)[template_export_key]['date'] is not defined
-      - (fetch_template_yaml_format_omit_date_result.template_yaml | from_yaml)[template_export_key]['groups'][0]['name'] == 'Templates'
-      - (fetch_template_yaml_format_omit_date_result.template_yaml | from_yaml)[template_export_key]['templates'][0]['template'] == 'ExampleTemplateForTempleteInfoModule'
+      - fetch_template_yaml_format_result.template_yaml | regex_search('date: .+') is not defined
+      - fetch_template_yaml_format_result.template_yaml | regex_search('name: Templates') is defined
+      - fetch_template_yaml_format_result.template_yaml | regex_search('template: ExampleTemplateForTempleteInfoModule') is defined
   when: zabbix_version is version('5.2', '>=')
 
 - name: "test - Fetch template info with none format from Zabbix Server"
