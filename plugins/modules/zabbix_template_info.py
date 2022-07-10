@@ -231,7 +231,7 @@ class TemplateInfo(ZabbixBase):
 
     def load_yaml_template(self, template_yaml, omit_date=False):
         if omit_date:
-            yaml_lines = template_yaml.splitlines(keepends=True)
+            yaml_lines = template_yaml.splitlines(True)
             for index, line in enumerate(yaml_lines):
                 if 'date:' in line:
                     del yaml_lines[index]
