@@ -1329,8 +1329,6 @@ class RecoveryOperations(Operations):
                 constructed_operation['opmessage'] = self._construct_opmessage(op)
                 constructed_operation['opmessage_usr'] = self._construct_opmessage_usr(op)
                 constructed_operation['opmessage_grp'] = self._construct_opmessage_grp(op)
-                if LooseVersion(self._zbx_api_version) >= LooseVersion('6.0'):
-                    constructed_operation['opmessage'].pop('mediatypeid')
 
             if constructed_operation['operationtype'] == 11:
                 constructed_operation['opmessage'] = self._construct_opmessage(op)
@@ -1401,8 +1399,6 @@ class AcknowledgeOperations(Operations):
                 constructed_operation['opmessage'] = self._construct_opmessage(op)
                 constructed_operation['opmessage_usr'] = self._construct_opmessage_usr(op)
                 constructed_operation['opmessage_grp'] = self._construct_opmessage_grp(op)
-                if LooseVersion(self._zbx_api_version) >= LooseVersion('6.0'):
-                    constructed_operation['opmessage'].pop('mediatypeid')
 
             if constructed_operation['operationtype'] == 12:
                 constructed_operation['opmessage'] = self._construct_opmessage(op)
