@@ -1,0 +1,2 @@
+---
+template_groups_key: "{{ 'template_groups' if zabbix_version is version('6.2', '>=') else 'groups' }}"
