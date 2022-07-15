@@ -1,0 +1,3 @@
+---
+bugfixes:
+  - zabbix_host - fix update of TLS PSK parameters for Zabbix >= 5.4
