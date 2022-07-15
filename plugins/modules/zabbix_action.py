@@ -1236,8 +1236,8 @@ class Operations(Zapi):
                 constructed_operation['opmessage'] = self._construct_opmessage(op)
                 constructed_operation['opmessage_usr'] = self._construct_opmessage_usr(op)
                 constructed_operation['opmessage_grp'] = self._construct_opmessage_grp(op)
-
-                if LooseVersion(self._zbx_api_version) < LooseVersion('6.0'):
+                if event_source == 'trigger':
+                    # opconditions valid only for 'trigger' action
                     constructed_operation['opconditions'] = self._construct_opconditions(op)
 
             # Send Command type
@@ -1245,9 +1245,7 @@ class Operations(Zapi):
                 constructed_operation['opcommand'] = self._construct_opcommand(op)
                 constructed_operation['opcommand_hst'] = self._construct_opcommand_hst(op)
                 constructed_operation['opcommand_grp'] = self._construct_opcommand_grp(op)
-                if LooseVersion(self._zbx_api_version) < LooseVersion('6.0'):
-                    constructed_operation['opconditions'] = self._construct_opconditions(op)
-                elif event_source == 'trigger':
+                if event_source == 'trigger':
                     # opconditions valid only for 'trigger' action
                     constructed_operation['opconditions'] = self._construct_opconditions(op)
 
