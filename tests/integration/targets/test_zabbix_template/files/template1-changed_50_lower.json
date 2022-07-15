@@ -8,10 +8,10 @@
         "description": "",
         "groups": [
           {
-            "name": "Linux servers"
+            "name": "Templates"
           },
           {
-            "name": "Templates"
+            "name": "Templates/Applications"
           }
         ],
         "macros": [
@@ -41,10 +41,10 @@
     "version": "3.0",
     "groups": [
       {
-        "name": "Linux servers"
+        "name": "Templates"
       },
       {
-        "name": "Templates"
+        "name": "Templates/Applications"
       }
     ]
   }

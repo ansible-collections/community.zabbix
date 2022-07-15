@@ -4,12 +4,12 @@
     <date>2022-01-23T15:24:01Z</date>
     <groups>
         <group>
-            <uuid>dc579cd7a1a34222933f24f52a68bcd8</uuid>
-            <name>Linux servers</name>
-        </group>
-        <group>
             <uuid>7df96b18c230490a9a0a9e2307226338</uuid>
             <name>Templates</name>
+        </group>
+        <group>
+            <uuid>a571c0d144b14fd4a87a9d9b2aa9fcd6</uuid>
+            <name>Templates/Applications</name>
         </group>
     </groups>
     <templates>
@@ -27,10 +27,10 @@
             </templates>
             <groups>
                 <group>
-                    <name>Linux servers</name>
+                    <name>Templates</name>
                 </group>
                 <group>
-                    <name>Templates</name>
+                    <name>Templates/Applications</name>
                 </group>
             </groups>
             <macros>
