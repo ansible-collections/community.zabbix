@@ -564,7 +564,7 @@ class Host(ZabbixBase):
         }
 
         if LooseVersion(self._zbx_api_version) >= LooseVersion('4.2.0'):
-            params.update({'selectTags': 'extend'})
+            params.update({'selectTags': ['tag', 'value']})
 
         if LooseVersion(self._zbx_api_version) >= LooseVersion('5.4.0'):
             params.update({
@@ -1179,8 +1179,9 @@ def main():
                 if macros is not None and 'macros' in zabbix_host_obj.keys():
                     existing_macros = zabbix_host_obj['macros']
                     for macro in existing_macros:
-                        macro.pop('hostmacroid', False)
-                        macro.pop('hostid')
+                        macro.pop('hostmacroid', None)
+                        macro.pop('hostid', None)
+                        macro.pop('automatic', None)
                         found = False
                         for idx1, prov_macro in enumerate(macros):
                             diff_dict = {}
