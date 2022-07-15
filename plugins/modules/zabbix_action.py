@@ -1239,7 +1239,7 @@ class Operations(Zapi):
                 if event_source == 'trigger':
                     # opconditions valid only for 'trigger' action
                     constructed_operation['opconditions'] = self._construct_opconditions(op)
-                    
+
             # Send Command type
             if constructed_operation['operationtype'] == 1:
                 constructed_operation['opcommand'] = self._construct_opcommand(op)
