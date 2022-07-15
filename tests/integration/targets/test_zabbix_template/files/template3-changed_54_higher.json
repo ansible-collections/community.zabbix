@@ -3,22 +3,22 @@
       "date": "2022-01-23T15:13:26Z",
       "groups": [
           {
-              "name": "Linux servers",
-              "uuid": "dc579cd7a1a34222933f24f52a68bcd8"
-          },
-          {
               "name": "Templates",
               "uuid": "7df96b18c230490a9a0a9e2307226338"
+          },
+          {
+              "name": "Templates/Applications",
+              "uuid": "a571c0d144b14fd4a87a9d9b2aa9fcd6"
           }
       ],
       "templates": [
           {
               "groups": [
                   {
-                      "name": "Linux servers"
+                      "name": "Templates"
                   },
                   {
-                      "name": "Templates"
+                      "name": "Templates/Applications"
                   }
               ],
               "macros": [

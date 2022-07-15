@@ -77,8 +77,8 @@
 - block:
     - assert:
         that:
-          - gather_template_result.template_json[template_export_key].groups.0.name == 'Linux servers'
-          - gather_template_result.template_json[template_export_key].groups.1.name == 'Templates'
+          - gather_template_result.template_json[template_export_key][template_groups_key].0.name == 'Templates'
+          - gather_template_result.template_json[template_export_key][template_groups_key].1.name == 'Templates/Applications'
           - gather_template_result.template_json[template_export_key].templates.0.templates.0.name == 'FTP Service'
           - gather_template_result.template_json[template_export_key].templates.0.templates.1.name == 'Zabbix proxy health'
           - gather_template_result.template_json[template_export_key].templates.0.macros.0.macro == '{$EXAMPLE_MACRO1}'

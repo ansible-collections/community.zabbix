@@ -1,0 +1,3 @@
+---
+minor_changes:
+  - zabbix_template - added support for template groups (Zabbix >= 6.2)
