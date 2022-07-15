@@ -1,3 +1,3 @@
 ---
-bugfixes:
-  - zabbix_host - fix update of TLS PSK parameters for Zabbix >= 5.4
+minor_changes:
+  - zabbix_host - using ``tls_psk_identity`` or ``tls_psk`` parameters with Zabbix >= 5.4 makes this module non-idempotent
