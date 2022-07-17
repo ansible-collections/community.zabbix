@@ -237,12 +237,14 @@ options:
             - It is a unique name by which this specific PSK is referred to by Zabbix components
             - Do not put sensitive information in the PSK identity string, it is transmitted over the network unencrypted.
             - Works only with >= Zabbix 3.0
+            - Using this parameter with Zabbix >= 5.4 makes this module non-idempotent.
         type: str
     tls_psk:
         description:
             - PSK value is a hard to guess string of hexadecimal digits.
             - The preshared key, at least 32 hex digits. Required if either I(tls_connect) or I(tls_accept) has PSK enabled.
             - Works only with >= Zabbix 3.0
+            - Using this parameter with Zabbix >= 5.4 makes this module non-idempotent.
         type: str
     ca_cert:
         description:
@@ -765,15 +767,17 @@ class Host(ZabbixBase):
             if int(host['tls_accept']) != tls_accept:
                 return True
 
-        if LooseVersion(self._zbx_api_version) <= LooseVersion('5.4.0'):
+        if LooseVersion(self._zbx_api_version) < LooseVersion('5.4'):
             if tls_psk_identity is not None and 'tls_psk_identity' in host:
                 if host['tls_psk_identity'] != tls_psk_identity:
                     return True
-
-        if LooseVersion(self._zbx_api_version) <= LooseVersion('5.4.0'):
             if tls_psk is not None and 'tls_psk' in host:
                 if host['tls_psk'] != tls_psk:
                     return True
+        else:
+            # in Zabbix >= 5.4 these parameters are write-only and are not returned in host.get response
+            if tls_psk_identity is not None or tls_psk is not None:
+                return True
 
         if tls_issuer is not None and 'tls_issuer' in host:
             if host['tls_issuer'] != tls_issuer:
