@@ -74,10 +74,11 @@ def helper_cleanup_data(obj):
         return obj
 
 
-def helper_to_numeric_value(strs, value):
+def helper_to_numeric_value(elements, value):
     """Converts string values to integers
 
     Parameters:
+        elements: list of elements to enumerate
         value: string value
 
     Returns:
@@ -85,10 +86,13 @@ def helper_to_numeric_value(strs, value):
     """
     if value is None:
         return None
-    strs = [s.lower() if isinstance(s, str) else s for s in strs]
-    value = value.lower()
-    tmp_dict = dict(zip(strs, list(range(len(strs)))))
-    return tmp_dict[value]
+    for index, element in enumerate(elements):
+        if isinstance(element, str) and element.lower() == value.lower():
+            return index
+        if isinstance(element, list):
+            for deep_element in element:
+                if isinstance(deep_element, str) and deep_element.lower() == value.lower():
+                    return index
 
 
 def helper_convert_unicode_to_str(data):
