@@ -17,7 +17,8 @@
     zabbix_version: 6.0
     zabbix_agent_version: 6.0
   when:
-    - ansible_distribution_release is defined and ansible_distribution_release == "jammy"
+    - ansible_distribution_release is defined
+    - ansible_distribution_release == "jammy"
     - ( zabbix_agent_version is version ('6.0','lt') or
         zabbix_version is version ('6.0','lt') )
 
