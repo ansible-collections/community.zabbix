@@ -145,18 +145,18 @@ options:
                     - C(matches), C(does not match), C(Yes) and C(No) condition operators work only with >= Zabbix 4.0
                     - When I(type) is set to C(maintenance_status), the choices are C(Yes) and C(No) for Zabbix >= 6.0
                 choices:
-                    - '='
-                    - '<>'
-                    - 'like'
-                    - 'not like'
-                    - 'in'
-                    - '>='
-                    - '<='
-                    - 'not in'
-                    - 'matches'
-                    - 'does not match'
-                    - 'Yes'
-                    - 'No'
+                    - C(equals) or C(=)
+                    - C(does not equal) or C(<>)
+                    - C(contains) or C(like)
+                    - C(does not contain) or C(not like)
+                    - C(in)
+                    - C(is greater than or equals) or C(>=)
+                    - C(is less than or equals) or C(<=)
+                    - C(not in)
+                    - C(matches)
+                    - C(does not match)
+                    - C(Yes)
+                    - C(No)
             formulaid:
                 description:
                     - Arbitrary unique ID that is used to reference the condition from a custom expression.
@@ -1521,13 +1521,13 @@ class Filter(Zapi):
         """
         try:
             return zabbix_utils.helper_to_numeric_value([
-                "=",
-                "<>",
-                "like",
-                "not like",
+                ["equals", "="],
+                ["does not equal", "<>"],
+                ["contains", "like"],
+                ["does not contain", "not like"],
                 "in",
-                ">=",
-                "<=",
+                ["is greater than or equals", ">="],
+                ["is less than or equals", "<="],
                 "not in",
                 "matches",
                 "does not match",

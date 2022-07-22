@@ -371,6 +371,24 @@
 
   - assert:
       that: zbxaction_conditions_operators.changed is sameas True
+  
+  - name: test - update action with multiple conditions with operator aliases
+    zabbix_action:
+      conditions:
+        - type: host_group
+          operator: does not equal
+          value: Linux servers
+        - type: event_tag_value
+          value: MyTag
+          operator: contains
+          value2: MyTagValue
+        - type: trigger_severity
+          operator: is less than or equals
+          value: Average
+    register: zbxaction_conditions_operator_aliases
+
+  - assert:
+      that: zbxaction_conditions_operator_aliases.changed is sameas True
 
   - name: test - update action with multiple conditions and evaltype
     zabbix_action:
