@@ -123,7 +123,7 @@
       zabbix_mediatype:
         max_sessions: 99
         max_attempts: 10
-        attempt_interval: 30
+        attempt_interval: 30s
       register: zbxmediatype_concur
 
     - assert:
@@ -133,7 +133,7 @@
       zabbix_mediatype:
         max_sessions: 99
         max_attempts: 10
-        attempt_interval: 30
+        attempt_interval: 30s
       register: zbxmediatype_concur
 
     - assert:
@@ -142,8 +142,8 @@
     - name: test - update email mediatype concurrent settings above range (fail)
       zabbix_mediatype:
         max_sessions: 102
-        max_attempts: 11
-        attempt_interval: 61
+        max_attempts: 101
+        attempt_interval: 61m
       register: zbxmediatype_concur_fail
       ignore_errors: true
 

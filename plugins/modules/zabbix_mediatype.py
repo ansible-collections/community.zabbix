@@ -77,12 +77,12 @@ options:
             - Works only with Zabbix versions 3.4 or newer.
         default: 3
     attempt_interval:
-        type: 'int'
+        type: 'str'
         description:
             - The interval between retry attempts.
-            - Possible range is 0-60.
+            - Possible range is 0-60s in Zabbix < 5.0 or 0-1h in Zabbix >= 5.0.
             - Works only with Zabbix versions 3.4 or newer.
-        default: 10
+        default: 10s
     script_name:
         type: 'str'
         description:
@@ -641,7 +641,7 @@ def main():
         status=dict(type='str', default='enabled', choices=['enabled', 'disabled'], required=False),
         max_sessions=dict(type='int', default=1, required=False),
         max_attempts=dict(type='int', default=3, required=False),
-        attempt_interval=dict(type='int', default=10, required=False),
+        attempt_interval=dict(type='str', default='10s', required=False),
         # Script
         script_name=dict(type='str', required=False),
         script_params=dict(type='list', required=False),
