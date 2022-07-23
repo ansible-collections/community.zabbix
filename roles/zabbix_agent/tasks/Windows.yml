@@ -118,13 +118,13 @@
     - zabbix_agent_2_service_exist | default(false)
 
 - name: "Windows | Uninstall Zabbix v1"
-  ansible.windows.win_command: '"{{ zabbix_win_exe_path }}" --config "{{ zabbix_win_install_dir }}\conf\{{ zabbix_win_config_name }}" --uninstall'
+  ansible.windows.win_command: '"{{ zabbix_win_exe_path }}" --config "{{ zabbix_win_install_dir_conf }}\{{ zabbix_win_config_name }}" --uninstall'
   when:
     - zabbix_agent_version_change | default(false) or zabbix_agent2
     - zabbix_agent_1_service_exist | default(false)
 
 - name: "Windows | Uninstall Zabbix v2"
-  ansible.windows.win_command: '"{{ zabbix2_win_exe_path }}" --config "{{ zabbix_win_install_dir }}\conf\{{ zabbix2_win_config_name }}" --uninstall'
+  ansible.windows.win_command: '"{{ zabbix2_win_exe_path }}" --config "{{ zabbix_win_install_dir_conf }}\{{ zabbix2_win_config_name }}" --uninstall'
   when:
     - zabbix_agent_version_change | default(false) or not zabbix_agent2
     - zabbix_agent_2_service_exist | default(false)
@@ -206,6 +206,22 @@
   when:
     - zabbix_agent_win_download_zip.changed
 
+- name: "Windows | Copy binary files to expected location"
+  ansible.windows.win_copy:
+    src: "{{ zabbix_win_install_dir }}\\bin\\{{ item }}"
+    dest: "{{ zabbix_win_install_dir_bin }}\\{{ item }}"
+    remote_src: yes
+  loop:
+    - zabbix_agentd.exe
+    - zabbix_sender.exe
+  when:
+    - zabbix_win_install_dir_bin is defined
+
+- set_fact:
+    zabbix_win_exe_path: "{{ zabbix_win_install_dir_bin }}\\zabbix_agentd.exe"
+  when:
+    - zabbix_win_install_dir_bin is defined
+
 - name: "Create directory for PSK file if not exist."
   win_file:
     path: "{{ zabbix_agent_tlspskfile | win_dirname }}"
@@ -254,7 +270,7 @@
   register: zabbix_windows_service
 
 - name: "Windows | Register Service"
-  ansible.windows.win_command: '"{{ zabbix_win_exe_path }}" --config "{{ zabbix_win_install_dir }}\conf\{{ zabbix_win_config_name }}" --install'
+  ansible.windows.win_command: '"{{ zabbix_win_exe_path }}" --config "{{ zabbix_win_install_dir_conf }}\{{ zabbix_win_config_name }}" --install'
   when: not zabbix_windows_service.exists
 
 - name: "Windows | Set service startup mode to auto, ensure it is started and set auto-recovery"
