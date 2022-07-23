@@ -291,6 +291,8 @@ Otherwise it just for the Zabbix Agent or for the Zabbix Agent 2.
 * `zabbix_version_long`: The long (major.minor.patch) version of the Zabbix Agent. This will be used to generate the `zabbix(2)_win_package` and `zabbix(2)_win_download_link` variables. This takes precedence over `zabbix_agent_version`.
 * `zabbix(2)_win_download_link`: The download url to the `win.zip` file.
 * `zabbix_win_install_dir`: The directory where Zabbix needs to be installed.
+* `zabbix_win_install_dir_conf`: The directory where Zabbix configuration file needs to be installed.
+* `zabbix_win_install_dir_bin`: The directory where Zabbix binary file needs to be installed.
 * `zabbix_agent(2)_win_logfile`: The full path to the logfile for the Zabbix Agent.
 * `zabbix_agent_win_include`: The directory in which the Zabbix Agent specific configuration files are stored.
 * `zabbix_agent_win_svc_recovery`: Enable Zabbix Agent service auto-recovery settings.
