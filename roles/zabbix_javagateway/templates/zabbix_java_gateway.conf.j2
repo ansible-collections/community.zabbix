@@ -1,23 +1,12 @@
-# This is a configuration file for Zabbix Java Gateway.
-# It is sourced by startup.sh and shutdown.sh scripts.
+{{ ansible_managed | comment }}
+# This is a configuration file for Zabbix Java Gateway
+# To get more information about Zabbix, visit http://www.zabbix.com
 
-### Option: zabbix.listenIP
-#       IP address to listen on.
-#
+# This configuration file is "minimalized", which means all the original comments 
+# are removed. The full documentation for your Zabbix Java Gateway can be found here:
+# https://www.zabbix.com/documentation/{{ zabbix_version }}/en/manual/concepts/java
+
 LISTEN_IP={{ zabbix_javagateway_listenip }}
-
-### Option: zabbix.listenPort
-#       Port to listen on.
-#
 LISTEN_PORT={{ zabbix_javagateway_listenport }}
-
-### Option: zabbix.pidFile
-#       Name of PID file.
-#       If omitted, Zabbix Java Gateway is started as a console application.
-#
 PID_FILE={{ zabbix_javagateway_pidfile }}
-
-### Option: zabbix.startPollers
-#       Number of worker threads to start.
-#
 START_POLLERS={{ zabbix_javagateway_startpollers }}
