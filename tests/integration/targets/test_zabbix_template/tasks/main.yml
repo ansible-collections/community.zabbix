@@ -7,8 +7,8 @@
     login_password: "{{ zabbix_api_login_pass }}"
     template_name: ExampleHost
     template_groups:
-      - 'Linux servers'
       - 'Templates'
+      - 'Templates/Applications'
     state: present
   register: create_zabbix_template_result
   check_mode: true
@@ -24,8 +24,8 @@
     login_password: "{{ zabbix_api_login_pass }}"
     template_name: ExampleHost
     template_groups:
-      - 'Linux servers'
       - 'Templates'
+      - 'Templates/Applications'
     state: present
   register: create_zabbix_template_result
 
@@ -40,8 +40,8 @@
     login_password: "{{ zabbix_api_login_pass }}"
     template_name: ExampleHost
     template_groups:
-      - 'Linux servers'
       - 'Templates'
+      - 'Templates/Applications'
     state: present
   register: create_zabbix_template_result
 
@@ -56,8 +56,8 @@
     login_password: "{{ zabbix_api_login_pass }}"
     template_name: ExampleHostWithLinked
     template_groups:
-      - 'Linux servers'
       - 'Templates'
+      - 'Templates/Applications'
     link_templates:
       - "{{ 'Zabbix proxy health' if zabbix_version | float >= 5.4 else 'Template App Zabbix Proxy' }}"
       - "{{ 'FTP Service' if zabbix_version | float >= 5.4 else 'Template App FTP Service' }}"
@@ -86,8 +86,8 @@
 
 - assert:
     that:
-      - gather_template_result.template_json[template_export_key].groups.0.name == 'Linux servers'
-      - gather_template_result.template_json[template_export_key].groups.1.name == 'Templates'
+      - gather_template_result.template_json[template_export_key][template_groups_key].0.name == 'Templates'
+      - gather_template_result.template_json[template_export_key][template_groups_key].1.name == 'Templates/Applications'
 
 - name: Add link_templates to Zabbix template.
   zabbix_template:
@@ -96,8 +96,8 @@
     login_password: "{{ zabbix_api_login_pass }}"
     template_name: ExampleHost
     template_groups:
-      - 'Linux servers'
       - 'Templates'
+      - 'Templates/Applications'
     link_templates:
       - "{{ 'Zabbix proxy health' if zabbix_version | float >= 5.4 else 'Template App Zabbix Proxy' }}"
       - "{{ 'FTP Service' if zabbix_version | float >= 5.4 else 'Template App FTP Service' }}"
@@ -115,8 +115,8 @@
     login_password: "{{ zabbix_api_login_pass }}"
     template_name: ExampleHost
     template_groups:
-      - 'Linux servers'
       - 'Templates'
+      - 'Templates/Applications'
     link_templates:
       - "{{ 'Zabbix proxy health' if zabbix_version | float >= 5.4 else 'Template App Zabbix Proxy' }}"
       - "{{ 'FTP Service' if zabbix_version | float >= 5.4 else 'Template App FTP Service' }}"
@@ -140,8 +140,8 @@
   block:
     - assert:
         that:
-          - gather_template_result.template_json[template_export_key].groups.0.name == 'Linux servers'
-          - gather_template_result.template_json[template_export_key].groups.1.name == 'Templates'
+          - gather_template_result.template_json[template_export_key].groups.0.name == 'Templates'
+          - gather_template_result.template_json[template_export_key].groups.1.name == 'Templates/Applications'
           - gather_template_result.template_json[template_export_key].templates.0.templates.0.name == 'Template App FTP Service'
           - gather_template_result.template_json[template_export_key].templates.0.templates.1.name == 'Template App Zabbix Proxy'
 
@@ -149,8 +149,8 @@
   block:
     - assert:
         that:
-          - gather_template_result.template_json[template_export_key].groups.0.name == 'Linux servers'
-          - gather_template_result.template_json[template_export_key].groups.1.name == 'Templates'
+          - gather_template_result.template_json[template_export_key][template_groups_key].0.name == 'Templates'
+          - gather_template_result.template_json[template_export_key][template_groups_key].1.name == 'Templates/Applications'
           - gather_template_result.template_json[template_export_key].templates.0.templates.0.name == 'FTP Service'
           - gather_template_result.template_json[template_export_key].templates.0.templates.1.name == 'Zabbix proxy health'
 
@@ -161,8 +161,8 @@
     login_password: "{{ zabbix_api_login_pass }}"
     template_name: ExampleHost
     template_groups:
-      - 'Linux servers'
       - 'Templates'
+      - 'Templates/Applications'
     link_templates:
       - "{{ 'Zabbix proxy health' if zabbix_version | float >= 5.4 else 'Template App Zabbix Proxy' }}"
       - "{{ 'FTP Service' if zabbix_version | float >= 5.4 else 'Template App FTP Service' }}"
@@ -185,8 +185,8 @@
     login_password: "{{ zabbix_api_login_pass }}"
     template_name: ExampleHost
     template_groups:
-      - 'Linux servers'
       - 'Templates'
+      - 'Templates/Applications'
     link_templates:
       - "{{ 'Zabbix proxy health' if zabbix_version | float >= 5.4 else 'Template App Zabbix Proxy' }}"
       - "{{ 'FTP Service' if zabbix_version | float >= 5.4 else 'Template App FTP Service' }}"

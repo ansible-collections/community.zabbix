@@ -49,8 +49,8 @@ options:
         type: str
     template_groups:
         description:
-            - List of host groups to add template to when template is created.
-            - Replaces the current host groups the template belongs to if the template is already present.
+            - List of template groups to add template to when template is created.
+            - Replaces the current template groups the template belongs to if the template is already present.
             - Required when creating a new template with C(state=present) and I(template_name) is used.
               Not required when updating an existing template.
         required: false
@@ -325,25 +325,18 @@ import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabb
 
 
 class Template(ZabbixBase):
-    # check if host group exists
-    def check_host_group_exist(self, group_names):
-        for group_name in group_names:
-            result = self._zapi.hostgroup.get({'filter': {'name': group_name}})
-            if not result:
-                self._module.fail_json(msg="Hostgroup not found: %s" %
-                                       group_name)
-        return True
-
     # get group ids by group names
     def get_group_ids_by_group_names(self, group_names):
         group_ids = []
-        if group_names is None or len(group_names) == 0:
-            return group_ids
-        if self.check_host_group_exist(group_names):
-            group_list = self._zapi.hostgroup.get({'output': 'extend', 'filter': {'name': group_names}})
-            for group in group_list:
-                group_id = group['groupid']
-                group_ids.append({'groupid': group_id})
+        for group_name in group_names:
+            if LooseVersion(self._zbx_api_version) >= LooseVersion('6.2'):
+                group = self._zapi.templategroup.get({'output': ['groupid'], 'filter': {'name': group_name}})
+            else:
+                group = self._zapi.hostgroup.get({'output': ['groupid'], 'filter': {'name': group_name}})
+            if group:
+                group_ids.append({'groupid': group[0]['groupid']})
+            else:
+                self._module.fail_json(msg="Template group not found: %s" % group_name)
         return group_ids
 
     def get_template_ids(self, template_list):
@@ -401,7 +394,10 @@ class Template(ZabbixBase):
 
         # If neither template_json or template_xml were used, user provided all parameters via module options
         if template_groups is not None:
-            existing_groups = [g['name'] for g in existing_template['zabbix_export']['groups']]
+            if LooseVersion(self._zbx_api_version) >= LooseVersion('6.2'):
+                existing_groups = [g['name'] for g in existing_template['zabbix_export']['template_groups']]
+            else:
+                existing_groups = [g['name'] for g in existing_template['zabbix_export']['groups']]
 
             if set(template_groups) != set(existing_groups):
                 changed = True
@@ -582,7 +578,7 @@ class Template(ZabbixBase):
                 'updateExisting': True,
                 'deleteMissing': True
             },
-            'groups': {
+            'host_groups': {
                 'createMissing': True
             },
             'httptests': {
@@ -598,6 +594,9 @@ class Template(ZabbixBase):
             'templates': {
                 'createMissing': True,
                 'updateExisting': True
+            },
+            'template_groups': {
+                'createMissing': True
             },
             'templateLinkage': {
                 'createMissing': True
@@ -639,6 +638,12 @@ class Template(ZabbixBase):
             # Zabbix 5.4 no longer supports applications
             if LooseVersion(self._zbx_api_version) >= LooseVersion('5.4'):
                 update_rules.pop('applications', None)
+
+            # before Zabbix 6.2 host_groups and template_group are joined into groups parameter
+            if LooseVersion(self._zbx_api_version) < LooseVersion('6.2'):
+                update_rules['groups'] = {'createMissing': True}
+                update_rules.pop('host_groups', None)
+                update_rules.pop('template_groups', None)
 
             # The loaded unicode slash of multibyte as a string is escaped when parsing JSON by json.loads in Python2.
             # So, it is imported in the unicode string into Zabbix.

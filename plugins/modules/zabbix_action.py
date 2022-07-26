@@ -145,18 +145,18 @@ options:
                     - C(matches), C(does not match), C(Yes) and C(No) condition operators work only with >= Zabbix 4.0
                     - When I(type) is set to C(maintenance_status), the choices are C(Yes) and C(No) for Zabbix >= 6.0
                 choices:
-                    - '='
-                    - '<>'
-                    - 'like'
-                    - 'not like'
-                    - 'in'
-                    - '>='
-                    - '<='
-                    - 'not in'
-                    - 'matches'
-                    - 'does not match'
-                    - 'Yes'
-                    - 'No'
+                    - C(equals) or C(=)
+                    - C(does not equal) or C(<>)
+                    - C(contains) or C(like)
+                    - C(does not contain) or C(not like)
+                    - C(in)
+                    - C(is greater than or equals) or C(>=)
+                    - C(is less than or equals) or C(<=)
+                    - C(not in)
+                    - C(matches)
+                    - C(does not match)
+                    - C(Yes)
+                    - C(No)
             formulaid:
                 description:
                     - Arbitrary unique ID that is used to reference the condition from a custom expression.
@@ -1236,8 +1236,8 @@ class Operations(Zapi):
                 constructed_operation['opmessage'] = self._construct_opmessage(op)
                 constructed_operation['opmessage_usr'] = self._construct_opmessage_usr(op)
                 constructed_operation['opmessage_grp'] = self._construct_opmessage_grp(op)
-
-                if LooseVersion(self._zbx_api_version) < LooseVersion('6.0'):
+                if event_source == 'trigger':
+                    # opconditions valid only for 'trigger' action
                     constructed_operation['opconditions'] = self._construct_opconditions(op)
 
             # Send Command type
@@ -1245,9 +1245,7 @@ class Operations(Zapi):
                 constructed_operation['opcommand'] = self._construct_opcommand(op)
                 constructed_operation['opcommand_hst'] = self._construct_opcommand_hst(op)
                 constructed_operation['opcommand_grp'] = self._construct_opcommand_grp(op)
-                if LooseVersion(self._zbx_api_version) < LooseVersion('6.0'):
-                    constructed_operation['opconditions'] = self._construct_opconditions(op)
-                elif event_source == 'trigger':
+                if event_source == 'trigger':
                     # opconditions valid only for 'trigger' action
                     constructed_operation['opconditions'] = self._construct_opconditions(op)
 
@@ -1329,8 +1327,6 @@ class RecoveryOperations(Operations):
                 constructed_operation['opmessage'] = self._construct_opmessage(op)
                 constructed_operation['opmessage_usr'] = self._construct_opmessage_usr(op)
                 constructed_operation['opmessage_grp'] = self._construct_opmessage_grp(op)
-                if LooseVersion(self._zbx_api_version) >= LooseVersion('6.0'):
-                    constructed_operation['opmessage'].pop('mediatypeid')
 
             if constructed_operation['operationtype'] == 11:
                 constructed_operation['opmessage'] = self._construct_opmessage(op)
@@ -1401,8 +1397,6 @@ class AcknowledgeOperations(Operations):
                 constructed_operation['opmessage'] = self._construct_opmessage(op)
                 constructed_operation['opmessage_usr'] = self._construct_opmessage_usr(op)
                 constructed_operation['opmessage_grp'] = self._construct_opmessage_grp(op)
-                if LooseVersion(self._zbx_api_version) >= LooseVersion('6.0'):
-                    constructed_operation['opmessage'].pop('mediatypeid')
 
             if constructed_operation['operationtype'] == 12:
                 constructed_operation['opmessage'] = self._construct_opmessage(op)
@@ -1527,13 +1521,13 @@ class Filter(Zapi):
         """
         try:
             return zabbix_utils.helper_to_numeric_value([
-                "=",
-                "<>",
-                "like",
-                "not like",
+                ["equals", "="],
+                ["does not equal", "<>"],
+                ["contains", "like"],
+                ["does not contain", "not like"],
                 "in",
-                ">=",
-                "<=",
+                ["is greater than or equals", ">="],
+                ["is less than or equals", "<="],
                 "not in",
                 "matches",
                 "does not match",

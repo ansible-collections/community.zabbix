@@ -8,10 +8,10 @@
       <description></description>
       <groups>
         <group>
-          <name>Linux servers</name>
+          <name>Templates</name>
         </group>
         <group>
-          <name>Templates</name>
+          <name>Templates/Applications</name>
         </group>
       </groups>
       <macros>
@@ -44,10 +44,10 @@
   <version>3.0</version>
   <groups>
     <group>
-      <name>Linux servers</name>
+      <name>Templates</name>
     </group>
     <group>
-      <name>Templates</name>
+      <name>Templates/Applications</name>
     </group>
   </groups>
 </zabbix_export>

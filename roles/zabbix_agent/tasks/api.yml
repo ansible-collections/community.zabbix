@@ -64,6 +64,7 @@
     ipmi_password: "{{ zabbix_agent_ipmi_password| default(omit) }}"
     ipmi_privilege: "{{ zabbix_agent_ipmi_privilege | default(omit) }}"
     ipmi_username: "{{ zabbix_agent_ipmi_username | default(omit) }}"
+    tags: "{{ zabbix_agent_tags }}"
   when:
     - not zabbix_agent2
   register: zabbix_api_host_created
@@ -105,6 +106,7 @@
     ipmi_password: "{{ zabbix_agent_ipmi_password| default(omit) }}"
     ipmi_privilege: "{{ zabbix_agent_ipmi_privilege | default(omit) }}"
     ipmi_username: "{{ zabbix_agent_ipmi_username | default(omit) }}"
+    tags: "{{ zabbix_agent_tags }}"
   when:
     - zabbix_agent2 | bool
   register: zabbix_api_host_created

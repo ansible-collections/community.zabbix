@@ -271,6 +271,7 @@ When `zabbix_api_create_hostgroup` or `zabbix_api_create_hosts` is set to `True`
 * `zabbix_host_groups`: A list of hostgroups which this host belongs to.
 * `zabbix_agent_link_templates`: A list of templates which needs to be link to this host. The templates should exist.
 * `zabbix_agent_macros`: A list with macro_key and macro_value for creating hostmacro's.
+* `zabbix_agent_tags`: A list with tag and (optionally) value for creating host tags.
 * `zabbix_agent_inventory_mode`: Configure Zabbix inventory mode. Needed for building inventory data, manually when configuring a host or automatically by using some automatic population options. This has to be set to `automatic` if you want to make automatically building inventory data.
 * `zabbix_agent_visible_hostname` : Configure Zabbix visible name inside Zabbix web UI for the node.
 * `zabbix_api_validate_certs` : yes (Default) if we need to validate tls certificates of the API. Use `no` in case self-signed certificates are used
@@ -290,6 +291,8 @@ Otherwise it just for the Zabbix Agent or for the Zabbix Agent 2.
 * `zabbix_version_long`: The long (major.minor.patch) version of the Zabbix Agent. This will be used to generate the `zabbix(2)_win_package` and `zabbix(2)_win_download_link` variables. This takes precedence over `zabbix_agent_version`.
 * `zabbix(2)_win_download_link`: The download url to the `win.zip` file.
 * `zabbix_win_install_dir`: The directory where Zabbix needs to be installed.
+* `zabbix_win_install_dir_conf`: The directory where Zabbix configuration file needs to be installed.
+* `zabbix_win_install_dir_bin`: The directory where Zabbix binary file needs to be installed.
 * `zabbix_agent(2)_win_logfile`: The full path to the logfile for the Zabbix Agent.
 * `zabbix_agent_win_include`: The directory in which the Zabbix Agent specific configuration files are stored.
 * `zabbix_agent_win_svc_recovery`: Enable Zabbix Agent service auto-recovery settings.
@@ -443,6 +446,9 @@ Including an example of how to use your role (for instance, with variables passe
              - macro_key: apache_type
                macro_value: reverse_proxy
                macro_type: text
+           zabbix_agent_tags:
+             - tag: environment
+               value: production
 ```
 
 ## Combination of group_vars and playbook
@@ -464,6 +470,9 @@ You can also use the group_vars or the host_vars files for setting the variables
     zabbix_agent_macros:
       - macro_key: apache_type
         macro_value: reverse_proxy
+    zabbix_agent_tags:
+      - tag: environment
+        value: production
 ```
 
 and in the playbook only specifying:
