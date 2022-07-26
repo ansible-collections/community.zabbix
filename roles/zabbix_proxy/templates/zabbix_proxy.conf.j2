@@ -1,689 +1,172 @@
+{{ ansible_managed | comment }}
 # This is a configuration file for Zabbix Proxy process
-# To get more information about Zabbix,
-# visit http://www.zabbix.com
+# To get more information about Zabbix, visit http://www.zabbix.com
 
-############ GENERAL PARAMETERS #################
+# This configuration file is "minimalized", which means all the original comments 
+# are removed. The full documentation for your Zabbix Proxy can be found here:
+# https://www.zabbix.com/documentation/{{ zabbix_version }}/en/manual/appendix/config/zabbix_proxy
 
-### Option: ProxyMode
-#	Proxy operating mode
-#	0 - proxy in the active mode
-#	1 - proxy in the passive mode
-#
 ProxyMode={{ zabbix_proxy_mode }}
-
-### Option: Server
-#	IP address (or hostname) of Zabbix server.
-#	Active proxy will get configuration data from the server.
-#	For a proxy in the passive mode this parameter will be ignored.
-#
 Server={{ zabbix_proxy_server }}
-
-### Option: ServerPort
-#	Port of Zabbix trapper on Zabbix server.
-#	For a proxy in the passive mode this parameter will be ignored.
-#
 ServerPort={{ zabbix_proxy_serverport }}
-
-### Option: Hostname
-#	Unique, case sensitive Proxy name. Make sure the Proxy name is known to the server!
-#	Value is acquired from HostnameItem if undefined.
-#
 {% if zabbix_proxy_hostname is defined and zabbix_proxy_hostname %}
 Hostname={{ zabbix_proxy_hostname  }}
 {% endif %}
-
-### Option: HostnameItem
-#	Item used for generating Hostname if it is undefined.
-#	Ignored if Hostname is defined.
-#
-# Mandatory: no
-# Default:
-# HostnameItem=system.hostname
 {% if zabbix_proxy_hostnameitem is defined and zabbix_proxy_hostnameitem %}
 HostnameItem={{ zabbix_proxy_hostnameitem }}
 {% endif %}
-
-### Option: ListenPort
-#	Listen port for trapper.
-#
 ListenPort={{ zabbix_proxy_listenport }}
-
-### Option: SourceIP
-#	Source IP address for outgoing connections.
-#
 {% if zabbix_proxy_sourceip is defined and zabbix_proxy_sourceip %}
 SourceIP={{ zabbix_proxy_sourceip }}
 {% endif %}
-
 {% if zabbix_version is version('6.0', '>=') %}
-### Option: LogType
-#       Specifies where log messages are written to:
-#               system  - syslog
-#               file    - file specified with LogFile parameter
-#               console - standard output
 LogType={{ zabbix_proxy_logtype }}
 {% endif %}
-
-### Option: LogFile
-#	Name of log file.
-#	If not set, syslog is used.
-#
 LogFile={{ zabbix_proxy_logfile }}
-
-### Option: LogFileSize
-#	Maximum size of log file in MB.
-#	0 - disable automatic log rotation.
-#
 LogFileSize={{ zabbix_proxy_logfilesize }}
-
-### Option: EnableRemoteCommands
-#	Whether remote commands from Zabbix server are allowed.
-#	0 - not allowed
-#	1 - allowed
-#
 EnableRemoteCommands={{ zabbix_proxy_enableremotecommands }}
-
-### Option: DebugLevel
-#	Specifies debug level
-#	0 - no debug
-#	1 - critical information
-#	2 - error information
-#	3 - warnings
-#	4 - for debugging (produces lots of information)
-#
 DebugLevel={{ zabbix_proxy_debuglevel }}
-
-### Option: PidFile
-#	Name of PID file.
-#
 PidFile={{ zabbix_proxy_pidfile }}
 {% if zabbix_version is version('3.2', '>') %}
-### Option: SocketDir
-#	Location of the socketfile
-#
 SocketDir={{ zabbix_proxy_socketdir }}
 {% endif %}
-### Option: DBHost
-#	Database host name.
-#	If set to localhost, socket is used for MySQL.
-#	If set to empty string, socket is used for PostgreSQL.
-#
 DBHost={{ zabbix_proxy_dbhost }}
-
-### Option: DBName
-#	Database name.
-#	For SQLite3 path to database file must be provided. DBUser and DBPassword are ignored.
-#	Warning: do not attempt to use the same database Zabbix server is using.
-#
 DBName={{ zabbix_proxy_dbname }}
-
-### Option: DBSchema
-#	Schema name. Used for IBM DB2.
-#
 {% if zabbix_proxy_dbschema is defined and zabbix_proxy_dbschema %}
 DBSchema={{ zabbix_proxy_dbschema }}
 {% endif %}
-
-### Option: DBUser
-#	Database user. Ignored for SQLite.
-#
 DBUser={{ zabbix_proxy_dbuser }}
-
-### Option: DBPassword
-#	Database password. Ignored for SQLite.
-#	Comment this line if no password is used.
-#
 DBPassword={{ zabbix_proxy_dbpassword }}
-
-### Option: DBSocket
-#	Path to MySQL socket.
-#
-
-# Option: DBPort
-#	Database port when not using local socket. Ignored for SQLite.
-#
 DBPort={{ zabbix_proxy_dbport }}
-
 {% if zabbix_version is version('6.0', '>=') %}
-### Option: AllowUnsupportedDBVersions
-#       Allow server to work with unsupported database versions.
-#       0 - do not allow
-#       1 - allow
-#
-# Mandatory: no
-# Default:
-# AllowUnsupportedDBVersions=0
 AllowUnsupportedDBVersions={{ zabbix_proxy_allowunsupporteddbversions }}
 {% endif %}
-
-######### PROXY SPECIFIC PARAMETERS #############
-
-### Option: ProxyLocalBuffer
-#	Proxy will keep data locally for N hours, even if the data have already been synced with the server.
-#	This parameter may be used if local data will be used by third party applications.
-#
 ProxyLocalBuffer={{ zabbix_proxy_proxylocalbuffer }}
-
-### Option: ProxyOfflineBuffer
-#	Proxy will keep data for N hours in case if no connectivity with Zabbix Server.
-#	Older data will be lost.
-#
 ProxyOfflineBuffer={{ zabbix_proxy_proxyofflinebuffer }}
-
-### Option: HeartbeatFrequency
-#	Frequency of heartbeat messages in seconds.
-#	Used for monitoring availability of Proxy on server side.
-#	0 - heartbeat messages disabled.
-#	For a proxy in the passive mode this parameter will be ignored.
-#
 HeartbeatFrequency={{ zabbix_proxy_heartbeatfrequency }}
-
-### Option: ConfigFrequency
-#	How often proxy retrieves configuration data from Zabbix Server in seconds.
-#	For a proxy in the passive mode this parameter will be ignored.
-#
 ConfigFrequency={{ zabbix_proxy_configfrequency }}
-
-### Option: DataSenderFrequency
-#	Proxy will send collected data to the Server every N seconds.
-#	For a proxy in the passive mode this parameter will be ignored.
-#
 DataSenderFrequency={{ zabbix_proxy_datasenderfrequency }}
-
-############ ADVANCED PARAMETERS ################
-
-### Option: StartPollers
-#	Number of pre-forked instances of pollers.
-#
 StartPollers={{ zabbix_proxy_startpollers }}
-
-### Option: StartIPMIPollers
-#	Number of pre-forked instances of IPMI pollers.
-#
 StartIPMIPollers={{ zabbix_proxy_startipmipollers }}
-
 {% if zabbix_version is version('4.2', '>=') %}
-### Option: StartPreprocessors
-#       Number of pre-forked instances of preprocessing workers.
-#               The preprocessing manager process is automatically started when preprocessor worker is started.
-#
-# Mandatory: no
-# Range: 1-1000
-# Default:
-# StartPreprocessors=3
 StartPreprocessors={{ zabbix_proxy_startpreprocessors }}
 {% endif %}
-
-### Option: StartPollersUnreachable
-#	Number of pre-forked instances of pollers for unreachable hosts (including IPMI).
-#
 StartPollersUnreachable={{ zabbix_proxy_startpollersunreachable }}
-
-### Option: StartTrappers
-#	Number of pre-forked instances of trappers.
-#	Trappers accept incoming connections from Zabbix sender and active agents.
-#
 StartTrappers={{ zabbix_proxy_starttrappers }}
-
-### Option: StartPingers
-#	Number of pre-forked instances of ICMP pingers.
-#
 StartPingers={{ zabbix_proxy_startpingers }}
-
-### Option: StartDiscoverers
-#	Number of pre-forked instances of discoverers.
-#
 StartDiscoverers={{ zabbix_proxy_startdiscoverers }}
-
-### Option: StartHTTPPollers
-#	Number of pre-forked instances of HTTP pollers.
-#
 StartHTTPPollers={{ zabbix_proxy_starthttppollers }}
-
-### Option: JavaGateway
-#	IP address (or hostname) of Zabbix Java gateway.
-#	Only required if Java pollers are started.
-#
 {% if zabbix_proxy_javagateway is defined and zabbix_proxy_javagateway %}
 JavaGateway={{ zabbix_proxy_javagateway }}
-
-### Option: JavaGatewayPort
-#	Port that Zabbix Java gateway listens on.
-#
 JavaGatewayPort={{ zabbix_proxy_javagatewayport }}
-
-### Option: StartJavaPollers
-#	Number of pre-forked instances of Java pollers.
-#
 StartJavaPollers={{ zabbix_proxy_startjavapollers }}
 {% endif %}
-
 {% if zabbix_version is version_compare('2.4', '>=') %}
-### Option: StartVMwareCollectors
-#	Number of pre-forked vmware collector instances.
-#
 StartVMwareCollectors={{ zabbix_proxy_startvmwarecollector }}
-
-### Option: VMwareFrequency
-#	How often Zabbix will connect to VMware service to obtain a new data.
-#
 VMwareFrequency={{ zabbix_proxy_vmwarefrequency }}
-
-### Option: VMwareCacheSize
-#	Size of VMware cache, in bytes.
-#	Shared memory size for storing VMware data.
-#	Only used if VMware collectors are started.
-#
 VMwareCacheSize={{ zabbix_proxy_vmwarecachesize -}}M
 {% endif %}
-
-### Option: SNMPTrapperFile
-#	Temporary file used for passing data from SNMP trap daemon to the proxy.
-#	Must be the same as in zabbix_trap_receiver.pl or SNMPTT configuration file.
-#
 SNMPTrapperFile={{ zabbix_proxy_snmptrapperfile }}
-
-### Option: StartSNMPTrapper
-#	If 1, SNMP trapper process is started.
-#
 StartSNMPTrapper={{ zabbix_proxy_snmptrapper }}
-
-### Option: ListenIP
-#	List of comma delimited IP addresses that the trapper should listen on.
-#	Trapper will listen on all network interfaces if this parameter is missing.
-#
 {% if zabbix_proxy_listenip is defined and zabbix_proxy_listenip %}
 ListenIP={{ zabbix_proxy_listenip }}
 {% endif %}
-
-### Option: HousekeepingFrequency
-#	How often Zabbix will perform housekeeping procedure (in hours).
-#	Housekeeping is removing unnecessary information from history, alert, and alarms tables.
-#
 HousekeepingFrequency={{ zabbix_proxy_housekeepingfrequency }}
-
-### Option: CacheSize
-#	Size of configuration cache, in bytes.
-#	Shared memory size, for storing hosts and items data.
-#
 CacheSize={{ zabbix_proxy_cachesize -}}M
-
-### Option: StartDBSyncers
-#	Number of pre-forked instances of DB Syncers
-#
 StartDBSyncers={{ zabbix_proxy_startdbsyncers }}
-
-### Option: HistoryCacheSize
-#	Size of history cache, in bytes.
-#	Shared memory size for storing history data.
-#
 HistoryCacheSize={{ zabbix_proxy_historycachesize -}}M
-
 {% if zabbix_version is version_compare('3.2', '>=') %}
-### Option: HistoryIndexCacheSize
-# Size of history index cache, in bytes.
-# Shared memory size for indexing history cache.
-#
-# Mandatory: no
-# Range: 128K-2G
-# Default:
 HistoryIndexCacheSize={{ zabbix_proxy_historyindexcachesize -}}M
 {% endif %}
-
 {% if zabbix_version is version_compare('2.4', '<') %}
-### Option: HistoryTextCacheSize
-#	Size of text history cache, in bytes.
-#	Shared memory size for storing character, text or log history data.
-#
 HistoryTextCacheSize={{ zabbix_proxy_historytextcachesize -}}M
 {% endif %}
-
-### Option: Timeout
-#	Specifies how long we wait for agent, SNMP device or external check (in seconds).
-#
 Timeout={{ zabbix_proxy_timeout }}
-
-### Option: TrapperTimeout
-#	Specifies how many seconds trapper may spend processing new data.
-#
 TrapperTimeout={{ zabbix_proxy_trappertimeout }}
-
-### Option: UnreachablePeriod
-#	After how many seconds of unreachability treat a host as unavailable.
-#
 UnreachablePeriod={{ zabbix_proxy_unreachableperiod }}
-
-### Option: UnavailableDelay
-#	How often host is checked for availability during the unavailability period, in seconds.
-#
 UnavailableDelay={{ zabbix_proxy_unavaliabledelay }}
-
-### Option: UnreachableDelay
-#	How often host is checked for availability during the unreachability period, in seconds.
-#
 UnreachableDelay={{ zabbix_proxy_unreachabedelay }}
-
-### Option: ExternalScripts
-#	Full path to location of external scripts.
-#	Default depends on compilation options.
-#
 ExternalScripts={{ zabbix_proxy_externalscripts }}
-
-### Option: FpingLocation
-#	Location of fping.
-#	Make sure that fping binary has root ownership and SUID flag set.
-#
 FpingLocation={{ zabbix_proxy_fpinglocation }}
-
-### Option: Fping6Location
-#	Location of fping6.
-#	Make sure that fping6 binary has root ownership and SUID flag set.
-#	Make empty if your fping utility is capable to process IPv6 addresses.
-#
 Fping6Location={{ zabbix_proxy_fping6location }}
-
-### Option: SSHKeyLocation
-#	Location of public and private keys for SSH checks and actions.
-#
 {% if zabbix_proxy_sshkeylocation is defined and zabbix_proxy_sshkeylocation %}
 SSHKeyLocation={{ zabbix_proxy_sshkeylocation }}
 {% endif %}
-
-### Option: LogSlowQueries
-#	How long a database query may take before being logged (in milliseconds).
-#	Only works if DebugLevel set to 3 or 4.
-#	0 - don't log slow queries.
-#
 LogSlowQueries={{ zabbix_proxy_loglowqueries }}
-
-### Option: TmpDir
-#	Temporary directory.
-#
 TmpDir={{ zabbix_proxy_tmpdir }}
-
 {% if zabbix_version is version_compare('2.4', '<') %}
-### Option: AllowRoot
-#	Allow the proxy to run as 'root'. If disabled and the proxy is started by 'root', the proxy
-#	will try to switch to user 'zabbix' instead. Has no effect if started under a regular user.
-#	0 - do not allow
-#	1 - allow
-#
 AllowRoot={{ zabbix_proxy_allowroot }}
 {% endif %}
-
-### Option: Include
-#	You may include individual files or all files in a directory in the configuration file.
-#	Installing Zabbix will create include directory in /usr/local/etc, unless modified during the compile time.
-#
 Include={{ zabbix_proxy_include }}
-
-####### LOADABLE MODULES #######
-
 {% if zabbix_version is version_compare('3.0', '<') %}
-### Option: LoadModulePath
-#	Full path to location of proxy modules.
-#	Default depends on compilation options.
-#
 LoadModulePath={{ zabbix_proxy_loadmodulepath }}
 {% endif %}
-
-### Option: LoadModule
-#	Module to load at proxy startup. Modules are used to extend functionality of the proxy.
-#	Format: LoadModule=<module.so>
-#	The modules must be located in directory specified by LoadModulePath.
-#	It is allowed to include multiple LoadModule parameters.
-#
 {% if zabbix_proxy_loadmodule is defined and zabbix_proxy_loadmodule %}
 LoadModule={{ zabbix_proxy_loadmodule }}
 {% endif %}
-
 {% if zabbix_version is version_compare('4.0', '>=') %}
-### Option: StatsAllowedIP
-#       List of comma delimited IP addresses, optionally in CIDR notation, or DNS names of external Zabbix instances.
-#       Stats request will be accepted only from the addresses listed here. If this parameter is not set no stats requests
-#       will be accepted.
-#       If IPv6 support is enabled then '127.0.0.1', '::127.0.0.1', '::ffff:127.0.0.1' are treated equally
-#       and '::/0' will allow any IPv4 or IPv6 address.
-#       '0.0.0.0/0' can be used to allow any IPv4 address.
-#       Example: StatsAllowedIP=127.0.0.1,192.168.1.0/24,::1,2001:db8::/32,zabbix.example.com
-#
-# Mandatory: no
-# Default:
-# StatsAllowedIP=
 StatsAllowedIP={{ zabbix_proxy_statsallowedip }}
 {% endif %}
-
 {% if zabbix_version is version_compare('3.0', '>=') %}
-####### TLS-RELATED PARAMETERS #######
-
-### Option: TLSConnect
-#       How the agent should connect to server or proxy. Used for active checks.
-#       Only one value can be specified:
-#               unencrypted - connect without encryption
-#               psk         - connect using TLS and a pre-shared key
-#               cert        - connect using TLS and a certificate
-#
-# Mandatory: yes, if TLS certificate or PSK parameters are defined (even for 'unencrypted' connection)
-# Default:
-# TLSConnect=unencrypted
 {% if zabbix_proxy_tlsconnect is defined and zabbix_proxy_tlsconnect %}
 TLSConnect={{ zabbix_proxy_tlsconnect }}
 {% endif %}
-
-### Option: TLSAccept
-#       What incoming connections to accept.
-#       Multiple values can be specified, separated by comma:
-#               unencrypted - accept connections without encryption
-#               psk         - accept connections secured with TLS and a pre-shared key
-#               cert        - accept connections secured with TLS and a certificate
-#
-# Mandatory: yes, if TLS certificate or PSK parameters are defined (even for 'unencrypted' connection)
-# Default:
-# TLSAccept=unencrypted
 {% if zabbix_proxy_tlsaccept is defined and zabbix_proxy_tlsaccept %}
 TLSAccept={{ zabbix_proxy_tlsaccept }}
 {% endif %}
-
-### Option: TLSCAFile
-#       Full pathname of a file containing the top-level CA(s) certificates for
-#       peer certificate verification.
-#
-# Mandatory: no
-# Default:
-# TLSCAFile=
 {% if zabbix_proxy_tlscafile is defined and zabbix_proxy_tlscafile %}
 TLSCAFile={{ zabbix_proxy_tlscafile }}
 {% endif %}
-
-### Option: TLSCRLFile
-#       Full pathname of a file containing revoked certificates.
-#
-# Mandatory: no
-# Default:
-# TLSCRLFile=
 {% if zabbix_proxy_tlscrlfile is defined and zabbix_proxy_tlscrlfile %}
 TLSCRLFile={{ zabbix_proxy_tlscrlfile }}
 {% endif %}
-
-### Option: TLSServerCertIssuer
-#      Allowed server certificate issuer.
-#
-# Mandatory: no
-# Default:
-# TLSServerCertIssuer=
 {% if zabbix_proxy_tlsservercertissuer is defined and zabbix_proxy_tlsservercertissuer %}
 TLSServerCertIssuer={{ zabbix_proxy_tlsservercertissuer }}
 {% endif %}
-
-### Option: TLSServerCertSubject
-#      Allowed server certificate subject.
-#
-# Mandatory: no
-# Default:
-# TLSServerCertSubject=
 {% if zabbix_proxy_tlsservercertsubject is defined and zabbix_proxy_tlsservercertsubject %}
 TLSServerCertSubject={{ zabbix_proxy_tlsservercertsubject }}
 {% endif %}
-
-### Option: TLSCertFile
-#       Full pathname of a file containing the agent certificate or certificate chain.
-#
-# Mandatory: no
-# Default:
-# TLSCertFile=
 {% if zabbix_proxy_tlscertfile is defined and zabbix_proxy_tlscertfile %}
 TLSCertFile={{ zabbix_proxy_tlscertfile }}
 {% endif %}
-
-### Option: TLSKeyFile
-#       Full pathname of a file containing the agent private key.
-#
-# Mandatory: no
-# Default:
-# TLSKeyFile=
 {% if zabbix_proxy_tlskeyfile is defined and zabbix_proxy_tlskeyfile %}
 TLSKeyFile={{ zabbix_proxy_tlskeyfile }}
 {% endif %}
-
-### Option: TLSPSKIdentity
-#       Unique, case sensitive string used to identify the pre-shared key.
-#
-# Mandatory: no
-# Default:
-# TLSPSKIdentity=
 {% if zabbix_proxy_tlspskidentity is defined and zabbix_proxy_tlspskidentity %}
 TLSPSKIdentity={{ zabbix_proxy_tlspskidentity }}
 {% endif %}
-
-### Option: TLSPSKFile
-#       Full pathname of a file containing the pre-shared key.
-#
-# Mandatory: no
-# Default:
-# TLSPSKFile=
 {% if zabbix_proxy_tlspskfile is defined and zabbix_proxy_tlspskfile %}
 TLSPSKFile={{ zabbix_proxy_tlspskfile }}
 {% endif %}
 {% endif %}
-
-### Option: DBTLSConnect
-#	Setting this option enforces to use TLS connection to database.
-#	required    - connect using TLS
-#	verify_ca   - connect using TLS and verify certificate
-#	verify_full - connect using TLS, verify certificate and verify that database identity specified by DBHost
-#	              matches its certificate
-#	On MySQL starting from 5.7.11 and PostgreSQL following values are supported: "required", "verify_ca" and
-#	"verify_full".
-#	On MariaDB starting from version 10.2.6 "required" and "verify_full" values are supported.
-#	Default is not to set any option and behavior depends on database configuration
-#
-# Mandatory: no
-# Default:
-# DBTLSConnect=
 {% if zabbix_proxy_dbtlsconnect is defined and zabbix_proxy_dbtlsconnect is not none %}
 DBTLSConnect={{ zabbix_proxy_dbtlsconnect }}
 {% endif %}
-
-### Option: DBTLSCAFile
-#	Full pathname of a file containing the top-level CA(s) certificates for database certificate verification.
-#	Supported only for MySQL and PostgreSQL
-#
-# Mandatory: no
-#	(yes, if DBTLSConnect set to one of: verify_ca, verify_full)
-# Default:
-# DBTLSCAFile=
 {% if zabbix_proxy_dbtlscafile is defined and zabbix_proxy_dbtlscafile is not none %}
 DBTLSCAFile={{ zabbix_proxy_dbtlscafile }}
 {% endif %}
-
-### Option: DBTLSCertFile
-#	Full pathname of file containing Zabbix proxy certificate for authenticating to database.
-#	Supported only for MySQL and PostgreSQL
-#
-# Mandatory: no
-# Default:
-# DBTLSCertFile=
 {% if zabbix_proxy_dbtlscertfile is defined and zabbix_proxy_dbtlscertfile is not none %}
 DBTLSCertFile={{ zabbix_proxy_dbtlscertfile }}
 {% endif %}
-
-### Option: DBTLSKeyFile
-#	Full pathname of file containing the private key for authenticating to database.
-#	Supported only for MySQL and PostgreSQL
-#
-# Mandatory: no
-# Default:
-# DBTLSKeyFile=
 {% if zabbix_proxy_dbtlskeyfile is defined and zabbix_proxy_dbtlskeyfile is not none %}
 DBTLSKeyFile={{ zabbix_proxy_dbtlskeyfile }}
 {% endif %}
-
-### Option: DBTLSCipher
-#	The list of encryption ciphers that Zabbix proxy permits for TLS protocols up through TLSv1.2
-#	Supported only for MySQL
-#
-# Mandatory no
-# Default:
-# DBTLSCipher=
 {% if zabbix_proxy_dbtlscipher is defined and zabbix_proxy_dbtlscipher is not none %}
 DBTLSCipher={{ zabbix_proxy_dbtlscipher }}
 {% endif %}
-
-### Option: DBTLSCipher13
-#	The list of encryption ciphersuites that Zabbix proxy permits for TLSv1.3 protocol
-#	Supported only for MySQL, starting from version 8.0.16
-#
-# Mandatory no
-# Default:
-# DBTLSCipher13=
 {% if zabbix_proxy_dbtlscipher13 is defined and zabbix_proxy_dbtlscipher13 is not none %}
 DBTLSCipher13={{ zabbix_proxy_dbtlscipher13 }}
 {% endif %}
-
 {% if zabbix_version is version('6.0', '>=') %}
-### Option: VaultToken
-#       Vault authentication token that should have been generated exclusively for Zabbix server with read only permission
-#       to paths specified in Vault macros and read only permission to path specified in optional VaultDBPath
-#       configuration parameter.
-#       It is an error if VaultToken and VAULT_TOKEN environment variable are defined at the same time.
-#
-# Mandatory: no
-# Default:
-# VaultToken=
 {% if zabbix_proxy_vaulttoken is defined and zabbix_proxy_vaulttoken is not none %}
 VaultToken={{ zabbix_proxy_vaulttoken }}
 {% endif %}
-
-### Option: VaultURL
-#       Vault server HTTP[S] URL. System-wide CA certificates directory will be used if SSLCALocation is not specified.
-#
-# Mandatory: no
-# Default:
-# VaultURL=https://127.0.0.1:8200
 {% if zabbix_proxy_vaulturl is defined and zabbix_proxy_vaulturl is not none %}
 VaultURL={{ zabbix_proxy_vaulturl }}
 {% endif %}
-
-### Option: VaultDBPath
-#       Vault path from where credentials for database will be retrieved by keys 'password' and 'username'.
-#       Example: secret/zabbix/database
-#       This option can only be used if DBUser and DBPassword are not specified.
-#
-# Mandatory: no
-# Default:
-# VaultDBPath=
 {% if zabbix_proxy_vaultdbpath is defined and zabbix_proxy_vaultdbpath is not none %}
 VaultDBPath={{ zabbix_proxy_vaultdbpath }}
 {% endif %}
-
-####### For advanced users - TCP-related fine-tuning parameters #######
-
-## Option: ListenBacklog
-#       The maximum number of pending connections in the queue. This parameter is passed to
-#       listen() function as argument 'backlog' (see "man listen").
-#
-# Mandatory: no
-# Range: 0 - INT_MAX (depends on system, too large values may be silently truncated to implementation-specified maximum)
 {% if zabbix_proxy_listenbacklog is defined and zabbix_proxy_listenbacklog is not none %}
 ListenBacklog={{ zabbix_proxy_listenbacklog }}
 {% endif %}
