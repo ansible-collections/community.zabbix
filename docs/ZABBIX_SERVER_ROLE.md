@@ -329,7 +329,7 @@ We need to have the following dependencies met:
 2. We need to set some variables, either as input for the playbook or set them into the `group_vars` or `host_vars` (Your preference choice). We need to set the following properties:
 
 ```yaml
-zabbix_server_database: pgsq;
+zabbix_server_database: pgsql;
 zabbix_server_database_long: postgresql
 zabbix_server_dbport: 5432
 zabbix_server_dbhost: pgsql-host
