@@ -72,7 +72,7 @@ def main():
     argument_spec = zabbix_utils.zabbix_common_argument_spec()
     module = AnsibleModule(
         argument_spec=argument_spec,
-        supports_check_mode=True
+        supports_check_mode=False
     )
 
     apiinfo = ApiInfo(module)
