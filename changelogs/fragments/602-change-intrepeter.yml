@@ -1,0 +1,4 @@
+---
+
+minor_changes:
+  - zabbix_agent - Set a ansible_python_interpreter to localhost based on the env the playbook is executed from.
