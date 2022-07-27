@@ -470,12 +470,15 @@ class Host(ZabbixBase):
         try:
             if self._module.check_mode:
                 self._module.exit_json(changed=True)
-            parameters = {'host': host_name, 'interfaces': interfaces, 'groups': group_ids, 'status': status,
-                          'tls_connect': tls_connect, 'tls_accept': tls_accept}
+            parameters = {'host': host_name, 'interfaces': interfaces, 'groups': group_ids, 'status': status}
             if proxy_id:
                 parameters['proxy_hostid'] = proxy_id
             if visible_name:
                 parameters['name'] = visible_name
+            if tls_connect:
+                parameters['tls_connect'] = tls_connect
+            if tls_accept:
+                parameters['tls_accept'] = tls_accept  
             if tls_psk_identity is not None:
                 parameters['tls_psk_identity'] = tls_psk_identity
             if tls_psk is not None:
