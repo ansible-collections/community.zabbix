@@ -6,7 +6,6 @@
 # are removed. The full documentation for your Zabbix Agent can be found here:
 # https://www.zabbix.com/documentation/{{ zabbix_version }}/en/manual/appendix/config/zabbix_agentd{{ "_win" if zabbix_agent_os_family == "Windows" else "" }}
 
-{{ ansible_managed | comment }}
 {% if zabbix_agent_os_family != "Windows" %}
 PidFile={{ zabbix_agent_pidfile }}
 {% endif %}
