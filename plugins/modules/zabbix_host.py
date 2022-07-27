@@ -511,12 +511,15 @@ class Host(ZabbixBase):
         try:
             if self._module.check_mode:
                 self._module.exit_json(changed=True)
-            parameters = {'hostid': host_id, 'groups': group_ids, 'status': status, 'tls_connect': tls_connect,
-                          'tls_accept': tls_accept}
+            parameters = {'hostid': host_id, 'groups': group_ids, 'status': status}
             if proxy_id >= 0:
                 parameters['proxy_hostid'] = proxy_id
             if visible_name:
                 parameters['name'] = visible_name
+            if tls_connect: 
+                parameters['tls_connect'] = tls_connect
+            if tls_accept:
+                parameters['tls_accept'] = tls_accept      
             if tls_psk_identity:
                 parameters['tls_psk_identity'] = tls_psk_identity
             if tls_psk:
@@ -835,8 +838,11 @@ class Host(ZabbixBase):
         templates_clear = exist_template_ids.difference(template_ids)
         templates_clear_list = list(templates_clear)
         request_str = {'hostid': host_id, 'templates': template_id_list, 'templates_clear': templates_clear_list,
-                       'tls_connect': tls_connect, 'tls_accept': tls_accept, 'ipmi_authtype': ipmi_authtype,
-                       'ipmi_privilege': ipmi_privilege, 'ipmi_username': ipmi_username, 'ipmi_password': ipmi_password}
+                       'ipmi_authtype': ipmi_authtype,'ipmi_privilege': ipmi_privilege, 'ipmi_username': ipmi_username, 'ipmi_password': ipmi_password}
+        if tls_connect: 
+                request_str['tls_connect'] = tls_connect
+        if tls_accept:
+                request_str['tls_accept'] = tls_accept  
         if tls_psk_identity is not None:
             request_str['tls_psk_identity'] = tls_psk_identity
         if tls_psk is not None:
