@@ -200,7 +200,6 @@
   register: zabbix_agent_package_installed
   until: zabbix_agent_package_installed is succeeded
   become: true
-  check_mode: false
   tags:
     - zabbix-agent
     - init
