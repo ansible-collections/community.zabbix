@@ -30,6 +30,7 @@
     rich_rule: 'rule family="ipv4" source address="{{ zabbix_agent_firewalld_source }}" port protocol="tcp" port="{{ zabbix_agent_listenport }}" accept'
     zone: "{{ zabbix_agent_firewalld_zone }}"
     permanent: true
+    immediate: true
     state: enabled
   become: true
   when:
@@ -43,6 +44,7 @@
     rich_rule: 'rule family="ipv4" source address="{{ zabbix_agent_firewalld_source }}" port protocol="tcp" port="{{ zabbix_agent_jmx_listenport }}" accept'
     zone: "{{ zabbix_agent_firewalld_zone }}"
     permanent: true
+    immediate: true
     state: enabled
   become: true
   when:
