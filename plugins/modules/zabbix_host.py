@@ -221,7 +221,6 @@ options:
             - Specifies what encryption to use for outgoing connections.
             - Possible values, 1 (no encryption), 2 (PSK), 4 (certificate).
             - Works only with >= Zabbix 3.0
-        default: 1
         type: int
     tls_accept:
         description:
@@ -230,7 +229,6 @@ options:
             - Possible values, 1 (no encryption), 2 (PSK), 4 (certificate).
             - Values can be combined.
             - Works only with >= Zabbix 3.0
-        default: 1
         type: int
     tls_psk_identity:
         description:
@@ -478,7 +476,7 @@ class Host(ZabbixBase):
             if tls_connect:
                 parameters['tls_connect'] = tls_connect
             if tls_accept:
-                parameters['tls_accept'] = tls_accept  
+                parameters['tls_accept'] = tls_accept
             if tls_psk_identity is not None:
                 parameters['tls_psk_identity'] = tls_psk_identity
             if tls_psk is not None:
@@ -519,10 +517,10 @@ class Host(ZabbixBase):
                 parameters['proxy_hostid'] = proxy_id
             if visible_name:
                 parameters['name'] = visible_name
-            if tls_connect: 
+            if tls_connect:
                 parameters['tls_connect'] = tls_connect
             if tls_accept:
-                parameters['tls_accept'] = tls_accept      
+                parameters['tls_accept'] = tls_accept    
             if tls_psk_identity:
                 parameters['tls_psk_identity'] = tls_psk_identity
             if tls_psk:
@@ -841,11 +839,11 @@ class Host(ZabbixBase):
         templates_clear = exist_template_ids.difference(template_ids)
         templates_clear_list = list(templates_clear)
         request_str = {'hostid': host_id, 'templates': template_id_list, 'templates_clear': templates_clear_list,
-                       'ipmi_authtype': ipmi_authtype,'ipmi_privilege': ipmi_privilege, 'ipmi_username': ipmi_username, 'ipmi_password': ipmi_password}
-        if tls_connect: 
-                request_str['tls_connect'] = tls_connect
+                       'ipmi_authtype': ipmi_authtype, 'ipmi_privilege': ipmi_privilege, 'ipmi_username': ipmi_username, 'ipmi_password': ipmi_password}
+        if tls_connect:
+            request_str['tls_connect'] = tls_connect
         if tls_accept:
-                request_str['tls_accept'] = tls_accept  
+            request_str['tls_accept'] = tls_accept
         if tls_psk_identity is not None:
             request_str['tls_psk_identity'] = tls_psk_identity
         if tls_psk is not None:
