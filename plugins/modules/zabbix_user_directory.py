@@ -27,22 +27,22 @@ options:
     host:
         description:
             - LDAP server host name, IP or URI. URI should contain schema, host and port (optional).
-        required: true
+        required: false
         type: str
     port:
         description:
             - LDAP server port.
-        required: true
+        required: false
         type: int
     base_dn:
         description:
             - LDAP base distinguished name string.
-        required: true
+        required: false
         type: str
     search_attribute:
         description:
             - LDAP attribute name to identify user by username in Zabbix database.
-        required: true
+        required: false
         type: str
     bind_dn:
         description:
@@ -60,7 +60,7 @@ options:
             - User directory description.
         required: false
         type: str
-    earch_filter:
+    search_filter:
         description:
             - LDAP custom filter string when authenticating user in LDAP.
         default: (%{attr}=%{user})
@@ -126,7 +126,7 @@ def main():
         bind_password=dict(type='str', required=False, no_log=True),
         description=dict(type='str', required=False, default=''),
         search_filter=dict(type='str', required=False),
-        start_tls=dict(type='int', required=False, default=0),
+        start_tls=dict(type='int', required=False, choices=[0, 1], default=0),
         state=dict(type='str', default="present", choices=['present', 'absent']),
     ))
     module = AnsibleModule(
