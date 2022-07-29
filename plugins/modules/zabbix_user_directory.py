@@ -121,13 +121,13 @@ def main():
         host=dict(type='str', required=False),
         port=dict(type='int', required=False),
         base_dn=dict(type='str', required=False),
-        search_attribute=dict(type='str', required=False),
+        search_attribute=dict(type='str', default='(%{attr}=%{user})', required=False),
         bind_dn=dict(type='str', required=False, default=''),
         bind_password=dict(type='str', required=False, no_log=True),
         description=dict(type='str', required=False, default=''),
         search_filter=dict(type='str', required=False),
         start_tls=dict(type='int', required=False, choices=[0, 1], default=0),
-        state=dict(type='str', default="present", choices=['present', 'absent']),
+        state=dict(type='str', default='present', choices=['present', 'absent']),
     ))
     module = AnsibleModule(
         argument_spec=argument_spec,
