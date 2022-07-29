@@ -232,6 +232,7 @@ When there is one host running both Zabbix Server and the Zabbix Web (Running My
   become: yes
   roles:
     - role: geerlingguy.apache
+    - role: geerlingguy.php
     - role: community.zabbix.zabbix_server
       zabbix_server_database: mysql
       zabbix_server_database_long: mysql
@@ -260,6 +261,7 @@ This is a two host setup. On one host (Named: "zabbix-server") the Zabbix Server
   become: yes
   roles:
     - role: geerlingguy.apache
+    - role: geerlingguy.php
     - role: community.zabbix.zabbix_web
       zabbix_api_server_url: zabbix.mydomain.com
       zabbix_server_hostname: zabbix-server
