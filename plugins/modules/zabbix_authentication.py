@@ -461,10 +461,9 @@ class Authentication(ZabbixBase):
                     and future_authentication['ldap_configured'] == '1'):
                 if LooseVersion(self._zbx_api_version) < LooseVersion('6.2.0'):
                     if (not ldap_host
-                        or not ldap_port
-                        or not ldap_search_attribute
-                        or not ldap_base_dn
-                        ):
+                            or not ldap_port
+                            or not ldap_search_attribute
+                            or not ldap_base_dn):
                         self._module.fail_json(
                             msg="Please set ldap_host, ldap_search_attribute and ldap_base_dn when you change a value of ldap_configured to true."
                         )
