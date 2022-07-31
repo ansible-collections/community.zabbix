@@ -14,10 +14,10 @@ short_description: Create/update/delete Zabbix user directories
 description:
    - This module allows you to create, modify and delete Zabbix user directories.
 author:
-    - "Evgeny Yurchenko (@BGmot)"
+    - Evgeny Yurchenko (@BGmot)
 requirements:
-    - "python >= 3.9"
-    - "zabbix-api >= 0.5.4"
+    - python >= 3.9
+    - zabbix-api >= 0.5.4
 options:
     name:
         description:
@@ -131,28 +131,19 @@ def main():
     ))
     module = AnsibleModule(
         argument_spec=argument_spec,
-        supports_check_mode=True,
-        required_if=[
-            ['state', 'present', [
-                'host', 'port', 'base_dn', 'search_attribute'
-            ]]
-        ]
+        supports_check_mode=True
     )
 
     parameters = {
         'name': module.params['name'],
-        'host': module.params['host'],
-        'port': str(module.params['port']),
-        'base_dn': module.params['base_dn'],
-        'search_attribute': module.params['search_attribute'],
-        'bind_dn': module.params['bind_dn'],
-        'description': module.params['description'],
-        'search_filter': module.params['search_filter'],
-        'start_tls': str(module.params['start_tls']),
+        'search_filter': module.params['search_filter']
     }
-    if module.params['bind_password']:
-        # bind_password provided
-        parameters['bind_password'] = module.params['bind_password']
+    for p in ['host', 'port', 'base_dn', 'search_attribute', 'bind_dn', 'bind_password', 'description', 'start_tls']:
+        if module.params[p]:
+            if p in ['port', 'start_tls']:
+                parameters[p] = str(module.params[p])
+            else:
+                parameters[p] = module.params[p]
 
     state = module.params['state']
 
@@ -165,29 +156,32 @@ def main():
     if not directory:
         # No User Directory found with given name
         if state == 'absent':
-            module.exit_json(changed=False, msg="User directory not found. Not changed: %s" % parameters['name'])
+            module.exit_json(changed=False, msg='User directory not found. Not changed: %s' % parameters['name'])
 
         elif state == 'present':
             if module.check_mode:
                 module.exit_json(changed=True)
             else:
+                for p in ['host', 'port', 'base_dn', 'search_attribute']:
+                    if p not in parameters:
+                        module.fail_json(msg='host, port, base_dn and search_attribute are mandatory parameters to create a user directory')
                 user_directory._zapi.userdirectory.create(parameters)
-                module.exit_json(changed=True, result="Successfully added user directory %s" % parameters['name'])
+                module.exit_json(changed=True, result='Successfully added user directory %s' % parameters['name'])
     else:
         # User Directory with given name exists
         if state == 'absent':
             user_directory._zapi.userdirectory.delete([directory[0]['userdirectoryid']])
-            module.exit_json(changed=True, result="Successfully deleted user directory %s" % parameters['name'])
+            module.exit_json(changed=True, result='Successfully deleted user directory %s' % parameters['name'])
         elif state == 'present':
             diff_dict = {}
             if zabbix_utils.helper_compare_dictionaries(parameters, directory[0], diff_dict):
                 parameters['userdirectoryid'] = directory[0]['userdirectoryid']
                 user_directory._zapi.userdirectory.update(parameters)
-                module.exit_json(changed=True, result="Successfully updated user directory %s" % parameters['name'])
+                module.exit_json(changed=True, result='Successfully updated user directory %s' % parameters['name'])
             else:
-                module.exit_json(changed=False, result="User directory %s is up-to date" % parameters['name'])
+                module.exit_json(changed=False, result='User directory %s is up-to date' % parameters['name'])
 
-            module.exit_json(changed=False, result="User directory %s is up-to date" % parameters['name'])
+            module.exit_json(changed=False, result='User directory %s is up-to date' % parameters['name'])
 
 
 if __name__ == '__main__':
