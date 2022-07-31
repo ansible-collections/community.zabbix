@@ -109,6 +109,8 @@ options:
         description:
             - LDAP authentication default user directory name for user groups with gui_access set to LDAP or System default.
             - Required to be set when C(ldap_configured) is set to 1.
+        required: false
+        type: str
     saml_auth_enabled:
         description:
             - SAML authentication will be enabled if C(true).
