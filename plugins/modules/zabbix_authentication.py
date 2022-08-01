@@ -64,29 +64,34 @@ options:
             - LDAP server name.
             - e.g. C(ldap://ldap.zabbix.com)
             - This setting is required if current value of I(ldap_configured) is C(false).
+            - Works only with Zabbix <= 6.0 and is silently ignored in higher versions.
         required: false
         type: str
     ldap_port:
         description:
             - A port number of LDAP server.
             - This setting is required if current value of I(ldap_configured) is C(false).
+            - Works only with Zabbix <= 6.0 and is silently ignored in higher versions.
         required: false
         type: int
     ldap_base_dn:
         description:
             - Base DN of LDAP.
             - This setting is required if current value of I(ldap_configured) is C(false).
+            - Works only with Zabbix <= 6.0 and is silently ignored in higher versions.
         required: false
         type: str
     ldap_search_attribute:
         description:
             - Search attribute of LDAP.
             - This setting is required if current value of I(ldap_configured) is C(false).
+            - Works only with Zabbix <= 6.0 and is silently ignored in higher versions.
         required: false
         type: str
     ldap_bind_dn:
         description:
             - Bind DN of LDAP.
+            - Works only with Zabbix <= 6.0 and is silently ignored in higher versions.
         required: false
         type: str
     ldap_case_sensitive:
@@ -97,6 +102,13 @@ options:
     ldap_bind_password:
         description:
             - Bind password of LDAP.
+            - Works only with Zabbix <= 6.0 and is silently ignored in higher versions.
+        required: false
+        type: str
+    ldap_userdirectory:
+        description:
+            - LDAP authentication default user directory name for user groups with gui_access set to LDAP or System default.
+            - Required to be set when C(ldap_configured) is set to 1.
         required: false
         type: str
     saml_auth_enabled:
@@ -291,6 +303,7 @@ class Authentication(ZabbixBase):
             ldap_bind_dn,
             ldap_case_sensitive,
             ldap_bind_password,
+            ldap_userdirectory,
             saml_auth_enabled,
             saml_idp_entityid,
             saml_sso_url,
@@ -335,26 +348,33 @@ class Authentication(ZabbixBase):
             if isinstance(ldap_configured, bool):
                 params['ldap_configured'] = str(int(ldap_configured))
 
-            if ldap_host:
-                params['ldap_host'] = ldap_host
+            if LooseVersion(self._zbx_api_version) < LooseVersion('6.2.0'):
+                if ldap_host:
+                    params['ldap_host'] = ldap_host
 
-            if ldap_port:
-                params['ldap_port'] = str(ldap_port)
+                if ldap_port:
+                    params['ldap_port'] = str(ldap_port)
 
-            if ldap_base_dn:
-                params['ldap_base_dn'] = ldap_base_dn
+                if ldap_base_dn:
+                    params['ldap_base_dn'] = ldap_base_dn
 
-            if ldap_search_attribute:
-                params['ldap_search_attribute'] = ldap_search_attribute
+                if ldap_search_attribute:
+                    params['ldap_search_attribute'] = ldap_search_attribute
 
-            if ldap_bind_dn:
-                params['ldap_bind_dn'] = ldap_bind_dn
+                if ldap_bind_dn:
+                    params['ldap_bind_dn'] = ldap_bind_dn
+
+                if ldap_bind_password:
+                    params['ldap_bind_password'] = ldap_bind_password
+            else:
+                if ldap_userdirectory:
+                    directory = self._zapi.userdirectory.get({'filter': {'name': ldap_userdirectory}})
+                    if not directory:
+                        self._module.fail_json(msg="Canot find user directory with name: %s" % ldap_userdirectory)
+                    params['ldap_userdirectoryid'] = directory[0]['userdirectoryid']
 
             if isinstance(ldap_case_sensitive, bool):
                 params['ldap_case_sensitive'] = str(int(ldap_case_sensitive))
-
-            if ldap_bind_password:
-                params['ldap_bind_password'] = ldap_bind_password
 
             if isinstance(saml_auth_enabled, bool):
                 params['saml_auth_enabled'] = str(int(saml_auth_enabled))
@@ -440,14 +460,18 @@ class Authentication(ZabbixBase):
             future_authentication.update(params)
 
             if (current_authentication['ldap_configured'] == '0'
-                    and future_authentication['ldap_configured'] == '1'
-                    and not ldap_host
-                    and not ldap_port
-                    and not ldap_search_attribute
-                    and not ldap_base_dn):
-                self._module.fail_json(
-                    msg="Please set ldap_host, ldap_search_attribute and ldap_base_dn when you change a value of ldap_configured to true."
-                )
+                    and future_authentication['ldap_configured'] == '1'):
+                if LooseVersion(self._zbx_api_version) < LooseVersion('6.2.0'):
+                    if (not ldap_host
+                            or not ldap_port
+                            or not ldap_search_attribute
+                            or not ldap_base_dn):
+                        self._module.fail_json(
+                            msg="Please set ldap_host, ldap_search_attribute and ldap_base_dn when you change a value of ldap_configured to true."
+                        )
+                else:
+                    if not ldap_userdirectory:
+                        self._module.fail_json(msg="Please set ldap_userdirectory when you change a value of ldap_configured to true.")
 
             if (current_authentication['saml_auth_enabled'] == '0'
                     and future_authentication['saml_auth_enabled'] == '1'
@@ -490,6 +514,7 @@ def main():
         ldap_bind_dn=dict(type='str'),
         ldap_case_sensitive=dict(type='bool'),
         ldap_bind_password=dict(type='str', no_log=True),
+        ldap_userdirectory=dict(type='str'),
         saml_auth_enabled=dict(type='bool'),
         saml_idp_entityid=dict(type='str'),
         saml_sso_url=dict(type='str'),
@@ -526,6 +551,7 @@ def main():
     ldap_bind_dn = module.params['ldap_bind_dn']
     ldap_case_sensitive = module.params['ldap_case_sensitive']
     ldap_bind_password = module.params['ldap_bind_password']
+    ldap_userdirectory = module.params['ldap_userdirectory']
     saml_auth_enabled = module.params['saml_auth_enabled']
     saml_idp_entityid = module.params['saml_idp_entityid']
     saml_sso_url = module.params['saml_sso_url']
@@ -562,6 +588,7 @@ def main():
         ldap_bind_dn,
         ldap_case_sensitive,
         ldap_bind_password,
+        ldap_userdirectory,
         saml_auth_enabled,
         saml_idp_entityid,
         saml_sso_url,
