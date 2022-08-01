@@ -520,7 +520,7 @@ class Host(ZabbixBase):
             if tls_connect:
                 parameters['tls_connect'] = tls_connect
             if tls_accept:
-                parameters['tls_accept'] = tls_accept    
+                parameters['tls_accept'] = tls_accept
             if tls_psk_identity:
                 parameters['tls_psk_identity'] = tls_psk_identity
             if tls_psk:
