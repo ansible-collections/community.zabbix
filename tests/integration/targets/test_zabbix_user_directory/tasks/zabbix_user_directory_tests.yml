@@ -1,0 +1,106 @@
+---
+- name: test - do not run tests for Zabbix < 6.2
+  meta: end_play
+  when: zabbix_version is version('6.2', '<')
+
+- name: test - user directory 
+  module_defaults:
+    community.zabbix.zabbix_user_directory:
+      server_url: "{{ zabbix_api_server_url }}"
+      login_user: "{{ zabbix_api_login_user }}"
+      login_password: "{{ zabbix_api_login_pass }}"
+      state: present
+      name: TestUserDirectory
+
+  block:
+  - name: test - create new user directory in check mode
+    zabbix_user_directory:
+      host: 'test.com'
+      port: 389
+      base_dn: 'ou=Users,dc=example,dc=org'
+      search_attribute: 'uid'
+    check_mode: true
+    register: directory_check_result
+
+  - assert:
+      that: directory_check_result.changed is sameas True
+
+  - name: test - attempt to create new user directory with not all mandatory parameters
+    zabbix_user_directory:
+      host: 'test.com'
+      port: 389
+    ignore_errors: true
+    register: directory_expect_fail_result
+
+  - assert:
+      that: directory_expect_fail_result.failed is sameas True
+
+  - name: test - create new user directory withoud bind_password
+    zabbix_user_directory:
+      host: 'test.com'
+      port: 389
+      base_dn: 'ou=Users,dc=example,dc=org'
+      search_attribute: 'uid'
+    register: directory_result
+
+  - assert:
+      that: directory_result.changed is sameas True
+
+  - name: test - create new user directory without bind_password again
+    zabbix_user_directory:
+      host: 'test.com'
+      port: 389
+      base_dn: 'ou=Users,dc=example,dc=org'
+      search_attribute: 'uid'
+    register: directory_again_result
+
+  - assert:
+      that: directory_again_result.changed is sameas False
+
+  - name: test - delete user directory
+    zabbix_user_directory:
+      state: absent
+    register: directory_delete_result
+
+  - assert:
+      that: directory_delete_result.changed is sameas True
+
+  - name: test - create new user directory with bind_password
+    zabbix_user_directory:
+      host: 'test.com'
+      port: 389
+      base_dn: 'ou=Users,dc=example,dc=org'
+      search_attribute: 'uid'
+      bind_password: 'password'
+    register: directory_result
+
+  - assert:
+      that: directory_result.changed is sameas True
+
+  - name: test - create new user directory with bind_password again
+    zabbix_user_directory:
+      host: 'test.com'
+      port: 389
+      base_dn: 'ou=Users,dc=example,dc=org'
+      search_attribute: 'uid'
+      bind_password: 'password'
+    register: directory_again_result
+
+  - assert:
+      that: directory_again_result.changed is sameas True
+
+  - name: test - update only host parameter in user directory
+    zabbix_user_directory:
+      host: 'test.ca'
+    register: directory_update_result
+
+  - assert:
+      that: directory_update_result.changed is sameas True
+
+  - name: test - update only host parameter in user directory again
+    zabbix_user_directory:
+      host: 'test.ca'
+    register: directory_update_again_result
+
+  - assert:
+      that: directory_update_again_result.changed is sameas False
