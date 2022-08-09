@@ -5,7 +5,7 @@
 
 - name: Determine Latest Supported Zabbix Version
   set_fact:
-    zabbix_proxy_version: "{{ zabbix_valid_proxy_versions[ansible_distribution_major_version][0] }}"
+    zabbix_proxy_version: "{{ zabbix_valid_proxy_versions[ansible_distribution_major_version][0] | default(6.0) }}"
   when: zabbix_proxy_version is not defined
 
 - name: "Replace Sangoma with RedHat task"
