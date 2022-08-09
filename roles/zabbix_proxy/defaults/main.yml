@@ -1,7 +1,7 @@
 ---
 # defaults file for zabbix_proxy
 
-zabbix_proxy_version: 6.0
+# zabbix_proxy_version: 6.0
 zabbix_proxy_version_minor: "*"
 zabbix_version: "{{ zabbix_proxy_version }}"
 zabbix_selinux: false
@@ -27,13 +27,13 @@ zabbix_repo_yum:
     description: Zabbix Official Repository - $basearch
     baseurl: "{{ zabbix_repo_yum_schema }}://repo.zabbix.com/zabbix/{{ zabbix_version | regex_search('^[0-9]+.[0-9]+') }}/rhel/{{ ansible_distribution_major_version }}/$basearch/"
     gpgcheck: "{{ zabbix_repo_yum_gpgcheck }}"
-    mode: '0644'
+    mode: "0644"
     gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-ZABBIX
     state: present
   - name: zabbix-non-supported
     description: Zabbix Official Repository non-supported - $basearch
     baseurl: "{{ zabbix_repo_yum_schema }}://repo.zabbix.com/non-supported/rhel/{{ ansible_distribution_major_version }}/$basearch/"
-    mode: '0644'
+    mode: "0644"
     gpgcheck: "{{ zabbix_repo_yum_gpgcheck }}"
     gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-ZABBIX
     state: present
@@ -42,9 +42,9 @@ zabbix_repo_yum:
 zabbix_proxy_username: zabbix
 zabbix_proxy_groupname: zabbix
 
-zabbix_server_host: 192.168.1.1          # Will be deprecated in 2.0.0
+zabbix_server_host: 192.168.1.1 # Will be deprecated in 2.0.0
 zabbix_proxy_server: "{{ zabbix_server_host }}"
-zabbix_server_port: 10051          # Will be deprecated in 2.0.0
+zabbix_server_port: 10051 # Will be deprecated in 2.0.0
 zabbix_proxy_serverport: "{{ zabbix_server_port }}"
 zabbix_database_creation: true
 zabbix_database_sqlload: true
@@ -87,9 +87,9 @@ zabbix_proxy_dbsocket:
 zabbix_proxy_dbport: 5432
 zabbix_proxy_dbhost_run_install: true
 zabbix_proxy_privileged_host: localhost
-zabbix_proxy_localbuffer: 0          # Will be deprecated in 2.0.0
+zabbix_proxy_localbuffer: 0 # Will be deprecated in 2.0.0
 zabbix_proxy_proxylocalbuffer: "{{ zabbix_proxy_localbuffer }}"
-zabbix_proxy_offlinebuffer: 1          # Will be deprecated in 2.0.0
+zabbix_proxy_offlinebuffer: 1 # Will be deprecated in 2.0.0
 zabbix_proxy_proxyofflinebuffer: "{{ zabbix_proxy_offlinebuffer }}"
 zabbix_proxy_heartbeatfrequency: 60
 zabbix_proxy_configfrequency: 3600
@@ -130,11 +130,11 @@ zabbix_proxy_loglowqueries: 0
 zabbix_proxy_tmpdir: /tmp
 zabbix_proxy_allowroot: 0
 zabbix_proxy_include: /etc/zabbix/zabbix_proxy.conf.d
-zabbix_proxy_include_mode: '0755'
+zabbix_proxy_include_mode: "0755"
 zabbix_proxy_libdir: /usr/lib/zabbix
 zabbix_proxy_loadmodulepath: "{{ zabbix_proxy_libdir }}/modules"
 zabbix_proxy_manage_service: true
-zabbix_proxy_statsallowedip: '127.0.0.1'
+zabbix_proxy_statsallowedip: "127.0.0.1"
 zabbix_proxy_vaulttoken:
 zabbix_proxy_vaulturl: https://127.0.0.1:8200
 zabbix_proxy_vaultdbpath:
@@ -147,34 +147,34 @@ zabbix_proxy_tlscafile:
 zabbix_proxy_tlscrlfile:
 zabbix_proxy_tlsservercertissuer:
 zabbix_proxy_tlsservercertsubject:
-zabbix_proxy_tls_subject: "{{ zabbix_proxy_tlsservercertsubject }}"      # FIXME this is not correct and should be removed with 2.0.0, here only to prevent regression
+zabbix_proxy_tls_subject: "{{ zabbix_proxy_tlsservercertsubject }}" # FIXME this is not correct and should be removed with 2.0.0, here only to prevent regression
 zabbix_proxy_tlscertfile:
 zabbix_proxy_tlskeyfile:
 zabbix_proxy_tlspskidentity:
 
 zabbix_proxy_tls_config:
-  no_encryption: 'no_encryption'
-  psk: 'PSK'
-  cert: 'certificate'
+  no_encryption: "no_encryption"
+  psk: "PSK"
+  cert: "certificate"
 
 # Zabbix API stuff
-zabbix_validate_certs: true                        # Will be deprecated in 2.0.0
+zabbix_validate_certs: true # Will be deprecated in 2.0.0
 zabbix_api_validate_certs: "{{ zabbix_validate_certs }}"
-zabbix_url: http://localhost          # Will be deprecated in 2.0.0
+zabbix_url: http://localhost # Will be deprecated in 2.0.0
 zabbix_api_server_url: "{{ zabbix_url }}"
 # zabbix_http_user: admin                          # Will be deprecated in 2.0.0
 # zabbix_http_password: admin                      # Will be deprecated in 2.0.0
 # zabbix_api_http_user: admin
 # zabbix_api_http_password: admin
-zabbix_api_user: Admin                             # Will be deprecated in 2.0.0
-zabbix_api_pass: !unsafe zabbix                    # Will be deprecated in 2.0.0
+zabbix_api_user: Admin # Will be deprecated in 2.0.0
+zabbix_api_pass: !unsafe zabbix # Will be deprecated in 2.0.0
 zabbix_api_login_user: "{{ zabbix_api_user }}"
 zabbix_api_login_pass: "{{ zabbix_api_pass }}"
 zabbix_api_create_proxy: false
 zabbix_api_timeout: 30
-zabbix_create_proxy: present  # or absent          # Will be deprecated in 2.0.0
+zabbix_create_proxy: present # or absent          # Will be deprecated in 2.0.0
 zabbix_proxy_state: "{{ zabbix_create_proxy }}"
-zabbix_proxy_status: active   # or passive
+zabbix_proxy_status: active # or passive
 
 zabbix_useuip: 1
 zabbix_proxy_become_on_localhost: true

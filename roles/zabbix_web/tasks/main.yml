@@ -6,6 +6,11 @@
   tags:
     - always
 
+- name: Determine Latest Supported Zabbix Version
+  set_fact:
+    zabbix_web_version: "{{ zabbix_valid_web_versions[ansible_distribution_major_version][0] | default(6.0) }}"
+  when: zabbix_web_version is not defined
+
 - name: "Include distribution and version-specific vars"
   include_vars: "{{ item }}"
   with_first_found:
@@ -19,7 +24,7 @@
   set_fact:
     zabbix_short_version: "{{ zabbix_version | regex_replace('\\.', '') }}"
     zabbix_php_version: "{{ zabbix_php_version if zabbix_php_version is defined else _zabbix_php_version }}"
-    _zabbix_php_package_prefix: ''
+    _zabbix_php_package_prefix: ""
   tags:
     - always
 
