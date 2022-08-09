@@ -16,3 +16,16 @@ _nginx_service: nginx
 _nginx_tls_crt: /etc/pki/server.crt
 _nginx_tls_key: /etc/pki/server.key
 _nginx_tls_dhparam: /etc/pki/dhparam-server.pem
+
+zabbix_valid_web_versions:
+  "9":
+    # - 6.2
+    - 6.0
+  "8":
+    # - 6.2
+    - 6.1
+    - 5.0
+    - 4.0
+  "7":
+    - 5.0
+    - 4.0
