@@ -4,3 +4,16 @@ apache_group: apache
 apache_log: httpd
 
 mysql_create_dir: create/
+
+zabbix_valid_versions:
+  "9":
+    # - 6.2
+    - 6.0
+  "8":
+    # - 6.2
+    - 6.1
+    - 5.0
+    - 4.0
+  "7":
+    - 5.0
+    - 4.0

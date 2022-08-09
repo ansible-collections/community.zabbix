@@ -4,6 +4,11 @@
 - name: "Include OS-specific variables"
   include_vars: "{{ ansible_os_family }}.yml"
 
+- name: Determine Latest Supported zabbix_version
+  set_fact:
+    zabbix_server_version: "{{ zabbix_valid_versions[ansible_distribution_major_version][0] }}"
+  when: zabbix_server_version is not defined
+
 - name: "Install the correct repository"
   include_tasks: "{{ ansible_os_family }}.yml"
 
@@ -39,7 +44,7 @@
 - name: "Add zabbix-server scripts"
   include: "scripts.yml"
   when: ( zabbix_server_alertscripts is defined ) or
-        ( zabbix_server_externalscripts is defined )
+    ( zabbix_server_externalscripts is defined )
 
 - name: "Zabbix-server started"
   service:
