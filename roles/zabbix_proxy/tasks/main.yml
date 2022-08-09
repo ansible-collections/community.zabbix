@@ -1,9 +1,16 @@
 ---
 # tasks file for zabbix_proxy
+- name: "Include OS-specific variables"
+  include_vars: "{{ ansible_os_family }}.yml"
+
+- name: Determine Latest Supported Zabbix Version
+  set_fact:
+    zabbix_proxy_version: "{{ zabbix_valid_proxy_versions[ansible_distribution_major_version][0] }}"
+  when: zabbix_proxy_version is not defined
 
 - name: "Replace Sangoma with RedHat task"
   set_fact:
-    ansible_os_family: 'RedHat'
+    ansible_os_family: "RedHat"
   when:
     - ansible_os_family == 'Sangoma'
 
@@ -48,7 +55,7 @@
     owner: zabbix
     group: zabbix
     state: directory
-    mode: '0755'
+    mode: "0755"
   become: true
 
 - name: "Create directory for PSK file if not exist."
