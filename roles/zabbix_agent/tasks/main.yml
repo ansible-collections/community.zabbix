@@ -39,6 +39,11 @@
   tags:
     - always
 
+- name: Determine Latest Supported Zabbix Version
+  set_fact:
+    zabbix_agent_version: "{{ zabbix_valid_agent_versions[ansible_distribution_major_version][0] | default(6.0) }}"
+  when: zabbix_agent_version is not defined
+
 - name: "Reset zabbix_agent_version for Ubuntu 22.04 to 6.0"
   # README https://support.zabbix.com/browse/ZBXNEXT-7624
   set_fact:
