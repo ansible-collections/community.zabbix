@@ -5,3 +5,34 @@ zabbix_agent: zabbix-agent
 zabbix_agent_service: zabbix-agent
 zabbix_agent_conf: zabbix_agentd.conf
 zabbix_agent2_conf: zabbix_agent2.conf
+
+zabbix_valid_agent_versions:
+  # Debian
+  "11":
+    # - 6.2
+    - 6.0
+    - 5.0
+    - 4.0
+  "10":
+    - 6.0
+    - 5.0
+    - 4.0
+  "9":
+    - 6.0
+    - 5.0
+    - 4.0
+  # Ubuntu
+  "22":
+    # - 6.2
+    - 6.0
+    - 5.0
+    - 4.0
+  "20":
+    # - 6.2
+    - 6.0
+    - 5.0
+    - 4.0
+  "18":
+    - 6.0
+    - 5.0
+    - 4.0

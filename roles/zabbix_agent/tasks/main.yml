@@ -11,17 +11,6 @@
   tags:
     - always
 
-- name: "Reset zabbix_agent_version for Ubuntu 22.04 to 6.0"
-  # README https://support.zabbix.com/browse/ZBXNEXT-7624
-  set_fact:
-    zabbix_version: 6.0
-    zabbix_agent_version: 6.0
-  when:
-    - ansible_distribution_release is defined
-    - ansible_distribution_release == "jammy"
-    - ( zabbix_agent_version is version ('6.0','lt') or
-        zabbix_version is version ('6.0','lt') )
-
 - name: "Fix facts for linuxmint - distribution release"
   set_fact:
     zabbix_agent_distribution_release: xenial
@@ -50,6 +39,22 @@
   tags:
     - always
 
+- name: Determine Latest Supported Zabbix Version
+  set_fact:
+    zabbix_agent_version: "{{ zabbix_valid_agent_versions[ansible_distribution_major_version][0] | default(6.0) }}"
+  when: zabbix_agent_version is not defined
+
+- name: "Reset zabbix_agent_version for Ubuntu 22.04 to 6.0"
+  # README https://support.zabbix.com/browse/ZBXNEXT-7624
+  set_fact:
+    zabbix_version: 6.0
+    zabbix_agent_version: 6.0
+  when:
+    - ansible_distribution_release is defined
+    - ansible_distribution_release == "jammy"
+    - ( zabbix_agent_version is version ('6.0','lt') or
+      zabbix_version is version ('6.0','lt') )
+
 - name: "Install the correct repository"
   include_tasks: "{{ zabbix_agent_os_family if (zabbix_agent_os_family not in ['Sangoma']) else 'RedHat' }}.yml"
   when:
@@ -59,7 +64,7 @@
 
 - name: "Set the 'ansible_python_interpreter' to the one we use for running this playbook."
   set_fact:
-    ansible_python_interpreter: '{{ ansible_playbook_python }}'
+    ansible_python_interpreter: "{{ ansible_playbook_python }}"
   delegate_to: localhost
   delegate_facts: true
   when:

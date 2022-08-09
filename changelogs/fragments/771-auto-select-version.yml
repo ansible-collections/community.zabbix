@@ -1,0 +1,3 @@
+---
+minor_changes:
+  - roles - Updated the version defaults to select the latest version supported by an operating system.

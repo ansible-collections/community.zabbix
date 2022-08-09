@@ -1,7 +1,7 @@
 ---
 # defaults file for zabbix-web
 
-zabbix_web_version: 6.0
+# zabbix_web_version: 6.0
 zabbix_web_version_minor: "*"
 zabbix_version: "{{ zabbix_web_version }}"
 zabbix_repo: zabbix
@@ -11,9 +11,9 @@ zabbix_web_rhel_release: true
 zabbix_selinux: false
 zabbix_web_doubleprecision: false
 zabbix_web_conf_mode: "0640"
-zabbix_web_connect_ha_backend: false 
+zabbix_web_connect_ha_backend: false
 
-zabbix_url: zabbix.example.com                 # Will be deprecated in 2.0.0
+zabbix_url: zabbix.example.com # Will be deprecated in 2.0.0
 zabbix_api_server_url: "{{ zabbix_url }}"
 zabbix_websrv: apache
 zabbix_websrv_servername: "{{ zabbix_api_server_url | regex_findall('(?:https?\\://)?([\\w\\-\\.]+)') | first }}"
@@ -72,13 +72,13 @@ zabbix_repo_yum:
     description: Zabbix Official Repository - $basearch
     baseurl: "{{ zabbix_repo_yum_schema }}://repo.zabbix.com/zabbix/{{ zabbix_version | regex_search('^[0-9]+.[0-9]+') }}/rhel/{{ ansible_distribution_major_version }}/$basearch/"
     gpgcheck: "{{ zabbix_repo_yum_gpgcheck }}"
-    mode: '0644'
+    mode: "0644"
     gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-ZABBIX
     state: present
   - name: zabbix-non-supported
     description: Zabbix Official Repository non-supported - $basearch
     baseurl: "{{ zabbix_repo_yum_schema }}://repo.zabbix.com/non-supported/rhel/{{ ansible_distribution_major_version }}/$basearch/"
-    mode: '0644'
+    mode: "0644"
     gpgcheck: "{{ zabbix_repo_yum_gpgcheck }}"
     gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-ZABBIX
     state: present
@@ -87,7 +87,7 @@ zabbix_5_repo_yum:
   - name: zabbix-frontend
     description: Zabbix Official Repository - $basearch
     baseurl: "{{ zabbix_repo_yum_schema }}://repo.zabbix.com/zabbix/{{ zabbix_version | regex_search('^[0-9]+.[0-9]+') }}/rhel/{{ ansible_distribution_major_version }}/$basearch/frontend/"
-    mode: '0644'
+    mode: "0644"
     gpgcheck: "{{ zabbix_repo_yum_gpgcheck }}"
     gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-ZABBIX
     state: present
@@ -122,11 +122,11 @@ zabbix_server_dbschema:
 #  - "'dbl' => 'http://localhost:9200'"
 #  - "'str' => 'http://localhost:9200'"
 zabbix_server_history_types:
-  - 'str'
-  - 'text'
-  - 'log'
-  - 'uint'
-  - 'dbl'
+  - "str"
+  - "text"
+  - "log"
+  - "uint"
+  - "dbl"
 
 selinux_allow_zabbix_can_network: false
 _zabbix_web_apache_php_addition: false
