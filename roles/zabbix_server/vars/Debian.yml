@@ -5,7 +5,7 @@ apache_log: apache2
 
 mysql_create_dir: ""
 
-zabbix_valid_versions:
+zabbix_valid_server_versions:
   # Debian
   "11":
     # - 6.2

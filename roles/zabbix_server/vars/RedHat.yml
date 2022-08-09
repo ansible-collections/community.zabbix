@@ -5,7 +5,7 @@ apache_log: httpd
 
 mysql_create_dir: create/
 
-zabbix_valid_versions:
+zabbix_valid_server_versions:
   "9":
     # - 6.2
     - 6.0
