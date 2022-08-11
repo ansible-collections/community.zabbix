@@ -7,10 +7,10 @@ mysql_create_dir: create/
 
 zabbix_valid_server_versions:
   "9":
-    # - 6.2
+    - 6.2
     - 6.0
   "8":
-    # - 6.2
+    - 6.2
     - 6.0
     - 5.0
     - 4.0
