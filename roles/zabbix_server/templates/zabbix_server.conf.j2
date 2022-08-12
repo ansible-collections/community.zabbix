@@ -124,6 +124,9 @@
 {% if zabbix_server_version is version('6.2', '>=') %}
 {{ (zabbix_server_vault is defined and zabbix_server_vault is not none) | ternary('', '# ') }}Vault={{ zabbix_server_vault | default('') }}
 {% endif %}
+{% if zabbix_version is version('6.2', '>=') %}
+StartODBCPollers={{ zabbix_server_startodbcpollers }}
+{% endif %}
 {% if zabbix_server_version is version('6.0', '>=') %}
 {{ (zabbix_server_vaultdbpath is defined and zabbix_server_vaultdbpath is not none) | ternary('', '# ') }}VaultDBPath={{ zabbix_server_vaultdbpath | default('') }}
 {% endif %}
