@@ -47,7 +47,7 @@ sign_keys:
       sign_key: E709712C
     trusty:
       sign_key: E709712C
-    tricia:
+    jammy:
       sign_key: E709712C
     bullseye:
       sign_key: E709712C
