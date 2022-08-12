@@ -97,7 +97,7 @@ The following is an overview of all available configuration default for this rol
 
 ### Overall Zabbix
 
-* `zabbix_proxy_version`: This is the version of zabbix. Default: The highest supported version for the operating system. Can be overridden to 6.0, 5.4, 5.2, 5.0, 4.4, 4.0, 3.4, 3.2, 3.0, 2.4, or 2.2. Previously the variable `zabbix_version` was used directly but it could cause [some inconvenience](https://github.com/dj-wasabi/ansible-zabbix-agent/pull/303). That variable is maintained by retrocompativility.
+* `zabbix_proxy_version`: This is the version of zabbix. Default: The highest supported version for the operating system. Can be overridden to 6.2, 6.0, 5.4, 5.2, 5.0, 4.4, 4.0, 3.4, 3.2, 3.0, 2.4, or 2.2. Previously the variable `zabbix_version` was used directly but it could cause [some inconvenience](https://github.com/dj-wasabi/ansible-zabbix-agent/pull/303). That variable is maintained by retrocompativility.
 * `zabbix_proxy_version_minor`: When you want to specify a minor version to be installed. RedHat only. Default set to: `*` (latest available)
 * `zabbix_repo`: Default: `zabbix`
   * `epel`: install agent from EPEL repo
