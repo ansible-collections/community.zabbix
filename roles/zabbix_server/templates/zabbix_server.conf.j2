@@ -78,6 +78,9 @@ StartLLDProcessors={{ zabbix_server_startlldprocessors }}
 StartPreprocessors={{ zabbix_server_startpreprocessors }}
 {% endif %}
 StartPollersUnreachable={{ zabbix_server_startpollersunreachable }}
+{% if zabbix_version is version('6.2', '>=') %}
+StartHistoryPollers={{ zabbix_server_starthistorypollers }}
+{% endif %}
 StartTrappers={{ zabbix_server_starttrappers }}
 StartPingers={{ zabbix_server_startpingers }}
 StartDiscoverers={{ zabbix_server_startdiscoverers }}
@@ -102,6 +105,13 @@ ListenIP={{ zabbix_server_listenip }}
 HousekeepingFrequency={{ zabbix_server_housekeepingfrequency }}
 MaxHousekeeperDelete={{ zabbix_server_maxhousekeeperdelete }}
 CacheSize={{ zabbix_server_cachesize }}
+{% else %}
+{% if zabbix_version is version('6.2', '<') %}
+CacheSize=8M
+{% else %}
+CacheSize=32M
+{% endif %}
+{% endif %}
 CacheUpdateFrequency={{ zabbix_server_cacheupdatefrequency }}
 StartDBSyncers={{ zabbix_server_startdbsyncers }}
 HistoryCacheSize={{ zabbix_server_historycachesize }}
@@ -130,6 +140,12 @@ VaultURL={{ zabbix_server_vaulturl }}
 {% if zabbix_server_vaultdbpath is defined and zabbix_server_vaultdbpath is not none %}
 VaultDBPath={{ zabbix_server_vaultdbpath }}
 {% endif %}
+{% if zabbix_server_vaulttlscertfile is defined and zabbix_server_vaulttlscertfile is not none %}
+VaultTLSKeyFile={{ zabbix_server_vaulttlscertfile }}
+{% endif %}
+{% if zabbix_server_vaulttlskeyfile is defined and zabbix_server_vaulttlskeyfile is not none %}
+VaultTLSCertFile={{ zabbix_server_vaulttlskeyfile }}
+{% endif %}
 {% if zabbix_server_startreportwriters is defined and zabbix_server_startreportwriters is not none %}
 StartReportWriters={{ zabbix_server_startreportwriters }}
 {% endif %}
@@ -141,6 +157,9 @@ ServiceManagerSyncFrequency={{ zabbix_server_servicemanagersyncfrequency }}
 {% endif %}
 {% if zabbix_server_problemhousekeepingfrequency is defined and zabbix_server_problemhousekeepingfrequency is not none %}
 ProblemHousekeepingFrequency={{ zabbix_server_problemhousekeepingfrequency }}
+{% endif %}
+{% if zabbix_version is version('6.2', '>=') %}
+StartODBCPollers={{ zabbix_server_startodbcpollers }}
 {% endif %}
 {% if zabbix_server_listenbacklog is defined and zabbix_server_listenbacklog is not none %}
 ListenBacklog={{ zabbix_server_listenbacklog }}
