@@ -1,0 +1,52 @@
+---
+
+driver:
+  name: docker
+platforms:
+  - name: zabbix-server-${MY_MOLECULE_CONTAINER:-mysql-centos}
+    image: ${MY_MOLECULE_IMAGE:-"geerlingguy/docker-centos8-ansible"}
+    command: ${MY_MOLECULE_DOCKER_COMMAND:-""}
+    privileged: true
+    pre_build_image: true
+    networks:
+      - name: zabbix
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    groups:
+      - ${MY_MOLECULE_GROUP:-mysql}
+
+provisioner:
+  name: ansible
+  lint:
+    name: ansible-lint
+  env:
+    ANSIBLE_COLLECTIONS_PATHS: $HOME/.ansible/collections/ansible_collections/community/zabbix
+    ANSIBLE_ROLES_PATH: $HOME/.ansible/collections/ansible_collections/community/zabbix/roles
+  inventory:
+    group_vars:
+      mysql:
+        zabbix_server_database: mysql
+        zabbix_server_database_long: mysql
+        zabbix_server_dbport: 3306
+        zabbix_server_dbhost: mysql-host
+        zabbix_server_dbhost_run_install: false
+        zabbix_server_privileged_host: '%'
+        zabbix_server_mysql_login_host: mysql-host
+        zabbix_server_mysql_login_user: root
+        zabbix_server_mysql_login_password: changeme
+        zabbix_server_mysql_login_port: 3306
+      postgresql:
+        zabbix_server_database: pgsql
+        zabbix_server_database_long: postgresql
+        zabbix_server_dbport: 5432
+        zabbix_server_dbhost: postgresql-host
+        zabbix_server_dbhost_run_install: false
+        zabbix_server_pgsql_login_host: postgresql-host
+        zabbix_server_pgsql_login_user: postgres
+        zabbix_server_pgsql_login_password: changeme
+        zabbix_server_pgsql_login_port: 5432
+
+verifier:
+  name: testinfra
+  lint:
+    name: flake8
