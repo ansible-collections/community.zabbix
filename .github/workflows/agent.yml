@@ -3,16 +3,16 @@ name: "community.zabbix.zabbix_agent"
 on:
   push:
     paths:
-      - 'roles/zabbix_agent/**'
-      - 'molecule/zabbix_agent/**'
-      - 'molecule/requirements.txt'
-      - '.github/workflows/agent.yml'
+      - "roles/zabbix_agent/**"
+      - "molecule/zabbix_agent/**"
+      - "molecule/requirements.txt"
+      - ".github/workflows/agent.yml"
   pull_request:
     paths:
-      - 'roles/zabbix_agent/**'
-      - 'molecule/zabbix_agent/**'
-      - 'molecule/requirements.txt'
-      - '.github/workflows/agent.yml'
+      - "roles/zabbix_agent/**"
+      - "molecule/zabbix_agent/**"
+      - "molecule/requirements.txt"
+      - ".github/workflows/agent.yml"
 jobs:
   molecule:
     runs-on: ubuntu-18.04
@@ -30,6 +30,8 @@ jobs:
             image: geerlingguy/docker-ubuntu2004-ansible
           - container: pgsql-ubuntu1804
             image: geerlingguy/docker-ubuntu1804-ansible
+          - container: debian11
+            image: geerlingguy/docker-debian11-ansible
           - container: debian10
             image: geerlingguy/docker-debian10-ansible
           - container: debian9
