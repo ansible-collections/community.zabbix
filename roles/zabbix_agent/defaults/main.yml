@@ -152,6 +152,7 @@ zabbix_agent_loadmodule:
 zabbix_agent_become_on_localhost: true
 zabbix_agent_description:
 zabbix_agent_inventory_zabbix: {}
+zabbix_agent_heartbeatfrequency: 60
 zabbix_macros: [] # Will be deprecated in 2.0.0
 zabbix_agent_macros: "{{ zabbix_macros }}"
 zabbix_agent_tags: []
