@@ -41,6 +41,6 @@ def test_zabbix_package(host, zabbix_agent_package):
     assert zabbix_agent_package.is_installed
 
     if host.system_info.distribution == "debian":
-        assert zabbix_agent_package.version.startswith("1:6.0")
+        assert zabbix_agent_package.version.startswith("1:6.2")
     if host.system_info.distribution == "centos":
-        assert zabbix_agent_package.version.startswith("6.0")
+        assert zabbix_agent_package.version.startswith("6.2")
