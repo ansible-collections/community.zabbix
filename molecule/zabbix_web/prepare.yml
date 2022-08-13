@@ -51,8 +51,8 @@
           - which
           - curl
           - sudo
-          - "{{ 'python3-libselinux' if ansible_distribution_major_version == '8' else 'libselinux-python' }}"
           - "{{ 'python3-pip' if ansible_distribution_major_version == '8' else 'python-pip' }}"
+          - "{{ 'python3-libselinux' if ansible_distribution_major_version == '8' else 'libselinux-python' }}"
         state: present
       register: installation_dependencies
       until: installation_dependencies is succeeded
@@ -69,7 +69,7 @@
         - ansible_os_family == 'RedHat'
         - ansible_distribution_major_version == '7'
 
-    - name: "Installing packages on CentOS"
+    - name: "Installing MySQL on CentOS"
       yum:
         name:
           - mysql
@@ -88,12 +88,12 @@
           - apt-utils
           - apt-transport-https
           - ca-certificates
-          - python-apt
           - gnupg2
-          - "{{ 'python3-pip' if ansible_distribution == 'Ubuntu' else 'python-pip' }}"
-          - "{{ 'gnupg-agent' if ansible_distribution_major_version in ['7', '8'] else 'gpg-agent' }}"
+          - gpg-agent
           - sudo
           - vim
+          - "{{ 'python3-apt' if ansible_distribution_major_version in ['10', '11', '18', '20'] else 'python-apt' }}"
+          - "{{ 'python3-pip' if ansible_distribution_major_version in ['10', '11', '18', '20'] else 'python-pip' }}"
         update_cache: true
         state: present
       register: installation_dependencies
