@@ -88,6 +88,7 @@ zabbix_server_startpingers: 1
 zabbix_server_startdiscoverers: 1
 zabbix_server_starthttppollers: 1
 zabbix_server_startpreprocessors: 3
+zabbix_server_startodbcpollers: 1
 zabbix_server_starttimers: 1
 zabbix_server_starthistorypollers: 5
 zabbix_server_javagateway:
