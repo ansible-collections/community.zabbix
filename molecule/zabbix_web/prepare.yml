@@ -3,7 +3,6 @@
   hosts: localhost
   connection: local
   pre_tasks:
-
     - name: "Create MySQL Container"
       docker_container:
         name: mysql-host
@@ -37,7 +36,6 @@
 - name: Prepare
   hosts: all
   pre_tasks:
-
     - name: "Create group for imaginary host"
       add_host:
         name: imaginary-host
@@ -125,6 +123,12 @@
       when:
         - inventory_hostname in groups['mysql']
 
+    - name: Enabeling PHP 7.4
+      command: dnf module enable php:7.4 -y
+      when:
+        - ansible_os_family == 'RedHat'
+        - ansible_distribution_major_version == "8"
+
   roles:
     - role: geerlingguy.apache
       when:
@@ -132,7 +136,7 @@
     - role: geerlingguy.nginx
       when:
         - zabbix_websrv == "nginx"
-    - role: wdijkerman.php
+    - role: geerlingguy.php
       when:
         - ansible_os_family != 'RedHat' or (ansible_os_family == 'RedHat' and ansible_distribution_major_version == "8")
     - role: zabbix_server
@@ -140,7 +144,7 @@
   post_tasks:
     - name: "Remove file"
       file:
-        path: '{{ item }}'
+        path: "{{ item }}"
         state: absent
       with_items:
         - /var/www/html/index.html
