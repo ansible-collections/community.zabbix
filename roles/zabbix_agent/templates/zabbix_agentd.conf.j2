@@ -22,7 +22,16 @@ DebugLevel={{ zabbix_agent_debuglevel }}
 {% if zabbix_agent_sourceip is defined and zabbix_agent_sourceip %}
 SourceIP={{ zabbix_agent_sourceip }}
 {% endif %}
+{% if zabbix_agent_version is version('6.0', '<=') %}
 EnableRemoteCommands={{ zabbix_agent_enableremotecommands }}
+{% else %}
+{% if zabbix_agent_allowkeys is defined and zabbix_agent_allowkeys %}
+AllowKey={{ zabbix_agent_allowkeys }}
+{% endif %}
+{% if zabbix_agent_denykeys is defined and zabbix_agent_denykeys %}
+DenyKey={{ zabbix_agent_denykeys }}
+{% endif %}
+{% endif %}
 LogRemoteCommands={{ zabbix_agent_logremotecommands }}
 Server={{ zabbix_agent_server }}
 ListenPort={{ zabbix_agent_listenport }}
@@ -57,7 +66,7 @@ RefreshActiveChecks={{ zabbix_agent_refreshactivechecks }}
 BufferSend={{ zabbix_agent_buffersend }}
 BufferSize={{ zabbix_agent_buffersize }}
 MaxLinesPerSecond={{ zabbix_agent_maxlinespersecond }}
-{% if zabbix_version is version_compare('2.2', '>=') %}
+{% if zabbix_version is version_compare('6.2', '>=') %}
 HeartbeatFrequency={{ zabbix_agent_heartbeatfrequency }}
 {% endif %}
 {% if zabbix_agent_zabbix_alias is defined and zabbix_agent_zabbix_alias %}
