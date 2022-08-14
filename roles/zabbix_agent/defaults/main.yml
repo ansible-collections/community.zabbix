@@ -123,6 +123,8 @@ zabbix_agent_logfilesize: 100
 zabbix_agent_debuglevel: 3
 zabbix_agent_sourceip:
 zabbix_agent_enableremotecommands: 0
+zabbix_agent_allowkeys:
+zabbix_agent_denykeys:
 zabbix_agent_logremotecommands: 0
 zabbix_agent_listenport: 10050
 zabbix_agent_jmx_listenport:
