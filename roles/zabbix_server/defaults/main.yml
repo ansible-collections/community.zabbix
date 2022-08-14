@@ -72,7 +72,6 @@ zabbix_server_dbpassword: zabbix-server
 zabbix_server_dbsocket:
 zabbix_server_dbport: 5432
 zabbix_server_dbhost_run_install: true
-zabbix_server_allowunsupporteddbversions: 0
 zabbix_server_privileged_host: localhost
 zabbix_server_historystorageurl:
 zabbix_server_historystoragetypes: uint,dbl,str,log,text
@@ -80,17 +79,13 @@ zabbix_server_historystoragedateindex: 0
 zabbix_server_exportdir:
 zabbix_server_exportfilesize: 1G
 zabbix_server_startpollers: 5
-zabbix_server_startlldprocessors: 2
 zabbix_server_startipmipollers: 0
 zabbix_server_startpollersunreachable: 1
 zabbix_server_starttrappers: 5
 zabbix_server_startpingers: 1
 zabbix_server_startdiscoverers: 1
 zabbix_server_starthttppollers: 1
-zabbix_server_startpreprocessors: 3
-zabbix_server_startodbcpollers: 1
 zabbix_server_starttimers: 1
-zabbix_server_starthistorypollers: 5
 zabbix_server_javagateway:
 zabbix_server_javagatewayport: 10052
 zabbix_server_startjavapollers: 5
@@ -102,18 +97,13 @@ zabbix_server_startsnmptrapper: 0
 zabbix_server_listenip:
 zabbix_server_housekeepingfrequency: 1
 zabbix_server_maxhousekeeperdelete: 500
-zabbix_server_senderfrequency: 30
 zabbix_server_cachesize: 8M
 zabbix_server_cacheupdatefrequency: 60
 zabbix_server_startdbsyncers: 4
 zabbix_server_historycachesize: 8M
 zabbix_server_historyindexcachesize: 4M
 zabbix_server_trendcachesize: 4M
-zabbix_server_trendfunctioncachesize: 4M
-zabbix_server_historytextcachesize: 16M
 zabbix_server_valuecachesize: 8M
-zabbix_server_nodenoevents: 0
-zabbix_server_nodenohistory: 0
 zabbix_server_timeout: 3
 zabbix_server_trappertimeout: 300
 zabbix_server_unreachableperiod: 45
@@ -146,7 +136,6 @@ zabbix_server_startescalators: 1
 zabbix_server_vmwareperffrequency: 60
 zabbix_server_vmwaretimeout: 10
 zabbix_server_manage_service: true
-zabbix_server_vaulttoken:
 zabbix_server_vaulturl: https://127.0.0.1:8200
 zabbix_server_vaultdbpath:
 zabbix_server_startreportwriters: 0
