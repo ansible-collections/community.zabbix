@@ -123,6 +123,8 @@ zabbix_agent_logfilesize: 100
 zabbix_agent_debuglevel: 3
 zabbix_agent_sourceip:
 zabbix_agent_enableremotecommands: 0
+zabbix_agent_allowkeys:
+zabbix_agent_denykeys:
 zabbix_agent_logremotecommands: 0
 zabbix_agent_listenport: 10050
 zabbix_agent_jmx_listenport:
@@ -152,6 +154,7 @@ zabbix_agent_loadmodule:
 zabbix_agent_become_on_localhost: true
 zabbix_agent_description:
 zabbix_agent_inventory_zabbix: {}
+zabbix_agent_heartbeatfrequency: 60
 zabbix_macros: [] # Will be deprecated in 2.0.0
 zabbix_agent_macros: "{{ zabbix_macros }}"
 zabbix_agent_tags: []
