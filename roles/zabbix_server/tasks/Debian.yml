@@ -1,5 +1,4 @@
 ---
-
 - name: "Include Zabbix gpg ids"
   include_vars: zabbix.yml
 
@@ -27,33 +26,21 @@
   when:
     - ansible_machine == "aarch64"
 
-
-- name: "Debian | Set some facts"
-  set_fact:
-    datafiles_path: /usr/share/zabbix-server-{{ zabbix_server_database }}
-  when:
-    - zabbix_version is version('3.0', '<')
-  tags:
-    - zabbix-server
-    - init
-    - config
-
-- name: "Debian | Set some facts for Zabbix >= 3.0 && < 5.4"
+- name: "Debian | Set some facts for Zabbix < 6.0"
   set_fact:
     datafiles_path: /usr/share/doc/zabbix-server-{{ zabbix_server_database }}
   when:
-    - zabbix_version is version('3.0', '>=')
-    - zabbix_version is version('5.4', '<')
+    - zabbix_version is version('6.0', '<')
   tags:
     - zabbix-server
     - init
     - config
 
-- name: "Debian | Set some facts for Zabbix >= 5.4"
+- name: "Debian | Set some facts for Zabbix >= 6.0"
   set_fact:
     datafiles_path: /usr/share/doc/zabbix-sql-scripts/{{ zabbix_server_database_long }}
   when:
-    - zabbix_version is version('5.4', '>=')
+    - zabbix_version is version('6.0', '>=')
   tags:
     - zabbix-server
     - init
@@ -103,7 +90,7 @@
   file:
     path: /etc/apt/preferences.d/
     state: directory
-    mode: '0755'
+    mode: "0755"
   when:
     - zabbix_server_apt_priority | int
   become: true
@@ -116,7 +103,7 @@
       Pin: origin repo.zabbix.com
       Pin-Priority: {{ zabbix_server_apt_priority }}
     owner: root
-    mode: '0644'
+    mode: "0644"
   when:
     - zabbix_server_apt_priority | int
   become: true
@@ -144,7 +131,7 @@
 - name: Allow Zabbix dpkg installs to /usr/share/doc/zabbix*
   lineinfile:
     path: /etc/dpkg/dpkg.cfg.d/excludes
-    line: 'path-include=/usr/share/doc/zabbix*'
+    line: "path-include=/usr/share/doc/zabbix*"
   become: true
   when:
     - dpkg_exclude_line.rc == 0

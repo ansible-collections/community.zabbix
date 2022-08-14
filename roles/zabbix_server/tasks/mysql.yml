@@ -54,11 +54,10 @@
     - zabbix-server
     - database
 
-- name: "Get the file for create.sql >= 3.0"
+- name: "Get the file for create.sql"
   shell: ls -1 {{ datafiles_path }}/{{ 'create' if zabbix_version is version('6.0', '<') else 'server' }}.sq*
   changed_when: false
   when:
-    - zabbix_version is version('3.0', '>=')
     - zabbix_database_sqlload | bool
     - zabbix_repo != "epel"
   register: ls_output_create
@@ -122,7 +121,6 @@
     login_port: "{{ zabbix_server_mysql_login_port | default(omit) }}"
     login_unix_socket: "{{ zabbix_server_mysql_login_unix_socket | default(omit) }}"
   when:
-    - zabbix_version is version('3.0', '>=')
     - zabbix_database_sqlload | bool
     - zabbix_repo != "epel"
     - mysql_schema_empty
@@ -143,7 +141,6 @@
     login_port: "{{ zabbix_server_mysql_login_port | default(omit) }}"
     login_unix_socket: "{{ zabbix_server_mysql_login_unix_socket | default(omit) }}"
   when:
-    - zabbix_version is version('3.0', '>=')
     - zabbix_database_sqlload | bool
     - zabbix_repo != "epel"
     - mysql_schema_empty
@@ -169,7 +166,7 @@
   copy:
     src: /tmp/{{ role_name }}/
     dest: "{{ ls_output_create.stdout | dirname }}"
-    mode: '0640'
+    mode: "0640"
   delegate_to: "{{ delegated_dbhost }}"
   when:
     - delegated_dbhost != inventory_hostname
@@ -177,7 +174,7 @@
     - zabbix_repo != "epel"
     - mysql_schema_empty
 
-- name: "MySQL | Create database and import file >= 3.0"
+- name: "MySQL | Create database and import file"
   community.mysql.mysql_db:
     login_host: "{{ zabbix_server_mysql_login_host | default(omit) }}"
     login_user: "{{ zabbix_server_mysql_login_user | default(omit) }}"
@@ -190,7 +187,6 @@
     state: import
     target: "{{ ls_output_create.stdout }}"
   when:
-    - zabbix_version is version('3.0', '>=')
     - zabbix_database_sqlload | bool
     - zabbix_repo != "epel"
     - mysql_schema_empty
@@ -202,14 +198,13 @@
 - name: "MySQL | Revert innodb_default_row_format to previous value"
   community.mysql.mysql_variables:
     variable: innodb_default_row_format
-    value: '{{ mysql_innodb_default_row_format.msg }}'
+    value: "{{ mysql_innodb_default_row_format.msg }}"
     login_host: "{{ zabbix_server_mysql_login_host | default(omit) }}"
     login_user: "{{ zabbix_server_mysql_login_user | default(omit) }}"
     login_password: "{{ zabbix_server_mysql_login_password | default(omit) }}"
     login_port: "{{ zabbix_server_mysql_login_port | default(omit) }}"
     login_unix_socket: "{{ zabbix_server_mysql_login_unix_socket | default(omit) }}"
   when:
-    - zabbix_version is version('3.0', '>=')
     - zabbix_database_sqlload | bool
     - zabbix_repo != "epel"
     - mysql_schema_empty
@@ -219,88 +214,12 @@
     - zabbix-server
     - database
 
-- name: "Check if we have sql_done files >= 3.0"
+- name: "Check if we have sql_done files"
   file:
     path: /etc/zabbix/create.done
     state: touch
-    mode: '0644'
+    mode: "0644"
   when:
-    - zabbix_version is version('3.0', '>=')
     - zabbix_database_sqlload | bool
     - zabbix_repo != "epel"
     - mysql_schema_empty
-
-- name: "Get the correct path for the SQL files < 3.0"
-  shell: ls -1 {{ datafiles_path }}/{{ mysql_create_dir }}{{ item }}.sql*
-  changed_when: false
-  register: ls_output_schema
-  with_items:
-    - schema
-    - images
-    - data
-  when:
-    - zabbix_version is version('3.0', '<')
-    - zabbix_database_sqlload | bool
-  tags:
-    - zabbix-server
-    - database
-
-- name: "Check if we have done files < 3.0"
-  stat:
-    path: /etc/zabbix/{{ item }}.done
-  register: done_files
-  with_items:
-    - schema
-    - images
-    - data
-  when:
-    - zabbix_version is version('3.0', '<')
-    - zabbix_database_sqlload | bool
-  tags:
-    - zabbix-server
-    - database
-
-- name: "Create fact if sql_done files exists"
-  set_fact:
-    sql_files_executed: "{{ sql_files_executed | default({}) | combine({item.item: item.stat}) }}"
-  with_items: "{{ done_files.results }}"
-  when:
-    - zabbix_version is version('3.0', '<')
-    - zabbix_database_sqlload | bool
-  tags:
-    - zabbix-server
-    - database
-
-- name: "MySQL | Create database and import files < 3.0"
-  community.mysql.mysql_db:
-    name: "{{ zabbix_server_dbname }}"
-    encoding: "{{ zabbix_server_dbencoding }}"
-    collation: "{{ zabbix_server_dbcollation }}"
-    state: import
-    target: "{{ item.stdout }}"
-  with_items: "{{ ls_output_schema.results }}"
-  when:
-    - zabbix_version is version('3.0', '<')
-    - zabbix_database_sqlload | bool
-    - not sql_files_executed[item.item].exists
-  delegate_to: "{{ delegated_dbhost }}"
-  tags:
-    - zabbix-server
-    - database
-
-- name: "Check if we have sql_done files < 3.0"
-  file:
-    path: /etc/zabbix/{{ item }}.done
-    state: touch
-    mode: '0644'
-  with_items:
-    - schema
-    - images
-    - data
-  when:
-    - zabbix_version is version('3.0', '<')
-    - zabbix_database_sqlload | bool
-    - not sql_files_executed[item].exists
-  tags:
-    - zabbix-server
-    - database
