@@ -1,0 +1,7 @@
+minor_changes:
+  - zabbix_agent - new options for Windows installations zabbix_win_install_dir_conf/bin
+  - zabbix_agent - is now able to manage directories and upload files for TLS PSK configuration used with Windows operating systems
+
+bugfixes:
+  - zabbix_script - should no longer fail when description is not set
+  - zabbix_host - fixed idempotency of the module when hostmacros or snmp interfaces are used
