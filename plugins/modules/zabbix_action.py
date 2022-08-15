@@ -552,7 +552,7 @@ class Zapi(ZapiWrapper):
                 'filter': {'name': [name]}
             })
             if len(action_list) < 1:
-                self._module.fail_json(msg="Action not found: " % name)
+                self._module.fail_json(msg="Action not found: %s" % name)
             else:
                 return action_list[0]
         except Exception as e:
