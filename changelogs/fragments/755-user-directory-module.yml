@@ -1,4 +1,0 @@
----
-minor_changes:
-  - zabbix_user_directory - added new module to support multiple sources for LDAP authentication
-  - zabbix_authentication - module updated to support Zabbix 6.2

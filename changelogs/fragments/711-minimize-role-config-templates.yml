@@ -1,3 +1,0 @@
----
-minor_changes:
-  - roles - Minimized the config templates for the zabbix_agent, zabbix_javagateway, zabbix_proxy, and zabbix_server roles to make them version independent.
