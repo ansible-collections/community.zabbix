@@ -76,7 +76,7 @@ User={{ zabbix_agent_runas_user }}
 {% if zabbix_agent_os_family == "Windows" %}
 Include={{ zabbix_agent_win_include }}
 {% else %}
-Include={{ zabbix_agent_include }}
+Include={{ zabbix_agent_include }}/{{ zabbix_agent_include_pattern }}
 {% endif %}
 UnsafeUserParameters={{ zabbix_agent_unsafeuserparameters }}
 {% if zabbix_version is version_compare('2.2', '>=') %}

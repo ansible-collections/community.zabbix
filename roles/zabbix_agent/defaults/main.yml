@@ -141,6 +141,7 @@ zabbix_agent_allowroot: 0
 zabbix_agent_zabbix_alias:
 zabbix_agent_timeout: 3
 zabbix_agent_include: /etc/zabbix/zabbix_agentd.d
+zabbix_agent_include_pattern:
 zabbix_agent_include_mode: "0750"
 zabbix_agent_unsafeuserparameters: 0
 zabbix_agent_userparameters: []
@@ -186,6 +187,7 @@ zabbix_agent2_logfile: /var/log/zabbix/zabbix_agent2.log
 zabbix_agent2_logtype: file
 zabbix_agent2_statusport: 9999
 zabbix_agent2_include: /etc/zabbix/zabbix_agent2.d
+zabbix_agent2_include_pattern:
 zabbix_agent2_logfilesize: 100
 zabbix_agent2_debuglevel: 3
 zabbix_agent2_sourceip:

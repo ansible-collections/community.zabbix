@@ -211,6 +211,7 @@ Otherwise it just for the Zabbix Agent or for the Zabbix Agent 2.
 * `zabbix_agent(2)_zabbix_alias`: sets an alias for parameter. it can be useful to substitute long and complex parameter name with a smaller and simpler one. Can be both a string as an list.
 * `zabbix_agent(2)_timeout`: spend no more than timeout seconds on processing
 * `zabbix_agent(2)_include`: you may include individual files or all files in a directory in the configuration file.
+* `zabbix_agent(2)_include_pattern`: Optional file pattern used for included files.
 * `zabbix_agent(2)_include_mode`: The mode for the directory mentioned above.
 * `zabbix_agent(2)_unsafeuserparameters`: allow all characters to be passed in arguments to user-defined parameters.
 * `zabbix_agent_loadmodulepath`: Full path to location of agent modules.
