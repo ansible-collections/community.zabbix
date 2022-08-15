@@ -15,7 +15,7 @@ try:
     from zabbix_api import ZabbixAPI, Already_Exists, ZabbixAPIException
 
     HAS_ZABBIX_API = True
-    ZBX_IMP_ERR = Exception(msg="Undefined exception")
+    ZBX_IMP_ERR = Exception()
 except ImportError:
     ZBX_IMP_ERR = traceback.format_exc()
     HAS_ZABBIX_API = False

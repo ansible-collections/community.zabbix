@@ -192,7 +192,7 @@ import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabb
 try:
     import pydotplus
     HAS_PYDOTPLUS = True
-    PYDOT_IMP_ERR = Exception(msg="Undefined exception")
+    PYDOT_IMP_ERR = Exception()
 except ImportError:
     PYDOT_IMP_ERR = traceback.format_exc()
     HAS_PYDOTPLUS = False
@@ -200,7 +200,7 @@ except ImportError:
 try:
     import webcolors
     HAS_WEBCOLORS = True
-    WEBCOLORS_IMP_ERR = Exception(msg="Undefined exception")
+    WEBCOLORS_IMP_ERR = Exception()
 except ImportError:
     WEBCOLORS_IMP_ERR = traceback.format_exc()
     HAS_WEBCOLORS = False
@@ -208,7 +208,7 @@ except ImportError:
 try:
     from PIL import Image
     HAS_PIL = True
-    PIL_IMP_ERR = Exception(msg="Undefined exception")
+    PIL_IMP_ERR = Exception()
 except ImportError:
     PIL_IMP_ERR = traceback.format_exc()
     HAS_PIL = False
