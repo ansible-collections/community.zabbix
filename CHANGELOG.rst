@@ -31,8 +31,8 @@ Minor Changes
 Bugfixes
 --------
 
-- script - fix compatibility with Zabbix <5.4.
 - zabbix_host - fixed idempotency of the module when hostmacros or snmp interfaces are used
+- zabbix_script - fix compatibility with Zabbix <5.4.
 - zabbix_script - should no longer fail when description is not set
 
 v1.7.0
