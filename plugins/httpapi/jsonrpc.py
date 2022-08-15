@@ -46,14 +46,14 @@ class HttpApi(HttpApiBase):
 
     def login(self, username, password):
         payload = self.payload_builder("user.login", username=username, password=password)
-        code, response = self.send_request(payload=payload)
+        code, response = self.send_request(data=payload)
 
         if code == 200 and response != '':
             self.connection._auth = response
 
     def logout(self):
         payload = self.payload_builder("user.logout", self.connection._auth)
-        self.send_request(payload=payload)
+        self.send_request(data=payload)
 
     def handle_httperror(self, exc):
         """Overridable method for dealing with HTTP codes.
@@ -86,21 +86,21 @@ class HttpApi(HttpApiBase):
     def api_version(self):
         if not self.zbx_api_version:
             if not hasattr(self.connection, 'zbx_api_version'):
-                code, version = self.send_request(payload=self.payload_builder('apiinfo.version'))
+                code, version = self.send_request(data=self.payload_builder('apiinfo.version'))
                 if code == 200 and version != '':
                     self.connection.zbx_api_version = version
             self.zbx_api_version = self.connection.zbx_api_version
         return self.zbx_api_version
 
-    def send_request(self, request_method="POST", path="/api_jsonrpc.php", payload=None):
-        if not payload:
-            payload = {}
+    def send_request(self, data=None, request_method="POST", path="/api_jsonrpc.php"):
+        if not data:
+            data = {}
 
         try:
             self._display_request(request_method, path)
             response, response_data = self.connection.send(
                 path,
-                payload,
+                data,
                 method=request_method,
                 headers=BASE_HEADERS
             )
