@@ -37,7 +37,7 @@ provisioner:
         zabbix_server_dbport: 3306
         zabbix_server_dbhost: mysql-host
         zabbix_server_dbhost_run_install: false
-        zabbix_server_privileged_host: '%'
+        zabbix_server_privileged_host: "%"
         zabbix_server_mysql_login_host: mysql-host
         zabbix_server_mysql_login_user: root
         zabbix_server_mysql_login_password: changeme
@@ -55,13 +55,11 @@ provisioner:
     host_vars:
       zabbix-web-pgsql-debian:
         zabbix_websrv: apache
-        php_default_version_debian: 7.2
         zabbix_php_fpm_conf_listen: false
         zabbix_api_server_url: zabbix-web-pgsql-debian
         zabbix_websrv_servername: zabbix-web-pgsql-debian
       zabbix-web-mysql-debian:
         zabbix_websrv: apache
-        php_default_version_debian: 7.2
         zabbix_php_fpm_conf_listen: false
         zabbix_api_server_url: zabbix-web-mysql-debian
         zabbix_websrv_servername: zabbix-web-mysql-debian
@@ -82,13 +80,12 @@ provisioner:
       zabbix-web-mysql-ubuntu18:
         zabbix_websrv: nginx
         zabbix_php_fpm_conf_listen: false
-        php_default_version_debian: 7.2
         zabbix_api_server_url: zabbix-web-mysql-ubuntu18
         zabbix_websrv_servername: zabbix-web-mysql-ubuntu18
+        php_webserver_daemon: nginx
       zabbix-web-pgsql-ubuntu20:
         zabbix_php_fpm_conf_listen: false
         zabbix_websrv: apache
-        php_default_version_debian: 7.4
         zabbix_api_server_url: zabbix-web-pgsql-ubuntu20
         zabbix_websrv_servername: zabbix-web-pgsql-ubuntu20
 

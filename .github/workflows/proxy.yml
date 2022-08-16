@@ -3,16 +3,16 @@ name: "community.zabbix.zabbix_proxy"
 on:
   push:
     paths:
-      - 'roles/zabbix_proxy/**'
-      - 'molecule/zabbix_proxy/**'
-      - 'molecule/requirements.txt'
-      - '.github/workflows/proxy.yml'
+      - "roles/zabbix_proxy/**"
+      - "molecule/zabbix_proxy/**"
+      - "molecule/requirements.txt"
+      - ".github/workflows/proxy.yml"
   pull_request:
     paths:
-      - 'roles/zabbix_proxy/**'
-      - 'molecule/zabbix_proxy/**'
-      - 'molecule/requirements.txt'
-      - '.github/workflows/proxy.yml'
+      - "roles/zabbix_proxy/**"
+      - "molecule/zabbix_proxy/**"
+      - "molecule/requirements.txt"
+      - ".github/workflows/proxy.yml"
 jobs:
   molecule:
     runs-on: ubuntu-18.04
@@ -41,13 +41,13 @@ jobs:
             group: sqlite3
             command: /sbin/init
           - container: mysql-debian
-            image: geerlingguy/docker-debian10-ansible
+            image: geerlingguy/docker-debian11-ansible
             group: mysql
           - container: pgsql-debian
-            image: geerlingguy/docker-debian10-ansible
+            image: geerlingguy/docker-debian11-ansible
             group: postgresql
           - container: sqlite-debian
-            image: geerlingguy/docker-debian10-ansible
+            image: geerlingguy/docker-debian11-ansible
             group: sqlite3
         collection_role:
           - zabbix_proxy

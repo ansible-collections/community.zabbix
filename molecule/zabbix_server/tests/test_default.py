@@ -4,12 +4,13 @@ import pytest
 import testinfra.utils.ansible_runner
 
 testinfra_hosts = testinfra.utils.ansible_runner.AnsibleRunner(
-    os.environ['MOLECULE_INVENTORY_FILE']).get_hosts('all')
+    os.environ["MOLECULE_INVENTORY_FILE"]
+).get_hosts("all")
 
 
 def test_zabbiserver_running_and_enabled(host):
     zabbix = host.service("zabbix-server")
-    if host.system_info.distribution == 'centos':
+    if host.system_info.distribution == "centos":
         assert zabbix.is_enabled
         assert zabbix.is_running
     else:
@@ -19,7 +20,7 @@ def test_zabbiserver_running_and_enabled(host):
 @pytest.mark.parametrize("server", [("zabbix-server-pgsql"), ("zabbix-server-mysql")])
 def test_zabbix_package(host, server):
     ansible_data = host.ansible.get_variables()
-    zabbixhost = ansible_data['inventory_hostname']
+    zabbixhost = ansible_data["inventory_hostname"]
 
     zabbixhost = zabbixhost.replace("-centos", "")
     zabbixhost = zabbixhost.replace("-debian", "")
@@ -27,10 +28,10 @@ def test_zabbix_package(host, server):
 
     if zabbixhost == server:
         zabbix_server = host.package(server)
-        if host.system_info.distribution in ['debian', 'ubuntu']:
-            assert zabbix_server.version.startswith("1:6.0")
-        elif host.system_info.distribution == 'centos':
-            assert zabbix_server.version.startswith("6.0")
+        if host.system_info.distribution in ["debian", "ubuntu"]:
+            assert zabbix_server.version.startswith("1:6.2")
+        elif host.system_info.distribution == "centos":
+            assert zabbix_server.version.startswith("6.2")
         assert zabbix_server.is_installed
 
 
@@ -55,7 +56,7 @@ def test_zabbix_include_dir(host):
 def test_zabbix_server_logfile(host):
     zabbix_logfile = host.file("/var/log/zabbix/zabbix_server.log")
 
-    assert not zabbix_logfile.contains('Access denied for user')
-    assert not zabbix_logfile.contains('database is down: reconnecting')
-    assert zabbix_logfile.contains('current database version')
+    assert not zabbix_logfile.contains("Access denied for user")
+    assert not zabbix_logfile.contains("database is down: reconnecting")
+    assert zabbix_logfile.contains("current database version")
     assert zabbix_logfile.contains(r"server #0 started \[main process\]")

@@ -3,16 +3,16 @@ name: "community.zabbix.zabbix_web"
 on:
   push:
     paths:
-      - 'roles/zabbix_web/**'
-      - 'molecule/zabbix_web/**'
-      - 'molecule/requirements.txt'
-      - '.github/workflows/web.yml'
+      - "roles/zabbix_web/**"
+      - "molecule/zabbix_web/**"
+      - "molecule/requirements.txt"
+      - ".github/workflows/web.yml"
   pull_request:
     paths:
-      - 'roles/zabbix_web/**'
-      - 'molecule/zabbix_web/**'
-      - 'molecule/requirements.txt'
-      - '.github/workflows/web.yml'
+      - "roles/zabbix_web/**"
+      - "molecule/zabbix_web/**"
+      - "molecule/requirements.txt"
+      - ".github/workflows/web.yml"
 jobs:
   molecule:
     runs-on: ubuntu-18.04
@@ -33,10 +33,10 @@ jobs:
             image: geerlingguy/docker-ubuntu2004-ansible
             group: postgresql
           - container: mysql-debian
-            image: geerlingguy/docker-debian10-ansible
+            image: geerlingguy/docker-debian11-ansible
             group: mysql
           - container: pgsql-debian
-            image: geerlingguy/docker-debian10-ansible
+            image: geerlingguy/docker-debian11-ansible
             group: postgresql
         collection_role:
           - zabbix_web

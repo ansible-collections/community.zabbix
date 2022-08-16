@@ -8,7 +8,9 @@
 
 ProxyMode={{ zabbix_proxy_mode }}
 Server={{ zabbix_proxy_server }}
+{% if zabbix_version is version('6.0', '<=') %}
 ServerPort={{ zabbix_proxy_serverport }}
+{% endif %}
 {% if zabbix_proxy_hostname is defined and zabbix_proxy_hostname %}
 Hostname={{ zabbix_proxy_hostname  }}
 {% endif %}
@@ -44,7 +46,15 @@ AllowUnsupportedDBVersions={{ zabbix_proxy_allowunsupporteddbversions }}
 ProxyLocalBuffer={{ zabbix_proxy_proxylocalbuffer }}
 ProxyOfflineBuffer={{ zabbix_proxy_proxyofflinebuffer }}
 HeartbeatFrequency={{ zabbix_proxy_heartbeatfrequency }}
+{% if zabbix_proxy_configfrequency is defined and zabbix_proxy_configfrequency is not none %}
 ConfigFrequency={{ zabbix_proxy_configfrequency }}
+{% else %}
+{% if zabbix_version is version('6.2', '<') %}
+ConfigFrequency=3600
+{% else %}
+ConfigFrequency=300
+{% endif %}
+{% endif %}
 DataSenderFrequency={{ zabbix_proxy_datasenderfrequency }}
 StartPollers={{ zabbix_proxy_startpollers }}
 StartIPMIPollers={{ zabbix_proxy_startipmipollers }}
@@ -86,6 +96,9 @@ TrapperTimeout={{ zabbix_proxy_trappertimeout }}
 UnreachablePeriod={{ zabbix_proxy_unreachableperiod }}
 UnavailableDelay={{ zabbix_proxy_unavaliabledelay }}
 UnreachableDelay={{ zabbix_proxy_unreachabedelay }}
+{% if zabbix_version is version_compare('6.2', '>=') %}
+StartODBCPollers={{ zabbix_proxy_startodbcpollers }}
+{% endif %}
 ExternalScripts={{ zabbix_proxy_externalscripts }}
 FpingLocation={{ zabbix_proxy_fpinglocation }}
 Fping6Location={{ zabbix_proxy_fping6location }}
@@ -166,6 +179,12 @@ VaultURL={{ zabbix_proxy_vaulturl }}
 {% endif %}
 {% if zabbix_proxy_vaultdbpath is defined and zabbix_proxy_vaultdbpath is not none %}
 VaultDBPath={{ zabbix_proxy_vaultdbpath }}
+{% endif %}
+{% if zabbix_proxy_vaulttlscertfile is defined and zabbix_proxy_vaulttlscertfile is not none %}
+VaultTLSKeyFile={{ zabbix_proxy_vaulttlscertfile }}
+{% endif %}
+{% if zabbix_proxy_vaulttlskeyfile is defined and zabbix_proxy_vaulttlskeyfile is not none %}
+VaultTLSCertFile={{ zabbix_proxy_vaulttlskeyfile }}
 {% endif %}
 {% if zabbix_proxy_listenbacklog is defined and zabbix_proxy_listenbacklog is not none %}
 ListenBacklog={{ zabbix_proxy_listenbacklog }}

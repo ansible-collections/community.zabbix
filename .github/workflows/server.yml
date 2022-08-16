@@ -3,16 +3,16 @@ name: "community.zabbix.zabbix_server"
 on:
   push:
     paths:
-      - 'roles/zabbix_server/**'
-      - 'molecule/zabbix_server/**'
-      - 'molecule/requirements.txt'
-      - '.github/workflows/server.yml'
+      - "roles/zabbix_server/**"
+      - "molecule/zabbix_server/**"
+      - "molecule/requirements.txt"
+      - ".github/workflows/server.yml"
   pull_request:
     paths:
-      - 'roles/zabbix_server/**'
-      - 'molecule/zabbix_server/**'
-      - 'molecule/requirements.txt'
-      - '.github/workflows/server.yml'
+      - "roles/zabbix_server/**"
+      - "molecule/zabbix_server/**"
+      - "molecule/requirements.txt"
+      - ".github/workflows/server.yml"
 jobs:
   molecule:
     runs-on: ubuntu-18.04
@@ -34,10 +34,10 @@ jobs:
             group: postgresql
             command: /sbin/init
           - container: mysql-debian
-            image: geerlingguy/docker-debian10-ansible
+            image: geerlingguy/docker-debian11-ansible
             group: mysql
           - container: pgsql-debian
-            image: geerlingguy/docker-debian10-ansible
+            image: geerlingguy/docker-debian11-ansible
             group: postgresql
         collection_role:
           - zabbix_server
