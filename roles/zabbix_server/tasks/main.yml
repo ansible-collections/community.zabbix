@@ -1,19 +1,29 @@
 ---
 # tasks file for wdijkerman.zabbix
 
-- name: "Include OS-specific variables"
+- name: Include OS-specific variables
   include_vars: "{{ ansible_os_family }}.yml"
 
 - name: Determine Latest Supported Zabbix Version
   set_fact:
-    zabbix_server_version: "{{ zabbix_valid_server_versions[ansible_distribution_major_version][0] | default(6.0) }}"
+    zabbix_server_version: "{{ zabbix_valid_server_versions[ansible_distribution_major_version][0] | default(6.2) }}"
   when: zabbix_server_version is not defined
 
-- name: "Install the correct repository"
-  include_tasks: "{{ ansible_os_family }}.yml"
+- name: Set More Variables
+  set_fact:
+    zabbix_db_type_long: "{{ 'postgresql' if zabbix_server_database == 'pgsql' else 'mysql' }}"
+    zabbix_valid_version: "{{ zabbix_server_version in zabbix_valid_server_versions[ansible_distribution_major_version] }}"
 
-- name: "Installing the {{ zabbix_server_database_long }} database"
-  include_tasks: "{{ zabbix_server_database_long }}.yml"
+# - name: Stopping Install of Invalid Version
+#   fail:
+#     msg: Zabbix version {{ zabbix_server_version }} is not supported on {{ ansible_distribution }} {{ ansible_distribution_major_version }}
+#   when: not zabbix_valid_version
+
+# - name: Install the correct repository
+#   include_tasks: "{{ ansible_os_family }}.yml"
+
+# - name: Installing the {{ zabbix_db_type_long }} database
+#   include_tasks: "{{ zabbix_db_type_long }}.yml"
 
 - name: "Configure zabbix-server"
   template:
