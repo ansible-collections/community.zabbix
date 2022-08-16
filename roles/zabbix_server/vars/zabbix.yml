@@ -32,12 +32,14 @@ sign_keys:
       sign_key: E709712C
     trusty:
       sign_key: E709712C
-  "50":
+    jammy:
+      sign_key: E709712C
+  "60":
+    bullseye:
+      sign_key: E709712C
     buster:
       sign_key: E709712C
     stretch:
-      sign_key: E709712C
-    jessie:
       sign_key: E709712C
     focal:
       sign_key: E709712C
@@ -47,7 +49,21 @@ sign_keys:
       sign_key: E709712C
     trusty:
       sign_key: E709712C
-    tricia:
+  "50":
+    buster:
+      sign_key: E709712C
+    stretch:
+      sign_key: E709712C
+    focal:
+      sign_key: E709712C
+    bionic:
+      sign_key: E709712C
+    xenial:
+      sign_key: E709712C
+    trusty:
+      sign_key: E709712C
+  "50":
+    buster:
       sign_key: E709712C
   "40":
     focal:
