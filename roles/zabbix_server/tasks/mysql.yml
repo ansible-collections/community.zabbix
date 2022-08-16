@@ -1,18 +1,18 @@
 ---
 # task file for mysql
-- name: "Set the correct delegated_dbhost (to support MySQL db deployment on a remote dbhost)"
+- name: "MySQL | Set the correct delegated_dbhost (to support MySQL db deployment on a remote dbhost)"
   set_fact:
     delegated_dbhost: "{{ zabbix_server_dbhost if (zabbix_server_dbhost != 'localhost') else inventory_hostname }}"
   when:
     - zabbix_server_dbhost_run_install
 
-- name: "Set the correct delegated_dbhost (to support MySQL db deployment on a remote dbhost)"
+- name: "MySQL | Set the correct delegated_dbhost (to support MySQL db deployment on a remote dbhost)"
   set_fact:
     delegated_dbhost: "{{ inventory_hostname }}"
   when:
     - not zabbix_server_dbhost_run_install
 
-- name: "Override delegated_dbhost with real dbhost when dbhost is behind loadbalancer"
+- name: "MySQL | Override delegated_dbhost with real dbhost when dbhost is behind loadbalancer"
   set_fact:
     delegated_dbhost: "{{ zabbix_server_real_dbhost }}"
   when: zabbix_server_real_dbhost | default(false)
@@ -54,7 +54,7 @@
     - zabbix-server
     - database
 
-- name: "Get the file for create.sql"
+- name: "MySQL | Get the file for create.sql"
   shell: ls -1 {{ datafiles_path }}/{{ 'create' if zabbix_version is version('6.0', '<') else 'server' }}.sq*
   changed_when: false
   when:
@@ -151,7 +151,7 @@
     - zabbix-server
     - database
 
-- name: "Fetch sql create file"
+- name: "MySQL | Fetch sql create file"
   fetch:
     src: "{{ ls_output_create.stdout }}"
     dest: /tmp/{{ role_name }}/
@@ -162,7 +162,7 @@
     - zabbix_repo != "epel"
     - mysql_schema_empty
 
-- name: "Copy sql create file"
+- name: "MySQL | Copy sql create file"
   copy:
     src: /tmp/{{ role_name }}/
     dest: "{{ ls_output_create.stdout | dirname }}"
@@ -214,7 +214,7 @@
     - zabbix-server
     - database
 
-- name: "Check if we have sql_done files"
+- name: "MySQL | Check if we have sql_done files"
   file:
     path: /etc/zabbix/create.done
     state: touch
