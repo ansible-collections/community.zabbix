@@ -3,7 +3,6 @@
   hosts: localhost
   connection: local
   pre_tasks:
-
     - name: "Create MySQL Container"
       docker_container:
         name: mysql-host
@@ -15,9 +14,9 @@
         env:
           MYSQL_ROOT_PASSWORD: changeme
       no_log: true
-      with_items: "{{ molecule_yml.platforms }}"
-      when:
-        - '"mysql" in item.groups'
+      # with_items: "{{ molecule_yml.platforms }}"
+      # when:
+      #   - '"mysql" in item.groups'
 
     - name: "Create postgresql Container"
       docker_container:
@@ -30,14 +29,13 @@
         env:
           POSTGRES_PASSWORD: changeme
       no_log: true
-      with_items: "{{ molecule_yml.platforms }}"
-      when:
-        - '"postgresql" in item.groups'
+      # with_items: "{{ molecule_yml.platforms }}"
+      # when:
+      #   - '"postgresql" in item.groups'
 
 - name: Prepare
   hosts: all
   tasks:
-
     - name: "Create group for imaginary host"
       add_host:
         name: imaginary-host

@@ -1,7 +1,5 @@
 ---
 # defaults file for zabbix_server
-
-# zabbix_server_version: 6.0
 zabbix_server_version_minor: "*"
 zabbix_version: "{{ zabbix_server_version }}"
 zabbix_repo: zabbix
@@ -22,7 +20,7 @@ zabbix_repo_yum_enabled: []
 zabbix_repo_yum:
   - name: zabbix
     description: Zabbix Official Repository - $basearch
-    baseurl: "{{ zabbix_repo_yum_schema }}://repo.zabbix.com/zabbix/{{ zabbix_version | regex_search('^[0-9]+.[0-9]+') }}/rhel/{{ ansible_distribution_major_version }}/$basearch/"
+    baseurl: "{{ zabbix_repo_yum_schema }}://repo.zabbix.com/zabbix/{{ zabbix_server_version | regex_search('^[0-9]+.[0-9]+') }}/rhel/{{ ansible_distribution_major_version }}/$basearch/"
     gpgcheck: "{{ zabbix_repo_yum_gpgcheck }}"
     mode: "0644"
     gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-ZABBIX
@@ -41,7 +39,7 @@ zabbix_server_groupname: zabbix
 
 # Database
 zabbix_server_database: pgsql
-zabbix_server_database_long: postgresql
+# zabbix_server_database_long: postgresql
 zabbix_database_creation: true
 zabbix_database_sqlload: true
 zabbix_database_timescaledb: false
@@ -51,6 +49,7 @@ zabbix_server_dbtlscertfile:
 zabbix_server_dbtlskeyfile:
 zabbix_server_dbtlscipher:
 zabbix_server_dbtlscipher13:
+zabbix_server_allowunsupporteddbversions: 0
 
 # zabbix-server specific vars
 zabbix_server_listenport: 10051
@@ -79,12 +78,22 @@ zabbix_server_historystoragedateindex: 0
 zabbix_server_exportdir:
 zabbix_server_exportfilesize: 1G
 zabbix_server_startpollers: 5
+zabbix_server_exporttype:
+zabbix_server_startalerters:
 zabbix_server_startipmipollers: 0
 zabbix_server_startpollersunreachable: 1
 zabbix_server_starttrappers: 5
 zabbix_server_startpingers: 1
+zabbix_server_vault:
+zabbix_server_tlscipherall:
+zabbix_server_tlscipherall13:
+zabbix_server_tlsciphercert:
+zabbix_server_tlsciphercert13:
+zabbix_server_tlscipherpsk:
+zabbix_server_tlscipherpsk13:
 zabbix_server_startdiscoverers: 1
 zabbix_server_starthttppollers: 1
+zabbix_server_statsallowedip:
 zabbix_server_starttimers: 1
 zabbix_server_javagateway:
 zabbix_server_javagatewayport: 10052
@@ -140,11 +149,17 @@ zabbix_server_vaulturl: https://127.0.0.1:8200
 zabbix_server_vaultdbpath:
 zabbix_server_startreportwriters: 0
 zabbix_server_webserviceurl:
-zabbix_server_servicemanagersyncfrequency: 60
-zabbix_server_problemhousekeepingfrequency: 60
 zabbix_server_listenbacklog:
 zabbix_server_hanodename:
 zabbix_server_nodeaddress:
+zabbix_server_starthistorypollers:
+zabbix_server_startlldprocessors:
+zabbix_server_startodbcpollers:
+zabbix_server_startpreprocessors:
+zabbix_server_trendfunctioncachesize:
+zabbix_server_vaulttlskeyfile:
+zabbix_server_vaulttlscertfile:
+zabbix_server_vaulttoken:
 
 # SELinux specific
 zabbix_selinux: false
