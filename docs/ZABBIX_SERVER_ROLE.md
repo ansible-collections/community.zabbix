@@ -57,7 +57,7 @@ ansible-galaxy collection install ansible.posix
 
 ### MySQL
 
-When you are a MySQL user and using Ansible 2.10 or newer, then there is a dependency on the collection named `community.mysql`. This collections are needed as the `mysql_` modules are now part of collections and not standard in Ansible anymmore. Installing the collection:
+When you are a MySQL there is a dependency on the collection named `community.mysql`.  Installing the collection:
 
 ```sh
 ansible-galaxy collection install community.mysql
@@ -65,7 +65,7 @@ ansible-galaxy collection install community.mysql
 
 ### PostgreSQL
 
-When you are a PostgreSQL user and using Ansible 2.10 or newer, then there is a dependency on the collection named `community.postgresql`. This collections are needed as the `postgresql_` modules are now part of collections and not standard in Ansible anymmore. Installing the collection:
+When you are a PostgreSQL there is a dependency on the collection named `community.postgresql`. Installing the collection:
 
 ```sh
 ansible-galaxy collection install community.postgresql
@@ -75,23 +75,16 @@ ansible-galaxy collection install community.postgresql
 
 See the following list of supported Operating systems with the Zabbix releases:
 
-| Zabbix              | 6.2 | 6.0 | 5.4 | 5.2 | 5.0 (LTS) | 4.4 | 4.0 (LTS) | 3.0 (LTS) |
-|---------------------|-----|-----|-----|-----|-----------|-----|-----------|-----------|
-| Red Hat Fam 8       |  V  |  V  |  V  |  V  |  V        | V   |           |           |
-| Red Hat Fam 7       |     |     |     |     |  V        | V   | V         | V         |
-| Red Hat Fam 6       |     |     |     |  V  |  V        |     |           | V         |
-| Red Hat Fam 5       |     |     |     |  V  |  V        |     |           | V         |
-| Fedora              |     |     |     |     |           | V   | V         |           |
-| Ubuntu 20.04 focal  |  V  |  V  |  V  |  V  |  V        |     | V         |           |
-| Ubuntu 18.04 bionic |     |  V  |  V  |  V  |  V        | V   | V         |           |
-| Ubuntu 16.04 xenial |     |     |     |  V  |  V        | V   | V         |           |
-| Ubuntu 14.04 trusty |     |     |     |  V  |  V        | V   | V         | V         |
-| Debian 10 buster    |     |  V  |  V  |  V  |  V        | V   |           |           |
-| Debian 9 stretch    |     |  V  |  V  |  V  |  V        | V   | V         |           |
-| Debian 8 jessie     |     |     |     |  V  |  V        | V   | V         | V         |
-| Debian 7 wheezy     |     |     |     |     |           |     | V         | V         |
-| macOS 10.15         |     |     |     |     |           | V   | V         |           |
-| macOS 10.14         |     |     |     |     |           | V   | V         |           |
+| Zabbix              | 6.2 | 6.0 | 5.0 (LTS) | 4.0 (LTS) | 
+|---------------------|-----|-----|-----------|-----------|
+| Red Hat Fam 8       |  V  |  V  |  V        |           |
+| Red Hat Fam 7       |     |     |  V        | V         |
+| Ubuntu 22.04 jammy  |  V  |  V  |  V        | V         |
+| Ubuntu 20.04 focal  |  V  |  V  |  V        | V         |
+| Ubuntu 18.04 bionic |     |  V  |  V        | V         |
+| Debian 11 bullseye  |  V  |  V  |  V        |           | 
+| Debian 10 buster    |     |  V  |  V        |           |
+
 
 See https://support.zabbix.com/browse/ZBX-18790 why RHEL7 is not supported anymore.
 
@@ -109,7 +102,7 @@ The following is an overview of all available configuration default for this rol
 
 ### Overall Zabbix
 
-* `zabbix_server_version`: This is the version of zabbix. Default: The highest supported version for the operating system. Can be overridden to 6.2, 6.0, 5.4, 5.2, 5.0, 4.4, 4.0, 3.4, 3.2, 3.0, 2.4, or 2.2. Previously the variable `zabbix_version` was used directly but it could cause [some inconvenience](https://github.com/dj-wasabi/ansible-zabbix-agent/pull/303). That variable is maintained by retrocompativility.
+* `zabbix_server_version`: This is the version of zabbix. Default: The highest supported version for the operating system. Can be overridden to 6.2, 6.0,  5.0, or 4.0. Previously the variable `zabbix_version` was used directly but it could cause [some inconvenience](https://github.com/dj-wasabi/ansible-zabbix-agent/pull/303). That variable is maintained by retrocompativility.
 * `zabbix_server_version_minor`: When you want to specify a minor version to be installed. RedHat only. Default set to: `*` (latest available)
 * `zabbix_repo`: Default: `zabbix`
   * `epel`: install agent from EPEL repo
@@ -149,8 +142,6 @@ The following is an overview of all available configuration default for this rol
 * `zabbix_server_vaultdbpath`: Vault path from where credentials for database will be retrieved by keys 'password' and 'username'.
 * `zabbix_server_startreportwriters`: Number of pre-forked report writer instances.
 * `zabbix_server_webserviceurl`: URL to Zabbix web service, used to perform web related tasks.
-* `zabbix_server_servicemanagersyncfrequency`: How often Zabbix will synchronize configuration of a service manager (in seconds).
-* `zabbix_server_problemhousekeepingfrequency`: How often Zabbix will delete problems for deleted triggers (in seconds).
 
 ### High Availability
 
@@ -163,9 +154,8 @@ These variables are specific for Zabbix 6.0 and higher:
 
 * `zabbix_server_dbhost_run_install`: Default: `True`. When set to `True`, sql files will be executed on the host running the database.
 * `zabbix_server_database`: Default: `pgsql`. The type of database used. Can be: `mysql` or `pgsql`
-* `zabbix_server_database_long`: Default: `postgresql`. The type of database used, but long name. Can be: `mysql` or `postgresql`
 * `zabbix_server_dbhost`: The hostname on which the database is running.
-* `zabbix_server_real_dbhost`: The hostname of the dbhost that is running behind a loadbalancer/VIP (loadbalancers doesn't accept ssh connections)
+* `zabbix_server_real_dbhost`: The hostname of the dbhost that is running behind a loadbalancer/VIP (loadbalancers don't accept ssh connections)
 * `zabbix_server_dbname`: The database name which is used by the Zabbix Server.
 * `zabbix_server_dbuser`: The database username which is used by the Zabbix Server.
 * `zabbix_server_dbpassword`: The database user password which is used by the Zabbix Server.
@@ -261,7 +251,6 @@ We need to have the following dependencies met:
 
 ```yaml
 zabbix_server_database: mysql
-zabbix_server_database_long: mysql
 zabbix_server_dbport: 3306
 zabbix_server_dbpassword: <SOME_SECRET_STRING>
 ```
@@ -278,7 +267,6 @@ We need to have the following dependencies met:
 
 ```yaml
 zabbix_server_database: mysql
-zabbix_server_database_long: mysql
 zabbix_server_dbport: 3306
 zabbix_server_dbhost: mysql-host
 zabbix_server_dbhost_run_install: false
@@ -312,7 +300,6 @@ We need to have the following dependencies met:
 
 ```yaml
 zabbix_server_database: pgsql
-zabbix_server_database_long: postgresql
 zabbix_server_dbport: 5432
 zabbix_server_dbpassword: <SOME_SECRET_STRING>
 ```
@@ -329,7 +316,6 @@ We need to have the following dependencies met:
 
 ```yaml
 zabbix_server_database: pgsql;
-zabbix_server_database_long: postgresql
 zabbix_server_dbport: 5432
 zabbix_server_dbhost: pgsql-host
 zabbix_server_dbhost_run_install: false
@@ -356,7 +342,6 @@ Including an example of how to use your role (for instance, with variables passe
     roles:
       - role: community.zabbix.zabbix_server
         zabbix_server_database: mysql
-        zabbix_server_database_long: mysql
 ```
 
 # Molecule
