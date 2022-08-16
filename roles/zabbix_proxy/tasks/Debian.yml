@@ -1,5 +1,4 @@
 ---
-
 - name: "Include Zabbix gpg ids"
   include_vars: zabbix.yml
 
@@ -102,21 +101,19 @@
   set_fact:
     deb_pkg: "zabbix-proxy-{{ zabbix_proxy_database }}={{ zabbix_proxy_deb_version }}"
     cacheable: true
-  when:
-    zabbix_proxy_deb_version is defined
+  when: zabbix_proxy_deb_version is defined
 
 - name: "Debian | Define package without version"
   set_fact:
     deb_pkg: "zabbix-proxy-{{ zabbix_proxy_database }}"
     cacheable: true
-  when:
-    zabbix_proxy_deb_version is not defined
+  when: zabbix_proxy_deb_version is not defined
 
 - name: "Debian | Create /etc/apt/preferences.d/"
   file:
     path: /etc/apt/preferences.d/
     state: directory
-    mode: '0755'
+    mode: "0755"
   when:
     - zabbix_proxy_apt_priority | int
   become: true
@@ -129,7 +126,7 @@
       Pin: origin repo.zabbix.com
       Pin-Priority: {{ zabbix_proxy_apt_priority }}
     owner: root
-    mode: '0644'
+    mode: "0644"
   when:
     - zabbix_proxy_apt_priority | int
   become: true
@@ -184,7 +181,7 @@
     - zabbix-server
     - init
 
-- name: "Debian | Install Mysql Client package"
+- name: "Debian 9 | Install Mysql Client package"
   apt:
     name:
       - mysql-client
@@ -199,7 +196,7 @@
   when:
     - zabbix_proxy_database == 'mysql'
     - zabbix_proxy_install_database_client
-    - ansible_distribution_release != "buster"
+    - ansible_distribution_release == "stretch"
   tags:
     - zabbix-server
     - init
@@ -221,6 +218,27 @@
     - zabbix_proxy_database == 'mysql'
     - zabbix_proxy_install_database_client
     - ansible_distribution_release == "buster"
+  tags:
+    - zabbix-server
+    - init
+    - database
+
+- name: "Debian 11 | Install Mysql Client package"
+  apt:
+    name:
+      - mycli
+      - "{{ zabbix_python_prefix }}-mysqldb"
+    state: present
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
+  register: zabbix_proxy_dependencies_installed
+  until: zabbix_proxy_dependencies_installed is succeeded
+  become: true
+  when:
+    - zabbix_proxy_database == 'mysql'
+    - zabbix_proxy_install_database_client
+    - ansible_distribution_release == "bullseye"
   tags:
     - zabbix-server
     - init
