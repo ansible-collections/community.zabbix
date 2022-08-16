@@ -1,3 +1,0 @@
----
-minor_changes:
-  - zabbix_mediatype - added support for time units in ``attempt_interval`` parameter
