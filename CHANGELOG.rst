@@ -12,10 +12,12 @@ Minor Changes
 -------------
 
 - roles - Minimized the config templates for the zabbix_agent, zabbix_javagateway, zabbix_proxy, and zabbix_server roles to make them version independent.
+- roles - Support for Zabbix 6.2 has been added
 - roles - Updated the version defaults to select the latest version supported by an operating system.
 - zabbix_action - added another condition operator naming options (contains, does not contain,...)
 - zabbix_agent - Set a ansible_python_interpreter to localhost based on the env the playbook is executed from.
 - zabbix_agent - add option to set host tags using ``zabbix_agent_tags``.
+- zabbix_agent - add possiblity to set include file pattern using ``zabbix_agent(2)_include_pattern`` variable.
 - zabbix_agent - is now able to manage directories and upload files for TLS PSK configuration used with Windows operating systems
 - zabbix_agent - new options for Windows installations zabbix_win_install_dir_conf/bin
 - zabbix_agent - when configuring firewalld, make sure the new rule is applied immediately
