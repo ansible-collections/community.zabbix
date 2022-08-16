@@ -27,16 +27,16 @@
 {{ (zabbix_server_dbtlsconnect is defined and zabbix_server_dbtlsconnect is not none) | ternary('', '# ') }}DBTLSConnect={{ zabbix_server_dbtlsconnect | default('') }}
 {{ (zabbix_server_dbtlskeyfile is defined and zabbix_server_dbtlskeyfile is not none) | ternary('', '# ') }}DBTLSKeyFile={{ zabbix_server_dbtlskeyfile | default('') }}
 {% endif %}
-{{ (zabbix_server_dbuser is defined and zabbix_server_dbuser is not none) | ternary('', '# ') }}DBUser={{ zabbix_server_dbuser | default('') }}
-{{ (zabbix_server_debuglevel is defined and zabbix_server_debuglevel is not none) | ternary('', '# ') }}DebugLevel={{ zabbix_server_debuglevel | default('') }}
-{{ (zabbix_server_exportdir is defined and zabbix_server_exportdir is not none) | ternary('', '# ') }}ExportDir={{ zabbix_server_exportdir | default('') }}
-{{ (zabbix_server_exportfilesize is defined and zabbix_server_exportfilesize is not none) | ternary('', '# ') }}ExportFileSize={{ zabbix_server_exportfilesize | default('') }}
-{{ (zabbix_server_exporttype is defined and zabbix_server_exporttype is not none) | ternary('', '# ') }}ExportType={{ zabbix_server_exporttype | default('') }}
-{{ (zabbix_server_externalscriptspath is defined and zabbix_server_externalscriptspath is not none) | ternary('', '# ') }}ExternalScripts={{ zabbix_server_externalscriptspath | default('') }}
-{{ (zabbix_server_fping6location is defined and zabbix_server_fping6location is not none) | ternary('', '# ') }}Fping6Location={{ zabbix_server_fping6location | default('') }}
-{{ (zabbix_server_fpinglocation is defined and zabbix_server_fpinglocation is not none) | ternary('', '# ') }}FpingLocation={{ zabbix_server_fpinglocation | default('') }}
-{% if zabbix_server_version is version('6.0', '>=') %}
-{{ (zabbix_server_hanodename is defined and zabbix_server_hanodename is not none) | ternary('', '# ') }}HANodeName={{ zabbix_server_hanodename | default('') }}
+{{ zabbix_server_dbuser is defined and zabbix_server_dbuser is not none | ternary('', '# ') }}DBUser={{ zabbix_server_dbuser | default('') }}
+{{ zabbix_server_debuglevel is defined and zabbix_server_debuglevel is not none | ternary('', '# ') }}DebugLevel={{ zabbix_server_debuglevel | default('') }}
+{{ zabbix_server_exportdir is defined and zabbix_server_exportdir is not none | ternary('', '# ') }}ExportDir={{ zabbix_server_exportdir | default('') }}
+{{ zabbix_server_exportfilesize is defined and zabbix_server_exportfilesize is not none | ternary('', '# ') }}ExportFileSize={{ zabbix_server_exportfilesize | default('') }}
+{{ zabbix_server_exporttype is defined and zabbix_server_exporttype is not none | ternary('', '# ') }}ExportType={{ zabbix_server_exporttype | default('') }}
+{{ zabbix_server_externalscriptspath is defined and zabbix_server_externalscriptspath is not none | ternary('', '# ') }}ExternalScripts={{ zabbix_server_externalscriptspath | default('') }}
+{{ zabbix_server_fping6location is defined and zabbix_server_fping6location is not none | ternary('', '# ') }}Fping6Location={{ zabbix_server_fping6location | default('') }}
+{{ zabbix_server_fpinglocation is defined and zabbix_server_fpinglocation is not none | ternary('', '# ') }}FpingLocation={{ zabbix_server_fpinglocation | default('') }}
+{% if zabbix_version is version('6.0', '>=') %}
+{{ zabbix_server_hanodename is defined and zabbix_server_hanodename is not none | ternary('', '# ') }}HANodeName={{ zabbix_server_hanodename | default('') }}
 {% endif %}
 {{ (zabbix_server_historycachesize is defined and zabbix_server_historycachesize is not none) | ternary('', '# ') }}HistoryCacheSize={{ zabbix_server_historycachesize | default('') }}
 {{ (zabbix_server_historyindexcachesize is defined and zabbix_server_historyindexcachesize is not none) | ternary('', '# ') }}HistoryIndexCacheSize={{ zabbix_server_historyindexcachesize | default('') }}
@@ -124,6 +124,11 @@
 {% if zabbix_server_version is version('6.2', '>=') %}
 {{ (zabbix_server_vault is defined and zabbix_server_vault is not none) | ternary('', '# ') }}Vault={{ zabbix_server_vault | default('') }}
 {% endif %}
+{{ zabbix_server_unavailabledelay is defined and zabbix_server_unavailabledelay is not none | ternary('', '# ') }}UnavailableDelay={{ zabbix_server_unavailabledelay | default('') }}
+{{ zabbix_server_unreachabledelay is defined and zabbix_server_unreachabledelay is not none | ternary('', '# ') }}UnreachableDelay={{ zabbix_server_unreachabledelay | default('') }}
+{{ zabbix_server_unreachableperiod is defined and zabbix_server_unreachableperiod is not none | ternary('', '# ') }}UnreachablePeriod={{ zabbix_server_unreachableperiod | default('') }}
+{{ zabbix_server_user is defined and zabbix_server_user is not none | ternary('', '# ') }}User={{ zabbix_server_user | default('') }}
+{{ zabbix_server_valuecachesize is defined and zabbix_server_valuecachesize is not none | ternary('', '# ') }}ValueCacheSize={{ zabbix_server_valuecachesize | default('') }}
 {% if zabbix_version is version('6.2', '>=') %}
 StartODBCPollers={{ zabbix_server_startodbcpollers }}
 {% endif %}
