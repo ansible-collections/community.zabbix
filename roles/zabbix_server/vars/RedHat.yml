@@ -17,3 +17,22 @@ zabbix_valid_server_versions:
   "7":
     - 5.0
     - 4.0
+
+pgsql_depenencies:
+  "9":
+    - python3-psycopg2
+  "8":
+    - python3-psycopg2
+  "7":
+    - python-psycopg2
+
+mysql_client_pkgs:
+  "9":
+    - mysql
+    - python3-PyMySQL
+  "8":
+    - mysql
+    - python3-PyMySQL
+  "7":
+    - mariadb
+    - MySQL-python
