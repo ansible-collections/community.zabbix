@@ -1,7 +1,7 @@
 ---
 # Tasks specific for RedHat systems
 
-- name: "Set short version name"
+- name: "RedHat | Set short version name"
   set_fact:
     zabbix_short_version: "{{ zabbix_version | regex_replace('\\.', '') }}"
 
@@ -31,7 +31,7 @@
 
 - name: "RedHat | Set facts for Zabbix >= 6.0"
   set_fact:
-    datafiles_path: "/usr/share/doc/zabbix-sql-scripts/{{ zabbix_server_database_long }}"
+    datafiles_path: "/usr/share/doc/zabbix-sql-scripts/{{ 'postgresql' if zabbix_server_database == 'pgsql' else 'mysql' }}"
   when:
     - zabbix_version is version('6.0', '>=')
   tags:
@@ -48,7 +48,7 @@
 
 - name: "RedHat | Set some facts EPEL"
   set_fact:
-    datafiles_path: "/usr/share/zabbix-{{ zabbix_server_database_long }}"
+    datafiles_path: "/usr/share/zabbix-{{ 'postgresql' if zabbix_server_database == 'pgsql' else 'mysql' }}"
   when:
     - zabbix_repo == "epel"
   tags:
@@ -73,7 +73,7 @@
   when:
     - zabbix_repo == "epel"
 
-- name: "Make sure old file is absent"
+- name: "RedHat | Make sure old file is absent"
   file:
     path: /etc/yum.repos.d/zabbix-supported.repo
     state: absent
@@ -164,7 +164,7 @@
 
 - name: "RedHat | Install Ansible module dependencies"
   yum:
-    name: python-psycopg2
+    name: "{{ pgsql_depenencies[ansible_distribution_major_version] }}"
     state: present
   environment:
     http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
@@ -175,82 +175,43 @@
   when:
     - zabbix_database_creation
     - zabbix_server_database == 'pgsql'
-    - ansible_distribution_major_version == "7"
   tags:
     - zabbix-server
 
-- name: "RedHat | Install Ansible module dependencies on RHEL8"
-  yum:
-    name: python3-psycopg2
-    state: present
-  environment:
-    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
-    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
-  register: zabbix_server_dependencies_installed
-  until: zabbix_server_dependencies_installed is succeeded
-  become: true
-  when:
-    - zabbix_database_creation
-    - zabbix_server_database == 'pgsql'
-    - ansible_distribution_major_version == "8"
+- name: RedHat | Install Database Client Package
+  block:
+    - name: "RedHat | Install Mysql Client packages"
+      yum:
+        name: "{{ mysql_client_pkgs[ansible_distribution_major_version] }}"
+        state: present
+      environment:
+        http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+        https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
+      register: zabbix_server_dependencies_installed
+      until: zabbix_server_dependencies_installed is succeeded
+      become: true
+      when:
+        - zabbix_server_database == 'mysql'
+
+    - name: "RedHat | Install PostgreSQL client package"
+      yum:
+        name: postgresql
+        state: present
+      environment:
+        http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+        https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
+      register: zabbix_server_dependencies_installed
+      until: zabbix_server_dependencies_installed is succeeded
+      become: true
+      when:
+        - zabbix_server_database == 'pgsql'
+  when: zabbix_server_install_database_client
   tags:
     - zabbix-server
+    - init
+    - database
 
-- name: "RedHat | Install Mysql Client packages RHEL8"
-  yum:
-    name:
-      - mysql
-      - python3-PyMySQL
-    state: present
-  environment:
-    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
-    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
-  register: zabbix_server_dependencies_installed
-  until: zabbix_server_dependencies_installed is succeeded
-  become: true
-  when:
-    - zabbix_server_database == 'mysql'
-    - zabbix_server_install_database_client
-    - ansible_distribution_major_version == "8"
-  tags:
-    - zabbix-server
-
-- name: "RedHat | Install Mysql Client package RHEL7"
-  yum:
-    name:
-      - mariadb
-      - MySQL-python
-    state: present
-  environment:
-    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
-    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
-  register: zabbix_server_dependencies_installed
-  until: zabbix_server_dependencies_installed is succeeded
-  become: true
-  when:
-    - zabbix_server_database == 'mysql'
-    - zabbix_server_install_database_client
-    - ansible_distribution_major_version == "7"
-  tags:
-    - zabbix-server
-
-- name: "RedHat | Install PostgreSQL client package"
-  yum:
-    name: postgresql
-    state: present
-  environment:
-    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
-    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
-  register: zabbix_server_dependencies_installed
-  until: zabbix_server_dependencies_installed is succeeded
-  become: true
-  when:
-    - zabbix_server_database == 'pgsql'
-    - zabbix_server_install_database_client
-  tags:
-    - zabbix-server
-
-- name: "Configure SELinux when enabled"
+- name: "RedHat | Configure SELinux when enabled"
   include: selinux.yml
   when:
     - zabbix_selinux | bool

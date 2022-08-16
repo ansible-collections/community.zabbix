@@ -1,13 +1,13 @@
 ---
 # task file for postgresql
 
-- name: "Set the correct delegated_dbhost (to support postgres db deployment on a remote dbhost)"
+- name: "PostgreSQL | Set the correct delegated_dbhost (to support postgres db deployment on a remote dbhost)"
   set_fact:
     delegated_dbhost: "{{ zabbix_server_dbhost if (zabbix_server_dbhost != 'localhost') else inventory_hostname }}"
   when:
     - zabbix_server_dbhost_run_install
 
-- name: "Set the correct delegated_dbhost (to support postgres db deployment on a remote dbhost)"
+- name: "PostgreSQL | Set the correct delegated_dbhost (to support postgres db deployment on a remote dbhost)"
   set_fact:
     delegated_dbhost: "{{ inventory_hostname }}"
   when:
@@ -134,7 +134,7 @@
     - zabbix-server
     - database
 
-- name: "Get complete path"
+- name: "PostgreSQL | Get complete path"
   shell: ls -d {{ datafiles_path }}
   register: datafiles_path_full
   changed_when: false
@@ -144,7 +144,7 @@
   tags:
     - skip_ansible_lint
 
-- name: "Check if we have a create dir"
+- name: "PostgreSQL | Check if we have a create dir"
   stat:
     path: "{{ datafiles_path_full.stdout }}/create"
   register: create_dir_or_not
@@ -152,7 +152,7 @@
     - zabbix_repo == "epel"
     - zabbix_database_sqlload
 
-- name: "Set fact"
+- name: "PostgreSQL | Set fact"
   set_fact:
     datafiles_path: "{{ datafiles_path }}/create"
   when:
