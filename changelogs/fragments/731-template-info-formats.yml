@@ -1,4 +1,0 @@
----
-minor_changes:
-  - zabbix_template_info - add yaml and none formats
-  - zabbix_template_info - add template_id return value

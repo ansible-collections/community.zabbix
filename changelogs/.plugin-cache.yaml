@@ -1,5 +1,4 @@
-objects:
-  role: {}
+objects: {}
 plugins:
   become: {}
   cache: {}
@@ -137,6 +136,11 @@ plugins:
       name: zabbix_user
       namespace: ''
       version_added: null
+    zabbix_user_directory:
+      description: Create/update/delete Zabbix user directories
+      name: zabbix_user_directory
+      namespace: ''
+      version_added: null
     zabbix_user_info:
       description: Gather information about Zabbix user
       name: zabbix_user_info
@@ -156,4 +160,4 @@ plugins:
   shell: {}
   strategy: {}
   vars: {}
-version: 1.7.0
+version: 1.8.0

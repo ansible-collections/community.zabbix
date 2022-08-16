@@ -1,3 +1,0 @@
----
-minor_changes:
-  - zabbix_action - added another condition operator naming options (contains, does not contain,...)

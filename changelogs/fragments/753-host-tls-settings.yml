@@ -1,3 +1,0 @@
----
-minor_changes:
-  - zabbix_host - will no longer wipe tls_connect en tls_accept settings when not specified on update
