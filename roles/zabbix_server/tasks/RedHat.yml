@@ -5,6 +5,12 @@
   set_fact:
     zabbix_short_version: "{{ zabbix_version | regex_replace('\\.', '') }}"
 
+- name: "RedHat | Set Zabbix user/group (RHEL 9)"
+  set_fact:
+    zabbix_os_user: zabbixsrv
+  when:
+    - ansible_distribution_major_version == "9"
+
 - name: "RedHat | Use Zabbix package name"
   set_fact:
     zabbix_server_package: "zabbix-server-{{ zabbix_server_database }}"
@@ -210,6 +216,26 @@
     - zabbix-server
     - init
     - database
+
+- name: "RedHat | Remove Service Symlink (RHEL 9 Zabbix = 6.0)"
+  file:
+    path: /usr/lib/systemd/system/zabbix-server.service
+    state: absent
+  when:
+    - zabbix_version is version('6.0', '==')
+    - ansible_distribution_major_version == "9"
+
+- name: "RedHat | Copy Service File (RHEL 9 Zabbix = 6.0)"
+  copy:
+    src: /etc/alternatives/zabbix-server-systemd
+    dest: /usr/lib/systemd/system/zabbix-server.service
+    remote_src: true
+    owner: root
+    group: root
+    mode: 0644
+  when:
+    - zabbix_version is version('6.0', '==')
+    - ansible_distribution_major_version == "9"
 
 - name: "RedHat | Configure SELinux when enabled"
   include: selinux.yml
