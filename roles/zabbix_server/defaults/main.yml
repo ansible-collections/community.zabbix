@@ -97,7 +97,7 @@ zabbix_server_statsallowedip:
 zabbix_server_starttimers: 1
 zabbix_server_javagateway:
 zabbix_server_javagatewayport: 10052
-zabbix_server_startjavapollers: 5
+zabbix_server_startjavapollers: 0
 zabbix_server_startvmwarecollectors: 0
 zabbix_server_vmwarefrequency: 60
 zabbix_server_vmwarecachesize: 8M
