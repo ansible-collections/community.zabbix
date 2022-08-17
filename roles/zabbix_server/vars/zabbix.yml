@@ -32,6 +32,8 @@ sign_keys:
       sign_key: E709712C
     trusty:
       sign_key: E709712C
+    jammy:
+      sign_key: E709712C
   "50":
     buster:
       sign_key: E709712C
@@ -48,6 +50,8 @@ sign_keys:
     trusty:
       sign_key: E709712C
     tricia:
+      sign_key: E709712C
+    bullseye:
       sign_key: E709712C
   "40":
     focal:
