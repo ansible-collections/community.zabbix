@@ -62,8 +62,9 @@ sign_keys:
       sign_key: E709712C
     trusty:
       sign_key: E709712C
-  "50":
-    buster:
+    tricia:
+      sign_key: E709712C
+    bullseye:
       sign_key: E709712C
   "40":
     focal:
