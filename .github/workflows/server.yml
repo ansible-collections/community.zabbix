@@ -76,7 +76,7 @@ jobs:
       - name: Install the collection
         run: ansible-galaxy collection install $COLLECTION_FILE
 
-      - name: Run role tests
+      - name: Run server role tests
         run: >-
           MY_MOLECULE_CONTAINER=${{ matrix.molecule_distro.container }}
           MY_MOLECULE_IMAGE=${{ matrix.molecule_distro.database }}
