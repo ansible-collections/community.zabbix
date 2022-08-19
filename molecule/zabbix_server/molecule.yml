@@ -2,8 +2,8 @@
 driver:
   name: docker
 platforms:
-  - name: centos8
-    image: geerlingguy/docker-rockylinux8-ansible
+  - name: zabbix-javagateway-${MY_MOLECULE_CONTAINER:-centos}
+    image: ${MY_MOLECULE_IMAGE:-"geerlingguy/docker-centos8-ansible"}
     privileged: true
     pre_build_image: true
     command: ${MOLECULE_DOCKER_COMMAND:-""}
@@ -11,60 +11,9 @@ platforms:
       - name: zabbix
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
-  - name: centos9
-    image: geerlingguy/docker-rockylinux9-ansible
-    privileged: true
-    pre_build_image: true
-    command: ${MOLECULE_DOCKER_COMMAND:-""}
-    networks:
-      - name: zabbix
-    volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:ro
-  - name: Ubuntu22
-    image: geerlingguy/docker-ubuntu2204-ansible
-    privileged: true
-    pre_build_image: true
-    command: ${MOLECULE_DOCKER_COMMAND:-""}
-    networks:
-      - name: zabbix
-    volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:ro
-  - name: Ubuntu20
-    image: geerlingguy/docker-ubuntu2004-ansible
-    privileged: true
-    pre_build_image: true
-    command: ${MOLECULE_DOCKER_COMMAND:-""}
-    networks:
-      - name: zabbix
-    volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:ro
-  - name: Ubuntu18
-    image: geerlingguy/docker-ubuntu1804-ansible
-    privileged: true
-    pre_build_image: true
-    command: ${MOLECULE_DOCKER_COMMAND:-""}
-    networks:
-      - name: zabbix
-    volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:ro
-  - name: Debian11
-    image: geerlingguy/docker-debian11-ansible
-    privileged: true
-    pre_build_image: true
-    command: ${MOLECULE_DOCKER_COMMAND:-""}
-    networks:
-      - name: zabbix
-    volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:ro
-  - name: Debian10
-    image: geerlingguy/docker-debian10-ansible
-    privileged: true
-    pre_build_image: true
-    command: ${MOLECULE_DOCKER_COMMAND:-""}
-    networks:
-      - name: zabbix
-    volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    groups:
+      - ${MY_MOLECULE_DATABASE:-mysql}
+      - ${MY_MOLECULE_VERSION:-6.2}
 
 provisioner:
   name: ansible
@@ -75,10 +24,16 @@ provisioner:
     ANSIBLE_ROLES_PATH: $HOME/.ansible/collections/ansible_collections/community/zabbix/roles
   inventory:
     group_vars:
-      all:
+      v62:
         zabbix_server_version: 6.2
-        zabbix_server_dbname: "{{ inventory_hostname }}-db"
-        zabbix_server_dbuser: "{{ inventory_hostname }}"
+      v60:
+        zabbix_server_version: 6.0
+      v50:
+        zabbix_server_version: 5.0
+      mysql:
+        zabbix_server_version: 5.0
+        zabbix_server_dbname: zabbix
+        zabbix_server_dbuser: zabbix-dbuser
         zabbix_server_database: mysql
         zabbix_server_dbport: 3306
         zabbix_server_dbhost: mysql-host
@@ -88,15 +43,15 @@ provisioner:
         zabbix_server_mysql_login_user: root
         zabbix_server_mysql_login_password: changeme
         zabbix_server_mysql_login_port: 3306
-      # postgresql:
-      #   zabbix_server_database: pgsql
-      #   zabbix_server_dbport: 5432
-      #   zabbix_server_dbhost: postgresql-host
-      #   zabbix_server_dbhost_run_install: false
-      #   zabbix_server_pgsql_login_host: postgresql-host
-      #   zabbix_server_pgsql_login_user: postgres
-      #   zabbix_server_pgsql_login_password: changeme
-      #   zabbix_server_pgsql_login_port: 5432
+      pgsql:
+        zabbix_server_database: pgsql
+        zabbix_server_dbport: 5432
+        zabbix_server_dbhost: postgresql-host
+        zabbix_server_dbhost_run_install: false
+        zabbix_server_pgsql_login_host: postgresql-host
+        zabbix_server_pgsql_login_user: postgres
+        zabbix_server_pgsql_login_password: changeme
+        zabbix_server_pgsql_login_port: 5432
 
 verifier:
   name: testinfra
