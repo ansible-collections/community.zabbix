@@ -37,8 +37,8 @@ jobs:
           - v60
           - v50
         exclude:
-          - molecule_distro['container']: rhel7
-            molecule_distro['version']: v60
+          - container: centos7
+            version: v60
           - container: centos7
             version: v62
           - container: debian10
