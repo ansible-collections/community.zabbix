@@ -75,15 +75,15 @@ ansible-galaxy collection install community.postgresql
 
 See the following list of supported Operating systems with the Zabbix releases:
 
-| Zabbix              | 6.2 | 6.0 | 5.0 (LTS) | 4.0 (LTS) | 
-|---------------------|-----|-----|-----------|-----------|
-| Red Hat Fam 8       |  V  |  V  |  V        |           |
-| Red Hat Fam 7       |     |     |  V        | V         |
-| Ubuntu 22.04 jammy  |  V  |  V  |  V        | V         |
-| Ubuntu 20.04 focal  |  V  |  V  |  V        | V         |
-| Ubuntu 18.04 bionic |     |  V  |  V        | V         |
-| Debian 11 bullseye  |  V  |  V  |  V        |           | 
-| Debian 10 buster    |     |  V  |  V        |           |
+| Zabbix              | 6.2 | 6.0 | 5.0 (LTS) | 
+|---------------------|-----|-----|-----------|
+| Red Hat Fam 8       |  V  |  V  |  V        |
+| Red Hat Fam 7       |     |     |  V        |
+| Ubuntu 22.04 jammy  |  V  |  V  |  V        |
+| Ubuntu 20.04 focal  |  V  |  V  |  V        |
+| Ubuntu 18.04 bionic |     |  V  |  V        |
+| Debian 11 bullseye  |  V  |  V  |  V        |
+| Debian 10 buster    |     |  V  |  V        ?
 
 
 See https://support.zabbix.com/browse/ZBX-18790 why RHEL7 is not supported anymore.
@@ -102,7 +102,7 @@ The following is an overview of all available configuration default for this rol
 
 ### Overall Zabbix
 
-* `zabbix_server_version`: This is the version of zabbix. Default: The highest supported version for the operating system. Can be overridden to 6.2, 6.0,  5.0, or 4.0. Previously the variable `zabbix_version` was used directly but it could cause [some inconvenience](https://github.com/dj-wasabi/ansible-zabbix-agent/pull/303). That variable is maintained by retrocompativility.
+* `zabbix_server_version`: This is the version of zabbix. Default: The highest supported version for the operating system. Can be overridden to 6.2, 6.0,  or 5.0. Previously the variable `zabbix_version` was used directly but it could cause [some inconvenience](https://github.com/dj-wasabi/ansible-zabbix-agent/pull/303). That variable is maintained by retrocompativility.
 * `zabbix_server_version_minor`: When you want to specify a minor version to be installed. RedHat only. Default set to: `*` (latest available)
 * `zabbix_repo`: Default: `zabbix`
   * `epel`: install agent from EPEL repo
@@ -196,13 +196,12 @@ These variables are specific for Zabbix 3.0 and higher:
 
 On `MySQL` starting from 5.7.11 and `PostgreSQL` the following values are supported: `required`, `verify`, `verify_full`. On MariaDB starting from version 10.2.6 `required` and `verify_full` values are supported.
 By default not set to any option and the behaviour depends on database configuration.
-This parameter is supported since Zabbix 5.0.0.
 
-* `zabbix_server_dbtlscafile`: Full pathname of a file containing the top-level CA(s) certificates for database certificate verification. This parameter is supported since Zabbix 5.0.0.
-* `zabbix_server_dbtlscertfile`: Full pathname of file containing Zabbix server certificate for authenticating to database. This parameter is supported since Zabbix 5.0.0.
-* `zabbix_server_dbtlskeyfile`: Full pathname of file containing the private key for authenticating to database. This parameter is supported since Zabbix 5.0.0.
-* `zabbix_server_dbtlscipher`: The list of encryption ciphers that Zabbix server permits for TLS protocols up through TLSv1.2. Supported only for MySQL.This parameter is supported since Zabbix 5.0.0.
-* `zabbix_server_dbtlscipher13`: The list of encryption ciphersuites that Zabbix server permits for TLSv1.3 protocol. Supported only for MySQL, starting from version 8.0.16. This parameter is supported since Zabbix 5.0.0.
+* `zabbix_server_dbtlscafile`: Full pathname of a file containing the top-level CA(s) certificates for database certificate verification.
+* `zabbix_server_dbtlscertfile`: Full pathname of file containing Zabbix server certificate for authenticating to database.
+* `zabbix_server_dbtlskeyfile`: Full pathname of file containing the private key for authenticating to database.
+* `zabbix_server_dbtlscipher`: The list of encryption ciphers that Zabbix server permits for TLS protocols up through TLSv1.2.
+* `zabbix_server_dbtlscipher13`: The list of encryption ciphersuites that Zabbix server permits for TLSv1.3 protocol. Supported only for MySQL, starting from version 8.0.16.
 
 ### Custom Zabbix Scripts
 

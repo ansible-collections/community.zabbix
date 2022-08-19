@@ -10,6 +10,7 @@
     zabbix_os_user: zabbixsrv
   when:
     - ansible_distribution_major_version == "9"
+    - zabbix_version is version('6.0', '<=')
 
 - name: "RedHat | Use Zabbix package name"
   set_fact:

@@ -16,7 +16,6 @@ zabbix_valid_server_versions:
     - 4.0
   "7":
     - 5.0
-    - 4.0
 
 pgsql_depenencies:
   "9":
