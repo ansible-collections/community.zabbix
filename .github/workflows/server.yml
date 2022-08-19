@@ -71,9 +71,9 @@ jobs:
 
       - name: Run server role tests
         run: >-
-          MY_MOLECULE_CONTAINER=${{ matrix.molecule_distro.container }}
-          MY_MOLECULE_IMAGE=$geerlingguy/docker-{{ matrix.molecule_distro.database }}-ansible:latest
-          MY_MOLECULE_VERSION=${{ matrix.molecule_distro.version }}
-          MY_MOLECULE_DATABASE=${{ matrix.molecule_distro.database }}
-          MY_MOLECULE_DOCKER_COMMAND=${{ matrix.molecule_distro.command }}
+          MY_MOLECULE_CONTAINER=${{ matrix.container }}
+          MY_MOLECULE_IMAGE=$geerlingguy/docker-{{ matrix.container }}-ansible:latest
+          MY_MOLECULE_VERSION=${{ matrix.version }}
+          MY_MOLECULE_DATABASE=${{ matrix.database }}
+          MY_MOLECULE_DOCKER_COMMAND=${{ matrix.command }}
           molecule test -s ${{ matrix.collection_role }}
