@@ -44,16 +44,16 @@ jobs:
           - v60
           - v50
         exclude:
-          - container: rhel7
-            version: v60
-          - container: rhel7
-            version: v62
-          - container: debian10
-            version: v62
-          - container: ubuntu1804
-            version: v62
-          - container: ubuntu2204
-            version: v50
+          - molecule_distro[container]: rhel7
+            molecule_distro[version]: v60
+          - molecule_distro[container]: rhel7
+            molecule_distro[version]: v62
+          - molecule_distro[container]: debian10
+            molecule_distro[version]: v62
+          - molecule_distro[container]: ubuntu1804
+            molecule_distro[version]: v62
+          - molecule_distro[container]: ubuntu2204
+            molecule_distro[version]: v50
     steps:
       - name: Check out code
         uses: actions/checkout@v1
