@@ -19,21 +19,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        molecule_distro:
-          - container: rhel8
-            image: geerlingguy/docker-rockylinux8-ansible:latest
-          - container: rhel7
-            image: geerlingguy/docker-centos7-ansible:latest
-          - container: ubuntu2204
-            image: geerlingguy/docker-ubuntu2204-ansible
-          - container: ubuntu2004
-            image: geerlingguy/docker-ubuntu2004-ansible
-          - container: ubuntu1804
-            image: geerlingguy/docker-ubuntu1804-ansible
-          - container: debian11
-            image: geerlingguy/docker-debian11-ansible
-          - container: debian10
-            image: geerlingguy/docker-debian10-ansible
+        container:
+          - rockylinux8
+          - centos7
+          - ubuntu2204
+          - ubuntu2004
+          - ubuntu1804
+          - debian11
+          - debian10
         collection_role:
           - zabbix_server
         database:
@@ -46,7 +39,7 @@ jobs:
         exclude:
           - molecule_distro['container']: rhel7
             molecule_distro['version']: v60
-          - container: rhel7
+          - container: centos7
             version: v62
           - container: debian10
             version: v62
@@ -79,7 +72,7 @@ jobs:
       - name: Run server role tests
         run: >-
           MY_MOLECULE_CONTAINER=${{ matrix.molecule_distro.container }}
-          MY_MOLECULE_IMAGE=${{ matrix.molecule_distro.database }}
+          MY_MOLECULE_IMAGE=$geerlingguy/docker-{{ matrix.molecule_distro.database }}-ansible:latest
           MY_MOLECULE_VERSION=${{ matrix.molecule_distro.version }}
           MY_MOLECULE_DATABASE=${{ matrix.molecule_distro.database }}
           MY_MOLECULE_DOCKER_COMMAND=${{ matrix.molecule_distro.command }}
