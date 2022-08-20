@@ -160,8 +160,8 @@
 - name: "MySQL | Create database and import file"
   community.mysql.mysql_db:
     login_host: "{{ zabbix_server_mysql_login_host | default(omit) }}"
-    login_user: "{{ zabbix_server_dbuser | default(omit) }}"
-    login_password: "{{ zabbix_server_dbpassword | default(omit) }}"
+    login_user: "{{ zabbix_server_dbuser if (ansible_os_family == 'RedHat' and ansible_distribution_major_version == '7') else zabbix_server_mysql_login_user }}"
+    login_password: "{{ zabbix_server_dbpassword if (ansible_os_family == 'RedHat' and ansible_distribution_major_version == '7') else zabbix_server_mysql_login_password }}"
     login_port: "{{ zabbix_server_mysql_login_port | default(omit) }}"
     login_unix_socket: "{{ zabbix_server_mysql_login_unix_socket | default(omit) }}"
     name: "{{ zabbix_server_dbname }}"
