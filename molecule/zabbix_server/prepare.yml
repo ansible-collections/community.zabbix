@@ -31,7 +31,7 @@
       no_log: true
       with_items: "{{ molecule_yml.platforms }}"
       when:
-        - '"postgresql" in item.groups'
+        - '"pgsql" in item.groups'
 
 - name: Prepare
   hosts: all
