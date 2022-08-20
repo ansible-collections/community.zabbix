@@ -31,7 +31,6 @@ provisioner:
       v50:
         zabbix_server_version: 5.0
       mysql:
-        zabbix_server_version: 5.0
         zabbix_server_dbname: zabbix
         zabbix_server_dbuser: zabbix-dbuser
         zabbix_server_database: mysql
