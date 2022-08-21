@@ -3,7 +3,6 @@
   hosts: localhost
   connection: local
   pre_tasks:
-
     - name: "Create MySQL Container"
       docker_container:
         name: mysql-host
@@ -32,12 +31,11 @@
       no_log: true
       with_items: "{{ molecule_yml.platforms }}"
       when:
-        - '"postgresql" in item.groups'
+        - '"pgsql" in item.groups'
 
 - name: Prepare
   hosts: all
   tasks:
-
     - name: "Set short version name"
       set_fact:
         zabbix_python_prefix: "python{% if ansible_python_version is version('3', '>=') %}3{% endif %}"
@@ -116,7 +114,7 @@
       lineinfile:
         path: /etc/dpkg/dpkg.cfg.d/excludes
         state: absent
-        regexp: 'path-exclude=/usr/share/doc/*'
+        regexp: "path-exclude=/usr/share/doc/*"
       when:
         - ansible_os_family != 'RedHat'
 
