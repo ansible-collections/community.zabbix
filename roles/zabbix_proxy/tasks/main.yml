@@ -18,12 +18,6 @@
     msg: Zabbix version {{ zabbix_proxy_version }} is not supported on {{ ansible_distribution }} {{ ansible_distribution_major_version }}
   when: not zabbix_valid_version
 
-- name: "Replace Sangoma with RedHat task"
-  set_fact:
-    ansible_os_family: "RedHat"
-  when:
-    - ansible_os_family == 'Sangoma'
-
 - name: "Set default ip address for zabbix_proxy_ip"
   set_fact:
     zabbix_proxy_ip: "{{ hostvars[inventory_hostname]['ansible_default_ipv4'].address }}"
@@ -31,21 +25,8 @@
     - zabbix_proxy_ip is not defined
     - "'ansible_default_ipv4' in hostvars[inventory_hostname]"
 
-- name: "Set OS dependent variables"
-  include_vars: "{{ item }}"
-  with_first_found:
-    - "../vars/{{ ansible_distribution }}.yml"
-    - "../vars/main.yml"
-
-- name: "Install the correct repository"
-  include: "RedHat.yml"
-  when:
-    - ansible_os_family == "RedHat"
-
-- name: "Install the correct repository"
-  include: "Debian.yml"
-  when:
-    - ansible_os_family == "Debian"
+- name: "Complete OS Specific Tasks"
+  include: "{{ ansible_os_family }}.yml"
 
 - name: "Installing the database"
   include: "{{ zabbix_proxy_database_long }}.yml"
