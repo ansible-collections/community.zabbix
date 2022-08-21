@@ -1,5 +1,4 @@
 ---
-
 - name: "SELinux | RedHat | Install related SELinux package to fix issues"
   yum:
     name:
@@ -15,7 +14,7 @@
   become: true
   when:
     - ansible_os_family == "RedHat"
-    - ansible_distribution_major_version == "7" or ansible_distribution_major_version == "6"
+    - ansible_distribution_major_version == "7"
   tags:
     - zabbix-proxy
 

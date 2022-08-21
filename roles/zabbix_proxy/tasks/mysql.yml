@@ -113,7 +113,6 @@
     login_port: "{{ zabbix_proxy_mysql_login_port | default(omit) }}"
     login_unix_socket: "{{ zabbix_proxy_mysql_login_unix_socket | default(omit) }}"
   when:
-    - zabbix_version is version('3.0', '>=')
     - zabbix_database_sqlload | bool
     - zabbix_repo != "epel"
     - not done_file.stat.exists
@@ -148,14 +147,13 @@
 - name: "MySQL | Revert innodb_default_row_format to previous value"
   community.mysql.mysql_variables:
     variable: innodb_default_row_format
-    value: '{{ mysql_innodb_default_row_format.msg }}'
+    value: "{{ mysql_innodb_default_row_format.msg }}"
     login_host: "{{ zabbix_proxy_mysql_login_host | default(omit) }}"
     login_user: "{{ zabbix_proxy_mysql_login_user | default(omit) }}"
     login_password: "{{ zabbix_proxy_mysql_login_password | default(omit) }}"
     login_port: "{{ zabbix_proxy_mysql_login_port | default(omit) }}"
     login_unix_socket: "{{ zabbix_proxy_mysql_login_unix_socket | default(omit) }}"
   when:
-    - zabbix_version is version('3.0', '>=')
     - zabbix_database_sqlload | bool
     - zabbix_repo != "epel"
     - not done_file.stat.exists
@@ -169,7 +167,7 @@
   file:
     path: /etc/zabbix/schema.done
     state: touch
-    mode: '0644'
+    mode: "0644"
   when:
     - zabbix_database_sqlload
     - zabbix_repo != "epel"
