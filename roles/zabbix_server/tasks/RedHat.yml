@@ -3,14 +3,14 @@
 
 - name: "RedHat | Set short version name"
   set_fact:
-    zabbix_short_version: "{{ zabbix_version | regex_replace('\\.', '') }}"
+    zabbix_short_version: "{{ zabbix_server_version | regex_replace('\\.', '') }}"
 
 - name: "RedHat | Set Zabbix user/group (RHEL 9)"
   set_fact:
     zabbix_os_user: zabbixsrv
   when:
     - ansible_distribution_major_version == "9"
-    - zabbix_version is version('6.0', '<=')
+    - zabbix_server_version is version('6.0', '<=')
 
 - name: "RedHat | Use Zabbix package name"
   set_fact:
@@ -32,7 +32,7 @@
   set_fact:
     datafiles_path: "/usr/share/doc/zabbix-server-{{ zabbix_server_database }}*"
   when:
-    - zabbix_version is version('6.0', '<')
+    - zabbix_server_version is version('6.0', '<')
   tags:
     - zabbix-server
 
@@ -40,7 +40,7 @@
   set_fact:
     datafiles_path: "/usr/share/doc/zabbix-sql-scripts/{{ 'postgresql' if zabbix_server_database == 'pgsql' else 'mysql' }}"
   when:
-    - zabbix_version is version('6.0', '>=')
+    - zabbix_server_version is version('6.0', '>=')
   tags:
     - zabbix-server
 
@@ -49,7 +49,7 @@
     datafiles_path: "/usr/share/doc/zabbix-server-{{ zabbix_server_database }}"
   when:
     - ansible_distribution_major_version == "8"
-    - zabbix_version is version('6.0', '<')
+    - zabbix_server_version is version('6.0', '<')
   tags:
     - zabbix-server
 
@@ -145,7 +145,7 @@
   register: zabbix_server_sql_package_installed
   until: zabbix_server_sql_package_installed is succeeded
   when:
-    - zabbix_version is version('6.0', '>=')
+    - zabbix_server_version is version('6.0', '>=')
     - zabbix_repo != "other"
   become: true
   tags:
@@ -163,7 +163,7 @@
   register: zabbix_server_sql_package_installed
   until: zabbix_server_sql_package_installed is succeeded
   when:
-    - zabbix_version is version('6.0', '>=')
+    - zabbix_server_version is version('6.0', '>=')
     - zabbix_repo == "other"
   become: true
   tags:
@@ -223,7 +223,7 @@
     path: /usr/lib/systemd/system/zabbix-server.service
     state: absent
   when:
-    - zabbix_version is version('6.0', '==')
+    - zabbix_server_version is version('6.0', '==')
     - ansible_distribution_major_version == "9"
 
 - name: "RedHat | Copy Service File (RHEL 9 Zabbix = 6.0)"
@@ -235,7 +235,7 @@
     group: root
     mode: 0644
   when:
-    - zabbix_version is version('6.0', '==')
+    - zabbix_server_version is version('6.0', '==')
     - ansible_distribution_major_version == "9"
 
 - name: "RedHat | Configure SELinux when enabled"

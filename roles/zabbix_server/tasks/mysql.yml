@@ -56,7 +56,7 @@
     - database
 
 - name: "MySQL | Get the file for create.sql"
-  shell: ls -1 {{ datafiles_path }}/{{ 'create' if zabbix_version is version('6.0', '<') else 'server' }}.sq*
+  shell: ls -1 {{ datafiles_path }}/{{ 'create' if zabbix_server_version is version('6.0', '<') else 'server' }}.sq*
   changed_when: false
   when:
     - zabbix_database_sqlload | bool
@@ -169,7 +169,7 @@
     collation: "{{ zabbix_server_dbcollation }}"
     state: import
     target: "{{ ls_output_create.stdout }}"
-    use_shell: "{{ true if zabbix_version is version('5.0', '==') else false }}"
+    use_shell: "{{ true if zabbix_server_version is version('5.0', '==') else false }}"
   when:
     - zabbix_database_sqlload | bool
     - zabbix_repo != "epel"

@@ -49,7 +49,10 @@ Please send Pull Requests or suggestions when you want to use this role for othe
 
 ## Ansible 2.10 and higher
 
-With the release of Ansible 2.10, modules have been moved into collections.  With the exception of ansible.builtin modules, this means additonal collections must be installed in order to use modules such as seboolean (now ansible.posix.seboolean).  The following collection is now required: `ansible.posix`.  Installing the collection:
+With the release of Ansible 2.10, modules have been moved into collections.  This means additonal collections must be installed in order to use various modules.
+
+### Posix
+This collection has a dependency of the `ansible.posix` collection.  Installing the collection:
 
 ```sh
 ansible-galaxy collection install ansible.posix
@@ -57,7 +60,7 @@ ansible-galaxy collection install ansible.posix
 
 ### MySQL
 
-When you are a MySQL there is a dependency on the collection named `community.mysql`.  Installing the collection:
+When you are using MySQL there is a dependency on the collection named `community.mysql`.  Installing the collection:
 
 ```sh
 ansible-galaxy collection install community.mysql
@@ -65,7 +68,7 @@ ansible-galaxy collection install community.mysql
 
 ### PostgreSQL
 
-When you are a PostgreSQL there is a dependency on the collection named `community.postgresql`. Installing the collection:
+When you are using PostgreSQL there is a dependency on the collection named `community.postgresql`. Installing the collection:
 
 ```sh
 ansible-galaxy collection install community.postgresql
@@ -83,7 +86,7 @@ See the following list of supported Operating systems with the Zabbix releases:
 | Ubuntu 20.04 focal  |  V  |  V        |  V        |
 | Ubuntu 18.04 bionic |     |  V        |  V        |
 | Debian 11 bullseye  |  V  |  V        |  V        |
-| Debian 10 buster    |     |  V        |  V        ?
+| Debian 10 buster    |     |  V        |  V        |
 
 
 See https://support.zabbix.com/browse/ZBX-18790 why RHEL7 is not supported anymore.
@@ -102,26 +105,29 @@ The following is an overview of all available configuration default for this rol
 
 ### Overall Zabbix
 
-* `zabbix_server_version`: This is the version of zabbix. Default: The highest supported version for the operating system. Can be overridden to 6.2, 6.0,  or 5.0. Previously the variable `zabbix_version` was used directly but it could cause [some inconvenience](https://github.com/dj-wasabi/ansible-zabbix-agent/pull/303). That variable is maintained by retrocompativility.
+* `zabbix_server_version`: This is the version of zabbix. Default: The highest supported version for the operating system. Can be overridden to 6.2, 6.0, or 5.0.
+* `zabbix_server_database`: Default: `pgsql`. The type of database used. Can be: `mysql` or `pgsql`
 * `zabbix_server_version_minor`: When you want to specify a minor version to be installed. RedHat only. Default set to: `*` (latest available)
 * `zabbix_repo`: Default: `zabbix`
   * `epel`: install agent from EPEL repo
   * `zabbix`: (default) install agent from Zabbix repo
   * `other`: install agent from pre-existing or other repo
+* `zabbix_service_state`: Default: `started`. Can be overridden to stopped if needed
+* `zabbix_service_enabled`: Default: `True` Can be overridden to `False` if needed
+
+### RHEL Installs
 * `zabbix_repo_yum`: A list with Yum repository configuration.
 * `zabbix_repo_yum_schema`: Default: `https`. Option to change the web schema for the yum repository(http/https)
 * `zabbix_repo_yum_disabled`: A string with repository names that should be disabled when installing Zabbix component specific packages. Is only used when `zabbix_repo_yum_enabled` contains 1 or more repositories. Default `*`.
 * `zabbix_repo_yum_enabled`: A list with repository names that should be enabled when installing Zabbix component specific packages.
-* `zabbix_service_state`: Default: `started`. Can be overridden to stopped if needed
-* `zabbix_service_enabled`: Default: `True` Can be overridden to `False` if needed
 
 ### SElinux
-
 * `zabbix_selinux`: Default: `False`. Enables an SELinux policy so that the server will run.
 * `selinux_allow_zabbix_can_network`: Default: `False`. 
 * `selinux_allow_zabbix_can_http`: Default: `False`. 
 
 ### Zabbix Server
+**NOTE**: The Zabbix server configuraiton file has a large number of configurable options.  Below is a subset of those options, however all of them are configurable through the the role's variables.
 
 * `zabbix_server_package_state`: Default: `present`. Can be overridden to `latest` to update packages when needed.
 * `zabbix_server_listenport`: Default: `10051`. On which port the Zabbix Server is available.
@@ -153,7 +159,6 @@ These variables are specific for Zabbix 6.0 and higher:
 ### Database specific
 
 * `zabbix_server_dbhost_run_install`: Default: `True`. When set to `True`, sql files will be executed on the host running the database.
-* `zabbix_server_database`: Default: `pgsql`. The type of database used. Can be: `mysql` or `pgsql`
 * `zabbix_server_dbhost`: The hostname on which the database is running.
 * `zabbix_server_real_dbhost`: The hostname of the dbhost that is running behind a loadbalancer/VIP (loadbalancers don't accept ssh connections)
 * `zabbix_server_dbname`: The database name which is used by the Zabbix Server.
