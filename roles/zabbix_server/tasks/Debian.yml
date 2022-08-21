@@ -4,24 +4,24 @@
 
 - name: "Debian | Set some variables"
   set_fact:
-    zabbix_short_version: "{{ zabbix_version | regex_replace('\\.', '') }}"
+    zabbix_short_version: "{{ zabbix_server_version | regex_replace('\\.', '') }}"
     zabbix_server_apt_repository:
-      - "http://repo.zabbix.com/zabbix/{{ zabbix_version }}/{{ ansible_distribution.lower() }}/"
+      - "http://repo.zabbix.com/zabbix/{{ zabbix_server_version }}/{{ ansible_distribution.lower() }}/"
       - "{{ ansible_distribution_release }}"
       - "main"
-    zabbix_underscore_version: "{{ zabbix_version | regex_replace('\\.', '_') }}"
+    zabbix_underscore_version: "{{ zabbix_server_version | regex_replace('\\.', '_') }}"
     zabbix_python_prefix: "python{% if ansible_python_version is version('3', '>=') %}3{% endif %}"
   when:
     - ansible_machine != "aarch64"
 
 - name: "Debian | Set some variables"
   set_fact:
-    zabbix_short_version: "{{ zabbix_version | regex_replace('\\.', '') }}"
+    zabbix_short_version: "{{ zabbix_server_version | regex_replace('\\.', '') }}"
     zabbix_server_apt_repository:
-      - "http://repo.zabbix.com/zabbix/{{ zabbix_version }}/{{ ansible_distribution.lower() }}-arm64/"
+      - "http://repo.zabbix.com/zabbix/{{ zabbix_server_version }}/{{ ansible_distribution.lower() }}-arm64/"
       - "{{ ansible_distribution_release }}"
       - "main"
-    zabbix_underscore_version: "{{ zabbix_version | regex_replace('\\.', '_') }}"
+    zabbix_underscore_version: "{{ zabbix_server_version | regex_replace('\\.', '_') }}"
     zabbix_python_prefix: "python{% if ansible_python_version is version('3', '>=') %}3{% endif %}"
   when:
     - ansible_machine == "aarch64"
@@ -30,7 +30,7 @@
   set_fact:
     datafiles_path: /usr/share/doc/zabbix-server-{{ zabbix_server_database }}
   when:
-    - zabbix_version is version('6.0', '<')
+    - zabbix_server_version is version('6.0', '<')
   tags:
     - zabbix-server
     - init
@@ -40,7 +40,7 @@
   set_fact:
     datafiles_path: /usr/share/doc/zabbix-sql-scripts/{{ 'postgresql' if zabbix_server_database == 'pgsql' else 'mysql' }}
   when:
-    - zabbix_version is version('6.0', '>=')
+    - zabbix_server_version is version('6.0', '>=')
   tags:
     - zabbix-server
     - init
@@ -168,7 +168,7 @@
   register: zabbix_server_package_sql_installed
   until: zabbix_server_package_sql_installed is succeeded
   when:
-    - zabbix_version is version('5.4', '>=')
+    - zabbix_server_version is version('5.4', '>=')
   become: true
   tags:
     - zabbix-server
