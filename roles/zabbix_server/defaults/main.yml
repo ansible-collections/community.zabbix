@@ -8,6 +8,7 @@ zabbix_service_state: started
 zabbix_service_enabled: true
 zabbix_repo: zabbix
 zabbix_server_version_minor: "*"
+zabbix_server_package_state: present
 
 # Deb Variables
 zabbix_server_apt_priority:
