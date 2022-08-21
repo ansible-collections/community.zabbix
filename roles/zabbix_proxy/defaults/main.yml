@@ -1,16 +1,9 @@
 ---
 # defaults file for zabbix_proxy
-
-# zabbix_proxy_version: 6.0
+zabbix_proxy_version:
 zabbix_proxy_version_minor: "*"
 zabbix_version: "{{ zabbix_proxy_version }}"
 zabbix_selinux: false
-
-# These variables are optional. They specify the version of Zabbix proxy package.
-
-# zabbix_proxy_rhel_version: 4.4.4
-# zabbix_proxy_debian_version: 1:4.4.4-1+stretch
-# zabbix_proxy_ubuntu_version: 1:4.4.4-1+xenial
 
 zabbix_repo: zabbix
 zabbix_proxy_apt_priority:
