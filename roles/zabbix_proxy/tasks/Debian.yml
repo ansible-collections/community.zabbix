@@ -19,23 +19,22 @@
     - init
     - config
 
-- name: "Debian | Set some facts for Zabbix >= 3.0 && < 5.4"
+- name: "Debian | Set some facts for Zabbix  < 6.0"
   set_fact:
     apache_log: apache2
     datafiles_path: /usr/share/doc/zabbix-proxy-{{ zabbix_proxy_database }}
   when:
-    - zabbix_version is version('3.0', '>=')
-    - zabbix_version is version('5.4', '<')
+    - zabbix_version is version('6.0', '<')
   tags:
     - zabbix-proxy
     - init
     - config
 
-- name: "Debian | Set some facts for Zabbix >= 5.4"
+- name: "Debian | Set some facts for Zabbix >= 6.0"
   set_fact:
     datafiles_path: /usr/share/doc/zabbix-sql-scripts/{{ zabbix_proxy_database_long }}
   when:
-    - zabbix_version is version('5.4', '>=')
+    - zabbix_version is version('6.0', '>=')
   tags:
     - zabbix-server
     - init
@@ -159,7 +158,7 @@
   register: zabbix_proxy_package_sql_installed
   until: zabbix_proxy_package_sql_installed is succeeded
   when:
-    - zabbix_version is version('5.4', '>=')
+    - zabbix_version is version('6.0', '>=')
   become: true
   tags:
     - zabbix-server
@@ -180,27 +179,6 @@
   tags:
     - zabbix-server
     - init
-
-- name: "Debian 9 | Install Mysql Client package"
-  apt:
-    name:
-      - mysql-client
-      - "{{ zabbix_python_prefix }}-mysqldb"
-    state: present
-  environment:
-    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
-    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
-  register: zabbix_proxy_dependencies_installed
-  until: zabbix_proxy_dependencies_installed is succeeded
-  become: true
-  when:
-    - zabbix_proxy_database == 'mysql'
-    - zabbix_proxy_install_database_client
-    - ansible_distribution_release == "stretch"
-  tags:
-    - zabbix-server
-    - init
-    - database
 
 - name: "Debian 10 | Install Mysql Client package"
   apt:
