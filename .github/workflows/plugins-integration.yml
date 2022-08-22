@@ -55,7 +55,7 @@ jobs:
         with:
           path: ansible_collections/community/zabbix
 
-      - name: Set up Python ${{ matrix.ansible }}
+      - name: Set up Python ${{ matrix.python }}
         uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python }}
