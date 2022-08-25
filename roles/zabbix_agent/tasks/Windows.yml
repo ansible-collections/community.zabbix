@@ -216,11 +216,30 @@
     - zabbix_sender.exe
   when:
     - zabbix_win_install_dir_bin is defined
+    - not (zabbix_agent2 | bool)
+
+- name: "Windows | Copy binary files to expected location (zabbix-agent2)"
+  ansible.windows.win_copy:
+    src: "{{ zabbix_win_install_dir }}\\bin\\{{ item }}"
+    dest: "{{ zabbix_win_install_dir_bin }}\\{{ item }}"
+    remote_src: yes
+  loop:
+    - zabbix_agent2.exe
+  when:
+    - zabbix_win_install_dir_bin is defined
+    - zabbix_agent2 | bool
 
 - set_fact:
     zabbix_win_exe_path: "{{ zabbix_win_install_dir_bin }}\\zabbix_agentd.exe"
   when:
     - zabbix_win_install_dir_bin is defined
+    - not (zabbix_agent2 | bool)
+
+- set_fact:
+    zabbix_win_exe_path: "{{ zabbix_win_install_dir_bin }}\\zabbix_agent2.exe"
+  when:
+    - zabbix_win_install_dir_bin is defined
+    - zabbix_agent2 | bool
 
 - name: "Create directory for PSK file if not exist."
   win_file:
