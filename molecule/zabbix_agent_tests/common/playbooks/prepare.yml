@@ -1,5 +1,4 @@
 ---
-
 - name: Prepare
   hosts: all
   tasks:
@@ -30,6 +29,7 @@
         name:
           - "{{ 'net-tools' if ansible_distribution_major_version not in ['10','18', '20'] else 'iproute2' }}"
         state: present
+        update_cache: true
       register: zabbix_agent_prepare_packages_install
       until: zabbix_agent_prepare_packages_install is succeeded
       when:

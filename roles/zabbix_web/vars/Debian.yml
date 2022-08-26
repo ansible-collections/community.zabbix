@@ -7,7 +7,7 @@ _apache_service: apache2
 _php_fpm_dir: /etc/php/{{ _zabbix_php_version }}/fpm/pool.d
 _php_fpm_session: /tmp
 _php_fpm_listen: /run/php/zabbix.sock
-_zabbix_php_fpm_mode: '0666'
+_zabbix_php_fpm_mode: "0666"
 _zabbix_php_fpm_allowed_clients: 127.0.0.1
 
 _nginx_user: www-data
@@ -18,3 +18,30 @@ _nginx_service: nginx
 _nginx_tls_crt: /etc/ssl/certs/ssl-cert-snakeoil.pem
 _nginx_tls_key: /etc/ssl/private/ssl-cert-snakeoil.key
 _nginx_tls_dhparam: /etc/ssl/private/dhparams.pem
+
+zabbix_valid_web_versions:
+  # Debian
+  "11":
+    - 6.2
+    - 6.0
+    - 5.0
+    - 4.0
+  "10":
+    - 6.0
+    - 5.0
+    - 4.0
+  "9":
+    - 4.0
+  # Ubuntu
+  "22":
+    - 6.2
+    - 6.0
+  "20":
+    - 6.2
+    - 6.0
+    - 5.0
+    - 4.0
+  "18":
+    - 6.0
+    - 5.0
+    - 4.0

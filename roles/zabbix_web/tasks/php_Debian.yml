@@ -34,6 +34,7 @@
       - php{{ _zabbix_php_package_prefix }}-ldap
       - php{{ _zabbix_php_package_prefix }}-xml
       - php{{ _zabbix_php_package_prefix }}-gd
+      - php{{ _zabbix_php_package_prefix }}-fpm
   register: zabbix_web_php_dependency_install
   until: zabbix_web_php_dependency_install is succeeded
   become: true

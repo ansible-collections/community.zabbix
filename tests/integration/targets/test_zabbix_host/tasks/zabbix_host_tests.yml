@@ -45,9 +45,6 @@
         dns: ""
         port: "12345"
     proxy: ExampleProxy
-    tls_psk_identity: test
-    tls_connect: 2
-    tls_psk: 123456789abcdef123456789abcdef12
     macros:
       - macro: MACRO1
         value: test1
@@ -110,9 +107,6 @@
         dns: ""
         port: "12345"
     proxy: ExampleProxy
-    tls_psk_identity: test
-    tls_connect: 2
-    tls_psk: 123456789abcdef123456789abcdef12
     macros:
       - macro: MACRO1
         value: test1
@@ -176,9 +170,6 @@
         dns: ""
         port: "12345"
     proxy: ExampleProxy
-    tls_psk_identity: test
-    tls_connect: 2
-    tls_psk: 123456789abcdef123456789abcdef12
   register: zabbix_host1
 
 - name: updating with same values and force false should be idempotent
@@ -233,9 +224,6 @@
         dns: ""
         port: "12345"
     proxy: ExampleProxy
-    tls_psk_identity: test
-    tls_connect: 2
-    tls_psk: 123456789abcdef123456789abcdef12
   register: zabbix_host1
 
 - name: changing the value of an already defined inventory should work and mark task as changed
@@ -621,16 +609,14 @@
     that:
       - "not zabbix_host1 is changed"
 
-- name: "test: change tls settings"
+- name: "test: change tls certificate settings"
   zabbix_host:
     server_url: "{{ zabbix_api_server_url }}"
     login_user: "{{ zabbix_api_login_user }}"
     login_password: "{{ zabbix_api_login_pass }}"
     host_name: ExampleHost
-    tls_psk_identity: test2
     tls_connect: 4
-    tls_accept: 7
-    tls_psk: 123456789abcdef123456789abcdef13
+    tls_accept: 4
     tls_issuer: AcmeCorp
     tls_subject: AcmeCorpServer
   register: zabbix_host1
@@ -640,16 +626,14 @@
     that:
       - "zabbix_host1 is changed"
 
-- name: "test: change tls settings (again)"
+- name: "test: change tls certificate settings (again)"
   zabbix_host:
     server_url: "{{ zabbix_api_server_url }}"
     login_user: "{{ zabbix_api_login_user }}"
     login_password: "{{ zabbix_api_login_pass }}"
     host_name: ExampleHost
-    tls_psk_identity: test2
     tls_connect: 4
-    tls_accept: 7
-    tls_psk: 123456789abcdef123456789abcdef13
+    tls_accept: 4
     tls_issuer: AcmeCorp
     tls_subject: AcmeCorpServer
   register: zabbix_host1
@@ -658,6 +642,44 @@
   assert:
     that:
       - "not zabbix_host1 is changed"
+
+- name: "test: change tls psk (write-only) settings"
+  zabbix_host:
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
+    host_name: ExampleHost
+    tls_connect: 2
+    tls_accept: 2
+    tls_psk_identity: test
+    tls_psk: 123456789abcdef123456789abcdef12
+  register: zabbix_host1
+
+- name: expect to succeed and that things have changed
+  assert:
+    that: zabbix_host1 is changed
+
+- name: "test: change tls psk (write-only) settings (again)"
+  zabbix_host:
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
+    host_name: ExampleHost
+    tls_connect: 2
+    tls_accept: 2
+    tls_psk_identity: test
+    tls_psk: 123456789abcdef123456789abcdef12
+  register: zabbix_host1
+
+- name: expect to succeed and that things have changed (tls_psk makes module non-idempotent)
+  assert:
+    that: zabbix_host1 is changed
+  when: zabbix_version is version('5.4', '>=')
+
+- name: expect to succeed and that things have not changed
+  assert:
+    that: zabbix_host1 is not changed
+  when: zabbix_version is version('5.4', '<')
 
 - name: "test: change interface settings (remove one)"
   zabbix_host:
@@ -1305,6 +1327,23 @@
     that:
       - "zabbix_host1 is changed"
 
+- name: "test: add user macro while keeping previous ones with force=no (again)"
+  zabbix_host:
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
+    host_name: ExampleHost
+    force: false
+    macros:
+      - macro: '{$NEWMACRO3}'
+        value: testing
+  register: zabbix_host1
+
+- name: expect to succeed and that things have not changed
+  assert:
+    that:
+      - "zabbix_host1 is not changed"
+
 - name: "test: add the same user macros (again)"
   zabbix_host:
     server_url: "{{ zabbix_api_server_url }}"
@@ -1357,10 +1396,10 @@
             type: secret
       register: zabbix_host1
 
-    - name: expect to succeed and that things have not changed
+    - name: expect to succeed and that things have changed as it has secret value
       assert:
         that:
-          - "zabbix_host1 is not changed"
+          - "zabbix_host1 is changed"
 
 - name: "test: wipe out all of the user macros"
   zabbix_host:

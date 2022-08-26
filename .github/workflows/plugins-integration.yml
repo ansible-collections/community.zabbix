@@ -24,6 +24,7 @@ jobs:
           - version: "5.0"
           # - version: "5.4" # only activate after basic compatibility
           - version: "6.0"
+          - version: "6.2"
         ansible:
           - stable-2.10
           - stable-2.11
@@ -54,7 +55,7 @@ jobs:
         with:
           path: ansible_collections/community/zabbix
 
-      - name: Set up Python ${{ matrix.ansible }}
+      - name: Set up Python ${{ matrix.python }}
         uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python }}

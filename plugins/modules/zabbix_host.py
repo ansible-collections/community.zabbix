@@ -221,7 +221,6 @@ options:
             - Specifies what encryption to use for outgoing connections.
             - Possible values, 1 (no encryption), 2 (PSK), 4 (certificate).
             - Works only with >= Zabbix 3.0
-        default: 1
         type: int
     tls_accept:
         description:
@@ -230,19 +229,20 @@ options:
             - Possible values, 1 (no encryption), 2 (PSK), 4 (certificate).
             - Values can be combined.
             - Works only with >= Zabbix 3.0
-        default: 1
         type: int
     tls_psk_identity:
         description:
             - It is a unique name by which this specific PSK is referred to by Zabbix components
             - Do not put sensitive information in the PSK identity string, it is transmitted over the network unencrypted.
             - Works only with >= Zabbix 3.0
+            - Using this parameter with Zabbix >= 5.4 makes this module non-idempotent.
         type: str
     tls_psk:
         description:
             - PSK value is a hard to guess string of hexadecimal digits.
             - The preshared key, at least 32 hex digits. Required if either I(tls_connect) or I(tls_accept) has PSK enabled.
             - Works only with >= Zabbix 3.0
+            - Using this parameter with Zabbix >= 5.4 makes this module non-idempotent.
         type: str
     ca_cert:
         description:
@@ -468,12 +468,15 @@ class Host(ZabbixBase):
         try:
             if self._module.check_mode:
                 self._module.exit_json(changed=True)
-            parameters = {'host': host_name, 'interfaces': interfaces, 'groups': group_ids, 'status': status,
-                          'tls_connect': tls_connect, 'tls_accept': tls_accept}
+            parameters = {'host': host_name, 'interfaces': interfaces, 'groups': group_ids, 'status': status}
             if proxy_id:
                 parameters['proxy_hostid'] = proxy_id
             if visible_name:
                 parameters['name'] = visible_name
+            if tls_connect:
+                parameters['tls_connect'] = tls_connect
+            if tls_accept:
+                parameters['tls_accept'] = tls_accept
             if tls_psk_identity is not None:
                 parameters['tls_psk_identity'] = tls_psk_identity
             if tls_psk is not None:
@@ -509,12 +512,15 @@ class Host(ZabbixBase):
         try:
             if self._module.check_mode:
                 self._module.exit_json(changed=True)
-            parameters = {'hostid': host_id, 'groups': group_ids, 'status': status, 'tls_connect': tls_connect,
-                          'tls_accept': tls_accept}
+            parameters = {'hostid': host_id, 'groups': group_ids, 'status': status}
             if proxy_id >= 0:
                 parameters['proxy_hostid'] = proxy_id
             if visible_name:
                 parameters['name'] = visible_name
+            if tls_connect:
+                parameters['tls_connect'] = tls_connect
+            if tls_accept:
+                parameters['tls_accept'] = tls_accept
             if tls_psk_identity:
                 parameters['tls_psk_identity'] = tls_psk_identity
             if tls_psk:
@@ -564,7 +570,7 @@ class Host(ZabbixBase):
         }
 
         if LooseVersion(self._zbx_api_version) >= LooseVersion('4.2.0'):
-            params.update({'selectTags': 'extend'})
+            params.update({'selectTags': ['tag', 'value']})
 
         if LooseVersion(self._zbx_api_version) >= LooseVersion('5.4.0'):
             params.update({
@@ -615,11 +621,11 @@ class Host(ZabbixBase):
     # get group ids by group names
     def get_group_ids_by_group_names(self, group_names):
         if self.check_host_group_exist(group_names):
-            return self._zapi.hostgroup.get({'output': 'groupid', 'filter': {'name': group_names}})
+            return self._zapi.hostgroup.get({'output': 'extend', 'filter': {'name': group_names}})
 
     # get host groups ids by host id
     def get_group_ids_by_host_id(self, host_id):
-        return self._zapi.hostgroup.get({'output': 'groupid', 'hostids': host_id})
+        return self._zapi.hostgroup.get({'output': 'extend', 'hostids': host_id})
 
     # get host templates by host id
     def get_host_templates_by_host_id(self, host_id):
@@ -765,15 +771,17 @@ class Host(ZabbixBase):
             if int(host['tls_accept']) != tls_accept:
                 return True
 
-        if LooseVersion(self._zbx_api_version) <= LooseVersion('5.4.0'):
+        if LooseVersion(self._zbx_api_version) < LooseVersion('5.4'):
             if tls_psk_identity is not None and 'tls_psk_identity' in host:
                 if host['tls_psk_identity'] != tls_psk_identity:
                     return True
-
-        if LooseVersion(self._zbx_api_version) <= LooseVersion('5.4.0'):
             if tls_psk is not None and 'tls_psk' in host:
                 if host['tls_psk'] != tls_psk:
                     return True
+        else:
+            # in Zabbix >= 5.4 these parameters are write-only and are not returned in host.get response
+            if tls_psk_identity is not None or tls_psk is not None:
+                return True
 
         if tls_issuer is not None and 'tls_issuer' in host:
             if host['tls_issuer'] != tls_issuer:
@@ -802,20 +810,13 @@ class Host(ZabbixBase):
         # hostmacroid and hostid are present in every item of host['macros'] and need to be removed
         if macros is not None and 'macros' in host:
             t_macros = copy.deepcopy(macros)  # make copy to prevent change in original data
-            existing_macros = sorted(host['macros'], key=lambda k: k['macro'])
-            for macro in existing_macros:
+            for macro in host['macros']:
                 macro.pop('hostid', False)
                 macro.pop('hostmacroid', False)
-                if 'type' in macro:
-                    macro['type'] = int(macro['type'])
 
-            # 'secret' type macros don't return 'value' from API
-            if LooseVersion(self._zbx_api_version) >= LooseVersion('5.0'):
-                for macro in t_macros:
-                    if macro['type'] == 1:
-                        macro.pop('value', False)
-
-            if sorted(t_macros, key=lambda k: k['macro']) != existing_macros:
+            diff = []
+            zabbix_utils.helper_compare_lists(t_macros, host['macros'], diff)
+            if diff != []:
                 return True
 
         if tags is not None and 'tags' in host:
@@ -838,8 +839,11 @@ class Host(ZabbixBase):
         templates_clear = exist_template_ids.difference(template_ids)
         templates_clear_list = list(templates_clear)
         request_str = {'hostid': host_id, 'templates': template_id_list, 'templates_clear': templates_clear_list,
-                       'tls_connect': tls_connect, 'tls_accept': tls_accept, 'ipmi_authtype': ipmi_authtype,
-                       'ipmi_privilege': ipmi_privilege, 'ipmi_username': ipmi_username, 'ipmi_password': ipmi_password}
+                       'ipmi_authtype': ipmi_authtype, 'ipmi_privilege': ipmi_privilege, 'ipmi_username': ipmi_username, 'ipmi_password': ipmi_password}
+        if tls_connect:
+            request_str['tls_connect'] = tls_connect
+        if tls_accept:
+            request_str['tls_accept'] = tls_accept
         if tls_psk_identity is not None:
             request_str['tls_psk_identity'] = tls_psk_identity
         if tls_psk is not None:
@@ -959,8 +963,8 @@ def main():
         ipmi_privilege=dict(type='int', default=None),
         ipmi_username=dict(type='str', required=False, default=None),
         ipmi_password=dict(type='str', required=False, default=None, no_log=True),
-        tls_connect=dict(type='int', default=1),
-        tls_accept=dict(type='int', default=1),
+        tls_connect=dict(type='int', required=False),
+        tls_accept=dict(type='int', required=False),
         tls_psk_identity=dict(type='str', required=False),
         tls_psk=dict(type='str', required=False),
         ca_cert=dict(type='str', required=False, aliases=['tls_issuer']),
@@ -1085,9 +1089,9 @@ def main():
                     macro.pop('type')
                 else:
                     if macro['type'] == 'text':
-                        macro['type'] = 0
+                        macro['type'] = '0'
                     elif macro['type'] == 'secret':
-                        macro['type'] = 1
+                        macro['type'] = '1'
 
     # Use proxy specified, or set to 0
     if proxy:
@@ -1184,10 +1188,21 @@ def main():
 
                 # Macros not present in host.update will be removed if we dont copy them when force=no
                 if macros is not None and 'macros' in zabbix_host_obj.keys():
-                    provided_macros = [m['macro'] for m in macros]
                     existing_macros = zabbix_host_obj['macros']
                     for macro in existing_macros:
-                        if macro['macro'] not in provided_macros:
+                        macro.pop('hostmacroid', None)
+                        macro.pop('hostid', None)
+                        macro.pop('automatic', None)
+                        found = False
+                        for idx1, prov_macro in enumerate(macros):
+                            diff_dict = {}
+                            zabbix_utils.helper_compare_dictionaries(prov_macro, macro, diff_dict)
+                            if diff_dict == {}:
+                                found = True
+                                break
+                        if found:
+                            macros[idx1] = macro
+                        else:
                             macros.append(macro)
 
                 # Tags not present in host.update will be removed if we dont copy them when force=no

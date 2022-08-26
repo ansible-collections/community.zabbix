@@ -100,7 +100,7 @@
           - gather_all_facts_result.hosts.0.hostinterfaces.0.type == "1"
           - gather_all_facts_result.hosts.0.hostinterfaces.0.useip == "1"
 
-    - when: zabbix_version is version('5.4', '>=')
+    - when: zabbix_version is version('5.4', '>=') and zabbix_version is version('6.2', '<')
       assert:
         that:
           - gather_all_facts_result.hosts | length == 1
@@ -109,6 +109,27 @@
           - gather_all_facts_result.hosts.0.description == "Test Host"
           - gather_all_facts_result.hosts.0.groups.0.name == "Linux servers"
           - gather_all_facts_result.hosts.0.groups.1.name == "Hypervisors"
+          - gather_all_facts_result.hosts.0.parentTemplates.0.name == "Zabbix server health"
+          - gather_all_facts_result.hosts.0.status == "0"
+          - gather_all_facts_result.hosts.0.inventory_mode == "0"
+          - gather_all_facts_result.hosts.0.inventory.tag == "tag1"
+          - gather_all_facts_result.hosts.0.inventory.os == "Linux"
+          - gather_all_facts_result.hosts.0.hostinterfaces.0.dns == ""
+          - gather_all_facts_result.hosts.0.hostinterfaces.0.ip == "192.168.0.1"
+          - gather_all_facts_result.hosts.0.hostinterfaces.0.main == "1"
+          - gather_all_facts_result.hosts.0.hostinterfaces.0.port == "10050"
+          - gather_all_facts_result.hosts.0.hostinterfaces.0.type == "1"
+          - gather_all_facts_result.hosts.0.hostinterfaces.0.useip == "1"
+
+    - when: zabbix_version is version('6.2', '>=')
+      assert:
+        that:
+          - gather_all_facts_result.hosts | length == 1
+          - gather_all_facts_result.hosts.0.host == "ExampleHostForHostInfoModule"
+          - gather_all_facts_result.hosts.0.name == "ExampleHostForHostInfoModuleName"
+          - gather_all_facts_result.hosts.0.description == "Test Host"
+          - gather_all_facts_result.hosts.0.groups.0.name == "Hypervisors"
+          - gather_all_facts_result.hosts.0.groups.1.name == "Linux servers"
           - gather_all_facts_result.hosts.0.parentTemplates.0.name == "Zabbix server health"
           - gather_all_facts_result.hosts.0.status == "0"
           - gather_all_facts_result.hosts.0.inventory_mode == "0"

@@ -1,7 +1,7 @@
 ---
 # defaults file for zabbix_server
 
-zabbix_server_version: 6.0
+# zabbix_server_version: 6.0
 zabbix_server_version_minor: "*"
 zabbix_version: "{{ zabbix_server_version }}"
 zabbix_repo: zabbix
@@ -24,13 +24,13 @@ zabbix_repo_yum:
     description: Zabbix Official Repository - $basearch
     baseurl: "{{ zabbix_repo_yum_schema }}://repo.zabbix.com/zabbix/{{ zabbix_version | regex_search('^[0-9]+.[0-9]+') }}/rhel/{{ ansible_distribution_major_version }}/$basearch/"
     gpgcheck: "{{ zabbix_repo_yum_gpgcheck }}"
-    mode: '0644'
+    mode: "0644"
     gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-ZABBIX
     state: present
   - name: zabbix-non-supported
     description: Zabbix Official Repository non-supported - $basearch
     baseurl: "{{ zabbix_repo_yum_schema }}://repo.zabbix.com/non-supported/rhel/{{ ansible_distribution_major_version }}/$basearch/"
-    mode: '0644'
+    mode: "0644"
     gpgcheck: "{{ zabbix_repo_yum_gpgcheck }}"
     gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-ZABBIX
     state: present
@@ -88,7 +88,9 @@ zabbix_server_startpingers: 1
 zabbix_server_startdiscoverers: 1
 zabbix_server_starthttppollers: 1
 zabbix_server_startpreprocessors: 3
+zabbix_server_startodbcpollers: 1
 zabbix_server_starttimers: 1
+zabbix_server_starthistorypollers: 5
 zabbix_server_javagateway:
 zabbix_server_javagatewayport: 10052
 zabbix_server_startjavapollers: 5
@@ -130,7 +132,7 @@ zabbix_server_proxydatafrequency: 1
 zabbix_server_allowroot: 0
 zabbix_server_user: zabbix
 zabbix_server_include: /etc/zabbix/zabbix_server.conf.d
-zabbix_server_include_mode: '0755'
+zabbix_server_include_mode: "0755"
 zabbix_server_sslcertlocation: ${datadir}/zabbix/ssl/certs
 zabbix_server_sslkeylocation: ${datadir}/zabbix/ssl/keys
 zabbix_server_sslcalocation:
