@@ -140,8 +140,8 @@ The following is an overview of all available configuration default for this rol
 ### Database specific
 
 * `zabbix_proxy_dbhost_run_install`: Default: `True`. When set to `True`, sql files will be executed on the host running the database.
-* `zabbix_proxy_database`: Default: `pgsql`. The type of database used. Can be: `mysql`, `pgsql` or `sqlite3`
-* `zabbix_proxy_database_long`: Default: `postgresql`. The type of database used, but long name. Can be: `mysql`, `postgresql` or `sqlite3`
+* `zabbix_proxy_database`: Default: `mysql`. The type of database used. Can be: `mysql`, `pgsql` or `sqlite3`
+* `zabbix_proxy_database_long`: Default: `mysql`. The type of database used, but long name. Can be: `mysql`, `postgresql` or `sqlite3`
 * `zabbix_proxy_dbhost`: The hostname on which the database is running. Will be ignored when `sqlite3` is used as database.
 * `zabbix_proxy_real_dbhost`: The hostname of the dbhost that is running behind a loadbalancer/VIP (loadbalancers doesn't accept ssh connections) Will be ignored when `sqlite3` is used as database.
 * `zabbix_proxy_dbname`: The database name which is used by the Zabbix Proxy.
