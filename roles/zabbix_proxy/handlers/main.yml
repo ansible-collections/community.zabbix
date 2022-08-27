@@ -13,7 +13,7 @@
 
 - name: restart zabbix-proxy
   service:
-    name: zabbix-proxy-mysql{{ zabbix_proxy_database_long }}
+    name: zabbix-proxy-mysql{{ zabbix_db_type_long }}
     state: restarted
     enabled: true
   become: true

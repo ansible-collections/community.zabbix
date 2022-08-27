@@ -1,13 +1,13 @@
 ---
 # task file for postgresql
 
-- name: "Set the correct delegated_dbhost (to support postgres db deployment on a remote dbhost)"
+- name: "PostgreSQL | Set the correct delegated_dbhost (to support postgres db deployment on a remote dbhost)"
   set_fact:
     delegated_dbhost: "{{ zabbix_proxy_dbhost if (zabbix_proxy_dbhost != 'localhost') else inventory_hostname }}"
   when:
     - zabbix_proxy_dbhost_run_install
 
-- name: "Set the correct delegated_dbhost (to support postgres db deployment on a remote dbhost)"
+- name: "PostgreSQL | Set the correct delegated_dbhost (to support postgres db deployment on a remote dbhost)"
   set_fact:
     delegated_dbhost: "{{ inventory_hostname }}"
   when:
@@ -20,6 +20,7 @@
         name: "{{ zabbix_proxy_dbname }}"
         port: "{{ zabbix_proxy_dbport }}"
         state: present
+
     - name: "PostgreSQL | Delegated | Create database user"
       postgresql_user:
         db: "{{ zabbix_proxy_dbname }}"
@@ -87,6 +88,6 @@
     creates: /etc/zabbix/schema.done
     executable: /bin/bash
   environment:
-    PGPASSWORD: '{{ zabbix_proxy_dbpassword }}'
+    PGPASSWORD: "{{ zabbix_proxy_dbpassword }}"
   when:
     - zabbix_database_creation

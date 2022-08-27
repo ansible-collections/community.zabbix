@@ -35,10 +35,8 @@ zabbix_repo_yum:
 zabbix_proxy_username: zabbix
 zabbix_proxy_groupname: zabbix
 
-zabbix_server_host: 192.168.1.1 # Will be deprecated in 2.0.0
-zabbix_proxy_server: "{{ zabbix_server_host }}"
-zabbix_server_port: 10051 # Will be deprecated in 2.0.0
-zabbix_proxy_serverport: "{{ zabbix_server_port }}"
+zabbix_proxy_server: 192.168.1.1
+zabbix_proxy_serverport: 10051
 zabbix_database_creation: true
 zabbix_database_sqlload: true
 zabbix_proxy_dbtlsconnect:
@@ -51,11 +49,8 @@ zabbix_proxy_allowunsupporteddbversions: 0
 
 # Some role specific vars
 zabbix_proxy_database: mysql
-zabbix_proxy_database_long: mysql
 # zabbix_proxy_database: pgsql
-# zabbix_proxy_database_long: postgresql
 # zabbix_proxy_database: sqlite3
-# zabbix_proxy_database_long: sqlite3
 
 # zabbix-proxy specific vars
 zabbix_proxy_mode: 0
@@ -81,10 +76,8 @@ zabbix_proxy_dbport: 5432
 zabbix_proxy_startodbcpollers: 1
 zabbix_proxy_dbhost_run_install: true
 zabbix_proxy_privileged_host: localhost
-zabbix_proxy_localbuffer: 0 # Will be deprecated in 2.0.0
-zabbix_proxy_proxylocalbuffer: "{{ zabbix_proxy_localbuffer }}"
-zabbix_proxy_offlinebuffer: 1 # Will be deprecated in 2.0.0
-zabbix_proxy_proxyofflinebuffer: "{{ zabbix_proxy_offlinebuffer }}"
+zabbix_proxy_proxylocalbuffer: 0
+zabbix_proxy_proxyofflinebuffer: 1
 zabbix_proxy_heartbeatfrequency: 60
 zabbix_proxy_configfrequency: 3600
 zabbix_proxy_datasenderfrequency: 1
@@ -98,19 +91,19 @@ zabbix_proxy_starthttppollers: 1
 zabbix_proxy_startpreprocessors: 3
 zabbix_proxy_javagateway:
 zabbix_proxy_javagatewayport: 10052
-zabbix_proxy_startjavapollers: 5
+zabbix_proxy_startjavapollers:
 zabbix_proxy_startvmwarecollector: 0
 zabbix_proxy_vmwarefrequency: 60
-zabbix_proxy_vmwarecachesize: 8
+zabbix_proxy_vmwarecachesize: 8M
 zabbix_proxy_snmptrapperfile: /tmp/zabbix_traps.tmp
 zabbix_proxy_snmptrapper: 0
 zabbix_proxy_listenip:
 zabbix_proxy_housekeepingfrequency: 1
-zabbix_proxy_cachesize: 8
+zabbix_proxy_cachesize: 8M
 zabbix_proxy_startdbsyncers: 4
-zabbix_proxy_historycachesize: 8
-zabbix_proxy_historyindexcachesize: 4
-zabbix_proxy_historytextcachesize: 16
+zabbix_proxy_historycachesize: 8M
+zabbix_proxy_historyindexcachesize: 4M
+zabbix_proxy_historytextcachesize: 16M
 zabbix_proxy_timeout: 3
 zabbix_proxy_trappertimeout: 300
 zabbix_proxy_unreachableperiod: 45
@@ -152,22 +145,15 @@ zabbix_proxy_tls_config:
   cert: "certificate"
 
 # Zabbix API stuff
-zabbix_validate_certs: true # Will be deprecated in 2.0.0
-zabbix_api_validate_certs: "{{ zabbix_validate_certs }}"
-zabbix_url: http://localhost # Will be deprecated in 2.0.0
-zabbix_api_server_url: "{{ zabbix_url }}"
-# zabbix_http_user: admin                          # Will be deprecated in 2.0.0
-# zabbix_http_password: admin                      # Will be deprecated in 2.0.0
+zabbix_api_validate_certs: true
+zabbix_api_server_url: http://localhost
 # zabbix_api_http_user: admin
 # zabbix_api_http_password: admin
-zabbix_api_user: Admin # Will be deprecated in 2.0.0
-zabbix_api_pass: !unsafe zabbix # Will be deprecated in 2.0.0
 zabbix_api_login_user: "{{ zabbix_api_user }}"
 zabbix_api_login_pass: "{{ zabbix_api_pass }}"
 zabbix_api_create_proxy: false
 zabbix_api_timeout: 30
-zabbix_create_proxy: present # or absent          # Will be deprecated in 2.0.0
-zabbix_proxy_state: "{{ zabbix_create_proxy }}"
+zabbix_proxy_state: present
 zabbix_proxy_status: active # or passive
 
 zabbix_useuip: 1
