@@ -24,9 +24,7 @@
 {{ (zabbix_proxy_dbtlscipher13 is defined and zabbix_proxy_dbtlscipher13 is not none) | ternary('','# ') }}DBTLSCipher13={{ zabbix_proxy_dbtlscipher13 | default('') }}
 {{ (zabbix_proxy_dbtlsconnect is defined and zabbix_proxy_dbtlsconnect is not none) | ternary('','# ') }}DBTLSConnect={{ zabbix_proxy_dbtlsconnect | default('') }}
 {{ (zabbix_proxy_dbtlskeyfile is defined and zabbix_proxy_dbtlskeyfile is not none) | ternary('','# ') }}DBTLSKeyFile={{ zabbix_proxy_dbtlskeyfile | default('') }}
-{% if zabbix_version is version('6.0', '>=') %}
 {{ (zabbix_proxy_dbuser is defined and zabbix_proxy_dbuser is not none) | ternary('','# ') }}DBUser={{ zabbix_proxy_dbuser | default('') }}
-{% endif %}
 {{ (zabbix_proxy_debuglevel is defined and zabbix_proxy_debuglevel is not none) | ternary('','# ') }}DebugLevel={{ zabbix_proxy_debuglevel | default('') }}
 {{ (zabbix_proxy_enableremotecommands is defined and zabbix_proxy_enableremotecommands is not none) | ternary('','# ') }}EnableRemoteCommands={{ zabbix_proxy_enableremotecommands | default('') }}
 {{ (zabbix_proxy_externalscripts is defined and zabbix_proxy_externalscripts is not none) | ternary('','# ') }}ExternalScripts={{ zabbix_proxy_externalscripts | default('') }}
