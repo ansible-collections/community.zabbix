@@ -5,12 +5,12 @@
 
 - name: Determine Latest Supported Zabbix Version
   set_fact:
-    zabbix_proxy_version: "{{ zabbix_valid_proxy_versions[ansible_distribution_major_version][0] | default(6.0) }}"
-  when: zabbix_proxy_version is not defined
+    zabbix_proxy_version: "{{ zabbix_valid_proxy_versions[ansible_distribution_major_version][0] | default(6.2) }}"
+  when: zabbix_proxy_version is not defined or zabbix_proxy_version is none
 
 - name: Set More Variables
   set_fact:
-    zabbix_db_type_long: "{{ 'postgresql' if zabbix_server_database == 'pgsql' else 'mysql' }}"
+    zabbix_db_type_long: "{{ 'postgresql' if zabbix_proxy_database == 'pgsql' else zabbix_proxy_database }}"
     zabbix_valid_version: "{{ zabbix_proxy_version in zabbix_valid_proxy_versions[ansible_distribution_major_version] }}"
 
 - name: Stopping Install of Invalid Version
@@ -29,7 +29,7 @@
   include: "{{ ansible_os_family }}.yml"
 
 - name: "Installing the database"
-  include: "{{ zabbix_proxy_database_long }}.yml"
+  include: "{{ zabbix_db_type_long }}.yml"
 
 - name: "Create include dir zabbix-proxy"
   file:
@@ -118,8 +118,8 @@
 - name: Ensure proxy definition is up-to-date (added/updated/removed)
   zabbix_proxy:
     server_url: "{{ zabbix_api_server_url }}"
-    http_login_user: "{{ zabbix_api_http_user | default(zabbix_http_user | default(omit)) }}"
-    http_login_password: "{{ zabbix_api_http_password | default(zabbix_http_password | default(omit)) }}"
+    http_login_user: "{{ zabbix_api_http_user |  default(omit)) }}"
+    http_login_password: "{{ zabbix_api_http_password | default(omit)) }}"
     login_user: "{{ zabbix_api_login_user }}"
     login_password: "{{ zabbix_api_login_pass }}"
     state: "{{ zabbix_proxy_state }}"

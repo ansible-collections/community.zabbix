@@ -39,11 +39,11 @@
     creates: "{{ zabbix_proxy_dbname }}"
     executable: /bin/bash
   environment:
-    PGPASSWORD: '{{ zabbix_proxy_dbpassword }}'
+    PGPASSWORD: "{{ zabbix_proxy_dbpassword }}"
   when:
     - zabbix_database_creation
 
-- name: "Fix zabbix db file permission (SELinux)"
+- name: "Sqlite3 | Fix zabbix db file permission (SELinux)"
   file:
     path: "{{ zabbix_proxy_dbname }}"
     state: file
