@@ -2,7 +2,7 @@
 driver:
   name: docker
 platforms:
-  - name: zabbix-server-${MY_MOLECULE_CONTAINER:-centos}
+  - name: zabbix-proxy-${MY_MOLECULE_CONTAINER:-centos}
     image: geerlingguy/docker-${MY_MOLECULE_IMAGE:-"centos8"}-ansible:latest
     privileged: true
     pre_build_image: true
@@ -13,7 +13,7 @@ platforms:
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
     groups:
       - ${MY_MOLECULE_DATABASE:-mysql}
-      - ${MY_MOLECULE_VERSION:-6.2}
+      - ${MY_MOLECULE_VERSION:-v62}
 
 provisioner:
   name: ansible
@@ -25,37 +25,37 @@ provisioner:
   inventory:
     group_vars:
       v62:
-        zabbix_server_version: 6.2
+        zabbix_proxy_version: 6.2
       v60:
-        zabbix_server_version: 6.0
+        zabbix_proxy_version: 6.0
       v50:
-        zabbix_server_version: 5.0
+        zabbix_proxy_version: 5.0
       mysql:
-        zabbix_server_dbname: zabbix
-        zabbix_server_dbuser: zabbix-dbuser
-        zabbix_server_database: mysql
-        zabbix_server_dbport: 3306
-        zabbix_server_dbhost: mysql-host
-        zabbix_server_dbhost_run_install: false
-        zabbix_server_privileged_host: "%"
-        zabbix_server_mysql_login_host: mysql-host
-        zabbix_server_mysql_login_user: root
-        zabbix_server_mysql_login_password: changeme
-        zabbix_server_mysql_login_port: 3306
+        zabbix_proxy_dbname: zabbix
+        zabbix_proxy_dbuser: zabbix-dbuser
+        zabbix_proxy_database: mysql
+        zabbix_proxy_dbport: 3306
+        zabbix_proxy_dbhost: mysql-host
+        zabbix_proxy_dbhost_run_install: false
+        zabbix_proxy_privileged_host: "%"
+        zabbix_proxy_mysql_login_host: mysql-host
+        zabbix_proxy_mysql_login_user: root
+        zabbix_proxy_mysql_login_password: changeme
+        zabbix_proxy_mysql_login_port: 3306
+        zabbix_proxy_install_database_client: false
       pgsql:
-        zabbix_server_database: pgsql
-        zabbix_server_dbport: 5432
-        zabbix_server_dbhost: postgresql-host
-        zabbix_server_dbhost_run_install: false
-        zabbix_server_pgsql_login_host: postgresql-host
-        zabbix_server_pgsql_login_user: postgres
-        zabbix_server_pgsql_login_password: changeme
-        zabbix_server_pgsql_login_port: 5432
+        zabbix_proxy_database: pgsql
+        zabbix_proxy_dbport: 5432
+        zabbix_proxy_dbhost: postgresql-host
+        zabbix_proxy_dbhost_run_install: false
+        zabbix_proxy_pgsql_login_host: postgresql-host
+        zabbix_proxy_pgsql_login_user: postgres
+        zabbix_proxy_pgsql_login_password: changeme
+        zabbix_proxy_pgsql_login_port: 5432
       sqlite3:
         zabbix_proxy_database: sqlite3
         zabbix_proxy_database_long: sqlite3
         zabbix_proxy_dbname: /path/to/sqlite3.db
-
 verifier:
   name: testinfra
   lint:

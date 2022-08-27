@@ -14,9 +14,9 @@
         env:
           MYSQL_ROOT_PASSWORD: changeme
       no_log: true
-      # with_items: "{{ molecule_yml.platforms }}"
-      # when:
-      #   - '"mysql" in item.groups'
+      with_items: "{{ molecule_yml.platforms }}"
+      when:
+        - '"mysql" in item.groups'
 
     - name: "Create postgresql Container"
       docker_container:
@@ -29,9 +29,9 @@
         env:
           POSTGRES_PASSWORD: changeme
       no_log: true
-      # with_items: "{{ molecule_yml.platforms }}"
-      # when:
-      #   - '"pgsql" in item.groups'
+      with_items: "{{ molecule_yml.platforms }}"
+      when:
+        - '"pgsql" in item.groups'
 
 - name: Prepare
   hosts: all
