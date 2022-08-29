@@ -49,7 +49,10 @@ Please send Pull Requests or suggestions when you want to use this role for othe
 
 ## Ansible 2.10 and higher
 
-With the release of Ansible 2.10, modules have been moved into collections.  With the exception of ansible.builtin modules, this means additonal collections must be installed in order to use modules such as seboolean (now ansible.posix.seboolean).  The following collection is now required: `ansible.posix`.  Installing the collection:
+With the release of Ansible 2.10, modules have been moved into collections.  This means additonal collections must be installed in order to use various modules.
+
+### Posix
+This collection has a dependency of the `ansible.posix` collection.  Installing the collection:
 
 ```sh
 ansible-galaxy collection install ansible.posix
@@ -57,7 +60,7 @@ ansible-galaxy collection install ansible.posix
 
 ### MySQL
 
-When you are a MySQL user and using Ansible 2.10 or newer, then there is a dependency on the collection named `community.mysql`. This collections are needed as the `mysql_` modules are now part of collections and not standard in Ansible anymmore. Installing the collection:
+When you are using MySQL there is a dependency on the collection named `community.mysql`.  Installing the collection:
 
 ```sh
 ansible-galaxy collection install community.mysql
@@ -65,7 +68,7 @@ ansible-galaxy collection install community.mysql
 
 ### PostgreSQL
 
-When you are a PostgreSQL user and using Ansible 2.10 or newer, then there is a dependency on the collection named `community.postgresql`. This collections are needed as the `postgresql_` modules are now part of collections and not standard in Ansible anymmore. Installing the collection:
+When you are using PostgreSQL there is a dependency on the collection named `community.postgresql`. Installing the collection:
 
 ```sh
 ansible-galaxy collection install community.postgresql
@@ -75,23 +78,16 @@ ansible-galaxy collection install community.postgresql
 
 See the following list of supported Operating systems with the Zabbix releases:
 
-| Zabbix              | 6.2 | 6.0 | 5.4 | 5.2 | 5.0 (LTS) | 4.4 | 4.0 (LTS) | 3.0 (LTS) |
-|---------------------|-----|-----|-----|-----|-----------|-----|-----------|-----------|
-| Red Hat Fam 8       |  V  |  V  |  V  |  V  |  V        | V   |           |           |
-| Red Hat Fam 7       |     |     |     |     |  V        | V   | V         | V         |
-| Red Hat Fam 6       |     |     |     |  V  |  V        |     |           | V         |
-| Red Hat Fam 5       |     |     |     |  V  |  V        |     |           | V         |
-| Fedora              |     |     |     |     |           | V   | V         |           |
-| Ubuntu 20.04 focal  |  V  |  V  |  V  |  V  |  V        |     | V         |           |
-| Ubuntu 18.04 bionic |     |  V  |  V  |  V  |  V        | V   | V         |           |
-| Ubuntu 16.04 xenial |     |     |     |  V  |  V        | V   | V         |           |
-| Ubuntu 14.04 trusty |     |     |     |  V  |  V        | V   | V         | V         |
-| Debian 10 buster    |     |  V  |  V  |  V  |  V        | V   |           |           |
-| Debian 9 stretch    |     |  V  |  V  |  V  |  V        | V   | V         |           |
-| Debian 8 jessie     |     |     |     |  V  |  V        | V   | V         | V         |
-| Debian 7 wheezy     |     |     |     |     |           |     | V         | V         |
-| macOS 10.15         |     |     |     |     |           | V   | V         |           |
-| macOS 10.14         |     |     |     |     |           | V   | V         |           |
+| Zabbix              | 6.2 | 6.0 (LTS) | 5.0 (LTS) | 
+|---------------------|-----|-----------|-----------|
+| Red Hat Fam 8       |  V  |  V        |  V        |
+| Red Hat Fam 7       |     |           |  V        |
+| Ubuntu 22.04 jammy  |  V  |  V        |  V        |
+| Ubuntu 20.04 focal  |  V  |  V        |  V        |
+| Ubuntu 18.04 bionic |     |  V        |  V        |
+| Debian 11 bullseye  |  V  |  V        |  V        |
+| Debian 10 buster    |     |  V        |  V        |
+
 
 See https://support.zabbix.com/browse/ZBX-18790 why RHEL7 is not supported anymore.
 
@@ -109,26 +105,29 @@ The following is an overview of all available configuration default for this rol
 
 ### Overall Zabbix
 
-* `zabbix_server_version`: This is the version of zabbix. Default: The highest supported version for the operating system. Can be overridden to 6.2, 6.0, 5.4, 5.2, 5.0, 4.4, 4.0, 3.4, 3.2, 3.0, 2.4, or 2.2. Previously the variable `zabbix_version` was used directly but it could cause [some inconvenience](https://github.com/dj-wasabi/ansible-zabbix-agent/pull/303). That variable is maintained by retrocompativility.
+* `zabbix_server_version`: This is the version of zabbix. Default: The highest supported version for the operating system. Can be overridden to 6.2, 6.0, or 5.0.
+* `zabbix_server_database`: Default: `pgsql`. The type of database used. Can be: `mysql` or `pgsql`
 * `zabbix_server_version_minor`: When you want to specify a minor version to be installed. RedHat only. Default set to: `*` (latest available)
 * `zabbix_repo`: Default: `zabbix`
   * `epel`: install agent from EPEL repo
   * `zabbix`: (default) install agent from Zabbix repo
   * `other`: install agent from pre-existing or other repo
+* `zabbix_service_state`: Default: `started`. Can be overridden to stopped if needed
+* `zabbix_service_enabled`: Default: `True` Can be overridden to `False` if needed
+
+### RHEL Installs
 * `zabbix_repo_yum`: A list with Yum repository configuration.
 * `zabbix_repo_yum_schema`: Default: `https`. Option to change the web schema for the yum repository(http/https)
 * `zabbix_repo_yum_disabled`: A string with repository names that should be disabled when installing Zabbix component specific packages. Is only used when `zabbix_repo_yum_enabled` contains 1 or more repositories. Default `*`.
 * `zabbix_repo_yum_enabled`: A list with repository names that should be enabled when installing Zabbix component specific packages.
-* `zabbix_service_state`: Default: `started`. Can be overridden to stopped if needed
-* `zabbix_service_enabled`: Default: `True` Can be overridden to `False` if needed
 
 ### SElinux
-
 * `zabbix_selinux`: Default: `False`. Enables an SELinux policy so that the server will run.
 * `selinux_allow_zabbix_can_network`: Default: `False`. 
 * `selinux_allow_zabbix_can_http`: Default: `False`. 
 
 ### Zabbix Server
+**NOTE**: The Zabbix server configuraiton file has a large number of configurable options.  Below is a subset of those options, however all of them are configurable through the the role's variables.
 
 * `zabbix_server_package_state`: Default: `present`. Can be overridden to `latest` to update packages when needed.
 * `zabbix_server_listenport`: Default: `10051`. On which port the Zabbix Server is available.
@@ -149,8 +148,6 @@ The following is an overview of all available configuration default for this rol
 * `zabbix_server_vaultdbpath`: Vault path from where credentials for database will be retrieved by keys 'password' and 'username'.
 * `zabbix_server_startreportwriters`: Number of pre-forked report writer instances.
 * `zabbix_server_webserviceurl`: URL to Zabbix web service, used to perform web related tasks.
-* `zabbix_server_servicemanagersyncfrequency`: How often Zabbix will synchronize configuration of a service manager (in seconds).
-* `zabbix_server_problemhousekeepingfrequency`: How often Zabbix will delete problems for deleted triggers (in seconds).
 
 ### High Availability
 
@@ -162,10 +159,8 @@ These variables are specific for Zabbix 6.0 and higher:
 ### Database specific
 
 * `zabbix_server_dbhost_run_install`: Default: `True`. When set to `True`, sql files will be executed on the host running the database.
-* `zabbix_server_database`: Default: `pgsql`. The type of database used. Can be: `mysql` or `pgsql`
-* `zabbix_server_database_long`: Default: `postgresql`. The type of database used, but long name. Can be: `mysql` or `postgresql`
 * `zabbix_server_dbhost`: The hostname on which the database is running.
-* `zabbix_server_real_dbhost`: The hostname of the dbhost that is running behind a loadbalancer/VIP (loadbalancers doesn't accept ssh connections)
+* `zabbix_server_real_dbhost`: The hostname of the dbhost that is running behind a loadbalancer/VIP (loadbalancers don't accept ssh connections)
 * `zabbix_server_dbname`: The database name which is used by the Zabbix Server.
 * `zabbix_server_dbuser`: The database username which is used by the Zabbix Server.
 * `zabbix_server_dbpassword`: The database user password which is used by the Zabbix Server.
@@ -206,13 +201,12 @@ These variables are specific for Zabbix 3.0 and higher:
 
 On `MySQL` starting from 5.7.11 and `PostgreSQL` the following values are supported: `required`, `verify`, `verify_full`. On MariaDB starting from version 10.2.6 `required` and `verify_full` values are supported.
 By default not set to any option and the behaviour depends on database configuration.
-This parameter is supported since Zabbix 5.0.0.
 
-* `zabbix_server_dbtlscafile`: Full pathname of a file containing the top-level CA(s) certificates for database certificate verification. This parameter is supported since Zabbix 5.0.0.
-* `zabbix_server_dbtlscertfile`: Full pathname of file containing Zabbix server certificate for authenticating to database. This parameter is supported since Zabbix 5.0.0.
-* `zabbix_server_dbtlskeyfile`: Full pathname of file containing the private key for authenticating to database. This parameter is supported since Zabbix 5.0.0.
-* `zabbix_server_dbtlscipher`: The list of encryption ciphers that Zabbix server permits for TLS protocols up through TLSv1.2. Supported only for MySQL.This parameter is supported since Zabbix 5.0.0.
-* `zabbix_server_dbtlscipher13`: The list of encryption ciphersuites that Zabbix server permits for TLSv1.3 protocol. Supported only for MySQL, starting from version 8.0.16. This parameter is supported since Zabbix 5.0.0.
+* `zabbix_server_dbtlscafile`: Full pathname of a file containing the top-level CA(s) certificates for database certificate verification.
+* `zabbix_server_dbtlscertfile`: Full pathname of file containing Zabbix server certificate for authenticating to database.
+* `zabbix_server_dbtlskeyfile`: Full pathname of file containing the private key for authenticating to database.
+* `zabbix_server_dbtlscipher`: The list of encryption ciphers that Zabbix server permits for TLS protocols up through TLSv1.2.
+* `zabbix_server_dbtlscipher13`: The list of encryption ciphersuites that Zabbix server permits for TLSv1.3 protocol. Supported only for MySQL, starting from version 8.0.16.
 
 ### Custom Zabbix Scripts
 
@@ -261,7 +255,6 @@ We need to have the following dependencies met:
 
 ```yaml
 zabbix_server_database: mysql
-zabbix_server_database_long: mysql
 zabbix_server_dbport: 3306
 zabbix_server_dbpassword: <SOME_SECRET_STRING>
 ```
@@ -278,7 +271,6 @@ We need to have the following dependencies met:
 
 ```yaml
 zabbix_server_database: mysql
-zabbix_server_database_long: mysql
 zabbix_server_dbport: 3306
 zabbix_server_dbhost: mysql-host
 zabbix_server_dbhost_run_install: false
@@ -312,7 +304,6 @@ We need to have the following dependencies met:
 
 ```yaml
 zabbix_server_database: pgsql
-zabbix_server_database_long: postgresql
 zabbix_server_dbport: 5432
 zabbix_server_dbpassword: <SOME_SECRET_STRING>
 ```
@@ -329,7 +320,6 @@ We need to have the following dependencies met:
 
 ```yaml
 zabbix_server_database: pgsql;
-zabbix_server_database_long: postgresql
 zabbix_server_dbport: 5432
 zabbix_server_dbhost: pgsql-host
 zabbix_server_dbhost_run_install: false
@@ -356,7 +346,6 @@ Including an example of how to use your role (for instance, with variables passe
     roles:
       - role: community.zabbix.zabbix_server
         zabbix_server_database: mysql
-        zabbix_server_database_long: mysql
 ```
 
 # Molecule
