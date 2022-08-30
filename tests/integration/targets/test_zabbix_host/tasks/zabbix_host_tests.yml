@@ -1594,6 +1594,24 @@
   - name: verify host was created without interfaces
     assert:
       that: zbx_host_create_interfaceless is changed
+  
+  - name: "test: create host without host interfaces (again)"
+    zabbix_host:
+      server_url: "{{ zabbix_api_server_url }}"
+      login_user: "{{ zabbix_api_login_user }}"
+      login_password: "{{ zabbix_api_login_pass }}"
+      host_name: ExampleHost
+      visible_name: ExampleName
+      description: My ExampleHost Description
+      host_groups:
+        - Linux servers
+      status: disabled
+      state: present
+    register: zbx_host_create_interfaceless
+
+  - name: expect to succeed and that things have not changed
+    assert:
+      that: zbx_host_create_interfaceless is not changed
 
   - name: "cleanup"
     zabbix_host:
