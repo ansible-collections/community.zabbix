@@ -703,7 +703,7 @@ class Host(ZabbixBase):
                     found = True
                     break
 
-        if not found:
+        if interfaces and not found:
             return True
 
         return False
