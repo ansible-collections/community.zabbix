@@ -1,5 +1,6 @@
 ---
 # task file for mysql
+
 - name: "MySQL | Set the correct delegated_dbhost (to support MySQL db deployment on a remote dbhost)"
   set_fact:
     delegated_dbhost: "{{ zabbix_server_dbhost if (zabbix_server_dbhost != 'localhost') else inventory_hostname }}"
