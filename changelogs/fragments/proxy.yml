@@ -1,0 +1,18 @@
+breaking_changes:
+  - zabbix_server_host - Removed zabbix_server_host and replaced with zabbix_proxy_server
+  - zabbix_server_port - Removed zabbix_server_port and replaced with zabbix_proxy_serverport
+  - zabbix_proxy_localbuffer - Removed zabbix_proxy_localbuffer and replaced with zabbix_proxy_proxylocalbuffer
+  - zabbix_proxy_offlinebuffer - Removed zabbix_proxy_offlinebuffer and replaced with zabbix_proxy_proxyofflinebuffer
+  - zabbix_validate_certs - Removed zabbix_validate_certs and replaced with zabbix_api_validate_certs
+  - zabbix_url - Removed zabbix_url and replaced with zabbix_api_server_url
+  - zabbix_http_user - Removed zabbix_http_user and replaced with zabbix_api_http_user
+  - zabbix_http_password - Removed zabbix_http_password and replaced with zabbix_api_http_password
+  - zabbix_api_user - Removed zabbix_api_user and replaced with zabbix_api_login_user
+  - zabbix_api_pass - Removed zabbix_api_pass and replaced with zabbix_api_login_pass
+  - zabbix_create_proxy - Removed zabbix_create_proxy and replaced with zabbix_proxy_state
+  - Zabbix < 5.0 - Removed support for all versions older than 5.0
+  - EOL Operating Systems - Removed support for EOL operating systems
+minor_changes:
+  - zabbix_proxy_database_long - Removed requirement for zabbix_proxy_database_long
+  - github workflow - Updated workflow files to checked against all supported combinations
+  - documentation - Updated role documentation to reflect changes
