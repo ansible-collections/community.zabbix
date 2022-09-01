@@ -73,7 +73,7 @@
 - name: "PostgreSQL | Importing schema file"
   shell: |
     set -euxo pipefail
-    FILE={{ 'schema.sql' if zabbix_version is version('6.0', '<') else 'proxy.sql' }}
+    FILE={{ 'schema.sql' if zabbix_proxy_version is version('6.0', '<') else 'proxy.sql' }}
     cd {{ datafiles_path }}
     if [ -f ${FILE}.gz ]
       then zcat ${FILE}.gz > /tmp/schema.sql

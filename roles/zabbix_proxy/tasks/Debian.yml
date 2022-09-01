@@ -4,16 +4,16 @@
 
 - name: "Debian | Set short version name"
   set_fact:
-    zabbix_short_version: "{{ zabbix_version | regex_replace('\\.', '') }}"
+    zabbix_short_version: "{{ zabbix_proxy_version | regex_replace('\\.', '') }}"
     zabbix_python_prefix: "python{% if ansible_python_version is version('3', '>=') %}3{% endif %}"
-    zabbix_underscore_version: "{{ zabbix_version | regex_replace('\\.', '_') }}"
+    zabbix_underscore_version: "{{ zabbix_proxy_version | regex_replace('\\.', '_') }}"
 
 - name: "Debian | Set some facts for Zabbix  < 6.0"
   set_fact:
     apache_log: apache2
     datafiles_path: /usr/share/doc/zabbix-proxy-{{ zabbix_proxy_database }}
   when:
-    - zabbix_version is version('6.0', '<')
+    - zabbix_proxy_version is version('6.0', '<')
   tags:
     - zabbix-proxy
     - init
@@ -21,9 +21,9 @@
 
 - name: "Debian | Set some facts for Zabbix >= 6.0"
   set_fact:
-    datafiles_path: /usr/share/doc/zabbix-sql-scripts/{{ zabbix_db_type_long }}
+    datafiles_path: /usr/share/doc/zabbix-sql-scripts/{{ zabbix_proxy_db_long }}
   when:
-    - zabbix_version is version('6.0', '>=')
+    - zabbix_proxy_version is version('6.0', '>=')
   tags:
     - zabbix-server
     - init
@@ -58,7 +58,7 @@
 
 - name: "Debian | Installing repository {{ ansible_distribution }}"
   apt_repository:
-    repo: "{{ item }} http://repo.zabbix.com/zabbix/{{ zabbix_version }}/{{ ansible_distribution.lower() }}/ {{ ansible_distribution_release }} main"
+    repo: "{{ item }} http://repo.zabbix.com/zabbix/{{ zabbix_proxy_version }}/{{ ansible_distribution.lower() }}/ {{ ansible_distribution_release }} main"
     state: present
   when: zabbix_repo == "zabbix"
   become: true
@@ -119,7 +119,7 @@
   register: zabbix_proxy_package_sql_installed
   until: zabbix_proxy_package_sql_installed is succeeded
   when:
-    - zabbix_version is version('6.0', '>=')
+    - zabbix_proxy_version is version('6.0', '>=')
   become: true
   tags:
     - zabbix-server

@@ -3,11 +3,11 @@
 
 - name: "RedHat | Set short version name"
   set_fact:
-    zabbix_short_version: "{{ zabbix_version | regex_replace('\\.', '') }}"
+    zabbix_short_version: "{{ zabbix_proxy_version | regex_replace('\\.', '') }}"
 
 - name: "RedHat | Use EPEL package name"
   set_fact:
-    zabbix_proxy_package: "zabbix{{ zabbix_version | regex_replace('\\.', '') }}-proxy"
+    zabbix_proxy_package: "zabbix{{ zabbix_proxy_version | regex_replace('\\.', '') }}-proxy"
   when:
     - zabbix_repo == "epel"
   tags:
@@ -24,17 +24,17 @@
 - name: "RedHat | Set facts for Zabbix < 6.0"
   set_fact:
     apache_log: httpd
-    datafiles_path: "/usr/share/doc/zabbix-proxy-{{ zabbix_proxy_database }}-{{ zabbix_version }}*"
+    datafiles_path: "/usr/share/doc/zabbix-proxy-{{ zabbix_proxy_database }}-{{ zabbix_proxy_version }}*"
   when:
-    - zabbix_version is version('6.0', '<')
+    - zabbix_proxy_version is version('6.0', '<')
   tags:
     - zabbix-proxy
 
 - name: "RedHat | Set facts for Zabbix >= 6.0"
   set_fact:
-    datafiles_path: "/usr/share/doc/zabbix-sql-scripts/{{ zabbix_db_type_long }}"
+    datafiles_path: "/usr/share/doc/zabbix-sql-scripts/{{ zabbix_proxy_db_long }}"
   when:
-    - zabbix_version is version('6.0', '>=')
+    - zabbix_proxy_version is version('6.0', '>=')
   tags:
     - zabbix-server
 
@@ -43,14 +43,14 @@
     apache_log: httpd
     datafiles_path: "/usr/share/doc/zabbix-proxy-{{ zabbix_proxy_database }}"
   when:
-    - zabbix_version is version('6.0', '<')
+    - zabbix_proxy_version is version('6.0', '<')
     - ansible_distribution_major_version == '8'
   tags:
     - zabbix-proxy
 
 - name: "RedHat | Set some facts EPEL"
   set_fact:
-    datafiles_path: "/usr/share/zabbix-{{ zabbix_db_type_long }}"
+    datafiles_path: "/usr/share/zabbix-{{ zabbix_proxy_db_long }}"
   when:
     - zabbix_repo == "epel"
   tags:
@@ -129,7 +129,7 @@
       register: zabbix_proxy_sql_package_installed
       until: zabbix_proxy_sql_package_installed is succeeded
       when:
-        - zabbix_version is version('6.0', '>=')
+        - zabbix_proxy_version is version('6.0', '>=')
       become: true
   when: zabbix_repo != "other"
   tags:
@@ -153,7 +153,7 @@
       register: zabbix_proxy_sql_package_installed
       until: zabbix_proxy_sql_package_installed is succeeded
       when:
-        - zabbix_version is version('6.0', '>=')
+        - zabbix_proxy_version is version('6.0', '>=')
       become: true
   when: zabbix_repo == "other"
   tags:

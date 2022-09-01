@@ -10,7 +10,7 @@
 
 - name: Set More Variables
   set_fact:
-    zabbix_db_type_long: "{{ 'postgresql' if zabbix_proxy_database == 'pgsql' else zabbix_proxy_database }}"
+    zabbix_proxy_db_long: "{{ 'postgresql' if zabbix_proxy_database == 'pgsql' else zabbix_proxy_database }}"
     zabbix_valid_version: "{{ zabbix_proxy_version in zabbix_valid_proxy_versions[ansible_distribution_major_version] }}"
 
 - name: Stopping Install of Invalid Version
@@ -29,7 +29,7 @@
   include: "{{ ansible_os_family }}.yml"
 
 - name: "Installing the database"
-  include: "{{ zabbix_db_type_long }}.yml"
+  include: "{{ zabbix_proxy_db_long }}.yml"
 
 - name: "Create include dir zabbix-proxy"
   file:
@@ -129,7 +129,7 @@
     interface: "{{ zabbix_proxy_interface }}"
     tls_psk: "{{ zabbix_proxy_tlspsk_secret | default(omit) }}"
     tls_psk_identity: "{{ zabbix_proxy_tlspskidentity | default(omit) }}"
-    tls_subject: "{{ zabbix_proxy_tls_subject | default(omit) }}"
+    tls_subject: "{{ zabbix_proxy_tlsservercertsubject | default(omit) }}"
     tls_accept: "{{ zabbix_proxy_tls_config[zabbix_proxy_tlsaccept if zabbix_proxy_tlsaccept else 'no_encryption'] }}"
     tls_connect: "{{ zabbix_proxy_tls_config[zabbix_proxy_tlsconnect if zabbix_proxy_tlsconnect else 'no_encryption'] }}"
     validate_certs: "{{ zabbix_api_validate_certs | default(omit) }}"

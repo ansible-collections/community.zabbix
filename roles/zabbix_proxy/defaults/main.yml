@@ -2,7 +2,6 @@
 # defaults file for zabbix_proxy
 zabbix_proxy_version:
 zabbix_proxy_version_minor: "*"
-zabbix_version: "{{ zabbix_proxy_version }}"
 zabbix_selinux: false
 
 zabbix_repo: zabbix
@@ -18,7 +17,7 @@ zabbix_repo_yum_enabled: []
 zabbix_repo_yum:
   - name: zabbix
     description: Zabbix Official Repository - $basearch
-    baseurl: "{{ zabbix_repo_yum_schema }}://repo.zabbix.com/zabbix/{{ zabbix_version | regex_search('^[0-9]+.[0-9]+') }}/rhel/{{ ansible_distribution_major_version }}/$basearch/"
+    baseurl: "{{ zabbix_repo_yum_schema }}://repo.zabbix.com/zabbix/{{ zabbix_proxy_version | regex_search('^[0-9]+.[0-9]+') }}/rhel/{{ ansible_distribution_major_version }}/$basearch/"
     gpgcheck: "{{ zabbix_repo_yum_gpgcheck }}"
     mode: "0644"
     gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-ZABBIX
@@ -134,7 +133,6 @@ zabbix_proxy_tlscafile:
 zabbix_proxy_tlscrlfile:
 zabbix_proxy_tlsservercertissuer:
 zabbix_proxy_tlsservercertsubject:
-zabbix_proxy_tls_subject: "{{ zabbix_proxy_tlsservercertsubject }}" # FIXME this is not correct and should be removed with 2.0.0, here only to prevent regression
 zabbix_proxy_tlscertfile:
 zabbix_proxy_tlskeyfile:
 zabbix_proxy_tlspskidentity:
@@ -147,8 +145,8 @@ zabbix_proxy_tls_config:
 # Zabbix API stuff
 zabbix_api_validate_certs: true
 zabbix_api_server_url: http://localhost
-# zabbix_api_http_user: admin
-# zabbix_api_http_password: admin
+zabbix_api_http_user: admin
+zabbix_api_http_password: admin
 zabbix_api_login_user: "{{ zabbix_api_user }}"
 zabbix_api_login_pass: "{{ zabbix_api_pass }}"
 zabbix_api_create_proxy: false

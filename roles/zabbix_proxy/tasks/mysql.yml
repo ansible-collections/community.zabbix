@@ -55,7 +55,7 @@
     - database
 
 - name: "MySQL | Get the file for schema.sql"
-  shell: ls -1 {{ datafiles_path }}/{{ 'schema' if zabbix_version is version('6.0', '<') else 'proxy' }}.sq*
+  shell: ls -1 {{ datafiles_path }}/{{ 'schema' if zabbix_proxy_version is version('6.0', '<') else 'proxy' }}.sq*
   changed_when: false
   when:
     - zabbix_database_sqlload
