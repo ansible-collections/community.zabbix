@@ -30,7 +30,7 @@
   set_fact:
     datafiles_path: /usr/share/doc/zabbix-server-{{ zabbix_server_database }}
   when:
-    - zabbix_server_version is version('6.0', '<')
+    - zabbix_version is version('6.0', '<')
   tags:
     - zabbix-server
     - init
@@ -40,7 +40,7 @@
   set_fact:
     datafiles_path: /usr/share/doc/zabbix-sql-scripts/{{ 'postgresql' if zabbix_server_database == 'pgsql' else 'mysql' }}
   when:
-    - zabbix_server_version is version('6.0', '>=')
+    - zabbix_version is version('6.0', '>=')
   tags:
     - zabbix-server
     - init

@@ -1,12 +1,5 @@
 ---
 # defaults file for zabbix_server
-zabbix_server_version:
-zabbix_server_database: pgsql
-zabbix_database_creation: true
-zabbix_server_install_database_client: true
-zabbix_service_state: started
-zabbix_service_enabled: true
-zabbix_repo: zabbix
 zabbix_server_version_minor: "*"
 zabbix_server_package_state: present
 
@@ -41,6 +34,9 @@ zabbix_server_username: zabbix
 zabbix_server_groupname: zabbix
 
 # Database
+zabbix_server_database: pgsql
+# zabbix_server_database_long: postgresql
+zabbix_database_creation: true
 zabbix_database_sqlload: true
 zabbix_database_timescaledb: false
 zabbix_server_dbtlsconnect:

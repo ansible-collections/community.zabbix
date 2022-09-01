@@ -60,7 +60,7 @@ ansible-galaxy collection install ansible.posix
 
 ### MySQL
 
-When you are using MySQL there is a dependency on the collection named `community.mysql`.  Installing the collection:
+When you are a MySQL there is a dependency on the collection named `community.mysql`.  Installing the collection:
 
 ```sh
 ansible-galaxy collection install community.mysql
@@ -68,7 +68,7 @@ ansible-galaxy collection install community.mysql
 
 ### PostgreSQL
 
-When you are using PostgreSQL there is a dependency on the collection named `community.postgresql`. Installing the collection:
+When you are a PostgreSQL there is a dependency on the collection named `community.postgresql`. Installing the collection:
 
 ```sh
 ansible-galaxy collection install community.postgresql
@@ -86,7 +86,7 @@ See the following list of supported Operating systems with the Zabbix releases:
 | Ubuntu 20.04 focal  |  V  |  V        |  V        |
 | Ubuntu 18.04 bionic |     |  V        |  V        |
 | Debian 11 bullseye  |  V  |  V        |  V        |
-| Debian 10 buster    |     |  V        |  V        |
+| Debian 10 buster    |     |  V        |  V        ?
 
 
 See https://support.zabbix.com/browse/ZBX-18790 why RHEL7 is not supported anymore.
@@ -105,8 +105,7 @@ The following is an overview of all available configuration default for this rol
 
 ### Overall Zabbix
 
-* `zabbix_server_version`: This is the version of zabbix. Default: The highest supported version for the operating system. Can be overridden to 6.2, 6.0, or 5.0.
-* `zabbix_server_database`: Default: `pgsql`. The type of database used. Can be: `mysql` or `pgsql`
+* `zabbix_server_version`: This is the version of zabbix. Default: The highest supported version for the operating system. Can be overridden to 6.2, 6.0,  or 5.0. Previously the variable `zabbix_version` was used directly but it could cause [some inconvenience](https://github.com/dj-wasabi/ansible-zabbix-agent/pull/303). That variable is maintained by retrocompativility.
 * `zabbix_server_version_minor`: When you want to specify a minor version to be installed. RedHat only. Default set to: `*` (latest available)
 * `zabbix_repo`: Default: `zabbix`
   * `epel`: install agent from EPEL repo
@@ -159,6 +158,7 @@ These variables are specific for Zabbix 6.0 and higher:
 ### Database specific
 
 * `zabbix_server_dbhost_run_install`: Default: `True`. When set to `True`, sql files will be executed on the host running the database.
+* `zabbix_server_database`: Default: `pgsql`. The type of database used. Can be: `mysql` or `pgsql`
 * `zabbix_server_dbhost`: The hostname on which the database is running.
 * `zabbix_server_real_dbhost`: The hostname of the dbhost that is running behind a loadbalancer/VIP (loadbalancers don't accept ssh connections)
 * `zabbix_server_dbname`: The database name which is used by the Zabbix Server.
