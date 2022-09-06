@@ -219,3 +219,10 @@
   tags:
     - init
     - service
+
+- name: "Give zabbix-agent access to system.hw.chassis info"
+  file:
+    path: /sys/firmware/dmi/tables/DMI
+    owner: root
+    group: zabbix
+  when: zabbix_agent_chassis | bool
