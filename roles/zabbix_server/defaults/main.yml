@@ -1,6 +1,6 @@
 ---
 # defaults file for zabbix_server
-zabbix_server_version:
+# zabbix_server_version:
 zabbix_server_database: pgsql
 zabbix_database_creation: true
 zabbix_server_install_database_client: true
@@ -106,7 +106,7 @@ zabbix_server_startsnmptrapper: 0
 zabbix_server_listenip:
 zabbix_server_housekeepingfrequency: 1
 zabbix_server_maxhousekeeperdelete: 500
-zabbix_server_cachesize: 8M
+zabbix_server_cachesize:
 zabbix_server_cacheupdatefrequency: 60
 zabbix_server_startdbsyncers: 4
 zabbix_server_historycachesize: 8M

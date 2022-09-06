@@ -1,6 +1,4 @@
 ---
-# tasks file for wdijkerman.zabbix
-
 - name: Include OS-specific variables
   include_vars: "{{ ansible_os_family }}.yml"
 
@@ -12,7 +10,7 @@
 - name: Set More Variables
   set_fact:
     zabbix_db_type_long: "{{ 'postgresql' if zabbix_server_database == 'pgsql' else 'mysql' }}"
-    zabbix_valid_version: "{{ zabbix_server_version in zabbix_valid_server_versions[ansible_distribution_major_version] }}"
+    zabbix_valid_version: "{{ zabbix_server_version|float in zabbix_valid_server_versions[ansible_distribution_major_version] }}"
 
 - name: Stopping Install of Invalid Version
   fail:
