@@ -1,7 +1,0 @@
-minor_changes:
-  - github workflow - Updated workflow files to checked against all supported combinations
-  - documentation - Updated role documentation to reflect changes
-breaking_changes:
-  - Zabbix < 5.0 - Removed support for all versions older than 5.0
-  - EOL Operating Systems - Removed support for EOL operating systems
-  - zabbix_server - Replaced zabbix_version variable with zabbix_javagateway_version
