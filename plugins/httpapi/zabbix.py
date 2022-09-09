@@ -12,7 +12,7 @@ DOCUMENTATION = """
 name: zabbix
 authors:
   - Markus Fischbacher (@rockaut)
-  = Evgeny Yurchenko (@BGmot)
+  - Evgeny Yurchenko (@BGmot)
 short_description: HttpApi Plugin for Zabbix
 description:
   - This HttpApi plugin provides methods to connect to Zabbix over their HTTP(S)-based api.
