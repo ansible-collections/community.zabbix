@@ -503,7 +503,7 @@ from ansible_collections.community.zabbix.plugins.module_utils.version import Lo
 import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabbix_utils
 
 
-class Zapi(ZapiWrapper):
+class Zapi(ZabbixBase):
     def __init__(self, module, zbx=None):
         super(Zapi, self).__init__(module, zbx)
         self._zapi_wrapper = self
@@ -842,9 +842,9 @@ class Zapi(ZapiWrapper):
             self._module.fail_json(msg="Failed to get script '%s': %s" % (script_name, e))
 
 
-class Action(ZabbixBase):
-    def __init__(self, module, zbx=None, zapi_wrapper=None):
-        super(Action, self).__init__(module, zbx, zapi_wrapper)
+class Action(Zapi):
+    def __init__(self, module, zbx=None):
+        super(Action, self).__init__(module, zbx)
         self.existing_data = None
 
     def _construct_parameters(self, **kwargs):
@@ -934,7 +934,7 @@ class Action(ZabbixBase):
         Returns:
             dict: dictionary of differences
         """
-        existing_action = zabbix_utils.helper_convert_unicode_to_str(self._zapi_wrapper.check_if_action_exists(kwargs['name'])[0])
+        existing_action = zabbix_utils.helper_convert_unicode_to_str(self.check_if_action_exists(kwargs['name'])[0])
         parameters = zabbix_utils.helper_convert_unicode_to_str(self._construct_parameters(**kwargs))
         change_parameters = {}
         _diff = zabbix_utils.helper_cleanup_data(zabbix_utils.helper_compare_dictionaries(parameters, existing_action, change_parameters))
@@ -1953,6 +1953,8 @@ def main():
         supports_check_mode=True
     )
 
+    zabbix_utils.require_creds_params(module)
+
     name = module.params['name']
     esc_period = module.params['esc_period']
     event_source = module.params['event_source']
@@ -1973,7 +1975,7 @@ def main():
     acknowledge_operations = module.params['acknowledge_operations']
 
     zapi_wrapper = Zapi(module)
-    action = Action(module, zapi_wrapper=zapi_wrapper)
+    action = Action(module)
 
     action_exists = zapi_wrapper.check_if_action_exists(name)
     ops = Operations(module, zapi_wrapper)
