@@ -9,6 +9,12 @@ __metaclass__ = type
 
 from ansible.module_utils.basic import env_fallback
 
+def require_creds_params(module):
+    if module._socket_path is None:
+        # ansible_connection = local
+        if ((not module.params.get('login_user', None)) or
+            (not module.params.get('login_password', None))):
+            module.fail_json(msg="login_user and login_password are mandatory parameters when httpapi connection is not used")
 
 def zabbix_common_argument_spec():
     """
@@ -18,30 +24,19 @@ def zabbix_common_argument_spec():
     return dict(
         server_url=dict(
             type='str',
-            required=True,
+            required=False,
             aliases=['url'],
             fallback=(env_fallback, ['ZABBIX_SERVER'])
         ),
         login_user=dict(
-            type='str', required=True,
+            type='str', required=False,
             fallback=(env_fallback, ['ZABBIX_USERNAME'])
         ),
         login_password=dict(
             type='str',
-            required=True,
+            required=False,
             no_log=True,
             fallback=(env_fallback, ['ZABBIX_PASSWORD'])
-        ),
-        http_login_user=dict(
-            type='str',
-            required=False,
-            default=None
-        ),
-        http_login_password=dict(
-            type='str',
-            required=False,
-            default=None,
-            no_log=True
         ),
         timeout=dict(
             type='int',

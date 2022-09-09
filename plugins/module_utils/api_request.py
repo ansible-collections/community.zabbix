@@ -26,7 +26,7 @@ class ZabbixApiRequest(object):
 
     def _httpapi_error_handle(self, payload=None):
         try:
-            code, response = self.connection.send_request(payload=payload)
+            code, response = self.connection.send_request(data=payload)
         except ConnectionError as e:
             self.module.fail_json(msg="connection error occurred: {0}".format(e))
         except CertificateError as e:
@@ -52,13 +52,10 @@ class ZabbixApiRequest(object):
     def api_version(self):
         return self.connection.api_version()
 
-    def _zbx_api_version(self):
-        return self.connection.api_version()
-
     @staticmethod
-    def payload_builder(method_, jsonrpc_version='2.0', reqid=str(uuid4()), **kwargs):
+    def payload_builder(method_, params, jsonrpc_version='2.0', reqid=str(uuid4()), **kwargs):
         req = {'jsonrpc': jsonrpc_version, 'method': method_, 'id': reqid}
-        req['params'] = (kwargs)
+        req['params'] = params
         return req
 
     def __getattr__(self, name):
@@ -78,7 +75,7 @@ class ZabbixApiSection(object):
             _method = "%s.%s" % (self.name, name)
             if not opts:
                 opts = {}
-            payload = ZabbixApiRequest.payload_builder(_method, **opts)
+            payload = ZabbixApiRequest.payload_builder(_method, opts)
             return self.parent._httpapi_error_handle(payload=payload)
 
         return method
