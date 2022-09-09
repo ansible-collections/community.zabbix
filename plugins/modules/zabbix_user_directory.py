@@ -134,6 +134,8 @@ def main():
         supports_check_mode=True
     )
 
+    zabbix_utils.require_creds_params(module)
+
     parameters = {
         'name': module.params['name'],
         'search_filter': module.params['search_filter']
