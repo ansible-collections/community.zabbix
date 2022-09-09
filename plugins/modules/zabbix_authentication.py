@@ -538,6 +538,8 @@ def main():
         supports_check_mode=True
     )
 
+    zabbix_utils.require_creds_params(module)
+
     authentication_type = module.params['authentication_type']
     http_auth_enabled = module.params['http_auth_enabled']
     http_login_form = module.params['http_login_form']
