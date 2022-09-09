@@ -9,12 +9,14 @@ __metaclass__ = type
 
 DOCUMENTATION = """
 ---
-name: jsonrpc
-author: Markus Fischbacher (@rockaut)
+name: zabbix
+authors:
+  - Markus Fischbacher (@rockaut)
+  = Evgeny Yurchenko (@BGmot)
 short_description: HttpApi Plugin for Zabbix
 description:
   - This HttpApi plugin provides methods to connect to Zabbix over their HTTP(S)-based api.
-version_added: 1.6.0
+version_added: 1.8.0
 """
 
 import json
@@ -28,7 +30,7 @@ from ansible.module_utils.connection import ConnectionError
 
 
 BASE_HEADERS = {
-    'Content-Type': 'application/json',
+    'Content-Type': 'application/json-rpc',
     'Accept': 'application/json',
 }
 
@@ -45,15 +47,16 @@ class HttpApi(HttpApiBase):
         return None
 
     def login(self, username, password):
-        payload = self.payload_builder("user.login", username=username, password=password)
+        payload = self.payload_builder("user.login", user=username, password=password)
         code, response = self.send_request(data=payload)
 
         if code == 200 and response != '':
-            self.connection._auth = response
+            self.connection._auth = { 'auth' : response }
 
     def logout(self):
-        payload = self.payload_builder("user.logout", self.connection._auth)
-        self.send_request(data=payload)
+        if self.connection._auth:
+            payload = self.payload_builder("user.logout")
+            self.send_request(data=payload)
 
     def handle_httperror(self, exc):
         """Overridable method for dealing with HTTP codes.
@@ -96,6 +99,10 @@ class HttpApi(HttpApiBase):
         if not data:
             data = {}
 
+        if self.connection._auth:
+            data['auth'] = self.connection._auth['auth']
+
+        data = json.dumps(data)
         try:
             self._display_request(request_method, path)
             response, response_data = self.connection.send(
@@ -113,6 +120,9 @@ class HttpApi(HttpApiBase):
             # JSONDecodeError only available on Python 3.5+
             except ValueError:
                 raise ConnectionError("Invalid JSON response: %s" % value)
+
+            if "error" in json_data:
+                raise ConnectionError("REST API returned %s when sending %s" % (json_data["error"], data))
 
             return response.getcode(), json_data
         except AnsibleConnectionFailure as e:
@@ -146,8 +156,6 @@ class HttpApi(HttpApiBase):
     def payload_builder(method_, auth_=None, **kwargs):
         reqid = str(uuid4())
         req = {'jsonrpc': '2.0', 'method': method_, 'id': reqid}
-        if auth_:
-            req['auth'] = auth_
         req['params'] = (kwargs)
 
         return req
