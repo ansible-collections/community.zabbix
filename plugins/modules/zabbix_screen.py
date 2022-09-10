@@ -375,6 +375,8 @@ def main():
         supports_check_mode=True
     )
 
+    zabbix_utils.require_creds_params(module)
+
     screens = module.params['screens']
 
     screen = Screen(module)
