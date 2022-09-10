@@ -1,10 +1,8 @@
 ---
 # defaults file for zabbix_javagateway
 
-zabbix_javagateway_version: 6.2
-zabbix_version: "{{ zabbix_javagateway_version }}"
+zabbix_javagateway_version:
 zabbix_javagateway_package_state: present
-zabbix_selinux: false
 zabbix_repo: zabbix
 zabbix_repo_yum_schema: https
 zabbix_java_gateway_conf_mode: "0644"

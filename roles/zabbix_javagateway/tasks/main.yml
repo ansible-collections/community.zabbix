@@ -1,32 +1,43 @@
 ---
-# tasks file for zabbix_proxy
+# tasks file for zabbix_javagateway
+
+- name: Include OS-specific variables
+  include_vars: "{{ ansible_os_family }}.yml"
+
+- name: Determine Latest Supported Zabbix Version
+  set_fact:
+    zabbix_javagateway_version: "{{ zabbix_valid_javagateway_versions[ansible_distribution_major_version][0] | default(6.2) }}"
+  when: zabbix_server_version is not defined
+
+- name: Set More Variables
+  set_fact:
+    zabbix_valid_version: "{{ zabbix_javagateway_version|float in zabbix_valid_javagateway_versions[ansible_distribution_major_version] }}"
+
+- name: Stopping Install of Invalid Version
+  fail:
+    msg: Zabbix version {{ zabbix_javagateway_version }} is not supported on {{ ansible_distribution }} {{ ansible_distribution_major_version }}
+  when: not zabbix_valid_version
 
 - name: "Install the correct repository"
-  include: "RedHat.yml"
-  when:
-    - ansible_os_family == "RedHat"
+  include: "{{ ansible_os_family }}.yml"
 
-- name: "Install the correct repository"
-  include: "Debian.yml"
-  when:
-    - ansible_os_family == "Debian"
+- name: "Configure Service"
+  block:
+    - name: "Place systemd unit file"
+      copy:
+        src: systemd.service
+        dest: /etc/systemd/system/zabbix-java-gateway.service
+        mode: "0644"
+      register: systemd_state
 
-- name: "Place systemd unit file"
-  copy:
-    src: systemd.service
-    dest: /etc/systemd/system/zabbix-java-gateway.service
-    mode: '0644'
-  register: systemd_state
+    - name: "Reload systemd"
+      shell: systemctl daemon-reload
+      when:
+        - systemd_state.changed
+      tags:
+        - skip_ansible_lint
   when:
-    - zabbix_version is version('5.4', '<')
-
-- name: "Reload systemd"
-  shell: systemctl daemon-reload
-  when:
-    - zabbix_version is version('5.4', '<')
-    - systemd_state.changed
-  tags:
-    - skip_ansible_lint
+    - zabbix_javagateway_version is version('6.0', '<')
 
 - name: "Configure zabbix-proxy"
   template:

@@ -1,0 +1,4 @@
+breaking_changes:
+  - zabbix_javagateway - Removed support for all versions older than 5.0
+  - zabbix_javagateway -  Removed support for EOL operating systems
+  - zabbix_javagateway - Replaced zabbix_version variable with zabbix_javagateway_version
