@@ -2,7 +2,7 @@
 
 - name: "Set default ip address for zabbix_agent_ip"
   set_fact:
-    zabbix_agent_ip: "{{ hostvars[inventory_hostname]['ansible_ip_addresses'][0] }}"
+    zabbix_agent_ip: "{{ hostvars[inventory_hostname]['ansible_ip_addresses'] | ansible.utils.ipv4 | first }}"
   when:
     - zabbix_agent_ip is not defined
     - "'ansible_ip_addresses' in hostvars[inventory_hostname]"
