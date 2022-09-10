@@ -1,0 +1,2 @@
+bugfixes:
+  - zabbix_agent - Filter IPv6 addresses from list of IP as Zabbix host creation expects IPv4
