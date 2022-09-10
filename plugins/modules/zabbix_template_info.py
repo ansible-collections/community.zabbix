@@ -273,6 +273,8 @@ def main():
         supports_check_mode=True
     )
 
+    zabbix_utils.require_creds_params(module)
+
     template_name = module.params['template_name']
     omit_date = module.params['omit_date']
     format = module.params['format']
