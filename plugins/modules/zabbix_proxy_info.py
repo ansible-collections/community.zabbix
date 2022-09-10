@@ -144,6 +144,8 @@ def main():
         supports_check_mode=True
     )
 
+    zabbix_utils.require_creds_params(module)
+
     name = module.params['proxy_name']
     hosts = module.params['proxy_hosts']
 
