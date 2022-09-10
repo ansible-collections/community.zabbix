@@ -131,6 +131,8 @@ def main():
         supports_check_mode=True
     )
 
+    zabbix_utils.require_creds_params(module)
+
     username = module.params['username']
 
     user = User(module)
