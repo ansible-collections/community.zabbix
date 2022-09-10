@@ -712,6 +712,8 @@ def main():
         supports_check_mode=True
     )
 
+    zabbix_utils.require_creds_params(module)
+
     state = module.params['state']
     name = module.params['name']
 
