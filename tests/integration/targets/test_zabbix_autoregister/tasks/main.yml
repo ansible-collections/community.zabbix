@@ -8,9 +8,6 @@
   block:
     - name: test fail to update autoregistration
       community.zabbix.zabbix_autoregister:
-        server_url: "{{ zabbix_api_server_url }}"
-        login_user: "{{ zabbix_api_login_user }}"
-        login_password: "{{ zabbix_api_login_pass }}"
         tls_accept: "tls_with_psk"
         tls_psk_identity: 'PSK 001'
         tls_psk: "11111595725ac58dd977beef14b97461a7c1045b9a1c923453302c5473193478"
@@ -25,9 +22,6 @@
   block:
     - name: test update autoregistration with no parameter
       community.zabbix.zabbix_autoregister:
-        server_url: "{{ zabbix_api_server_url }}"
-        login_user: "{{ zabbix_api_login_user }}"
-        login_password: "{{ zabbix_api_login_pass }}"
       register: zbxautoregister_update_result
       ignore_errors: true
 
@@ -36,9 +30,6 @@
 
     - name: test update autoregistration with all parameters
       community.zabbix.zabbix_autoregister:
-        server_url: "{{ zabbix_api_server_url }}"
-        login_user: "{{ zabbix_api_login_user }}"
-        login_password: "{{ zabbix_api_login_pass }}"
         tls_accept:
           - unsecure
           - tls_with_psk
@@ -51,9 +42,6 @@
 
     - name: test update autoregistration with all parameters (again)
       community.zabbix.zabbix_autoregister:
-        server_url: "{{ zabbix_api_server_url }}"
-        login_user: "{{ zabbix_api_login_user }}"
-        login_password: "{{ zabbix_api_login_pass }}"
         tls_accept:
           - unsecure
           - tls_with_psk
@@ -66,9 +54,6 @@
 
     - name: test update autoregistration with only tls_accept
       community.zabbix.zabbix_autoregister:
-        server_url: "{{ zabbix_api_server_url }}"
-        login_user: "{{ zabbix_api_login_user }}"
-        login_password: "{{ zabbix_api_login_pass }}"
         tls_accept: "tls_with_psk"
       register: zbxautoregister_update_result
 
@@ -77,9 +62,6 @@
 
     - name: test update autoregistration with only tls_accept (again)
       community.zabbix.zabbix_autoregister:
-        server_url: "{{ zabbix_api_server_url }}"
-        login_user: "{{ zabbix_api_login_user }}"
-        login_password: "{{ zabbix_api_login_pass }}"
         tls_accept:
           - tls_with_psk
       register: zbxautoregister_update_result
@@ -89,9 +71,6 @@
 
     - name: test update autoregistration with only tls_accept (unsecure)
       community.zabbix.zabbix_autoregister:
-        server_url: "{{ zabbix_api_server_url }}"
-        login_user: "{{ zabbix_api_login_user }}"
-        login_password: "{{ zabbix_api_login_pass }}"
         tls_accept:
           - unsecure
       register: zbxautoregister_update_result
@@ -101,9 +80,6 @@
 
     - name: test fail to update autoregistration with only tls_accept (tls_with_psk)
       community.zabbix.zabbix_autoregister:
-        server_url: "{{ zabbix_api_server_url }}"
-        login_user: "{{ zabbix_api_login_user }}"
-        login_password: "{{ zabbix_api_login_pass }}"
         tls_accept: "tls_with_psk"
       register: zbxautoregister_update_result
       ignore_errors: true
@@ -113,9 +89,6 @@
 
     - name: test fail to update autoregistration with only tls_accept and tls_psk_identity (tls_with_psk)
       community.zabbix.zabbix_autoregister:
-        server_url: "{{ zabbix_api_server_url }}"
-        login_user: "{{ zabbix_api_login_user }}"
-        login_password: "{{ zabbix_api_login_pass }}"
         tls_accept: "tls_with_psk"
         tls_psk_identity: 'PSK 001'
       register: zbxautoregister_update_result
@@ -126,9 +99,6 @@
 
     - name: test fail to update autoregistration with only tls_accept and tls_psk (tls_with_psk)
       community.zabbix.zabbix_autoregister:
-        server_url: "{{ zabbix_api_server_url }}"
-        login_user: "{{ zabbix_api_login_user }}"
-        login_password: "{{ zabbix_api_login_pass }}"
         tls_accept: "tls_with_psk"
         tls_psk: "11111595725ac58dd977beef14b97461a7c1045b9a1c923453302c5473193478"
       register: zbxautoregister_update_result

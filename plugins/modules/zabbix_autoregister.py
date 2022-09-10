@@ -174,6 +174,8 @@ def main():
         supports_check_mode=True
     )
 
+    zabbix_utils.require_creds_params(module)
+
     tls_accept = module.params['tls_accept']
     tls_psk_identity = module.params['tls_psk_identity']
     tls_psk = module.params['tls_psk']
