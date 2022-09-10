@@ -6,9 +6,6 @@
 - name: test - Test action operation script
   module_defaults:
     community.zabbix.zabbix_script:
-      server_url: "{{ zabbix_api_server_url }}"
-      login_user: "{{ zabbix_api_login_user }}"
-      login_password: "{{ zabbix_api_login_pass }}"
       name: Test action operation script
       scope: action_operation
       script_type: webhook
@@ -349,9 +346,6 @@
 - name: test - Test manual host action script
   module_defaults:
     community.zabbix.zabbix_script:
-      server_url: "{{ zabbix_api_server_url }}"
-      login_user: "{{ zabbix_api_login_user }}"
-      login_password: "{{ zabbix_api_login_pass }}"
       name: Test manual host action script
       scope: manual_host_action
       script_type: webhook
@@ -478,9 +472,6 @@
 - name: test - Test manual event action script
   module_defaults:
     community.zabbix.zabbix_script:
-      server_url: "{{ zabbix_api_server_url }}"
-      login_user: "{{ zabbix_api_login_user }}"
-      login_password: "{{ zabbix_api_login_pass }}"
       name: Test manual event action script
       scope: manual_event_action
       script_type: webhook
