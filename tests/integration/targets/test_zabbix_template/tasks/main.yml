@@ -240,3 +240,8 @@
     - assert:
         that:
           - delete_zabbix_template_result.changed is sameas true
+
+- name: Clean up ExampleHostWithLinked template
+  zabbix_template:
+    template_name: ExampleHostWithLinked
+    state: absent
