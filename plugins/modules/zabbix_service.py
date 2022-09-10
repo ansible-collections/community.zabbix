@@ -640,6 +640,8 @@ def main():
         supports_check_mode=True
     )
 
+    zabbix_utils.require_creds_params(module)
+
     name = module.params['name']
     parent = module.params['parent']
     sla = module.params['sla']
