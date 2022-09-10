@@ -51,7 +51,7 @@ class HttpApi(HttpApiBase):
         code, response = self.send_request(data=payload)
 
         if code == 200 and response != '':
-            self.connection._auth = { 'auth' : response }
+            self.connection._auth = {'auth': response}
 
     def logout(self):
         if self.connection._auth:
