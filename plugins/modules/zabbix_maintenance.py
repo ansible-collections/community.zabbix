@@ -353,6 +353,8 @@ def main():
         supports_check_mode=True
     )
 
+    zabbix_utils.require_creds_params(module)
+
     maint = MaintenanceModule(module)
 
     host_names = module.params['host_names']
