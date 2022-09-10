@@ -159,6 +159,7 @@ zabbix_agent_heartbeatfrequency: 60
 zabbix_macros: [] # Will be deprecated in 2.0.0
 zabbix_agent_macros: "{{ zabbix_macros }}"
 zabbix_agent_tags: []
+zabbix_agent_chassis: false
 
 # TLS settings
 zabbix_agent_tlsconnect:
