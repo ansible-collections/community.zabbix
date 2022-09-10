@@ -660,6 +660,8 @@ def main():
         supports_check_mode=True
     )
 
+    zabbix_utils.require_creds_params(module)
+
     username = module.params['username']
     name = module.params['name']
     surname = module.params['surname']
