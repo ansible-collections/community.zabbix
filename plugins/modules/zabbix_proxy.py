@@ -352,6 +352,8 @@ def main():
         supports_check_mode=True
     )
 
+    zabbix_utils.require_creds_params(module)
+
     proxy_name = module.params['proxy_name']
     proxy_address = module.params['proxy_address']
     description = module.params['description']
