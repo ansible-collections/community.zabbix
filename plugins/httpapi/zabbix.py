@@ -121,6 +121,13 @@ class HttpApi(HttpApiBase):
             except ValueError:
                 raise ConnectionError("Invalid JSON response: %s" % value)
 
+            try:
+                # Some methods return bool not a dict in "result"
+                iter(json_data)
+            except TypeError:
+                # Do not try to find "error" if it is not a dict
+                return response.getcode(), json_data
+
             if "error" in json_data:
                 raise ConnectionError("REST API returned %s when sending %s" % (json_data["error"], data))
 

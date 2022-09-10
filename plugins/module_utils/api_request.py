@@ -72,7 +72,10 @@ class ZabbixApiSection(object):
 
     def __getattr__(self, name):
         def method(opts=None):
-            _method = "%s.%s" % (self.name, name)
+            if self.name == "configuration" and name == "import_":
+                _method = "configuration.import"
+            else:
+                _method = "%s.%s" % (self.name, name)
             if not opts:
                 opts = {}
             payload = ZabbixApiRequest.payload_builder(_method, opts)
