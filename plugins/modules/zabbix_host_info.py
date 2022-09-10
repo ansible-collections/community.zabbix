@@ -177,6 +177,8 @@ def main():
         module.deprecate("The 'zabbix_host_facts' module has been renamed to 'zabbix_host_info'",
                          collection_name="community.zabbix", version='2.0.0')  # was 2.13
 
+    zabbix_utils.require_creds_params(module)
+
     host_name = module.params['host_name']
     host_ips = module.params['host_ip']
     exact_match = module.params['exact_match']
