@@ -14,7 +14,7 @@ options:
             - URL of Zabbix server, with protocol (http or https).
               C(url) is an alias for C(server_url).
             - If not set the environment variable C(ZABBIX_SERVER) will be used.
-        required: true
+        required: false
         type: str
         aliases: [ url ]
     login_user:
@@ -22,21 +22,13 @@ options:
             - Zabbix user name.
             - If not set the environment variable C(ZABBIX_USERNAME) will be used.
         type: str
-        required: true
+        required: false
     login_password:
         description:
             - Zabbix user password.
             - If not set the environment variable C(ZABBIX_PASSWORD) will be used.
         type: str
-        required: true
-    http_login_user:
-        description:
-            - Basic Auth login
-        type: str
-    http_login_password:
-        description:
-            - Basic Auth password
-        type: str
+        required: false
     timeout:
         description:
             - The timeout of API request (seconds).
