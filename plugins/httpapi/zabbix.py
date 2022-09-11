@@ -10,7 +10,7 @@ __metaclass__ = type
 DOCUMENTATION = """
 ---
 name: zabbix
-authors:
+author:
   - Markus Fischbacher (@rockaut)
   - Evgeny Yurchenko (@BGmot)
 short_description: HttpApi Plugin for Zabbix
