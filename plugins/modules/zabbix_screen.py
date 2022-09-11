@@ -92,11 +92,7 @@ EXAMPLES = r'''
 
 # Create/update a screen.
 - name: Create a new screen or update an existing screen's items 5 in a row
-  local_action:
-    module: community.zabbix.zabbix_screen
-    server_url: http://monitor.example.com
-    login_user: username
-    login_password: password
+  community.zabbix.zabbix_screen:
     screens:
       - screen_name: ExampleScreen1
         host_group: Example group1
@@ -110,11 +106,7 @@ EXAMPLES = r'''
 
 # Create/update multi-screen
 - name: Create two of new screens or update the existing screens' items
-  local_action:
-    module: community.zabbix.zabbix_screen
-    server_url: http://monitor.example.com
-    login_user: username
-    login_password: password
+  community.zabbix.zabbix_screen:
     screens:
       - screen_name: ExampleScreen1
         host_group: Example group1
@@ -135,11 +127,7 @@ EXAMPLES = r'''
 
 # Limit the Zabbix screen creations to one host since Zabbix can return an error when doing concurrent updates
 - name: Create a new screen or update an existing screen's items
-  local_action:
-    module: community.zabbix.zabbix_screen
-    server_url: http://monitor.example.com
-    login_user: username
-    login_password: password
+  community.zabbix.zabbix_screen:
     state: present
     screens:
       - screen_name: ExampleScreen
@@ -154,11 +142,7 @@ EXAMPLES = r'''
 
 # Create/update using multiple hosts_groups. Hosts NOT present in all listed host_groups will be skipped.
 - name: Create new screen or update the existing screen's items for hosts in both given groups
-  local_action:
-    module: community.zabbix.zabbix_screen
-    server_url: http://monitor.example.com
-    login_user: username
-    login_password: password
+  community.zabbix.zabbix_screen:
     screens:
       - screen_name: ExampleScreen1
         host_group:

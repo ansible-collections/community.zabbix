@@ -396,9 +396,6 @@ EXAMPLES = '''
 # Trigger action with only one condition
 - name: Deploy trigger action
   community.zabbix.zabbix_action:
-    server_url: "http://zabbix.example.com/zabbix/"
-    login_user: Admin
-    login_password: secret
     name: "Send alerts to Admin"
     event_source: 'trigger'
     state: present
@@ -419,9 +416,6 @@ EXAMPLES = '''
 # Trigger action with multiple conditions and operations
 - name: Deploy trigger action
   community.zabbix.zabbix_action:
-    server_url: "http://zabbix.example.com/zabbix/"
-    login_user: Admin
-    login_password: secret
     name: "Send alerts to Admin"
     event_source: 'trigger'
     state: present
@@ -452,9 +446,6 @@ EXAMPLES = '''
 # Trigger action with recovery and acknowledge operations
 - name: Deploy trigger action
   community.zabbix.zabbix_action:
-    server_url: "http://zabbix.example.com/zabbix/"
-    login_user: Admin
-    login_password: secret
     name: "Send alerts to Admin"
     event_source: 'trigger'
     state: present

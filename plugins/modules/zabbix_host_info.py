@@ -69,11 +69,7 @@ extends_documentation_fragment:
 
 EXAMPLES = r'''
 - name: Get host info
-  local_action:
-    module: community.zabbix.zabbix_host_info
-    server_url: http://monitor.example.com
-    login_user: username
-    login_password: password
+  community.zabbix.zabbix_host_info:
     host_name: ExampleHost
     host_ip: 127.0.0.1
     timeout: 10
@@ -81,11 +77,7 @@ EXAMPLES = r'''
     remove_duplicate: yes
 
 - name: Reduce host inventory information to provided keys
-  local_action:
-    module: community.zabbix.zabbix_host_info
-    server_url: http://monitor.example.com
-    login_user: username
-    login_password: password
+  community.zabbix.zabbix_host_info:
     host_name: ExampleHost
     host_inventory:
       - os

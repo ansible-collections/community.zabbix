@@ -183,9 +183,6 @@ EXAMPLES = r'''
 # Base create discovery rule example
 - name: Create discovery rule with ICMP and zabbix agent checks
   community.zabbix.zabbix_discovery_rule:
-    server_url: "http://zabbix.example.com/zabbix/"
-    login_user: admin
-    login_password: secret
     name: ACME
     state: present
     iprange: 192.168.1.1-255
@@ -200,9 +197,6 @@ EXAMPLES = r'''
 # Base update (add new dcheck) discovery rule example
 - name: Create discovery rule with ICMP and zabbix agent checks
   community.zabbix.zabbix_discovery_rule:
-    server_url: "http://zabbix.example.com/zabbix/"
-    login_user: admin
-    login_password: secret
     name: ACME
     state: present
     iprange: 192.168.1.1-255
@@ -225,9 +219,6 @@ EXAMPLES = r'''
 # Base delete discovery rule example
 - name: Delete discovery rule
   community.zabbix.zabbix_discovery_rule:
-    server_url: "http://zabbix.example.com/zabbix/"
-    login_user: admin
-    login_password: secret
     name: ACME
     state: absent
 '''

@@ -73,11 +73,7 @@ extends_documentation_fragment:
 
 EXAMPLES = r'''
 - name: Create new global macro or update an existing macro's value
-  local_action:
-    module: community.zabbix.zabbix_globalmacro
-    server_url: http://monitor.example.com
-    login_user: username
-    login_password: password
+  community.zabbix.zabbix_globalmacro:
     macro_name: EXAMPLE.MACRO
     macro_value: Example value
     macro_type: 0
@@ -85,22 +81,14 @@ EXAMPLES = r'''
     state: present
 # Values with curly brackets need to be quoted otherwise they will be interpreted as a dictionary
 - name: Create new global macro in Zabbix native format with Secret Type
-  local_action:
-    module: community.zabbix.zabbix_globalmacro
-    server_url: http://monitor.example.com
-    login_user: username
-    login_password: password
+  community.zabbix.zabbix_globalmacro:
     macro_name: "{$EXAMPLE.MACRO}"
     macro_value: Example value
     macro_type: 1
     macro_description: Example description
     state: present
 - name: Delete existing global macro
-  local_action:
-    module: community.zabbix.zabbix_globalmacro
-    server_url: http://monitor.example.com
-    login_user: username
-    login_password: password
+  community.zabbix.zabbix_globalmacro:
     macro_name: "{$EXAMPLE.MACRO}"
     state: absent
 '''

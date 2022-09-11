@@ -112,9 +112,6 @@ EXAMPLES = r'''
     host_name: www1.example.com
     state: present
     minutes: 90
-    server_url: https://monitoring.example.com
-    login_user: ansible
-    login_password: pAsSwOrD
 
 - name: Create a named maintenance window for host www1 and host groups Office and Dev
   community.zabbix.zabbix_maintenance:
@@ -124,9 +121,6 @@ EXAMPLES = r'''
       - Office
       - Dev
     state: present
-    server_url: https://monitoring.example.com
-    login_user: ansible
-    login_password: pAsSwOrD
     tags:
       - tag: ExampleHostsTag
       - tag: ExampleHostsTag2
@@ -143,17 +137,11 @@ EXAMPLES = r'''
       - db1.example.com
     state: present
     collect_data: False
-    server_url: https://monitoring.example.com
-    login_user: ansible
-    login_password: pAsSwOrD
 
 - name: Remove maintenance window by name
   community.zabbix.zabbix_maintenance:
     name: Test1
     state: absent
-    server_url: https://monitoring.example.com
-    login_user: ansible
-    login_password: pAsSwOrD
 '''
 
 import datetime

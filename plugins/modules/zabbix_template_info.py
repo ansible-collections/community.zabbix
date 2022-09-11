@@ -48,9 +48,6 @@ notes:
 EXAMPLES = '''
 - name: Get Zabbix template as JSON
   community.zabbix.zabbix_template_info:
-    server_url: "http://zabbix.example.com/zabbix/"
-    login_user: admin
-    login_password: secret
     template_name: Template
     format: json
     omit_date: yes
@@ -58,9 +55,6 @@ EXAMPLES = '''
 
 - name: Get Zabbix template as XML
   community.zabbix.zabbix_template_info:
-    server_url: "http://zabbix.example.com/zabbix/"
-    login_user: admin
-    login_password: secret
     template_name: Template
     format: xml
     omit_date: no
@@ -68,9 +62,6 @@ EXAMPLES = '''
 
 - name: Get Zabbix template as YAML
   community.zabbix.zabbix_template_info:
-    server_url: "http://zabbix.example.com/zabbix/"
-    login_user: admin
-    login_password: secret
     template_name: Template
     format: yaml
     omit_date: no
@@ -78,9 +69,6 @@ EXAMPLES = '''
 
 - name: Determine if Zabbix template exists
   community.zabbix.zabbix_template_info:
-    server_url: "http://zabbix.example.com/zabbix/"
-    login_user: admin
-    login_password: secret
     template_name: Template
     format: none
   register: template

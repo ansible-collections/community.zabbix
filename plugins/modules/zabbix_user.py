@@ -220,9 +220,6 @@ extends_documentation_fragment:
 EXAMPLES = r'''
 - name: create a new zabbix user.
   community.zabbix.zabbix_user:
-    server_url: "http://zabbix.example.com/zabbix/"
-    login_user: Admin
-    login_password: secret
     username: example
     name: user name
     surname: user surname
@@ -254,9 +251,6 @@ EXAMPLES = r'''
 
 - name: delete existing zabbix user.
   community.zabbix.zabbix_user:
-    server_url: "http://zabbix.example.com/zabbix/"
-    login_user: admin
-    login_password: secret
     username: example
     usrgrps:
       - Guests

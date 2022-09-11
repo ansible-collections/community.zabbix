@@ -217,9 +217,6 @@ extends_documentation_fragment:
 EXAMPLES = '''
 - name: Update all authentication setting
   zabbix_authentication:
-    server_url: "http://zabbix.example.com/zabbix/"
-    login_user: Admin
-    login_password: secret
     authentication_type: internal
     http_auth_enabled: true
     http_login_form: zabbix_login_form

@@ -58,11 +58,7 @@ RETURN = r'''
 
 EXAMPLES = r'''
 - name: Create a value map
-  local_action:
-    module: community.zabbix.zabbix_valuemap
-    server_url: http://zabbix.example.com
-    login_user: username
-    login_password: password
+  community.zabbix.zabbix_valuemap:
     name: Numbers
     mappings:
       - value: 1

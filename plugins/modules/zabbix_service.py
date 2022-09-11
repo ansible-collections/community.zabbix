@@ -253,9 +253,6 @@ EXAMPLES = '''
 # Creates a new Zabbix service with Zabbix < 6.0
 - name: Manage services
   community.zabbix.zabbix_service:
-    server_url: "http://zabbix.example.com/zabbix/"
-    login_user: username
-    login_password: password
     name: apache2 service
     sla: 99.99
     calculate_sla: yes
@@ -267,9 +264,6 @@ EXAMPLES = '''
 # Creates a new Zabbix service with Zabbix >= 6.0
 - name: Create Zabbix service monitoring Apache2 in DCs in Toronto area
   community.zabbix.zabbix_service:
-    server_url: "zabbix.example.com/zabbix/"
-    login_user: username
-    login_password: password
     name: 'apache2 service Toronto'
     description: Apache2 services in Toronto area
     sortorder: 0
@@ -296,9 +290,6 @@ EXAMPLES = '''
 
 - name: Create Zabbix service monitoring all Apache2 services
   community.zabbix.zabbix_service:
-    server_url: "zabbix.example.com/zabbix/"
-    login_user: username
-    login_password: password
     name: apache2 service
     description: Apache2 services
     tags:

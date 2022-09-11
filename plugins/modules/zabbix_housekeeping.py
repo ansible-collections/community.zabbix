@@ -138,7 +138,6 @@ extends_documentation_fragment:
 EXAMPLES = '''
 - name: Update housekeeping all parameter
   community.zabbix.zabbix_housekeeping:
-    server_url: "http://zabbix.example.com/zabbix/"
     login_user: Admin
     login_password: secret
     hk_events_mode: yes

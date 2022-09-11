@@ -113,27 +113,18 @@ EXAMPLES = r'''
 # Base create user group example
 - name: Create user group
   community.zabbix.zabbix_usergroup:
-    server_url: "http://zabbix.example.com/zabbix/"
-    login_user: admin
-    login_password: secret
     name: ACME
     state: present
 
 # Base create user group with disabled gui access
 - name: Create user group with disabled gui access
   community.zabbix.zabbix_usergroup:
-    server_url: "http://zabbix.example.com/zabbix/"
-    login_user: admin
-    login_password: secret
     name: ACME
     gui_access: disable
 
 # Base create user group with permissions
 - name: Create user group with permissions
   community.zabbix.zabbix_usergroup:
-    server_url: "http://zabbix.example.com/zabbix/"
-    login_user: admin
-    login_password: secret
     name: ACME
     rights:
         - host_group: Webserver
@@ -145,9 +136,6 @@ EXAMPLES = r'''
 # Base create user group with tag permissions
 - name: Create user group with tag permissions
   community.zabbix.zabbix_usergroup:
-    server_url: "http://zabbix.example.com/zabbix/"
-    login_user: admin
-    login_password: secret
     name: ACME
     tag_filters:
         - host_group: Webserver
@@ -161,9 +149,6 @@ EXAMPLES = r'''
 # Base delete user groups example
 - name: Delete user groups
   community.zabbix.zabbix_usergroup:
-    server_url: "http://zabbix.example.com/zabbix/"
-    login_user: admin
-    login_password: secret
     name: ACME
     state: absent
 '''

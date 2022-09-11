@@ -160,9 +160,6 @@ EXAMPLES = r'''
 ### Create Zabbix map "Demo Map" made of template 'map.j2'
 - name: Create Zabbix map
   community.zabbix.zabbix_map:
-    server_url: http://zabbix.example.com
-    login_user: username
-    login_password: password
     name: Demo map
     state: present
     data: "{{ lookup('template', 'map.j2') }}"

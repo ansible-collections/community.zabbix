@@ -68,11 +68,7 @@ extends_documentation_fragment:
 
 EXAMPLES = r'''
 - name: Create new host macro or update an existing macro's value
-  local_action:
-    module: community.zabbix.zabbix_hostmacro
-    server_url: http://monitor.example.com
-    login_user: username
-    login_password: password
+  community.zabbix.zabbix_hostmacro:
     host_name: ExampleHost
     macro_name: EXAMPLE.MACRO
     macro_value: Example value
@@ -80,22 +76,14 @@ EXAMPLES = r'''
 
 # Values with curly brackets need to be quoted otherwise they will be interpreted as a dictionary
 - name: Create new host macro in Zabbix native format
-  local_action:
-    module: community.zabbix.zabbix_hostmacro
-    server_url: http://monitor.example.com
-    login_user: username
-    login_password: password
+  community.zabbix.zabbix_hostmacro:
     host_name: ExampleHost
     macro_name: "{$EXAMPLE.MACRO}"
     macro_value: Example value
     state: present
 
 - name: Delete existing host macro
-  local_action:
-    module: community.zabbix.zabbix_hostmacro
-    server_url: http://monitor.example.com
-    login_user: username
-    login_password: password
+  community.zabbix.zabbix_hostmacro:
     host_name: ExampleHost
     macro_name: "{$EXAMPLE.MACRO}"
     state: absent

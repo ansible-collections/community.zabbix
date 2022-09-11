@@ -129,11 +129,7 @@ notes:
 EXAMPLES = r'''
 ---
 - name: Create a new Zabbix template linked to groups, macros and templates
-  local_action:
-    module: community.zabbix.zabbix_template
-    server_url: http://127.0.0.1
-    login_user: username
-    login_password: password
+  community.zabbix.zabbix_template:
     template_name: ExampleHost
     template_groups:
       - Role
@@ -151,11 +147,7 @@ EXAMPLES = r'''
     state: present
 
 - name: Unlink and clear templates from the existing Zabbix template
-  local_action:
-    module: community.zabbix.zabbix_template
-    server_url: http://127.0.0.1
-    login_user: username
-    login_password: password
+  community.zabbix.zabbix_template:
     template_name: ExampleHost
     clear_templates:
       - Example template3
@@ -163,28 +155,17 @@ EXAMPLES = r'''
     state: present
 
 - name: Import Zabbix templates from JSON
-  local_action:
-    module: community.zabbix.zabbix_template
-    server_url: http://127.0.0.1
-    login_user: username
-    login_password: password
+  community.zabbix.zabbix_template:
     template_json: "{{ lookup('file', 'zabbix_apache2.json') }}"
     state: present
 
 - name: Import Zabbix templates from XML
-  local_action:
-    module: community.zabbix.zabbix_template
-    server_url: http://127.0.0.1
-    login_user: username
-    login_password: password
+  community.zabbix.zabbix_template:
     template_xml: "{{ lookup('file', 'zabbix_apache2.xml') }}"
     state: present
 
 - name: Import Zabbix template from Ansible dict variable
   community.zabbix.zabbix_template:
-    login_user: username
-    login_password: password
-    server_url: http://127.0.0.1
     template_json:
       zabbix_export:
         version: '3.2'
@@ -199,11 +180,7 @@ EXAMPLES = r'''
     state: present
 
 - name: Configure macros on the existing Zabbix template
-  local_action:
-    module: community.zabbix.zabbix_template
-    server_url: http://127.0.0.1
-    login_user: username
-    login_password: password
+  community.zabbix.zabbix_template:
     template_name: Template
     macros:
       - macro: '{$TEST_MACRO}'
@@ -211,31 +188,19 @@ EXAMPLES = r'''
     state: present
 
 - name: Delete Zabbix template
-  local_action:
-    module: community.zabbix.zabbix_template
-    server_url: http://127.0.0.1
-    login_user: username
-    login_password: password
+  community.zabbix.zabbix_template:
     template_name: Template
     state: absent
 
 - name: Dump Zabbix template as JSON
-  local_action:
-    module: community.zabbix.zabbix_template
-    server_url: http://127.0.0.1
-    login_user: username
-    login_password: password
+  community.zabbix.zabbix_template:
     template_name: Template
     omit_date: yes
     state: dump
   register: template_dump
 
 - name: Dump Zabbix template as XML
-  local_action:
-    module: community.zabbix.zabbix_template
-    server_url: http://127.0.0.1
-    login_user: username
-    login_password: password
+  community.zabbix.zabbix_template:
     template_name: Template
     dump_format: xml
     omit_date: false

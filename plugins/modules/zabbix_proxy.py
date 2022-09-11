@@ -159,11 +159,7 @@ extends_documentation_fragment:
 
 EXAMPLES = r'''
 - name: Create or update a proxy with proxy type active
-  local_action:
-    module: community.zabbix.zabbix_proxy
-    server_url: http://monitor.example.com
-    login_user: username
-    login_password: password
+  community.zabbix.zabbix_proxy:
     proxy_name: ExampleProxy
     description: ExampleProxy
     status: active
@@ -171,11 +167,7 @@ EXAMPLES = r'''
     proxy_address: ExampleProxy.local
 
 - name: Create a new passive proxy using only it's IP
-  local_action:
-    module: community.zabbix.zabbix_proxy
-    server_url: http://monitor.example.com
-    login_user: username
-    login_password: password
+  community.zabbix.zabbix_proxy:
     proxy_name: ExampleProxy
     description: ExampleProxy
     status: passive
@@ -186,11 +178,7 @@ EXAMPLES = r'''
       port: 10051
 
 - name: Create a new passive proxy using only it's DNS
-  local_action:
-    module: community.zabbix.zabbix_proxy
-    server_url: http://monitor.example.com
-    login_user: username
-    login_password: password
+  community.zabbix.zabbix_proxy:
     proxy_name: ExampleProxy
     description: ExampleProxy
     status: passive
