@@ -202,6 +202,44 @@
     that:
       - update_zabbix_template_result.changed is sameas false
 
+- name: Add tags to Zabbix template.
+  zabbix_template:
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
+    template_name: ExampleHost
+    template_groups:
+      - 'Templates/Applications'
+    tags:
+      - tag: tag1
+        value: 1000
+      - tag: tag2
+        value: text
+    state: present
+  register: update_zabbix_template_result
+
+- assert:
+    that: update_zabbix_template_result is changed
+
+- name: Add tags to Zabbix template (idempotency check).
+  zabbix_template:
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
+    template_name: ExampleHost
+    template_groups:
+      - 'Templates/Applications'
+    tags:
+      - tag: tag1
+        value: 1000
+      - tag: tag2
+        value: text
+    state: present
+  register: update_zabbix_template_result
+
+- assert:
+    that: update_zabbix_template_result is changed
+
 # ####
 # Import template tests
 # ####
