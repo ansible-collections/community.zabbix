@@ -208,6 +208,12 @@
     login_user: "{{ zabbix_api_login_user }}"
     login_password: "{{ zabbix_api_login_pass }}"
     template_name: ExampleHost
+    template_groups:
+      - 'Templates'
+      - 'Templates/Applications'
+    link_templates:
+      - "{{ 'Zabbix proxy health' if zabbix_version | float >= 5.4 else 'Template App Zabbix Proxy' }}"
+      - "{{ 'FTP Service' if zabbix_version | float >= 5.4 else 'Template App FTP Service' }}"
     tags:
       - tag: tag1
         value: 1000
@@ -225,6 +231,12 @@
     login_user: "{{ zabbix_api_login_user }}"
     login_password: "{{ zabbix_api_login_pass }}"
     template_name: ExampleHost
+    template_groups:
+      - 'Templates'
+      - 'Templates/Applications'
+    link_templates:
+      - "{{ 'Zabbix proxy health' if zabbix_version | float >= 5.4 else 'Template App Zabbix Proxy' }}"
+      - "{{ 'FTP Service' if zabbix_version | float >= 5.4 else 'Template App FTP Service' }}"
     tags:
       - tag: tag1
         value: 1000
