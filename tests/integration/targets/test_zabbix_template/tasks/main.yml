@@ -214,6 +214,11 @@
     link_templates:
       - "{{ 'Zabbix proxy health' if zabbix_version | float >= 5.4 else 'Template App Zabbix Proxy' }}"
       - "{{ 'FTP Service' if zabbix_version | float >= 5.4 else 'Template App FTP Service' }}"
+    macros:
+      - macro: '{$EXAMPLE_MACRO1}'
+        value: 1000
+      - macro: '{$EXAMPLE_MACRO2}'
+        value: 'text'
     tags:
       - tag: tag1
         value: 1000
@@ -237,6 +242,11 @@
     link_templates:
       - "{{ 'Zabbix proxy health' if zabbix_version | float >= 5.4 else 'Template App Zabbix Proxy' }}"
       - "{{ 'FTP Service' if zabbix_version | float >= 5.4 else 'Template App FTP Service' }}"
+    macros:
+      - macro: '{$EXAMPLE_MACRO1}'
+        value: 1000
+      - macro: '{$EXAMPLE_MACRO2}'
+        value: 'text'
     tags:
       - tag: tag1
         value: 1000
