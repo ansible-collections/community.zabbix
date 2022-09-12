@@ -462,13 +462,13 @@ class Template(ZabbixBase):
             if template_macros != existing_macros:
                 changed = True
 
-        if 'tags' not in existing_template['zabbix_export']['templates'][0]:
-            existing_template['zabbix_export']['templates'][0]['tags'] = []
-
-        if template_tags is not None:
-            existing_tags = existing_template['zabbix_export']['templates'][0]['tags']
-            if template_tags != existing_tags:
-                changed = True
+        if LooseVersion(self._zbx_api_version) >= LooseVersion('4.2'):
+            if 'tags' not in existing_template['zabbix_export']['templates'][0]:
+                existing_template['zabbix_export']['templates'][0]['tags'] = []
+            if template_tags is not None:
+                existing_tags = existing_template['zabbix_export']['templates'][0]['tags']
+                if template_tags != existing_tags:
+                    changed = True
 
         return changed
 
