@@ -238,7 +238,7 @@
   register: update_zabbix_template_result
 
 - assert:
-    that: update_zabbix_template_result is changed
+    that: update_zabbix_template_result is not changed
 
 # ####
 # Import template tests
