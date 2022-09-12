@@ -727,7 +727,7 @@ def main():
             elements='dict',
             options=dict(
                 tag=dict(type='str', required=True),
-                value=dict(type='str', required=True)
+                value=dict(type='str', default='')
             )
         ),
         omit_date=dict(type='bool', required=False, default=False),
