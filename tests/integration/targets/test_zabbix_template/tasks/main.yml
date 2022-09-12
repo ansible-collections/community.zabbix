@@ -208,8 +208,6 @@
     login_user: "{{ zabbix_api_login_user }}"
     login_password: "{{ zabbix_api_login_pass }}"
     template_name: ExampleHost
-    template_groups:
-      - 'Templates/Applications'
     tags:
       - tag: tag1
         value: 1000
@@ -227,8 +225,6 @@
     login_user: "{{ zabbix_api_login_user }}"
     login_password: "{{ zabbix_api_login_pass }}"
     template_name: ExampleHost
-    template_groups:
-      - 'Templates/Applications'
     tags:
       - tag: tag1
         value: 1000
