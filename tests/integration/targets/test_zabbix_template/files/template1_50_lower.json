@@ -24,16 +24,6 @@
             "value": "text"
           }
         ],
-        "tags": [
-          {
-            "tag": "tag1",
-            "value": "1000"
-          },
-          {
-            "tag": "tag2",
-            "value": "text"
-          }
-        ],
         "templates": [
           {
             "name": "Template App FTP Service"

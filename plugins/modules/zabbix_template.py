@@ -821,6 +821,11 @@ def main():
                 for key in macroitem:
                     macroitem[key] = str(macroitem[key])
 
+        if template_tags is not None:
+            for tagitem in template_tags:
+                for key in tagitem:
+                    tagitem[key] = str(tagitem[key])
+
         if not template_ids:
             # Assume new templates are being added when no ID's were found
             if template_content is not None:
