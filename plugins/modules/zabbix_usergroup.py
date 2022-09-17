@@ -18,7 +18,7 @@ description:
 author:
     - "Tobias Birkefeld (@tcraxs)"
 requirements:
-    - "zabbix-api >= 0.5.4"
+    - "python >= 2.6"
 options:
     name:
         description:
@@ -436,7 +436,6 @@ def main():
     state = module.params['state']
 
     userGroup = UserGroup(module)
-    # reuse zabbix-api login
     zbx = userGroup._zapi
     rgts = Rights(module, zbx)
     tgflts = TagFilters(module, zbx)

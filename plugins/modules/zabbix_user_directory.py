@@ -17,7 +17,6 @@ author:
     - Evgeny Yurchenko (@BGmot)
 requirements:
     - python >= 3.9
-    - zabbix-api >= 0.5.4
 options:
     name:
         description:

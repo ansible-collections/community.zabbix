@@ -18,7 +18,7 @@ description:
 author:
     - "Tobias Birkefeld (@tcraxs)"
 requirements:
-    - "zabbix-api >= 0.5.4"
+    - "python >= 2.6"
 options:
     state:
         description:
@@ -636,7 +636,6 @@ def main():
     status = module.params['status']
 
     drule = DiscoveryRule(module)
-    # reuse zabbix-api login
     zbx = drule._zapi
     dcks = Dchecks(module, zbx)
 

@@ -17,7 +17,6 @@ description:
 author: "Alexander Bulimov (@abulimov)"
 requirements:
     - "python >= 2.6"
-    - "zabbix-api >= 0.5.4"
 options:
     state:
         description:
@@ -102,7 +101,6 @@ notes:
     - Module creates maintenance window from now() to now() + minutes,
       so if Zabbix server's time and host's time are not synchronized,
       you will get strange results.
-    - Install required module with 'pip install zabbix-api' command.
 '''
 
 EXAMPLES = r'''

@@ -18,7 +18,6 @@ description:
     - This module allows you to obtain detailed information about configured zabbix proxies.
 requirements:
     - "python >= 2.6"
-    - "zabbix-api >= 0.5.4"
 options:
     proxy_name:
         description:

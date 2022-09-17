@@ -18,7 +18,6 @@ description:
     - This module allows you to create, update and delete scripts.
 requirements:
     - "python >= 2.6"
-    - "zabbix-api >= 0.5.4"
 options:
     name:
         description:

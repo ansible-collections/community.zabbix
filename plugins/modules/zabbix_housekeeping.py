@@ -21,7 +21,7 @@ author:
     - ONODERA Masaru(@masa-orca)
 
 requirements:
-    - "zabbix-api >= 0.5.4"
+    - "python >= 2.6"
 
 version_added: 1.6.0
 

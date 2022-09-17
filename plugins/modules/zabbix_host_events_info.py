@@ -148,7 +148,6 @@ author:
     - "Stéphane Travassac (@stravassac)"
 requirements:
     - "python >= 2.7"
-    - "zabbix-api >= 0.5.3"
 options:
     host_identifier:
         description:

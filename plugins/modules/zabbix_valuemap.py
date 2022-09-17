@@ -17,7 +17,7 @@ description:
 author:
     - "Ruben Tsirunyan (@rubentsirunyan)"
 requirements:
-    - "zabbix-api >= 0.5.4"
+    - "python >= 2.6"
 options:
     name:
         type: 'str'

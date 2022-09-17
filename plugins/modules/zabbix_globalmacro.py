@@ -22,7 +22,6 @@ author:
     - Timothy Test (@ttestscripting)
 requirements:
     - "python >= 2.6"
-    - "zabbix-api >= 0.5.4"
 options:
     macro_name:
         description:

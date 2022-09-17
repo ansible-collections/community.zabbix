@@ -32,7 +32,6 @@ author:
     - "Alen Komic (@akomic)"
 requirements:
     - "python >= 2.6"
-    - "zabbix-api >= 0.5.4"
 options:
     proxy_name:
         description:

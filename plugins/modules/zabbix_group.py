@@ -21,7 +21,6 @@ author:
     - "Harrison Gu (@harrisongu)"
 requirements:
     - "python >= 2.6"
-    - "zabbix-api >= 0.5.4"
 options:
     state:
         description:
@@ -133,9 +132,6 @@ def main():
     )
 
     zabbix_utils.require_creds_params(module)
-
-    if not HAS_ZABBIX_API:
-        module.fail_json(msg=missing_required_lib('zabbix-api', url='https://pypi.org/project/zabbix-api/'), exception=ZBX_IMP_ERR)
 
     host_groups = module.params['host_groups']
     state = module.params['state']

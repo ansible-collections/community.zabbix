@@ -19,7 +19,6 @@ author:
     - Dean Hailin Song (!UNKNOWN)
 requirements:
     - "python >= 2.6"
-    - "zabbix-api >= 0.5.4"
 options:
     host_name:
         description:
