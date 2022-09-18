@@ -40,8 +40,7 @@
       }}
     ansible_network_os: community.zabbix.zabbix
     ansible_connection: httpapi
-    #ansible_httpapi_session_key:
-    #  auth: 2920b1179da3041e23e60e38b421cd95582fc6b8ae06763e4979580d0fa7c8be
+    # ansible_zabbix_auth_key: 8ec0d52432c15c91fcafe9888500cf9a607f44091ab554dbee860f6b44fac895
     ansible_host: 127.0.0.1
     ansible_httpapi_port: 8080
     ansible_httpapi_use_ssl: false
