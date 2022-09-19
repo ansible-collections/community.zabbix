@@ -759,6 +759,8 @@ def main():
         supports_check_mode=True
     )
 
+    zabbix_utils.require_creds_params(module)
+
     if not HAS_PYDOTPLUS:
         module.fail_json(msg=missing_required_lib('pydotplus', url='https://pypi.org/project/pydotplus/'), exception=PYDOT_IMP_ERR)
     if not HAS_WEBCOLORS:
