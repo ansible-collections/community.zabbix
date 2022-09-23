@@ -45,10 +45,11 @@ jobs:
         ansible:
           # It's important that Sanity is tested against all stable-X.Y branches
           # Testing against `devel` may fail as new tests are added.
-          - stable-2.10
-          - stable-2.11
+
+          # https://docs.ansible.com/ansible/latest/reference_appendices/release_and_maintenance.html#ansible-core-changelogs
           - stable-2.12
           - stable-2.13
+          - stable-2.14
           - devel
         python:
           - 2.7 # required by Ansible see https://github.com/ansible-collections/overview/blob/main/collection_requirements.rst#python-compatibility
@@ -67,9 +68,12 @@ jobs:
             python: 2.7
           - ansible: stable-2.13
             python: 3.6
+          - ansible: stable-2.14
+            python: 2.7
+          - ansible: stable-2.14
+            python: 3.6
     runs-on: ubuntu-latest
     steps:
-
       # ansible-test requires the collection to be in a directory in the form
       # .../ansible_collections/NAMESPACE/COLLECTION_NAME/
 
