@@ -32,26 +32,7 @@ jobs:
           - stable-2.14
           - devel
         python:
-          - 2.7 # required by Ansible see https://github.com/ansible-collections/overview/blob/main/collection_requirements.rst#python-compatibility
-          - 3.6 # required by Ansible see https://github.com/ansible-collections/overview/blob/main/collection_requirements.rst#python-compatibility
           - 3.9
-        exclude:
-          - ansible: devel
-            python: 2.7
-          - ansible: devel
-            python: 3.6
-          - ansible: stable-2.12
-            python: 2.7
-          - ansible: stable-2.12
-            python: 3.6
-          - ansible: stable-2.13
-            python: 2.7
-          - ansible: stable-2.13
-            python: 3.6
-          - ansible: stable-2.14
-            python: 2.7
-          - ansible: stable-2.14
-            python: 3.6
 
     steps:
       - name: Check out code
