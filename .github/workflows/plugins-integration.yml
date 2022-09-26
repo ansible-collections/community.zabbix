@@ -3,14 +3,14 @@ name: plugins-integration
 on:
   push:
     paths:
-      - 'plugins/**'
-      - 'tests/integration/**'
-      - '.github/workflows/plugins-integration.yml'
+      - "plugins/**"
+      - "tests/integration/**"
+      - ".github/workflows/plugins-integration.yml"
   pull_request:
     paths:
-      - 'plugins/**'
-      - 'tests/integration/**'
-      - '.github/workflows/plugins-integration.yml'
+      - "plugins/**"
+      - "tests/integration/**"
+      - ".github/workflows/plugins-integration.yml"
 
 jobs:
   integration:
@@ -26,28 +26,13 @@ jobs:
           - version: "6.0"
           - version: "6.2"
         ansible:
-          - stable-2.10
-          - stable-2.11
+          # https://docs.ansible.com/ansible/latest/reference_appendices/release_and_maintenance.html#ansible-core-changelogs
           - stable-2.12
           - stable-2.13
+          - stable-2.14
           - devel
         python:
-          - 2.7 # required by Ansible see https://github.com/ansible-collections/overview/blob/main/collection_requirements.rst#python-compatibility
-          - 3.6 # required by Ansible see https://github.com/ansible-collections/overview/blob/main/collection_requirements.rst#python-compatibility
           - 3.9
-        exclude:
-          - ansible: devel
-            python: 2.7
-          - ansible: devel
-            python: 3.6
-          - ansible: stable-2.12
-            python: 2.7
-          - ansible: stable-2.12
-            python: 3.6
-          - ansible: stable-2.13
-            python: 2.7
-          - ansible: stable-2.13
-            python: 3.6
 
     steps:
       - name: Check out code
