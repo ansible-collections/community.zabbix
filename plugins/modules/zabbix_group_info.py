@@ -75,6 +75,10 @@ def main():
 
     zabbix_utils.require_creds_params(module)
 
+    for p in ['server_url', 'login_user', 'login_password', 'timeout', 'validate_certs']:
+        if p in module.params:
+            module.warn('Option "%s" is deprecated with the move to httpapi connection and will be removed in the next release' % p)
+
     if module._name == 'zabbix_group_facts':
         module.deprecate("The 'zabbix_group_facts' module has been renamed to 'zabbix_group_info'",
                          collection_name="community.zabbix", version='2.0.0')  # was 2.13

@@ -1945,6 +1945,10 @@ def main():
 
     zabbix_utils.require_creds_params(module)
 
+    for p in ['server_url', 'login_user', 'login_password', 'timeout', 'validate_certs']:
+        if p in module.params:
+            module.warn('Option "%s" is deprecated with the move to httpapi connection and will be removed in the next release' % p)
+
     name = module.params['name']
     esc_period = module.params['esc_period']
     event_source = module.params['event_source']
