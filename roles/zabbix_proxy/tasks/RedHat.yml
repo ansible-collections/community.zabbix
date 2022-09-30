@@ -39,7 +39,7 @@
   tags:
     - zabbix-proxy
 
-- name: "RedHat | Set facts for Zabbix >= 3.0"
+- name: "RedHat | Set facts for Zabbix >= 3.0 && < 5.4"
   set_fact:
     apache_log: httpd
     datafiles_path: "/usr/share/doc/zabbix-proxy-{{ zabbix_proxy_database }}-{{ zabbix_version }}*"
@@ -49,11 +49,19 @@
   tags:
     - zabbix-proxy
 
-- name: "RedHat | Set facts for Zabbix >= 5.4"
+- name: "RedHat | Set facts for Zabbix = 5.4"
   set_fact:
     datafiles_path: "/usr/share/doc/zabbix-sql-scripts/{{ zabbix_proxy_database_long }}"
   when:
-    - zabbix_version is version('5.4', '>=')
+    - zabbix_version is version('5.4', '=')
+  tags:
+    - zabbix-server
+
+- name: "RedHat | Set facts for Zabbix >= 6.0"
+  set_fact:
+    datafiles_path: "/usr/share/zabbix-sql-scripts/{{ zabbix_proxy_database_long }}"
+  when:
+    - zabbix_version is version('6.0', '>=')
   tags:
     - zabbix-server
 
