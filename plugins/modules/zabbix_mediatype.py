@@ -16,7 +16,7 @@ description:
 author:
     - Ruben Tsirunyan (@rubentsirunyan)
 requirements:
-    - "zabbix-api >= 0.5.4"
+    - "python >= 2.6"
 
 options:
     name:
@@ -280,9 +280,6 @@ EXAMPLES = r'''
 - name: 'Create an email mediatype with SMTP authentication'
   community.zabbix.zabbix_mediatype:
     name: "Ops email"
-    server_url: "http://example.com/zabbix/"
-    login_user: Admin
-    login_password: "zabbix"
     type: 'email'
     smtp_server: 'example.com'
     smtp_server_port: 2000
@@ -294,9 +291,6 @@ EXAMPLES = r'''
 - name: 'Create a script mediatype'
   community.zabbix.zabbix_mediatype:
     name: "my script"
-    server_url: "http://example.com/zabbix/"
-    login_user: Admin
-    login_password: "zabbix"
     type: 'script'
     script_name: 'my_script.py'
     script_params:
@@ -306,9 +300,6 @@ EXAMPLES = r'''
 - name: 'Create a jabber mediatype'
   community.zabbix.zabbix_mediatype:
     name: "My jabber"
-    server_url: "http://example.com/zabbix/"
-    login_user: Admin
-    login_password: "zabbix"
     type: 'jabber'
     username: 'jabber_id'
     password: 'jabber_pass'
@@ -316,9 +307,6 @@ EXAMPLES = r'''
 - name: 'Create a SMS mediatype'
   community.zabbix.zabbix_mediatype:
     name: "My SMS Mediatype"
-    server_url: "http://example.com/zabbix/"
-    login_user: Admin
-    login_password: "zabbix"
     type: 'sms'
     gsm_modem: '/dev/ttyS0'
 
@@ -326,9 +314,6 @@ EXAMPLES = r'''
 - name: 'Create a webhook mediatype'
   community.zabbix.zabbix_mediatype:
     name: "My webhook Mediatype"
-    server_url: "http://example.com/zabbix/"
-    login_user: Admin
-    login_password: "zabbix"
     type: 'webhook'
     webhook_script: "{{ lookup('file', 'slack.js') }}"
     webhook_params:
@@ -345,9 +330,6 @@ EXAMPLES = r'''
 - name: 'Create an email mediatype with message templates'
   community.zabbix.zabbix_mediatype:
     name: "Ops email"
-    server_url: "http://example.com/zabbix/"
-    login_user: Admin
-    login_password: "zabbix"
     type: 'email'
     smtp_email: 'ops@example.com'
     message_templates:
@@ -711,6 +693,12 @@ def main():
         argument_spec=argument_spec,
         supports_check_mode=True
     )
+
+    zabbix_utils.require_creds_params(module)
+
+    for p in ['server_url', 'login_user', 'login_password', 'timeout', 'validate_certs']:
+        if p in module.params:
+            module.warn('Option "%s" is deprecated with the move to httpapi connection and will be removed in the next release' % p)
 
     state = module.params['state']
     name = module.params['name']

@@ -18,7 +18,7 @@ description:
 author:
     - "Tobias Birkefeld (@tcraxs)"
 requirements:
-    - "zabbix-api >= 0.5.4"
+    - "python >= 2.6"
 options:
     name:
         description:
@@ -113,27 +113,18 @@ EXAMPLES = r'''
 # Base create user group example
 - name: Create user group
   community.zabbix.zabbix_usergroup:
-    server_url: "http://zabbix.example.com/zabbix/"
-    login_user: admin
-    login_password: secret
     name: ACME
     state: present
 
 # Base create user group with disabled gui access
 - name: Create user group with disabled gui access
   community.zabbix.zabbix_usergroup:
-    server_url: "http://zabbix.example.com/zabbix/"
-    login_user: admin
-    login_password: secret
     name: ACME
     gui_access: disable
 
 # Base create user group with permissions
 - name: Create user group with permissions
   community.zabbix.zabbix_usergroup:
-    server_url: "http://zabbix.example.com/zabbix/"
-    login_user: admin
-    login_password: secret
     name: ACME
     rights:
         - host_group: Webserver
@@ -145,9 +136,6 @@ EXAMPLES = r'''
 # Base create user group with tag permissions
 - name: Create user group with tag permissions
   community.zabbix.zabbix_usergroup:
-    server_url: "http://zabbix.example.com/zabbix/"
-    login_user: admin
-    login_password: secret
     name: ACME
     tag_filters:
         - host_group: Webserver
@@ -161,9 +149,6 @@ EXAMPLES = r'''
 # Base delete user groups example
 - name: Delete user groups
   community.zabbix.zabbix_usergroup:
-    server_url: "http://zabbix.example.com/zabbix/"
-    login_user: admin
-    login_password: secret
     name: ACME
     state: absent
 '''
@@ -440,6 +425,12 @@ def main():
         supports_check_mode=True
     )
 
+    zabbix_utils.require_creds_params(module)
+
+    for p in ['server_url', 'login_user', 'login_password', 'timeout', 'validate_certs']:
+        if p in module.params:
+            module.warn('Option "%s" is deprecated with the move to httpapi connection and will be removed in the next release' % p)
+
     name = module.params['name']
     gui_access = module.params['gui_access']
     debug_mode = module.params['debug_mode']
@@ -449,7 +440,6 @@ def main():
     state = module.params['state']
 
     userGroup = UserGroup(module)
-    # reuse zabbix-api login
     zbx = userGroup._zapi
     rgts = Rights(module, zbx)
     tgflts = TagFilters(module, zbx)

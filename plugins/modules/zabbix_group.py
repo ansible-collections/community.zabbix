@@ -21,7 +21,6 @@ author:
     - "Harrison Gu (@harrisongu)"
 requirements:
     - "python >= 2.6"
-    - "zabbix-api >= 0.5.4"
 options:
     state:
         description:
@@ -48,11 +47,7 @@ notes:
 EXAMPLES = r'''
 # Base create host groups example
 - name: Create host groups
-  local_action:
-    module: community.zabbix.zabbix_group
-    server_url: http://monitor.example.com
-    login_user: username
-    login_password: password
+  community.zabbix.zabbix_group:
     state: present
     host_groups:
       - Example group1
@@ -60,11 +55,7 @@ EXAMPLES = r'''
 
 # Limit the Zabbix group creations to one host since Zabbix can return an error when doing concurrent updates
 - name: Create host groups
-  local_action:
-    module: community.zabbix.zabbix_group
-    server_url: http://monitor.example.com
-    login_user: username
-    login_password: password
+  community.zabbix.zabbix_group:
     state: present
     host_groups:
       - Example group1
@@ -84,7 +75,7 @@ except ImportError:
     ZBX_IMP_ERR = traceback.format_exc()
     HAS_ZABBIX_API = False
 
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+from ansible.module_utils.basic import AnsibleModule
 
 from ansible_collections.community.zabbix.plugins.module_utils.base import ZabbixBase
 import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabbix_utils
@@ -140,8 +131,11 @@ def main():
         supports_check_mode=True
     )
 
-    if not HAS_ZABBIX_API:
-        module.fail_json(msg=missing_required_lib('zabbix-api', url='https://pypi.org/project/zabbix-api/'), exception=ZBX_IMP_ERR)
+    zabbix_utils.require_creds_params(module)
+
+    for p in ['server_url', 'login_user', 'login_password', 'timeout', 'validate_certs']:
+        if p in module.params:
+            module.warn('Option "%s" is deprecated with the move to httpapi connection and will be removed in the next release' % p)
 
     host_groups = module.params['host_groups']
     state = module.params['state']

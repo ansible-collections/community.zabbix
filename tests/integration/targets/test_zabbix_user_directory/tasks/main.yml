@@ -6,9 +6,6 @@
   always:
   - name: "cleanup if tests failed"
     zabbix_user_directory:
-      server_url: "{{ zabbix_api_server_url }}"
-      login_user: "{{ zabbix_api_login_user }}"
-      login_password: "{{ zabbix_api_login_pass }}"
       name: TestUserDirectory
       state: absent
     ignore_errors: true

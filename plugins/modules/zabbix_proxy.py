@@ -32,7 +32,6 @@ author:
     - "Alen Komic (@akomic)"
 requirements:
     - "python >= 2.6"
-    - "zabbix-api >= 0.5.4"
 options:
     proxy_name:
         description:
@@ -159,11 +158,7 @@ extends_documentation_fragment:
 
 EXAMPLES = r'''
 - name: Create or update a proxy with proxy type active
-  local_action:
-    module: community.zabbix.zabbix_proxy
-    server_url: http://monitor.example.com
-    login_user: username
-    login_password: password
+  community.zabbix.zabbix_proxy:
     proxy_name: ExampleProxy
     description: ExampleProxy
     status: active
@@ -171,11 +166,7 @@ EXAMPLES = r'''
     proxy_address: ExampleProxy.local
 
 - name: Create a new passive proxy using only it's IP
-  local_action:
-    module: community.zabbix.zabbix_proxy
-    server_url: http://monitor.example.com
-    login_user: username
-    login_password: password
+  community.zabbix.zabbix_proxy:
     proxy_name: ExampleProxy
     description: ExampleProxy
     status: passive
@@ -186,11 +177,7 @@ EXAMPLES = r'''
       port: 10051
 
 - name: Create a new passive proxy using only it's DNS
-  local_action:
-    module: community.zabbix.zabbix_proxy
-    server_url: http://monitor.example.com
-    login_user: username
-    login_password: password
+  community.zabbix.zabbix_proxy:
     proxy_name: ExampleProxy
     description: ExampleProxy
     status: passive
@@ -351,6 +338,12 @@ def main():
         argument_spec=argument_spec,
         supports_check_mode=True
     )
+
+    zabbix_utils.require_creds_params(module)
+
+    for p in ['server_url', 'login_user', 'login_password', 'timeout', 'validate_certs']:
+        if p in module.params:
+            module.warn('Option "%s" is deprecated with the move to httpapi connection and will be removed in the next release' % p)
 
     proxy_name = module.params['proxy_name']
     proxy_address = module.params['proxy_address']

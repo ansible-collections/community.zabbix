@@ -12,9 +12,6 @@
 
 - name: Gather Zabbix template infomation.
   zabbix_template_info:
-    server_url: "{{ zabbix_api_server_url }}"
-    login_user: "{{ zabbix_api_login_user }}"
-    login_password: "{{ zabbix_api_login_pass }}"
     template_name: ExampleHost
     format: json
   register: gather_template_result
@@ -34,9 +31,6 @@
 - block:
     - name: Import Zabbix template from JSON file with matching values (idempotency check) - < Zabbix 5.4.
       zabbix_template:
-        server_url: "{{ zabbix_api_server_url }}"
-        login_user: "{{ zabbix_api_login_user }}"
-        login_password: "{{ zabbix_api_login_pass }}"
         template_json: "{{ lookup('file', 'template1_50_lower.json') }}"
         state: present
       register: import_template_json
@@ -49,9 +43,6 @@
 - block:
     - name: Import Zabbix template from JSON file with updated values.
       zabbix_template:
-        server_url: "{{ zabbix_api_server_url }}"
-        login_user: "{{ zabbix_api_login_user }}"
-        login_password: "{{ zabbix_api_login_pass }}"
         template_json: "{{ lookup('file', 'template1-changed_50_lower.json') }}"
         state: present
       register: import_template_json
@@ -62,9 +53,6 @@
 
 - name: Gather Zabbix template infomation.
   zabbix_template_info:
-    server_url: "{{ zabbix_api_server_url }}"
-    login_user: "{{ zabbix_api_login_user }}"
-    login_password: "{{ zabbix_api_login_pass }}"
     template_name: ExampleHost
     format: json
   register: gather_template_result
@@ -80,9 +68,6 @@
 
 - name: Dump Zabbix template to JSON format.
   zabbix_template:
-    server_url: "{{ zabbix_api_server_url }}"
-    login_user: "{{ zabbix_api_login_user }}"
-    login_password: "{{ zabbix_api_login_pass }}"
     template_name: ExampleHost
     dump_format: json
     state: dump
@@ -100,9 +85,6 @@
 - block:
     - name: Import Zabbix template from XML file with updated values.
       zabbix_template:
-        server_url: "{{ zabbix_api_server_url }}"
-        login_user: "{{ zabbix_api_login_user }}"
-        login_password: "{{ zabbix_api_login_pass }}"
         template_xml: "{{ lookup('file', 'template2_50_lower.xml') }}"
         state: present
       register: import_template_xml
@@ -113,9 +95,6 @@
 
 - name: Gather Zabbix template infomation.
   zabbix_template_info:
-    server_url: "{{ zabbix_api_server_url }}"
-    login_user: "{{ zabbix_api_login_user }}"
-    login_password: "{{ zabbix_api_login_pass }}"
     template_name: ExampleHost
     format: json
   register: gather_template_result
@@ -130,9 +109,6 @@
 
 - name: Dump Zabbix template to XML format.
   zabbix_template:
-    server_url: "{{ zabbix_api_server_url }}"
-    login_user: "{{ zabbix_api_login_user }}"
-    login_password: "{{ zabbix_api_login_pass }}"
     template_name: ExampleHost
     dump_format: xml
     state: dump
