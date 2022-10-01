@@ -90,6 +90,25 @@ options:
                     - Value of the macro.
                 type: str
                 required: true
+    tags:
+        description:
+            - List of tags to assign to the template.
+            - Works only with >= Zabbix 4.2.
+            - Providing I(tags=[]) with I(force=yes) will clean all of the tags from the template.
+        required: false
+        type: list
+        elements: dict
+        suboptions:
+            tag:
+                description:
+                    - Name of the template tag.
+                type: str
+                required: true
+            value:
+                description:
+                    - Value of the template tag.
+                type: str
+                default: ''
     dump_format:
         description:
             - Format to use when dumping template with C(state=dump).
@@ -184,6 +203,18 @@ EXAMPLES = r'''
     macros:
       - macro: '{$TEST_MACRO}'
         value: 'Example'
+    state: present
+
+- name: Add tags to the existing Zabbix template
+  local_action:
+    module: community.zabbix.zabbix_template
+    server_url: http://127.0.0.1
+    login_user: username
+    login_password: password
+    template_name: Template
+    tags:
+      - tag: class
+        value: application
     state: present
 
 - name: Delete Zabbix template
@@ -316,20 +347,22 @@ class Template(ZabbixBase):
                 template_ids.append({'templateid': template_id})
         return template_ids
 
-    def add_template(self, template_name, group_ids, link_template_ids, macros):
+    def add_template(self, template_name, group_ids, link_template_ids, macros, tags):
         if self._module.check_mode:
             self._module.exit_json(changed=True)
 
-        new_template = {'host': template_name, 'groups': group_ids, 'templates': link_template_ids, 'macros': macros}
+        new_template = {'host': template_name, 'groups': group_ids, 'templates': link_template_ids, 'macros': macros, 'tags': tags}
         if macros is None:
             new_template.update({'macros': []})
+        if tags is None:
+            new_template.update({'tags': []})
         if link_template_ids is None:
             new_template.update({'templates': []})
 
         self._zapi.template.create(new_template)
 
     def check_template_changed(self, template_ids, template_groups, link_templates, clear_templates,
-                               template_macros, template_content, template_type):
+                               template_macros, template_tags, template_content, template_type):
         """Compares template parameters to already existing values if any are found.
 
         template_json - JSON structures are compared as deep sorted dictionaries,
@@ -393,9 +426,17 @@ class Template(ZabbixBase):
             if template_macros != existing_macros:
                 changed = True
 
+        if LooseVersion(self._zbx_api_version) >= LooseVersion('4.2'):
+            if 'tags' not in existing_template['zabbix_export']['templates'][0]:
+                existing_template['zabbix_export']['templates'][0]['tags'] = []
+            if template_tags is not None:
+                existing_tags = existing_template['zabbix_export']['templates'][0]['tags']
+                if template_tags != existing_tags:
+                    changed = True
+
         return changed
 
-    def update_template(self, template_ids, group_ids, link_template_ids, clear_template_ids, template_macros):
+    def update_template(self, template_ids, group_ids, link_template_ids, clear_template_ids, template_macros, template_tags):
         template_changes = {}
         if group_ids is not None:
             template_changes.update({'groups': group_ids})
@@ -412,6 +453,11 @@ class Template(ZabbixBase):
             template_changes.update({'macros': template_macros})
         else:
             template_changes.update({'macros': []})
+
+        if template_tags is not None:
+            template_changes.update({'tags': template_tags})
+        else:
+            template_changes.update({'tags': []})
 
         if template_changes:
             # If we got here we know that only one template was provided via template_name
@@ -640,6 +686,14 @@ def main():
                 value=dict(type='str', required=True)
             )
         ),
+        tags=dict(
+            type='list',
+            elements='dict',
+            options=dict(
+                tag=dict(type='str', required=True),
+                value=dict(type='str', default='')
+            )
+        ),
         omit_date=dict(type='bool', required=False, default=False),
         dump_format=dict(type='str', required=False, default='json', choices=['json', 'xml']),
         state=dict(type='str', default="present", choices=['present', 'absent', 'dump']),
@@ -672,6 +726,7 @@ def main():
     link_templates = module.params['link_templates']
     clear_templates = module.params['clear_templates']
     template_macros = module.params['macros']
+    template_tags = module.params['tags']
     omit_date = module.params['omit_date']
     dump_format = module.params['dump_format']
     state = module.params['state']
@@ -736,6 +791,11 @@ def main():
                 for key in macroitem:
                     macroitem[key] = str(macroitem[key])
 
+        if template_tags is not None:
+            for tagitem in template_tags:
+                for key in tagitem:
+                    tagitem[key] = str(tagitem[key])
+
         if not template_ids:
             # Assume new templates are being added when no ID's were found
             if template_content is not None:
@@ -746,12 +806,12 @@ def main():
                 if group_ids is None:
                     module.fail_json(msg='template_groups are required when creating a new Zabbix template')
 
-                template.add_template(template_name, group_ids, link_template_ids, template_macros)
+                template.add_template(template_name, group_ids, link_template_ids, template_macros, template_tags)
                 module.exit_json(changed=True, result="Successfully added template: %s" % template_name)
 
         else:
             changed = template.check_template_changed(template_ids, template_groups, link_templates, clear_templates,
-                                                      template_macros, template_content, template_type)
+                                                      template_macros, template_tags, template_content, template_type)
 
             if module.check_mode:
                 module.exit_json(changed=changed)
@@ -761,7 +821,7 @@ def main():
                     template.import_template(template_content, template_type)
                 else:
                     template.update_template(template_ids, group_ids, link_template_ids, clear_template_ids,
-                                             template_macros)
+                                             template_macros, template_tags)
 
             module.exit_json(changed=changed, result="Template successfully updated")
 

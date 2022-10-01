@@ -172,6 +172,92 @@
     that:
       - update_zabbix_template_result.changed is sameas false
 
+- name: Add tags to Zabbix template.
+  zabbix_template:
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
+    template_name: ExampleHost
+    template_groups:
+      - 'Templates'
+      - 'Templates/Applications'
+    link_templates:
+      - "{{ 'Zabbix proxy health' if zabbix_version | float >= 5.4 else 'Template App Zabbix Proxy' }}"
+      - "{{ 'FTP Service' if zabbix_version | float >= 5.4 else 'Template App FTP Service' }}"
+    macros:
+      - macro: '{$EXAMPLE_MACRO1}'
+        value: 1000
+      - macro: '{$EXAMPLE_MACRO2}'
+        value: 'text'
+    tags:
+      - tag: tag1
+        value: 1000
+      - tag: tag2
+        value: text
+    state: present
+  register: update_zabbix_template_result
+  when: zabbix_version is version('4.2', '>=')
+
+- assert:
+    that: update_zabbix_template_result is changed
+  when: zabbix_version is version('4.2', '>=')
+
+- name: Add tags to Zabbix template (idempotency check).
+  zabbix_template:
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
+    template_name: ExampleHost
+    template_groups:
+      - 'Templates'
+      - 'Templates/Applications'
+    link_templates:
+      - "{{ 'Zabbix proxy health' if zabbix_version | float >= 5.4 else 'Template App Zabbix Proxy' }}"
+      - "{{ 'FTP Service' if zabbix_version | float >= 5.4 else 'Template App FTP Service' }}"
+    macros:
+      - macro: '{$EXAMPLE_MACRO1}'
+        value: 1000
+      - macro: '{$EXAMPLE_MACRO2}'
+        value: 'text'
+    tags:
+      - tag: tag1
+        value: 1000
+      - tag: tag2
+        value: text
+    state: present
+  register: update_zabbix_template_result
+  when: zabbix_version is version('4.2', '>=')
+
+- assert:
+    that: update_zabbix_template_result is not changed
+  when: zabbix_version is version('4.2', '>=')
+
+- name: Remove tags from Zabbix template.
+  zabbix_template:
+    server_url: "{{ zabbix_api_server_url }}"
+    login_user: "{{ zabbix_api_login_user }}"
+    login_password: "{{ zabbix_api_login_pass }}"
+    template_name: ExampleHost
+    template_groups:
+      - 'Templates'
+      - 'Templates/Applications'
+    link_templates:
+      - "{{ 'Zabbix proxy health' if zabbix_version | float >= 5.4 else 'Template App Zabbix Proxy' }}"
+      - "{{ 'FTP Service' if zabbix_version | float >= 5.4 else 'Template App FTP Service' }}"
+    macros:
+      - macro: '{$EXAMPLE_MACRO1}'
+        value: 1000
+      - macro: '{$EXAMPLE_MACRO2}'
+        value: 'text'
+    tags: []
+    state: present
+  register: update_zabbix_template_result
+  when: zabbix_version is version('4.2', '>=')
+
+- assert:
+    that: update_zabbix_template_result is changed
+  when: zabbix_version is version('4.2', '>=')
+
 # ####
 # Import template tests
 # ####
