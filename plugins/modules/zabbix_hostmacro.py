@@ -19,7 +19,6 @@ author:
     - Dean Hailin Song (!UNKNOWN)
 requirements:
     - "python >= 2.6"
-    - "zabbix-api >= 0.5.4"
 options:
     host_name:
         description:
@@ -68,11 +67,7 @@ extends_documentation_fragment:
 
 EXAMPLES = r'''
 - name: Create new host macro or update an existing macro's value
-  local_action:
-    module: community.zabbix.zabbix_hostmacro
-    server_url: http://monitor.example.com
-    login_user: username
-    login_password: password
+  community.zabbix.zabbix_hostmacro:
     host_name: ExampleHost
     macro_name: EXAMPLE.MACRO
     macro_value: Example value
@@ -80,22 +75,14 @@ EXAMPLES = r'''
 
 # Values with curly brackets need to be quoted otherwise they will be interpreted as a dictionary
 - name: Create new host macro in Zabbix native format
-  local_action:
-    module: community.zabbix.zabbix_hostmacro
-    server_url: http://monitor.example.com
-    login_user: username
-    login_password: password
+  community.zabbix.zabbix_hostmacro:
     host_name: ExampleHost
     macro_name: "{$EXAMPLE.MACRO}"
     macro_value: Example value
     state: present
 
 - name: Delete existing host macro
-  local_action:
-    module: community.zabbix.zabbix_hostmacro
-    server_url: http://monitor.example.com
-    login_user: username
-    login_password: password
+  community.zabbix.zabbix_hostmacro:
     host_name: ExampleHost
     macro_name: "{$EXAMPLE.MACRO}"
     state: absent
@@ -214,6 +201,12 @@ def main():
         ],
         supports_check_mode=True
     )
+
+    zabbix_utils.require_creds_params(module)
+
+    for p in ['server_url', 'login_user', 'login_password', 'timeout', 'validate_certs']:
+        if p in module.params:
+            module.warn('Option "%s" is deprecated with the move to httpapi connection and will be removed in the next release' % p)
 
     host_name = module.params['host_name']
     macro_name = normalize_macro_name(module.params['macro_name'])

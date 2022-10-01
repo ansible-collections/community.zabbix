@@ -36,12 +36,9 @@ class ZapiWrapper(object):
             self._zapi = zbx
         else:
             server_url = module.params['server_url']
-            http_login_user = module.params['http_login_user']
-            http_login_password = module.params['http_login_password']
             validate_certs = module.params['validate_certs']
             timeout = module.params['timeout']
-            self._zapi = ZabbixAPI(server_url, timeout=timeout, user=http_login_user, passwd=http_login_password,
-                                   validate_certs=validate_certs)
+            self._zapi = ZabbixAPI(server_url, timeout=timeout, validate_certs=validate_certs)
 
         self.login()
 

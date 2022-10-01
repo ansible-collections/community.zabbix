@@ -22,7 +22,6 @@ author:
     - Eike Frost (@eikef)
 requirements:
     - "python >= 2.6"
-    - "zabbix-api >= 0.5.4"
 options:
     host_name:
         description:
@@ -355,11 +354,7 @@ extends_documentation_fragment:
 
 EXAMPLES = r'''
 - name: Create a new host or update an existing host's info
-  local_action:
-    module: community.zabbix.zabbix_host
-    server_url: http://monitor.example.com
-    login_user: username
-    login_password: password
+  community.zabbix.zabbix_host:
     host_name: ExampleHost
     visible_name: ExampleName
     description: My ExampleHost Description
@@ -410,11 +405,7 @@ EXAMPLES = r'''
         value: ExampleTagValue
 
 - name: Update an existing host's TLS settings
-  local_action:
-    module: community.zabbix.zabbix_host
-    server_url: http://monitor.example.com
-    login_user: username
-    login_password: password
+  community.zabbix.zabbix_host:
     host_name: ExampleHost
     visible_name: ExampleName
     host_groups:
@@ -1033,6 +1024,12 @@ def main():
         argument_spec=argument_spec,
         supports_check_mode=True
     )
+
+    zabbix_utils.require_creds_params(module)
+
+    for p in ['server_url', 'login_user', 'login_password', 'timeout', 'validate_certs']:
+        if p in module.params:
+            module.warn('Option "%s" is deprecated with the move to httpapi connection and will be removed in the next release' % p)
 
     host_name = module.params['host_name']
     visible_name = module.params['visible_name']

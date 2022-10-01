@@ -2,9 +2,6 @@
 # New user create test from here
 - name: test - Create a new Zabbix user with check_mode and diff
   zabbix_user:
-    server_url: "{{ zabbix_api_server_url }}"
-    login_user: "{{ zabbix_api_login_user }}"
-    login_password: "{{ zabbix_api_login_pass }}"
     alias: example1
     name: example
     surname: test
@@ -21,9 +18,6 @@
 
 - name: test - Create a new Zabbix user
   zabbix_user:
-    server_url: "{{ zabbix_api_server_url }}"
-    login_user: "{{ zabbix_api_login_user }}"
-    login_password: "{{ zabbix_api_login_pass }}"
     alias: example1
     name: example
     surname: test
@@ -38,9 +32,6 @@
 
 - name: test - Create a new Zabbix user(again)
   zabbix_user:
-    server_url: "{{ zabbix_api_server_url }}"
-    login_user: "{{ zabbix_api_login_user }}"
-    login_password: "{{ zabbix_api_login_pass }}"
     alias: example1
     name: example
     surname: test
@@ -56,9 +47,6 @@
 # Parameter add test from here to existing user
 - name: test - Add user group to existing user
   zabbix_user:
-    server_url: "{{ zabbix_api_server_url }}"
-    login_user: "{{ zabbix_api_login_user }}"
-    login_password: "{{ zabbix_api_login_pass }}"
     alias: example1
     name: example
     surname: test
@@ -74,9 +62,6 @@
 
 - name: test - Add user medias(Email) to existing user
   zabbix_user:
-    server_url: "{{ zabbix_api_server_url }}"
-    login_user: "{{ zabbix_api_login_user }}"
-    login_password: "{{ zabbix_api_login_pass }}"
     alias: example1
     name: example
     surname: test
@@ -104,9 +89,6 @@
 
 - name: test - Add multiple user medias(Email and SMS) to existing user
   zabbix_user:
-    server_url: "{{ zabbix_api_server_url }}"
-    login_user: "{{ zabbix_api_login_user }}"
-    login_password: "{{ zabbix_api_login_pass }}"
     alias: example1
     name: example
     surname: test
@@ -146,9 +128,6 @@
 # Existing parameter updates test from here
 - name: test - Update password parameter for existing user
   zabbix_user:
-    server_url: "{{ zabbix_api_server_url }}"
-    login_user: "{{ zabbix_api_login_user }}"
-    login_password: "{{ zabbix_api_login_pass }}"
     alias: example1
     name: example
     surname: test
@@ -188,9 +167,6 @@
 
 - name: test - Update autologin parameter for existing user
   zabbix_user:
-    server_url: "{{ zabbix_api_server_url }}"
-    login_user: "{{ zabbix_api_login_user }}"
-    login_password: "{{ zabbix_api_login_pass }}"
     alias: example1
     name: example
     surname: test
@@ -230,9 +206,6 @@
 
 - name: test - Update autologout parameter for existing user
   zabbix_user:
-    server_url: "{{ zabbix_api_server_url }}"
-    login_user: "{{ zabbix_api_login_user }}"
-    login_password: "{{ zabbix_api_login_pass }}"
     alias: example1
     name: example
     surname: test
@@ -272,9 +245,6 @@
 
 - name: test - Update refresh parameter for existing user
   zabbix_user:
-    server_url: "{{ zabbix_api_server_url }}"
-    login_user: "{{ zabbix_api_login_user }}"
-    login_password: "{{ zabbix_api_login_pass }}"
     alias: example1
     name: example
     surname: test
@@ -315,9 +285,6 @@
 
 - name: test - Update rows_per_page parameter for existing user
   zabbix_user:
-    server_url: "{{ zabbix_api_server_url }}"
-    login_user: "{{ zabbix_api_login_user }}"
-    login_password: "{{ zabbix_api_login_pass }}"
     alias: example1
     name: example
     surname: test
@@ -359,9 +326,6 @@
 
 - name: test - Update after_login_url parameter for existing user
   zabbix_user:
-    server_url: "{{ zabbix_api_server_url }}"
-    login_user: "{{ zabbix_api_login_user }}"
-    login_password: "{{ zabbix_api_login_pass }}"
     alias: example1
     name: example
     surname: test
@@ -404,9 +368,6 @@
 
 - name: test - Update theme parameter for existing user
   zabbix_user:
-    server_url: "{{ zabbix_api_server_url }}"
-    login_user: "{{ zabbix_api_login_user }}"
-    login_password: "{{ zabbix_api_login_pass }}"
     alias: example1
     name: example
     surname: test
@@ -454,9 +415,6 @@
 
 - name: test - Update type parameter for existing user
   zabbix_user:
-    server_url: "{{ zabbix_api_server_url }}"
-    login_user: "{{ zabbix_api_login_user }}"
-    login_password: "{{ zabbix_api_login_pass }}"
     alias: example1
     name: example
     surname: test
@@ -505,9 +463,6 @@
 
 - name: test - Update lang parameter for existing user
   zabbix_user:
-    server_url: "{{ zabbix_api_server_url }}"
-    login_user: "{{ zabbix_api_login_user }}"
-    login_password: "{{ zabbix_api_login_pass }}"
     alias: example1
     name: example
     surname: test
@@ -553,9 +508,6 @@
 
 - name: test - Update name and surname parameter for existing user
   zabbix_user:
-    server_url: "{{ zabbix_api_server_url }}"
-    login_user: "{{ zabbix_api_login_user }}"
-    login_password: "{{ zabbix_api_login_pass }}"
     alias: example1
     name: example2
     surname: test2
@@ -601,9 +553,6 @@
 
 - name: test - Update lang parameter for existing user with check_mode and diff
   zabbix_user:
-    server_url: "{{ zabbix_api_server_url }}"
-    login_user: "{{ zabbix_api_login_user }}"
-    login_password: "{{ zabbix_api_login_pass }}"
     alias: example1
     name: example2
     surname: test2
@@ -651,9 +600,6 @@
 
 - name: test - Update lang parameter for existing user
   zabbix_user:
-    server_url: "{{ zabbix_api_server_url }}"
-    login_user: "{{ zabbix_api_login_user }}"
-    login_password: "{{ zabbix_api_login_pass }}"
     alias: example1
     name: example2
     surname: test2
@@ -699,9 +645,6 @@
 
 - name: test - Update lang parameter for existing user(again)
   zabbix_user:
-    server_url: "{{ zabbix_api_server_url }}"
-    login_user: "{{ zabbix_api_login_user }}"
-    login_password: "{{ zabbix_api_login_pass }}"
     alias: example1
     name: example2
     surname: test2
@@ -748,9 +691,6 @@
 # Parameter delete test from here from existing user
 - name: test - Delete user medias(SMS) for existing user with check_mode and diff
   zabbix_user:
-    server_url: "{{ zabbix_api_server_url }}"
-    login_user: "{{ zabbix_api_login_user }}"
-    login_password: "{{ zabbix_api_login_pass }}"
     alias: example1
     name: example2
     surname: test2
@@ -787,9 +727,6 @@
 
 - name: test - Delete user medias(SMS) for existing user
   zabbix_user:
-    server_url: "{{ zabbix_api_server_url }}"
-    login_user: "{{ zabbix_api_login_user }}"
-    login_password: "{{ zabbix_api_login_pass }}"
     alias: example1
     name: example2
     surname: test2
@@ -824,9 +761,6 @@
 
 - name: test - Delete user group for existing user
   zabbix_user:
-    server_url: "{{ zabbix_api_server_url }}"
-    login_user: "{{ zabbix_api_login_user }}"
-    login_password: "{{ zabbix_api_login_pass }}"
     alias: example1
     name: example2
     surname: test2
@@ -860,9 +794,6 @@
 
 - name: test - optional user_medias
   zabbix_user:
-    server_url: "{{ zabbix_api_server_url }}"
-    login_user: "{{ zabbix_api_login_user }}"
-    login_password: "{{ zabbix_api_login_pass }}"
     alias: example1
     name: example2
     surname: test2
@@ -884,9 +815,6 @@
 
 - name: test - Delete existing user with check_mode and diff
   zabbix_user:
-    server_url: "{{ zabbix_api_server_url }}"
-    login_user: "{{ zabbix_api_login_user }}"
-    login_password: "{{ zabbix_api_login_pass }}"
     alias: example1
     state: absent
   check_mode: true
@@ -899,9 +827,6 @@
 
 - name: test - Delete existing user
   zabbix_user:
-    server_url: "{{ zabbix_api_server_url }}"
-    login_user: "{{ zabbix_api_login_user }}"
-    login_password: "{{ zabbix_api_login_pass }}"
     alias: example1
     state: absent
   register: delete_existing_user_result
@@ -912,9 +837,6 @@
 
 - name: test - Delete existing user(again)
   zabbix_user:
-    server_url: "{{ zabbix_api_server_url }}"
-    login_user: "{{ zabbix_api_login_user }}"
-    login_password: "{{ zabbix_api_login_pass }}"
     alias: example1
     state: absent
   register: delete_existing_user_result
@@ -927,9 +849,6 @@
   block:
   - name: test - Create new password-less user without LDAP group (fail, <4.0)
     zabbix_user:
-      server_url: "{{ zabbix_api_server_url }}"
-      login_user: "{{ zabbix_api_login_user }}"
-      login_password: "{{ zabbix_api_login_pass }}"
       alias: example2alias
       name: example2
       surname: testldap
@@ -946,9 +865,6 @@
   block:
   - name: test prepare - Create LDAP user group
     zabbix_usergroup:
-      server_url: "{{ zabbix_api_server_url }}"
-      login_user: "{{ zabbix_api_login_user }}"
-      login_password: "{{ zabbix_api_login_pass }}"
       name: testLDAPgrp
       gui_access: LDAP
     register: zbxuser_create_ldap_group
@@ -959,9 +875,6 @@
 
   - name: test - Create new password-less user without LDAP group (fail)
     zabbix_user:
-      server_url: "{{ zabbix_api_server_url }}"
-      login_user: "{{ zabbix_api_login_user }}"
-      login_password: "{{ zabbix_api_login_pass }}"
       alias: example2alias
       name: example2
       surname: testldap
@@ -976,9 +889,6 @@
 
   - name: test - Create new password-less user as member in LDAP group
     zabbix_user:
-      server_url: "{{ zabbix_api_server_url }}"
-      login_user: "{{ zabbix_api_login_user }}"
-      login_password: "{{ zabbix_api_login_pass }}"
       alias: example2alias
       name: example2
       surname: testldap
@@ -992,9 +902,6 @@
 
   - name: test - Create new password-less user as member in LDAP group (again)
     zabbix_user:
-      server_url: "{{ zabbix_api_server_url }}"
-      login_user: "{{ zabbix_api_login_user }}"
-      login_password: "{{ zabbix_api_login_pass }}"
       alias: example2alias
       name: example2
       surname: testldap
@@ -1008,9 +915,6 @@
 
   - name: test - Delete existing user
     zabbix_user:
-      server_url: "{{ zabbix_api_server_url }}"
-      login_user: "{{ zabbix_api_login_user }}"
-      login_password: "{{ zabbix_api_login_pass }}"
       alias: example2alias
       state: absent
     register: delete_existing_user_result
@@ -1023,9 +927,6 @@
 # https://github.com/ansible-collections/community.zabbix/pull/382
 - name: test - Create a zabbix user with minimum parameters
   zabbix_user:
-    server_url: "{{ zabbix_api_server_url }}"
-    login_user: "{{ zabbix_api_login_user }}"
-    login_password: "{{ zabbix_api_login_pass }}"
     alias: example2
     usrgrps:
       - Guests
@@ -1038,9 +939,6 @@
 
 - name: test - Create a zabbix user with minimum parameters(again)
   zabbix_user:
-    server_url: "{{ zabbix_api_server_url }}"
-    login_user: "{{ zabbix_api_login_user }}"
-    login_password: "{{ zabbix_api_login_pass }}"
     alias: example2
     usrgrps:
       - Guests
@@ -1053,9 +951,6 @@
 
 - name: test - Update the parameters without role_name
   zabbix_user:
-    server_url: "{{ zabbix_api_server_url }}"
-    login_user: "{{ zabbix_api_login_user }}"
-    login_password: "{{ zabbix_api_login_pass }}"
     alias: example2
     name: example2
     surname: test
@@ -1070,9 +965,6 @@
 
 - name: test - Update the parameters without role_name(again)
   zabbix_user:
-    server_url: "{{ zabbix_api_server_url }}"
-    login_user: "{{ zabbix_api_login_user }}"
-    login_password: "{{ zabbix_api_login_pass }}"
     alias: example2
     name: example2
     surname: test
@@ -1087,8 +979,5 @@
 
 - name: test - Delete existing user
   zabbix_user:
-    server_url: "{{ zabbix_api_server_url }}"
-    login_user: "{{ zabbix_api_login_user }}"
-    login_password: "{{ zabbix_api_login_pass }}"
     alias: example2
     state: absent

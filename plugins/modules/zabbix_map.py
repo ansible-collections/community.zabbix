@@ -38,7 +38,6 @@ description:
         C(zbx_trigger_draw_style) contains indicator draw style. Possible values are the same as for C(zbx_draw_style)."
 requirements:
     - "python >= 2.6"
-    - "zabbix-api >= 0.5.4"
     - pydotplus
     - webcolors
     - Pillow
@@ -160,9 +159,6 @@ EXAMPLES = r'''
 ### Create Zabbix map "Demo Map" made of template 'map.j2'
 - name: Create Zabbix map
   community.zabbix.zabbix_map:
-    server_url: http://zabbix.example.com
-    login_user: username
-    login_password: password
     name: Demo map
     state: present
     data: "{{ lookup('template', 'map.j2') }}"
@@ -762,6 +758,12 @@ def main():
         argument_spec=argument_spec,
         supports_check_mode=True
     )
+
+    zabbix_utils.require_creds_params(module)
+
+    for p in ['server_url', 'login_user', 'login_password', 'timeout', 'validate_certs']:
+        if p in module.params:
+            module.warn('Option "%s" is deprecated with the move to httpapi connection and will be removed in the next release' % p)
 
     if not HAS_PYDOTPLUS:
         module.fail_json(msg=missing_required_lib('pydotplus', url='https://pypi.org/project/pydotplus/'), exception=PYDOT_IMP_ERR)

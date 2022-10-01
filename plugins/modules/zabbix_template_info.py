@@ -17,7 +17,6 @@ description:
     - This module allows you to search for Zabbix template.
 requirements:
     - "python >= 2.6"
-    - "zabbix-api >= 0.5.4"
 options:
     template_name:
         description:
@@ -48,9 +47,6 @@ notes:
 EXAMPLES = '''
 - name: Get Zabbix template as JSON
   community.zabbix.zabbix_template_info:
-    server_url: "http://zabbix.example.com/zabbix/"
-    login_user: admin
-    login_password: secret
     template_name: Template
     format: json
     omit_date: yes
@@ -58,9 +54,6 @@ EXAMPLES = '''
 
 - name: Get Zabbix template as XML
   community.zabbix.zabbix_template_info:
-    server_url: "http://zabbix.example.com/zabbix/"
-    login_user: admin
-    login_password: secret
     template_name: Template
     format: xml
     omit_date: no
@@ -68,9 +61,6 @@ EXAMPLES = '''
 
 - name: Get Zabbix template as YAML
   community.zabbix.zabbix_template_info:
-    server_url: "http://zabbix.example.com/zabbix/"
-    login_user: admin
-    login_password: secret
     template_name: Template
     format: yaml
     omit_date: no
@@ -78,9 +68,6 @@ EXAMPLES = '''
 
 - name: Determine if Zabbix template exists
   community.zabbix.zabbix_template_info:
-    server_url: "http://zabbix.example.com/zabbix/"
-    login_user: admin
-    login_password: secret
     template_name: Template
     format: none
   register: template
@@ -272,6 +259,12 @@ def main():
         argument_spec=argument_spec,
         supports_check_mode=True
     )
+
+    zabbix_utils.require_creds_params(module)
+
+    for p in ['server_url', 'login_user', 'login_password', 'timeout', 'validate_certs']:
+        if p in module.params:
+            module.warn('Option "%s" is deprecated with the move to httpapi connection and will be removed in the next release' % p)
 
     template_name = module.params['template_name']
     omit_date = module.params['omit_date']

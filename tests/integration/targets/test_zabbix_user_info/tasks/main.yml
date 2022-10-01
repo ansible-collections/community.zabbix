@@ -4,9 +4,6 @@
   block:
     - name: test - Create a new Zabbix user
       zabbix_user:
-        server_url: "{{ zabbix_api_server_url }}"
-        login_user: "{{ zabbix_api_login_user }}"
-        login_password: "{{ zabbix_api_login_pass }}"
         alias: example
         name: user name
         surname: user surname
@@ -79,9 +76,6 @@
   block:
     - name: test - Create a new Zabbix user
       zabbix_user:
-        server_url: "{{ zabbix_api_server_url }}"
-        login_user: "{{ zabbix_api_login_user }}"
-        login_password: "{{ zabbix_api_login_pass }}"
         alias: example
         name: user name
         surname: user surname
@@ -154,9 +148,6 @@
 
 - name: "test - Get a zabbix user information"
   zabbix_user_info:
-    server_url: "{{ zabbix_api_server_url }}"
-    login_user: "{{ zabbix_api_login_user }}"
-    login_password: "{{ zabbix_api_login_pass }}"
     alias: example
   register: get_user_info_result
 
@@ -173,9 +164,6 @@
 
 - name: test - Create a new Zabbix user
   zabbix_user:
-    server_url: "{{ zabbix_api_server_url }}"
-    login_user: "{{ zabbix_api_login_user }}"
-    login_password: "{{ zabbix_api_login_pass }}"
     alias: example2
     usrgrps:
       - Guests
@@ -190,9 +178,6 @@
 
 - name: "test - Get a zabbix user information"
   zabbix_user_info:
-    server_url: "{{ zabbix_api_server_url }}"
-    login_user: "{{ zabbix_api_login_user }}"
-    login_password: "{{ zabbix_api_login_pass }}"
     alias: example2
   register: get_user_info_result2
 

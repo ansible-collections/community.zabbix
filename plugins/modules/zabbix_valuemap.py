@@ -17,7 +17,7 @@ description:
 author:
     - "Ruben Tsirunyan (@rubentsirunyan)"
 requirements:
-    - "zabbix-api >= 0.5.4"
+    - "python >= 2.6"
 options:
     name:
         type: 'str'
@@ -58,11 +58,7 @@ RETURN = r'''
 
 EXAMPLES = r'''
 - name: Create a value map
-  local_action:
-    module: community.zabbix.zabbix_valuemap
-    server_url: http://zabbix.example.com
-    login_user: username
-    login_password: password
+  community.zabbix.zabbix_valuemap:
     name: Numbers
     mappings:
       - value: 1
@@ -211,6 +207,11 @@ def main():
         ]
     )
 
+    zabbix_utils.require_creds_params(module)
+
+    for p in ['server_url', 'login_user', 'login_password', 'timeout', 'validate_certs']:
+        if p in module.params:
+            module.warn('Option "%s" is deprecated with the move to httpapi connection and will be removed in the next release' % p)
     vm = ValuemapModule(module)
 
     name = module.params['name']

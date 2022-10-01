@@ -8,9 +8,6 @@
   block:
     - name: test fail to update housekeeping
       community.zabbix.zabbix_housekeeping:
-        server_url: "{{ zabbix_api_server_url }}"
-        login_user: "{{ zabbix_api_login_user }}"
-        login_password: "{{ zabbix_api_login_pass }}"
         hk_events_mode: true
       register: zbxhk_update_result
       ignore_errors: true
@@ -23,9 +20,6 @@
   block:
     - name: test update housekeeping parameters.
       community.zabbix.zabbix_housekeeping:
-        server_url: "{{ zabbix_api_server_url }}"
-        login_user: "{{ zabbix_api_login_user }}"
-        login_password: "{{ zabbix_api_login_pass }}"
         hk_events_mode: yes
         hk_events_trigger: 365d
         hk_events_service: 1w
@@ -53,9 +47,6 @@
 
     - name: test update housekeeping parameters (again).
       community.zabbix.zabbix_housekeeping:
-        server_url: "{{ zabbix_api_server_url }}"
-        login_user: "{{ zabbix_api_login_user }}"
-        login_password: "{{ zabbix_api_login_pass }}"
         hk_events_mode: yes
         hk_events_trigger: 365d
         hk_events_service: 1w
@@ -83,9 +74,6 @@
 
     - name: initialize housekeeping setting.
       community.zabbix.zabbix_housekeeping:
-        server_url: "{{ zabbix_api_server_url }}"
-        login_user: "{{ zabbix_api_login_user }}"
-        login_password: "{{ zabbix_api_login_pass }}"
         hk_events_mode: yes
         hk_events_trigger: 365d
         hk_events_service: 1d

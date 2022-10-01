@@ -18,7 +18,6 @@ description:
     - This module allows you to create, update and delete scripts.
 requirements:
     - "python >= 2.6"
-    - "zabbix-api >= 0.5.4"
 options:
     name:
         description:
@@ -383,6 +382,12 @@ def main():
         argument_spec=argument_spec,
         supports_check_mode=True
     )
+
+    zabbix_utils.require_creds_params(module)
+
+    for p in ['server_url', 'login_user', 'login_password', 'timeout', 'validate_certs']:
+        if p in module.params:
+            module.warn('Option "%s" is deprecated with the move to httpapi connection and will be removed in the next release' % p)
 
     name = module.params['name']
     script_type = module.params['script_type']

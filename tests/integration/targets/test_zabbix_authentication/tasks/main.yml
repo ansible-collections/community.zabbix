@@ -8,9 +8,6 @@
   block:
     - name: test - fail to update authentication setting
       zabbix_authentication:
-        server_url: "{{ zabbix_api_server_url }}"
-        login_user: "{{ zabbix_api_login_user }}"
-        login_password: "{{ zabbix_api_login_pass }}"
         authentication_type: internal
       ignore_errors: true
       register: zbxauth_update
@@ -25,9 +22,6 @@
   block:
     - name: test - update ldap_configured without mandatory paramters 
       zabbix_authentication:
-        server_url: "{{ zabbix_api_server_url }}"
-        login_user: "{{ zabbix_api_login_user }}"
-        login_password: "{{ zabbix_api_login_pass }}"
         ldap_configured: true
       ignore_errors: true
       register: zbxauth_update
@@ -40,9 +34,6 @@
 
     - name: test - update saml_auth_enabled without mandatory paramters 
       zabbix_authentication:
-        server_url: "{{ zabbix_api_server_url }}"
-        login_user: "{{ zabbix_api_login_user }}"
-        login_password: "{{ zabbix_api_login_pass }}"
         saml_auth_enabled: true
       ignore_errors: true
       register: zbxauth_update
@@ -55,9 +46,6 @@
 
     - name: test - update all authentication setting
       zabbix_authentication:
-        server_url: "{{ zabbix_api_server_url }}"
-        login_user: "{{ zabbix_api_login_user }}"
-        login_password: "{{ zabbix_api_login_pass }}"
         authentication_type: internal
         http_auth_enabled: true
         http_login_form: zabbix_login_form
@@ -100,9 +88,6 @@
 
     - name: test - update all authentication setting (again)
       zabbix_authentication:
-        server_url: "{{ zabbix_api_server_url }}"
-        login_user: "{{ zabbix_api_login_user }}"
-        login_password: "{{ zabbix_api_login_pass }}"
         authentication_type: internal
         http_auth_enabled: true
         http_login_form: zabbix_login_form
@@ -147,9 +132,6 @@
 
     - name: test - initialize all authentication setting
       zabbix_authentication:
-        server_url: "{{ zabbix_api_server_url }}"
-        login_user: "{{ zabbix_api_login_user }}"
-        login_password: "{{ zabbix_api_login_pass }}"
         authentication_type: internal
         http_auth_enabled: false
         http_login_form: zabbix_login_form
@@ -192,9 +174,6 @@
   block:
     - name: test - create user directory
       zabbix_user_directory:
-        server_url: "{{ zabbix_api_server_url }}"
-        login_user: "{{ zabbix_api_login_user }}"
-        login_password: "{{ zabbix_api_login_pass }}"
         name: TestUserDirectory
         host: 'test.com'
         port: 389
@@ -203,9 +182,6 @@
       
     - name: test - update ldap_configured without mandatory paramters 
       zabbix_authentication:
-        server_url: "{{ zabbix_api_server_url }}"
-        login_user: "{{ zabbix_api_login_user }}"
-        login_password: "{{ zabbix_api_login_pass }}"
         ldap_configured: true
       ignore_errors: true
       register: zbxauth_update
@@ -218,9 +194,6 @@
 
     - name: test - update saml_auth_enabled without mandatory paramters 
       zabbix_authentication:
-        server_url: "{{ zabbix_api_server_url }}"
-        login_user: "{{ zabbix_api_login_user }}"
-        login_password: "{{ zabbix_api_login_pass }}"
         saml_auth_enabled: true
       ignore_errors: true
       register: zbxauth_update
@@ -233,9 +206,6 @@
 
     - name: test - update all authentication setting
       zabbix_authentication:
-        server_url: "{{ zabbix_api_server_url }}"
-        login_user: "{{ zabbix_api_login_user }}"
-        login_password: "{{ zabbix_api_login_pass }}"
         authentication_type: internal
         http_auth_enabled: true
         http_login_form: zabbix_login_form
@@ -273,9 +243,6 @@
 
     - name: test - update all authentication setting (again)
       zabbix_authentication:
-        server_url: "{{ zabbix_api_server_url }}"
-        login_user: "{{ zabbix_api_login_user }}"
-        login_password: "{{ zabbix_api_login_pass }}"
         authentication_type: internal
         http_auth_enabled: true
         http_login_form: zabbix_login_form
@@ -315,9 +282,6 @@
 
     - name: test - initialize all authentication setting
       zabbix_authentication:
-        server_url: "{{ zabbix_api_server_url }}"
-        login_user: "{{ zabbix_api_login_user }}"
-        login_password: "{{ zabbix_api_login_pass }}"
         authentication_type: internal
         http_auth_enabled: false
         http_login_form: zabbix_login_form
@@ -351,8 +315,5 @@
 
     - name: test - delete user directory
       zabbix_user_directory:
-        server_url: "{{ zabbix_api_server_url }}"
-        login_user: "{{ zabbix_api_login_user }}"
-        login_password: "{{ zabbix_api_login_pass }}"
         name: TestUserDirectory
         state: absent

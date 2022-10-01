@@ -28,7 +28,6 @@ author:
     - "Michael Miko (@RedWhiteMiko)"
 requirements:
     - "python >= 2.6"
-    - "zabbix-api >= 0.5.4"
 options:
     hostgroup_name:
         description:
@@ -44,11 +43,7 @@ extends_documentation_fragment:
 
 EXAMPLES = r'''
 - name: Get hostgroup info
-  local_action:
-    module: community.zabbix.zabbix_group_info
-    server_url: http://monitor.example.com
-    login_user: username
-    login_password: password
+  community.zabbix.zabbix_group_info:
     hostgroup_name:
       - ExampleHostgroup
     timeout: 10
@@ -77,6 +72,12 @@ def main():
         argument_spec=argument_spec,
         supports_check_mode=True
     )
+
+    zabbix_utils.require_creds_params(module)
+
+    for p in ['server_url', 'login_user', 'login_password', 'timeout', 'validate_certs']:
+        if p in module.params:
+            module.warn('Option "%s" is deprecated with the move to httpapi connection and will be removed in the next release' % p)
 
     if module._name == 'zabbix_group_facts':
         module.deprecate("The 'zabbix_group_facts' module has been renamed to 'zabbix_group_info'",

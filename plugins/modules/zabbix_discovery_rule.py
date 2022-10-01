@@ -18,7 +18,7 @@ description:
 author:
     - "Tobias Birkefeld (@tcraxs)"
 requirements:
-    - "zabbix-api >= 0.5.4"
+    - "python >= 2.6"
 options:
     state:
         description:
@@ -183,9 +183,6 @@ EXAMPLES = r'''
 # Base create discovery rule example
 - name: Create discovery rule with ICMP and zabbix agent checks
   community.zabbix.zabbix_discovery_rule:
-    server_url: "http://zabbix.example.com/zabbix/"
-    login_user: admin
-    login_password: secret
     name: ACME
     state: present
     iprange: 192.168.1.1-255
@@ -200,9 +197,6 @@ EXAMPLES = r'''
 # Base update (add new dcheck) discovery rule example
 - name: Create discovery rule with ICMP and zabbix agent checks
   community.zabbix.zabbix_discovery_rule:
-    server_url: "http://zabbix.example.com/zabbix/"
-    login_user: admin
-    login_password: secret
     name: ACME
     state: present
     iprange: 192.168.1.1-255
@@ -225,9 +219,6 @@ EXAMPLES = r'''
 # Base delete discovery rule example
 - name: Delete discovery rule
   community.zabbix.zabbix_discovery_rule:
-    server_url: "http://zabbix.example.com/zabbix/"
-    login_user: admin
-    login_password: secret
     name: ACME
     state: absent
 '''
@@ -634,6 +625,12 @@ def main():
         supports_check_mode=True
     )
 
+    zabbix_utils.require_creds_params(module)
+
+    for p in ['server_url', 'login_user', 'login_password', 'timeout', 'validate_certs']:
+        if p in module.params:
+            module.warn('Option "%s" is deprecated with the move to httpapi connection and will be removed in the next release' % p)
+
     state = module.params['state']
     name = module.params['name']
     iprange = module.params['iprange']
@@ -643,7 +640,6 @@ def main():
     status = module.params['status']
 
     drule = DiscoveryRule(module)
-    # reuse zabbix-api login
     zbx = drule._zapi
     dcks = Dchecks(module, zbx)
 

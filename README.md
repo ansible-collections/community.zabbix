@@ -90,6 +90,7 @@ With the release of Ansible 2.10, modules have been moved into collections.  Wit
 ```bash
 ansible-galaxy collection install ansible.posix
 ansible-galaxy collection install community.general
+ansible-galaxy collection install ansible.netcommon
 ```
 ### Installing the Collection from Ansible Galaxy
 
@@ -124,17 +125,40 @@ To use a module or role from this collection, reference them with their Fully Qu
 
 ```yaml
 ---
-- name: Using Zabbix collection
+- name: Using Zabbix collection to install Zabbix Agent
   hosts: localhost
   roles:
     - role: community.zabbix.zabbix_agent
       zabbix_agent_server: zabbix.example.com
       ...
 
+- name: Using Zabbix collection to manage Zabbix Server's elements with username/password
+  hosts: zabbix.example.com
+  vars:
+    ansible_network_os: community.zabbix.zabbix
+    ansible_connection: httpapi
+    ansible_httpapi_port: 80
+    ansible_httpapi_use_ssl: false
+    ansible_httpapi_validate_certs: false
+    ansible_user: Admin
+    ansible_httpapi_pass: zabbix
   tasks:
     - name: Ensure host is monitored by Zabbix
       community.zabbix.zabbix_host:
-        server_url: https://zabbix.example.com
+        ...
+
+- name: Using Zabbix collection to manage Zabbix Server's elements with authentication key
+  hosts: zabbix.example.net
+  vars:
+    ansible_network_os: community.zabbix.zabbix
+    ansible_connection: httpapi
+    ansible_httpapi_port: 80
+    ansible_httpapi_use_ssl: false
+    ansible_httpapi_validate_certs: false
+    ansible_zabbix_auth_key: 8ec0d52432c15c91fcafe9888500cf9a607f44091ab554dbee860f6b44fac895
+  tasks:
+    - name: Ensure host is monitored by Zabbix
+      community.zabbix.zabbix_host:
         ...
 ```
 
@@ -152,10 +176,33 @@ Or you include collection name `community.zabbix` in the playbook's `collections
       zabbix_agent_server: zabbix.example.com
       ...
 
+- name: Using Zabbix collection to manage Zabbix Server's elements with username/password
+  hosts: zabbix.example.com
+  vars:
+    ansible_network_os: community.zabbix.zabbix
+    ansible_connection: httpapi
+    ansible_httpapi_port: 80
+    ansible_httpapi_use_ssl: false
+    ansible_httpapi_validate_certs: false
+    ansible_user: Admin
+    ansible_httpapi_pass: zabbix
+  tasks:
+    - name: Ensure host is monitored by Zabbix
+      zabbix.zabbix_host:
+        ...
+
+- name: Using Zabbix collection to manage Zabbix Server's elements with authentication key
+  hosts: zabbix.example.net
+  vars:
+    ansible_network_os: community.zabbix.zabbix
+    ansible_connection: httpapi
+    ansible_httpapi_port: 80
+    ansible_httpapi_use_ssl: false
+    ansible_httpapi_validate_certs: false
+    ansible_zabbix_auth_key: 8ec0d52432c15c91fcafe9888500cf9a607f44091ab554dbee860f6b44fac895
   tasks:
     - name: Ensure host is monitored by Zabbix
       zabbix_host:
-        server_url: https://zabbix.example.com
         ...
 ```
 
