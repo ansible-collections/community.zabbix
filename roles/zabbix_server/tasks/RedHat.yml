@@ -38,18 +38,9 @@
 
 - name: "RedHat | Set facts for Zabbix >= 6.0"
   set_fact:
-    datafiles_path: "/usr/share/doc/zabbix-sql-scripts/{{ 'postgresql' if zabbix_server_database == 'pgsql' else 'mysql' }}"
+    datafiles_path: "/usr/share/zabbix-sql-scripts/{{ 'postgresql' if zabbix_server_database == 'pgsql' else 'mysql' }}"
   when:
     - zabbix_server_version is version('6.0', '>=')
-  tags:
-    - zabbix-server
-
-- name: "RedHat | Set facts for RHEL8"
-  set_fact:
-    datafiles_path: "/usr/share/doc/zabbix-server-{{ zabbix_server_database }}"
-  when:
-    - ansible_distribution_major_version == "8"
-    - zabbix_server_version is version('6.0', '<')
   tags:
     - zabbix-server
 
