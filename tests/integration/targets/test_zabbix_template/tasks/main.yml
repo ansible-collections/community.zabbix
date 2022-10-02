@@ -174,9 +174,6 @@
 
 - name: Add tags to Zabbix template.
   zabbix_template:
-    server_url: "{{ zabbix_api_server_url }}"
-    login_user: "{{ zabbix_api_login_user }}"
-    login_password: "{{ zabbix_api_login_pass }}"
     template_name: ExampleHost
     template_groups:
       - 'Templates'
@@ -204,9 +201,6 @@
 
 - name: Add tags to Zabbix template (idempotency check).
   zabbix_template:
-    server_url: "{{ zabbix_api_server_url }}"
-    login_user: "{{ zabbix_api_login_user }}"
-    login_password: "{{ zabbix_api_login_pass }}"
     template_name: ExampleHost
     template_groups:
       - 'Templates'
@@ -234,9 +228,6 @@
 
 - name: Remove tags from Zabbix template.
   zabbix_template:
-    server_url: "{{ zabbix_api_server_url }}"
-    login_user: "{{ zabbix_api_login_user }}"
-    login_password: "{{ zabbix_api_login_pass }}"
     template_name: ExampleHost
     template_groups:
       - 'Templates'
