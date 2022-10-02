@@ -1,0 +1,2 @@
+bug_fixes:
+  - zabbix_server - Repaired location my SQL files
