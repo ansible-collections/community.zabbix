@@ -9,3 +9,4 @@ netaddr==0.8.0
 pytest-testinfra==6.1.0
 ipaddr==2.2.0
 ipaddress==1.0.23
+ansible-netcommon
