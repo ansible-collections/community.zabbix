@@ -206,11 +206,7 @@ EXAMPLES = r'''
     state: present
 
 - name: Add tags to the existing Zabbix template
-  local_action:
-    module: community.zabbix.zabbix_template
-    server_url: http://127.0.0.1
-    login_user: username
-    login_password: password
+  community.zabbix.zabbix_template:
     template_name: Template
     tags:
       - tag: class
