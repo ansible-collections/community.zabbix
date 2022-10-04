@@ -145,6 +145,7 @@ notes:
 '''
 
 EXAMPLES = r'''
+---
 # Set following variables for Zabbix Server host in play or inventory
 - name: Set connection specific variables
   set_fact:
@@ -166,7 +167,6 @@ EXAMPLES = r'''
   set_fact:
     ansible_zabbix_auth_key: 8ec0d52432c15c91fcafe9888500cf9a607f44091ab554dbee860f6b44fac895
 
----
 - name: Create a new Zabbix template linked to groups, macros and templates
   community.zabbix.zabbix_template:
     template_name: ExampleHost
