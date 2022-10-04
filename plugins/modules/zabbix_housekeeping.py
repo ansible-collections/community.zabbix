@@ -21,7 +21,7 @@ author:
     - ONODERA Masaru(@masa-orca)
 
 requirements:
-    - "zabbix-api >= 0.5.4"
+    - "python >= 2.6"
 
 version_added: 1.6.0
 
@@ -138,7 +138,6 @@ extends_documentation_fragment:
 EXAMPLES = '''
 - name: Update housekeeping all parameter
   community.zabbix.zabbix_housekeeping:
-    server_url: "http://zabbix.example.com/zabbix/"
     login_user: Admin
     login_password: secret
     hk_events_mode: yes
@@ -343,6 +342,12 @@ def main():
         argument_spec=argument_spec,
         supports_check_mode=True
     )
+
+    zabbix_utils.require_creds_params(module)
+
+    for p in ['server_url', 'login_user', 'login_password', 'timeout', 'validate_certs']:
+        if p in module.params:
+            module.warn('Option "%s" is deprecated with the move to httpapi connection and will be removed in the next release' % p)
 
     hk_events_mode = module.params['hk_events_mode']
     hk_events_trigger = module.params['hk_events_trigger']

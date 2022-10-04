@@ -17,7 +17,6 @@ author:
     - Evgeny Yurchenko (@BGmot)
 requirements:
     - python >= 3.9
-    - zabbix-api >= 0.5.4
 options:
     name:
         description:
@@ -133,6 +132,12 @@ def main():
         argument_spec=argument_spec,
         supports_check_mode=True
     )
+
+    zabbix_utils.require_creds_params(module)
+
+    for p in ['server_url', 'login_user', 'login_password', 'timeout', 'validate_certs']:
+        if p in module.params:
+            module.warn('Option "%s" is deprecated with the move to httpapi connection and will be removed in the next release' % p)
 
     parameters = {
         'name': module.params['name'],

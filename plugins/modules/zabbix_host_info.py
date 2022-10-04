@@ -29,7 +29,6 @@ author:
     - "Michael Miko (@RedWhiteMiko)"
 requirements:
     - "python >= 2.6"
-    - "zabbix-api >= 0.5.4"
 options:
     host_name:
         description:
@@ -69,11 +68,7 @@ extends_documentation_fragment:
 
 EXAMPLES = r'''
 - name: Get host info
-  local_action:
-    module: community.zabbix.zabbix_host_info
-    server_url: http://monitor.example.com
-    login_user: username
-    login_password: password
+  community.zabbix.zabbix_host_info:
     host_name: ExampleHost
     host_ip: 127.0.0.1
     timeout: 10
@@ -81,11 +76,7 @@ EXAMPLES = r'''
     remove_duplicate: yes
 
 - name: Reduce host inventory information to provided keys
-  local_action:
-    module: community.zabbix.zabbix_host_info
-    server_url: http://monitor.example.com
-    login_user: username
-    login_password: password
+  community.zabbix.zabbix_host_info:
     host_name: ExampleHost
     host_inventory:
       - os
@@ -176,6 +167,8 @@ def main():
     if module._name == 'zabbix_host_facts':
         module.deprecate("The 'zabbix_host_facts' module has been renamed to 'zabbix_host_info'",
                          collection_name="community.zabbix", version='2.0.0')  # was 2.13
+
+    zabbix_utils.require_creds_params(module)
 
     host_name = module.params['host_name']
     host_ips = module.params['host_ip']

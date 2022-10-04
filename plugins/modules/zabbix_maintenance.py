@@ -17,7 +17,6 @@ description:
 author: "Alexander Bulimov (@abulimov)"
 requirements:
     - "python >= 2.6"
-    - "zabbix-api >= 0.5.4"
 options:
     state:
         description:
@@ -102,7 +101,6 @@ notes:
     - Module creates maintenance window from now() to now() + minutes,
       so if Zabbix server's time and host's time are not synchronized,
       you will get strange results.
-    - Install required module with 'pip install zabbix-api' command.
 '''
 
 EXAMPLES = r'''
@@ -112,9 +110,6 @@ EXAMPLES = r'''
     host_name: www1.example.com
     state: present
     minutes: 90
-    server_url: https://monitoring.example.com
-    login_user: ansible
-    login_password: pAsSwOrD
 
 - name: Create a named maintenance window for host www1 and host groups Office and Dev
   community.zabbix.zabbix_maintenance:
@@ -124,9 +119,6 @@ EXAMPLES = r'''
       - Office
       - Dev
     state: present
-    server_url: https://monitoring.example.com
-    login_user: ansible
-    login_password: pAsSwOrD
     tags:
       - tag: ExampleHostsTag
       - tag: ExampleHostsTag2
@@ -143,17 +135,11 @@ EXAMPLES = r'''
       - db1.example.com
     state: present
     collect_data: False
-    server_url: https://monitoring.example.com
-    login_user: ansible
-    login_password: pAsSwOrD
 
 - name: Remove maintenance window by name
   community.zabbix.zabbix_maintenance:
     name: Test1
     state: absent
-    server_url: https://monitoring.example.com
-    login_user: ansible
-    login_password: pAsSwOrD
 '''
 
 import datetime
@@ -352,6 +338,12 @@ def main():
         argument_spec=argument_spec,
         supports_check_mode=True
     )
+
+    zabbix_utils.require_creds_params(module)
+
+    for p in ['server_url', 'login_user', 'login_password', 'timeout', 'validate_certs']:
+        if p in module.params:
+            module.warn('Option "%s" is deprecated with the move to httpapi connection and will be removed in the next release' % p)
 
     maint = MaintenanceModule(module)
 
