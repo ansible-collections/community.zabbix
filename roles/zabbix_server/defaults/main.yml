@@ -103,10 +103,10 @@ zabbix_server_listenip:
 zabbix_server_housekeepingfrequency: 1
 zabbix_server_maxhousekeeperdelete: 500
 zabbix_server_senderfrequency: 30
-zabbix_server_cachesize: 8M
+zabbix_server_cachesize: 32M
 zabbix_server_cacheupdatefrequency: 60
 zabbix_server_startdbsyncers: 4
-zabbix_server_historycachesize: 8M
+zabbix_server_historycachesize: 16M
 zabbix_server_historyindexcachesize: 4M
 zabbix_server_trendcachesize: 4M
 zabbix_server_trendfunctioncachesize: 4M
