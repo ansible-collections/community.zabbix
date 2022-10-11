@@ -10,28 +10,28 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: zabbix_role
-https://www.zabbix.com/documentation/current/en/manual/api/reference/role
-https://www.zabbix.com/documentation/current/en/manual/api/reference/role/create
-
+module: zabbix_user_role
 short_description: Adds or removes zabbix roles
-
-description: This module adds or removes zabbix roles
-
-options:
-    server_url: http://localhost/zabbix
-    login_user: username
-    login_password: password
-    state: exact
-    name: Operators
-      The name of the role
-    type: 1
-      https://www.zabbix.com/documentation/current/en/manual/api/reference/role/object#role
-    rules:
-      https://www.zabbix.com/documentation/current/en/manual/api/reference/role/object#role-rules
-
 author:
     - Martin van Es
+description:
+    - This module adds or removes zabbix roles
+requirements:
+    - "python >= 2.6"
+    - "zabbix-api >= 0.5.4"
+options:
+    state:
+    name:
+        description: Name of the role to be processed
+    type:
+        description:
+            - User (default)
+            - Admin
+            - Super admin
+    rules:
+        - description: Rules set as defined in https://www.zabbix.com/documentation/current/en/manual/api/reference/role/object#role-rules
+extends_documentation_fragment:
+- community.zabbix.zabbix
 '''
 
 EXAMPLES = r'''
@@ -46,7 +46,7 @@ EXAMPLES = r'''
     login_password: login_password
     state: present
     name: Operators
-    type: 1
+    type: User
     rules:
       ui.default_access: 0
       ui:
@@ -133,8 +133,8 @@ def main():
     argument_spec.update(dict(
         state=dict(type='str', required=False, default='present'),
         name=dict(type='str', required=True),
-        type=dict(type='int', required=False, default=1),
-        rules=dict(type='dict', required=True),
+        type=dict(type='str', required=False, default='User'),
+        rules=dict(type='dict', required=False, default={}),
     ))
 
     # the AnsibleModule object
@@ -145,7 +145,9 @@ def main():
 
     state = module.params['state']
     name = module.params['name']
-    type = module.params['type']
+    type = zabbix_utils.helper_to_numeric_value(
+        ['user', 'admin', 'auper admin'], module.params['type'].lower()
+    )
     rules = module.params['rules']
 
     user_role = UserRole(module)
