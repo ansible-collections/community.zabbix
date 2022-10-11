@@ -153,8 +153,9 @@ def main():
     state = module.params['state']
     name = module.params['name']
     type = zabbix_utils.helper_to_numeric_value(
-        ['user', 'admin', 'auper admin'], module.params['type'].lower()
+        ['', 'user', 'admin', 'auper admin'], module.params['type'].lower()
     )
+    # raise Exception(f"type: {type}")
     rules = module.params['rules']
 
     user_role = UserRole(module)

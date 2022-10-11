@@ -7,7 +7,7 @@
     login_password: "{{ zabbix_api_login_pass }}"
     state: present
     name: Operators
-    type: 1
+    type: User
     rules:
       ui.default_access: 0
       ui:
@@ -19,7 +19,7 @@
 
 - assert:
     that:
-      - create_zabbix_user_result.changed is sameas true
+      - create_zabbix_user_role_result.changed is sameas true
 
 # Check user role idempotency
 - name: test - Update a Zabbix role with same rules
@@ -29,7 +29,7 @@
     login_password: "{{ zabbix_api_login_pass }}"
     state: present
     name: Operators
-    type: 1
+    type: User
     rules:
       ui.default_access: 0
       ui:
@@ -41,7 +41,7 @@
 
 - assert:
     that:
-      - create_zabbix_user_result.changed is sameas false
+      - create_zabbix_user_role_result.changed is sameas false
 
 # Check user role change
 - name: test - Update a Zabbix role with new rules
@@ -51,7 +51,7 @@
     login_password: "{{ zabbix_api_login_pass }}"
     state: present
     name: Operators
-    type: 1
+    type: User
     rules:
       ui.default_access: 0
       ui:
@@ -63,7 +63,7 @@
 
 - assert:
     that:
-      - create_zabbix_user_result.changed is sameas true
+      - create_zabbix_user_role_result.changed is sameas true
 
 # Check user role remove
 - name: test - Remote Zabbix role
@@ -77,5 +77,5 @@
 
 - assert:
     that:
-      - create_zabbix_user_result.changed is sameas true
+      - create_zabbix_user_role_result.changed is sameas true
 
