@@ -131,9 +131,6 @@ def main():
 
     argument_spec = zabbix_utils.zabbix_common_argument_spec()
     argument_spec.update(dict(
-        server_url=dict(type='str', required=True),
-        login_user=dict(type='str', required=True),
-        login_password=dict(type='str', required=True, no_log=True),
         state=dict(type='str', required=False, default='present'),
         name=dict(type='str', required=True),
         type=dict(type='int', required=False, default=1),
