@@ -120,9 +120,9 @@
   
 - name: "Debian | Configuring the weight for APT"
   copy:
-    dest: "/etc/apt/preferences.d/zabbix_proxy-{{ zabbix_proxy_database }}"
-    content: |
-      Package: zabbix_proxy-{{ zabbix_proxy_database }}
+    dest: "/etc/apt/preferences.d/zabbix-proxy-{{ zabbix_proxy_database }}"
+    content: 
+      Package: zabbix-proxy-{{ zabbix_proxy_database }}
       Pin: origin repo.zabbix.com
       Pin-Priority: {{ zabbix_proxy_apt_priority }}
     owner: root
