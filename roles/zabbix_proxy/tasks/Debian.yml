@@ -225,8 +225,8 @@
   until: zabbix_proxy_dependencies_installed is succeeded
   become: true
   when:
-    - zabbix_server_database == 'mysql'
-    - zabbix_server_install_database_client
+    - zabbix_proxy_database == 'mysql'
+    - zabbix_proxy_install_database_client
     - ansible_distribution_release != "buster"
   tags:
     - zabbix-proxy
