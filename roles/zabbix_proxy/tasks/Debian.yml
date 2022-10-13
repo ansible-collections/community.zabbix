@@ -151,7 +151,7 @@
   changed_when: false
   check_mode: false
  
- - name: Allow Zabbix dpkg installs to /usr/share/doc/zabbix*
+- name: Allow Zabbix dpkg installs to /usr/share/doc/zabbix*
   lineinfile:
     path: /etc/dpkg/dpkg.cfg.d/excludes
     line: 'path-include=/usr/share/doc/zabbix*'
