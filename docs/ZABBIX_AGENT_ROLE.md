@@ -62,6 +62,11 @@ With the release of Ansible 2.10, modules have been moved into collections.  Wit
 ansible-galaxy collection install ansible.posix
 ansible-galaxy collection install community.general
 ```
+If you are willing to create host_groups and hosts in Zabbix via API as a part of this role execution then you need to install `ansible.netcommon` collection too:
+
+```
+ansible-galaxy collection install ansible.netcommon
+```
 
 ### Docker
 
@@ -251,11 +256,9 @@ The results are stored in the Ansible variables `zabbix_agent_tlspskidentity` an
 
 ## Zabbix API variables
 
-These variables need to be overridden when you want to make use of the zabbix-api for automatically creating and or updating hosts.
+These variables need to be overridden when you want to make use of the Zabbix API for automatically creating and or updating hosts.
 
 Host encryption configuration will be set to match agent configuration.
-
-When `zabbix_api_create_hostgroup` or `zabbix_api_create_hosts` is set to `True`, it will install on the host executing the Ansible playbook the `zabbix-api` python module.
 
 * `zabbix_api_create_hosts`: Default: `False`. When you want to enable the Zabbix API to create/delete the host. This has to be set to `True` if you want to make use of `zabbix_agent_host_state`.
 * `zabbix_api_create_hostgroup`: When you want to enable the Zabbix API to create/delete the hostgroups. This has to be set to `True` if you want to make use of `zabbix_agent_hostgroups_state`.Default: `False`
