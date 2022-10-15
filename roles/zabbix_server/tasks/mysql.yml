@@ -107,6 +107,7 @@
   delegate_to: "{{ delegated_dbhost }}"
   register: mysql_innodb_default_row_format
   when:
+    - not ansible_check_mode
     - install_mysql_version.msg is version('5.6', '>=')
   tags:
     - zabbix-server
