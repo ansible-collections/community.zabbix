@@ -159,7 +159,7 @@
   when:
     - dpkg_exclude_line.rc == 0
 
-- name: "Debian | Installing zabbix-server-{{ zabbix_server_database }}"
+- name: "Debian | Installing zabbix-proxy-{{ zabbix_proxy_database }}"
   apt:
     pkg: zabbix-proxy-{{ zabbix_proxy_database }}
     state: "{{ zabbix_proxy_package_state }}"
