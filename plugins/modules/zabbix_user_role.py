@@ -12,7 +12,7 @@ DOCUMENTATION = r'''
 module: zabbix_user_role
 short_description: Adds or removes zabbix roles
 author:
-    - Martin van Es
+    - Martin van Es (@mrvanes)
 description:
     - This module adds or removes zabbix roles
 requirements:
@@ -145,7 +145,7 @@ def main():
 
     argument_spec = zabbix_utils.zabbix_common_argument_spec()
     argument_spec.update(dict(
-        state=dict(type='str', required=False, default='present'),
+        state=dict(type='str', required=False, default='present', choices=['present', 'absent']),
         name=dict(type='str', required=True),
         type=dict(type='str', required=False, choices=["User", "Admin", "Super Admin"], default='User'),
         rules=dict(type='dict', required=False, default={}),
