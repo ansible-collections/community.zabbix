@@ -4,12 +4,11 @@
 # Copyright: (c) 2022, mrvanes
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
+
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-
 DOCUMENTATION = r'''
----
 module: zabbix_user_role
 short_description: Adds or removes zabbix roles
 author:
@@ -18,18 +17,34 @@ description:
     - This module adds or removes zabbix roles
 requirements:
     - "python >= 2.6"
-    - "zabbix-api >= 0.5.4"
 options:
     state:
+        description:
+            - State of the user_role.
+            - On C(present), it will create if user_role does not exist or update the user_role if the associated data is different.
+            - On C(absent) will remove a user_role if it exists.
+        default: 'present'
+        choices: ['present', 'absent']
+        type: str
+        required: false
     name:
-        description: Name of the role to be processed
+        description:
+            - Name of the role to be processed
+        type: str
+        required: true
     type:
         description:
-            - User (default)
-            - Admin
-            - Super admin
+            - User type.
+        choices: ["User", "Admin", "Super Admin"]
+        default: "User"
+        type: str
+        required: false
     rules:
-        - description: Rules set as defined in https://www.zabbix.com/documentation/current/en/manual/api/reference/role/object#role-rules
+        description:
+            - Rules set as defined in https://www.zabbix.com/documentation/current/en/manual/api/reference/role/object#role-rules
+        default: {}
+        type: dict
+        required: false
 extends_documentation_fragment:
 - community.zabbix.zabbix
 '''
@@ -132,7 +147,7 @@ def main():
     argument_spec.update(dict(
         state=dict(type='str', required=False, default='present'),
         name=dict(type='str', required=True),
-        type=dict(type='str', required=False, default='User'),
+        type=dict(type='str', required=False, choices=["User", "Admin", "Super Admin"], default='User'),
         rules=dict(type='dict', required=False, default={}),
     ))
 
