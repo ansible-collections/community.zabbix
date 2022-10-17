@@ -56,9 +56,6 @@ EXAMPLES = r'''
 - name: Create Zabbix role
   local_action:
     module: zabbix_role
-    server_url: http://zabbix.scz-vm.net/
-    login_user: username
-    login_password: login_password
     state: present
     name: Operators
     type: User

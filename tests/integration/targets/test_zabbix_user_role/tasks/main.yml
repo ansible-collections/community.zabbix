@@ -4,9 +4,6 @@
   block:
     - name: test - Create a new Zabbix role
       zabbix_user_role:
-        server_url: "{{ zabbix_api_server_url }}"
-        login_user: "{{ zabbix_api_login_user }}"
-        login_password: "{{ zabbix_api_login_pass }}"
         state: present
         name: Operators
         type: User
