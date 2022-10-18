@@ -23,9 +23,6 @@
     # Check user role idempotency
     - name: test - Update a Zabbix role with same rules
       zabbix_user_role:
-        server_url: "{{ zabbix_api_server_url }}"
-        login_user: "{{ zabbix_api_login_user }}"
-        login_password: "{{ zabbix_api_login_pass }}"
         state: present
         name: Operators
         type: User
@@ -45,9 +42,6 @@
     # Check user role change
     - name: test - Update a Zabbix role with new rules
       zabbix_user_role:
-        server_url: "{{ zabbix_api_server_url }}"
-        login_user: "{{ zabbix_api_login_user }}"
-        login_password: "{{ zabbix_api_login_pass }}"
         state: present
         name: Operators
         type: User
@@ -67,9 +61,6 @@
     # Check user role remove
     - name: test - Remote Zabbix role
       zabbix_user_role:
-        server_url: "{{ zabbix_api_server_url }}"
-        login_user: "{{ zabbix_api_login_user }}"
-        login_password: "{{ zabbix_api_login_pass }}"
         state: absent
         name: Operators
       register: create_zabbix_user_role_result
