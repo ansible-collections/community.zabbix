@@ -171,7 +171,7 @@ def main():
     # the AnsibleModule object
     module = AnsibleModule(
         argument_spec=argument_spec,
-        supports_check_mode=True
+        supports_check_mode=False
     )
 
     zabbix_utils.require_creds_params(module)
