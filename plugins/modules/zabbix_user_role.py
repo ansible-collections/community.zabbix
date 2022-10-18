@@ -50,12 +50,32 @@ extends_documentation_fragment:
 '''
 
 EXAMPLES = r'''
+# Set following variables for Zabbix Server host in play or inventory
+- name: Set connection specific variables
+  set_fact:
+    ansible_network_os: community.zabbix.zabbix
+    ansible_connection: httpapi
+    ansible_httpapi_port: 80
+    ansible_httpapi_use_ssl: false
+    ansible_httpapi_validate_certs: false
+
+# If you want to use Username and Password to be authenticated by Zabbix Server
+- name: Set credentials to access Zabbix Server API
+  set_fact:
+    ansible_user: Admin
+    ansible_httpapi_pass: zabbix
+
+# If you want to use API token to be authenticated by Zabbix Server
+# https://www.zabbix.com/documentation/current/en/manual/web_interface/frontend_sections/administration/general#api-tokens
+- name: Set API token
+  set_fact:
+    ansible_zabbix_auth_key: 8ec0d52432c15c91fcafe9888500cf9a607f44091ab554dbee860f6b44fac895
+
 # Creat role Operators with ui elements monitoring.hosts
 # disabled and monitoring.maps enabled
 
-- name: Create Zabbix role
-  local_action:
-    module: zabbix_role
+- name: Create Zabbix user role
+  community.zabbix.zabbix_user_role
     state: present
     name: Operators
     type: User
