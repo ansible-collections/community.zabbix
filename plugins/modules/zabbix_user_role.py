@@ -71,11 +71,11 @@ EXAMPLES = r'''
   set_fact:
     ansible_zabbix_auth_key: 8ec0d52432c15c91fcafe9888500cf9a607f44091ab554dbee860f6b44fac895
 
-# Creat role Operators with ui elements monitoring.hosts
+# Create user role Operators with ui elements monitoring.hosts
 # disabled and monitoring.maps enabled
 
 - name: Create Zabbix user role
-  community.zabbix.zabbix_user_role
+  community.zabbix.zabbix_user_role:
     state: present
     name: Operators
     type: User
