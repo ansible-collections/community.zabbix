@@ -114,6 +114,10 @@
     - always
 
 - name: "Run the API calls to Zabbix Server"
+  vars:
+    gather_facts: false
+    ansible_user: "{{ zabbix_api_login_user }}"
+    ansible_connection: httpapi
   include_tasks: api.yml
   when:
     - (zabbix_api_create_hostgroup | bool) or (zabbix_api_create_hosts | bool)
