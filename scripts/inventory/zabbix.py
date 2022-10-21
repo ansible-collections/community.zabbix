@@ -103,7 +103,7 @@ class ZabbixInventory(object):
         if self.use_host_interface or self.read_host_inventory:
             try:
                 hosts_data = api.host.get(api_query)[0]
-                if 'interfaces' in hosts_data:
+                if 'interfaces' in hosts_data and len(hosts_data['interfaces']) >= 1:
                     # use first interface only
                     if hosts_data['interfaces'][0]['useip'] == 0:
                         data['ansible_ssh_host'] = hosts_data['interfaces'][0]['dns']
@@ -139,7 +139,7 @@ class ZabbixInventory(object):
                     data[groupname] = self.hoststub()
 
                 data[groupname]['hosts'].append(hostname)
-            if 'interfaces' in host:
+            if 'interfaces' in host and len(host['interfaces']) >= 1:
                 # use first interface only
                 if host['interfaces'][0]['useip'] == 0:
                     hostvars['ansible_ssh_host'] = host['interfaces'][0]['dns']
