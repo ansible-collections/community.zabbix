@@ -127,7 +127,7 @@
     tls_connect: "{{ zabbix_proxy_tls_config[zabbix_proxy_tlsconnect if zabbix_proxy_tlsconnect else 'no_encryption'] }}"
   when:
     - zabbix_api_create_proxy | bool
-  delegate_to: localhost
+  delegate_to: "{{ zabbix_api_server_host }}"
   become: false
   tags:
     - api
