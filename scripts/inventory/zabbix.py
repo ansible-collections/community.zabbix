@@ -103,12 +103,15 @@ class ZabbixInventory(object):
         if self.use_host_interface or self.read_host_inventory:
             try:
                 hosts_data = api.host.get(api_query)[0]
+                # check if zabbix api returned a interfaces element
                 if 'interfaces' in hosts_data:
-                    # use first interface only
-                    if hosts_data['interfaces'][0]['useip'] == 0:
-                        data['ansible_ssh_host'] = hosts_data['interfaces'][0]['dns']
-                    else:
-                        data['ansible_ssh_host'] = hosts_data['interfaces'][0]['ip']
+                    # check for a interfaces list that contains at least interface
+                    if len(hosts_data['interfaces']) >= 1:
+                        # use first interface only
+                        if hosts_data['interfaces'][0]['useip'] == 0:
+                            data['ansible_ssh_host'] = hosts_data['interfaces'][0]['dns']
+                        else:
+                            data['ansible_ssh_host'] = hosts_data['interfaces'][0]['ip']
                 if ('inventory' in hosts_data) and (hosts_data['inventory']):
                     data.update(hosts_data['inventory'])
             except IndexError:
@@ -139,12 +142,15 @@ class ZabbixInventory(object):
                     data[groupname] = self.hoststub()
 
                 data[groupname]['hosts'].append(hostname)
+            # check if zabbix api returned a interfaces element
             if 'interfaces' in host:
-                # use first interface only
-                if host['interfaces'][0]['useip'] == 0:
-                    hostvars['ansible_ssh_host'] = host['interfaces'][0]['dns']
-                else:
-                    hostvars['ansible_ssh_host'] = host['interfaces'][0]['ip']
+                # check for a interfaces list that contains at least interface
+                if len(host['interfaces']) >= 1:
+                    # use first interface only
+                    if host['interfaces'][0]['useip'] == 0:
+                        hostvars['ansible_ssh_host'] = host['interfaces'][0]['dns']
+                    else:
+                        hostvars['ansible_ssh_host'] = host['interfaces'][0]['ip']
             if ('inventory' in host) and (host['inventory']):
                 hostvars.update(host['inventory'])
             data['_meta']['hostvars'][hostname] = hostvars
