@@ -1,25 +1,6 @@
 ---
-
-- name: "API | Installing the Zabbix-api package on localhost"
-  pip:
-    name: zabbix-api
-    state: present
-  register: zabbix_api_package_installed
-  until: zabbix_api_package_installed is succeeded
-  delegate_to: localhost
-  run_once: true
-  become: "{{ zabbix_agent_become_on_localhost }}"
-  when:
-    - zabbix_install_pip_packages | bool
-    - (zabbix_api_create_hostgroup | bool) or (zabbix_api_create_hosts | bool)
-
 - name: "API | Create host groups"
-  zabbix_group:
-    server_url: "{{ zabbix_api_server_url }}"
-    http_login_user: "{{ zabbix_api_http_user | default(zabbix_http_user | default(omit)) }}"
-    http_login_password: "{{ zabbix_api_http_password | default(zabbix_http_password | default(omit)) }}"
-    login_user: "{{ zabbix_api_login_user }}"
-    login_password: "{{ zabbix_api_login_pass }}"
+  community.zabbix.zabbix_group:
     host_group: "{{ zabbix_host_groups }}"
     state: "{{ zabbix_agent_hostgroups_state }}"
     validate_certs: "{{ zabbix_api_validate_certs|default(omit) }}"
@@ -28,18 +9,13 @@
     - zabbix_api_create_hostgroup | bool
   register: zabbix_api_hostgroup_created
   until: zabbix_api_hostgroup_created is succeeded
-  delegate_to: localhost
+  delegate_to: "{{ zabbix_api_server_host }}"
   become: false
   tags:
     - api
 
 - name: "API | Create a new host or update an existing host's info"
-  zabbix_host:
-    server_url: "{{ zabbix_api_server_url }}"
-    http_login_user: "{{ zabbix_api_http_user | default(zabbix_http_user | default(omit)) }}"
-    http_login_password: "{{ zabbix_api_http_password | default(zabbix_http_password | default(omit)) }}"
-    login_user: "{{ zabbix_api_login_user }}"
-    login_password: "{{ zabbix_api_login_pass }}"
+  community.zabbix.zabbix_host:
     host_name: "{{ zabbix_agent_hostname }}"
     host_groups: "{{ zabbix_host_groups }}"
     link_templates: "{{ zabbix_agent_link_templates }}"
@@ -69,19 +45,14 @@
     - not zabbix_agent2
   register: zabbix_api_host_created
   until: zabbix_api_host_created is succeeded
-  delegate_to: localhost
+  delegate_to: "{{ zabbix_api_server_host }}"
   become: false
   changed_when: false
   tags:
     - api
 
 - name: "API | Create a new host using agent2 or update an existing host's info"
-  zabbix_host:
-    server_url: "{{ zabbix_api_server_url }}"
-    http_login_user: "{{ zabbix_api_http_user | default(zabbix_http_user | default(omit)) }}"
-    http_login_password: "{{ zabbix_api_http_password | default(zabbix_http_password | default(omit)) }}"
-    login_user: "{{ zabbix_api_login_user }}"
-    login_password: "{{ zabbix_api_login_pass }}"
+  community.zabbix.zabbix_host:
     host_name: "{{ zabbix_agent2_hostname }}"
     host_groups: "{{ zabbix_host_groups }}"
     link_templates: "{{ zabbix_agent_link_templates }}"
@@ -111,19 +82,14 @@
     - zabbix_agent2 | bool
   register: zabbix_api_host_created
   until: zabbix_api_host_created is succeeded
-  delegate_to: localhost
+  delegate_to: "{{ zabbix_api_server_host }}"
   become: false
   changed_when: false
   tags:
     - api
 
 - name: "API | Updating host configuration with macros"
-  zabbix_hostmacro:
-    server_url: "{{ zabbix_api_server_url }}"
-    http_login_user: "{{ zabbix_api_http_user | default(zabbix_http_user | default(omit)) }}"
-    http_login_password: "{{ zabbix_api_http_password | default(zabbix_http_password | default(omit)) }}"
-    login_user: "{{ zabbix_api_login_user }}"
-    login_password: "{{ zabbix_api_login_pass }}"
+  community.zabbix.zabbix_hostmacro:
     host_name: "{{ (zabbix_agent2 | bool) | ternary(zabbix_agent2_hostname, zabbix_agent_hostname) }}"
     macro_name: "{{ item.macro_key }}"
     macro_value: "{{ item.macro_value }}"
@@ -136,7 +102,7 @@
     - item.macro_key is defined
   register: zabbix_api_hostmarcro_created
   until: zabbix_api_hostmarcro_created is succeeded
-  delegate_to: localhost
+  delegate_to: "{{ zabbix_api_server_host }}"
   become: false
   tags:
     - api
