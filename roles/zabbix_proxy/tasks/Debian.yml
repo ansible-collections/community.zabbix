@@ -132,10 +132,10 @@
   become: true
 
 - name: apt-get clean
-  shell: apt-get clean; apt-get update
-  args:
-    warn: false
-  changed_when: false
+  apt:
+    clean: yes
+    update_cache: yes
+    cache_valid_time: 0
   become: true
   tags:
     - skip_ansible_lint
