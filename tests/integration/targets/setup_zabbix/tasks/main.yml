@@ -42,6 +42,7 @@
     ansible_connection: httpapi
     # ansible_zabbix_auth_key: 8ec0d52432c15c91fcafe9888500cf9a607f44091ab554dbee860f6b44fac895
     ansible_host: 127.0.0.1
+    ansible_zabbix_url_path: ''
     ansible_httpapi_port: 8080
     ansible_httpapi_use_ssl: false
     ansible_httpapi_validate_certs: false
