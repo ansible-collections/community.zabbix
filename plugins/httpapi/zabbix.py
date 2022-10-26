@@ -86,8 +86,8 @@ class HttpApi(HttpApiBase):
     def api_version(self):
         url_path = self.get_option('zabbix_url_path')
         if isinstance(url_path, str):
-          # zabbix_url_path provided (even if it is an empty string)
-          self.url_path = '/' + url_path
+            # zabbix_url_path provided (even if it is an empty string)
+            self.url_path = '/' + url_path
         if not self.zbx_api_version:
             if not hasattr(self.connection, 'zbx_api_version'):
                 code, version = self.send_request(data=self.payload_builder('apiinfo.version'))
