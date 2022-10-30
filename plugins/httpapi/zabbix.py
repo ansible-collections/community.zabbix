@@ -26,6 +26,15 @@ options:
       - name: ANSIBLE_ZABBIX_AUTH_KEY
     vars:
       - name: ansible_zabbix_auth_key
+  zabbix_url_path:
+    type: str
+    description:
+      - Specifies path portion in Zabbix WebUI URL, e.g. for https://myzabbixfarm.com/zabbixeu zabbix_url_path=zabbixeu
+    default: zabbix
+    env:
+      - name: ANSIBLE_ZABBIX_URL_PATH
+    vars:
+      - name: ansible_zabbix_url_path
 """
 
 import json
@@ -47,6 +56,7 @@ BASE_HEADERS = {
 class HttpApi(HttpApiBase):
     zbx_api_version = None
     auth_key = None
+    url_path = '/zabbix'  # By default Zabbix WebUI is on http(s)://FQDN/zabbix
 
     def set_become(self, become_context):
         """As this is an http rpc call there is no elevation available
@@ -74,6 +84,10 @@ class HttpApi(HttpApiBase):
             self.send_request(data=payload)
 
     def api_version(self):
+        url_path = self.get_option('zabbix_url_path')
+        if isinstance(url_path, str):
+            # zabbix_url_path provided (even if it is an empty string)
+            self.url_path = '/' + url_path
         if not self.zbx_api_version:
             if not hasattr(self.connection, 'zbx_api_version'):
                 code, version = self.send_request(data=self.payload_builder('apiinfo.version'))
@@ -83,6 +97,7 @@ class HttpApi(HttpApiBase):
         return self.zbx_api_version
 
     def send_request(self, data=None, request_method="POST", path="/api_jsonrpc.php"):
+        path = self.url_path + path
         if not data:
             data = {}
 

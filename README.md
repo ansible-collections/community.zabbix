@@ -132,6 +132,10 @@ To use a module or role from this collection, reference them with their Fully Qu
       zabbix_agent_server: zabbix.example.com
       ...
 
+- name: If Zabbix WebUI runs on non-default (zabbix) path, e.g. http://<FQDN>/zabbixeu
+  set_fact:
+    ansible_zabbix_url_path: 'zabbixeu'
+
 - name: Using Zabbix collection to manage Zabbix Server's elements with username/password
   hosts: zabbix.example.com
   vars:
