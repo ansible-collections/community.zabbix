@@ -28,16 +28,9 @@
     - "../vars/main.yml"
 
 - name: "Install the correct repository"
-  include: "RedHat.yml"
-  when:
-    - ansible_os_family == "RedHat"
+  include_tasks: "{{ ansible_os_family }}.yml"
 
-- name: "Install the correct repository"
-  include: "Debian.yml"
-  when:
-    - ansible_os_family == "Debian"
-
-- name: "Installing the database"
+- name: "Installing the {{ zabbix_proxy_database_long }} database"
   include: "{{ zabbix_proxy_database_long }}.yml"
 
 - name: "Create include dir zabbix-proxy"
