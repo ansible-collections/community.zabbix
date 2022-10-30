@@ -15,6 +15,7 @@ zabbix_selinux: false
 zabbix_repo: zabbix
 zabbix_proxy_apt_priority:
 zabbix_proxy_package_state: present
+zabbix_proxy_install_recommends: true
 zabbix_proxy_install_database_client: true
 zabbix_install_pip_packages: true
 zabbix_repo_yum_schema: https
