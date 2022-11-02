@@ -1,0 +1,48 @@
+---
+- name: Test module_defaults applied to a group during creation
+  module_defaults:
+    group/community.zabbix.zabbix:
+      host_groups:
+        - Example Group
+      state: present
+  block:
+    - name: Create host group
+      zabbix_group:
+      register: _grp
+
+    - name: Create host
+      zabbix_host:
+        host_name: Example Host
+        interfaces:
+          - type: agent
+            main: 1
+            dns: example-host01.local
+      register: _host
+
+    - name: Assert that resources were correctly created
+      assert:
+        that:
+          - _grp is changed
+          - _host is changed
+
+- name: Test module_defaults applied to a group during deletion
+  module_defaults:
+    group/community.zabbix.zabbix:
+      host_groups:
+        - Example Group
+      state: absent
+  block:
+    - name: Delete host
+      zabbix_host:
+        host_name: Example Host
+      register: _host
+
+    - name: Delete host group
+      zabbix_group:
+      register: _grp
+
+    - name: Assert that resources were correctly deleted
+      assert:
+        that:
+          - _grp is changed
+          - _host is changed

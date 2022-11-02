@@ -121,7 +121,7 @@ Modules are tested via `ansible-test` command. Configurations for integration an
 Running test suites locally requires a few dependencies to be installed. Same as for the roles, it is recommended to use [Python virtual environment](#virtualenv):
 
 ```bash
-pip install docker-compose zabbix-api
+pip install docker-compose
 ```
 
 Integration test suite for modules can be run with the commands below:
@@ -129,7 +129,7 @@ Integration test suite for modules can be run with the commands below:
 ```bash
 export zabbix_version=X.Y
 docker-compose up -d
-ansible-test integration -v --color --retry-on-error --continue-on-error --diff
+ansible-test integration -v --color --continue-on-error --diff [test_zabbix_xyz]
 docker-compose down
 ```
 *Notes*:
