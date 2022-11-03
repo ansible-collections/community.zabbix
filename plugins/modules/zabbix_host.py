@@ -117,13 +117,11 @@ options:
                 description:
                     - IP address used by host interface.
                     - Required if I(useip=1).
-                default: ''
             dns:
                 type: str
                 description:
                     - DNS name of the host interface.
                     - Required if I(useip=0).
-                default: ''
             port:
                 type: str
                 description:
@@ -170,6 +168,7 @@ options:
                         description:
                             - SNMPv1 and SNMPv2 community string.
                             - Required when I(version=1) or I(version=2).
+                        default: ''
                     securityname:
                         type: str
                         description:

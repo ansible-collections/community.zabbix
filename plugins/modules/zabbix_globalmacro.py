@@ -48,6 +48,7 @@ options:
             - Text Description of the global macro.
             - Works only with Zabbix >= 4.4 and is silently ignored in lower versions
         type: str
+        default: ''
     state:
         description:
             - State of the macro.

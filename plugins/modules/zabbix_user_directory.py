@@ -48,6 +48,7 @@ options:
             - LDAP bind distinguished name string. Can be empty for anonymous binding.
         required: false
         type: str
+        default: ''
     bind_password:
         description:
             - LDAP bind password. Can be empty for anonymous binding.
@@ -59,6 +60,7 @@ options:
             - User directory description.
         required: false
         type: str
+        default: ''
     search_filter:
         description:
             - LDAP custom filter string when authenticating user in LDAP.
