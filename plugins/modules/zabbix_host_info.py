@@ -37,6 +37,7 @@ options:
             - Required when I(host_ip) is not used.
         required: false
         type: str
+        default: ''
     host_ip:
         description:
             - Host interface IP of the host in Zabbix.
@@ -44,6 +45,7 @@ options:
         required: false
         type: list
         elements: str
+        default: []
     exact_match:
         description:
             - Find the exact match
@@ -61,6 +63,7 @@ options:
         type: list
         elements: str
         required: false
+        default: []
 extends_documentation_fragment:
 - community.zabbix.zabbix
 
