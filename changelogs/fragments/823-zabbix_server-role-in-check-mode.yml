@@ -1,0 +1,2 @@
+minor_changes:
+  - fixed ``zabbix_server`` role failure running in check_mode (see https://github.com/ansible-collections/community.zabbix/issues/804)
