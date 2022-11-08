@@ -978,7 +978,7 @@ def main():
         tls_connect=dict(type='int', required=False),
         tls_accept=dict(type='int', required=False),
         tls_psk_identity=dict(type='str', required=False),
-        tls_psk=dict(type='str', required=False),
+        tls_psk=dict(type='str', required=False, no_log=True),
         ca_cert=dict(type='str', required=False, aliases=['tls_issuer']),
         tls_subject=dict(type='str', required=False),
         inventory_zabbix=dict(type='dict', required=False),
