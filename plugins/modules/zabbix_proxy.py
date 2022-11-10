@@ -341,7 +341,7 @@ def main():
         ca_cert=dict(type='str', required=False, default=None, aliases=['tls_issuer']),
         tls_subject=dict(type='str', required=False, default=None),
         tls_psk_identity=dict(type='str', required=False, default=None),
-        tls_psk=dict(type='str', required=False, default=None),
+        tls_psk=dict(type='str', required=False, default=None, no_log=True),
         interface=dict(
             type='dict',
             required=False,
