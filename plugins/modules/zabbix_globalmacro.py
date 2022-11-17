@@ -22,7 +22,6 @@ author:
     - Timothy Test (@ttestscripting)
 requirements:
     - "python >= 2.6"
-    - "zabbix-api >= 0.5.4"
 options:
     macro_name:
         description:
@@ -49,6 +48,7 @@ options:
             - Text Description of the global macro.
             - Works only with Zabbix >= 4.4 and is silently ignored in lower versions
         type: str
+        default: ''
     state:
         description:
             - State of the macro.
@@ -72,12 +72,30 @@ extends_documentation_fragment:
 '''
 
 EXAMPLES = r'''
+# Set following variables for Zabbix Server host in play or inventory
+- name: Set connection specific variables
+  set_fact:
+    ansible_network_os: community.zabbix.zabbix
+    ansible_connection: httpapi
+    ansible_httpapi_port: 80
+    ansible_httpapi_use_ssl: false
+    ansible_httpapi_validate_certs: false
+    ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
+
+# If you want to use Username and Password to be authenticated by Zabbix Server
+- name: Set credentials to access Zabbix Server API
+  set_fact:
+    ansible_user: Admin
+    ansible_httpapi_pass: zabbix
+
+# If you want to use API token to be authenticated by Zabbix Server
+# https://www.zabbix.com/documentation/current/en/manual/web_interface/frontend_sections/administration/general#api-tokens
+- name: Set API token
+  set_fact:
+    ansible_zabbix_auth_key: 8ec0d52432c15c91fcafe9888500cf9a607f44091ab554dbee860f6b44fac895
+
 - name: Create new global macro or update an existing macro's value
-  local_action:
-    module: community.zabbix.zabbix_globalmacro
-    server_url: http://monitor.example.com
-    login_user: username
-    login_password: password
+  community.zabbix.zabbix_globalmacro:
     macro_name: EXAMPLE.MACRO
     macro_value: Example value
     macro_type: 0
@@ -85,22 +103,14 @@ EXAMPLES = r'''
     state: present
 # Values with curly brackets need to be quoted otherwise they will be interpreted as a dictionary
 - name: Create new global macro in Zabbix native format with Secret Type
-  local_action:
-    module: community.zabbix.zabbix_globalmacro
-    server_url: http://monitor.example.com
-    login_user: username
-    login_password: password
+  community.zabbix.zabbix_globalmacro:
     macro_name: "{$EXAMPLE.MACRO}"
     macro_value: Example value
     macro_type: 1
     macro_description: Example description
     state: present
 - name: Delete existing global macro
-  local_action:
-    module: community.zabbix.zabbix_globalmacro
-    server_url: http://monitor.example.com
-    login_user: username
-    login_password: password
+  community.zabbix.zabbix_globalmacro:
     macro_name: "{$EXAMPLE.MACRO}"
     state: absent
 '''
@@ -231,6 +241,12 @@ def main():
         ],
         supports_check_mode=True
     )
+
+    zabbix_utils.require_creds_params(module)
+
+    for p in ['server_url', 'login_user', 'login_password', 'timeout', 'validate_certs']:
+        if p in module.params:
+            module.warn('Option "%s" is deprecated with the move to httpapi connection and will be removed in the next release' % p)
 
     macro_name = normalize_macro_name(module.params['macro_name'])
     macro_value = module.params['macro_value']

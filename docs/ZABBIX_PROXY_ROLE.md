@@ -51,6 +51,12 @@ With the release of Ansible 2.10, modules have been moved into collections.  Wit
 ansible-galaxy collection install ansible.posix
 ```
 
+If you are willing to create proxy in Zabbix via API as a part of this role execution then you need to install `ansible.netcommon` collection too:
+
+```
+ansible-galaxy collection install ansible.netcommon
+```
+
 ### MySQL
 
 When you are a MySQL user and using Ansible 2.10 or newer, then there is a dependency on the collection named `community.mysql`. This collections are needed as the `mysql_` modules are now part of collections and not standard in Ansible anymmore. Installing the collection:
@@ -326,16 +332,17 @@ NOTE: When using `zabbix_proxy_dbname: zabbix_proxy` (Which is default with this
 
 ## Zabbix API variables
 
-These variables need to be overridden when you want to make use of the zabbix-api for automatically creating and or updating hosts. Host encryption configuration will be set to match agent configuration.
+These variables need to be overridden when you want to make use of the Zabbix API for automatically creating and or updating proxies, i.e. when `zabbix_api_create_proxy` is set to `True`.
 
-When `zabbix_api_create_proxy` is set to `True`, it will install on the host executing the Ansible playbook the `zabbix-api` python module.
-
-* `zabbix_api_server_url`: The url on which the Zabbix webpage is available. Example: http://zabbix.example.com
-* `zabbix_api_http_user`: The http user to access zabbix url with Basic Auth
-* `zabbix_api_http_password`: The http password to access zabbix url with Basic Auth
-* `zabbix_api_create_proxy`: When you want to enable the Zabbix API to create/delete the proxy. This has to be set to `True` if you want to make use of `zabbix_proxy_state`. Default: `False`
+* `zabbix_api_server_host`: The IP or hostname/FQDN of Zabbix server. Example: zabbix.example.com
+* `zabbix_api_server_port`: TCP port to use to connect to Zabbix server. Example: 8080
+* `zabbix_api_use_ssl`: yes (Default) if we need to connect to Zabbix server over HTTPS
+* `zabbix_api_validate_certs` : yes (Default) if we need to validate tls certificates of the API. Use `no` in case self-signed certificates are used
 * `zabbix_api_login_user`: Username of user which has API access.
 * `zabbix_api_login_pass`: Password for the user which has API access.
+* `ansible_zabbix_url_path`: URL path if Zabbix WebUI running on non-default (zabbix) path, e.g. if http://<FQDN>/zabbixeu then set to `zabbixeu`
+* `zabbix_api_create_proxy`: When you want to enable the Zabbix API to create/delete the proxy. This has to be set to `True` if you want to make use of `zabbix_proxy_state`. Default: `False`
+* `zabbix_proxy_name`: name of the Zabbix proxy as it is seen by Zabbix server
 * `zabbix_proxy_state`: present (Default) if the proxy needs to be created or absent if you want to delete it. This only works when `zabbix_api_create_proxy` is set to `True`.
 * `zabbix_proxy_status`: active (Default) if the proxy needs to be active or passive.
 * `zabbix_api_timeout`: timeout for API calls (default to 30 seconds)

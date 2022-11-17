@@ -17,7 +17,6 @@ description:
 author: "Alexander Bulimov (@abulimov)"
 requirements:
     - "python >= 2.6"
-    - "zabbix-api >= 0.5.4"
 options:
     state:
         description:
@@ -102,19 +101,37 @@ notes:
     - Module creates maintenance window from now() to now() + minutes,
       so if Zabbix server's time and host's time are not synchronized,
       you will get strange results.
-    - Install required module with 'pip install zabbix-api' command.
 '''
 
 EXAMPLES = r'''
+# Set following variables for Zabbix Server host in play or inventory
+- name: Set connection specific variables
+  set_fact:
+    ansible_network_os: community.zabbix.zabbix
+    ansible_connection: httpapi
+    ansible_httpapi_port: 80
+    ansible_httpapi_use_ssl: false
+    ansible_httpapi_validate_certs: false
+    ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
+
+# If you want to use Username and Password to be authenticated by Zabbix Server
+- name: Set credentials to access Zabbix Server API
+  set_fact:
+    ansible_user: Admin
+    ansible_httpapi_pass: zabbix
+
+# If you want to use API token to be authenticated by Zabbix Server
+# https://www.zabbix.com/documentation/current/en/manual/web_interface/frontend_sections/administration/general#api-tokens
+- name: Set API token
+  set_fact:
+    ansible_zabbix_auth_key: 8ec0d52432c15c91fcafe9888500cf9a607f44091ab554dbee860f6b44fac895
+
 - name: Create a named maintenance window for host www1 for 90 minutes
   community.zabbix.zabbix_maintenance:
     name: Update of www1
     host_name: www1.example.com
     state: present
     minutes: 90
-    server_url: https://monitoring.example.com
-    login_user: ansible
-    login_password: pAsSwOrD
 
 - name: Create a named maintenance window for host www1 and host groups Office and Dev
   community.zabbix.zabbix_maintenance:
@@ -124,9 +141,6 @@ EXAMPLES = r'''
       - Office
       - Dev
     state: present
-    server_url: https://monitoring.example.com
-    login_user: ansible
-    login_password: pAsSwOrD
     tags:
       - tag: ExampleHostsTag
       - tag: ExampleHostsTag2
@@ -143,17 +157,11 @@ EXAMPLES = r'''
       - db1.example.com
     state: present
     collect_data: False
-    server_url: https://monitoring.example.com
-    login_user: ansible
-    login_password: pAsSwOrD
 
 - name: Remove maintenance window by name
   community.zabbix.zabbix_maintenance:
     name: Test1
     state: absent
-    server_url: https://monitoring.example.com
-    login_user: ansible
-    login_password: pAsSwOrD
 '''
 
 import datetime
@@ -352,6 +360,12 @@ def main():
         argument_spec=argument_spec,
         supports_check_mode=True
     )
+
+    zabbix_utils.require_creds_params(module)
+
+    for p in ['server_url', 'login_user', 'login_password', 'timeout', 'validate_certs']:
+        if p in module.params:
+            module.warn('Option "%s" is deprecated with the move to httpapi connection and will be removed in the next release' % p)
 
     maint = MaintenanceModule(module)
 

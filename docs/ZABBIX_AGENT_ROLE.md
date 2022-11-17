@@ -62,6 +62,11 @@ With the release of Ansible 2.10, modules have been moved into collections.  Wit
 ansible-galaxy collection install ansible.posix
 ansible-galaxy collection install community.general
 ```
+If you are willing to create host_groups and hosts in Zabbix via API as a part of this role execution then you need to install `ansible.netcommon` collection too:
+
+```
+ansible-galaxy collection install ansible.netcommon
+```
 
 ### Docker
 
@@ -172,6 +177,7 @@ The following is an overview of all available configuration default for this rol
 * `zabbix_agent_apt_priority`: Add a weight (`Pin-Priority`) for the APT repository.
 * `zabbix_agent_conf_mode`: Default: `0644`. The "mode" for the Zabbix configuration file.
 * `zabbix_agent_dont_detect_ip`: Default `false`. When set to `true`, it won't detect available ip addresses on the host and no need for the Python module `netaddr` to be installed.
+* `zabbix_agent_chassis`: Default: `false`. When set to `true`, it will give Zabbix Agent access to the Linux DMI table allowing system.hw.chassis info to populate.
 
 ### Zabbix Agent vs Zabbix Agent 2 configuration
 
@@ -250,19 +256,19 @@ The results are stored in the Ansible variables `zabbix_agent_tlspskidentity` an
 
 ## Zabbix API variables
 
-These variables need to be overridden when you want to make use of the zabbix-api for automatically creating and or updating hosts.
+These variables need to be overridden when you want to make use of the Zabbix API for automatically creating and or updating hosts.
 
 Host encryption configuration will be set to match agent configuration.
 
-When `zabbix_api_create_hostgroup` or `zabbix_api_create_hosts` is set to `True`, it will install on the host executing the Ansible playbook the `zabbix-api` python module.
-
-* `zabbix_api_server_url`: The url on which the Zabbix webpage is available. Example: http://zabbix.example.com
-* `zabbix_api_http_user`: The http user to access zabbix url with Basic Auth
-* `zabbix_api_http_password`: The http password to access zabbix url with Basic Auth
 * `zabbix_api_create_hosts`: Default: `False`. When you want to enable the Zabbix API to create/delete the host. This has to be set to `True` if you want to make use of `zabbix_agent_host_state`.
 * `zabbix_api_create_hostgroup`: When you want to enable the Zabbix API to create/delete the hostgroups. This has to be set to `True` if you want to make use of `zabbix_agent_hostgroups_state`.Default: `False`
+* `zabbix_api_server_host`: The IP or hostname/FQDN of Zabbix server. Example: zabbix.example.com
+* `zabbix_api_server_port`: TCP port to use to connect to Zabbix server. Example: 8080
+* `zabbix_api_use_ssl`: yes (Default) if we need to connect to Zabbix server over HTTPS
+* `zabbix_api_validate_certs` : yes (Default) if we need to validate tls certificates of the API. Use `no` in case self-signed certificates are used
 * `zabbix_api_login_user`: Username of user which has API access.
 * `zabbix_api_login_pass`: Password for the user which has API access.
+* `ansible_zabbix_url_path`: URL path if Zabbix WebUI running on non-default (zabbix) path, e.g. if http://<FQDN>/zabbixeu then set to `zabbixeu`
 * `zabbix_agent_hostgroups_state`: present (Default) if the hostgroup needs to be created or absent if you want to delete it. This only works when `zabbix_api_create_hostgroup` is set to `True`.
 * `zabbix_host_status`: enabled (Default) when host in monitored, disabled when host is disabled for monitoring.
 * `zabbix_agent_host_state`: present (Default) if the host needs to be created or absent is you want to delete it. This only works when `zabbix_api_create_hosts` is set to `True`.
@@ -274,7 +280,6 @@ When `zabbix_api_create_hostgroup` or `zabbix_api_create_hosts` is set to `True`
 * `zabbix_agent_tags`: A list with tag and (optionally) value for creating host tags.
 * `zabbix_agent_inventory_mode`: Configure Zabbix inventory mode. Needed for building inventory data, manually when configuring a host or automatically by using some automatic population options. This has to be set to `automatic` if you want to make automatically building inventory data.
 * `zabbix_agent_visible_hostname` : Configure Zabbix visible name inside Zabbix web UI for the node.
-* `zabbix_api_validate_certs` : yes (Default) if we need to validate tls certificates of the API. Use `no` in case self-signed certificates are used
 * `zabbix_agent_description`: Description of the host in Zabbix.
 * `zabbix_agent_inventory_zabbix`: Adds Facts for a zabbix inventory
 

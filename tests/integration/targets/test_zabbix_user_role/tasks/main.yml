@@ -1,0 +1,70 @@
+---
+# New user role create test from here, only 6.0 and higher
+- when: zabbix_version is version('6.0', '>=')
+  block:
+    - name: test - Create a new Zabbix role
+      zabbix_user_role:
+        state: present
+        name: Operators
+        type: User
+        rules:
+          ui.default_access: 0
+          ui:
+            - name: "monitoring.hosts"
+              status: 0
+            - name: "monitoring.maps"
+              status: 1
+      register: create_zabbix_user_role_result
+
+    - assert:
+        that:
+          - create_zabbix_user_role_result.changed is sameas true
+
+    # Check user role idempotency
+    - name: test - Update a Zabbix role with same rules
+      zabbix_user_role:
+        state: present
+        name: Operators
+        type: User
+        rules:
+          ui.default_access: 0
+          ui:
+            - name: "monitoring.hosts"
+              status: 0
+            - name: "monitoring.maps"
+              status: 1
+      register: create_zabbix_user_role_result
+
+    - assert:
+        that:
+          - create_zabbix_user_role_result.changed is sameas false
+
+    # Check user role change
+    - name: test - Update a Zabbix role with new rules
+      zabbix_user_role:
+        state: present
+        name: Operators
+        type: User
+        rules:
+          ui.default_access: 0
+          ui:
+            - name: "monitoring.hosts"
+              status: 1
+            - name: "monitoring.maps"
+              status: 0
+      register: create_zabbix_user_role_result
+
+    - assert:
+        that:
+          - create_zabbix_user_role_result.changed is sameas true
+
+    # Check user role remove
+    - name: test - Remote Zabbix role
+      zabbix_user_role:
+        state: absent
+        name: Operators
+      register: create_zabbix_user_role_result
+
+    - assert:
+        that:
+          - create_zabbix_user_role_result.changed is sameas true

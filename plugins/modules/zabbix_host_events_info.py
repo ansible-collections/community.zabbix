@@ -148,7 +148,6 @@ author:
     - "Stéphane Travassac (@stravassac)"
 requirements:
     - "python >= 2.7"
-    - "zabbix-api >= 0.5.3"
 options:
     host_identifier:
         description:
@@ -184,11 +183,30 @@ extends_documentation_fragment:
 '''
 
 EXAMPLES = '''
+# Set following variables for Zabbix Server host in play or inventory
+- name: Set connection specific variables
+  set_fact:
+    ansible_network_os: community.zabbix.zabbix
+    ansible_connection: httpapi
+    ansible_httpapi_port: 80
+    ansible_httpapi_use_ssl: false
+    ansible_httpapi_validate_certs: false
+    ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
+
+# If you want to use Username and Password to be authenticated by Zabbix Server
+- name: Set credentials to access Zabbix Server API
+  set_fact:
+    ansible_user: Admin
+    ansible_httpapi_pass: zabbix
+
+# If you want to use API token to be authenticated by Zabbix Server
+# https://www.zabbix.com/documentation/current/en/manual/web_interface/frontend_sections/administration/general#api-tokens
+- name: Set API token
+  set_fact:
+    ansible_zabbix_auth_key: 8ec0d52432c15c91fcafe9888500cf9a607f44091ab554dbee860f6b44fac895
+
 - name: exclude machine if alert active on it
   community.zabbix.zabbix_host_events_info:
-      server_url: "{{ zabbix_api_server_url }}"
-      login_user: "{{ lookup('env','ZABBIX_USER') }}"
-      login_password: "{{ lookup('env','ZABBIX_PASSWORD') }}"
       host_identifier: "{{inventory_hostname}}"
       host_id_type: "hostname"
       timeout: 120
@@ -253,6 +271,12 @@ def main():
         argument_spec=argument_spec,
         supports_check_mode=True
     )
+
+    zabbix_utils.require_creds_params(module)
+
+    for p in ['server_url', 'login_user', 'login_password', 'timeout', 'validate_certs']:
+        if p in module.params:
+            module.warn('Option "%s" is deprecated with the move to httpapi connection and will be removed in the next release' % p)
 
     trigger_severity_map = {'not_classified': 0, 'information': 1, 'warning': 2, 'average': 3, 'high': 4, 'disaster': 5}
     host_id = module.params['host_identifier']

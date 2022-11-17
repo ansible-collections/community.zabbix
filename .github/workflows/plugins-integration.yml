@@ -3,14 +3,14 @@ name: plugins-integration
 on:
   push:
     paths:
-      - 'plugins/**'
-      - 'tests/integration/**'
-      - '.github/workflows/plugins-integration.yml'
+      - "plugins/**"
+      - "tests/integration/**"
+      - ".github/workflows/plugins-integration.yml"
   pull_request:
     paths:
-      - 'plugins/**'
-      - 'tests/integration/**'
-      - '.github/workflows/plugins-integration.yml'
+      - "plugins/**"
+      - "tests/integration/**"
+      - ".github/workflows/plugins-integration.yml"
 
 jobs:
   integration:
@@ -26,28 +26,13 @@ jobs:
           - version: "6.0"
           - version: "6.2"
         ansible:
-          - stable-2.10
-          - stable-2.11
+          # https://docs.ansible.com/ansible/latest/reference_appendices/release_and_maintenance.html#ansible-core-changelogs
           - stable-2.12
           - stable-2.13
+          - stable-2.14
           - devel
         python:
-          - 2.7 # required by Ansible see https://github.com/ansible-collections/overview/blob/main/collection_requirements.rst#python-compatibility
-          - 3.6 # required by Ansible see https://github.com/ansible-collections/overview/blob/main/collection_requirements.rst#python-compatibility
           - 3.9
-        exclude:
-          - ansible: devel
-            python: 2.7
-          - ansible: devel
-            python: 3.6
-          - ansible: stable-2.12
-            python: 2.7
-          - ansible: stable-2.12
-            python: 3.6
-          - ansible: stable-2.13
-            python: 2.7
-          - ansible: stable-2.13
-            python: 3.6
 
     steps:
       - name: Check out code
@@ -66,6 +51,10 @@ jobs:
       - name: Install dependencies
         run: pip install docker-compose zabbix-api
 
+      - name: Install ansible.netcommon collection
+        run: ansible-galaxy collection install ansible.netcommon -p /home/runner/work/community.zabbix/community.zabbix
+        working-directory: ./ansible_collections/community/zabbix
+
       # For Zabbix integration tests we need to test against different versions of
       # the Zabbix server. To do this we spin up a Docker container using the `matrix`
       # of version and ports specified earlier.
@@ -79,7 +68,7 @@ jobs:
       # As we need to connect to an existing docker container we can't use `--docker` here as the VMs would be on different
       # (non-routing) networks, so we run them locally and ensure any required dependencies are installed via `--requirements`
       - name: Run integration test
-        run: ansible-test integration -v --color --retry-on-error --continue-on-error --diff --python ${{ matrix.python }} --requirements --coverage
+        run: ansible-test integration -v --color --continue-on-error --diff --python ${{ matrix.python }} --requirements --coverage
         working-directory: ./ansible_collections/community/zabbix
 
         # ansible-test support producing code coverage date

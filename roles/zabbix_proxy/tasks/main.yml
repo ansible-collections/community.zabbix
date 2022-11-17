@@ -28,16 +28,9 @@
     - "../vars/main.yml"
 
 - name: "Install the correct repository"
-  include: "RedHat.yml"
-  when:
-    - ansible_os_family == "RedHat"
+  include_tasks: "{{ ansible_os_family }}.yml"
 
-- name: "Install the correct repository"
-  include: "Debian.yml"
-  when:
-    - ansible_os_family == "Debian"
-
-- name: "Installing the database"
+- name: "Installing the {{ zabbix_proxy_database_long }} database"
   include: "{{ zabbix_proxy_database_long }}.yml"
 
 - name: "Create include dir zabbix-proxy"
@@ -109,28 +102,12 @@
   notify: restart zabbix-proxy
   become: true
 
-- name: "Installing the Zabbix-api package on localhost"
-  pip:
-    name: zabbix-api
-    state: present
-  register: zabbix_api_package_installed
-  until: zabbix_api_package_installed is succeeded
-  delegate_to: localhost
-  run_once: true
-  become: "{{ zabbix_proxy_become_on_localhost }}"
-  when:
-    - zabbix_install_pip_packages | bool
-    - zabbix_api_create_proxy | bool
-  tags:
-    - api
-
 - name: Ensure proxy definition is up-to-date (added/updated/removed)
-  zabbix_proxy:
-    server_url: "{{ zabbix_api_server_url }}"
-    http_login_user: "{{ zabbix_api_http_user | default(zabbix_http_user | default(omit)) }}"
-    http_login_password: "{{ zabbix_api_http_password | default(zabbix_http_password | default(omit)) }}"
-    login_user: "{{ zabbix_api_login_user }}"
-    login_password: "{{ zabbix_api_login_pass }}"
+  vars:
+    gather_facts: false
+    ansible_user: "{{ zabbix_api_login_user }}"
+    ansible_connection: httpapi
+  community.zabbix.zabbix_proxy:
     state: "{{ zabbix_proxy_state }}"
     status: "{{ zabbix_proxy_status }}"
     proxy_name: "{{ zabbix_proxy_name }}"
@@ -141,11 +118,9 @@
     tls_subject: "{{ zabbix_proxy_tls_subject | default(omit) }}"
     tls_accept: "{{ zabbix_proxy_tls_config[zabbix_proxy_tlsaccept if zabbix_proxy_tlsaccept else 'no_encryption'] }}"
     tls_connect: "{{ zabbix_proxy_tls_config[zabbix_proxy_tlsconnect if zabbix_proxy_tlsconnect else 'no_encryption'] }}"
-    validate_certs: "{{ zabbix_api_validate_certs | default(omit) }}"
-    timeout: "{{ zabbix_api_timeout }}"
   when:
     - zabbix_api_create_proxy | bool
-  delegate_to: localhost
+  delegate_to: "{{ zabbix_api_server_host }}"
   become: false
   tags:
     - api

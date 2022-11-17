@@ -29,7 +29,6 @@ author:
     - "Michael Miko (@RedWhiteMiko)"
 requirements:
     - "python >= 2.6"
-    - "zabbix-api >= 0.5.4"
 options:
     host_name:
         description:
@@ -38,6 +37,7 @@ options:
             - Required when I(host_ip) is not used.
         required: false
         type: str
+        default: ''
     host_ip:
         description:
             - Host interface IP of the host in Zabbix.
@@ -45,6 +45,7 @@ options:
         required: false
         type: list
         elements: str
+        default: []
     exact_match:
         description:
             - Find the exact match
@@ -62,18 +63,37 @@ options:
         type: list
         elements: str
         required: false
+        default: []
 extends_documentation_fragment:
 - community.zabbix.zabbix
 
 '''
 
 EXAMPLES = r'''
+# Set following variables for Zabbix Server host in play or inventory
+- name: Set connection specific variables
+  set_fact:
+    ansible_network_os: community.zabbix.zabbix
+    ansible_connection: httpapi
+    ansible_httpapi_port: 80
+    ansible_httpapi_use_ssl: false
+    ansible_httpapi_validate_certs: false
+    ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
+
+# If you want to use Username and Password to be authenticated by Zabbix Server
+- name: Set credentials to access Zabbix Server API
+  set_fact:
+    ansible_user: Admin
+    ansible_httpapi_pass: zabbix
+
+# If you want to use API token to be authenticated by Zabbix Server
+# https://www.zabbix.com/documentation/current/en/manual/web_interface/frontend_sections/administration/general#api-tokens
+- name: Set API token
+  set_fact:
+    ansible_zabbix_auth_key: 8ec0d52432c15c91fcafe9888500cf9a607f44091ab554dbee860f6b44fac895
+
 - name: Get host info
-  local_action:
-    module: community.zabbix.zabbix_host_info
-    server_url: http://monitor.example.com
-    login_user: username
-    login_password: password
+  community.zabbix.zabbix_host_info:
     host_name: ExampleHost
     host_ip: 127.0.0.1
     timeout: 10
@@ -81,11 +101,7 @@ EXAMPLES = r'''
     remove_duplicate: yes
 
 - name: Reduce host inventory information to provided keys
-  local_action:
-    module: community.zabbix.zabbix_host_info
-    server_url: http://monitor.example.com
-    login_user: username
-    login_password: password
+  community.zabbix.zabbix_host_info:
     host_name: ExampleHost
     host_inventory:
       - os
@@ -176,6 +192,8 @@ def main():
     if module._name == 'zabbix_host_facts':
         module.deprecate("The 'zabbix_host_facts' module has been renamed to 'zabbix_host_info'",
                          collection_name="community.zabbix", version='2.0.0')  # was 2.13
+
+    zabbix_utils.require_creds_params(module)
 
     host_name = module.params['host_name']
     host_ips = module.params['host_ip']

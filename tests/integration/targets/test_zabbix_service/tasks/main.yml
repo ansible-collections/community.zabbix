@@ -2,9 +2,6 @@
 - when: zabbix_version is version('6.0', '<')
   module_defaults:
     community.zabbix.zabbix_service:
-      server_url: "{{ zabbix_api_server_url }}"
-      login_user: "{{ zabbix_api_login_user }}"
-      login_password: "{{ zabbix_api_login_pass }}"
       name: ExampleServiceForServiceModule
       sla: 99.99
       sortorder: 0
@@ -305,9 +302,6 @@
   when: zabbix_version is version('6.0', '>=')
   module_defaults:
     community.zabbix.zabbix_service:
-      server_url: "{{ zabbix_api_server_url }}"
-      login_user: "{{ zabbix_api_login_user }}"
-      login_password: "{{ zabbix_api_login_pass }}"
       description: "Example Service for Service Module"
       sortorder: 0
       propagation_rule: increase

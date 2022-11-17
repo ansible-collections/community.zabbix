@@ -2,9 +2,6 @@
 
 - name: Create a new Zabbix template (check mode).
   zabbix_template:
-    server_url: "{{ zabbix_api_server_url }}"
-    login_user: "{{ zabbix_api_login_user }}"
-    login_password: "{{ zabbix_api_login_pass }}"
     template_name: ExampleHost
     template_groups:
       - 'Templates'
@@ -19,9 +16,6 @@
 
 - name: Create a new Zabbix template.
   zabbix_template:
-    server_url: "{{ zabbix_api_server_url }}"
-    login_user: "{{ zabbix_api_login_user }}"
-    login_password: "{{ zabbix_api_login_pass }}"
     template_name: ExampleHost
     template_groups:
       - 'Templates'
@@ -35,9 +29,6 @@
 
 - name: Create a new Zabbix template (idempotency check).
   zabbix_template:
-    server_url: "{{ zabbix_api_server_url }}"
-    login_user: "{{ zabbix_api_login_user }}"
-    login_password: "{{ zabbix_api_login_pass }}"
     template_name: ExampleHost
     template_groups:
       - 'Templates'
@@ -51,9 +42,6 @@
 
 - name: Create a new Zabbix template with linked templates.
   zabbix_template:
-    server_url: "{{ zabbix_api_server_url }}"
-    login_user: "{{ zabbix_api_login_user }}"
-    login_password: "{{ zabbix_api_login_pass }}"
     template_name: ExampleHostWithLinked
     template_groups:
       - 'Templates'
@@ -70,9 +58,6 @@
 
 - name: Gather Zabbix template infomation.
   zabbix_template_info:
-    server_url: "{{ zabbix_api_server_url }}"
-    login_user: "{{ zabbix_api_login_user }}"
-    login_password: "{{ zabbix_api_login_pass }}"
     template_name: ExampleHost
     format: json
   register: gather_template_result
@@ -91,9 +76,6 @@
 
 - name: Add link_templates to Zabbix template.
   zabbix_template:
-    server_url: "{{ zabbix_api_server_url }}"
-    login_user: "{{ zabbix_api_login_user }}"
-    login_password: "{{ zabbix_api_login_pass }}"
     template_name: ExampleHost
     template_groups:
       - 'Templates'
@@ -110,9 +92,6 @@
 
 - name: Add link_templates to Zabbix template (idempotency check).
   zabbix_template:
-    server_url: "{{ zabbix_api_server_url }}"
-    login_user: "{{ zabbix_api_login_user }}"
-    login_password: "{{ zabbix_api_login_pass }}"
     template_name: ExampleHost
     template_groups:
       - 'Templates'
@@ -129,9 +108,6 @@
 
 - name: Gather Zabbix template infomation.
   zabbix_template_info:
-    server_url: "{{ zabbix_api_server_url }}"
-    login_user: "{{ zabbix_api_login_user }}"
-    login_password: "{{ zabbix_api_login_pass }}"
     template_name: ExampleHost
     format: json
   register: gather_template_result
@@ -156,9 +132,6 @@
 
 - name: Add macros to Zabbix template.
   zabbix_template:
-    server_url: "{{ zabbix_api_server_url }}"
-    login_user: "{{ zabbix_api_login_user }}"
-    login_password: "{{ zabbix_api_login_pass }}"
     template_name: ExampleHost
     template_groups:
       - 'Templates'
@@ -180,9 +153,6 @@
 
 - name: Add macros to Zabbix template (idempotency check).
   zabbix_template:
-    server_url: "{{ zabbix_api_server_url }}"
-    login_user: "{{ zabbix_api_login_user }}"
-    login_password: "{{ zabbix_api_login_pass }}"
     template_name: ExampleHost
     template_groups:
       - 'Templates'
@@ -202,6 +172,83 @@
     that:
       - update_zabbix_template_result.changed is sameas false
 
+- name: Add tags to Zabbix template.
+  zabbix_template:
+    template_name: ExampleHost
+    template_groups:
+      - 'Templates'
+      - 'Templates/Applications'
+    link_templates:
+      - "{{ 'Zabbix proxy health' if zabbix_version | float >= 5.4 else 'Template App Zabbix Proxy' }}"
+      - "{{ 'FTP Service' if zabbix_version | float >= 5.4 else 'Template App FTP Service' }}"
+    macros:
+      - macro: '{$EXAMPLE_MACRO1}'
+        value: 1000
+      - macro: '{$EXAMPLE_MACRO2}'
+        value: 'text'
+    tags:
+      - tag: tag1
+        value: 1000
+      - tag: tag2
+        value: text
+    state: present
+  register: update_zabbix_template_result
+  when: zabbix_version is version('4.2', '>=')
+
+- assert:
+    that: update_zabbix_template_result is changed
+  when: zabbix_version is version('4.2', '>=')
+
+- name: Add tags to Zabbix template (idempotency check).
+  zabbix_template:
+    template_name: ExampleHost
+    template_groups:
+      - 'Templates'
+      - 'Templates/Applications'
+    link_templates:
+      - "{{ 'Zabbix proxy health' if zabbix_version | float >= 5.4 else 'Template App Zabbix Proxy' }}"
+      - "{{ 'FTP Service' if zabbix_version | float >= 5.4 else 'Template App FTP Service' }}"
+    macros:
+      - macro: '{$EXAMPLE_MACRO1}'
+        value: 1000
+      - macro: '{$EXAMPLE_MACRO2}'
+        value: 'text'
+    tags:
+      - tag: tag1
+        value: 1000
+      - tag: tag2
+        value: text
+    state: present
+  register: update_zabbix_template_result
+  when: zabbix_version is version('4.2', '>=')
+
+- assert:
+    that: update_zabbix_template_result is not changed
+  when: zabbix_version is version('4.2', '>=')
+
+- name: Remove tags from Zabbix template.
+  zabbix_template:
+    template_name: ExampleHost
+    template_groups:
+      - 'Templates'
+      - 'Templates/Applications'
+    link_templates:
+      - "{{ 'Zabbix proxy health' if zabbix_version | float >= 5.4 else 'Template App Zabbix Proxy' }}"
+      - "{{ 'FTP Service' if zabbix_version | float >= 5.4 else 'Template App FTP Service' }}"
+    macros:
+      - macro: '{$EXAMPLE_MACRO1}'
+        value: 1000
+      - macro: '{$EXAMPLE_MACRO2}'
+        value: 'text'
+    tags: []
+    state: present
+  register: update_zabbix_template_result
+  when: zabbix_version is version('4.2', '>=')
+
+- assert:
+    that: update_zabbix_template_result is changed
+  when: zabbix_version is version('4.2', '>=')
+
 # ####
 # Import template tests
 # ####
@@ -218,9 +265,6 @@
 
 - name: Delete Zabbix template.
   zabbix_template:
-    server_url: "{{ zabbix_api_server_url }}"
-    login_user: "{{ zabbix_api_login_user }}"
-    login_password: "{{ zabbix_api_login_pass }}"
     template_name: ExampleHost
     state: absent
   register: delete_zabbix_template_result
@@ -231,9 +275,6 @@
 
 - name: Delete Zabbix template (idempotency check).
   zabbix_template:
-    server_url: "{{ zabbix_api_server_url }}"
-    login_user: "{{ zabbix_api_login_user }}"
-    login_password: "{{ zabbix_api_login_pass }}"
     template_name: ExampleHost
     state: absent
   register: delete_zabbix_template_result
@@ -252,18 +293,12 @@
     # https://github.com/ansible-collections/community.zabbix/issues/314
     - name: Import Zabbix template from JSON file with unicode.
       zabbix_template:
-        server_url: "{{ zabbix_api_server_url }}"
-        login_user: "{{ zabbix_api_login_user }}"
-        login_password: "{{ zabbix_api_login_pass }}"
         template_json: "{{ lookup('file', 'template1_50_higher_decode_unicode.json') }}"
         state: present
       register: import_template_json
 
     - name: Gather Zabbix template infomation.
       zabbix_template_info:
-        server_url: "{{ zabbix_api_server_url }}"
-        login_user: "{{ zabbix_api_login_user }}"
-        login_password: "{{ zabbix_api_login_pass }}"
         template_name: ExampleTemplate314
         format: json
       register: gather_template_result
@@ -275,9 +310,6 @@
 
     - name: Delete Zabbix template.
       zabbix_template:
-        server_url: "{{ zabbix_api_server_url }}"
-        login_user: "{{ zabbix_api_login_user }}"
-        login_password: "{{ zabbix_api_login_pass }}"
         template_name: ExampleTemplate314
         state: absent
       register: delete_zabbix_template_result
@@ -285,3 +317,8 @@
     - assert:
         that:
           - delete_zabbix_template_result.changed is sameas true
+
+- name: Clean up ExampleHostWithLinked template
+  zabbix_template:
+    template_name: ExampleHostWithLinked
+    state: absent

@@ -1,0 +1,3 @@
+bugfixes:
+  - zabbix_proxy - updated the datafiles_path fact for the zabbix_proxy and zabbix_server roles due to upstream change
+  - zabbix_server - updated the datafiles_path fact for the zabbix_proxy and zabbix_server roles due to upstream change

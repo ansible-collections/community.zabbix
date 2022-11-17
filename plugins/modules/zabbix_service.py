@@ -19,7 +19,6 @@ author:
     - "Evgeny Yurchenko (@BGmot)"
 requirements:
     - "python >= 2.7"
-    - "zabbix-api >= 0.5.4"
 options:
     name:
         description:
@@ -250,12 +249,31 @@ extends_documentation_fragment:
 
 EXAMPLES = '''
 ---
+# Set following variables for Zabbix Server host in play or inventory
+- name: Set connection specific variables
+  set_fact:
+    ansible_network_os: community.zabbix.zabbix
+    ansible_connection: httpapi
+    ansible_httpapi_port: 80
+    ansible_httpapi_use_ssl: false
+    ansible_httpapi_validate_certs: false
+    ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
+
+# If you want to use Username and Password to be authenticated by Zabbix Server
+- name: Set credentials to access Zabbix Server API
+  set_fact:
+    ansible_user: Admin
+    ansible_httpapi_pass: zabbix
+
+# If you want to use API token to be authenticated by Zabbix Server
+# https://www.zabbix.com/documentation/current/en/manual/web_interface/frontend_sections/administration/general#api-tokens
+- name: Set API token
+  set_fact:
+    ansible_zabbix_auth_key: 8ec0d52432c15c91fcafe9888500cf9a607f44091ab554dbee860f6b44fac895
+
 # Creates a new Zabbix service with Zabbix < 6.0
 - name: Manage services
   community.zabbix.zabbix_service:
-    server_url: "http://zabbix.example.com/zabbix/"
-    login_user: username
-    login_password: password
     name: apache2 service
     sla: 99.99
     calculate_sla: yes
@@ -267,9 +285,6 @@ EXAMPLES = '''
 # Creates a new Zabbix service with Zabbix >= 6.0
 - name: Create Zabbix service monitoring Apache2 in DCs in Toronto area
   community.zabbix.zabbix_service:
-    server_url: "zabbix.example.com/zabbix/"
-    login_user: username
-    login_password: password
     name: 'apache2 service Toronto'
     description: Apache2 services in Toronto area
     sortorder: 0
@@ -296,9 +311,6 @@ EXAMPLES = '''
 
 - name: Create Zabbix service monitoring all Apache2 services
   community.zabbix.zabbix_service:
-    server_url: "zabbix.example.com/zabbix/"
-    login_user: username
-    login_password: password
     name: apache2 service
     description: Apache2 services
     tags:
@@ -639,6 +651,12 @@ def main():
         argument_spec=argument_spec,
         supports_check_mode=True
     )
+
+    zabbix_utils.require_creds_params(module)
+
+    for p in ['server_url', 'login_user', 'login_password', 'timeout', 'validate_certs']:
+        if p in module.params:
+            module.warn('Option "%s" is deprecated with the move to httpapi connection and will be removed in the next release' % p)
 
     name = module.params['name']
     parent = module.params['parent']

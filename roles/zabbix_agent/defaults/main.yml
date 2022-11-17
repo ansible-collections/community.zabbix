@@ -70,6 +70,8 @@ zabbix_api_validate_certs: "{{ zabbix_validate_certs }}"
 zabbix_agent_server_url: http://localhost # Will be deprecated in 2.0.0
 zabbix_url: "{{ zabbix_agent_server_url }}" # Will be deprecated in 2.0.0
 zabbix_api_server_url: "{{ zabbix_agent_server_url }}"
+zabbix_api_server_host: "{{ zabbix_agent_server_url | urlsplit('hostname') }}"
+zabbix_api_port_from_url: "{{ zabbix_api_server_port | default(zabbix_api_server_url | urlsplit('port') | default(80)) }}"
 # zabbix_http_user: admin                          # Will be deprecated in 2.0.0
 # zabbix_http_password: admin                      # Will be deprecated in 2.0.0
 # zabbix_api_http_user: admin
@@ -78,6 +80,11 @@ zabbix_api_user: Admin # Will be deprecated in 2.0.0
 zabbix_api_pass: !unsafe zabbix # Will be deprecated in 2.0.0
 zabbix_api_login_user: "{{ zabbix_api_user }}"
 zabbix_api_login_pass: "{{ zabbix_api_pass }}"
+ansible_httpapi_pass: "{{ zabbix_api_pass }}"
+ansible_network_os: community.zabbix.zabbix
+ansible_httpapi_port: "{{ (zabbix_api_port_from_url == '') | ternary(80, zabbix_api_port_from_url) }}"
+ansible_httpapi_use_ssl: "{{ zabbix_api_use_ssl | default(false) }}"
+ansible_httpapi_validate_certs: "{{ zabbix_api_validate_certs }}"
 zabbix_api_create_hostgroup: false
 zabbix_api_create_hosts: false
 zabbix_api_timeout: 30
@@ -159,6 +166,7 @@ zabbix_agent_heartbeatfrequency: 60
 zabbix_macros: [] # Will be deprecated in 2.0.0
 zabbix_agent_macros: "{{ zabbix_macros }}"
 zabbix_agent_tags: []
+zabbix_agent_chassis: false
 
 # TLS settings
 zabbix_agent_tlsconnect:
