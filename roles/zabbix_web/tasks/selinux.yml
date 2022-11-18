@@ -18,7 +18,7 @@
   tags:
     - zabbix-web
 
-- name: "SELinux | RedHat | Install related SELinux package on RHEL8"
+- name: "SELinux | RedHat | Install related SELinux package on RHEL9 and RHEL8"
   yum:
     name:
       - python3-libsemanage
@@ -32,7 +32,7 @@
   when:
     - ansible_os_family == "RedHat"
     - selinux_allow_zabbix_can_network
-    - ansible_distribution_major_version == "8"
+    - ansible_distribution_major_version == "9" or ansible_distribution_major_version == "8"
   tags:
     - zabbix-web
 
