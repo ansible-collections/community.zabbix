@@ -63,6 +63,13 @@ zabbix_repo_yum:
     gpgcheck: "{{ zabbix_repo_yum_gpgcheck }}"
     gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-ZABBIX
     state: present
+  - name: zabbix-agent2-plugins
+    description: Zabbix Official Repository (Agent2 Plugins) - $basearch
+    baseurl: "{{ zabbix_repo_yum_schema }}://repo.zabbix.com/zabbix-agent2-plugins/1/rhel/{{ zabbix_agent_distribution_major_version }}/$basearch/"
+    mode: "0644"
+    gpgcheck: "{{ zabbix_repo_yum_gpgcheck }}"
+    gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-ZABBIX
+    state: present
 
 # Zabbix API stuff
 zabbix_validate_certs: true # Will be deprecated in 2.0.0
