@@ -121,8 +121,6 @@ zabbix_server_unavailabledelay: 60
 zabbix_server_unreachabledelay: 15
 zabbix_server_alertscriptspath: /usr/lib/zabbix/alertscripts
 zabbix_server_externalscriptspath: /usr/lib/zabbix/externalscripts
-zabbix_server_fpinglocation: /usr/sbin/fping
-zabbix_server_fping6location: /usr/sbin/fping6
 zabbix_server_sshkeylocation:
 zabbix_server_logslowqueries: 0
 zabbix_server_tmpdir: /tmp

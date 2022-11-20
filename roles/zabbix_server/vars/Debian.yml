@@ -31,3 +31,6 @@ zabbix_valid_server_versions:
     - 6.0
     - 5.0
     - 4.0
+
+zabbix_server_fpinglocation: /usr/bin/fping
+zabbix_server_fping6location: /usr/bin/fping6
