@@ -30,7 +30,7 @@
     gpgcheck: "{{ item.gpgcheck }}"
     gpgkey: "{{ item.gpgkey }}"
     mode: "{{ item.mode | default('0644') }}"
-    priority: "{{ item.priority | default('99') }}"
+    priority: "{{ item.priority | default('98') }}"
     state: "{{ item.state | default('present') }}"
     proxy: "{{ zabbix_http_proxy | default(omit) }}"
   with_items: "{{ zabbix_5_repo_yum }}"
@@ -61,7 +61,8 @@
   when:
     - zabbix_version is version('5.0', '>=')
     - zabbix_web_centos_release
-    - ansible_distribution_major_version != '9' or ansible_distribution_major_version != '8'
+    - ansible_distribution_major_version != '9' 
+    - ansible_distribution_major_version != '8'
     - ansible_distribution == "CentOS"
   tags:
     - zabbix-web
@@ -84,7 +85,8 @@
   when:
     - zabbix_version is version('5.0', '>=')
     - zabbix_web_centos_release
-    - ansible_distribution_major_version != '9' or ansible_distribution_major_version != '8'
+    - ansible_distribution_major_version != '9'
+    - ansible_distribution_major_version != '8'
     - ansible_distribution == "RedHat"
   tags:
     - zabbix-web
@@ -105,14 +107,15 @@
   become: true
   when:
     - zabbix_version is version('5.0', '>=')
-    - ansible_distribution_major_version != '9' or ansible_distribution_major_version != '8'
+    - ansible_distribution_major_version != '9'
+    - ansible_distribution_major_version != '8'
     - zabbix_websrv == 'apache'
   tags:
     - zabbix-web
 
 - name: "RedHat | Install zabbix-web-{{ zabbix_server_database }}"
   yum:
-    pkg: zabbix-web-{{ zabbix_server_database }}{{ '-scl' if zabbix_version is version('5.0', '>=') and (ansible_distribution_major_version != '8' or ansible_distribution_major_version != '9') else '' }}-{{ zabbix_web_version }}.{{ zabbix_web_version_minor }}
+    pkg: zabbix-web-{{ zabbix_server_database }}{{ '-scl' if zabbix_version is version('5.0', '>=') and ansible_distribution_major_version|int < 8 else '' }}-{{ zabbix_web_version }}.{{ zabbix_web_version_minor }}
     state: "{{ zabbix_web_package_state }}"
     update_cache: true
     disablerepo: "{{ '*' if (zabbix_repo_yum_enabled | length>0) else omit }}"

@@ -104,7 +104,7 @@
     gpgcheck: "{{ item.gpgcheck }}"
     gpgkey: "{{ item.gpgkey }}"
     mode: "{{ item.mode | default('0644') }}"
-    priority: "{{ item.priority | default('99') }}"
+    priority: "{{ item.priority | default('98') }}"
     state: "{{ item.state | default('present') }}"
     proxy: "{{ zabbix_http_proxy | default(omit) }}"
   with_items: "{{ zabbix_repo_yum }}"
@@ -213,7 +213,7 @@
   when:
     - zabbix_database_creation
     - zabbix_server_database == 'pgsql'
-    - ansible_distribution_major_version == "9" or ansible_distribution_major_version == "8"
+    - ansible_distribution_major_version|int >= 8
   tags:
     - zabbix-server
 
@@ -232,7 +232,7 @@
   when:
     - zabbix_server_database == 'mysql'
     - zabbix_server_install_database_client
-    - ansible_distribution_major_version == "9" or ansible_distribution_major_version == "8"
+    - ansible_distribution_major_version|int >= 8
   tags:
     - zabbix-server
 
