@@ -9,7 +9,7 @@
     gpgcheck: "{{ item.gpgcheck }}"
     gpgkey: "{{ item.gpgkey }}"
     mode: "{{ item.mode | default('0644') }}"
-    priority: "{{ item.priority | default('99') }}"
+    priority: "{{ item.priority | default('98') }}"
     state: "{{ item.state | default('present') }}"
     proxy: "{{ zabbix_http_proxy | default(omit) }}"
   with_items: "{{ zabbix_repo_yum }}"
@@ -38,7 +38,8 @@
   when:
     - zabbix_repo == "zabbix"
     - zabbix_version is version('5.0', '>=')
-    - ansible_distribution_major_version != '8' or ansible_distribution_major_version != '9'
+    - ansible_distribution_major_version != '8'
+    - ansible_distribution_major_version != '9'
   notify:
     - "clean repo files from proxy creds"
   tags:
