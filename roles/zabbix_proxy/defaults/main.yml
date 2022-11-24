@@ -164,8 +164,10 @@ zabbix_validate_certs: true # Will be deprecated in 2.0.0
 zabbix_api_validate_certs: "{{ zabbix_validate_certs }}"
 zabbix_url: http://localhost # Will be deprecated in 2.0.0
 zabbix_api_server_url: "{{ zabbix_url }}"
-zabbix_api_server_host: "{{ zabbix_url | urlsplit('hostname') }}"
-zabbix_api_port_from_url: "{{ zabbix_api_server_port | default(zabbix_api_server_url | urlsplit('port') | default(80)) }}"
+zabbix_api_server_host: "{{ zabbix_api_server_url | urlsplit('hostname') }}"
+zabbix_api_port_from_url: "{{ zabbix_api_server_port | default(zabbix_api_server_url | urlsplit('port')) }}"
+zabbix_api_scheme_from_url: "{{ zabbix_api_server_url | urlsplit('scheme') }}"
+zabbix_api_port_from_shema: "{{ (zabbix_api_scheme_from_url == 'https') | ternary(443, 80) }}"
 # zabbix_http_user: admin                          # Will be deprecated in 2.0.0
 # zabbix_http_password: admin                      # Will be deprecated in 2.0.0
 # zabbix_api_http_user: admin
@@ -176,8 +178,8 @@ zabbix_api_login_user: "{{ zabbix_api_user }}"
 zabbix_api_login_pass: "{{ zabbix_api_pass }}"
 ansible_httpapi_pass: "{{ zabbix_api_pass }}"
 ansible_network_os: community.zabbix.zabbix
-ansible_httpapi_port: "{{ (zabbix_api_port_from_url == '') | ternary(80, zabbix_api_port_from_url) }}"
-ansible_httpapi_use_ssl: "{{ zabbix_api_use_ssl | default(false) }}"
+ansible_httpapi_port: "{{ (zabbix_api_port_from_url == '') | ternary(zabbix_api_port_from_shema, zabbix_api_port_from_url) }}"
+ansible_httpapi_use_ssl: "{{ zabbix_api_use_ssl | default((zabbix_api_scheme_from_url == 'https') | ternary(true, false)) }}"
 ansible_httpapi_validate_certs: "{{ zabbix_api_validate_certs }}"
 zabbix_api_create_proxy: false
 zabbix_api_timeout: 30
