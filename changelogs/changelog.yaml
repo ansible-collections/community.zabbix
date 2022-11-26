@@ -744,8 +744,11 @@ releases:
       - zabbix_agent - installation on Windows will no longer fail when zabbix_agent2
         is used
       - zabbix_host - fix updating of host without interfaces
+      - zabbix_proxy - correctly provision tls_accept and tls_connect on Zabbix backend
       - zabbix_proxy - updated the datafiles_path fact for the zabbix_proxy and zabbix_server
         roles due to upstream change
+      - zabbix_server - move location of the fping(6) variables to distribution specific
+        files (https://github.com/ansible-collections/community.zabbix/issues/812)
       - zabbix_server - updated the datafiles_path fact for the zabbix_proxy and zabbix_server
         roles due to upstream change
       major_changes:
@@ -769,6 +772,7 @@ releases:
       - zabbix_web - add support for Ubuntu 22.04 jammy
     fragments:
     - 326-module_defaults-group.yml
+    - 526-swap-tls-accept-connect-in-proxy.yaml
     - 778-zbx-agent2-win.yml
     - 784-allow-system.hw.chassis-to-populate-on-linux.yml
     - 786-web-add-ubuntu-22-04-support.yml
@@ -776,6 +780,7 @@ releases:
     - 795-zbx-agent-win-ipv6.yml
     - 800-add-template-tags.yml
     - 806-httpapi-connection-plugin.yml
+    - 812-fping-binary-location.yml
     - 813-sql-scripts-moved-to-usr-share.yml
     - 821-zabbix-proxy-debian-arm64.yml
     - 822-roles-to-httpapi.yml

@@ -33,7 +33,9 @@ Bugfixes
 - zabbix_agent - Filter IPv6 addresses from list of IP as Zabbix host creation expects IPv4
 - zabbix_agent - installation on Windows will no longer fail when zabbix_agent2 is used
 - zabbix_host - fix updating of host without interfaces
+- zabbix_proxy - correctly provision tls_accept and tls_connect on Zabbix backend
 - zabbix_proxy - updated the datafiles_path fact for the zabbix_proxy and zabbix_server roles due to upstream change
+- zabbix_server - move location of the fping(6) variables to distribution specific files (https://github.com/ansible-collections/community.zabbix/issues/812)
 - zabbix_server - updated the datafiles_path fact for the zabbix_proxy and zabbix_server roles due to upstream change
 
 v1.8.0
