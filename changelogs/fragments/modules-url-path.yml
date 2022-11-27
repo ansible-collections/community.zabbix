@@ -1,2 +1,0 @@
-minor_changes:
-  - ansible_zabbix_url_path introduced to be able to specify non-default Zabbix WebUI path, e.g. http://<FQDN>/zabbixeu

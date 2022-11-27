@@ -5,6 +5,39 @@ community.zabbix Release Notes
 .. contents:: Topics
 
 
+v1.9.0
+======
+
+Major Changes
+-------------
+
+- all modules are opting away from zabbix-api and using httpapi ansible.netcommon plugin. We will support zabbix-api for backwards compatibility until next major release. See our README.md for more information about how to migrate
+- zabbix_agent and zabbix_proxy roles are opting away from zabbix-api and use httpapi ansible.netcommon plugin. We will support zabbix-api for backwards compatibility until next major release. See our README.md for more information about how to migrate
+
+Minor Changes
+-------------
+
+- ansible_zabbix_url_path introduced to be able to specify non-default Zabbix WebUI path, e.g. http://<FQDN>/zabbixeu
+- collection now supports creating ``module_defaults`` for ``group/community.zabbix.zabbix`` (see https://github.com/ansible-collections/community.zabbix/issues/326)
+- fixed ``zabbix_server`` role failure running in check_mode (see https://github.com/ansible-collections/community.zabbix/issues/804)
+- zabbix_agent - give Zabbix Agent access to the Linux DMI table allowing system.hw.chassis info to populate.
+- zabbix_template - add support for template tags
+- zabbix_user_role module added
+- zabbix_web - add support for Ubuntu 22.04 jammy
+
+Bugfixes
+--------
+
+- The inventory script had insufficient error handling in case the Zabbix API provided an empty interfaces list. This bugfix checks for an exisiting interfaces element, then for the minimal length of 1 so that the first interface will only be accessed when it really exists in the api response. (https://github.com/ansible-collections/community.zabbix/issues/826)
+- zabbix-proxy - updated to install correct sources for Debian arm64 family
+- zabbix_agent - Filter IPv6 addresses from list of IP as Zabbix host creation expects IPv4
+- zabbix_agent - installation on Windows will no longer fail when zabbix_agent2 is used
+- zabbix_host - fix updating of host without interfaces
+- zabbix_proxy - correctly provision tls_accept and tls_connect on Zabbix backend
+- zabbix_proxy - updated the datafiles_path fact for the zabbix_proxy and zabbix_server roles due to upstream change
+- zabbix_server - move location of the fping(6) variables to distribution specific files (https://github.com/ansible-collections/community.zabbix/issues/812)
+- zabbix_server - updated the datafiles_path fact for the zabbix_proxy and zabbix_server roles due to upstream change
+
 v1.8.0
 ======
 

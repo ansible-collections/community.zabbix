@@ -1,2 +1,0 @@
-bugfixes:
-  - zabbix_agent - installation on Windows will no longer fail when zabbix_agent2 is used
