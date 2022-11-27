@@ -1,2 +1,0 @@
-bugfixes:
-  - zabbix_server - move location of the fping(6) variables to distribution specific files (https://github.com/ansible-collections/community.zabbix/issues/812)

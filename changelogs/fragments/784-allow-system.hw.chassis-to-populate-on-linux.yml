@@ -1,3 +1,0 @@
----
-minor_changes:
-  - zabbix_agent - give Zabbix Agent access to the Linux DMI table allowing system.hw.chassis info to populate.

@@ -4,16 +4,12 @@ plugins:
   cache: {}
   callback: {}
   cliconf: {}
-  connection:
-    httpapi:
-      description: Use httpapi to run command on network appliances
-      name: httpapi
-      version_added: 1.6.0
+  connection: {}
   httpapi:
-    jsonrpc:
+    zabbix:
       description: HttpApi Plugin for Zabbix
-      name: jsonrpc
-      version_added: 1.6.0
+      name: zabbix
+      version_added: 1.8.0
   inventory:
     zabbix_inventory:
       description: Zabbix Inventory Plugin
@@ -146,6 +142,11 @@ plugins:
       name: zabbix_user_info
       namespace: ''
       version_added: null
+    zabbix_user_role:
+      description: Adds or removes zabbix roles
+      name: zabbix_user_role
+      namespace: ''
+      version_added: null
     zabbix_usergroup:
       description: Create/delete/update Zabbix user groups
       name: zabbix_usergroup
@@ -160,4 +161,4 @@ plugins:
   shell: {}
   strategy: {}
   vars: {}
-version: 1.8.0
+version: 1.9.0

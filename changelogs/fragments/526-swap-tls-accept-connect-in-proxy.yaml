@@ -1,2 +1,0 @@
-bugfixes:
-  - zabbix_proxy - correctly provision tls_accept and tls_connect on Zabbix backend

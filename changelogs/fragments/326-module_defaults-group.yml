@@ -1,2 +1,0 @@
-minor_changes:
-  - collection now supports creating ``module_defaults`` for ``group/community.zabbix.zabbix`` (see https://github.com/ansible-collections/community.zabbix/issues/326)

@@ -1,2 +1,0 @@
-bugfixes:
-  - zabbix_host - fix updating of host without interfaces

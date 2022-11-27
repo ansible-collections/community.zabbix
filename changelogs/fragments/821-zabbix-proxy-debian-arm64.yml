@@ -1,2 +1,0 @@
-bugfixes:
-  - zabbix-proxy - updated to install correct sources for Debian arm64 family
