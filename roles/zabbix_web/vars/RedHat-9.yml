@@ -1,0 +1,8 @@
+---
+_php_fpm_dir: /etc/php-fpm.d
+_php_fpm_session: /var/lib/php/session
+_php_fpm_listen: "/run/php-fpm/zabbix.sock"
+
+_zabbix_php_version: 8.0
+_zabbix_php_fpm_session: /var/lib/php/session
+_zabbix_php_fpm_listen: /run/php-fpm/zabbix.sock

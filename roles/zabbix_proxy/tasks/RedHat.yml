@@ -117,7 +117,7 @@
     gpgcheck: "{{ item.gpgcheck }}"
     gpgkey: "{{ item.gpgkey }}"
     mode: "{{ item.mode | default('0644') }}"
-    priority: "{{ item.priority | default('99') }}"
+    priority: "{{ item.priority | default('98') }}"
     state: "{{ item.state | default('present') }}"
     proxy: "{{ zabbix_http_proxy | default(omit) }}"
   with_items: "{{ zabbix_repo_yum }}"
@@ -204,7 +204,7 @@
     - zabbix-proxy
     - init
 
-- name: "RedHat | Install Ansible module dependencies on RHEL8"
+- name: "RedHat | Install Ansible module dependencies on RHEL9 or RHEL8"
   yum:
     name: python3-psycopg2
     state: present
@@ -217,7 +217,7 @@
   when:
     - zabbix_database_creation
     - zabbix_proxy_database == 'pgsql'
-    - ansible_distribution_major_version == "8"
+    - ansible_distribution_major_version|int >= 8
   tags:
     - zabbix-server
 
@@ -241,7 +241,7 @@
     - zabbix-proxy
     - init
 
-- name: "RedHat | Install Mysql Client packages RHEL8"
+- name: "RedHat | Install Mysql Client packages RHEL9 or RHEL8"
   yum:
     name:
       - mysql
@@ -255,7 +255,7 @@
   become: true
   when:
     - zabbix_proxy_database == 'mysql'
-    - ansible_distribution_major_version == "8"
+    - ansible_distribution_major_version|int >= 8
   tags:
     - zabbix-proxy
     - init
