@@ -56,6 +56,7 @@ See the following list of supported Operating Systems with the Zabbix releases.
 
 | Zabbix              | 6.2 | 6.0 | 5.4 | 5.2 | 5.0  (LTS) | 4.4 | 4.0 (LTS) | 3.0 (LTS) |
 |---------------------|-----|-----|-----|-----|------------|-----|-----------|-----------|
+| Red Hat Fam 9       |  V  |  V  |     |     |            |     |           |           |
 | Red Hat Fam 8       |  V  |  V  |  V  |  V  |  V         | V   |           |           |
 | Red Hat Fam 7       |     |  V  |  V  |  V  |  V         | V   | V         | V         |
 | Red Hat Fam 6       |     |     |     |  V  |  V         |     |           | V         |

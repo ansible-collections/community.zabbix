@@ -33,6 +33,7 @@ zabbix_php_fpm_conf_enable_user: true
 zabbix_php_fpm_conf_enable_group: true
 zabbix_php_fpm_conf_mode: "0664"
 zabbix_php_fpm_conf_enable_mode: true
+zabbix_php_install_state: present
 
 zabbix_apache_vhost_port: 80
 zabbix_apache_vhost_tls_port: 443
