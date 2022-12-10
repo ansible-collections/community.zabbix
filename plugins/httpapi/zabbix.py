@@ -35,9 +35,22 @@ options:
       - name: ANSIBLE_ZABBIX_URL_PATH
     vars:
       - name: ansible_zabbix_url_path
+  http_login_user:
+    type: str
+    description:
+      - The http user to access zabbix url with Basic Auth
+    vars:
+      - name: http_login_user
+  http_login_password:
+    type: str
+    description:
+      - The http password to access zabbix url with Basic Auth
+    vars:
+      - name: http_login_password
 """
 
 import json
+import base64
 
 from uuid import uuid4
 
@@ -45,12 +58,6 @@ from ansible.module_utils.basic import to_text
 from ansible.errors import AnsibleConnectionFailure
 from ansible.plugins.httpapi import HttpApiBase
 from ansible.module_utils.connection import ConnectionError
-
-
-BASE_HEADERS = {
-    'Content-Type': 'application/json-rpc',
-    'Accept': 'application/json',
-}
 
 
 class HttpApi(HttpApiBase):
@@ -72,10 +79,14 @@ class HttpApi(HttpApiBase):
             self.connection._auth = {'auth': self.auth_key}
             return
 
+        if self.get_option('http_login_user'):
+            # Provide "fake" auth so netcommon.connection does not replace our headers
+            self.connection._auth = {'auth': 'fake'}
         payload = self.payload_builder("user.login", user=username, password=password)
         code, response = self.send_request(data=payload)
 
         if code == 200 and response != '':
+            # Replace auth with real api_key we got from Zabbix after successful login
             self.connection._auth = {'auth': response}
 
     def logout(self):
@@ -104,6 +115,18 @@ class HttpApi(HttpApiBase):
         if self.connection._auth:
             data['auth'] = self.connection._auth['auth']
 
+        hdrs = {
+            'Content-Type': 'application/json-rpc',
+            'Accept': 'application/json',
+        }
+        if self.get_option('http_login_user'):
+            # Need to add Basic auth header
+            credentials = (self.get_option('http_login_user') + ':' + self.get_option('http_login_password')).encode('ascii')
+            hdrs['Authorization'] = 'Basic ' + base64.b64encode(credentials).decode("ascii")
+            if data['method'] == 'user.login':
+                # user.login does not need "auth" in data, we provided fake one in login() method
+                data.pop('auth')
+
         data = json.dumps(data)
         try:
             self._display_request(request_method, path)
@@ -111,7 +134,7 @@ class HttpApi(HttpApiBase):
                 path,
                 data,
                 method=request_method,
-                headers=BASE_HEADERS
+                headers=hdrs
             )
             value = to_text(response_data.getvalue())
 
@@ -168,3 +191,12 @@ class HttpApi(HttpApiBase):
         req['params'] = (kwargs)
 
         return req
+
+    def handle_httperror(self, exc):
+        # The method defined in ansible.plugins.httpapi
+        # We need to override it to avoid endless re-tries if HTTP authentication fails
+
+        if exc.code == 401:
+            return False
+
+        return exc

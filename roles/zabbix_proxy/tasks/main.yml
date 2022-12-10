@@ -107,6 +107,8 @@
     gather_facts: false
     ansible_user: "{{ zabbix_api_login_user }}"
     ansible_connection: httpapi
+    http_login_user: "{{ zabbix_api_http_user | default(omit) }}"
+    http_login_password: "{{ zabbix_api_http_password | default(omit) }}"
   community.zabbix.zabbix_proxy:
     state: "{{ zabbix_proxy_state }}"
     status: "{{ zabbix_proxy_status }}"

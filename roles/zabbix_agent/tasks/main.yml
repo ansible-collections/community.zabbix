@@ -118,6 +118,8 @@
     gather_facts: false
     ansible_user: "{{ zabbix_api_login_user }}"
     ansible_connection: httpapi
+    http_login_user: "{{ zabbix_api_http_user | default(omit) }}"
+    http_login_password: "{{ zabbix_api_http_password | default(omit) }}"
   include_tasks: api.yml
   when:
     - (zabbix_api_create_hostgroup | bool) or (zabbix_api_create_hosts | bool)

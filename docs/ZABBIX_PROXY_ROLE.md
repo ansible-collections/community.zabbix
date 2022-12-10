@@ -335,6 +335,8 @@ NOTE: When using `zabbix_proxy_dbname: zabbix_proxy` (Which is default with this
 
 These variables need to be overridden when you want to make use of the Zabbix API for automatically creating and or updating proxies, i.e. when `zabbix_api_create_proxy` is set to `True`.
 
+* `zabbix_api_http_user`: The http user to access zabbix url with Basic Auth.
+* `zabbix_api_http_password`: The http password to access zabbix url with Basic Auth.
 * `zabbix_api_server_host`: The IP or hostname/FQDN of Zabbix server. Example: zabbix.example.com
 * `zabbix_api_server_port`: TCP port to use to connect to Zabbix server. Example: 8080
 * `zabbix_api_use_ssl`: yes (Default) if we need to connect to Zabbix server over HTTPS

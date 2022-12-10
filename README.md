@@ -210,6 +210,12 @@ Or you include collection name `community.zabbix` in the playbook's `collections
         ...
 ```
 
+If Basic Authentication is required to access Zabbix server add following variables:
+```
+zabbix_api_http_user: "user"
+zabbix_api_http_password: "password"
+```
+
 ## Supported Zabbix versions
 
 Main priority is to support Zabbix releases which have official full support from Zabbix LLC. Please checkout the versions at [Zabbix Life Cycle & Release Policy](https://www.zabbix.com/life_cycle_and_release_policy) page.
