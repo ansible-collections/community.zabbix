@@ -119,9 +119,11 @@ class HttpApi(HttpApiBase):
             'Content-Type': 'application/json-rpc',
             'Accept': 'application/json',
         }
-        if self.get_option('http_login_user'):
+        http_login_user = self.get_option('http_login_user')
+        http_login_password = self.get_option('http_login_password')
+        if http_login_user and http_login_user != '-42':
             # Need to add Basic auth header
-            credentials = (self.get_option('http_login_user') + ':' + self.get_option('http_login_password')).encode('ascii')
+            credentials = (http_login_user + ':' + http_login_password).encode('ascii')
             hdrs['Authorization'] = 'Basic ' + base64.b64encode(credentials).decode("ascii")
             if data['method'] == 'user.login':
                 # user.login does not need "auth" in data, we provided fake one in login() method
