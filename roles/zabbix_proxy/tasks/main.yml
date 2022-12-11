@@ -107,8 +107,9 @@
     gather_facts: false
     ansible_user: "{{ zabbix_api_login_user }}"
     ansible_connection: httpapi
-    http_login_user: "{{ zabbix_api_http_user | default(omit) }}"
-    http_login_password: "{{ zabbix_api_http_password | default(omit) }}"
+    # Can't think of a way to make http_login_* vars be undefined -(
+    http_login_user: "{{ zabbix_api_http_user | default(zabbix_http_user | default(-42)) }}"
+    http_login_password: "{{ zabbix_api_http_password | default(zabbix_http_password | default(-42)) }}"
   community.zabbix.zabbix_proxy:
     state: "{{ zabbix_proxy_state }}"
     status: "{{ zabbix_proxy_status }}"
