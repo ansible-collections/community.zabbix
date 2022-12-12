@@ -7,6 +7,7 @@
     timeout: "{{ zabbix_api_timeout }}"
   when:
     - zabbix_api_create_hostgroup | bool
+    - zabbix_agent_package_installed | bool
   register: zabbix_api_hostgroup_created
   until: zabbix_api_hostgroup_created is succeeded
   delegate_to: "{{ zabbix_api_server_host }}"
@@ -43,6 +44,7 @@
     tags: "{{ zabbix_agent_tags }}"
   when:
     - not zabbix_agent2
+    - zabbix_agent_package_installed | bool
   register: zabbix_api_host_created
   until: zabbix_api_host_created is succeeded
   delegate_to: "{{ zabbix_api_server_host }}"
@@ -80,6 +82,7 @@
     tags: "{{ zabbix_agent_tags }}"
   when:
     - zabbix_agent2 | bool
+    - zabbix_agent_package_installed | bool
   register: zabbix_api_host_created
   until: zabbix_api_host_created is succeeded
   delegate_to: "{{ zabbix_api_server_host }}"

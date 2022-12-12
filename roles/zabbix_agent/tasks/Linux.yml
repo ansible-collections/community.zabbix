@@ -216,6 +216,7 @@
   become: true
   when:
     - not (zabbix_agent_docker | bool)
+    - zabbix_agent_package_installed | bool
   tags:
     - init
     - service
