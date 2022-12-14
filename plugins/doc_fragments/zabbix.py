@@ -32,6 +32,16 @@ options:
             - This option is deprecated with the move to httpapi connection and will be removed in the next release
         type: str
         required: false
+    http_login_user:
+        description:
+            - Basic Auth login
+        type: str
+        required: false
+    http_login_password:
+        description:
+            - Basic Auth password
+        type: str
+        required: false
     timeout:
         description:
             - The timeout of API request (seconds).

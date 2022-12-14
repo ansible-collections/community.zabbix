@@ -261,6 +261,8 @@ These variables need to be overridden when you want to make use of the Zabbix AP
 
 Host encryption configuration will be set to match agent configuration.
 
+* `zabbix_api_http_user`: The http user to access zabbix url with Basic Auth.
+* `zabbix_api_http_password`: The http password to access zabbix url with Basic Auth.
 * `zabbix_api_create_hosts`: Default: `False`. When you want to enable the Zabbix API to create/delete the host. This has to be set to `True` if you want to make use of `zabbix_agent_host_state`.
 * `zabbix_api_create_hostgroup`: When you want to enable the Zabbix API to create/delete the hostgroups. This has to be set to `True` if you want to make use of `zabbix_agent_hostgroups_state`.Default: `False`
 * `zabbix_api_server_host`: The IP or hostname/FQDN of Zabbix server. Example: zabbix.example.com
