@@ -39,6 +39,17 @@ def zabbix_common_argument_spec():
             no_log=True,
             fallback=(env_fallback, ['ZABBIX_PASSWORD'])
         ),
+        http_login_user=dict(
+            type='str',
+            required=False,
+            default=None
+        ),
+        http_login_password=dict(
+            type='str',
+            required=False,
+            default=None,
+            no_log=True
+        ),
         timeout=dict(
             type='int',
             default=10
