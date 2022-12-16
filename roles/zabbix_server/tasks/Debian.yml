@@ -133,8 +133,6 @@
 
 - name: apt-get clean
   shell: apt-get clean; apt-get update
-  args:
-    warn: false
   changed_when: false
   become: true
   tags:
