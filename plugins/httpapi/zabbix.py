@@ -128,8 +128,9 @@ class HttpApi(HttpApiBase):
             # Need to add Basic auth header
             credentials = (http_login_user + ':' + http_login_password).encode('ascii')
             hdrs['Authorization'] = 'Basic ' + base64.b64encode(credentials).decode("ascii")
-            if data['method'] == 'user.login':
-                # user.login does not need "auth" in data, we provided fake one in login() method
+            if data['method'] in ['user.login', 'apiinfo.version']:
+                # user.login and apiinfo.version do not need "auth" in data
+                # we provided fake one in login() method to correctly handle HTTP basic auth header
                 data.pop('auth')
 
         data = json.dumps(data)
