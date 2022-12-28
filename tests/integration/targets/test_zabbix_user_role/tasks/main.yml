@@ -59,7 +59,7 @@
           - create_zabbix_user_role_result.changed is sameas true
 
     # Check user role remove
-    - name: test - Remote Zabbix role
+    - name: test - Remove Zabbix role
       zabbix_user_role:
         state: absent
         name: Operators
@@ -68,3 +68,39 @@
     - assert:
         that:
           - create_zabbix_user_role_result.changed is sameas true
+
+    - name: test - Create a new Zabbix role type Admin
+      zabbix_user_role:
+        state: present
+        name: Admins
+        type: Admin
+        rules:
+          ui.default_access: 0
+      register: create_zabbix_user_role_admin_result
+
+    - assert:
+        that:
+          - create_zabbix_user_role_admin_result.changed is sameas true
+
+    - name: test - Remove Zabbix role type Admin
+      zabbix_user_role:
+        state: absent
+        name: Admins
+
+    - name: test - Create a new Zabbix role type Super Admin
+      zabbix_user_role:
+        state: present
+        name: Super Admins
+        type: Super Admin
+        rules:
+          ui.default_access: 0
+      register: create_zabbix_user_role_super_admin_result
+
+    - assert:
+        that:
+          - create_zabbix_user_role_super_admin_result.changed is sameas true
+
+    - name: test - Remove Zabbix role type Super Admin
+      zabbix_user_role:
+        state: absent
+        name: Super Admins
