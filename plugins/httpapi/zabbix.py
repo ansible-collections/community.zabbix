@@ -79,7 +79,8 @@ class HttpApi(HttpApiBase):
             self.connection._auth = {'auth': self.auth_key}
             return
 
-        if self.get_option('http_login_user'):
+        http_login_user = self.get_option('http_login_user')
+        if http_login_user and http_login_user != '-42':
             # Provide "fake" auth so netcommon.connection does not replace our headers
             self.connection._auth = {'auth': 'fake'}
         payload = self.payload_builder("user.login", user=username, password=password)
@@ -131,7 +132,7 @@ class HttpApi(HttpApiBase):
             if data['method'] in ['user.login', 'apiinfo.version']:
                 # user.login and apiinfo.version do not need "auth" in data
                 # we provided fake one in login() method to correctly handle HTTP basic auth header
-                data.pop('auth')
+                data.pop('auth', None)
 
         data = json.dumps(data)
         try:
