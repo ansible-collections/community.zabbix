@@ -149,7 +149,7 @@
   become: true
 
 - name: "Install the Docker container"
-  include: Docker.yml
+  include_tasks: Docker.yml
   when:
     - zabbix_agent_docker | bool
 

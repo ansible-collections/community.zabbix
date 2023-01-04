@@ -2,12 +2,12 @@
 # tasks file for zabbix_proxy
 
 - name: "Install the correct repository"
-  include: "RedHat.yml"
+  include_tasks: "RedHat.yml"
   when:
     - ansible_os_family == "RedHat"
 
 - name: "Install the correct repository"
-  include: "Debian.yml"
+  include_tasks: "Debian.yml"
   when:
     - ansible_os_family == "Debian"
 

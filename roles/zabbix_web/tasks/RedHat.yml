@@ -62,7 +62,7 @@
   when:
     - zabbix_version is version('5.0', '>=')
     - zabbix_web_centos_release
-    - ansible_distribution_major_version != '9' 
+    - ansible_distribution_major_version != '9'
     - ansible_distribution_major_version != '8'
     - ansible_distribution == "CentOS"
   tags:
@@ -178,6 +178,6 @@
     - nginx
 
 - name: "Configure SELinux when enabled"
-  include: selinux.yml
+  include_tasks: selinux.yml
   when:
     - zabbix_selinux | bool
