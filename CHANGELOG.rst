@@ -8,7 +8,7 @@ community.zabbix Release Notes
 v1.9.1
 ======
 
-Major Changes
+Minor Changes
 -------------
 
 - zabbix suport for rhel 9
