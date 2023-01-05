@@ -1,2 +1,0 @@
-bugfixes:
-  - all modules - remove deprecation warnings for modules parameters related to zabbix-api when these parapmeters are not explicetely defined
