@@ -253,10 +253,10 @@
 # Import template tests
 # ####
 
-- include: import_54_lower.yml
+- include_tasks: import_54_lower.yml
   when: zabbix_version is version('5.4', '<')
 
-- include: import_54_higher.yml
+- include_tasks: import_54_higher.yml
   when: zabbix_version is version('5.4', '>=')
 
 #

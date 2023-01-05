@@ -57,13 +57,13 @@
     - zabbix_websrv == 'nginx'
 
 - name: "Install the correct repository"
-  include: "RedHat.yml"
+  include_tasks: "RedHat.yml"
   when: ansible_os_family == "RedHat"
   tags:
     - zabbix-web
 
 - name: "Install the correct repository"
-  include: "Debian.yml"
+  include_tasks: "Debian.yml"
   when: ansible_os_family == "Debian"
   tags:
     - zabbix-web

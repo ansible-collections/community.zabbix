@@ -31,7 +31,7 @@
   include_tasks: "{{ ansible_os_family }}.yml"
 
 - name: "Installing the {{ zabbix_proxy_database_long }} database"
-  include: "{{ zabbix_proxy_database_long }}.yml"
+  include_tasks: "{{ zabbix_proxy_database_long }}.yml"
 
 - name: "Create include dir zabbix-proxy"
   file:
