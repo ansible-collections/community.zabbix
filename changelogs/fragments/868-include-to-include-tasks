@@ -1,0 +1,2 @@
+bugfixes:
+  - all roles and modules integration tests - replace deprecated include module whith include_tasks

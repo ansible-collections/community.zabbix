@@ -1,0 +1,2 @@
+bugfixes:
+  - zabbix_user_role module - creation of a User Role with Super Admin type
