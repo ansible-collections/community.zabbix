@@ -8,7 +8,7 @@
 
 ProxyMode={{ zabbix_proxy_mode }}
 Server={{ zabbix_proxy_server }}
-{% if zabbix_version is version('6.0', '<=') %}
+{% if zabbix_version is version('6.0', '<') %}
 ServerPort={{ zabbix_proxy_serverport }}
 {% endif %}
 {% if zabbix_proxy_hostname is defined and zabbix_proxy_hostname %}
