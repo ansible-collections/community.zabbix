@@ -83,7 +83,7 @@
     - config
 
 - name: "Configure SELinux when enabled"
-  include: selinux.yml
+  include_tasks: selinux.yml
   when:
     - zabbix_selinux | bool
 
@@ -193,17 +193,17 @@
     - include
 
 - name: "Install the Docker container"
-  include: Docker.yml
+  include_tasks: Docker.yml
   when:
     - zabbix_agent_docker | bool
 
 - name: "Configure the firewall(d|iptables)"
-  include: firewall.yml
+  include_tasks: firewall.yml
   when:
     - (zabbix_agent_firewall_enable | bool) or (zabbix_agent_firewalld_enable | bool)
 
 - name: "Remove zabbix-agent installation when zabbix-agent2 is used."
-  include: remove.yml
+  include_tasks: remove.yml
   when:
     - zabbix_agent2 | bool
     - zabbix_agent_package_remove

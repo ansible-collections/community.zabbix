@@ -42,7 +42,7 @@
     - config
 
 - name: "Add zabbix-server scripts"
-  include: "scripts.yml"
+  include_tasks: "scripts.yml"
   when: ( zabbix_server_alertscripts is defined ) or
     ( zabbix_server_externalscripts is defined )
 
