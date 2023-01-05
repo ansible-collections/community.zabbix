@@ -5,6 +5,22 @@ community.zabbix Release Notes
 .. contents:: Topics
 
 
+v1.9.1
+======
+
+Major Changes
+-------------
+
+- zabbix suport for rhel 9
+
+Bugfixes
+--------
+
+- all modules - remove deprecation warnings for modules parameters related to zabbix-api when these parapmeters are not explicetely defined
+- zabbix_agent, zabbix_proxy roles, all modules - make httpapi connection work with HTTP Basic Authorization
+- zabbix_proxy - do not set ServerPort config parameter which was removed in Zabbix 6.0
+- zabbix_server role Debian.yml task - remove warn: arg for shell module as the arg is deprecated since ansible-core above 2.13
+
 v1.9.0
 ======
 

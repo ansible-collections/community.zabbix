@@ -789,3 +789,23 @@ releases:
     - module_zabbix-user-role.yml
     - modules-url-path.yml
     release_date: '2022-11-07'
+  1.9.1:
+    changes:
+      bugfixes:
+      - all modules - remove deprecation warnings for modules parameters related to
+        zabbix-api when these parapmeters are not explicetely defined
+      - zabbix_agent, zabbix_proxy roles, all modules - make httpapi connection work
+        with HTTP Basic Authorization
+      - zabbix_proxy - do not set ServerPort config parameter which was removed in
+        Zabbix 6.0
+      - 'zabbix_server role Debian.yml task - remove warn: arg for shell module as
+        the arg is deprecated since ansible-core above 2.13'
+      major_changes:
+      - zabbix suport for rhel 9
+    fragments:
+    - 845-rhel-9-support.yml
+    - 850-proxy-serverport.yml
+    - 857-deprecation-warnings.yml
+    - 859-remove-warn-arg.yml
+    - fix-httpapi-http-auth.yml
+    release_date: '2023-01-06'

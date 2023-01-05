@@ -1,3 +1,0 @@
----
-bugfixes:
-  - 'zabbix_server role Debian.yml task - remove warn: arg for shell module as the arg is deprecated since ansible-core above 2.13'

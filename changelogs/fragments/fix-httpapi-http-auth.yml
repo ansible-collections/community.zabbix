@@ -1,3 +1,0 @@
----
-bugfixes:
-  - zabbix_agent, zabbix_proxy roles, all modules - make httpapi connection work with HTTP Basic Authorization
