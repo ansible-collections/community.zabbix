@@ -1,3 +1,0 @@
----
-bugfixes:
-  - zabbix_proxy - do not set ServerPort config parameter which was removed in Zabbix 6.0
