@@ -17,9 +17,11 @@ Bugfixes
 --------
 
 - all modules - remove deprecation warnings for modules parameters related to zabbix-api when these parapmeters are not explicetely defined
+- all roles and modules integration tests - replace deprecated include module whith include_tasks
 - zabbix_agent, zabbix_proxy roles, all modules - make httpapi connection work with HTTP Basic Authorization
 - zabbix_proxy - do not set ServerPort config parameter which was removed in Zabbix 6.0
 - zabbix_server role Debian.yml task - remove warn: arg for shell module as the arg is deprecated since ansible-core above 2.13
+- zabbix_user_role module - creation of a User Role with Super Admin type
 
 v1.9.0
 ======
