@@ -46,15 +46,15 @@ options:
         description:
             - The timeout of API request (seconds).
             - This option is deprecated with the move to httpapi connection and will be removed in the next release
+            - The default value is C(10)
         type: int
-        default: 10
     validate_certs:
-      description:
-       - If set to False, SSL certificates will not be validated. This should only be used on personally controlled sites using self-signed certificates.
-       - If not set the environment variable C(ZABBIX_VALIDATE_CERTS) will be used.
-       - This option is deprecated with the move to httpapi connection and will be removed in the next release
-      type: bool
-      default: true
+        description:
+            - If set to False, SSL certificates will not be validated. This should only be used on personally controlled sites using self-signed certificates.
+            - If not set the environment variable C(ZABBIX_VALIDATE_CERTS) will be used.
+            - This option is deprecated with the move to httpapi connection and will be removed in the next release
+            - The default value is C(true)
+        type: bool
 notes:
     - If you use I(login_password=zabbix), the word "zabbix" is replaced by "********" in all module output, because I(login_password) uses C(no_log).
       See L(this FAQ,https://docs.ansible.com/ansible/latest/network/user_guide/faq.html#why-is-my-output-sometimes-replaced-with) for more information.
