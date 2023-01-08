@@ -51,13 +51,11 @@ def zabbix_common_argument_spec():
             no_log=True
         ),
         timeout=dict(
-            type='int',
-            default=10
+            type='int'
         ),
         validate_certs=dict(
             type='bool',
             required=False,
-            default=True,
             fallback=(env_fallback, ['ZABBIX_VALIDATE_CERTS'])
         ),
     )
