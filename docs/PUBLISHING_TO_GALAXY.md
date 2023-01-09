@@ -26,10 +26,12 @@
     git push origin X.Y.Z
     ```
 
+2. Create new Release pointing to new X.Y.Z tag https://github.com/ansible-collections/community.zabbix/releases
+
 Additional manual steps are required when automatic publish to Ansible Galaxy is not enabled in the repository. This
 requires a user who has access to the `community.zabbix` namespace on Ansible Galaxy to publish the build artifact.
 
-4. Run the following commands to build and release the new version on Galaxy:
+3. Run the following commands to build and release the new version on Galaxy:
 
    ```
    ansible-galaxy collection build
