@@ -896,9 +896,9 @@
               contextname: snmp_context
               securityname: SNMP3 sec name
               securitylevel: 2
-              authprotocol: {{ 2 if zabbix_version | float >= 5.4 else 0 }}
+              authprotocol: "{{ 2 if zabbix_version | float >= 5.4 else 0 }}"
               authpassphrase: secret_auth_passphrase
-              privprotocol: {{ 2 if zabbix_version | float >= 5.4 else 0 }}
+              privprotocol: "{{ 2 if zabbix_version | float >= 5.4 else 0 }}"
               privpassphrase: secret_priv_passphrase
       register: zabbix_host1
 
