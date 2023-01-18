@@ -191,6 +191,7 @@ options:
                         description:
                             - SNMPv3 authentication protocol.
                             - Used when I(securitylevel=1)(authNoPriv) or I(securitylevel=2)(AuthPriv).
+                            - Variants 2,3,4,5 are supported only on Zabbix 5.4 or greater
                             - 0 (MD5), 1 (SHA1), 2 (SHA224), 3 (SHA256), 4 (SHA384), 5 (SHA512)
                         default: 0
                         choices: [0, 1, 2, 3, 4, 5]
@@ -205,6 +206,7 @@ options:
                         description:
                             - SNMPv3 privacy protocol.
                             - Used when I(securitylevel=2)(authPriv).
+                            - Variants 2,3,4,5 are supported only on Zabbix 5.4 or greater
                             - 0 (DES), 1 (AES128), 2 (AES192), 3 (AES256), 4 (AES192C), 5 (AES256C)
                         default: 0
                         choices: [0, 1, 2, 3, 4, 5]
