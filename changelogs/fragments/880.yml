@@ -1,0 +1,2 @@
+minor_changes:
+  - zabbix_host - add missing variants for SNMPv3 authprotocol and privprotocol introduced by Zabbix 6
