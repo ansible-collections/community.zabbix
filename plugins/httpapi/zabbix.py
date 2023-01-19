@@ -106,8 +106,10 @@ class HttpApi(HttpApiBase):
         if not self.zbx_api_version:
             if not hasattr(self.connection, 'zbx_api_version'):
                 code, version = self.send_request(data=self.payload_builder('apiinfo.version'))
-                if code == 200 and version != '':
+                if code == 200 and len(version) != 0:
                     self.connection.zbx_api_version = version
+                else:
+                    raise ConnectionError("Could not get API version from Zabbix. Got HTTP code %s. Got version %s" % (code, version))
             self.zbx_api_version = self.connection.zbx_api_version
         return self.zbx_api_version
 
