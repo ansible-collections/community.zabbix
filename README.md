@@ -142,8 +142,8 @@ To use a module or role from this collection, reference them with their Fully Qu
     ansible_network_os: community.zabbix.zabbix
     ansible_connection: httpapi
     ansible_httpapi_port: 80
-    ansible_httpapi_use_ssl: false
-    ansible_httpapi_validate_certs: false
+    ansible_httpapi_use_ssl: false  # Set to true for HTTPS
+    ansible_httpapi_validate_certs: false  # For HTTPS et to true to validate server's certificate
     ansible_user: Admin
     ansible_httpapi_pass: zabbix
   tasks:
@@ -157,8 +157,8 @@ To use a module or role from this collection, reference them with their Fully Qu
     ansible_network_os: community.zabbix.zabbix
     ansible_connection: httpapi
     ansible_httpapi_port: 80
-    ansible_httpapi_use_ssl: false
-    ansible_httpapi_validate_certs: false
+    ansible_httpapi_use_ssl: false  # Set to true for HTTPS
+    ansible_httpapi_validate_certs: false  # For HTTPS set to true to validate server's certificate
     ansible_zabbix_auth_key: 8ec0d52432c15c91fcafe9888500cf9a607f44091ab554dbee860f6b44fac895
   tasks:
     - name: Ensure host is monitored by Zabbix
@@ -186,8 +186,8 @@ Or you include collection name `community.zabbix` in the playbook's `collections
     ansible_network_os: community.zabbix.zabbix
     ansible_connection: httpapi
     ansible_httpapi_port: 80
-    ansible_httpapi_use_ssl: false
-    ansible_httpapi_validate_certs: false
+    ansible_httpapi_use_ssl: false  # Set to true for HTTPS
+    ansible_httpapi_validate_certs: false  # For HTTPS et to true to validate server's certificate
     ansible_user: Admin
     ansible_httpapi_pass: zabbix
   tasks:
@@ -201,8 +201,8 @@ Or you include collection name `community.zabbix` in the playbook's `collections
     ansible_network_os: community.zabbix.zabbix
     ansible_connection: httpapi
     ansible_httpapi_port: 80
-    ansible_httpapi_use_ssl: false
-    ansible_httpapi_validate_certs: false
+    ansible_httpapi_use_ssl: false  # Set to true for HTTPS
+    ansible_httpapi_validate_certs: false  # For HTTPS et to true to validate server's certificate
     ansible_zabbix_auth_key: 8ec0d52432c15c91fcafe9888500cf9a607f44091ab554dbee860f6b44fac895
   tasks:
     - name: Ensure host is monitored by Zabbix
