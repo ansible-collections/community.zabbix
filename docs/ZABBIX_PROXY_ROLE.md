@@ -161,6 +161,7 @@ The following is an overview of all available configuration default for this rol
 * `zabbix_proxy_dbencoding`: Default: `utf8`. The encoding for the MySQL database.
 * `zabbix_proxy_dbcollation`: Default: `utf8_bin`. The collation for the MySQL database.zabbix_proxy_
 * `zabbix_server_allowunsupporteddbversions`: Allow proxy to work with unsupported database versions.
+* `zabbix_proxy_dbpassword_hash_method`: Default: `md5`. Allow switching postgresql user password creation to `scram-sha-256`, when anything other than `md5` is used then ansible won't hash the password with `md5`.
 
 ### TLS Specific configuration
 

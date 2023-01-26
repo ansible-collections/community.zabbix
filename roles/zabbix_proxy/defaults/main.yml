@@ -86,6 +86,7 @@ zabbix_proxy_dbuser: zabbix_proxy
 zabbix_proxy_dbpassword: zabbix_proxy
 zabbix_proxy_dbsocket:
 zabbix_proxy_dbport: 5432
+zabbix_proxy_dbpassword_hash_method: md5
 zabbix_proxy_startodbcpollers: 1
 zabbix_proxy_dbhost_run_install: true
 zabbix_proxy_privileged_host: localhost
