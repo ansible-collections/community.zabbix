@@ -171,6 +171,7 @@ These variables are specific for Zabbix 6.0 and higher:
 * `zabbix_server_dbuser`: The database username which is used by the Zabbix Server.
 * `zabbix_server_dbpassword`: The database user password which is used by the Zabbix Server.
 * `zabbix_server_dbport`: The database port which is used by the Zabbix Server.
+* `zabbix_server_dbpassword_hash_method`: Default: `md5`. Allow switching postgresql user password creation to `scram-sha-256`, when anything other than `md5` is used then ansible won't hash the password with `md5`.
 * `zabbix_database_creation`: Default: `True`. When you don't want to create the database including user, you can set it to False.
 * `zabbix_server_install_database_client`: Default: `True`. False does not install database client. Default true
 * `zabbix_database_sqlload`:True / False. When you don't want to load the sql files into the database, you can set it to False.
@@ -318,7 +319,7 @@ zabbix_server_dbport: 5432
 zabbix_server_dbpassword: <SOME_SECRET_STRING>
 ```
 
-Please generate a value for the `zabbix_server_dbpassword` property (Maybe use `ansible-vault` for this). The zabbix-server role will create an database and username (With the provided value for the password) in `PgSQL`.
+Please generate a value for the `zabbix_server_dbpassword` property (Maybe use `ansible-vault` for this). The zabbix-server role will create an database and username (With the provided value for the password) in `PgSQL`. Set `zabbix_server_dbpassword_hash_method` for PostgreSQL 10 and newer if they default to `scram-sha-256`.
 3. Execute the role by running the Ansible playbook that calls this role. At the end of this run, the Zabbix Server with `PgSQL` will be running.
 
 #### Separate Setup
@@ -342,7 +343,7 @@ zabbix_server_pgsql_login_password: changeme
 zabbix_server_pgsql_login_port: 5432
 ```
 
-Please generate a value for the `zabbix_server_dbpassword` property (Maybe use `ansible-vault` for this). The zabbix-server role will create an database and username (With the provided value for the password) in `PgSQL`.
+Please generate a value for the `zabbix_server_dbpassword` property (Maybe use `ansible-vault` for this). The zabbix-server role will create an database and username (With the provided value for the password) in `PgSQL`.  Set `zabbix_server_dbpassword_hash_methodh` for PostgreSQL 10 and newer if they default to `scram-sha-256`.
 
 The `zabbix_server_privileged_host` can be set to the hostname/ip of the host running Zabbix Server for security related purposes. Also make sure that `zabbix_server_mysql_login_password` is set to the correct password for the user provided with `zabbix_server_mysql_login_host` to create a database and user in the `PgSQL` instance.
 
