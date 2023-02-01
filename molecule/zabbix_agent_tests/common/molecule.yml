@@ -29,6 +29,7 @@ provisioner:
   inventory:
     group_vars:
       all:
+        ansible_python_interpreter: /usr/bin/python3
         zabbix_agent_src_reinstall: false
         zabbix_install_pip_packages: false
         zabbix_agent_server: 192.168.3.33
