@@ -24,6 +24,8 @@ provisioner:
     ANSIBLE_ROLES_PATH: $HOME/.ansible/collections/ansible_collections/community/zabbix/roles
   inventory:
     group_vars:
+      all:
+        ansible_python_interpreter: /usr/bin/python3
       mysql:
         zabbix_server_database: mysql
         zabbix_server_database_long: mysql
