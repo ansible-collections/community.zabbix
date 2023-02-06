@@ -55,6 +55,7 @@ options:
     rights:
         description:
             - Permissions to assign to the group
+            - For <= Zabbix 6.0
         required: false
         type: list
         elements: dict
@@ -67,6 +68,44 @@ options:
             permission:
                 description:
                     - Access level to the host group.
+                required: true
+                type: str
+                choices: [ "denied", "read-only", "read-write" ]
+    hostgroup_rights:
+        description:
+            - Host group permissions to assign to the user group
+            - For => Zabbix 6.2
+        required: false
+        type: list
+        elements: dict
+        suboptions:
+            host_group:
+                description:
+                    - Name of the host group to add permission to.
+                required: true
+                type: str
+            permission:
+                description:
+                    - Access level to the host group.
+                required: true
+                type: str
+                choices: [ "denied", "read-only", "read-write" ]
+    templategroup_rights:
+        description:
+            - Template group permissions to assign to the user group
+            - For => Zabbix 6.2
+        required: false
+        type: list
+        elements: dict
+        suboptions:
+            template_group:
+                description:
+                    - Name of the template group to add permission to.
+                required: true
+                type: str
+            permission:
+                description:
+                    - Access level to the templategroup.
                 required: true
                 type: str
                 choices: [ "denied", "read-only", "read-write" ]
@@ -144,7 +183,7 @@ EXAMPLES = r'''
     name: ACME
     gui_access: disable
 
-# Base create user group with permissions
+# Base create user group with permissions for Zabbix <= 6.0
 - name: Create user group with permissions
   community.zabbix.zabbix_usergroup:
     name: ACME
@@ -152,6 +191,22 @@ EXAMPLES = r'''
         - host_group: Webserver
           permission: read-write
         - host_group: Databaseserver
+          permission: read-only
+    state: present
+
+# Base create user group with permissions for Zabbix => 6.2
+- name: Create user group with permissions
+  community.zabbix.zabbix_usergroup:
+    name: ACME
+    hostgroup_rights:
+        - host_group: Webserver
+          permission: read-write
+        - host_group: Databaseserver
+          permission: read-only
+    templategroup_rights:
+        - template_group: Linux Templates
+          permission: read-write
+        - template_group: Templates
           permission: read-only
     state: present
 
@@ -201,6 +256,7 @@ msg:
 from ansible.module_utils.basic import AnsibleModule
 
 from ansible_collections.community.zabbix.plugins.module_utils.base import ZabbixBase
+from ansible_collections.community.zabbix.plugins.module_utils.version import LooseVersion
 import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabbix_utils
 
 
@@ -245,6 +301,110 @@ class Rights(ZabbixBase):
         for right in _rights:
             constructed_right = {
                 'id': self.get_hostgroup_by_hostgroup_name(right.get('host_group'))['groupid'],
+                'permission': zabbix_utils.helper_to_numeric_value([
+                    'denied',
+                    None,
+                    'read-only',
+                    'read-write'], right.get('permission')
+                )
+            }
+            constructed_data.append(constructed_right)
+        return zabbix_utils.helper_cleanup_data(constructed_data)
+
+
+class HostgroupRights(ZabbixBase):
+    """
+    Restructure the user defined host group rights to fit the Zabbix API requirements
+    """
+
+    def get_hostgroup_by_hostgroup_name(self, name):
+        """Get host group by host group name.
+
+        Parameters:
+            name: Name of the host group.
+
+        Returns:
+            host group matching host group name.
+        """
+        try:
+            _hostgroup = self._zapi.hostgroup.get({
+                'output': 'extend',
+                'filter': {'name': [name]}
+            })
+            if len(_hostgroup) < 1:
+                self._module.fail_json(msg='Host group not found: %s' % name)
+            else:
+                return _hostgroup[0]
+        except Exception as e:
+            self._module.fail_json(msg='Failed to get host group "%s": %s' % (name, e))
+
+    def construct_the_data(self, _rights):
+        """Construct the user defined host group rights to fit the Zabbix API requirements
+
+        Parameters:
+            _rights: rights to construct
+
+        Returns:
+            dict: user defined rights
+        """
+        if _rights is None:
+            return []
+        constructed_data = []
+        for right in _rights:
+            constructed_right = {
+                'id': self.get_hostgroup_by_hostgroup_name(right.get('host_group'))['groupid'],
+                'permission': zabbix_utils.helper_to_numeric_value([
+                    'denied',
+                    None,
+                    'read-only',
+                    'read-write'], right.get('permission')
+                )
+            }
+            constructed_data.append(constructed_right)
+        return zabbix_utils.helper_cleanup_data(constructed_data)
+
+
+class TemplategroupRights(ZabbixBase):
+    """
+    Restructure the user defined template group rights to fit the Zabbix API requirements
+    """
+
+    def get_templategroup_by_templategroup_name(self, name):
+        """Get template group by template group name.
+
+        Parameters:
+            name: Name of the template group.
+
+        Returns:
+            template group matching template group name.
+        """
+        try:
+            _templategroup = self._zapi.templategroup.get({
+                'output': 'extend',
+                'filter': {'name': [name]}
+            })
+            if len(_templategroup) < 1:
+                self._module.fail_json(msg='Template group not found: %s' % name)
+            else:
+                return _templategroup[0]
+        except Exception as e:
+            self._module.fail_json(msg='Failed to get template group "%s": %s' % (name, e))
+
+    def construct_the_data(self, _rights):
+        """Construct the user defined template rights to fit the Zabbix API requirements
+
+        Parameters:
+            _rights: rights to construct
+
+        Returns:
+            dict: user defined rights
+        """
+        if _rights is None:
+            return []
+        constructed_data = []
+        for right in _rights:
+            constructed_right = {
+                'id': self.get_templategroup_by_templategroup_name(right.get('template_group'))['groupid'],
                 'permission': zabbix_utils.helper_to_numeric_value([
                     'denied',
                     None,
@@ -309,9 +469,14 @@ class UserGroup(ZabbixBase):
                 'enabled',
                 'disabled'], kwargs['status']
             ),
-            'rights': kwargs['rights'],
             'tag_filters': kwargs['tag_filters']
         }
+        if LooseVersion(self._zbx_api_version) <= LooseVersion('6.0'):
+            _params['rights'] = kwargs['rights']
+        else:
+            _params['hostgroup_rights'] = kwargs['hostgroup_rights']
+            _params['templategroup_rights'] = kwargs['templategroup_rights']
+
         return _params
 
     def check_if_usergroup_exists(self, name):
@@ -343,12 +508,22 @@ class UserGroup(ZabbixBase):
             User group matching user group name.
         """
         try:
-            _usergroup = self._zapi.usergroup.get({
-                'output': 'extend',
-                'selectTagFilters': 'extend',
-                'selectRights': 'extend',
-                'filter': {'name': [name]}
-            })
+            if LooseVersion(self._zbx_api_version) <= LooseVersion('6.0'):
+                _usergroup = self._zapi.usergroup.get({
+                    'output': 'extend',
+                    'selectTagFilters': 'extend',
+                    'selectRights': 'extend',
+                    'filter': {'name': [name]}
+                })
+            else:
+                _usergroup = self._zapi.usergroup.get({
+                    'output': 'extend',
+                    'selectTagFilters': 'extend',
+                    'selectHostGroupRights': 'extend',
+                    'selectTemplateGroupRights': 'extend',
+                    'filter': {'name': [name]}
+                })
+
             if len(_usergroup) < 1:
                 self._module.fail_json(msg='User group not found: %s' % name)
             else:
@@ -434,6 +609,14 @@ def main():
             host_group=dict(type='str', required=True),
             permission=dict(type='str', required=True, choices=['denied', 'read-only', 'read-write'])
         )),
+        hostgroup_rights=dict(type='list', elements='dict', required=False, options=dict(
+            host_group=dict(type='str', required=True),
+            permission=dict(type='str', required=True, choices=['denied', 'read-only', 'read-write'])
+        )),
+        templategroup_rights=dict(type='list', elements='dict', required=False, options=dict(
+            template_group=dict(type='str', required=True),
+            permission=dict(type='str', required=True, choices=['denied', 'read-only', 'read-write'])
+        )),
         tag_filters=dict(type='list', elements='dict', required=False, options=dict(
             host_group=dict(type='str', required=True),
             tag=dict(type='str', default=''),
@@ -458,12 +641,18 @@ def main():
     debug_mode = module.params['debug_mode']
     status = module.params['status']
     rights = module.params['rights']
+    hostgroup_rights = module.params['hostgroup_rights']
+    templategroup_rights = module.params['templategroup_rights']
     tag_filters = module.params['tag_filters']
     state = module.params['state']
 
     userGroup = UserGroup(module)
     zbx = userGroup._zapi
-    rgts = Rights(module, zbx)
+    if LooseVersion(userGroup._zbx_api_version) <= LooseVersion('6.0'):
+        rgts = Rights(module, zbx)
+    else:
+        hostgroup_rgts = HostgroupRights(module, zbx)
+        templategroup_rgts = TemplategroupRights(module, zbx)
     tgflts = TagFilters(module, zbx)
 
     usergroup_exists = userGroup.check_if_usergroup_exists(name)
@@ -474,15 +663,27 @@ def main():
             userGroup.delete(usrgrpid)
             module.exit_json(changed=True, state=state, usergroup=name, usrgrpid=usrgrpid, msg='User group deleted: %s, ID: %s' % (name, usrgrpid))
         else:
-            difference = userGroup.check_difference(
-                usrgrpid=usrgrpid,
-                name=name,
-                gui_access=gui_access,
-                debug_mode=debug_mode,
-                status=status,
-                rights=rgts.construct_the_data(rights),
-                tag_filters=tgflts.construct_the_data(tag_filters)
-            )
+            if LooseVersion(userGroup._zbx_api_version) <= LooseVersion('6.0'):
+                difference = userGroup.check_difference(
+                    usrgrpid=usrgrpid,
+                    name=name,
+                    gui_access=gui_access,
+                    debug_mode=debug_mode,
+                    status=status,
+                    rights=rgts.construct_the_data(rights),
+                    tag_filters=tgflts.construct_the_data(tag_filters)
+                )
+            else:
+                difference = userGroup.check_difference(
+                    usrgrpid=usrgrpid,
+                    name=name,
+                    gui_access=gui_access,
+                    debug_mode=debug_mode,
+                    status=status,
+                    hostgroup_rights=hostgroup_rgts.construct_the_data(hostgroup_rights),
+                    templategroup_rights=templategroup_rgts.construct_the_data(templategroup_rights),
+                    tag_filters=tgflts.construct_the_data(tag_filters)
+                )
             if difference == {}:
                 module.exit_json(changed=False, state=state, usergroup=name, usrgrpid=usrgrpid, msg='User group is up to date: %s' % name)
             else:
@@ -495,14 +696,25 @@ def main():
         if state == 'absent':
             module.exit_json(changed=False, state=state, usergroup=name, msg='User group %s does not exists, nothing to delete' % name)
         else:
-            usrgrpid = userGroup.add(
-                name=name,
-                gui_access=gui_access,
-                debug_mode=debug_mode,
-                status=status,
-                rights=rgts.construct_the_data(rights),
-                tag_filters=tgflts.construct_the_data(tag_filters)
-            )
+            if LooseVersion(userGroup._zbx_api_version) <= LooseVersion('6.0'):
+                usrgrpid = userGroup.add(
+                    name=name,
+                    gui_access=gui_access,
+                    debug_mode=debug_mode,
+                    status=status,
+                    rights=rgts.construct_the_data(rights),
+                    tag_filters=tgflts.construct_the_data(tag_filters)
+                )
+            else:
+                usrgrpid = userGroup.add(
+                    name=name,
+                    gui_access=gui_access,
+                    debug_mode=debug_mode,
+                    status=status,
+                    hostgroup_rights=hostgroup_rgts.construct_the_data(hostgroup_rights),
+                    templategroup_rights=templategroup_rgts.construct_the_data(templategroup_rights),
+                    tag_filters=tgflts.construct_the_data(tag_filters)
+                )
             module.exit_json(changed=True, state=state, usergroup=name, usrgrpid=usrgrpid, msg='User group created: %s, ID: %s' % (name, usrgrpid))
 
 

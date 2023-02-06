@@ -53,42 +53,135 @@
     assert:
       that: usergroup_reset is changed
 
-  - name: test - update Zabbix user group with one right
-    zabbix_usergroup:
-      rights:
-        - host_group: Discovered hosts
-          permission: read-only
-    register: usergroup_updated_right
+  - when: zabbix_version is version('6.2', '<')
+    block:
+    - name: test - update Zabbix user group with one right
+      zabbix_usergroup:
+        rights:
+          - host_group: Discovered hosts
+            permission: read-only
+      register: usergroup_updated_right
 
-  - name: assert that user group was updated
-    assert:
-      that: usergroup_updated_right is changed
+    - name: assert that user group was updated
+      assert:
+        that: usergroup_updated_right is changed
 
-  - name: test - update Zabbix user group with multiple rights
-    zabbix_usergroup:
-      rights:
-        - host_group: Discovered hosts
-          permission: read-only
-        - host_group: Zabbix servers
-          permission: read-write
-    register: usergroup_updated_rights
+    - name: test - update Zabbix user group with multiple rights
+      zabbix_usergroup:
+        rights:
+          - host_group: Discovered hosts
+            permission: read-only
+          - host_group: Zabbix servers
+            permission: read-write
+      register: usergroup_updated_rights
 
-  - name: assert that user group was updated
-    assert:
-      that: usergroup_updated_rights is changed
+    - name: assert that user group was updated
+      assert:
+        that: usergroup_updated_rights is changed
 
-  - name: test - update Zabbix user group with multiple rights (again)
-    zabbix_usergroup:
-      rights:
-        - host_group: Discovered hosts
-          permission: read-only
-        - host_group: Zabbix servers
-          permission: read-write
-    register: usergroup_updated_rights_again
+    - name: test - update Zabbix user group with multiple rights (again)
+      zabbix_usergroup:
+        rights:
+          - host_group: Discovered hosts
+            permission: read-only
+          - host_group: Zabbix servers
+            permission: read-write
+      register: usergroup_updated_rights_again
 
-  - name: assert that user group was not updated
-    assert:
-      that: not usergroup_updated_rights_again is changed
+    - name: assert that user group was not updated
+      assert:
+        that: not usergroup_updated_rights_again is changed
+
+  - when: zabbix_version is version('6.2', '>=')
+    block:
+    - name: test - update Zabbix user group with one hostgroup right
+      zabbix_usergroup:
+        hostgroup_rights:
+          - host_group: Discovered hosts
+            permission: read-only
+      register: usergroup_updated_hostgroup_right
+
+    - name: assert that user group was updated
+      assert:
+        that: usergroup_updated_hostgroup_right is changed
+
+    - name: test - update Zabbix user group with multiple hostgroup rights
+      zabbix_usergroup:
+        hostgroup_rights:
+          - host_group: Discovered hosts
+            permission: read-only
+          - host_group: Zabbix servers
+            permission: read-write
+      register: usergroup_updated_hostgroup_rights
+
+    - name: assert that user group was updated
+      assert:
+        that: usergroup_updated_hostgroup_rights is changed
+
+    - name: test - update Zabbix user group with multiple hostgroup rights (again)
+      zabbix_usergroup:
+        hostgroup_rights:
+          - host_group: Discovered hosts
+            permission: read-only
+          - host_group: Zabbix servers
+            permission: read-write
+      register: usergroup_updated_hostgroup_rights_again
+
+    - name: assert that user group was not updated
+      assert:
+        that: not usergroup_updated_hostgroup_rights_again is changed
+
+    - name: test - update Zabbix user group with one template group right
+      zabbix_usergroup:
+        hostgroup_rights:
+          - host_group: Discovered hosts
+            permission: read-only
+          - host_group: Zabbix servers
+            permission: read-write
+        templategroup_rights:
+          - template_group: Templates
+            permission: read-only
+      register: usergroup_updated_templategroup_right
+
+    - name: assert that user group was updated
+      assert:
+        that: usergroup_updated_templategroup_right is changed
+
+    - name: test - update Zabbix user group with multiple template group rights
+      zabbix_usergroup:
+        hostgroup_rights:
+          - host_group: Discovered hosts
+            permission: read-only
+          - host_group: Zabbix servers
+            permission: read-write
+        templategroup_rights:
+          - template_group: Templates
+            permission: read-only
+          - template_group: Templates/Applications
+            permission: read-write
+      register: usergroup_updated_templategroup_rights
+
+    - name: assert that user group was updated
+      assert:
+        that: usergroup_updated_templategroup_right is changed
+
+    - name: test - update Zabbix user group with multiple template group rights (again)
+      zabbix_usergroup:
+        hostgroup_rights:
+          - host_group: Discovered hosts
+            permission: read-only
+          - host_group: Zabbix servers
+            permission: read-write
+        templategroup_rights:
+          - template_group: Templates
+            permission: read-only
+          - template_group: Templates/Applications
+            permission: read-write
+      register: usergroup_updated_templategroup_rights_again
+
+    - name: assert that user group was not updated
+      assert:
+        that: not usergroup_updated_templategroup_rights_again is changed
 
   - name: test - reset Zabbix user group to default
     zabbix_usergroup:
