@@ -218,6 +218,37 @@
     assert:
       that: usergroup_updated_tag_filters is changed
 
+  - name: test - reset Zabbix user group to default
+    zabbix_usergroup:
+
+  - when: zabbix_version is version('6.2', '>=')
+    block:
+    - name: test - create new user director
+      zabbix_user_directory:
+        name: LDAP infra 1
+        host: 'test.com'
+        port: 389
+        base_dn: 'ou=Users,dc=example,dc=org'
+        search_attribute: 'uid'
+
+    - name: test - update Zabbix user group with user directory
+      zabbix_usergroup:
+        userdirectory: LDAP infra 1
+      register: usergroup_create_userdir
+
+    - name: assert that user group was updated
+      assert:
+        that: usergroup_create_userdir is changed
+
+    - name: test - update Zabbix user group with user directory (again)
+      zabbix_usergroup:
+        userdirectory: LDAP infra 1
+      register: usergroup_create_userdir_again
+
+    - name: assert that user group was not updated
+      assert:
+        that: not usergroup_create_userdir_again is changed
+
   - name: test - delete Zabbix user group
     zabbix_usergroup:
       state: absent
@@ -226,3 +257,11 @@
   - name: assert that Zabbix user group has been deleted
     assert:
       that: usergroup_delete is changed
+
+
+  - name: test - delete user directory
+    zabbix_user_directory:
+      name: LDAP infra 1
+      host: 'test.com'
+      state: absent
+    when: zabbix_version is version('6.2', '>=')

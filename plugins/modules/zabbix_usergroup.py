@@ -133,6 +133,12 @@ options:
                 required: false
                 type: str
                 default: ''
+    userdirectory:
+        description:
+            - Authentication user directory when gui_access set to LDAP or System default.
+            - For => Zabbix 6.2
+        required: false
+        type: str
     state:
         description:
             - State of the user group.
@@ -175,6 +181,13 @@ EXAMPLES = r'''
 - name: Create user group
   community.zabbix.zabbix_usergroup:
     name: ACME
+    state: present
+
+# Base create user group with selected user directory for LDAP authentication
+- name: Create user group
+  community.zabbix.zabbix_usergroup:
+    name: ACME
+    userdirectory: LDAP infra 1
     state: present
 
 # Base create user group with disabled gui access
@@ -477,6 +490,18 @@ class UserGroup(ZabbixBase):
             _params['hostgroup_rights'] = kwargs['hostgroup_rights']
             _params['templategroup_rights'] = kwargs['templategroup_rights']
 
+            if kwargs['userdirectory']:
+                try:
+                    _userdir = self._zapi.userdirectory.get({
+                        'output': 'extend',
+                        'filter': {'name': [kwargs['userdirectory']]}
+                    })
+                except Exception as e:
+                    self._module.fail_json(msg='Failed to get user directory "%s": %s' % (kwargs['userdirectory'], e))
+                if len(_userdir) == 0:
+                    self._module.fail_json(msg='User directory "%s" not found' % kwargs['userdirectory'])
+                _params['userdirectoryid'] = _userdir[0]['userdirectoryid']
+
         return _params
 
     def check_if_usergroup_exists(self, name):
@@ -622,6 +647,7 @@ def main():
             tag=dict(type='str', default=''),
             value=dict(type='str', default='')
         )),
+        userdirectory=dict(type='str', required=False),
         state=dict(type='str', default='present', choices=['present', 'absent'])
     )
 
@@ -644,6 +670,7 @@ def main():
     hostgroup_rights = module.params['hostgroup_rights']
     templategroup_rights = module.params['templategroup_rights']
     tag_filters = module.params['tag_filters']
+    userdirectory = module.params['userdirectory']
     state = module.params['state']
 
     userGroup = UserGroup(module)
@@ -682,7 +709,8 @@ def main():
                     status=status,
                     hostgroup_rights=hostgroup_rgts.construct_the_data(hostgroup_rights),
                     templategroup_rights=templategroup_rgts.construct_the_data(templategroup_rights),
-                    tag_filters=tgflts.construct_the_data(tag_filters)
+                    tag_filters=tgflts.construct_the_data(tag_filters),
+                    userdirectory=userdirectory
                 )
             if difference == {}:
                 module.exit_json(changed=False, state=state, usergroup=name, usrgrpid=usrgrpid, msg='User group is up to date: %s' % name)
@@ -713,7 +741,8 @@ def main():
                     status=status,
                     hostgroup_rights=hostgroup_rgts.construct_the_data(hostgroup_rights),
                     templategroup_rights=templategroup_rgts.construct_the_data(templategroup_rights),
-                    tag_filters=tgflts.construct_the_data(tag_filters)
+                    tag_filters=tgflts.construct_the_data(tag_filters),
+                    userdirectory=userdirectory
                 )
             module.exit_json(changed=True, state=state, usergroup=name, usrgrpid=usrgrpid, msg='User group created: %s, ID: %s' % (name, usrgrpid))
 
