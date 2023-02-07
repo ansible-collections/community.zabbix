@@ -484,7 +484,7 @@ class UserGroup(ZabbixBase):
             ),
             'tag_filters': kwargs['tag_filters']
         }
-        if LooseVersion(self._zbx_api_version) <= LooseVersion('6.0'):
+        if LooseVersion(self._zbx_api_version) < LooseVersion('6.2'):
             _params['rights'] = kwargs['rights']
         else:
             _params['hostgroup_rights'] = kwargs['hostgroup_rights']
@@ -533,7 +533,7 @@ class UserGroup(ZabbixBase):
             User group matching user group name.
         """
         try:
-            if LooseVersion(self._zbx_api_version) <= LooseVersion('6.0'):
+            if LooseVersion(self._zbx_api_version) < LooseVersion('6.2'):
                 _usergroup = self._zapi.usergroup.get({
                     'output': 'extend',
                     'selectTagFilters': 'extend',
@@ -675,7 +675,7 @@ def main():
 
     userGroup = UserGroup(module)
     zbx = userGroup._zapi
-    if LooseVersion(userGroup._zbx_api_version) <= LooseVersion('6.0'):
+    if LooseVersion(userGroup._zbx_api_version) < LooseVersion('6.2'):
         rgts = Rights(module, zbx)
     else:
         hostgroup_rgts = HostgroupRights(module, zbx)
@@ -690,7 +690,7 @@ def main():
             userGroup.delete(usrgrpid)
             module.exit_json(changed=True, state=state, usergroup=name, usrgrpid=usrgrpid, msg='User group deleted: %s, ID: %s' % (name, usrgrpid))
         else:
-            if LooseVersion(userGroup._zbx_api_version) <= LooseVersion('6.0'):
+            if LooseVersion(userGroup._zbx_api_version) < LooseVersion('6.2'):
                 difference = userGroup.check_difference(
                     usrgrpid=usrgrpid,
                     name=name,
@@ -724,7 +724,7 @@ def main():
         if state == 'absent':
             module.exit_json(changed=False, state=state, usergroup=name, msg='User group %s does not exists, nothing to delete' % name)
         else:
-            if LooseVersion(userGroup._zbx_api_version) <= LooseVersion('6.0'):
+            if LooseVersion(userGroup._zbx_api_version) < LooseVersion('6.2'):
                 usrgrpid = userGroup.add(
                     name=name,
                     gui_access=gui_access,
