@@ -120,7 +120,6 @@
     - zabbix-server
     - init
     - database
-
 - name: "RedHat | Configure SELinux when enabled"
   include: selinux.yml
   when:
