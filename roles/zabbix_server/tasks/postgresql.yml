@@ -1,13 +1,13 @@
 ---
 # task file for postgresql
 
-- name: "Set the correct delegated_dbhost (to support postgres db deployment on a remote dbhost)"
+- name: "PostgreSQL | Set the correct delegated_dbhost (to support postgres db deployment on a remote dbhost)"
   set_fact:
     delegated_dbhost: "{{ zabbix_server_dbhost if (zabbix_server_dbhost != 'localhost') else inventory_hostname }}"
   when:
     - zabbix_server_dbhost_run_install
 
-- name: "Set the correct delegated_dbhost (to support postgres db deployment on a remote dbhost)"
+- name: "PostgreSQL | Set the correct delegated_dbhost (to support postgres db deployment on a remote dbhost)"
   set_fact:
     delegated_dbhost: "{{ inventory_hostname }}"
   when:
@@ -24,7 +24,7 @@
       community.postgresql.postgresql_user:
         db: "{{ zabbix_server_dbname }}"
         name: "{{ zabbix_server_dbuser }}"
-        password: "{{ ('md5' + (zabbix_server_dbpassword + zabbix_server_dbuser)|hash('md5')) if zabbix_server_dbpassword_hash_method == 'md5' else zabbix_server_dbpassword }}"
+        password: "md5{{ (zabbix_server_dbpassword + zabbix_server_dbuser)|hash('md5') }}"
         port: "{{ zabbix_server_dbport }}"
         priv: ALL
         state: present
@@ -62,7 +62,7 @@
         login_password: "{{ zabbix_server_pgsql_login_password | default(omit) }}"
         db: "{{ zabbix_server_dbname }}"
         name: "{{ zabbix_server_dbuser }}"
-        password: "{{ ('md5' + (zabbix_server_dbpassword + zabbix_server_dbuser)|hash('md5')) if zabbix_server_dbpassword_hash_method == 'md5' else zabbix_server_dbpassword }}"
+        password: "md5{{ (zabbix_server_dbpassword + zabbix_server_dbuser)|hash('md5') }}"
         port: "{{ zabbix_server_dbport }}"
         priv: ALL
         state: present
@@ -83,15 +83,10 @@
     - zabbix-server
     - database
 
-- name: Check if warn parameter can be used for shell module
-  set_fact:
-    produce_warn: False
-  when: ansible_version.full is version("2.14", "<")
-
 - name: "PostgreSQL | Create schema"
   shell: |
     set -euxo pipefail
-    FILE={{ 'create.sql' if zabbix_version is version('6.0', '<') else 'server.sql' }}
+    FILE={{ 'create.sql' if zabbix_server_version is version('6.0', '<') else 'server.sql' }}
     cd {{ datafiles_path }}
     if [ -f ${FILE}.gz ]
       then zcat ${FILE}.gz > /tmp/create.sql
@@ -111,7 +106,6 @@
   environment:
     PGPASSWORD: "{{ zabbix_server_dbpassword }}"
   when:
-    - zabbix_version is version('3.0', '>=')
     - zabbix_database_sqlload
   tags:
     - zabbix-server
@@ -135,33 +129,35 @@
   environment:
     PGPASSWORD: "{{ zabbix_server_dbpassword }}"
   when:
-    - zabbix_version is version('3.0', '>=')
     - zabbix_database_timescaledb
   tags:
     - zabbix-server
     - database
 
-- name: "Get complete path"
+- name: "PostgreSQL | Get complete path"
   shell: ls -d {{ datafiles_path }}
   register: datafiles_path_full
   changed_when: false
   when:
-    - (zabbix_version is version('3.0', '<') and zabbix_database_sqlload) or (zabbix_repo == "epel" and zabbix_database_sqlload)
+    - zabbix_repo == "epel"
+    - zabbix_database_sqlload
   tags:
     - skip_ansible_lint
 
-- name: "Check if we have a create dir"
+- name: "PostgreSQL | Check if we have a create dir"
   stat:
     path: "{{ datafiles_path_full.stdout }}/create"
   register: create_dir_or_not
   when:
-    - (zabbix_version is version('3.0', '<') and zabbix_database_sqlload) or (zabbix_repo == "epel" and zabbix_database_sqlload)
+    - zabbix_repo == "epel"
+    - zabbix_database_sqlload
 
-- name: "Set fact"
+- name: "PostgreSQL | Set fact"
   set_fact:
     datafiles_path: "{{ datafiles_path }}/create"
   when:
-    - (zabbix_version is version('3.0', '<') and zabbix_database_sqlload) or (zabbix_repo == "epel" and zabbix_database_sqlload)
+    - zabbix_repo == "epel"
+    - zabbix_database_sqlload
     - create_dir_or_not.stat.isdir is defined and create_dir_or_not.stat.isdir
     - create_dir_or_not.stat.exists
 
@@ -183,7 +179,8 @@
   environment:
     PGPASSWORD: "{{ zabbix_server_dbpassword }}"
   when:
-    - (zabbix_version is version('3.0', '<') and zabbix_database_sqlload) or (zabbix_repo == "epel" and zabbix_database_sqlload)
+    - zabbix_repo == "epel"
+    - zabbix_database_sqlload
   tags:
     - zabbix-server
     - database
@@ -201,7 +198,9 @@
     warn: "{{ produce_warn | default(omit) }}"
   environment:
     PGPASSWORD: "{{ zabbix_server_dbpassword }}"
-  when: (zabbix_version is version('3.0', '<') and zabbix_database_sqlload) or (zabbix_repo == "epel" and zabbix_database_sqlload)
+  when:
+    - zabbix_repo == "epel"
+    - zabbix_database_sqlload
   tags:
     - zabbix-server
     - database
@@ -219,7 +218,9 @@
     warn: "{{ produce_warn | default(omit) }}"
   environment:
     PGPASSWORD: "{{ zabbix_server_dbpassword }}"
-  when: (zabbix_version is version('3.0', '<') and zabbix_database_sqlload) or (zabbix_repo == "epel" and zabbix_database_sqlload)
+  when:
+    - zabbix_repo == "epel"
+    - zabbix_database_sqlload
   tags:
     - zabbix-server
     - database
