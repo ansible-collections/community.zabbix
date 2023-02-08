@@ -1,0 +1,2 @@
+bugfixes:
+  - zabbix_agent role - Fix MacOS install never executed because of the missing include_tasks "Darwin.yml" in the "main.yml" task file and wrong user permission on folder/files.
