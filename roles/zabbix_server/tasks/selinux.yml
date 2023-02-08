@@ -1,16 +1,15 @@
 ---
-
 # straight to getenforce binary , workaround for missing python_selinux library
-- name: "Get getenforce binary"
+- name: "SELinux | Get getenforce binary"
   stat:
     path: /usr/sbin/getenforce
   register: getenforce_bin
   become: true
 
-- name: "Collect getenforce output"
+- name: "SELinux | Collect getenforce output"
   command: getenforce
   register: sestatus
-  when: 'getenforce_bin.stat.exists'
+  when: "getenforce_bin.stat.exists"
   changed_when: false
   become: true
   check_mode: false
@@ -40,7 +39,7 @@
   tags:
     - zabbix-server
 
-- name: "SELinux | RedHat | Install related SELinux package on RHEL9 and RHEL8"
+- name: "SELinux | RedHat | Install related SELinux package on RHEL8"
   yum:
     name:
       - python3-libsemanage
@@ -54,7 +53,7 @@
   when:
     - ansible_os_family == "RedHat"
     - selinux_allow_zabbix_can_network
-    - ansible_distribution_major_version|int >= 8
+    - ansible_distribution_major_version == "8"
   tags:
     - zabbix-server
 
@@ -97,7 +96,7 @@
   tags:
     - zabbix-server
 
-- name: "SELinux | RedHat | Install related SELinux package on RHEL9 and RHEL8"
+- name: "SELinux | RedHat | Install related SELinux package to fix issues on RHEL8"
   yum:
     name:
       - policycoreutils
@@ -112,7 +111,7 @@
   become: true
   when:
     - ansible_os_family == "RedHat"
-    - ansible_distribution_major_version|int >= 8
+    - ansible_distribution_major_version == "8"
   tags:
     - zabbix-server
 
