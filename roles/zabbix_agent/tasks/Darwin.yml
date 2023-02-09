@@ -91,7 +91,7 @@
   template:
     src: zabbix_agentd.conf.j2
     dest: "/usr/local/etc/zabbix/{{ zabbix_agent_conf }}"
-    owner: root
+    owner: zabbix
     group: wheel
     mode: 0644
   notify:
@@ -130,7 +130,7 @@
 - name: "Create include dir zabbix-agent"
   file:
     path: "{{ zabbix_agent_include }}"
-    owner: root
+    owner: zabbix
     group: zabbix
     mode: 0750
     state: directory
