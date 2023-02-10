@@ -29,7 +29,6 @@ provisioner:
   inventory:
     group_vars:
       all:
-        ansible_python_interpreter: "{{ '${MY_MOLECULE_CONTAINER}' | regex_search('centos8') | ternary('/usr/bin/python3', 'auto') }}"
         zabbix_agent_src_reinstall: false
         zabbix_install_pip_packages: false
         zabbix_agent_server: 192.168.3.33
@@ -37,6 +36,9 @@ provisioner:
         zabbix_agent_listenip: 0.0.0.0
         zabbix_agent_tlsconnect: psk
         zabbix_agent_tlsaccept: psk
+        zabbix_agent_userparameters:
+        - name: a
+        - name: b
 
 scenario:
   test_sequence:
@@ -55,5 +57,5 @@ scenario:
     - destroy
 verifier:
   name: testinfra
-  lint:
-    name: flake8
+#  lint:
+#    name: flake8
