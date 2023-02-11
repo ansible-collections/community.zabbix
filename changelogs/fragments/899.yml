@@ -1,0 +1,2 @@
+minor_changes:
+  - zabbix_agent role - Add support for SUSE Linux Enterprise Server for SAP Applications ("SLES_SAP").
