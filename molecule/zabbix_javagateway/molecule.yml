@@ -20,10 +20,6 @@ provisioner:
   env:
     ANSIBLE_COLLECTIONS_PATHS: $HOME/.ansible/collections/ansible_collections/community/zabbix
     ANSIBLE_ROLES_PATH: $HOME/.ansible/collections/ansible_collections/community/zabbix/roles
-  inventory:
-    group_vars:
-      all:
-        ansible_python_interpreter: /usr/bin/python3
 
 verifier:
   name: testinfra

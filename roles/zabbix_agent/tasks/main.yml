@@ -124,6 +124,7 @@
   vars:
     gather_facts: false
     ansible_user: "{{ zabbix_api_login_user }}"
+    ansible_network_os: community.zabbix.zabbix
     ansible_connection: httpapi
     # Can't think of a way to make http_login_* vars be undefined -(
     http_login_user: "{{ zabbix_api_http_user | default(zabbix_http_user | default(-42)) }}"
