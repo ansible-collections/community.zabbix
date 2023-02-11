@@ -253,3 +253,16 @@ suse:
       name: server_monitoring
       url: http://download.opensuse.org/repositories/server:/monitoring/SLE_15_SP3/
       python_libxml2_package: python3-libxml2-python
+  "SLES_SAP":  # SAP specific version of SLES
+    "11":
+      name: server_monitoring
+      url: http://download.opensuse.org/repositories/server:/monitoring/SLE_11_SP3/
+      python_libxml2_package: python-libxml2
+    "12":
+      name: server_monitoring
+      url: http://download.opensuse.org/repositories/server:/monitoring/SLE_12_SP5/
+      python_libxml2_package: python-libxml2
+    "15":
+      name: server_monitoring
+      url: http://download.opensuse.org/repositories/server:/monitoring/SLE_15_SP3/
+      python_libxml2_package: python3-libxml2-python
