@@ -36,9 +36,6 @@ provisioner:
         zabbix_agent_listenip: 0.0.0.0
         zabbix_agent_tlsconnect: psk
         zabbix_agent_tlsaccept: psk
-        zabbix_agent_userparameters:
-        - name: a
-        - name: b
 
 scenario:
   test_sequence:
@@ -57,5 +54,5 @@ scenario:
     - destroy
 verifier:
   name: testinfra
-#  lint:
-#    name: flake8
+  lint:
+    name: flake8
