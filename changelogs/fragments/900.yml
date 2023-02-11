@@ -1,0 +1,2 @@
+minor_changes:
+  - zabbix_agent and zabbix_proxy roles - fixed a bug whith ansible_python_interpreter not being set correctly in some corner cases

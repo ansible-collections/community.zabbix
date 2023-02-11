@@ -1,0 +1,2 @@
+minor_changes:
+  - zabbix_agent, zabbix_proxy and zabbix_server roles - make Ansible 2.14 compatible by removing warn parameter

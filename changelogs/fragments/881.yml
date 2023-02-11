@@ -1,0 +1,2 @@
+minor_changes:
+  - httpapi connection - improve connection errors reporting
