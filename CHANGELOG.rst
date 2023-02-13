@@ -5,6 +5,16 @@ community.zabbix Release Notes
 .. contents:: Topics
 
 
+v1.9.2
+======
+
+Bugfixes
+--------
+
+- zabbix_agent and zabbix_proxy roles - fixed a bug whith ansible_python_interpreter not being set correctly in some corner cases
+- zabbix_agent role - Fix MacOS install never executed because of the missing include_tasks "Darwin.yml" in the "main.yml" task file and wrong user permission on folder/files.
+- zabbix_agent, zabbix_proxy and zabbix_server roles - make Ansible 2.14 compatible by removing warn parameter
+
 v1.9.1
 ======
 
