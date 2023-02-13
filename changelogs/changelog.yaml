@@ -814,3 +814,17 @@ releases:
     - 868-include-to-include-tasks.yml
     - fix-httpapi-http-auth.yml
     release_date: '2023-01-09'
+  1.9.2:
+    changes:
+      bugfixes:
+      - zabbix_agent and zabbix_proxy roles - fixed a bug whith ansible_python_interpreter
+        not being set correctly in some corner cases
+      - zabbix_agent role - Fix MacOS install never executed because of the missing
+        include_tasks "Darwin.yml" in the "main.yml" task file and wrong user permission
+        on folder/files.
+      - zabbix_agent, zabbix_proxy and zabbix_server roles - make Ansible 2.14 compatible
+        by removing warn parameter
+    fragments:
+    - 897.yml
+    - missing.yml
+    release_date: '2023-02-11'
