@@ -16,17 +16,6 @@
   tags:
     - zabbix-server
 
-# - name: "RedHat | Set Zabbix user/group (RHEL 9)"
-#   set_fact:
-#     zabbix_os_user: zabbixsrv
-#     zabbix_proxy_config: /etc/zabbix_proxy.conf
-#     zabbix_proxy_logfile: /var/log/zabbixsrv/zabbix_proxy.log
-#     zabbix_proxy_pidfile: /tmp/zabbix_proxy.pid
-#     zabbix_proxy_socketdir: /tmp
-#   when:
-#     - ansible_distribution_major_version == "9"
-#     - zabbix_proxy_version is version('6.0', '<=')
-
 - name: "RedHat | Make sure old file is absent"
   file:
     path: /etc/yum.repos.d/zabbix-supported.repo
@@ -130,6 +119,38 @@
     - zabbix_proxy_database == 'sqlite3'
   tags:
     - zabbix-proxy
+
+- name: "Ensure Service has Hard Link (Zabbix 6 RHEL 9 Only)"
+  block:
+    - name: Checking Source File
+      stat:
+        path: /etc/alternatives/zabbix-proxy-systemd
+      register: src_stat
+
+    - name: Checkiong Target File
+      stat:
+        path: /usr/lib/systemd/system/zabbix-proxy.service
+      register: dest_stat
+
+    - name: Updating File
+      block:
+        - name: Deleting Soft Link
+          file:
+            path: /usr/lib/systemd/system/zabbix-proxy.service
+            state: absent
+
+        - name: Adding Hard Link
+          file:
+            src: /etc/alternatives/zabbix-proxy-systemd
+            dest: /usr/lib/systemd/system/zabbix-proxy.service
+            state: hard
+            owner: root
+            group: root
+            mode: 0644
+      when: dest_stat.stat.inode | default(1) != src_stat.stat.inode | default(100)
+  when:
+    - zabbix_proxy_version is version('6.0', '==')
+    - ansible_distribution_major_version == "9"
 
 - name: "Configure SELinux when enabled"
   include: selinux.yml
