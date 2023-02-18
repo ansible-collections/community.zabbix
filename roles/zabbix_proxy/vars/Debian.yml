@@ -9,6 +9,7 @@ zabbix_valid_proxy_versions:
   "22":
     - 6.4
     - 6.0
+    - 5.0
   "20":
     - 6.4
     - 6.0
