@@ -9,14 +9,13 @@
     gpgcheck: "{{ item.gpgcheck }}"
     gpgkey: "{{ item.gpgkey }}"
     mode: "{{ item.mode | default('0644') }}"
-    priority: "{{ item.priority | default('98') }}"
+    priority: "{{ item.priority | default('99') }}"
     state: "{{ item.state | default('present') }}"
     proxy: "{{ zabbix_http_proxy | default(omit) }}"
   with_items: "{{ zabbix_repo_yum }}"
   register: yum_repo_installed
   become: true
-  when:
-    zabbix_repo == "zabbix"
+  when: zabbix_repo == "zabbix"
   notify:
     - "clean repo files from proxy creds"
 
