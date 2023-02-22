@@ -121,8 +121,9 @@ options:
             sendto:
                 description:
                     - Address, user name or other identifier of the recipient.
+                    - If C(mediatype) is Email, values are represented as array. For other types of Media types, value is represented as a string.
                 required: true
-                type: str
+                type: raw
             period:
                 description:
                     - Time when the notifications can be sent as a time period or user macros separated by a semicolon.
@@ -257,7 +258,9 @@ EXAMPLES = r'''
     after_login_url: ''
     user_medias:
       - mediatype: Email
-        sendto: example@example.com
+        sendto:
+          - example@example.com
+          - example1@example.com
         period: 1-7,00:00-24:00
         severity:
           not_classified: no
@@ -381,6 +384,10 @@ class User(ZabbixBase):
                     if media_type['name'] == user_media['mediatype']:
                         user_media['mediatypeid'] = media_type['mediatypeid']
                         break
+            if user_media['mediatype'] == 'Email':
+                if not isinstance(user_media['sendto'], list):
+                    # sendto should be a list for Email media type
+                    user_media['sendto'] = [user_media['sendto']]
 
             if 'mediatypeid' not in user_media:
                 self._module.fail_json(msg="Media type not found: %s" % user_media['mediatype'])
@@ -422,26 +429,16 @@ class User(ZabbixBase):
         usrgrpids = []
         for usrgrp in existing_data['usrgrps']:
             usrgrpids.append({'usrgrpid': usrgrp['usrgrpid']})
-
         existing_data['usrgrps'] = sorted(usrgrpids, key=lambda x: x['usrgrpid'])
-
-        # Processing for zabbix 4.0 and above.
-        # In zabbix 4.0 and above, Email sendto is of type list.
-        # This module, one media supports only one Email sendto.
-        # Therefore following processing extract one Email from list.
-        if LooseVersion(self._zbx_api_version) >= LooseVersion('4.0'):
-            for media in existing_data['medias']:
-                if isinstance(media['sendto'], list):
-                    media['sendto'] = media['sendto'][0]
-
-        existing_data['user_medias'] = sorted(existing_data['medias'], key=lambda x: x['sendto'])
+        existing_data['user_medias'] = existing_data['medias']
         for del_key in ['medias', 'attempt_clock', 'attempt_failed', 'attempt_ip', 'debug_mode', 'users_status',
                         'gui_access']:
             del existing_data[del_key]
 
-        for user_media in existing_data['user_medias']:
-            for del_key in ['mediaid', 'userid']:
-                del user_media[del_key]
+        if 'user_medias' in existing_data and existing_data['user_medias']:
+            for user_media in existing_data['user_medias']:
+                for del_key in ['mediaid', 'userid']:
+                    del user_media[del_key]
 
         # request data
         request_data = {
@@ -460,9 +457,10 @@ class User(ZabbixBase):
         }
 
         if user_medias:
-            request_data['user_medias'] = sorted(user_medias, key=lambda x: x['sendto'])
+            request_data['user_medias'] = user_medias
         else:
-            del existing_data['user_medias']
+            if 'user_medias' in existing_data and existing_data['user_medias']:
+                del existing_data['user_medias']
 
         if override_passwd:
             request_data['passwd'] = passwd
@@ -478,7 +476,8 @@ class User(ZabbixBase):
         existing_data, _del_keys = helper_normalize_data(existing_data, del_keys)
 
         user_parameter_difference_check_result = True
-        if existing_data == request_data:
+        diff_dict = {}
+        if not zabbix_utils.helper_compare_dictionaries(request_data, existing_data, diff_dict):
             user_parameter_difference_check_result = False
 
         diff_params = {
@@ -644,7 +643,7 @@ def main():
         after_login_url=dict(type='str'),
         user_medias=dict(type='list', elements='dict',
                          options=dict(mediatype=dict(type='str', default='Email'),
-                                      sendto=dict(type='str', required=True),
+                                      sendto=dict(type='raw', required=True),
                                       period=dict(type='str', default='1-7,00:00-24:00'),
                                       severity=dict(type='dict',
                                                     options=dict(
@@ -695,6 +694,15 @@ def main():
     rows_per_page = module.params['rows_per_page']
     after_login_url = module.params['after_login_url']
     user_medias = module.params['user_medias']
+    if user_medias:
+        # Because user media sendto parameter is raw in parameters specs perform explicit check on type
+        for user_media in user_medias:
+            if user_media['mediatype'] == 'Email':
+                if not (isinstance(user_media['sendto'], list) or isinstance(user_media['sendto'], str)):
+                    module.fail_json('For Email media type sendto parameter must be of type list or str.')
+            else:
+                if not isinstance(user_media['sendto'], str):
+                    module.fail_json('For any other than Email media type sendto parameter must be of type str.')
     user_type = module.params['type']
     timezone = module.params['timezone']
     role_name = module.params['role_name']
