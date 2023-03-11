@@ -79,7 +79,6 @@ class HttpApi(HttpApiBase):
             self.connection._auth = {'auth': self.auth_key}
             return
 
-        http_login_user = self.get_option('http_login_user')
         if not self.auth_key:
             # Provide "fake" auth so netcommon.connection does not replace our headers
             self.connection._auth = {'auth': 'fake'}
