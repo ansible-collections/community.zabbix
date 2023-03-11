@@ -37,7 +37,7 @@
     - zabbix_database_creation
     - zabbix_proxy_pgsql_login_host is not defined
   tags:
-    - zabbix-server
+    - zabbix-proxy
     - database
 
 - name: "PostgreSQL | Remote"
@@ -67,7 +67,7 @@
     - zabbix_database_creation
     - zabbix_proxy_pgsql_login_host is defined
   tags:
-    - zabbix-server
+    - zabbix-proxy
     - database
 
 - name: "PostgreSQL | Handle Compressed Schema File"
