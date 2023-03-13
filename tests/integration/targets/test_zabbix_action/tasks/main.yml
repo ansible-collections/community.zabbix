@@ -3,10 +3,6 @@
   meta: end_play
   when: zabbix_version is version('3.0', '=')
 
-- name: Temporarily use zabbix-api
-  set_fact:
-    ansible_connection: local
-
 - name: test - prepare example template for zabbix_action module
   zabbix_template:
     server_url: "{{ zabbix_api_server_url }} "
@@ -28,10 +24,6 @@
     type: email
     state: present
   register: zbxaction_prep_mediatype
-
-- name: Restore httpapi connection
-  set_fact:
-    ansible_connection: httpapi
 
 - name: test - simple actions
   module_defaults:
