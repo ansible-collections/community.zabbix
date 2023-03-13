@@ -96,7 +96,7 @@ class HttpApi(HttpApiBase):
             # Zabbix <= 6.2
             payload = self.payload_builder("user.login", user=username, password=password)
             code, response = self.send_request(data=payload)
-        except ConnectionError as ex:
+        except ConnectionError:
             # Zabbix >= 6.4
             payload = self.payload_builder("user.login", username=username, password=password)
             code, response = self.send_request(data=payload)
