@@ -367,8 +367,8 @@ EXAMPLES = r'''
     ansible_zabbix_auth_key: 8ec0d52432c15c91fcafe9888500cf9a607f44091ab554dbee860f6b44fac895
 
 - name: Create a new host or rewrite an existing host's info
+# Set task level following variables for Zabbix Server host in task
   vars:
-# Set following variables for Zabbix Server host in task
     ansible_network_os: community.zabbix.zabbix
     ansible_connection: httpapi
     ansible_httpapi_port: 443
@@ -428,6 +428,16 @@ EXAMPLES = r'''
         value: ExampleTagValue
 
 - name: Update an existing host's TLS settings
+# Set current task level variables for Zabbix Server host in task
+  vars:
+    ansible_network_os: community.zabbix.zabbix
+    ansible_connection: httpapi
+    ansible_httpapi_port: 443
+    ansible_httpapi_use_ssl: true
+    ansible_httpapi_validate_certs: false
+    ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
+  become: false
+  delegate_to: zabbix-exaple-fqdn.org
   community.zabbix.zabbix_host:
     host_name: ExampleHost
     visible_name: ExampleName
