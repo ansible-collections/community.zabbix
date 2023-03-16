@@ -376,7 +376,7 @@ EXAMPLES = r'''
     ansible_httpapi_validate_certs: false
     ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
   become: false
-  delegate_to: zabbix-exaple-fqdn.org
+  delegate_to: zabbix-example-fqdn.org
   community.zabbix.zabbix_host:
     host_name: ExampleHost
     visible_name: ExampleName
@@ -437,7 +437,7 @@ EXAMPLES = r'''
     ansible_httpapi_validate_certs: false
     ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
   become: false
-  delegate_to: zabbix-exaple-fqdn.org
+  delegate_to: zabbix-example-fqdn.org
   community.zabbix.zabbix_host:
     host_name: ExampleHost
     visible_name: ExampleName
