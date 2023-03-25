@@ -353,34 +353,50 @@ EXAMPLES = r'''
     state: present
     name: TestUserDirectory
     idp_type: ldap
-    host: 'test.com'
+    host: 'test.ca'
     port: 389
     base_dn: 'ou=Users,dc=example,dc=org'
     search_attribute: 'uid'
-    bind_dn: 'cn=ldap_search,dc=example,dc=org'
-    description: 'Test user directory'
-    search_filter: '(%{attr}=test_user)'
-    start_tls: 0
+    provision_status: True
+    group_name: cn
+    group_basedn: ou=Group,dc=example,dc=org
+    group_member: member
+    user_ref_attr: uid
+    group_filter: '(member=uid=%{ref},ou=Users,dc=example,dc=com)'
+    user_username: first_name
+    user_lastname: last_name
+    provision_media:
+      - name: Media1
+        mediatype: Email
+        attribute: email1
+    provision_groups:
+      - name: idpname1
+        role: Guest role
+        user_groups:
+          - Guests
 
 - name: Create new user directory with SAML IDP or update existing info (Zabbix >= 6.4)
   community.zabbix.zabbix_user_directory:
     state: present
     name: TestUserDirectory
     idp_type: saml
-    saml_idp_entityid: ''
-    saml_sso_url: 'https://localhost/SAML2/SSO'
-    saml_slo_url: 'https://localhost/SAML2/SLO'
-    saml_username_attribute: 'uid'
-    saml_sp_entityid: 'https://localhost'
-    saml_nameid_format: 'urn:oasis:names:tc:SAML:2.0:nameid-format:entity'
-    scim_status: false
-    saml_encrypt_nameid: true
-    saml_encrypt_assertions: true
-    saml_sign_messages: true
-    saml_sign_assertions: true
-    saml_sign_authn_requests: true
-    saml_sign_logout_requests: true
-    saml_sign_logout_responses: true
+    idp_entityid: http://okta.com/xxxxx
+    sp_entityid: zabbix
+    sso_url: http://xxxx.okta.com/app/xxxxxx_123dhu8o3
+    username_attribute: usrEmail
+    provision_status: True
+    group_name: cn
+    user_username: first_name
+    user_lastname: last_name
+    provision_media:
+      - name: Media1
+        mediatype: Email
+        attribute: email1
+    provision_groups:
+      - name: idpname1
+        role: Guest role
+        user_groups:
+          - Guests
 '''
 
 
