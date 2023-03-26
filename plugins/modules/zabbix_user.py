@@ -597,8 +597,8 @@ class User(ZabbixBase):
             except Exception as e:
                 self._module.fail_json(msg="Failed to update user medias %s: %s" % (username, e))
 
-        if (LooseVersion(self._zbx_api_version) >= LooseVersion('3.4') and
-            LooseVersion(self._zbx_api_version) < LooseVersion('6.4')):
+        if (LooseVersion(self._zbx_api_version) >= LooseVersion('3.4')
+                and LooseVersion(self._zbx_api_version) < LooseVersion('6.4')):
             try:
                 if user_medias:
                     request_data['user_medias'] = user_medias

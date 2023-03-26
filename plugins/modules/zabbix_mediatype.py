@@ -626,7 +626,6 @@ class MediaTypeModule(ZabbixBase):
                             kwargs[key] = sorted(kwargs[key], key=lambda x: x['name'])
                             existing_mediatype[key] = sorted(existing_mediatype[key], key=lambda x: x['name'])
 
-
                 if key == 'message_templates' and (kwargs[key] != [] or existing_mediatype[key] != []):
                     kwargs[key] = sorted(kwargs[key], key=lambda x: x['subject'])
                     existing_mediatype[key] = sorted(existing_mediatype[key], key=lambda x: x['subject'])
