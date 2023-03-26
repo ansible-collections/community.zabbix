@@ -223,13 +223,24 @@
 
   - when: zabbix_version is version('6.2', '>=')
     block:
-    - name: test - create new user director
+    - name: test - create new user directory
       zabbix_user_directory:
         name: LDAP infra 1
         host: 'test.com'
         port: 389
         base_dn: 'ou=Users,dc=example,dc=org'
         search_attribute: 'uid'
+      when: zabbix_version is version('6.4', '<')
+
+    - name: test - create new user directory
+      zabbix_user_directory:
+        name: LDAP infra 1
+        idp_type: ldap
+        host: 'test.com'
+        port: 389
+        base_dn: 'ou=Users,dc=example,dc=org'
+        search_attribute: 'uid'
+      when: zabbix_version is version('6.4', '>=')
 
     - name: test - update Zabbix user group with user directory
       zabbix_usergroup:
