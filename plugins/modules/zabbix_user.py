@@ -22,7 +22,7 @@ options:
         description:
             - Name of the user alias in Zabbix.
             - username is the unique identifier used and cannot be updated using this module.
-            - alias should be replaced with username
+            - alias must be replaced with username since Zabbix 6.4.
         aliases: [ alias ]
         required: true
         type: str
@@ -276,11 +276,6 @@ EXAMPLES = r'''
 - name: delete existing zabbix user.
   community.zabbix.zabbix_user:
     username: example
-    usrgrps:
-      - Guests
-    passwd: password
-    user_medias:
-      - sendto: example@example.com
     state: absent
 '''
 
@@ -480,6 +475,11 @@ class User(ZabbixBase):
         if not zabbix_utils.helper_compare_dictionaries(request_data, existing_data, diff_dict):
             user_parameter_difference_check_result = False
 
+        if LooseVersion(self._zbx_api_version) >= LooseVersion('6.4'):
+            if user_medias:
+                request_data['medias'] = user_medias
+                del request_data['user_medias']
+
         diff_params = {
             "before": existing_data,
             "after": request_data
@@ -515,7 +515,10 @@ class User(ZabbixBase):
             'url': url,
         }
         if user_medias:
-            request_data['user_medias'] = user_medias
+            if LooseVersion(self._zbx_api_version) <= LooseVersion('6.2'):
+                request_data['user_medias'] = user_medias
+            else:
+                request_data['medias'] = user_medias
 
         if LooseVersion(self._zbx_api_version) < LooseVersion('4.0') or require_password:
             request_data['passwd'] = passwd
@@ -594,10 +597,19 @@ class User(ZabbixBase):
             except Exception as e:
                 self._module.fail_json(msg="Failed to update user medias %s: %s" % (username, e))
 
-        if LooseVersion(self._zbx_api_version) >= LooseVersion('3.4'):
+        if (LooseVersion(self._zbx_api_version) >= LooseVersion('3.4') and
+            LooseVersion(self._zbx_api_version) < LooseVersion('6.4')):
             try:
                 if user_medias:
                     request_data['user_medias'] = user_medias
+                user_ids = self._zapi.user.update(request_data)
+            except Exception as e:
+                self._module.fail_json(msg="Failed to update user %s: %s" % (username, e))
+
+        if LooseVersion(self._zbx_api_version) >= LooseVersion('6.4'):
+            try:
+                if user_medias:
+                    request_data['medias'] = user_medias
                 user_ids = self._zapi.user.update(request_data)
             except Exception as e:
                 self._module.fail_json(msg="Failed to update user %s: %s" % (username, e))
