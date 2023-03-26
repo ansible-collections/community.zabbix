@@ -613,7 +613,7 @@ class Authentication(ZabbixBase):
             future_authentication = current_authentication.copy()
             future_authentication.update(params)
 
-            if LooseVersion(self._zbx_api_version) <= LooseVersion('6.2'):
+            if LooseVersion(self._zbx_api_version) < LooseVersion('6.4'):
                 if (current_authentication['ldap_configured'] == '0'
                         and future_authentication['ldap_configured'] == '1'):
                     if LooseVersion(self._zbx_api_version) < LooseVersion('6.2.0'):
@@ -633,7 +633,7 @@ class Authentication(ZabbixBase):
                     if not ldap_userdirectory:
                         self._module.fail_json(msg="Please set ldap_userdirectory when you change a value of ldap_auth_enabled to true.")
 
-            if LooseVersion(self._zbx_api_version) <= LooseVersion('6.2'):
+            if LooseVersion(self._zbx_api_version) < LooseVersion('6.4'):
                 if (current_authentication['saml_auth_enabled'] == '0'
                         and future_authentication['saml_auth_enabled'] == '1'
                         and not saml_idp_entityid
