@@ -1280,6 +1280,66 @@
   - assert:
       that: zbxaction_recack_new.changed is sameas False
 
+  - when: zabbix_version is version('6.4', '>=')
+    block:
+    - name: test - update action with pause_symptoms off
+      zabbix_action:
+        recovery_operations:
+          - type: send_message
+            subject: ExampleSubject
+            message: ExampleMessage
+            media_type: ExampleMediaTypeForActionModule
+            send_to_users:
+              - Admin
+          - type: notify_all_involved
+            subject: RecoverySubject
+            message: RecoveryMessage
+        acknowledge_operations:
+          - type: send_message
+            subject: ExampleSubject
+            message: ExampleMessage
+            media_type: ExampleMediaTypeForActionModule
+            send_to_users:
+              - Admin
+          - type: notify_all_involved
+            subject: RecoverySubject
+            message: RecoveryMessage
+            media_type: ExampleMediaTypeForActionModule
+        pause_symptoms: False
+      register: zbxaction_pause_symptoms
+
+    - assert:
+        that: zbxaction_pause_symptoms.changed is sameas True
+
+    - name: test - update action with pause_symptoms off (again)
+      zabbix_action:
+        recovery_operations:
+          - type: send_message
+            subject: ExampleSubject
+            message: ExampleMessage
+            media_type: ExampleMediaTypeForActionModule
+            send_to_users:
+              - Admin
+          - type: notify_all_involved
+            subject: RecoverySubject
+            message: RecoveryMessage
+        acknowledge_operations:
+          - type: send_message
+            subject: ExampleSubject
+            message: ExampleMessage
+            media_type: ExampleMediaTypeForActionModule
+            send_to_users:
+              - Admin
+          - type: notify_all_involved
+            subject: RecoverySubject
+            message: RecoveryMessage
+            media_type: ExampleMediaTypeForActionModule
+        pause_symptoms: False
+      register: zbxaction_pause_symptoms
+
+    - assert:
+        that: zbxaction_pause_symptoms.changed is sameas False
+
   - name: test - delete action
     zabbix_action:
       state: absent
