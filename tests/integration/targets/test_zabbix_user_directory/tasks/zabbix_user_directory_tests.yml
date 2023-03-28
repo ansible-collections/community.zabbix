@@ -3,7 +3,7 @@
   meta: end_play
   when: zabbix_version is version('6.2', '<')
 
-- name: test - user directory 
+- name: test - user directory for Zabbix < 6.4
   module_defaults:
     community.zabbix.zabbix_user_directory:
       state: present
@@ -101,3 +101,337 @@
 
   - assert:
       that: directory_update_again_result.changed is sameas False
+
+  when: zabbix_version is version('6.4', '<')
+
+- name: test - user directory for Zabbix >= 6.4
+  module_defaults:
+    community.zabbix.zabbix_user_directory:
+      state: present
+      name: TestUserDirectory
+
+  block:
+  - name: test - create new LDAP user directory in check mode
+    zabbix_user_directory:
+      idp_type: ldap
+      host: 'test.com'
+      port: 389
+      base_dn: 'ou=Users,dc=example,dc=org'
+      search_attribute: 'uid'
+    check_mode: true
+    register: directory_check_result
+
+  - assert:
+      that: directory_check_result.changed is sameas True
+
+  - name: test - attempt to create new LDAP user directory with not all mandatory parameters
+    zabbix_user_directory:
+      idp_type: ldap
+      host: 'test.com'
+      port: 389
+    ignore_errors: true
+    register: directory_expect_fail_result
+
+  - assert:
+      that: directory_expect_fail_result.failed is sameas True
+
+  - name: test - create new LDAP user directory withoud bind_password
+    zabbix_user_directory:
+      idp_type: ldap
+      host: 'test.com'
+      port: 389
+      base_dn: 'ou=Users,dc=example,dc=org'
+      search_attribute: 'uid'
+    register: directory_result
+
+  - assert:
+      that: directory_result.changed is sameas True
+
+  - name: test - create new LDAP user directory without bind_password again
+    zabbix_user_directory:
+      idp_type: ldap
+      host: 'test.com'
+      port: 389
+      base_dn: 'ou=Users,dc=example,dc=org'
+      search_attribute: 'uid'
+    register: directory_again_result
+
+  - assert:
+      that: directory_again_result.changed is sameas False
+
+  - name: test - delete LDAP user directory
+    zabbix_user_directory:
+      state: absent
+    register: directory_delete_result
+
+  - assert:
+      that: directory_delete_result.changed is sameas True
+
+  - name: test - create new LDAP user directory with bind_password
+    zabbix_user_directory:
+      idp_type: ldap
+      host: 'test.com'
+      port: 389
+      base_dn: 'ou=Users,dc=example,dc=org'
+      search_attribute: 'uid'
+      bind_password: 'password'
+    register: directory_result
+
+  - assert:
+      that: directory_result.changed is sameas True
+
+  - name: test - create new LDAP user directory with bind_password again
+    zabbix_user_directory:
+      idp_type: ldap
+      host: 'test.com'
+      port: 389
+      base_dn: 'ou=Users,dc=example,dc=org'
+      search_attribute: 'uid'
+      bind_password: 'password'
+    register: directory_again_result
+
+  - assert:
+      that: directory_again_result.changed is sameas True
+
+  - name: test - update host parameter in LDAP user directory
+    zabbix_user_directory:
+      idp_type: ldap
+      host: 'test.ca'
+      port: 389
+      base_dn: 'ou=Users,dc=example,dc=org'
+      search_attribute: 'uid'
+    register: directory_update_result
+
+  - assert:
+      that: directory_update_result.changed is sameas True
+
+  - name: test - update host parameter in LDAP user directory again
+    zabbix_user_directory:
+      idp_type: ldap
+      host: 'test.ca'
+      port: 389
+      base_dn: 'ou=Users,dc=example,dc=org'
+      search_attribute: 'uid'
+    register: directory_update_again_result
+
+  - assert:
+      that: directory_update_again_result.changed is sameas False
+
+  - name: test - add media type mapping with non-existing media type
+    zabbix_user_directory:
+      idp_type: ldap
+      host: 'test.ca'
+      port: 389
+      base_dn: 'ou=Users,dc=example,dc=org'
+      search_attribute: 'uid'
+      provision_status: True
+      provision_media:
+        - name: Media1
+          mediatype: EmailX
+          attribute: email
+      provision_groups:
+        - name: idpname1
+          role: Guest role
+          user_groups:
+            - Guests
+    ignore_errors: True
+    register: directory_update_media_fail_result
+
+  - assert:
+      that: directory_update_media_fail_result.failed is sameas True
+
+  - name: test - add mappings
+    zabbix_user_directory:
+      idp_type: ldap
+      host: 'test.ca'
+      port: 389
+      base_dn: 'ou=Users,dc=example,dc=org'
+      search_attribute: 'uid'
+      provision_status: True
+      group_name: cn
+      group_basedn: ou=Group,dc=example,dc=org
+      group_member: member
+      user_ref_attr: uid
+      group_filter: '(member=uid=%{ref},ou=Users,dc=example,dc=com)'
+      user_username: first_name
+      user_lastname: last_name
+      provision_media:
+        - name: Media1
+          mediatype: Email
+          attribute: email1
+      provision_groups:
+        - name: idpname1
+          role: Guest role
+          user_groups:
+            - Guests
+    register: directory_update_media_result
+
+  - assert:
+      that: directory_update_media_result.changed is sameas True
+
+  - name: test - add mappings again
+    zabbix_user_directory:
+      idp_type: ldap
+      host: 'test.ca'
+      port: 389
+      base_dn: 'ou=Users,dc=example,dc=org'
+      search_attribute: 'uid'
+      provision_status: True
+      group_name: cn
+      group_basedn: ou=Group,dc=example,dc=org
+      group_member: member
+      user_ref_attr: uid
+      group_filter: '(member=uid=%{ref},ou=Users,dc=example,dc=com)'
+      user_username: first_name
+      user_lastname: last_name
+      provision_media:
+        - name: Media1
+          mediatype: Email
+          attribute: email1
+      provision_groups:
+        - name: idpname1
+          role: Guest role
+          user_groups:
+            - Guests
+    register: directory_update_media_again_result
+
+  - assert:
+      that: directory_update_media_again_result.changed is sameas False
+
+  - name: test - delete LDAP user directory
+    zabbix_user_directory:
+      state: absent
+
+  - name: test - create new SAML user directory in check mode
+    zabbix_user_directory:
+      idp_type: saml
+      idp_entityid: http://okta.com/xxxxx
+      sp_entityid: zabbix
+      sso_url: http://xxxx.okta.com/app/xxxxxx_123dhu8o3
+      username_attribute: usrEmail
+    check_mode: true
+    register: directory_check_result
+
+  - assert:
+      that: directory_check_result.changed is sameas True
+
+  - name: test - attempt to create new SAML user directory with not all mandatory parameters
+    zabbix_user_directory:
+      idp_type: saml
+    ignore_errors: true
+    register: directory_expect_fail_result
+
+  - assert:
+      that: directory_expect_fail_result.failed is sameas True
+
+  - name: test - create new SAML user directory
+    zabbix_user_directory:
+      idp_type: saml
+      idp_entityid: http://okta.com/xxxxx
+      sp_entityid: zabbix
+      sso_url: http://xxxx.okta.com/app/xxxxxx_123dhu8o3
+      username_attribute: usrEmail
+    register: directory_create_result
+
+  - assert:
+      that: directory_create_result.changed is sameas True
+
+  - name: test - update SAML user directory with all optional parameters
+    zabbix_user_directory:
+      idp_type: saml
+      idp_entityid: http://okta.com/xxxxx
+      sp_entityid: zabbix
+      sso_url: http://xxxx.okta.com/app/xxxxxx_123dhu8o3
+      username_attribute: usrEmail
+      slo_url: http://yyyy.okta.com
+      nameid_format: 'urn:oasis'
+      scim_status: true
+      encrypt_nameid: true
+      encrypt_assertions: true
+      sign_messages: true
+      sign_assertions: true
+      sign_authn_requests: true
+      sign_logout_requests: true
+      sign_logout_responses: true
+    register: directory_create_all_result
+
+  - assert:
+      that: directory_create_all_result.changed is sameas True
+
+  - name: test - update SAML user directory with all optional parameters again
+    zabbix_user_directory:
+      idp_type: saml
+      idp_entityid: http://okta.com/xxxxx
+      sp_entityid: zabbix
+      sso_url: http://xxxx.okta.com/app/xxxxxx_123dhu8o3
+      username_attribute: usrEmail
+      slo_url: http://yyyy.okta.com
+      nameid_format: 'urn:oasis'
+      scim_status: true
+      encrypt_nameid: true
+      encrypt_assertions: true
+      sign_messages: true
+      sign_assertions: true
+      sign_authn_requests: true
+      sign_logout_requests: true
+      sign_logout_responses: true
+    register: directory_create_all_again_result
+
+  - assert:
+      that: directory_create_all_again_result.changed is sameas False
+
+  - name: test - delete SAML user directory
+    zabbix_user_directory:
+      state: absent
+
+  - name: test - create new SAML user directory with mappings
+    zabbix_user_directory:
+      idp_type: saml
+      idp_entityid: http://okta.com/xxxxx
+      sp_entityid: zabbix
+      sso_url: http://xxxx.okta.com/app/xxxxxx_123dhu8o3
+      username_attribute: usrEmail
+      provision_status: True
+      group_name: cn
+      user_username: first_name
+      user_lastname: last_name
+      provision_media:
+        - name: Media1
+          mediatype: Email
+          attribute: email1
+      provision_groups:
+        - name: idpname1
+          role: Guest role
+          user_groups:
+            - Guests
+    register: directory_create_mappings_result
+
+  - assert:
+      that: directory_create_mappings_result.changed is sameas True
+
+  - name: test - create new SAML user directory with mappings again
+    zabbix_user_directory:
+      idp_type: saml
+      idp_entityid: http://okta.com/xxxxx
+      sp_entityid: zabbix
+      sso_url: http://xxxx.okta.com/app/xxxxxx_123dhu8o3
+      username_attribute: usrEmail
+      provision_status: True
+      group_name: cn
+      user_username: first_name
+      user_lastname: last_name
+      provision_media:
+        - name: Media1
+          mediatype: Email
+          attribute: email1
+      provision_groups:
+        - name: idpname1
+          role: Guest role
+          user_groups:
+            - Guests
+    register: directory_create_mappings_again_result
+
+  - assert:
+      that: directory_create_mappings_again_result.changed is sameas False
+
+  when: zabbix_version is version('6.4', '>=')
