@@ -509,14 +509,24 @@ class MediaTypeModule(ZabbixBase):
             return parameters
 
         elif self._module.params['type'] == 'script':
-            if self._module.params['script_params'] is None:
-                _script_params = ''  # ZBX-15706
+            if LooseVersion(self._zbx_api_version) < LooseVersion('6.4'):
+                if self._module.params['script_params'] is None:
+                    _script_params = ''  # ZBX-15706
+                else:
+                    _script_params = '\n'.join(str(i) for i in self._module.params['script_params']) + '\n'
+                parameters.update(dict(
+                    exec_path=self._module.params['script_name'],
+                    exec_params=_script_params
+                ))
             else:
-                _script_params = '\n'.join(str(i) for i in self._module.params['script_params']) + '\n'
-            parameters.update(dict(
-                exec_path=self._module.params['script_name'],
-                exec_params=_script_params
-            ))
+                _script_params = []
+                if self._module.params['script_params']:
+                    for i, val in enumerate(self._module.params['script_params']):
+                        _script_params.append({'sortorder': str(i), 'value': val})
+                parameters.update(dict(
+                    exec_path=self._module.params['script_name'],
+                    parameters=_script_params
+                ))
             return parameters
 
         elif self._module.params['type'] == 'sms':
@@ -605,8 +615,16 @@ class MediaTypeModule(ZabbixBase):
             for key in kwargs:
                 # sort list of parameters to prevent mismatch due to reordering
                 if key == 'parameters' and (kwargs[key] != [] or existing_mediatype[key] != []):
-                    kwargs[key] = sorted(kwargs[key], key=lambda x: x['name'])
-                    existing_mediatype[key] = sorted(existing_mediatype[key], key=lambda x: x['name'])
+                    if LooseVersion(self._zbx_api_version) < LooseVersion('6.4'):
+                        kwargs[key] = sorted(kwargs[key], key=lambda x: x['name'])
+                        existing_mediatype[key] = sorted(existing_mediatype[key], key=lambda x: x['name'])
+                    else:
+                        if kwargs['type'] == '1':  # script
+                            kwargs[key] = sorted(kwargs[key], key=lambda x: x['sortorder'])
+                            existing_mediatype[key] = sorted(existing_mediatype[key], key=lambda x: x['sortorder'])
+                        elif kwargs['type'] == '4':  # webhook
+                            kwargs[key] = sorted(kwargs[key], key=lambda x: x['name'])
+                            existing_mediatype[key] = sorted(existing_mediatype[key], key=lambda x: x['name'])
 
                 if key == 'message_templates' and (kwargs[key] != [] or existing_mediatype[key] != []):
                     kwargs[key] = sorted(kwargs[key], key=lambda x: x['subject'])

@@ -492,10 +492,16 @@ class UserGroup(ZabbixBase):
 
             if kwargs['userdirectory']:
                 try:
-                    _userdir = self._zapi.userdirectory.get({
-                        'output': 'extend',
-                        'filter': {'name': [kwargs['userdirectory']]}
-                    })
+                    if LooseVersion(self._zbx_api_version) <= LooseVersion('6.2'):
+                        _userdir = self._zapi.userdirectory.get({
+                            'output': 'extend',
+                            'filter': {'name': [kwargs['userdirectory']]}
+                        })
+                    else:
+                        _userdir = self._zapi.userdirectory.get({
+                            'output': 'extend',
+                            'search': {'name': [kwargs['userdirectory']]}
+                        })
                 except Exception as e:
                     self._module.fail_json(msg='Failed to get user directory "%s": %s' % (kwargs['userdirectory'], e))
                 if len(_userdir) == 0:
