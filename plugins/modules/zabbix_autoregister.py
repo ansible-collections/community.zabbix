@@ -81,7 +81,7 @@ EXAMPLES = '''
     ansible_httpapi_use_ssl: true
     ansible_httpapi_validate_certs: false
     ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
-    ansible_host: zabbix-example-fqdn.org 
+    ansible_host: zabbix-example-fqdn.org
   community.zabbix.zabbix_autoregister:
     server_url: "http://zabbix.example.com/zabbix/"
     login_user: Admin
@@ -101,7 +101,7 @@ EXAMPLES = '''
     ansible_httpapi_use_ssl: true
     ansible_httpapi_validate_certs: false
     ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
-    ansible_host: zabbix-example-fqdn.org 
+    ansible_host: zabbix-example-fqdn.org
   community.zabbix.zabbix_autoregister:
     server_url: "http://zabbix.example.com/zabbix/"
     login_user: Admin

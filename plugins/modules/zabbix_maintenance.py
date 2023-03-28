@@ -125,7 +125,7 @@ EXAMPLES = r'''
     ansible_httpapi_use_ssl: true
     ansible_httpapi_validate_certs: false
     ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
-    ansible_host: zabbix-example-fqdn.org 
+    ansible_host: zabbix-example-fqdn.org
   community.zabbix.zabbix_maintenance:
     name: Update of www1
     host_name: www1.example.com
@@ -141,7 +141,7 @@ EXAMPLES = r'''
     ansible_httpapi_use_ssl: true
     ansible_httpapi_validate_certs: false
     ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
-    ansible_host: zabbix-example-fqdn.org 
+    ansible_host: zabbix-example-fqdn.org
   community.zabbix.zabbix_maintenance:
     name: Update of www1
     host_name: www1.example.com
@@ -166,7 +166,7 @@ EXAMPLES = r'''
     ansible_httpapi_use_ssl: true
     ansible_httpapi_validate_certs: false
     ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
-    ansible_host: zabbix-example-fqdn.org 
+    ansible_host: zabbix-example-fqdn.org
   community.zabbix.zabbix_maintenance:
     name: update
     host_names:
@@ -184,7 +184,7 @@ EXAMPLES = r'''
     ansible_httpapi_use_ssl: true
     ansible_httpapi_validate_certs: false
     ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
-    ansible_host: zabbix-example-fqdn.org 
+    ansible_host: zabbix-example-fqdn.org
   community.zabbix.zabbix_maintenance:
     name: Test1
     state: absent

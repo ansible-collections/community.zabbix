@@ -167,7 +167,7 @@ EXAMPLES = r'''
     ansible_httpapi_use_ssl: true
     ansible_httpapi_validate_certs: false
     ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
-    ansible_host: zabbix-example-fqdn.org 
+    ansible_host: zabbix-example-fqdn.org
   community.zabbix.zabbix_template:
     template_name: ExampleHost
     template_groups:
@@ -194,7 +194,7 @@ EXAMPLES = r'''
     ansible_httpapi_use_ssl: true
     ansible_httpapi_validate_certs: false
     ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
-    ansible_host: zabbix-example-fqdn.org 
+    ansible_host: zabbix-example-fqdn.org
   community.zabbix.zabbix_template:
     template_name: ExampleHost
     clear_templates:
@@ -211,7 +211,7 @@ EXAMPLES = r'''
     ansible_httpapi_use_ssl: true
     ansible_httpapi_validate_certs: false
     ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
-    ansible_host: zabbix-example-fqdn.org 
+    ansible_host: zabbix-example-fqdn.org
   community.zabbix.zabbix_template:
     template_json: "{{ lookup('file', 'zabbix_apache2.json') }}"
     state: present
@@ -225,7 +225,7 @@ EXAMPLES = r'''
     ansible_httpapi_use_ssl: true
     ansible_httpapi_validate_certs: false
     ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
-    ansible_host: zabbix-example-fqdn.org 
+    ansible_host: zabbix-example-fqdn.org
   community.zabbix.zabbix_template:
     template_xml: "{{ lookup('file', 'zabbix_apache2.xml') }}"
     state: present
@@ -239,7 +239,7 @@ EXAMPLES = r'''
     ansible_httpapi_use_ssl: true
     ansible_httpapi_validate_certs: false
     ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
-    ansible_host: zabbix-example-fqdn.org 
+    ansible_host: zabbix-example-fqdn.org
   community.zabbix.zabbix_template:
     template_json:
       zabbix_export:
@@ -263,7 +263,7 @@ EXAMPLES = r'''
     ansible_httpapi_use_ssl: true
     ansible_httpapi_validate_certs: false
     ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
-    ansible_host: zabbix-example-fqdn.org 
+    ansible_host: zabbix-example-fqdn.org
   community.zabbix.zabbix_template:
     template_name: Template
     macros:
@@ -280,7 +280,7 @@ EXAMPLES = r'''
     ansible_httpapi_use_ssl: true
     ansible_httpapi_validate_certs: false
     ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
-    ansible_host: zabbix-example-fqdn.org 
+    ansible_host: zabbix-example-fqdn.org
   community.zabbix.zabbix_template:
     template_name: Template
     tags:
@@ -297,7 +297,7 @@ EXAMPLES = r'''
     ansible_httpapi_use_ssl: true
     ansible_httpapi_validate_certs: false
     ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
-    ansible_host: zabbix-example-fqdn.org 
+    ansible_host: zabbix-example-fqdn.org
   community.zabbix.zabbix_template:
     template_name: Template
     state: absent
@@ -311,7 +311,7 @@ EXAMPLES = r'''
     ansible_httpapi_use_ssl: true
     ansible_httpapi_validate_certs: false
     ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
-    ansible_host: zabbix-example-fqdn.org 
+    ansible_host: zabbix-example-fqdn.org
   community.zabbix.zabbix_template:
     template_name: Template
     omit_date: yes
@@ -327,7 +327,7 @@ EXAMPLES = r'''
     ansible_httpapi_use_ssl: true
     ansible_httpapi_validate_certs: false
     ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
-    ansible_host: zabbix-example-fqdn.org 
+    ansible_host: zabbix-example-fqdn.org
   community.zabbix.zabbix_template:
     template_name: Template
     dump_format: xml

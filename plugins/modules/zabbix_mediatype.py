@@ -298,7 +298,7 @@ EXAMPLES = r'''
     ansible_httpapi_use_ssl: true
     ansible_httpapi_validate_certs: false
     ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
-    ansible_host: zabbix-example-fqdn.org 
+    ansible_host: zabbix-example-fqdn.org
   community.zabbix.zabbix_mediatype:
     name: "Ops email"
     type: 'email'
@@ -318,7 +318,7 @@ EXAMPLES = r'''
     ansible_httpapi_use_ssl: true
     ansible_httpapi_validate_certs: false
     ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
-    ansible_host: zabbix-example-fqdn.org 
+    ansible_host: zabbix-example-fqdn.org
   community.zabbix.zabbix_mediatype:
     name: "my script"
     type: 'script'
@@ -336,7 +336,7 @@ EXAMPLES = r'''
     ansible_httpapi_use_ssl: true
     ansible_httpapi_validate_certs: false
     ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
-    ansible_host: zabbix-example-fqdn.org 
+    ansible_host: zabbix-example-fqdn.org
   community.zabbix.zabbix_mediatype:
     name: "My jabber"
     type: 'jabber'
@@ -352,7 +352,7 @@ EXAMPLES = r'''
     ansible_httpapi_use_ssl: true
     ansible_httpapi_validate_certs: false
     ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
-    ansible_host: zabbix-example-fqdn.org 
+    ansible_host: zabbix-example-fqdn.org
   community.zabbix.zabbix_mediatype:
     name: "My SMS Mediatype"
     type: 'sms'
@@ -368,7 +368,7 @@ EXAMPLES = r'''
     ansible_httpapi_use_ssl: true
     ansible_httpapi_validate_certs: false
     ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
-    ansible_host: zabbix-example-fqdn.org 
+    ansible_host: zabbix-example-fqdn.org
   community.zabbix.zabbix_mediatype:
     name: "My webhook Mediatype"
     type: 'webhook'
@@ -393,7 +393,7 @@ EXAMPLES = r'''
     ansible_httpapi_use_ssl: true
     ansible_httpapi_validate_certs: false
     ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
-    ansible_host: zabbix-example-fqdn.org 
+    ansible_host: zabbix-example-fqdn.org
   community.zabbix.zabbix_mediatype:
     name: "Ops email"
     type: 'email'

@@ -188,7 +188,7 @@ EXAMPLES = '''
     ansible_httpapi_use_ssl: true
     ansible_httpapi_validate_certs: false
     ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
-    ansible_host: zabbix-example-fqdn.org 
+    ansible_host: zabbix-example-fqdn.org
   zabbix_script:
     name: Test action operation script
     scope: action_operation
