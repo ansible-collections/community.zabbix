@@ -406,11 +406,6 @@ class User(ZabbixBase):
                         user_media["mediatypeid"] = media_type["mediatypeid"]
                         user_media["mediatype"] = media_type["type"]
                         break
-            if user_media["mediatype"] == "Email":
-                if not isinstance(user_media["sendto"], list):
-                    # sendto should be a list for Email media type
-                    user_media["sendto"] = [user_media["sendto"]]
-
             if "mediatypeid" not in user_media:
                 self._module.fail_json(
                     msg="Media type not found: %s" % user_media["mediatype"]
@@ -428,6 +423,25 @@ class User(ZabbixBase):
                     if isinstance(user_media["sendto"], str):
                         # sendto should be a list for Email media type
                         user_media["sendto"] = [user_media["sendto"]]
+                else:
+                    if not isinstance(user_media["sendto"], str):
+                        self._module.fail_json(user_media)
+                        self._module.fail_json(
+                            "For any other than Email media type sendto parameter must be of type str."
+                        )
+                del user_media["mediatype"]
+
+            severity_binary_number = ""
+            for severity_key in (
+                "disaster",
+                "high",
+                "average",
+                "warning",
+                "information",
+                "not_classified",
+            ):
+                if user_media["severity"][severity_key]:
+                    severity_binary_number = severity_binary_number + "1"
                 else:
                     if not isinstance(user_media["sendto"], str):
                         self._module.fail_json(user_media)
@@ -872,22 +886,6 @@ def main():
     rows_per_page = module.params["rows_per_page"]
     after_login_url = module.params["after_login_url"]
     user_medias = module.params["user_medias"]
-    if user_medias:
-        # Because user media sendto parameter is raw in parameters specs perform explicit check on type
-        for user_media in user_medias:
-            if user_media["mediatype"] == "Email":
-                if not (
-                    isinstance(user_media["sendto"], list)
-                    or isinstance(user_media["sendto"], str)
-                ):
-                    module.fail_json(
-                        "For Email media type sendto parameter must be of type list or str."
-                    )
-            else:
-                if not isinstance(user_media["sendto"], str):
-                    module.fail_json(
-                        "For any other than Email media type sendto parameter must be of type str."
-                    )
     user_type = module.params["type"]
     timezone = module.params["timezone"]
     role_name = module.params["role_name"]
