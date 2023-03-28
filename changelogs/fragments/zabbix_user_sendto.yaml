@@ -1,0 +1,2 @@
+bugfixes:
+- treat sendto parameter in module zabbix_user according to real media type, do not rely on media name
