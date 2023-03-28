@@ -87,16 +87,6 @@ notes:
 '''
 
 EXAMPLES = r'''
-# Set following variables for Zabbix Server host in play or inventory
-- name: Set connection specific variables
-  set_fact:
-    ansible_network_os: community.zabbix.zabbix
-    ansible_connection: httpapi
-    ansible_httpapi_port: 80
-    ansible_httpapi_use_ssl: false
-    ansible_httpapi_validate_certs: false
-    ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
-
 # If you want to use Username and Password to be authenticated by Zabbix Server
 - name: Set credentials to access Zabbix Server API
   set_fact:
@@ -113,6 +103,15 @@ EXAMPLES = r'''
 
 # Create/update a screen.
 - name: Create a new screen or update an existing screen's items 5 in a row
+  # set task level variables as we change ansible_connection plugin here
+  vars:
+    ansible_network_os: community.zabbix.zabbix
+    ansible_connection: httpapi
+    ansible_httpapi_port: 443
+    ansible_httpapi_use_ssl: true
+    ansible_httpapi_validate_certs: false
+    ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
+    ansible_host: zabbix-example-fqdn.org 
   community.zabbix.zabbix_screen:
     screens:
       - screen_name: ExampleScreen1
@@ -127,6 +126,15 @@ EXAMPLES = r'''
 
 # Create/update multi-screen
 - name: Create two of new screens or update the existing screens' items
+  # set task level variables as we change ansible_connection plugin here
+  vars:
+    ansible_network_os: community.zabbix.zabbix
+    ansible_connection: httpapi
+    ansible_httpapi_port: 443
+    ansible_httpapi_use_ssl: true
+    ansible_httpapi_validate_certs: false
+    ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
+    ansible_host: zabbix-example-fqdn.org 
   community.zabbix.zabbix_screen:
     screens:
       - screen_name: ExampleScreen1
@@ -148,6 +156,15 @@ EXAMPLES = r'''
 
 # Limit the Zabbix screen creations to one host since Zabbix can return an error when doing concurrent updates
 - name: Create a new screen or update an existing screen's items
+  # set task level variables as we change ansible_connection plugin here
+  vars:
+    ansible_network_os: community.zabbix.zabbix
+    ansible_connection: httpapi
+    ansible_httpapi_port: 443
+    ansible_httpapi_use_ssl: true
+    ansible_httpapi_validate_certs: false
+    ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
+    ansible_host: zabbix-example-fqdn.org 
   community.zabbix.zabbix_screen:
     state: present
     screens:
@@ -163,6 +180,15 @@ EXAMPLES = r'''
 
 # Create/update using multiple hosts_groups. Hosts NOT present in all listed host_groups will be skipped.
 - name: Create new screen or update the existing screen's items for hosts in both given groups
+  # set task level variables as we change ansible_connection plugin here
+  vars:
+    ansible_network_os: community.zabbix.zabbix
+    ansible_connection: httpapi
+    ansible_httpapi_port: 443
+    ansible_httpapi_use_ssl: true
+    ansible_httpapi_validate_certs: false
+    ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
+    ansible_host: zabbix-example-fqdn.org 
   community.zabbix.zabbix_screen:
     screens:
       - screen_name: ExampleScreen1

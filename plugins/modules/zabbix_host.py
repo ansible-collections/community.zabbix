@@ -354,16 +354,6 @@ extends_documentation_fragment:
 '''
 
 EXAMPLES = r'''
-# Set following variables for Zabbix Server host in play or inventory
-- name: Set connection specific variables
-  set_fact:
-    ansible_network_os: community.zabbix.zabbix
-    ansible_connection: httpapi
-    ansible_httpapi_port: 80
-    ansible_httpapi_use_ssl: false
-    ansible_httpapi_validate_certs: false
-    ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
-
 # If you want to use Username and Password to be authenticated by Zabbix Server
 - name: Set credentials to access Zabbix Server API
   set_fact:
@@ -376,7 +366,17 @@ EXAMPLES = r'''
   set_fact:
     ansible_zabbix_auth_key: 8ec0d52432c15c91fcafe9888500cf9a607f44091ab554dbee860f6b44fac895
 
-- name: Create a new host or update an existing host's info
+- name: Create a new host or rewrite an existing host's info
+# Set task level following variables for Zabbix Server host in task
+  vars:
+    ansible_network_os: community.zabbix.zabbix
+    ansible_connection: httpapi
+    ansible_httpapi_port: 443
+    ansible_httpapi_use_ssl: true
+    ansible_httpapi_validate_certs: false
+    ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
+  become: false
+  delegate_to: zabbix-example-fqdn.org # you can use delegate_to or task level ansible_host like next example
   community.zabbix.zabbix_host:
     host_name: ExampleHost
     visible_name: ExampleName
@@ -428,6 +428,16 @@ EXAMPLES = r'''
         value: ExampleTagValue
 
 - name: Update an existing host's TLS settings
+# Set current task level variables for Zabbix Server host in task
+  vars:
+    ansible_network_os: community.zabbix.zabbix
+    ansible_connection: httpapi
+    ansible_httpapi_port: 443
+    ansible_httpapi_use_ssl: true
+    ansible_httpapi_validate_certs: false
+    ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
+    ansible_host: zabbix-example-fqdn.org # you can use task level ansible_host or delegate_to like in previous example 
+  become: false
   community.zabbix.zabbix_host:
     host_name: ExampleHost
     visible_name: ExampleName
@@ -436,6 +446,7 @@ EXAMPLES = r'''
     tls_psk_identity: test
     tls_connect: 2
     tls_psk: 123456789abcdef123456789abcdef12
+    force: false
 '''
 
 
