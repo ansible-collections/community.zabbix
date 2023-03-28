@@ -753,6 +753,16 @@ class User(ZabbixBase):
                     msg="Failed to update user %s: %s" % (username, e)
                 )
 
+        if LooseVersion(self._zbx_api_version) >= LooseVersion("6.4"):
+            try:
+                if user_medias:
+                    request_data["medias"] = user_medias
+                user_ids = self._zapi.user.update(request_data)
+            except Exception as e:
+                self._module.fail_json(
+                    msg="Failed to update user %s: %s" % (username, e)
+                )
+
         return user_ids
 
     def delete_user(self, zbx_user, username):
