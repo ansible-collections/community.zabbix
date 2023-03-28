@@ -379,19 +379,27 @@ class User(ZabbixBase):
                 if LooseVersion(self._zbx_api_version) < LooseVersion('4.4'):
                     if media_type['description'] == user_media['mediatype']:
                         user_media['mediatypeid'] = media_type['mediatypeid']
+                        user_media['mediatype'] = media_type['type']
                         break
                 else:
                     if media_type['name'] == user_media['mediatype']:
                         user_media['mediatypeid'] = media_type['mediatypeid']
+                        user_media['mediatype'] = media_type['type']
                         break
-            if user_media['mediatype'] == 'Email':
-                if not isinstance(user_media['sendto'], list):
-                    # sendto should be a list for Email media type
-                    user_media['sendto'] = [user_media['sendto']]
-
             if 'mediatypeid' not in user_media:
                 self._module.fail_json(msg="Media type not found: %s" % user_media['mediatype'])
             else:
+                if user_media['mediatype'] == '0':  # E-Mail
+                    # Because user media sendto parameter is raw in parameters specs perform explicit check on type
+                    if not (isinstance(user_media['sendto'], list) or isinstance(user_media['sendto'], str)):
+                        self._module.fail_json('For Email media type sendto parameter must be of type list or str.')
+                    if isinstance(user_media['sendto'], str):
+                        # sendto should be a list for Email media type
+                        user_media['sendto'] = [user_media['sendto']]
+                else:
+                    if not isinstance(user_media['sendto'], str):
+                        self._module.fail_json(user_media)
+                        self._module.fail_json('For any other than Email media type sendto parameter must be of type str.')
                 del user_media['mediatype']
 
             severity_binary_number = ''
@@ -420,9 +428,6 @@ class User(ZabbixBase):
     def user_parameter_difference_check(self, zbx_user, username, name, surname, user_group_ids, passwd, lang, theme,
                                         autologin, autologout, refresh, rows_per_page, url, user_medias, user_type,
                                         timezone, role_name, override_passwd):
-
-        if user_medias:
-            user_medias = self.convert_user_medias_parameter_types(user_medias)
 
         # existing data
         existing_data = copy.deepcopy(zbx_user[0])
@@ -496,9 +501,6 @@ class User(ZabbixBase):
             # https://github.com/ansible-collections/community.zabbix/pull/382
             role_name = "User role"
 
-        if user_medias:
-            user_medias = self.convert_user_medias_parameter_types(user_medias)
-
         user_ids = {}
 
         request_data = {
@@ -545,9 +547,6 @@ class User(ZabbixBase):
 
     def update_user(self, zbx_user, username, name, surname, user_group_ids, passwd, lang, theme, autologin, autologout,
                     refresh, rows_per_page, url, user_medias, user_type, timezone, role_name, override_passwd):
-
-        if user_medias:
-            user_medias = self.convert_user_medias_parameter_types(user_medias)
 
         user_ids = {}
 
@@ -694,15 +693,6 @@ def main():
     rows_per_page = module.params['rows_per_page']
     after_login_url = module.params['after_login_url']
     user_medias = module.params['user_medias']
-    if user_medias:
-        # Because user media sendto parameter is raw in parameters specs perform explicit check on type
-        for user_media in user_medias:
-            if user_media['mediatype'] == 'Email':
-                if not (isinstance(user_media['sendto'], list) or isinstance(user_media['sendto'], str)):
-                    module.fail_json('For Email media type sendto parameter must be of type list or str.')
-            else:
-                if not isinstance(user_media['sendto'], str):
-                    module.fail_json('For any other than Email media type sendto parameter must be of type str.')
     user_type = module.params['type']
     timezone = module.params['timezone']
     role_name = module.params['role_name']
@@ -722,6 +712,9 @@ def main():
     user_type = user_type_dict[user_type] if user_type else None
 
     user = User(module)
+
+    if user_medias:
+        user_medias = user.convert_user_medias_parameter_types(user_medias)
 
     user_ids = {}
     zbx_user = user.check_user_exist(username)
