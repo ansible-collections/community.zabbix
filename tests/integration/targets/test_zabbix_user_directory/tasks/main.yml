@@ -1,10 +1,9 @@
 ---
 - block:
-    # zabbix_host module tests
     - include_tasks: zabbix_user_directory_tests.yml
 
   always:
-  - name: "cleanup if tests failed"
+  - name: Cleanup
     zabbix_user_directory:
       name: TestUserDirectory
       state: absent

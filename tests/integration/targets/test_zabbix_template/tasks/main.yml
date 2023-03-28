@@ -1,4 +1,10 @@
 ---
+- name: Create FTP Service Template
+  zabbix_template:
+    template_name: FTP Service
+    template_groups:
+      - 'Templates'
+    state: present
 
 - name: Create a new Zabbix template (check mode).
   zabbix_template:

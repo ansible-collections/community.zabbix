@@ -382,6 +382,13 @@ options:
             - C(Suboptions) are the same as for I(operations).
             - Works only with >= Zabbix 3.4
         aliases: [ update_operations ]
+    pause_symptoms:
+        type: bool
+        description:
+            - Whether to pause escalation if event is a symptom event.
+            - I(supported) if C(event_source) is set to C(trigger)
+            - Works only with >= Zabbix 6.4
+        default: true
 
 notes:
     - Only Zabbix >= 3.0 is supported.
@@ -897,6 +904,8 @@ class Action(Zapi):
                 _params['pause_suppressed'] = '1' if kwargs['pause_in_maintenance'] else '0'
             else:
                 _params['maintenance_mode'] = '1' if kwargs['pause_in_maintenance'] else '0'
+            if LooseVersion(self._zbx_api_version) >= LooseVersion('6.4'):
+                _params['pause_symptoms'] = '1' if kwargs['pause_symptoms'] else '0'
 
         if LooseVersion(self._zbx_api_version) >= LooseVersion('5.0'):
             # remove some fields regarding
@@ -1953,7 +1962,8 @@ def main():
                 ['command_type', 'global_script', ['script_name']],
                 ['type', 'send_message', ['send_to_users', 'send_to_groups'], True]
             ]
-        )
+        ),
+        pause_symptoms=dict(type='bool', required=False, default=True)
     ))
     module = AnsibleModule(
         argument_spec=argument_spec,
@@ -1989,6 +1999,7 @@ def main():
     operations = module.params['operations']
     recovery_operations = module.params['recovery_operations']
     acknowledge_operations = module.params['acknowledge_operations']
+    pause_symptoms = module.params['pause_symptoms']
 
     zapi_wrapper = Zapi(module)
     action = Action(module)
@@ -2022,6 +2033,9 @@ def main():
                 recovery_operations=recovery_ops.construct_the_data(recovery_operations),
                 conditions=fltr.construct_the_data(eval_type, formula, conditions)
             )
+
+            if LooseVersion(zapi_wrapper._zbx_api_version) >= LooseVersion('6.4'):
+                kwargs['pause_symptoms'] = pause_symptoms
 
             if LooseVersion(zapi_wrapper._zbx_api_version) >= LooseVersion('6.0'):
                 kwargs[argument_spec['acknowledge_operations']['aliases'][0]] = acknowledge_ops.construct_the_data(acknowledge_operations)
@@ -2063,6 +2077,9 @@ def main():
                 kwargs[argument_spec['acknowledge_operations']['aliases'][0]] = acknowledge_ops.construct_the_data(acknowledge_operations)
             else:
                 kwargs['acknowledge_operations'] = acknowledge_ops.construct_the_data(acknowledge_operations)
+
+            if LooseVersion(zapi_wrapper._zbx_api_version) >= LooseVersion('6.4'):
+                kwargs['pause_symptoms'] = pause_symptoms
 
             action_id = action.add_action(**kwargs)
             module.exit_json(changed=True, msg="Action created: %s, ID: %s" % (name, action_id))

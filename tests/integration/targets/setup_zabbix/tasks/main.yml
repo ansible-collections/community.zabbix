@@ -1,22 +1,4 @@
 ---
-- name: check login to zabbix
-  uri:
-    url: "{{ zabbix_api_server_url }}/api_jsonrpc.php"
-    method: POST
-    body:
-      jsonrpc: "2.0"
-      method: "user.login"
-      params:
-        user: "{{ zabbix_api_login_user }}"
-        password: "{{ zabbix_api_login_pass }}"
-      id: "1"
-    body_format: json
-    status_code: 200
-  retries: 60
-  delay: 5
-  until: check_login_result is defined and 'json' in check_login_result and 'result' in check_login_result.json
-  register: check_login_result
-
 - name: get zabbix version
   uri:
     url: "{{ zabbix_api_server_url }}/api_jsonrpc.php"
@@ -28,6 +10,9 @@
       id: "1"
     body_format: json
     status_code: 200
+  retries: 60
+  delay: 5
+  until: zabbix_version_result is defined and 'json' in zabbix_version_result and 'result' in zabbix_version_result.json
   register: zabbix_version_result
 
 - name: set zabbix_version variable
@@ -48,3 +33,42 @@
     ansible_httpapi_validate_certs: false
     ansible_user: Admin
     ansible_httpapi_pass: zabbix
+
+- debug: var=zabbix_version
+- name: check login to zabbix for Zabbix < 6.4
+  uri:
+    url: "{{ zabbix_api_server_url }}/api_jsonrpc.php"
+    method: POST
+    body:
+      jsonrpc: "2.0"
+      method: "user.login"
+      params:
+        user: "{{ zabbix_api_login_user }}"
+        password: "{{ zabbix_api_login_pass }}"
+      id: "1"
+    body_format: json
+    status_code: 200
+  retries: 60
+  delay: 5
+  until: check_login_result is defined and 'json' in check_login_result and 'result' in check_login_result.json
+  register: check_login_result
+  when: zabbix_version is version('6.4', '<')
+
+- name: check login to zabbix for Zabbix >= 6.4
+  uri:
+    url: "{{ zabbix_api_server_url }}/api_jsonrpc.php"
+    method: POST
+    body:
+      jsonrpc: "2.0"
+      method: "user.login"
+      params:
+        username: "{{ zabbix_api_login_user }}"
+        password: "{{ zabbix_api_login_pass }}"
+      id: "1"
+    body_format: json
+    status_code: 200
+  retries: 60
+  delay: 5
+  until: check_login_result is defined and 'json' in check_login_result and 'result' in check_login_result.json
+  register: check_login_result
+  when: zabbix_version is version('6.4', '>=')

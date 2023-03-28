@@ -5,3 +5,14 @@
   zabbix_proxy:
     proxy_name: ExampleProxy
     state: absent
+
+- name: remove Templates
+  zabbix_template:
+    template_name: "{{ item }}"
+    state: absent
+  with_items:
+    - IMAP Service
+    - NTP Service
+    - HTTP Service
+    - LDAP Service
+  when: zabbix_version | float >= 6.4

@@ -3,10 +3,6 @@
   meta: end_play
   when: zabbix_version is version('3.0', '=')
 
-- name: Temporarily use zabbix-api
-  set_fact:
-    ansible_connection: local
-
 - name: test - prepare example template for zabbix_action module
   zabbix_template:
     server_url: "{{ zabbix_api_server_url }} "
@@ -28,10 +24,6 @@
     type: email
     state: present
   register: zbxaction_prep_mediatype
-
-- name: Restore httpapi connection
-  set_fact:
-    ansible_connection: httpapi
 
 - name: test - simple actions
   module_defaults:
@@ -1287,6 +1279,66 @@
 
   - assert:
       that: zbxaction_recack_new.changed is sameas False
+
+  - when: zabbix_version is version('6.4', '>=')
+    block:
+    - name: test - update action with pause_symptoms off
+      zabbix_action:
+        recovery_operations:
+          - type: send_message
+            subject: ExampleSubject
+            message: ExampleMessage
+            media_type: ExampleMediaTypeForActionModule
+            send_to_users:
+              - Admin
+          - type: notify_all_involved
+            subject: RecoverySubject
+            message: RecoveryMessage
+        acknowledge_operations:
+          - type: send_message
+            subject: ExampleSubject
+            message: ExampleMessage
+            media_type: ExampleMediaTypeForActionModule
+            send_to_users:
+              - Admin
+          - type: notify_all_involved
+            subject: RecoverySubject
+            message: RecoveryMessage
+            media_type: ExampleMediaTypeForActionModule
+        pause_symptoms: False
+      register: zbxaction_pause_symptoms
+
+    - assert:
+        that: zbxaction_pause_symptoms.changed is sameas True
+
+    - name: test - update action with pause_symptoms off (again)
+      zabbix_action:
+        recovery_operations:
+          - type: send_message
+            subject: ExampleSubject
+            message: ExampleMessage
+            media_type: ExampleMediaTypeForActionModule
+            send_to_users:
+              - Admin
+          - type: notify_all_involved
+            subject: RecoverySubject
+            message: RecoveryMessage
+        acknowledge_operations:
+          - type: send_message
+            subject: ExampleSubject
+            message: ExampleMessage
+            media_type: ExampleMediaTypeForActionModule
+            send_to_users:
+              - Admin
+          - type: notify_all_involved
+            subject: RecoverySubject
+            message: RecoveryMessage
+            media_type: ExampleMediaTypeForActionModule
+        pause_symptoms: False
+      register: zbxaction_pause_symptoms
+
+    - assert:
+        that: zbxaction_pause_symptoms.changed is sameas False
 
   - name: test - delete action
     zabbix_action:
