@@ -45,14 +45,22 @@ AllowUnsupportedDBVersions={{ zabbix_proxy_allowunsupporteddbversions }}
 {% endif %}
 ProxyLocalBuffer={{ zabbix_proxy_proxylocalbuffer }}
 ProxyOfflineBuffer={{ zabbix_proxy_proxyofflinebuffer }}
+{% if zabbix_version is version('6.4', '<') %}
 HeartbeatFrequency={{ zabbix_proxy_heartbeatfrequency }}
+{% endif %}
 {% if zabbix_proxy_configfrequency is defined and zabbix_proxy_configfrequency is not none %}
+{% if zabbix_version is version('6.4', '<') %}
 ConfigFrequency={{ zabbix_proxy_configfrequency }}
+{% else %}
+ProxyConfigFrequency={{ zabbix_proxy_configfrequency }}
+{% endif %}
 {% else %}
 {% if zabbix_version is version('6.2', '<') %}
 ConfigFrequency=3600
-{% else %}
+{% elif zabbix_version is version('6.4', '<')  %}
 ConfigFrequency=300
+{% else %}
+ProxyConfigFrequency=10
 {% endif %}
 {% endif %}
 DataSenderFrequency={{ zabbix_proxy_datasenderfrequency }}
