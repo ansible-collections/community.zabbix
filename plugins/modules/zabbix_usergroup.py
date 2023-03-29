@@ -153,9 +153,9 @@ notes:
     - Only Zabbix >= 4.0 is supported.
 extends_documentation_fragment:
 - community.zabbix.zabbix
-"""
+'''
 
-EXAMPLES = r"""
+EXAMPLES = r'''
 # If you want to use Username and Password to be authenticated by Zabbix Server
 - name: Set credentials to access Zabbix Server API
   set_fact:
@@ -185,6 +185,15 @@ EXAMPLES = r"""
 
 # Base create user group with selected user directory for LDAP authentication
 - name: Create user group
+    # set task level variables as we change ansible_connection plugin here
+  vars:
+    ansible_network_os: community.zabbix.zabbix
+    ansible_connection: httpapi
+    ansible_httpapi_port: 443
+    ansible_httpapi_use_ssl: true
+    ansible_httpapi_validate_certs: false
+    ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
+    ansible_host: zabbix-example-fqdn.org
   community.zabbix.zabbix_usergroup:
     name: ACME
     userdirectory: LDAP infra 1
@@ -227,6 +236,15 @@ EXAMPLES = r"""
 
 # Base create user group with permissions for Zabbix => 6.2
 - name: Create user group with permissions
+    # set task level variables as we change ansible_connection plugin here
+  vars:
+    ansible_network_os: community.zabbix.zabbix
+    ansible_connection: httpapi
+    ansible_httpapi_port: 443
+    ansible_httpapi_use_ssl: true
+    ansible_httpapi_validate_certs: false
+    ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
+    ansible_host: zabbix-example-fqdn.org
   community.zabbix.zabbix_usergroup:
     name: ACME
     hostgroup_rights:

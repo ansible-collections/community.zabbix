@@ -216,9 +216,9 @@ options:
 extends_documentation_fragment:
 - community.zabbix.zabbix
 
-"""
+'''
 
-EXAMPLES = r"""
+EXAMPLES = r'''
 # If you want to use Username and Password to be authenticated by Zabbix Server
 - name: Set credentials to access Zabbix Server API
   set_fact:
