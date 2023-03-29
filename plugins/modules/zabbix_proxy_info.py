@@ -36,16 +36,6 @@ extends_documentation_fragment:
 '''
 
 EXAMPLES = '''
-# Set following variables for Zabbix Server host in play or inventory
-- name: Set connection specific variables
-  set_fact:
-    ansible_network_os: community.zabbix.zabbix
-    ansible_connection: httpapi
-    ansible_httpapi_port: 80
-    ansible_httpapi_use_ssl: false
-    ansible_httpapi_validate_certs: false
-    ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
-
 # If you want to use Username and Password to be authenticated by Zabbix Server
 - name: Set credentials to access Zabbix Server API
   set_fact:
@@ -59,6 +49,15 @@ EXAMPLES = '''
     ansible_zabbix_auth_key: 8ec0d52432c15c91fcafe9888500cf9a607f44091ab554dbee860f6b44fac895
 
 - name: Get zabbix proxy info alongside the list of hosts monitored by the proxy
+  # set task level variables as we change ansible_connection plugin here
+  vars:
+    ansible_network_os: community.zabbix.zabbix
+    ansible_connection: httpapi
+    ansible_httpapi_port: 443
+    ansible_httpapi_use_ssl: true
+    ansible_httpapi_validate_certs: false
+    ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
+    ansible_host: zabbix-example-fqdn.org
   community.zabbix.zabbix_proxy_info:
     server_url: "http://zabbix.example.com/zabbix/"
     login_user: admin
