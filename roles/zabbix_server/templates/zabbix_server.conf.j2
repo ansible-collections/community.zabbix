@@ -61,7 +61,9 @@ StartLLDProcessors={{ zabbix_server_startlldprocessors }}
 {% if zabbix_version is version('4.2', '>=') %}
 StartPreprocessors={{ zabbix_server_startpreprocessors }}
 {% endif %}
-StartPollersUnreachable={{ zabbix_server_startpollersunreachable }}
+{% if zabbix_version is version('6.4', '>=') %}
+StartConnectors={{ zabbix_server_connectors }}
+{% endif %}
 {% if zabbix_version is version('6.2', '>=') %}
 StartHistoryPollers={{ zabbix_server_starthistorypollers }}
 {% endif %}
@@ -110,7 +112,15 @@ CacheSize=8M
 CacheSize=32M
 {% endif %}
 {% endif %}
+{% if zabbix_server_cacheupdatefrequency is defined and zabbix_server_cacheupdatefrequency is not none %}
 CacheUpdateFrequency={{ zabbix_server_cacheupdatefrequency }}
+{% else %}
+{% if zabbix_version is version('6.4', '<') %}
+CacheUpdateFrequency=60
+{% else %}
+CacheUpdateFrequency=10
+{%endif %}
+{%endif %}
 StartDBSyncers={{ zabbix_server_startdbsyncers }}
 HistoryCacheSize={{ zabbix_server_historycachesize }}
 {% if zabbix_version is version('3.0', '>=') %}
@@ -151,8 +161,10 @@ ProxyConfigFrequency={{ zabbix_server_proxyconfigfrequency }}
 {% else %}
 {% if zabbix_version is version('6.2', '<') %}
 ProxyConfigFrequency=3600
-{% else %}
+{% elif zabbix_version is version('6.4', '<') %}
 ProxyConfigFrequency=300
+{% else %}
+ProxyConfigFrequency=10
 {% endif %}
 {% endif %}
 ProxyDataFrequency={{ zabbix_server_proxydatafrequency }}
