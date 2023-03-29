@@ -201,12 +201,12 @@ options:
     event_menu_url:
         type: 'str'
         description:
-            - Requred when I(event_menu=True).
+            - Requred when I(event_menu=true).
             - Event menu entry underlying URL.
     event_menu_name:
         type: 'str'
         description:
-            - Requred when I(event_menu=True).
+            - Requred when I(event_menu=true).
             - Event menu entry name.
     webhook_params:
         type: 'list'
@@ -343,7 +343,7 @@ EXAMPLES = r'''
         value: '{ALERT.MESSAGE}'
       - name: zabbix_url
         value: '{$ZABBIX.URL}'
-    process_tags: True
+    process_tags: true
     event_menu: true
     event_menu_name: "Open in Slack: '{EVENT.TAGS.__channel_name}'"
     event_menu_url: '{EVENT.TAGS.__message_link}'

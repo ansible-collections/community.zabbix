@@ -64,7 +64,7 @@ EXAMPLES = '''
     login_user: admin
     login_password: secret
     proxy_name: zbx01.example.com
-    proxy_hosts: True
+    proxy_hosts: true
 '''
 
 RETURN = '''

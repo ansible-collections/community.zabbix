@@ -100,7 +100,7 @@ changed:
     description: The consequence of the action
     type: bool
     returned: always
-    sample: False
+    sample: false
 '''
 
 from ansible.module_utils.basic import AnsibleModule

@@ -156,7 +156,7 @@ EXAMPLES = r'''
       - www1.example.com
       - db1.example.com
     state: present
-    collect_data: False
+    collect_data: false
 
 - name: Remove maintenance window by name
   community.zabbix.zabbix_maintenance:
