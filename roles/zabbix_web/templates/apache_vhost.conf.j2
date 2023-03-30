@@ -7,7 +7,7 @@
   ## Vhost docroot
   DocumentRoot "/usr/share/zabbix"
 
-{% if zabbix_apache_custom_includes | length > 0 %}
+{% if zabbix_apache_custom_includes %}
   {% for include in zabbix_apache_custom_includes %}
   {{ include }}
   {% endfor %}
@@ -108,7 +108,7 @@ SSLCryptoDevice {{ zabbix_apache_SSLCryptoDevice }}
   ## Vhost docroot
   DocumentRoot "/usr/share/zabbix"
 
-{% if zabbix_apache_custom_includes | length > 0 %}
+{% if zabbix_apache_custom_includes %}
   {% for include in zabbix_apache_custom_includes %}
   {{ include }}
   {% endfor %}
