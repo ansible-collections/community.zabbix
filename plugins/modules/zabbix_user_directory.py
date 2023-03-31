@@ -366,7 +366,7 @@ EXAMPLES = r"""
     port: 389
     base_dn: 'ou=Users,dc=example,dc=org'
     search_attribute: 'uid'
-    provision_status: True
+    provision_status: true
     group_name: cn
     group_basedn: ou=Group,dc=example,dc=org
     group_member: member
@@ -402,7 +402,7 @@ EXAMPLES = r"""
     sp_entityid: zabbix
     sso_url: http://xxxx.okta.com/app/xxxxxx_123dhu8o3
     username_attribute: usrEmail
-    provision_status: True
+    provision_status: true
     group_name: cn
     user_username: first_name
     user_lastname: last_name

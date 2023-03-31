@@ -139,40 +139,40 @@ options:
                    not_classified:
                        description:
                            - severity not_classified enable/disable.
-                       default: True
+                       default: true
                        type: bool
                    information:
                        description:
                            - severity information enable/disable.
-                       default: True
+                       default: true
                        type: bool
                    warning:
                        description:
                            - severity warning enable/disable.
-                       default: True
+                       default: true
                        type: bool
                    average:
                        description:
                            - severity average enable/disable.
-                       default: True
+                       default: true
                        type: bool
                    high:
                        description:
                            - severity high enable/disable.
-                       default: True
+                       default: true
                        type: bool
                    disaster:
                        description:
                            - severity disaster enable/disable.
-                       default: True
+                       default: true
                        type: bool
                 default:
-                  not_classified: True
-                  information: True
-                  warning: True
-                  average: True
-                  high: True
-                  disaster: True
+                  not_classified: true
+                  information: true
+                  warning: true
+                  average: true
+                  high: true
+                  disaster: true
                 type: dict
             active:
                 description:
