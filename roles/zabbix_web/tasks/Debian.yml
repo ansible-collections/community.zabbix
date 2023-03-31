@@ -1,11 +1,73 @@
 ---
-
-- name: "Include Zabbix gpg ids"
+- name: "Debian | Include Zabbix gpg ids"
   include_vars: zabbix.yml
 
-- name: "Set short version name"
+- name: "Debian | Set Some Variables"
   set_fact:
-    zabbix_short_version: "{{ zabbix_version | regex_replace('\\.', '') }}"
+    _zabbix_web_apache_php_addition: true
+
+- name: "Debian | Set PHP Dependencies"
+  set_fact:
+    zabbix_web_php_dependencies: "{{ _apache_php_dependencies if zabbix_web_http_server == 'apache' else _nginx_php_dependencies }}"
+
+- name: "Debian | Set some variables"
+  set_fact:
+    zabbix_short_version: "{{ zabbix_web_version | regex_replace('\\.', '') }}"
+    zabbix_server_apt_repository:
+      - "http://repo.zabbix.com/zabbix/{{ zabbix_server_version }}/{{ ansible_distribution.lower() }}/"
+      - "{{ ansible_distribution_release }}"
+      - "main"
+    zabbix_underscore_version: "{{ zabbix_web_version | regex_replace('\\.', '_') }}"
+    zabbix_python_prefix: "python{% if ansible_python_version is version('3', '>=') %}3{% endif %}"
+  when:
+    - ansible_machine != "aarch64"
+
+- name: "Debian | Set some variables"
+  set_fact:
+    zabbix_short_version: "{{ zabbix_web_version | regex_replace('\\.', '') }}"
+    zabbix_server_apt_repository:
+      - "http://repo.zabbix.com/zabbix/{{ zabbix_server_version }}/{{ ansible_distribution.lower() }}-arm64/"
+      - "{{ ansible_distribution_release }}"
+      - "main"
+    zabbix_underscore_version: "{{ zabbix_server_version | regex_replace('\\.', '_') }}"
+    zabbix_python_prefix: "python{% if ansible_python_version is version('3', '>=') %}3{% endif %}"
+  when:
+    - ansible_machine == "aarch64"
+
+- name: "Debian | Install PHP Dependencies"
+  apt:
+    pkg: "{{ zabbix_web_php_dependencies }}"
+    state: "present"
+    update_cache: true
+    cache_valid_time: 0
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
+  register: zabbix_web_php_dependencies_install
+  until: zabbix_web_php_dependencies_install is succeeded
+  become: true
+  tags:
+    - zabbix-web
+    - init
+    - config
+
+- name: "Debian | Install PgSQL Dependencies"
+  apt:
+    pkg: "php{{ zabbix_web_php_installed_version }}-pgsql"
+    state: "present"
+    update_cache: true
+    cache_valid_time: 0
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
+  register: zabbix_web_php_dependencies_install
+  until: zabbix_web_php_dependencies_install is succeeded
+  become: true
+  when: zabbix_server_database == 'pgsql'
+  tags:
+    - zabbix-web
+    - init
+    - config
 
 - name: "Debian | Install gpg key"
   apt_key:
@@ -21,43 +83,51 @@
 
 - name: "Debian | Installing repository {{ ansible_distribution }}"
   apt_repository:
-    repo: "{{ item }} http://repo.zabbix.com/zabbix/{{ zabbix_version }}/{{ ansible_distribution.lower() }}/ {{ ansible_distribution_release }} main"
+    repo: "{{ item }} {{ zabbix_server_apt_repository | join(' ') }}"
     state: present
+  when: zabbix_repo == "zabbix"
   become: true
-  when:
-    - zabbix_repo == "zabbix"
-    - ansible_machine != "aarch64"
   with_items:
     - deb-src
     - deb
   tags:
-    - zabbix-web
+    - zabbix-server
     - init
-    - config
 
-- name: "Debian | Installing repository {{ ansible_distribution }}"
-  apt_repository:
-    repo: "{{ item }} http://repo.zabbix.com/zabbix/{{ zabbix_version }}/{{ ansible_distribution.lower() }}-arm64/ {{ ansible_distribution_release }} main"
-    state: present
-  become: true
+- name: "Debian | Create /etc/apt/preferences.d/"
+  file:
+    path: /etc/apt/preferences.d/
+    state: directory
+    mode: "0755"
   when:
-    - zabbix_repo == "zabbix"
-    - ansible_machine == "aarch64"
-  with_items:
-    - deb-src
-    - deb
-  tags:
-    - zabbix-web
-    - init
-    - config
+    - zabbix_web_apt_priority | int
+  become: true
 
-- name: "Debian | Install PHP apart from zabbix-frontend-php deps"
-  include_tasks: "php_Debian.yml"
-  when: zabbix_php_install
+- name: "Debian | Configuring the weight for APT"
+  copy:
+    dest: "/etc/apt/preferences.d/zabbix_server-{{ zabbix_proxy_database }}"
+    content: |
+      Package: zabbix_server-{{ zabbix_proxy_database }}
+      Pin: origin repo.zabbix.com
+      Pin-Priority: {{ zabbix_web_apt_priority }}
+    owner: root
+    mode: "0644"
+  when:
+    - zabbix_web_apt_priority | int
+  become: true
+
+- name: "Debian | apt-get clean"
+  shell: apt-get clean; apt-get update
+  args:
+    warn: "{{ produce_warn | default(omit) }}"
+  changed_when: false
+  become: true
+  tags:
+    - skip_ansible_lint
 
 - name: "Debian | Install zabbix-web"
   apt:
-    pkg: "zabbix-frontend-php{{ '-deprecated' if zabbix_php_frontend_deprecated else '' }}"
+    pkg: "zabbix-frontend-php"
     state: "{{ zabbix_web_package_state }}"
     update_cache: true
     cache_valid_time: 0
@@ -74,35 +144,10 @@
 
 - name: "Debian | Link graphfont.ttf (workaround ZBX-10467)"
   file:
-    src: '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf'
-    path: '/usr/share/zabbix/fonts/graphfont.ttf'
+    src: "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
+    path: "/usr/share/zabbix/fonts/graphfont.ttf"
     state: link
   tags:
     - zabbix-web
     - init
     - config
-
-- name: "Debian | Install PHP"
-  template:
-    src: php-fpm.conf.j2
-    dest: "{{ zabbix_php_fpm_dir }}/zabbix.conf"
-    owner: "{{ _apache_user }}"
-    group: "{{ _apache_group }}"
-    mode: 0644
-  become: true
-  when:
-    - zabbix_vhost
-  notify:
-    - restart php-fpm-version
-
-- name: "Including Apache Configuration"
-  include_tasks: apache_Debian.yml
-  vars:
-    zabbix_apache_servername: "{{ zabbix_websrv_servername }}"
-  when:
-    - zabbix_websrv == 'apache'
-
-- name: "Configure SELinux when enabled"
-  include_tasks: selinux.yml
-  when:
-    - zabbix_selinux | bool

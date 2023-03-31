@@ -5,16 +5,30 @@
   set_fact:
     zabbix_short_version: "{{ zabbix_server_version | regex_replace('\\.', '') }}"
 
-- name: "RedHat | Set Zabbix user/group (RHEL 9)"
+- name: "RedHat | Setting Epel State (Installing from Zabbix)"
   set_fact:
-    zabbix_os_user: zabbixsrv
-    zabbix_server_config: /etc/zabbix_server.conf
-    zabbix_server_logfile: /var/log/zabbixsrv/zabbix_server.log
-    zabbix_server_pidfile: /tmp/zabbix_server.pid
-    zabbix_server_socketdir: /tmp
+    zabbix_repo_yum_disabled: "{{ zabbix_repo_yum_disabled if zabbix_repo_yum_disabled is defined and zabbix_repo_yum_disabled is iterable and (zabbix_repo_yum_disabled | length>0) else __epel_repo }}"
   when:
-    - ansible_distribution_major_version == "9"
-    - zabbix_server_version is version('6.0', '<=')
+    - zabbix_repo == "zabbix"
+
+- name: "RedHat | Disable all Non-Explict Repos"
+  set_fact:
+    zabbix_repo_yum_disabled: "*"
+  when:
+    - zabbix_repo_yum_enabled is defined
+    - zabbix_repo_yum_enabled is iterable
+    - zabbix_repo_yum_enabled | length>0
+
+# - name: "RedHat | Set Zabbix user/group (RHEL 9)"
+#   set_fact:
+#     zabbix_os_user: zabbixsrv
+#     zabbix_server_config: /etc/zabbix_server.conf
+#     zabbix_server_logfile: /var/log/zabbixsrv/zabbix_server.log
+#     zabbix_server_pidfile: /tmp/zabbix_server.pid
+#     zabbix_server_socketdir: /tmp
+#   when:
+#     - ansible_distribution_major_version == "9"
+#     - zabbix_server_version is version('6.0', '<=')
 
 - name: "RedHat | Use Zabbix package name"
   set_fact:
@@ -105,8 +119,8 @@
   package:
     pkg: "{{ zabbix_server_package }}-{{ zabbix_server_version }}.{{ zabbix_server_version_minor }}"
     state: "{{ zabbix_server_package_state }}"
-    disablerepo: "{{ '*' if (zabbix_repo_yum_enabled | length>0) else omit }}"
-    enablerepo: "{{ zabbix_repo_yum_enabled if zabbix_repo_yum_enabled is iterable and (zabbix_repo_yum_enabled | length>0) else omit }}"
+    disablerepo: "{{ zabbix_repo_yum_disabled | default(omit) }}"
+    enablerepo: "{{ zabbix_repo_yum_enabled | default(omit) }}"
   environment:
     http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
     https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
@@ -132,8 +146,8 @@
   package:
     pkg: "zabbix-sql-scripts-{{ zabbix_server_version }}.{{ zabbix_server_version_minor }}"
     state: "{{ zabbix_server_package_state }}"
-    disablerepo: "{{ '*' if (zabbix_repo_yum_enabled | length>0) else omit }}"
-    enablerepo: "{{ zabbix_repo_yum_enabled if zabbix_repo_yum_enabled is iterable and (zabbix_repo_yum_enabled | length>0) else omit }}"
+    disablerepo: "{{ zabbix_repo_yum_disabled | default(omit) }}"
+    enablerepo: "{{ zabbix_repo_yum_enabled | default(omit) }}"
   environment:
     http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
     https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
@@ -150,8 +164,8 @@
   package:
     pkg: "zabbix-sql-scripts-{{ zabbix_server_version }}.{{ zabbix_server_version_minor }}"
     state: "{{ zabbix_server_package_state }}"
-    disablerepo: "{{ '*' if (zabbix_repo_yum_enabled | length>0) else omit }}"
-    enablerepo: "{{ zabbix_repo_yum_enabled if zabbix_repo_yum_enabled is iterable and (zabbix_repo_yum_enabled | length>0) else omit }}"
+    disablerepo: "{{ zabbix_repo_yum_disabled | default(omit) }}"
+    enablerepo: "{{ zabbix_repo_yum_enabled | default(omit) }}"
   environment:
     http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
     https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
@@ -213,27 +227,27 @@
     - init
     - database
 
-- name: "RedHat | Remove Service Symlink (RHEL 9 Zabbix = 6.0)"
-  file:
-    path: /usr/lib/systemd/system/zabbix-server.service
-    state: absent
-  tags: molecule-idempotence-notest
-  when:
-    - zabbix_server_version is version('6.0', '==')
-    - ansible_distribution_major_version == "9"
+# - name: "RedHat | Remove Service Symlink (RHEL 9 Zabbix = 6.0)"
+#   file:
+#     path: /usr/lib/systemd/system/zabbix-server.service
+#     state: absent
+#   tags: molecule-idempotence-notest
+#   when:
+#     - zabbix_server_version is version('6.0', '==')
+#     - ansible_distribution_major_version == "9"
 
-- name: "RedHat | Copy Service File (RHEL 9 Zabbix = 6.0)"
-  copy:
-    src: /etc/alternatives/zabbix-server-systemd
-    dest: /usr/lib/systemd/system/zabbix-server.service
-    remote_src: true
-    owner: root
-    group: root
-    mode: 0644
-  tags: molecule-idempotence-notest
-  when:
-    - zabbix_server_version is version('6.0', '==')
-    - ansible_distribution_major_version == "9"
+# - name: "RedHat | Copy Service File (RHEL 9 Zabbix = 6.0)"
+#   copy:
+#     src: /etc/alternatives/zabbix-server-systemd
+#     dest: /usr/lib/systemd/system/zabbix-server.service
+#     remote_src: true
+#     owner: root
+#     group: root
+#     mode: 0644
+#   tags: molecule-idempotence-notest
+#   when:
+#     - zabbix_server_version is version('6.0', '==')
+#     - ansible_distribution_major_version == "9"
 
 - name: "RedHat | Configure SELinux when enabled"
   include: selinux.yml

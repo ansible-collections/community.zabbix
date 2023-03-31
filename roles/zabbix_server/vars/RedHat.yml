@@ -5,6 +5,9 @@ apache_log: httpd
 
 mysql_create_dir: create/
 
+__epel_repo:
+  - epel
+
 zabbix_valid_server_versions:
   "9":
     - 6.2

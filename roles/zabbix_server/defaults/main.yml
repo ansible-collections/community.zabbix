@@ -21,7 +21,6 @@ zabbix_server_package_state: present
 zabbix_repo: zabbix
 zabbix_repo_yum_gpgcheck: 0
 zabbix_repo_yum_schema: https
-zabbix_repo_yum_disabled: "*"
 zabbix_repo_yum_enabled: []
 zabbix_repo_yum:
   - name: zabbix

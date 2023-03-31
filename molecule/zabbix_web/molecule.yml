@@ -10,17 +10,20 @@ dependency:
 driver:
   name: docker
 platforms:
-  - name: zabbix-web-${MY_MOLECULE_CONTAINER:-mysql-centos8}
-    image: ${MY_MOLECULE_IMAGE:-"geerlingguy/docker-centos8-ansible"}
-    command: ${MY_MOLECULE_DOCKER_COMMAND:-""}
+  - name: zabbix-web-${MY_MOLECULE_CONTAINER:-centos}
+    image: geerlingguy/docker-${MY_MOLECULE_IMAGE:-"rockylinux8"}-ansible:latest
     privileged: true
     pre_build_image: true
+    command: ${MOLECULE_DOCKER_COMMAND:-""}
     networks:
       - name: zabbix
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
     groups:
-      - ${MY_MOLECULE_GROUP:-mysql}
+      - ${MY_MOLECULE_DATABASE:-mysql}
+      - ${MY_MOLECULE_VERSION:-v62}
+      - ${MY_MOLECULE_INTERPRETER:-python3}
+      - ${MY_MOLECULE_WEB_SERVER:-apache}
 
 provisioner:
   name: ansible
@@ -32,10 +35,22 @@ provisioner:
   inventory:
     group_vars:
       all:
+        zabbix_api_server_url: zabbix-web-${MY_MOLECULE_CONTAINER:-centos}
+      python3:
         ansible_python_interpreter: /usr/bin/python3
+      python:
+        ansible_python_interpreter: /usr/bin/python
+      v62:
+        zabbix_server_version: 6.2
+        zabbix_web_version: 6.2
+      v60:
+        zabbix_server_version: 6.0
+        zabbix_web_version: 6.0
+      v50:
+        zabbix_server_version: 5.0
+        zabbix_web_version: 5.0
       mysql:
         zabbix_server_database: mysql
-        zabbix_server_database_long: mysql
         zabbix_server_dbport: 3306
         zabbix_server_dbhost: mysql-host
         zabbix_server_dbhost_run_install: false
@@ -44,9 +59,8 @@ provisioner:
         zabbix_server_mysql_login_user: root
         zabbix_server_mysql_login_password: changeme
         zabbix_server_mysql_login_port: 3306
-      postgresql:
+      pgsql:
         zabbix_server_database: pgsql
-        zabbix_server_database_long: postgresql
         zabbix_server_dbport: 5432
         zabbix_server_dbhost: postgresql-host
         zabbix_server_dbhost_run_install: false
@@ -54,42 +68,11 @@ provisioner:
         zabbix_server_pgsql_login_user: postgres
         zabbix_server_pgsql_login_password: changeme
         zabbix_server_pgsql_login_port: 5432
-    host_vars:
-      zabbix-web-pgsql-debian:
-        zabbix_websrv: apache
-        zabbix_php_fpm_conf_listen: false
-        zabbix_api_server_url: zabbix-web-pgsql-debian
-        zabbix_websrv_servername: zabbix-web-pgsql-debian
-      zabbix-web-mysql-debian:
-        zabbix_websrv: apache
-        zabbix_php_fpm_conf_listen: false
-        zabbix_api_server_url: zabbix-web-mysql-debian
-        zabbix_websrv_servername: zabbix-web-mysql-debian
-      zabbix-web-pgsql-centos8:
-        ansible_rhn_repo_disable_gpg_check: true
-        zabbix_websrv: apache
-        zabbix_php_fpm_conf_listen: false
-        zabbix_api_server_url: zabbix-web-pgsql-centos8
-        zabbix_websrv_servername: zabbix-web-pgsql-centos8
-      zabbix-web-mysql-centos8:
-        ansible_rhn_repo_disable_gpg_check: true
-        php_fpm_pool_user: nginx
-        php_fpm_pool_group: nginx
-        zabbix_websrv: nginx
-        zabbix_php_fpm_conf_listen: false
-        zabbix_api_server_url: zabbix-web-mysql-centos8
-        zabbix_websrv_servername: zabbix-web-mysql-centos8
-      zabbix-web-mysql-ubuntu18:
-        zabbix_websrv: nginx
-        zabbix_php_fpm_conf_listen: false
-        zabbix_api_server_url: zabbix-web-mysql-ubuntu18
-        zabbix_websrv_servername: zabbix-web-mysql-ubuntu18
+      apache:
+        zabbix_web_http_server: apache
+      nginx:
+        zabbix_web_http_server: nginx
         php_webserver_daemon: nginx
-      zabbix-web-pgsql-ubuntu20:
-        zabbix_php_fpm_conf_listen: false
-        zabbix_websrv: apache
-        zabbix_api_server_url: zabbix-web-pgsql-ubuntu20
-        zabbix_websrv_servername: zabbix-web-pgsql-ubuntu20
 
 verifier:
   name: testinfra
