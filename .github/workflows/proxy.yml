@@ -37,14 +37,10 @@ jobs:
         version:
           - v62
           - v60
-          - v50
         include:
           - interpreter: python3
           - interpreter: python
             container: centos7
-        exclude:
-          - container: rockylinux9
-            version: v50
     steps:
       - name: Check out code
         uses: actions/checkout@v1

@@ -21,24 +21,6 @@
 - name: "Install the correct repository"
   include: "{{ ansible_os_family }}.yml"
 
-- name: "Configure Service"
-  block:
-    - name: "Place systemd unit file"
-      copy:
-        src: systemd.service
-        dest: /etc/systemd/system/zabbix-java-gateway.service
-        mode: "0644"
-      register: systemd_state
-
-    - name: "Reload systemd"
-      shell: systemctl daemon-reload
-      when:
-        - systemd_state.changed
-      tags:
-        - skip_ansible_lint
-  when:
-    - zabbix_javagateway_version is version('6.0', '<')
-
 - name: "Configure zabbix-proxy"
   template:
     src: zabbix_java_gateway.conf.j2

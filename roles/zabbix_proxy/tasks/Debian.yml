@@ -8,22 +8,9 @@
     zabbix_python_prefix: "python{% if ansible_python_version is version('3', '>=') %}3{% endif %}"
     zabbix_underscore_version: "{{ zabbix_proxy_version | regex_replace('\\.', '_') }}"
 
-- name: "Debian | Set some facts for Zabbix  < 6.0"
-  set_fact:
-    apache_log: apache2
-    datafiles_path: /usr/share/doc/zabbix-proxy-{{ zabbix_proxy_database }}
-  when:
-    - zabbix_proxy_version is version('6.0', '<')
-  tags:
-    - zabbix-proxy
-    - init
-    - config
-
-- name: "Debian | Set some facts for Zabbix >= 6.0"
+- name: "Debian | Set some facts for Zabbix"
   set_fact:
     datafiles_path: /usr/share/doc/zabbix-sql-scripts/{{ zabbix_proxy_db_long }}
-  when:
-    - zabbix_proxy_version is version('6.0', '>=')
   tags:
     - zabbix-server
     - init

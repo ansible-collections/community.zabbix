@@ -19,17 +19,6 @@
     - zabbix_repo_yum_enabled is iterable
     - zabbix_repo_yum_enabled | length>0
 
-# - name: "RedHat | Set Zabbix user/group (RHEL 9)"
-#   set_fact:
-#     zabbix_os_user: zabbixsrv
-#     zabbix_server_config: /etc/zabbix_server.conf
-#     zabbix_server_logfile: /var/log/zabbixsrv/zabbix_server.log
-#     zabbix_server_pidfile: /tmp/zabbix_server.pid
-#     zabbix_server_socketdir: /tmp
-#   when:
-#     - ansible_distribution_major_version == "9"
-#     - zabbix_server_version is version('6.0', '<=')
-
 - name: "RedHat | Use Zabbix package name"
   set_fact:
     zabbix_server_package: "zabbix-server-{{ zabbix_server_database }}"
@@ -46,19 +35,9 @@
   tags:
     - zabbix-server
 
-- name: "RedHat | Set facts for Zabbix < 6.0"
-  set_fact:
-    datafiles_path: "/usr/share/doc/zabbix-server-{{ zabbix_server_database }}*"
-  when:
-    - zabbix_server_version is version('6.0', '<')
-  tags:
-    - zabbix-server
-
-- name: "RedHat | Set facts for Zabbix >= 6.0"
+- name: "RedHat | Set facts for Zabbix"
   set_fact:
     datafiles_path: "/usr/share/zabbix-sql-scripts/{{ 'postgresql' if zabbix_server_database == 'pgsql' else 'mysql' }}"
-  when:
-    - zabbix_server_version is version('6.0', '>=')
   tags:
     - zabbix-server
 
@@ -226,28 +205,6 @@
     - zabbix-server
     - init
     - database
-
-# - name: "RedHat | Remove Service Symlink (RHEL 9 Zabbix = 6.0)"
-#   file:
-#     path: /usr/lib/systemd/system/zabbix-server.service
-#     state: absent
-#   tags: molecule-idempotence-notest
-#   when:
-#     - zabbix_server_version is version('6.0', '==')
-#     - ansible_distribution_major_version == "9"
-
-# - name: "RedHat | Copy Service File (RHEL 9 Zabbix = 6.0)"
-#   copy:
-#     src: /etc/alternatives/zabbix-server-systemd
-#     dest: /usr/lib/systemd/system/zabbix-server.service
-#     remote_src: true
-#     owner: root
-#     group: root
-#     mode: 0644
-#   tags: molecule-idempotence-notest
-#   when:
-#     - zabbix_server_version is version('6.0', '==')
-#     - ansible_distribution_major_version == "9"
 
 - name: "RedHat | Configure SELinux when enabled"
   include: selinux.yml
