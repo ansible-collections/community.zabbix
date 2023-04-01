@@ -60,7 +60,6 @@
   register: done_file
   when:
     - zabbix_database_sqlload
-    - zabbix_repo != "epel"
 
 - name: "MySQL | Get version_comment"
   community.mysql.mysql_variables:
@@ -103,7 +102,6 @@
     login_unix_socket: "{{ zabbix_proxy_mysql_login_unix_socket | default(omit) }}"
   when:
     - zabbix_database_sqlload | bool
-    - zabbix_repo != "epel"
     - not done_file.stat.exists
     - install_mysql_version.msg is version('5.6', '>=')
     - mysql_innodb_default_row_format.msg != 'dynamic'
@@ -126,7 +124,6 @@
     target: "{{ ls_output_schema.stdout }}"
   when:
     - zabbix_database_sqlload
-    - zabbix_repo != "epel"
     - not done_file.stat.exists
   delegate_to: "{{ delegated_dbhost }}"
   tags:
@@ -144,7 +141,6 @@
     login_unix_socket: "{{ zabbix_proxy_mysql_login_unix_socket | default(omit) }}"
   when:
     - zabbix_database_sqlload | bool
-    - zabbix_repo != "epel"
     - not done_file.stat.exists
     - mysql_innodb_default_row_format.msg != 'dynamic'
   delegate_to: "{{ delegated_dbhost }}"
@@ -159,5 +155,4 @@
     mode: "0644"
   when:
     - zabbix_database_sqlload
-    - zabbix_repo != "epel"
     - not done_file.stat.exists

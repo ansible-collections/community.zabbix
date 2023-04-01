@@ -38,7 +38,6 @@
   changed_when: false
   when:
     - zabbix_database_sqlload
-    - zabbix_repo != "epel"
   register: ls_output_schema
   tags:
     - zabbix-proxy
