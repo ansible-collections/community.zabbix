@@ -18,7 +18,6 @@ zabbix_server_conf_mode: 0640
 # Yum Variables
 zabbix_server_version_minor: "*"
 zabbix_server_package_state: present
-zabbix_repo: zabbix
 zabbix_repo_yum_gpgcheck: 0
 zabbix_repo_yum_schema: https
 zabbix_repo_yum_enabled: []
