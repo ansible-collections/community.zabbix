@@ -61,6 +61,7 @@ StartLLDProcessors={{ zabbix_server_startlldprocessors }}
 {% if zabbix_version is version('4.2', '>=') %}
 StartPreprocessors={{ zabbix_server_startpreprocessors }}
 {% endif %}
+StartPollersUnreachable={{ zabbix_server_startpollersunreachable }}
 {% if zabbix_version is version('6.4', '>=') %}
 StartConnectors={{ zabbix_server_connectors }}
 {% endif %}
