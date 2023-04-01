@@ -5,8 +5,6 @@
 - name: "RedHat | Setting Epel State (Installing from Zabbix)"
   set_fact:
     zabbix_repo_yum_disabled: "{{ zabbix_repo_yum_disabled if zabbix_repo_yum_disabled is defined and zabbix_repo_yum_disabled is iterable and (zabbix_repo_yum_disabled | length>0) else __epel_repo }}"
-  when:
-    - zabbix_repo == "zabbix"
 
 - name: "RedHat | Disable all Non-Explict Repos"
   set_fact:
@@ -51,7 +49,6 @@
   with_items: "{{ zabbix_repo_yum }}"
   register: yum_repo_installed
   become: true
-  when: zabbix_repo == "zabbix"
   notify:
     - "clean repo files from proxy creds"
   tags:

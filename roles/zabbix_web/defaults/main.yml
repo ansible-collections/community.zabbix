@@ -3,7 +3,6 @@
 
 # zabbix_web_version: 6.0
 zabbix_web_version_minor: "*"
-zabbix_repo: zabbix
 zabbix_web_package_state: present
 zabbix_selinux: false
 zabbix_web_doubleprecision: false
