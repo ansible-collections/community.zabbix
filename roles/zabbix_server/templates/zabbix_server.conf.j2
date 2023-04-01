@@ -156,7 +156,7 @@ SSHKeyLocation={{ zabbix_server_sshkeylocation }}
 LogSlowQueries={{ zabbix_server_logslowqueries }}
 TmpDir={{ zabbix_server_tmpdir }}
 StartProxyPollers={{ zabbix_server_startproxypollers }}
-{% if zabbix_server_proxyconfigfrequency and zabbix_server_proxyconfigfrequency is not none %}
+{% if zabbix_server_proxyconfigfrequency is defined and zabbix_server_proxyconfigfrequency is not none %}
 ProxyConfigFrequency={{ zabbix_server_proxyconfigfrequency }}
 {% else %}
 {% if zabbix_version is version('6.2', '<') %}
