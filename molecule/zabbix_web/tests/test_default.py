@@ -54,7 +54,7 @@ def test_zabbix_api(host):
     my_host = host.ansible.get_variables()
     zabbix_api_server_url = str(my_host["zabbix_api_server_url"])
     hostname = "http://" + zabbix_api_server_url + "/api_jsonrpc.php"
-    post_data = '{"jsonrpc": "2.0", "method": "user.login", "params": { "user": "Admin", "password": "zabbix" }, "id": 1, "auth": null}'
+    post_data = '{"jsonrpc": "2.0", "method": "user.login", "params": { "username": "Admin", "password": "zabbix" }, "id": 1, "auth": null}'
     headers = "Content-Type: application/json-rpc"
     command = (
         "curl -XPOST -H '"
