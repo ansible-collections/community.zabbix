@@ -3,7 +3,6 @@
 
 zabbix_javagateway_version:
 zabbix_javagateway_package_state: present
-zabbix_repo: zabbix
 zabbix_repo_yum_schema: https
 zabbix_java_gateway_conf_mode: "0644"
 
