@@ -16,16 +16,16 @@
   tags:
     - zabbix-server
 
-- name: "RedHat | Set Zabbix user/group (RHEL 9)"
-  set_fact:
-    zabbix_os_user: zabbixsrv
-    zabbix_proxy_config: /etc/zabbix_proxy.conf
-    zabbix_proxy_logfile: /var/log/zabbixsrv/zabbix_proxy.log
-    zabbix_proxy_pidfile: /tmp/zabbix_proxy.pid
-    zabbix_proxy_socketdir: /tmp
-  when:
-    - ansible_distribution_major_version == "9"
-    - zabbix_proxy_version is version('6.0', '<=')
+# - name: "RedHat | Set Zabbix user/group (RHEL 9)"
+#   set_fact:
+#     zabbix_os_user: zabbixsrv
+#     zabbix_proxy_config: /etc/zabbix_proxy.conf
+#     zabbix_proxy_logfile: /var/log/zabbixsrv/zabbix_proxy.log
+#     zabbix_proxy_pidfile: /tmp/zabbix_proxy.pid
+#     zabbix_proxy_socketdir: /tmp
+#   when:
+#     - ansible_distribution_major_version == "9"
+#     - zabbix_proxy_version is version('6.0', '<=')
 
 - name: "RedHat | Make sure old file is absent"
   file:
@@ -58,8 +58,7 @@
       yum:
         pkg: "{{ zabbix_proxy_package }}-{{ zabbix_proxy_version }}.{{ zabbix_proxy_version_minor }}"
         state: "{{ zabbix_proxy_package_state }}"
-        disablerepo: "{{ '*' if (zabbix_repo_yum_enabled | length>0) else omit }}"
-        enablerepo: "{{ zabbix_repo_yum_enabled if zabbix_repo_yum_enabled is iterable and (zabbix_repo_yum_enabled | length>0) else omit }}"
+        disablerepo: "epel"
       environment:
         http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
         https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
@@ -71,8 +70,7 @@
       yum:
         pkg: "zabbix-sql-scripts-{{ zabbix_proxy_version }}.{{ zabbix_proxy_version_minor }}"
         state: "{{ zabbix_proxy_package_state }}"
-        disablerepo: "{{ '*' if (zabbix_repo_yum_enabled | length>0) else omit }}"
-        enablerepo: "{{ zabbix_repo_yum_enabled if zabbix_repo_yum_enabled is iterable and (zabbix_repo_yum_enabled | length>0) else omit }}"
+        disablerepo: "epel"
       environment:
         http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
         https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"

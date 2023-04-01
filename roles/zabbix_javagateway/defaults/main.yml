@@ -7,8 +7,7 @@ zabbix_repo_yum_schema: https
 zabbix_java_gateway_conf_mode: "0644"
 
 zabbix_repo_yum_gpgcheck: 0
-zabbix_repo_yum_disabled: "*"
-zabbix_repo_yum_enabled: []
+
 zabbix_repo_yum:
   - name: zabbix
     description: Zabbix Official Repository - $basearch

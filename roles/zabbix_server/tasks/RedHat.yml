@@ -5,18 +5,6 @@
   set_fact:
     zabbix_short_version: "{{ zabbix_server_version | regex_replace('\\.', '') }}"
 
-- name: "RedHat | Setting Epel State (Installing from Zabbix)"
-  set_fact:
-    zabbix_repo_yum_disabled: "{{ zabbix_repo_yum_disabled if zabbix_repo_yum_disabled is defined and zabbix_repo_yum_disabled is iterable and (zabbix_repo_yum_disabled | length>0) else __epel_repo }}"
-
-- name: "RedHat | Disable all Non-Explict Repos"
-  set_fact:
-    zabbix_repo_yum_disabled: "*"
-  when:
-    - zabbix_repo_yum_enabled is defined
-    - zabbix_repo_yum_enabled is iterable
-    - zabbix_repo_yum_enabled | length>0
-
 - name: "RedHat | Use Zabbix package name"
   set_fact:
     zabbix_server_package: "zabbix-server-{{ zabbix_server_database }}"
@@ -58,7 +46,7 @@
   package:
     pkg: "{{ zabbix_server_package }}-{{ zabbix_server_version }}.{{ zabbix_server_version_minor }}"
     state: "{{ zabbix_server_package_state }}"
-    disablerepo: "eple"
+    disablerepo: "epel"
   environment:
     http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
     https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
