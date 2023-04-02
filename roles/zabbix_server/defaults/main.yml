@@ -127,7 +127,6 @@ zabbix_server_sshkeylocation:
 zabbix_server_logslowqueries: 0
 zabbix_server_tmpdir: /tmp
 zabbix_server_startproxypollers: 1
-zabbix_server_proxyconfigfrequency: 3600
 zabbix_server_proxydatafrequency: 1
 zabbix_server_allowroot: 0
 zabbix_server_user: zabbix

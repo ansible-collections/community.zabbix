@@ -54,25 +54,25 @@ ansible-galaxy collection install community.general
 
 See the following list of supported Operating Systems with the Zabbix releases.
 
-| Zabbix              | 6.2 | 6.0 | 5.4 | 5.2 | 5.0  (LTS) | 4.4 | 4.0 (LTS) | 3.0 (LTS) |
-|---------------------|-----|-----|-----|-----|------------|-----|-----------|-----------|
-| Red Hat Fam 9       |  V  |  V  |     |     |            |     |           |           |
-| Red Hat Fam 8       |  V  |  V  |  V  |  V  |  V         | V   |           |           |
-| Red Hat Fam 7       |     |  V  |  V  |  V  |  V         | V   | V         | V         |
-| Red Hat Fam 6       |     |     |     |  V  |  V         |     |           | V         |
-| Red Hat Fam 5       |     |     |     |  V  |  V         |     |           | V         |
-| Fedora              |     |     |     |     |            | V   | V         |           |
-| Ubuntu 22.04 jammy  |  V  |  V  |     |     |            |     |           |           |
-| Ubuntu 20.04 focal  |  V  |  V  |  V  |  V  |  V         | V   |           |           |
-| Ubuntu 18.04 bionic |     |  V  |  V  |  V  |  V         | V   | V         |           |
-| Ubuntu 16.04 xenial |     |     |     |  V  |  V         | V   | V         |           |
-| Ubuntu 14.04 trusty |     |     |     |  V  |  V         | V   | V         | V         |
-| Debian 10 buster    |     |  V  |  V  |  V  |  V         | V   |           |           |
-| Debian 9 stretch    |     |  V  |  V  |  V  |  V         | V   | V         |           |
-| Debian 8 jessie     |     |     |     |  V  |  V         | V   | V         | V         |
-| Debian 7 wheezy     |     |     |     |     |            |     | V         | V         |
-| macOS 10.15         |     |     |     |     |            | V   | V         |           |
-| macOS 10.14         |     |     |     |     |            | V   | V         |           |
+| Zabbix              | 6.4 | 6.2 | 6.0 (LTS) | 5.4 | 5.2 | 5.0  (LTS) | 4.4 | 4.0 (LTS) | 3.0 (LTS) |
+|---------------------|-----|-----|-----------|-----|-----|------------|-----|-----------|-----------|
+| Red Hat Fam 9       |  V  |  V  |     V     |     |     |            |     |           |           |
+| Red Hat Fam 8       |  V  |  V  |     V     |  V  |  V  |  V         | V   |           |           |
+| Red Hat Fam 7       |     |  V  |     V     |  V  |  V  |  V         | V   | V         | V         |
+| Red Hat Fam 6       |     |     |           |     |  V  |  V         |     |           | V         |
+| Red Hat Fam 5       |     |     |           |     |  V  |  V         |     |           | V         |
+| Fedora              |     |     |           |     |     |            | V   | V         |           |
+| Ubuntu 22.04 jammy  |  V  |  V  |     V     |     |     |            |     |           |           |
+| Ubuntu 20.04 focal  |  V  |  V  |     V     |  V  |  V  |  V         | V   |           |           |
+| Ubuntu 18.04 bionic |     |     |     V     |  V  |  V  |  V         | V   | V         |           |
+| Ubuntu 16.04 xenial |     |     |           |     |  V  |  V         | V   | V         |           |
+| Ubuntu 14.04 trusty |     |     |           |     |  V  |  V         | V   | V         | V         |
+| Debian 10 buster    |  V  |  V  |     V     |  V  |  V  |  V         | V   |           |           |
+| Debian 9 stretch    |     |     |     V     |  V  |  V  |  V         | V   | V         |           |
+| Debian 8 jessie     |     |     |           |     |  V  |  V         | V   | V         | V         |
+| Debian 7 wheezy     |     |     |           |     |     |            |     | V         | V         |
+| macOS 10.15         |     |     |           |     |     |            | V   | V         |           |
+| macOS 10.14         |     |     |           |     |     |            | V   | V         |           |
 
 # Installation
 

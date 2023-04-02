@@ -31,9 +31,9 @@ def test_zabbix_package(host, proxy):
     if zabbixhost == proxy:
         zabbix_proxy = host.package(proxy)
         if host.system_info.distribution in ["debian", "ubuntu"]:
-            assert zabbix_proxy.version.startswith("1:6.2")
+            assert zabbix_proxy.version.startswith("1:6.4")
         elif host.system_info.distribution == "centos":
-            assert zabbix_proxy.version.startswith("6.2")
+            assert zabbix_proxy.version.startswith("6.4")
         assert zabbix_proxy.is_installed
 
 

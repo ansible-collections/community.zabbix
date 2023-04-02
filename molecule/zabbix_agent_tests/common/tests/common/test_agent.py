@@ -42,8 +42,8 @@ def test_zabbix_package(host, zabbix_agent_package):
 
     if host.system_info.distribution == "debian":
         if host.system_info.codename in ["bullseye", "focal"]:
-            assert zabbix_agent_package.version.startswith("1:6.2")
+            assert zabbix_agent_package.version.startswith("1:6.4")
         else:
             assert zabbix_agent_package.version.startswith("1:6.0")
     if host.system_info.distribution == "centos":
-        assert zabbix_agent_package.version.startswith("6.2")
+        assert zabbix_agent_package.version.startswith("6.4")
