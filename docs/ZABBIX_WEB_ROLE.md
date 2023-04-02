@@ -150,6 +150,7 @@ The following is an overview of all available configuration defaults for this ro
 * `zabbix_apache_SSLSessionCache`: Type of the global/inter-process SSL Session Cache
 * `zabbix_apache_SSLSessionCacheTimeout`: Number of seconds before an SSL session expires in the Session Cache
 * `zabbix_apache_SSLCryptoDevice`: Enable use of a cryptographic hardware accelerator
+* `zabbix_apache_custom_includes`: Configure custom includes. Default: `[]`
 
 When `zabbix_apache_tls_crt`, `zabbix_apache_tls_key` and/or `zabbix_apache_tls_chain` are used, make sure that these files exists before executing this role. The Zabbix-Web role will not install the mentioned files.
 

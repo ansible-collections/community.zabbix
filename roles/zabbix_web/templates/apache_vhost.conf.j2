@@ -7,6 +7,12 @@
   ## Vhost docroot
   DocumentRoot "/usr/share/zabbix"
 
+{% if zabbix_apache_custom_includes is iterable and (zabbix_apache_custom_includes | length>0) %}
+  {% for include in zabbix_apache_custom_includes %}
+  {{ include }}
+  {% endfor %}
+{% endif %}
+
 {% if zabbix_apache_redirect and zabbix_apache_tls %}
   RewriteEngine On
   RewriteCond %{HTTPS} !=on
@@ -101,6 +107,12 @@ SSLCryptoDevice {{ zabbix_apache_SSLCryptoDevice }}
 
   ## Vhost docroot
   DocumentRoot "/usr/share/zabbix"
+
+{% if zabbix_apache_custom_includes is iterable and (zabbix_apache_custom_includes | length>0) %}
+  {% for include in zabbix_apache_custom_includes %}
+  {{ include }}
+  {% endfor %}
+{% endif %}
 
   SSLEngine on
   SSLCipherSuite {{ apache_ssl_cipher_suite }}
