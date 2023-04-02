@@ -89,6 +89,7 @@ zabbix_server_startpingers: 1
 zabbix_server_startdiscoverers: 1
 zabbix_server_starthttppollers: 1
 zabbix_server_startpreprocessors: 3
+zabbix_server_connectors: 0
 zabbix_server_startodbcpollers: 1
 zabbix_server_starttimers: 1
 zabbix_server_starthistorypollers: 5
@@ -105,7 +106,6 @@ zabbix_server_housekeepingfrequency: 1
 zabbix_server_maxhousekeeperdelete: 500
 zabbix_server_senderfrequency: 30
 zabbix_server_cachesize: 32M
-zabbix_server_cacheupdatefrequency: 60
 zabbix_server_startdbsyncers: 4
 zabbix_server_historycachesize: 16M
 zabbix_server_historyindexcachesize: 4M
@@ -126,7 +126,6 @@ zabbix_server_sshkeylocation:
 zabbix_server_logslowqueries: 0
 zabbix_server_tmpdir: /tmp
 zabbix_server_startproxypollers: 1
-zabbix_server_proxyconfigfrequency: 3600
 zabbix_server_proxydatafrequency: 1
 zabbix_server_allowroot: 0
 zabbix_server_user: zabbix
