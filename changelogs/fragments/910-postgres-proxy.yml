@@ -1,0 +1,3 @@
+---
+bugfixes:
+  zabbix-proxy role - fix tags for postgresql task.
