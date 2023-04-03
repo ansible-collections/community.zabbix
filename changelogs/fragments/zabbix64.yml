@@ -1,4 +1,0 @@
----
-minor_changes:
-  - httpapi plugin - updated to work with Zabbix 6.4.
-  - zabbix_action, zabbix_authentication, zabbix_discovery_rule, zabbix_mediatype, zabbix_user, zabbix_user_directory, zabbix_usergroup - updated to work with Zabbix 6.4.
