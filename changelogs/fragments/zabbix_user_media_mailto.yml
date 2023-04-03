@@ -1,2 +1,0 @@
-bugfixes:
-  - zabbix_user module - ability to specify several e-mail addresses in Zabbix User's  media

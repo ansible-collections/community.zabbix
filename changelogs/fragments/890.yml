@@ -1,2 +1,0 @@
-minor_changes:
-  - zabbix_usergroup module - userdirectory, hostgroup_rights and templategroup_rights parameters added (Zabbix >= 6.2)
