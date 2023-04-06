@@ -710,7 +710,7 @@ def main():
         attempt_interval=dict(type='str', default='10s', required=False),
         # Script
         script_name=dict(type='str', required=False),
-        script_params=dict(type='list', required=False),
+        script_params=dict(type='list', required=False, elements='str'),
         # SMS
         gsm_modem=dict(type='str', required=False),
         # Jabber
