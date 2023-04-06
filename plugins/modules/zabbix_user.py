@@ -647,7 +647,7 @@ def main():
         username=dict(type='str', required=True, aliases=['alias']),
         name=dict(type='str'),
         surname=dict(type='str'),
-        usrgrps=dict(type='list'),
+        usrgrps=dict(type='list', elements='str'),
         passwd=dict(type='str', required=False, no_log=True),
         override_passwd=dict(type='bool', required=False, default=False, no_log=False),
         lang=dict(type='str', choices=['en_GB', 'en_US', 'zh_CN', 'cs_CZ', 'fr_FR',

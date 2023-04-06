@@ -979,8 +979,8 @@ def main():
     argument_spec = zabbix_utils.zabbix_common_argument_spec()
     argument_spec.update(dict(
         host_name=dict(type='str', required=True),
-        host_groups=dict(type='list', required=False),
-        link_templates=dict(type='list', required=False),
+        host_groups=dict(type='list', required=False, elements='str'),
+        link_templates=dict(type='list', required=False, elements='str'),
         status=dict(type='str', default="enabled", choices=['enabled', 'disabled']),
         state=dict(type='str', default="present", choices=['present', 'absent']),
         inventory_mode=dict(type='str', required=False, choices=['automatic', 'manual', 'disabled']),
