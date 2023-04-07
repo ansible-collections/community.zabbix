@@ -305,7 +305,8 @@ options:
                 elements: str
                 description:
                     - Users (usernames or aliases) to send messages to.
-            message:
+            op_message:
+                type: str
                 description:
                     - Operation message text.
                     - Will check the 'default message' and use the text from I(default_message) if this and I(default_subject) are not specified
@@ -522,6 +523,11 @@ options:
                     - Can be used with I(type=send_message) or I(type=notify_all_involved) inside I(acknowledge_operations).
                     - Set to C(all) for all media types
                 default: 'all'
+            op_message:
+                type: str
+                description:
+                    - Operation message text.
+                    - Will check the 'default message' and use the text from I(default_message) if this and I(default_subject) are not specified
             subject:
                 type: str
                 description:
@@ -643,6 +649,11 @@ options:
                     - Can be used with I(type=send_message) or I(type=notify_all_involved) inside I(acknowledge_operations).
                     - Set to C(all) for all media types
                 default: 'all'
+            op_message:
+                type: str
+                description:
+                    - Operation message text.
+                    - Will check the 'default message' and use the text from I(default_message) if this and I(default_subject) are not specified
             subject:
                 type: str
                 description:
@@ -727,7 +738,7 @@ EXAMPLES = '''
     operations:
       - type: send_message
         subject: "Something bad is happening"
-        message: "Come on, guys do something"
+        op_message: "Come on, guys do something"
         media_type: 'Email'
         send_to_users:
           - 'Admin'
@@ -795,14 +806,14 @@ EXAMPLES = '''
     operations:
       - type: send_message
         subject: "Something bad is happening"
-        message: "Come on, guys do something"
+        op_message: "Come on, guys do something"
         media_type: 'Email'
         send_to_users:
           - 'Admin'
     recovery_operations:
       - type: send_message
         subject: "Host is down"
-        message: "Come on, guys do something"
+        op_message: "Come on, guys do something"
         media_type: 'Email'
         send_to_users:
           - 'Admin'
@@ -1359,11 +1370,11 @@ class Operations(Zapi):
         """
         try:
             return {
-                'default_msg': '0' if operation.get('message') is not None or operation.get('subject') is not None else '1',
+                'default_msg': '0' if operation.get('op_message') is not None or operation.get('subject') is not None else '1',
                 'mediatypeid': self._zapi_wrapper.get_mediatype_by_mediatype_name(
                     operation.get('media_type')
                 ) if operation.get('media_type') is not None else '0',
-                'message': operation.get('message'),
+                'message': operation.get('op_message'),
                 'subject': operation.get('subject'),
             }
         except Exception as e:
@@ -2130,7 +2141,7 @@ def main():
                 # when type is send_message
                 media_type=dict(type='str', required=False, default='all'),
                 subject=dict(type='str', required=False),
-                message=dict(type='str', required=False),
+                op_message=dict(type='str', required=False),
                 send_to_groups=dict(type='list', required=False, elements='str'),
                 send_to_users=dict(type='list', required=False, elements='str'),
                 # when type is add_to_host_group or remove_from_host_group
@@ -2203,7 +2214,7 @@ def main():
                 # when type is send_message
                 media_type=dict(type='str', required=False, default='all'),
                 subject=dict(type='str', required=False),
-                message=dict(type='str', required=False),
+                op_message=dict(type='str', required=False),
                 send_to_groups=dict(type='list', required=False, elements='str'),
                 send_to_users=dict(type='list', required=False, elements='str'),
             ),
@@ -2272,7 +2283,7 @@ def main():
                 # when type is send_message
                 media_type=dict(type='str', required=False, default='all'),
                 subject=dict(type='str', required=False),
-                message=dict(type='str', required=False),
+                op_message=dict(type='str', required=False),
                 send_to_groups=dict(type='list', required=False, elements='str'),
                 send_to_users=dict(type='list', required=False, elements='str'),
             ),
