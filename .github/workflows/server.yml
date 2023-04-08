@@ -33,6 +33,7 @@ jobs:
           - mysql
           - pgsql
         version:
+          - v64
           - v62
           - v60
         include:
@@ -42,6 +43,10 @@ jobs:
             version: v62
           - container: ubuntu1804
             version: v62
+          - container: ubuntu1804
+            version: v64
+          - container: debian10
+            version: v64
     steps:
       - name: Check out code
         uses: actions/checkout@v1
