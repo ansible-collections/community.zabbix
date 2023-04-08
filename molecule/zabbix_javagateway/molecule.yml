@@ -28,12 +28,12 @@ provisioner:
         ansible_python_interpreter: /usr/bin/python3
       python:
         ansible_python_interpreter: /usr/bin/python
+      v64:
+        zabbix_javagateway_version: 6.4
       v62:
         zabbix_javagateway_version: 6.2
       v60:
         zabbix_javagateway_version: 6.0
-      v50:
-        zabbix_javagateway_version: 5.0
 
 verifier:
   name: testinfra
