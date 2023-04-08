@@ -25,6 +25,7 @@ jobs:
           # - version: "5.4" # only activate after basic compatibility
           - version: "6.0"
           - version: "6.2"
+          - version: "6.4"
         ansible:
           # https://docs.ansible.com/ansible/latest/reference_appendices/release_and_maintenance.html#ansible-core-changelogs
           - stable-2.12

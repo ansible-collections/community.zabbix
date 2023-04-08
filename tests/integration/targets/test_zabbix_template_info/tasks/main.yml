@@ -27,6 +27,10 @@
 - assert:
     that:
       - fetch_template_json_format_result.template_json[template_export_key].date is defined
+  when: zabbix_version is version('6.2', '<=')
+
+- assert:
+    that:
       - fetch_template_json_format_result.template_json[template_export_key][template_groups_key].0.name == "Templates"
       - fetch_template_json_format_result.template_json[template_export_key].templates.0.name == "ExampleTemplateForTempleteInfoModule"
       - fetch_template_json_format_result.template_json[template_export_key].templates.0.template == "ExampleTemplateForTempleteInfoModule"

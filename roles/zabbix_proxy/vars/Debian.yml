@@ -1,26 +1,41 @@
 zabbix_valid_proxy_versions:
   # Debian
   "11":
+    - 6.4
+    - 6.0
+  "10":
     - 6.2
     - 6.0
-    - 5.0
-    - 4.0
-  "10":
+  "22":
+    - 6.4
     - 6.0
     - 5.0
-    - 4.0
-  "9":
-    - 4.0
+  "20":
+    - 6.4
+    - 6.0
+  "18":
+    - 6.2
+    - 6.0
+
+mysql_client_pkgs:
+  # Debian
+  "11":
+    - mycli
+    - "{{ zabbix_python_prefix }}-mysqldb"
+  "10":
+    - mariadb-client
+    - "{{ zabbix_python_prefix }}-mysqldb"
   # Ubuntu
   "22":
-    - 6.2
-    - 6.0
+    - mycli
+    - "{{ zabbix_python_prefix }}-mysqldb"
   "20":
-    - 6.2
-    - 6.0
-    - 5.0
-    - 4.0
+    - mycli
+    - "{{ zabbix_python_prefix }}-mysqldb"
   "18":
-    - 6.0
-    - 5.0
-    - 4.0
+    - mycli
+    - "{{ zabbix_python_prefix }}-mysqldb"
+
+mysql_plugin:
+  "18": mysql_native_password
+  "10": mysql_native_password

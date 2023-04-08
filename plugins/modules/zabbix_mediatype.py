@@ -201,12 +201,12 @@ options:
     event_menu_url:
         type: 'str'
         description:
-            - Requred when I(event_menu=True).
+            - Requred when I(event_menu=true).
             - Event menu entry underlying URL.
     event_menu_name:
         type: 'str'
         description:
-            - Requred when I(event_menu=True).
+            - Requred when I(event_menu=true).
             - Event menu entry name.
     webhook_params:
         type: 'list'
@@ -277,16 +277,6 @@ extends_documentation_fragment:
 RETURN = r''' # '''
 
 EXAMPLES = r'''
-# Set following variables for Zabbix Server host in play or inventory
-- name: Set connection specific variables
-  set_fact:
-    ansible_network_os: community.zabbix.zabbix
-    ansible_connection: httpapi
-    ansible_httpapi_port: 80
-    ansible_httpapi_use_ssl: false
-    ansible_httpapi_validate_certs: false
-    ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
-
 # If you want to use Username and Password to be authenticated by Zabbix Server
 - name: Set credentials to access Zabbix Server API
   set_fact:
@@ -300,6 +290,15 @@ EXAMPLES = r'''
     ansible_zabbix_auth_key: 8ec0d52432c15c91fcafe9888500cf9a607f44091ab554dbee860f6b44fac895
 
 - name: 'Create an email mediatype with SMTP authentication'
+  # set task level variables as we change ansible_connection plugin here
+  vars:
+    ansible_network_os: community.zabbix.zabbix
+    ansible_connection: httpapi
+    ansible_httpapi_port: 443
+    ansible_httpapi_use_ssl: true
+    ansible_httpapi_validate_certs: false
+    ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
+    ansible_host: zabbix-example-fqdn.org
   community.zabbix.zabbix_mediatype:
     name: "Ops email"
     type: 'email'
@@ -311,6 +310,15 @@ EXAMPLES = r'''
     password: 'smtp_pass'
 
 - name: 'Create a script mediatype'
+  # set task level variables as we change ansible_connection plugin here
+  vars:
+    ansible_network_os: community.zabbix.zabbix
+    ansible_connection: httpapi
+    ansible_httpapi_port: 443
+    ansible_httpapi_use_ssl: true
+    ansible_httpapi_validate_certs: false
+    ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
+    ansible_host: zabbix-example-fqdn.org
   community.zabbix.zabbix_mediatype:
     name: "my script"
     type: 'script'
@@ -320,6 +328,15 @@ EXAMPLES = r'''
       - 'arg2'
 
 - name: 'Create a jabber mediatype'
+  # set task level variables as we change ansible_connection plugin here
+  vars:
+    ansible_network_os: community.zabbix.zabbix
+    ansible_connection: httpapi
+    ansible_httpapi_port: 443
+    ansible_httpapi_use_ssl: true
+    ansible_httpapi_validate_certs: false
+    ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
+    ansible_host: zabbix-example-fqdn.org
   community.zabbix.zabbix_mediatype:
     name: "My jabber"
     type: 'jabber'
@@ -327,6 +344,15 @@ EXAMPLES = r'''
     password: 'jabber_pass'
 
 - name: 'Create a SMS mediatype'
+  # set task level variables as we change ansible_connection plugin here
+  vars:
+    ansible_network_os: community.zabbix.zabbix
+    ansible_connection: httpapi
+    ansible_httpapi_port: 443
+    ansible_httpapi_use_ssl: true
+    ansible_httpapi_validate_certs: false
+    ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
+    ansible_host: zabbix-example-fqdn.org
   community.zabbix.zabbix_mediatype:
     name: "My SMS Mediatype"
     type: 'sms'
@@ -334,6 +360,15 @@ EXAMPLES = r'''
 
 # Supported since Zabbix 4.4
 - name: 'Create a webhook mediatype'
+  # set task level variables as we change ansible_connection plugin here
+  vars:
+    ansible_network_os: community.zabbix.zabbix
+    ansible_connection: httpapi
+    ansible_httpapi_port: 443
+    ansible_httpapi_use_ssl: true
+    ansible_httpapi_validate_certs: false
+    ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
+    ansible_host: zabbix-example-fqdn.org
   community.zabbix.zabbix_mediatype:
     name: "My webhook Mediatype"
     type: 'webhook'
@@ -343,13 +378,22 @@ EXAMPLES = r'''
         value: '{ALERT.MESSAGE}'
       - name: zabbix_url
         value: '{$ZABBIX.URL}'
-    process_tags: True
+    process_tags: true
     event_menu: true
     event_menu_name: "Open in Slack: '{EVENT.TAGS.__channel_name}'"
     event_menu_url: '{EVENT.TAGS.__message_link}'
 
 # Supported since Zabbix 5.0
 - name: 'Create an email mediatype with message templates'
+  # set task level variables as we change ansible_connection plugin here
+  vars:
+    ansible_network_os: community.zabbix.zabbix
+    ansible_connection: httpapi
+    ansible_httpapi_port: 443
+    ansible_httpapi_use_ssl: true
+    ansible_httpapi_validate_certs: false
+    ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
+    ansible_host: zabbix-example-fqdn.org
   community.zabbix.zabbix_mediatype:
     name: "Ops email"
     type: 'email'
@@ -381,7 +425,7 @@ EXAMPLES = r'''
 from ansible.module_utils.basic import AnsibleModule
 
 from ansible_collections.community.zabbix.plugins.module_utils.base import ZabbixBase
-from ansible_collections.community.zabbix.plugins.module_utils.version import LooseVersion
+from ansible.module_utils.compat.version import LooseVersion
 
 import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabbix_utils
 
@@ -509,14 +553,24 @@ class MediaTypeModule(ZabbixBase):
             return parameters
 
         elif self._module.params['type'] == 'script':
-            if self._module.params['script_params'] is None:
-                _script_params = ''  # ZBX-15706
+            if LooseVersion(self._zbx_api_version) < LooseVersion('6.4'):
+                if self._module.params['script_params'] is None:
+                    _script_params = ''  # ZBX-15706
+                else:
+                    _script_params = '\n'.join(str(i) for i in self._module.params['script_params']) + '\n'
+                parameters.update(dict(
+                    exec_path=self._module.params['script_name'],
+                    exec_params=_script_params
+                ))
             else:
-                _script_params = '\n'.join(str(i) for i in self._module.params['script_params']) + '\n'
-            parameters.update(dict(
-                exec_path=self._module.params['script_name'],
-                exec_params=_script_params
-            ))
+                _script_params = []
+                if self._module.params['script_params']:
+                    for i, val in enumerate(self._module.params['script_params']):
+                        _script_params.append({'sortorder': str(i), 'value': val})
+                parameters.update(dict(
+                    exec_path=self._module.params['script_name'],
+                    parameters=_script_params
+                ))
             return parameters
 
         elif self._module.params['type'] == 'sms':
@@ -605,8 +659,16 @@ class MediaTypeModule(ZabbixBase):
             for key in kwargs:
                 # sort list of parameters to prevent mismatch due to reordering
                 if key == 'parameters' and (kwargs[key] != [] or existing_mediatype[key] != []):
-                    kwargs[key] = sorted(kwargs[key], key=lambda x: x['name'])
-                    existing_mediatype[key] = sorted(existing_mediatype[key], key=lambda x: x['name'])
+                    if LooseVersion(self._zbx_api_version) < LooseVersion('6.4'):
+                        kwargs[key] = sorted(kwargs[key], key=lambda x: x['name'])
+                        existing_mediatype[key] = sorted(existing_mediatype[key], key=lambda x: x['name'])
+                    else:
+                        if kwargs['type'] == '1':  # script
+                            kwargs[key] = sorted(kwargs[key], key=lambda x: x['sortorder'])
+                            existing_mediatype[key] = sorted(existing_mediatype[key], key=lambda x: x['sortorder'])
+                        elif kwargs['type'] == '4':  # webhook
+                            kwargs[key] = sorted(kwargs[key], key=lambda x: x['name'])
+                            existing_mediatype[key] = sorted(existing_mediatype[key], key=lambda x: x['name'])
 
                 if key == 'message_templates' and (kwargs[key] != [] or existing_mediatype[key] != []):
                     kwargs[key] = sorted(kwargs[key], key=lambda x: x['subject'])
@@ -648,7 +710,7 @@ def main():
         attempt_interval=dict(type='str', default='10s', required=False),
         # Script
         script_name=dict(type='str', required=False),
-        script_params=dict(type='list', required=False),
+        script_params=dict(type='list', required=False, elements='str'),
         # SMS
         gsm_modem=dict(type='str', required=False),
         # Jabber

@@ -31,16 +31,26 @@ def test_zabbix_package(host, proxy):
     if zabbixhost == proxy:
         zabbix_proxy = host.package(proxy)
         if host.system_info.distribution in ["debian", "ubuntu"]:
-            assert zabbix_proxy.version.startswith("1:6.2")
+            assert zabbix_proxy.version.startswith("1:6.4")
         elif host.system_info.distribution == "centos":
-            assert zabbix_proxy.version.startswith("6.2")
+            assert zabbix_proxy.version.startswith("6.4")
         assert zabbix_proxy.is_installed
 
 
 def test_zabbix_proxy_dot_conf(host):
-    zabbix_proxy_conf = host.file("/etc/zabbix/zabbix_proxy.conf")
-    assert zabbix_proxy_conf.user == "zabbix"
-    assert zabbix_proxy_conf.group == "zabbix"
+    found = False
+    for file_name in [
+        "/etc/zabbix/zabbix_proxy.conf",
+        "/etc/zabbix_proxy.conf",
+    ]:
+        if host.file(file_name).exists:
+            found = True
+            break
+
+    assert found
+    zabbix_proxy_conf = host.file(file_name)
+    assert zabbix_proxy_conf.user in ["zabbix", "zabbixsrv"]
+    assert zabbix_proxy_conf.group in ["zabbix", "zabbixsrv"]
     assert zabbix_proxy_conf.mode == 0o644
 
     assert zabbix_proxy_conf.contains("ListenPort=10051")
@@ -50,14 +60,24 @@ def test_zabbix_proxy_dot_conf(host):
 def test_zabbix_include_dir(host):
     zabbix_include_dir = host.file("/etc/zabbix/zabbix_proxy.conf.d")
     assert zabbix_include_dir.is_directory
-    assert zabbix_include_dir.user == "zabbix"
-    assert zabbix_include_dir.group == "zabbix"
+    assert zabbix_include_dir.user in ["zabbix", "zabbixsrv"]
+    assert zabbix_include_dir.group in ["zabbix", "zabbixsrv"]
     # assert zabbix_include_dir.mode == 0o644
 
 
 def test_zabbix_proxy_logfile(host):
-    zabbix_logfile = host.file("/var/log/zabbix/zabbix_proxy.log")
+    found = False
+    for file_name in [
+        "/var/log/zabbix/zabbix_proxy.log",
+        "/var/log/zabbixsrv/zabbix_proxy.log",
+    ]:
+        if host.file(file_name).exists:
+            found = True
+            break
 
+    assert found
+
+    zabbix_logfile = host.file(file_name)
     assert not zabbix_logfile.contains("Access denied for user")
     assert not zabbix_logfile.contains("database is down: reconnecting")
     assert zabbix_logfile.contains("current database version")

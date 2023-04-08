@@ -75,24 +75,24 @@ ansible-galaxy collection install community.postgresql
 
 See the following list of supported Operating systems with the Zabbix releases:
 
-| Zabbix              | 6.2 | 6.0 | 5.4 | 5.2 | 5.0 (LTS) | 4.4 | 4.0 (LTS) | 3.0 (LTS) |
-|---------------------|-----|-----|-----|-----|-----------|-----|-----------|-----------|
-| Red Hat Fam 9       |  V  |  V  |     |     |           |     |           |           |
-| Red Hat Fam 8       |  V  |  V  |  V  |  V  |  V        | V   |           |           |
-| Red Hat Fam 7       |     |     |     |     |  V        | V   | V         | V         |
-| Red Hat Fam 6       |     |     |     |  V  |  V        |     |           | V         |
-| Red Hat Fam 5       |     |     |     |  V  |  V        |     |           | V         |
-| Fedora              |     |     |     |     |           | V   | V         |           |
-| Ubuntu 20.04 focal  |  V  |  V  |  V  |  V  |  V        |     | V         |           |
-| Ubuntu 18.04 bionic |     |  V  |  V  |  V  |  V        | V   | V         |           |
-| Ubuntu 16.04 xenial |     |     |     |  V  |  V        | V   | V         |           |
-| Ubuntu 14.04 trusty |     |     |     |  V  |  V        | V   | V         | V         |
-| Debian 10 buster    |     |  V  |  V  |  V  |  V        | V   |           |           |
-| Debian 9 stretch    |     |  V  |  V  |  V  |  V        | V   | V         |           |
-| Debian 8 jessie     |     |     |     |  V  |  V        | V   | V         | V         |
-| Debian 7 wheezy     |     |     |     |     |           |     | V         | V         |
-| macOS 10.15         |     |     |     |     |           | V   | V         |           |
-| macOS 10.14         |     |     |     |     |           | V   | V         |           |
+| Zabbix              | 6.4 | 6.2 | 6.0 | 5.4 | 5.2 | 5.0 (LTS) | 4.4 | 4.0 (LTS) | 3.0 (LTS) |
+|---------------------|-----|-----|-----|-----|-----|-----------|-----|-----------|-----------|
+| Red Hat Fam 9       |  V  |  V  |  V  |     |     |           |     |           |           |
+| Red Hat Fam 8       |  V  |  V  |  V  |  V  |  V  |  V        | V   |           |           |
+| Red Hat Fam 7       |     |     |     |     |     |  V        | V   | V         | V         |
+| Red Hat Fam 6       |     |     |     |     |  V  |  V        |     |           | V         |
+| Red Hat Fam 5       |     |     |     |     |  V  |  V        |     |           | V         |
+| Fedora              |     |     |     |     |     |           | V   | V         |           |
+| Ubuntu 20.04 focal  |  V  |  V  |  V  |  V  |  V  |  V        |     | V         |           |
+| Ubuntu 18.04 bionic |     |     |  V  |  V  |  V  |  V        | V   | V         |           |
+| Ubuntu 16.04 xenial |     |     |     |     |  V  |  V        | V   | V         |           |
+| Ubuntu 14.04 trusty |     |     |     |     |  V  |  V        | V   | V         | V         |
+| Debian 10 buster    |     |     |  V  |  V  |  V  |  V        | V   |           |           |
+| Debian 9 stretch    |     |     |  V  |  V  |  V  |  V        | V   | V         |           |
+| Debian 8 jessie     |     |     |     |     |  V  |  V        | V   | V         | V         |
+| Debian 7 wheezy     |     |     |     |     |     |           |     | V         | V         |
+| macOS 10.15         |     |     |     |     |     |           | V   | V         |           |
+| macOS 10.14         |     |     |     |     |     |           | V   | V         |           |
 
 See https://support.zabbix.com/browse/ZBX-18790 why RHEL7 is not supported anymore.
 
@@ -112,14 +112,8 @@ The following is an overview of all available configuration default for this rol
 
 * `zabbix_server_version`: This is the version of zabbix. Default: The highest supported version for the operating system. Can be overridden to 6.2, 6.0, 5.4, 5.2, 5.0, 4.4, 4.0, 3.4, 3.2, 3.0, 2.4, or 2.2. Previously the variable `zabbix_version` was used directly but it could cause [some inconvenience](https://github.com/dj-wasabi/ansible-zabbix-agent/pull/303). That variable is maintained by retrocompativility.
 * `zabbix_server_version_minor`: When you want to specify a minor version to be installed. RedHat only. Default set to: `*` (latest available)
-* `zabbix_repo`: Default: `zabbix`
-  * `epel`: install agent from EPEL repo
-  * `zabbix`: (default) install agent from Zabbix repo
-  * `other`: install agent from pre-existing or other repo
 * `zabbix_repo_yum`: A list with Yum repository configuration.
 * `zabbix_repo_yum_schema`: Default: `https`. Option to change the web schema for the yum repository(http/https)
-* `zabbix_repo_yum_disabled`: A string with repository names that should be disabled when installing Zabbix component specific packages. Is only used when `zabbix_repo_yum_enabled` contains 1 or more repositories. Default `*`.
-* `zabbix_repo_yum_enabled`: A list with repository names that should be enabled when installing Zabbix component specific packages.
 * `zabbix_service_state`: Default: `started`. Can be overridden to stopped if needed
 * `zabbix_service_enabled`: Default: `True` Can be overridden to `False` if needed
 
@@ -136,10 +130,6 @@ The following is an overview of all available configuration default for this rol
 * `zabbix_server_install_recommends`: Default: `True`. `False` does not install the recommended packages that come with the zabbix-server install.
 * `zabbix_server_manage_service`: Default: `True`. When you run multiple Zabbix servers in a High Available cluster setup (e.g. pacemaker), you don't want Ansible to manage the zabbix-server service, because Pacemaker is in control of zabbix-server service and in this case, it needs to be set to `False`.
 * `zabbix_proxy_startpreprocessors`: Number of pre-forked instances of preprocessing workers. The preprocessing manager process is automatically started when a preprocessor worker is started. This parameter is supported since Zabbix 4.2.0.
-* `zabbix_server_username`: Default: `zabbix`. The name of the account on the host. Will only be used when `zabbix_repo: epel` is used.
-* `zabbix_server_userid`: The UID of the account on the host. Will only be used when `zabbix_repo: epel` is used.
-* `zabbix_server_groupname`: Default: `zabbix`. The name of the group of the user on the host. Will only be used when `zabbix_repo: epel` is used.
-* `zabbix_server_groupid`: The GID of the group on the host. Will only be used when `zabbix_repo: epel` is used.
 * `zabbix_server_include_mode`: Default: `0755`. The "mode" for the directory configured with `zabbix_server_include`.
 * `zabbix_server_conf_mode`: Default: `0640`. The "mode" for the Zabbix configuration file.
 * `zabbix_server_listenbacklog`: The maximum number of pending connections in the queue.
@@ -152,6 +142,7 @@ The following is an overview of all available configuration default for this rol
 * `zabbix_server_webserviceurl`: URL to Zabbix web service, used to perform web related tasks.
 * `zabbix_server_servicemanagersyncfrequency`: How often Zabbix will synchronize configuration of a service manager (in seconds).
 * `zabbix_server_problemhousekeepingfrequency`: How often Zabbix will delete problems for deleted triggers (in seconds).
+* `zabbix_server_connectors`: Number of pre-forked instances of preprocessing workers.
 
 ### High Availability
 

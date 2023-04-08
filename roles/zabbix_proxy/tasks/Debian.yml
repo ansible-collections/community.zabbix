@@ -1,71 +1,18 @@
 ---
-- name: "Include Zabbix gpg ids"
+- name: "Debian | Include Zabbix gpg ids"
   include_vars: zabbix.yml
 
-- name: "Set some variables"
+- name: "Debian | Set short version name"
   set_fact:
-    zabbix_short_version: "{{ zabbix_version | regex_replace('\\.', '') }}"
-    zabbix_proxy_apt_repository:
-      - "http://repo.zabbix.com/zabbix/{{ zabbix_version }}/{{ ansible_distribution.lower() }}/"
-      - "{{ ansible_distribution_release }}"
-      - "main"
-    zabbix_underscore_version: "{{ zabbix_version | regex_replace('\\.', '_') }}"
+    zabbix_short_version: "{{ zabbix_proxy_version | regex_replace('\\.', '') }}"
     zabbix_python_prefix: "python{% if ansible_python_version is version('3', '>=') %}3{% endif %}"
-  when:
-    - ansible_machine != "aarch64"
+    zabbix_underscore_version: "{{ zabbix_proxy_version | regex_replace('\\.', '_') }}"
 
-- name: "Set some variables"
+- name: "Debian | Set some facts for Zabbix"
   set_fact:
-    zabbix_short_version: "{{ zabbix_version | regex_replace('\\.', '') }}"
-    zabbix_proxy_apt_repository:
-      - "http://repo.zabbix.com/zabbix/{{ zabbix_version }}/{{ ansible_distribution.lower() }}-arm64/"
-      - "{{ ansible_distribution_release }}"
-      - "main"
-    zabbix_underscore_version: "{{ zabbix_version | regex_replace('\\.', '_') }}"
-    zabbix_python_prefix: "python{% if ansible_python_version is version('3', '>=') %}3{% endif %}"
-  when:
-    - ansible_machine == "aarch64"
-
-- name: "Debian | Set some facts"
-  set_fact:
-    apache_log: apache2
-    datafiles_path: "/usr/share/zabbix-proxy-{{ zabbix_proxy_database }}"
-  when:
-    - zabbix_version is version_compare('3.0', '<')
+    datafiles_path: /usr/share/doc/zabbix-sql-scripts/{{ zabbix_proxy_db_long }}
   tags:
-    - zabbix-proxy
-    - init
-    - config
-
-- name: "Debian | Set some facts for Zabbix >= 3.0 && < 5.4"
-  set_fact:
-    apache_log: apache2
-    datafiles_path: /usr/share/doc/zabbix-proxy-{{ zabbix_proxy_database }}
-  when:
-    - zabbix_version is version('3.0', '>=')
-    - zabbix_version is version('5.4', '<')
-  tags:
-    - zabbix-proxy
-    - init
-    - config
-
-- name: "Debian | Set some facts for Zabbix == 5.4"
-  set_fact:
-    datafiles_path: /usr/share/doc/zabbix-sql-scripts/{{ zabbix_proxy_database_long }}
-  when:
-    - zabbix_version is version('5.4', '==')
-  tags:
-    - zabbix-proxy
-    - init
-    - config
-
-- name: "Debian | Set some facts for Zabbix >= 6.0"
-  set_fact:
-    datafiles_path: /usr/share/zabbix-sql-scripts/{{ zabbix_proxy_database_long }}
-  when:
-    - zabbix_version is version('6.0', '>=')
-  tags:
-    - zabbix-proxy
+    - zabbix-server
     - init
     - config
 
@@ -89,8 +36,7 @@
     url: http://repo.zabbix.com/zabbix-official-repo.key
   register: are_zabbix_proxy_dependency_packages_installed
   until: are_zabbix_proxy_dependency_packages_installed is succeeded
-  when:
-    - zabbix_repo == "zabbix"
+
   become: true
   tags:
     - zabbix-proxy
@@ -98,9 +44,8 @@
 
 - name: "Debian | Installing repository {{ ansible_distribution }}"
   apt_repository:
-    repo: "{{ item }} {{ zabbix_proxy_apt_repository | join(' ') }}"
+    repo: "{{ item }} http://repo.zabbix.com/zabbix/{{ zabbix_proxy_version }}/{{ ansible_distribution.lower() }}/ {{ ansible_distribution_release }} main"
     state: present
-  when: zabbix_repo == "zabbix"
   become: true
   with_items:
     - deb-src
@@ -108,16 +53,16 @@
   tags:
     - zabbix-proxy
     - init
-    
+
 - name: "Debian | Create /etc/apt/preferences.d/"
   file:
     path: /etc/apt/preferences.d/
     state: directory
-    mode: '0755'
+    mode: "0755"
   when:
     - zabbix_proxy_apt_priority | int
   become: true
-  
+
 - name: "Debian | Configuring the weight for APT"
   copy:
     dest: "/etc/apt/preferences.d/zabbix-proxy-{{ zabbix_proxy_database }}"
@@ -126,61 +71,25 @@
       Pin: origin repo.zabbix.com
       Pin-Priority: {{ zabbix_proxy_apt_priority }}
     owner: root
-    mode: '0644'
+    mode: "0644"
   when:
     - zabbix_proxy_apt_priority | int
   become: true
 
-- name: Check if warn parameter can be used for shell module
-  set_fact:
-    produce_warn: False
-  when: ansible_version.full is version("2.14", "<")
-
-- name: apt-get clean
-  shell: apt-get clean; apt-get update
-  args:
-    warn: "{{ produce_warn | default(omit) }}"
-  changed_when: false
-  become: true
-  tags:
-    - skip_ansible_lint
-    
-# On certain 18.04 images, such as docker or lxc, dpkg is configured not to
-# install files into paths /usr/share/doc/*
-# Since this is where Zabbix installs its database schemas, we need to allow
-# files to be installed to /usr/share/doc/zabbix*
-- name: Check for the dpkg exclude line
-  command: grep -F 'path-exclude=/usr/share/doc/*' /etc/dpkg/dpkg.cfg.d/excludes
-  register: dpkg_exclude_line
-  failed_when: false
-  changed_when: false
-  check_mode: false
- 
-- name: Allow Zabbix dpkg installs to /usr/share/doc/zabbix*
-  lineinfile:
-    path: /etc/dpkg/dpkg.cfg.d/excludes
-    line: 'path-include=/usr/share/doc/zabbix*'
-  become: true
-  when:
-    - dpkg_exclude_line.rc == 0
-
 - name: "Debian | Installing zabbix-proxy-{{ zabbix_proxy_database }}"
   apt:
-    pkg: zabbix-proxy-{{ zabbix_proxy_database }}
-    state: "{{ zabbix_proxy_package_state }}"
+    pkg: "zabbix-proxy-{{ zabbix_proxy_database }}"
     update_cache: true
-    cache_valid_time: 0
-    install_recommends: "{{ zabbix_proxy_install_recommends }}"
+    cache_valid_time: 3600
+    force: true
+    state: "{{ zabbix_proxy_package_state }}"
     default_release: "{{ ansible_distribution_release }}"
   environment:
     http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
     https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
-  register: zabbix_proxy_package_installed
-  until: zabbix_proxy_package_installed is succeeded
+  register: is_zabbix_proxy_package_installed
+  until: is_zabbix_proxy_package_installed is succeeded
   become: true
-  tags:
-    - zabbix-proxy
-    - init
 
 - name: "Debian | Installing zabbix-sql-scripts"
   apt:
@@ -195,10 +104,10 @@
   register: zabbix_proxy_package_sql_installed
   until: zabbix_proxy_package_sql_installed is succeeded
   when:
-    - zabbix_version is version('5.4', '>=')
+    - zabbix_proxy_version is version('6.0', '>=')
   become: true
   tags:
-    - zabbix-proxy
+    - zabbix-server
     - init
 
 - name: "Debian | Install Ansible module dependencies"
@@ -214,14 +123,12 @@
   when:
     - zabbix_database_creation
   tags:
-    - zabbix-proxy
+    - zabbix-server
     - init
 
 - name: "Debian | Install Mysql Client package"
   apt:
-    name:
-      - default-mysql-client
-      - "{{ zabbix_python_prefix }}-mysqldb"
+    name: "{{ mysql_client_pkgs[ansible_distribution_major_version] }}"
     state: present
   environment:
     http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
@@ -232,30 +139,8 @@
   when:
     - zabbix_proxy_database == 'mysql'
     - zabbix_proxy_install_database_client
-    - ansible_distribution_release != "buster"
   tags:
-    - zabbix-proxy
-    - init
-    - database
-
-- name: "Debian 10 | Install Mysql Client package"
-  apt:
-    name:
-      - mariadb-client
-      - "{{ zabbix_python_prefix }}-mysqldb"
-    state: present
-  environment:
-    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
-    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
-  register: zabbix_proxy_dependencies_installed
-  until: zabbix_proxy_dependencies_installed is succeeded
-  become: true
-  when:
-    - zabbix_proxy_database == 'mysql'
-    - zabbix_proxy_install_database_client
-    - ansible_distribution_release == "buster"
-  tags:
-    - zabbix-proxy
+    - zabbix-server
     - init
     - database
 

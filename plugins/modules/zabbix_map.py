@@ -116,16 +116,6 @@ extends_documentation_fragment:
 RETURN = r''' # '''
 
 EXAMPLES = r'''
-# Set following variables for Zabbix Server host in play or inventory
-- name: Set connection specific variables
-  set_fact:
-    ansible_network_os: community.zabbix.zabbix
-    ansible_connection: httpapi
-    ansible_httpapi_port: 80
-    ansible_httpapi_use_ssl: false
-    ansible_httpapi_validate_certs: false
-    ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
-
 # If you want to use Username and Password to be authenticated by Zabbix Server
 - name: Set credentials to access Zabbix Server API
   set_fact:
@@ -180,6 +170,15 @@ EXAMPLES = r'''
 ###
 ### Create Zabbix map "Demo Map" made of template 'map.j2'
 - name: Create Zabbix map
+  # set task level variables as we change ansible_connection plugin here
+  vars:
+    ansible_network_os: community.zabbix.zabbix
+    ansible_connection: httpapi
+    ansible_httpapi_port: 443
+    ansible_httpapi_use_ssl: true
+    ansible_httpapi_validate_certs: false
+    ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
+    ansible_host: zabbix-example-fqdn.org
   community.zabbix.zabbix_map:
     name: Demo map
     state: present
@@ -202,7 +201,7 @@ from operator import itemgetter
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 
 from ansible_collections.community.zabbix.plugins.module_utils.base import ZabbixBase
-from ansible_collections.community.zabbix.plugins.module_utils.version import LooseVersion
+from ansible.module_utils.compat.version import LooseVersion
 
 import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabbix_utils
 

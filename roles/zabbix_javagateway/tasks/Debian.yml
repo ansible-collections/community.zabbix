@@ -1,11 +1,28 @@
 ---
-
-- name: "Include Zabbix gpg ids"
+- name: "Debian | Include Zabbix gpg ids"
   include_vars: zabbix.yml
 
-- name: "Set some variables"
+- name: "Debian | Set some variables"
   set_fact:
     zabbix_short_version: "{{ zabbix_javagateway_version | regex_replace('\\.', '') }}"
+
+- name: "Debian | Set some variables"
+  set_fact:
+    zabbix_javagateway_apt_repository:
+      - "http://repo.zabbix.com/zabbix/{{ zabbix_javagateway_version }}/{{ ansible_distribution.lower() }}/"
+      - "{{ ansible_distribution_release }}"
+      - "main"
+  when:
+    - ansible_machine != "aarch64"
+
+- name: "Debian | Set some variables"
+  set_fact:
+    zabbix_javagateway_apt_repository:
+      - "http://repo.zabbix.com/zabbix/{{ zabbix_javagateway_version }}/{{ ansible_distribution.lower() }}-arm64/"
+      - "{{ ansible_distribution_release }}"
+      - "main"
+  when:
+    - ansible_machine == "aarch64"
 
 - name: "Debian | Install gpg key"
   apt_key:
@@ -15,63 +32,12 @@
 
 - name: "Debian | Installing repository Debian"
   apt_repository:
-    repo: "deb http://repo.zabbix.com/zabbix/{{ zabbix_javagateway_version }}/debian/ {{ ansible_distribution_release }} main"
+    repo: "{{ item }} {{ zabbix_javagateway_apt_repository | join(' ') }}"
     state: present
   become: true
-  when:
-    - ansible_distribution == "Debian"
-    - zabbix_repo == "zabbix"
-
-- name: "Debian | Installing repository Debian"
-  apt_repository:
-    repo: "deb-src http://repo.zabbix.com/zabbix/{{ zabbix_javagateway_version }}/debian/ {{ ansible_distribution_release }} main"
-    state: present
-  become: true
-  when:
-    - ansible_distribution == "Debian"
-    - ansible_machine == "aarch64"
-    - zabbix_repo == "zabbix"
-
-- name: "Debian | Installing repository Ubuntu"
-  apt_repository:
-    repo: "deb http://repo.zabbix.com/zabbix/{{ zabbix_javagateway_version }}/ubuntu-arm64/ {{ ansible_distribution_release }} main"
-    state: present
-  become: true
-  when:
-    - ansible_distribution == "Ubuntu"
-    - ansible_machine == "aarch64"
-    - zabbix_repo == "zabbix"
-
-
-- name: "Debian | Installing repository Ubuntu"
-  apt_repository:
-    repo: "deb http://repo.zabbix.com/zabbix/{{ zabbix_javagateway_version }}/ubuntu/ {{ ansible_distribution_release }} main"
-    state: present
-  become: true
-  when:
-    - ansible_distribution == "Ubuntu"
-    - ansible_machine != "aarch64"
-    - zabbix_repo == "zabbix"
-
-- name: "Debian | Installing repository Ubuntu"
-  apt_repository:
-    repo: "deb-src http://repo.zabbix.com/zabbix/{{ zabbix_javagateway_version }}/ubuntu-arm64/ {{ ansible_distribution_release }} main"
-    state: present
-  become: true
-  when:
-    - ansible_distribution == "Ubuntu"
-    - ansible_machine == "aarch64"
-    - zabbix_repo == "zabbix"
-
-
-- name: "Debian | Installing repository Ubuntu"
-  apt_repository:
-    repo: "deb-src http://repo.zabbix.com/zabbix/{{ zabbix_javagateway_version }}/ubuntu/ {{ ansible_distribution_release }} main"
-    state: present
-  become: true
-  when:
-    - ansible_distribution == "Ubuntu"
-    - zabbix_repo == "zabbix"
+  with_items:
+    - deb-src
+    - deb
 
 - name: "Debian | Installing zabbix-java-gateway"
   apt:
@@ -87,7 +53,7 @@
   until: zabbix_java_gateway_install is succeeded
   become: true
 
-- name: "Make sure Zabbix Java Gateway is not yet running"
+- name: "Debian | Make sure Zabbix Java Gateway is not yet running"
   systemd:
     name: zabbix-java-gateway
     state: stopped

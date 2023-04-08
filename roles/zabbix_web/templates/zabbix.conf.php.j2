@@ -6,7 +6,7 @@ global $DB, $HISTORY;
 global $DB;
 {% endif %}
 
-$DB['TYPE']        = '{{ zabbix_server_database_long | upper()              }}';
+$DB['TYPE']        = '{{ zabbix_db_type_long | upper()              }}';
 $DB['SERVER']      = '{{ zabbix_server_dbhost                               }}';
 $DB['PORT']        = '{{ zabbix_server_dbport                               }}';
 $DB['DATABASE']    = '{{ zabbix_server_dbname                               }}';

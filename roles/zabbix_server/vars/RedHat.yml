@@ -5,24 +5,22 @@ apache_log: httpd
 
 mysql_create_dir: create/
 
+__epel_repo:
+  - epel
+
 zabbix_valid_server_versions:
   "9":
-    - 6.2
+    - 6.4
     - 6.0
   "8":
-    - 6.2
+    - 6.4
     - 6.0
-    - 5.0
-  "7":
-    - 5.0
 
 pgsql_depenencies:
   "9":
     - python3-psycopg2
   "8":
     - python3-psycopg2
-  "7":
-    - python-psycopg2
 
 mysql_client_pkgs:
   "9":
@@ -31,6 +29,3 @@ mysql_client_pkgs:
   "8":
     - mysql
     - python3-PyMySQL
-  "7":
-    - mariadb
-    - MySQL-python

@@ -79,12 +79,27 @@ class HttpApi(HttpApiBase):
             self.connection._auth = {'auth': self.auth_key}
             return
 
-        http_login_user = self.get_option('http_login_user')
-        if http_login_user and http_login_user != '-42':
+        if not self.auth_key:
             # Provide "fake" auth so netcommon.connection does not replace our headers
             self.connection._auth = {'auth': 'fake'}
-        payload = self.payload_builder("user.login", user=username, password=password)
-        code, response = self.send_request(data=payload)
+
+        # login() method is called "somehow" as a very first call to the REST API.
+        # This collection's code first of all executes api_version() but login() anyway
+        # is called first (I suspect due to complicated (for me) httpapi modules inheritance/communication
+        # model). Bottom line: at the time of login() execution we are not aware of Zabbix version.
+        # Proposed approach: first execute "user.login" with "user" parameter and if it fails then
+        # execute "user.login" with "username" parameter.
+        # Zabbix < 5.0 supports only "user" parameter.
+        # Zabbix >= 6.0 and <= 6.2 support both "user" and "username" parameters.
+        # Zabbix >= 6.4 supports only "username" parameter.
+        try:
+            # Zabbix <= 6.2
+            payload = self.payload_builder("user.login", user=username, password=password)
+            code, response = self.send_request(data=payload)
+        except ConnectionError:
+            # Zabbix >= 6.4
+            payload = self.payload_builder("user.login", username=username, password=password)
+            code, response = self.send_request(data=payload)
 
         if code == 200 and response != '':
             # Replace auth with real api_key we got from Zabbix after successful login
@@ -131,10 +146,11 @@ class HttpApi(HttpApiBase):
             # Need to add Basic auth header
             credentials = (http_login_user + ':' + http_login_password).encode('ascii')
             hdrs['Authorization'] = 'Basic ' + base64.b64encode(credentials).decode("ascii")
-            if data['method'] in ['user.login', 'apiinfo.version']:
-                # user.login and apiinfo.version do not need "auth" in data
-                # we provided fake one in login() method to correctly handle HTTP basic auth header
-                data.pop('auth', None)
+
+        if data['method'] in ['user.login', 'apiinfo.version']:
+            # user.login and apiinfo.version do not need "auth" in data
+            # we provided fake one in login() method to correctly handle HTTP basic auth header
+            data.pop('auth', None)
 
         data = json.dumps(data)
         try:

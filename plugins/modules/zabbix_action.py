@@ -27,16 +27,19 @@ requirements:
 
 options:
     name:
+        type: str
         description:
             - Name of the action
         required: true
     event_source:
+        type: str
         description:
             - Type of events that the action will handle.
             - Required when C(state=present).
         required: false
         choices: ['trigger', 'discovery', 'auto_registration', 'internal']
     state:
+        type: str
         description:
             - State of the action.
             - On C(present), it will create an action if it does not exist or update the action if the associated data is different.
@@ -44,6 +47,7 @@ options:
         choices: ['present', 'absent']
         default: 'present'
     status:
+        type: str
         description:
             - Status of the action.
         choices: ['enabled', 'disabled']
@@ -55,6 +59,7 @@ options:
         type: 'bool'
         default: true
     esc_period:
+        type: str
         description:
             - Default operation step duration. Must be greater than 60 seconds.
             - Accepts only seconds in int for <= Zabbix 3.2
@@ -68,8 +73,10 @@ options:
             - List of conditions to use for filtering results.
             - For more information about suboptions of this option please
               check out Zabbix API documentation U(https://www.zabbix.com/documentation/5.0/manual/api/reference/action/object#action_filter_condition)
+        default: []
         suboptions:
             type:
+                type: str
                 description:
                     - Type (label) of the condition.
                     - C(application) is available only with <= Zabbix 5.2.
@@ -106,7 +113,9 @@ options:
                     - ' - C(host_template)'
                     - ' - C(application)'
                     - ' - C(event_type)'
+                required: true
             value:
+                type: str
                 description:
                     - Value to compare with.
                     - 'When I(type=discovery_status), the choices are:'
@@ -135,34 +144,45 @@ options:
                     - Besides the above options, this is usually either the name
                       of the object or a string to compare with.
             value2:
+                type: str
                 description:
                     - Secondary value to compare with.
                     - Required for trigger actions when condition I(type=event_tag_value).
             operator:
+                type: str
                 description:
                     - Condition operator.
                     - When I(type) is set to C(time_period), the choices are C(in), C(not in).
                     - C(matches), C(does not match), C(Yes) and C(No) condition operators work only with >= Zabbix 4.0
                     - When I(type) is set to C(maintenance_status), the choices are C(Yes) and C(No) for Zabbix >= 6.0
                 choices:
-                    - C(equals) or C(=)
-                    - C(does not equal) or C(<>)
-                    - C(contains) or C(like)
-                    - C(does not contain) or C(not like)
-                    - C(in)
-                    - C(is greater than or equals) or C(>=)
-                    - C(is less than or equals) or C(<=)
-                    - C(not in)
-                    - C(matches)
-                    - C(does not match)
-                    - C(Yes)
-                    - C(No)
+                    - 'equals'
+                    - '='
+                    - 'does not equal'
+                    - '<>'
+                    - 'contains'
+                    - 'like'
+                    - 'does not contain'
+                    - 'not like'
+                    - 'in'
+                    - 'is greater than or equals'
+                    - '>='
+                    - 'is less than or equals'
+                    - '<='
+                    - 'not in'
+                    - 'matches'
+                    - 'does not match'
+                    - 'Yes'
+                    - 'No'
+                required: true
             formulaid:
+                type: str
                 description:
                     - Arbitrary unique ID that is used to reference the condition from a custom expression.
                     - Can only contain upper-case letters.
                     - Required for custom expression filters and ignored otherwise.
     eval_type:
+        type: str
         description:
             - Filter condition evaluation method.
             - Defaults to C(andor) if conditions are less then 2 or if
@@ -174,6 +194,7 @@ options:
             - 'or'
             - 'custom_expression'
     formula:
+        type: str
         description:
             - User-defined expression to be used for evaluating conditions with a custom expression.
             - The expression must contain IDs that reference each condition by its formulaid.
@@ -183,41 +204,56 @@ options:
             - Use sequential IDs that start at "A". If non-sequential IDs are used, Zabbix re-indexes them.
               This makes each module run notice the difference in IDs and update the action.
     default_message:
+        type: str
         description:
             - Problem message default text.
             - With >= Zabbix 5.0 this field is removed from the API and is dropped silently by module.
             - Works only with < Zabbix 5.0
+        default: ''
     default_subject:
+        type: str
         description:
             - Problem message default subject.
             - With >= Zabbix 5.0 this field is removed from the API and is dropped silently by module.
             - Works only with < Zabbix 5.0
+        default: ''
     recovery_default_message:
+        type: str
         description:
             - Recovery message text.
             - With >= Zabbix 5.0 this field is removed from the API and is dropped silently by module.
             - Works only with >= Zabbix 3.2 and < Zabbix 5.0
+        default: ''
     recovery_default_subject:
+        type: str
         description:
             - Recovery message subject.
             - With >= Zabbix 5.0 this field is removed from the API and is dropped silently by module.
             - Works only with >= Zabbix 3.2 and < Zabbix 5.0
+        default: ''
     acknowledge_default_message:
+        type: str
         description:
             - Update operation (known as "Acknowledge operation" before Zabbix 4.0) message text.
             - With >= Zabbix 5.0 this field is removed from the API and is dropped silently by module.
             - Works only with >= Zabbix 3.4 and < Zabbix 5.0
+        default: ''
     acknowledge_default_subject:
+        type: str
         description:
             - Update operation (known as "Acknowledge operation" before Zabbix 4.0) message subject.
             - With >= Zabbix 5.0 this field is removed from the API and is dropped silently by module.
             - Works only with >= Zabbix 3.4 and < Zabbix 5.0
+        default: ''
     operations:
         type: list
+        elements: dict
         description:
             - List of action operations
+        default: []
         suboptions:
             type:
+                type: str
                 description:
                     - Type of operation.
                     - 'Valid choices when setting type for I(recovery_operations) and I(acknowledge_operations):'
@@ -238,7 +274,9 @@ options:
                     - disable_host
                     - set_host_inventory_mode
                     - notify_all_involved
+                required: true
             esc_period:
+                type: str
                 description:
                     - Duration of an escalation step in seconds.
                     - Must be greater than 60 seconds.
@@ -247,31 +285,38 @@ options:
                     - If set to 0 or 0s, the default action escalation period will be used.
                 default: 0s
             esc_step_from:
+                type: int
                 description:
                     - Step to start escalation from.
                 default: 1
             esc_step_to:
+                type: int
                 description:
                     - Step to end escalation at.
                     - Specify 0 for infinitely.
                 default: 1
             send_to_groups:
                 type: list
+                elements: str
                 description:
                     - User groups to send messages to.
             send_to_users:
                 type: list
+                elements: str
                 description:
                     - Users (usernames or aliases) to send messages to.
-            message:
+            op_message:
+                type: str
                 description:
                     - Operation message text.
                     - Will check the 'default message' and use the text from I(default_message) if this and I(default_subject) are not specified
             subject:
+                type: str
                 description:
                     - Operation message subject.
                     - Will check the 'default message' and use the text from I(default_subject) if this and I(default_subject) are not specified
             media_type:
+                type: str
                 description:
                     - Media type that will be used to send the message.
                     - Can be used with I(type=send_message) or I(type=notify_all_involved) inside I(acknowledge_operations).
@@ -286,15 +331,18 @@ options:
                     - not_acknowledged
             host_groups:
                 type: list
+                elements: str
                 description:
                     - List of host groups host should be added to.
                     - Required when I(type=add_to_host_group) or I(type=remove_from_host_group).
             templates:
                 type: list
+                elements: str
                 description:
                     - List of templates host should be linked to.
                     - Required when I(type=link_to_template) or I(type=unlink_from_template).
             inventory:
+                type: str
                 description:
                     - Host inventory mode.
                     - Required when I(type=set_host_inventory_mode).
@@ -302,6 +350,7 @@ options:
                     - manual
                     - automatic
             command_type:
+                type: str
                 description:
                     - Type of operation command.
                     - Required when I(type=remote_command).
@@ -312,10 +361,12 @@ options:
                     - telnet
                     - global_script
             command:
+                type: str
                 description:
                     - Command to run.
                     - Required when I(type=remote_command) and I(command_type!=global_script).
             execute_on:
+                type: str
                 description:
                     - Target on which the custom script operation command will be executed.
                     - Required when I(type=remote_command) and I(command_type=custom_script).
@@ -324,15 +375,20 @@ options:
                     - server
                     - proxy
             run_on_groups:
+                type: list
+                elements: str
                 description:
                     - Host groups to run remote commands on.
                     - Required when I(type=remote_command) and I(run_on_hosts) is not set.
             run_on_hosts:
+                type: list
+                elements: str
                 description:
                     - Hosts to run remote commands on.
                     - Required when I(type=remote_command) and I(run_on_groups) is not set.
                     - If set to 0 the command will be run on the current host.
             ssh_auth_type:
+                type: str
                 description:
                     - Authentication method used for SSH commands.
                     - Required when I(type=remote_command) and I(command_type=ssh).
@@ -340,48 +396,301 @@ options:
                     - password
                     - public_key
             ssh_privatekey_file:
+                type: str
                 description:
                     - Name of the private key file used for SSH commands with public key authentication.
                     - Required when I(ssh_auth_type=public_key).
                     - Can be used when I(type=remote_command).
             ssh_publickey_file:
+                type: str
                 description:
                     - Name of the public key file used for SSH commands with public key authentication.
                     - Required when I(ssh_auth_type=public_key).
                     - Can be used when I(type=remote_command).
             username:
+                type: str
                 description:
                     - User name used for authentication.
                     - Required when I(ssh_auth_type in [public_key, password]) or I(command_type=telnet).
                     - Can be used when I(type=remote_command).
             password:
+                type: str
                 description:
                     - Password used for authentication.
                     - Required when I(ssh_auth_type=password) or I(command_type=telnet).
                     - Can be used when I(type=remote_command).
             port:
+                type: int
                 description:
                     - Port number used for authentication.
                     - Can be used when I(command_type in [ssh, telnet]) and I(type=remote_command).
             script_name:
+                type: str
                 description:
                     - The name of script used for global script commands.
                     - Required when I(command_type=global_script).
                     - Can be used when I(type=remote_command).
     recovery_operations:
         type: list
+        elements: dict
         description:
             - List of recovery operations.
             - C(Suboptions) are the same as for I(operations).
             - Works only with >= Zabbix 3.2
+        default: []
+        suboptions:
+            type:
+                type: str
+                description:
+                    - Type of operation.
+                choices:
+                    - send_message
+                    - remote_command
+                    - notify_all_involved
+                required: true
+            command_type:
+                type: str
+                required: false
+                description:
+                    - Type of operation command.
+                choices:
+                    - custom_script
+                    - ipmi
+                    - ssh
+                    - telnet
+                    - global_script
+            command:
+                type: str
+                required: false
+                description:
+                    - Command to run.
+            execute_on:
+                type: str
+                required: false
+                description:
+                    - Target on which the custom script operation command will be executed.
+                choices:
+                    - agent
+                    - server
+                    - proxy
+            ssh_auth_type:
+                type: str
+                description:
+                    - Authentication method used for SSH commands.
+                    - Required when I(type=remote_command) and I(command_type=ssh).
+                choices:
+                    - password
+                    - public_key
+            ssh_privatekey_file:
+                type: str
+                description:
+                    - Name of the private key file used for SSH commands with public key authentication.
+                    - Required when I(ssh_auth_type=public_key).
+                    - Can be used when I(type=remote_command).
+            ssh_publickey_file:
+                type: str
+                description:
+                    - Name of the public key file used for SSH commands with public key authentication.
+                    - Required when I(ssh_auth_type=public_key).
+                    - Can be used when I(type=remote_command).
+            run_on_groups:
+                type: list
+                elements: str
+                description:
+                    - Host groups to run remote commands on.
+                    - Required when I(type=remote_command) and I(run_on_hosts) is not set.
+            run_on_hosts:
+                type: list
+                elements: str
+                description:
+                    - Hosts to run remote commands on.
+                    - Required when I(type=remote_command) and I(run_on_groups) is not set.
+                    - If set to 0 the command will be run on the current host.
+            send_to_groups:
+                type: list
+                elements: str
+                description:
+                    - User groups to send messages to.
+            send_to_users:
+                type: list
+                elements: str
+                description:
+                    - Users (usernames or aliases) to send messages to.
+            media_type:
+                type: str
+                description:
+                    - Media type that will be used to send the message.
+                    - Can be used with I(type=send_message) or I(type=notify_all_involved) inside I(acknowledge_operations).
+                    - Set to C(all) for all media types
+                default: 'all'
+            op_message:
+                type: str
+                description:
+                    - Operation message text.
+                    - Will check the 'default message' and use the text from I(default_message) if this and I(default_subject) are not specified
+            subject:
+                type: str
+                description:
+                    - Operation message subject.
+                    - Will check the 'default message' and use the text from I(default_subject) if this and I(default_subject) are not specified
+            username:
+                type: str
+                description:
+                    - User name used for authentication.
+                    - Required when I(ssh_auth_type in [public_key, password]) or I(command_type=telnet).
+                    - Can be used when I(type=remote_command).
+            password:
+                type: str
+                description:
+                    - Password used for authentication.
+                    - Required when I(ssh_auth_type=password) or I(command_type=telnet).
+                    - Can be used when I(type=remote_command).
+            port:
+                type: int
+                description:
+                    - Port number used for authentication.
+                    - Can be used when I(command_type in [ssh, telnet]) and I(type=remote_command).
+            script_name:
+                type: str
+                description:
+                    - The name of script used for global script commands.
+                    - Required when I(command_type=global_script).
+                    - Can be used when I(type=remote_command).
     acknowledge_operations:
         type: list
+        elements: dict
         description:
             - List of acknowledge operations.
             - Action acknowledge operations are known as update operations since Zabbix 4.0.
             - C(Suboptions) are the same as for I(operations).
             - Works only with >= Zabbix 3.4
+        suboptions:
+            type:
+                type: str
+                description:
+                    - Type of operation.
+                choices:
+                    - send_message
+                    - remote_command
+                    - notify_all_involved
+                required: true
+            command_type:
+                type: str
+                description:
+                    - Type of operation command.
+                required: false
+                choices:
+                    - custom_script
+                    - ipmi
+                    - ssh
+                    - telnet
+                    - global_script
+            execute_on:
+                type: str
+                required: false
+                description:
+                    - Target on which the custom script operation command will be executed.
+                choices:
+                    - agent
+                    - server
+                    - proxy
+            command:
+                type: str
+                required: false
+                description:
+                    - Command to run.
+            ssh_auth_type:
+                type: str
+                description:
+                    - Authentication method used for SSH commands.
+                    - Required when I(type=remote_command) and I(command_type=ssh).
+                choices:
+                    - password
+                    - public_key
+            ssh_privatekey_file:
+                type: str
+                description:
+                    - Name of the private key file used for SSH commands with public key authentication.
+                    - Required when I(ssh_auth_type=public_key).
+                    - Can be used when I(type=remote_command).
+            ssh_publickey_file:
+                type: str
+                description:
+                    - Name of the public key file used for SSH commands with public key authentication.
+                    - Required when I(ssh_auth_type=public_key).
+                    - Can be used when I(type=remote_command).
+            run_on_groups:
+                type: list
+                elements: str
+                description:
+                    - Host groups to run remote commands on.
+                    - Required when I(type=remote_command) and I(run_on_hosts) is not set.
+            run_on_hosts:
+                type: list
+                elements: str
+                description:
+                    - Hosts to run remote commands on.
+                    - Required when I(type=remote_command) and I(run_on_groups) is not set.
+                    - If set to 0 the command will be run on the current host.
+            send_to_groups:
+                type: list
+                elements: str
+                description:
+                    - User groups to send messages to.
+            send_to_users:
+                type: list
+                elements: str
+                description:
+                    - Users (usernames or aliases) to send messages to.
+            media_type:
+                type: str
+                description:
+                    - Media type that will be used to send the message.
+                    - Can be used with I(type=send_message) or I(type=notify_all_involved) inside I(acknowledge_operations).
+                    - Set to C(all) for all media types
+                default: 'all'
+            op_message:
+                type: str
+                description:
+                    - Operation message text.
+                    - Will check the 'default message' and use the text from I(default_message) if this and I(default_subject) are not specified
+            subject:
+                type: str
+                description:
+                    - Operation message subject.
+                    - Will check the 'default message' and use the text from I(default_subject) if this and I(default_subject) are not specified
+            username:
+                type: str
+                description:
+                    - User name used for authentication.
+                    - Required when I(ssh_auth_type in [public_key, password]) or I(command_type=telnet).
+                    - Can be used when I(type=remote_command).
+            password:
+                type: str
+                description:
+                    - Password used for authentication.
+                    - Required when I(ssh_auth_type=password) or I(command_type=telnet).
+                    - Can be used when I(type=remote_command).
+            port:
+                type: int
+                description:
+                    - Port number used for authentication.
+                    - Can be used when I(command_type in [ssh, telnet]) and I(type=remote_command).
+            script_name:
+                type: str
+                description:
+                    - The name of script used for global script commands.
+                    - Required when I(command_type=global_script).
+                    - Can be used when I(type=remote_command).
         aliases: [ update_operations ]
+        default: []
+    pause_symptoms:
+        type: bool
+        description:
+            - Whether to pause escalation if event is a symptom event.
+            - I(supported) if C(event_source) is set to C(trigger)
+            - Works only with >= Zabbix 6.4
+        default: true
 
 notes:
     - Only Zabbix >= 3.0 is supported.
@@ -393,16 +702,6 @@ extends_documentation_fragment:
 '''
 
 EXAMPLES = '''
-# Set following variables for Zabbix Server host in play or inventory
-- name: Set connection specific variables
-  set_fact:
-    ansible_network_os: community.zabbix.zabbix
-    ansible_connection: httpapi
-    ansible_httpapi_port: 80
-    ansible_httpapi_use_ssl: false
-    ansible_httpapi_validate_certs: false
-    ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
-
 # If you want to use Username and Password to be authenticated by Zabbix Server
 - name: Set credentials to access Zabbix Server API
   set_fact:
@@ -417,6 +716,15 @@ EXAMPLES = '''
 
 # Trigger action with only one condition
 - name: Deploy trigger action
+  # set task level variables as we change ansible_connection plugin here
+  vars:
+    ansible_network_os: community.zabbix.zabbix
+    ansible_connection: httpapi
+    ansible_httpapi_port: 443
+    ansible_httpapi_use_ssl: true
+    ansible_httpapi_validate_certs: false
+    ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
+    ansible_host: zabbix-example-fqdn.org
   community.zabbix.zabbix_action:
     name: "Send alerts to Admin"
     event_source: 'trigger'
@@ -430,13 +738,22 @@ EXAMPLES = '''
     operations:
       - type: send_message
         subject: "Something bad is happening"
-        message: "Come on, guys do something"
+        op_message: "Come on, guys do something"
         media_type: 'Email'
         send_to_users:
           - 'Admin'
 
 # Trigger action with multiple conditions and operations
 - name: Deploy trigger action
+  # set task level  variables as we change ansible_connection plugin here
+  vars:
+    ansible_network_os: community.zabbix.zabbix
+    ansible_connection: httpapi
+    ansible_httpapi_port: 443
+    ansible_httpapi_use_ssl: true
+    ansible_httpapi_validate_certs: false
+    ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
+    ansible_host: zabbix-example-fqdn.org
   community.zabbix.zabbix_action:
     name: "Send alerts to Admin"
     event_source: 'trigger'
@@ -467,6 +784,15 @@ EXAMPLES = '''
 
 # Trigger action with recovery and acknowledge operations
 - name: Deploy trigger action
+  # set task level variables as we change ansible_connection plugin here
+  vars:
+    ansible_network_os: community.zabbix.zabbix
+    ansible_connection: httpapi
+    ansible_httpapi_port: 443
+    ansible_httpapi_use_ssl: true
+    ansible_httpapi_validate_certs: false
+    ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
+    ansible_host: zabbix-example-fqdn.org
   community.zabbix.zabbix_action:
     name: "Send alerts to Admin"
     event_source: 'trigger'
@@ -480,14 +806,14 @@ EXAMPLES = '''
     operations:
       - type: send_message
         subject: "Something bad is happening"
-        message: "Come on, guys do something"
+        op_message: "Come on, guys do something"
         media_type: 'Email'
         send_to_users:
           - 'Admin'
     recovery_operations:
       - type: send_message
         subject: "Host is down"
-        message: "Come on, guys do something"
+        op_message: "Come on, guys do something"
         media_type: 'Email'
         send_to_users:
           - 'Admin'
@@ -510,7 +836,7 @@ msg:
 from ansible.module_utils.basic import AnsibleModule
 
 from ansible_collections.community.zabbix.plugins.module_utils.base import ZabbixBase
-from ansible_collections.community.zabbix.plugins.module_utils.version import LooseVersion
+from ansible.module_utils.compat.version import LooseVersion
 
 import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabbix_utils
 
@@ -897,6 +1223,8 @@ class Action(Zapi):
                 _params['pause_suppressed'] = '1' if kwargs['pause_in_maintenance'] else '0'
             else:
                 _params['maintenance_mode'] = '1' if kwargs['pause_in_maintenance'] else '0'
+            if LooseVersion(self._zbx_api_version) >= LooseVersion('6.4'):
+                _params['pause_symptoms'] = '1' if kwargs['pause_symptoms'] else '0'
 
         if LooseVersion(self._zbx_api_version) >= LooseVersion('5.0'):
             # remove some fields regarding
@@ -1042,11 +1370,11 @@ class Operations(Zapi):
         """
         try:
             return {
-                'default_msg': '0' if operation.get('message') is not None or operation.get('subject') is not None else '1',
+                'default_msg': '0' if operation.get('op_message') is not None or operation.get('subject') is not None else '1',
                 'mediatypeid': self._zapi_wrapper.get_mediatype_by_mediatype_name(
                     operation.get('media_type')
                 ) if operation.get('media_type') is not None else '0',
-                'message': operation.get('message'),
+                'message': operation.get('op_message'),
                 'subject': operation.get('subject'),
             }
         except Exception as e:
@@ -1716,7 +2044,30 @@ def main():
             elements='dict',
             options=dict(
                 formulaid=dict(type='str', required=False),
-                operator=dict(type='str', required=True),
+                operator=dict(
+                    type='str',
+                    required=True,
+                    choices=[
+                        'equals',
+                        '=',
+                        'does not equal',
+                        '<>',
+                        'contains',
+                        'like',
+                        'does not contain',
+                        'not like',
+                        'in',
+                        'is greater than or equals',
+                        '>=',
+                        'is less than or equals',
+                        '<=',
+                        'not in',
+                        'matches',
+                        'does not match',
+                        'Yes',
+                        'No'
+                    ]
+                ),
                 type=dict(type='str', required=True),
                 value=dict(type='str', required=False),
                 value2=dict(type='str', required=False)
@@ -1748,9 +2099,10 @@ def main():
                         'enable_host',
                         'disable_host',
                         'set_host_inventory_mode',
+                        'notify_all_involved'
                     ]
                 ),
-                esc_period=dict(type='str', required=False),
+                esc_period=dict(type='str', required=False, default='0s'),
                 esc_step_from=dict(type='int', required=False, default=1),
                 esc_step_to=dict(type='int', required=False, default=1),
                 operation_condition=dict(
@@ -1779,25 +2131,25 @@ def main():
                 ),
                 password=dict(type='str', required=False, no_log=True),
                 port=dict(type='int', required=False),
-                run_on_groups=dict(type='list', required=False),
-                run_on_hosts=dict(type='list', required=False),
+                run_on_groups=dict(type='list', required=False, elements='str'),
+                run_on_hosts=dict(type='list', required=False, elements='str'),
                 script_name=dict(type='str', required=False),
                 ssh_auth_type=dict(type='str', required=False, choices=['password', 'public_key']),
                 ssh_privatekey_file=dict(type='str', required=False),
                 ssh_publickey_file=dict(type='str', required=False),
                 username=dict(type='str', required=False),
                 # when type is send_message
-                media_type=dict(type='str', required=False),
+                media_type=dict(type='str', required=False, default='all'),
                 subject=dict(type='str', required=False),
-                message=dict(type='str', required=False),
-                send_to_groups=dict(type='list', required=False),
-                send_to_users=dict(type='list', required=False),
+                op_message=dict(type='str', required=False),
+                send_to_groups=dict(type='list', required=False, elements='str'),
+                send_to_users=dict(type='list', required=False, elements='str'),
                 # when type is add_to_host_group or remove_from_host_group
-                host_groups=dict(type='list', required=False),
+                host_groups=dict(type='list', required=False, elements='str'),
                 # when type is set_host_inventory_mode
                 inventory=dict(type='str', required=False, choices=['manual', 'automatic']),
                 # when type is link_to_template or unlink_from_template
-                templates=dict(type='list', required=False)
+                templates=dict(type='list', required=False, elements='str')
             ),
             required_if=[
                 ['type', 'remote_command', ['command_type']],
@@ -1852,19 +2204,19 @@ def main():
                 ),
                 password=dict(type='str', required=False, no_log=True),
                 port=dict(type='int', required=False),
-                run_on_groups=dict(type='list', required=False),
-                run_on_hosts=dict(type='list', required=False),
+                run_on_groups=dict(type='list', required=False, elements='str'),
+                run_on_hosts=dict(type='list', required=False, elements='str'),
                 script_name=dict(type='str', required=False),
                 ssh_auth_type=dict(type='str', required=False, choices=['password', 'public_key']),
                 ssh_privatekey_file=dict(type='str', required=False),
                 ssh_publickey_file=dict(type='str', required=False),
                 username=dict(type='str', required=False),
                 # when type is send_message
-                media_type=dict(type='str', required=False),
+                media_type=dict(type='str', required=False, default='all'),
                 subject=dict(type='str', required=False),
-                message=dict(type='str', required=False),
-                send_to_groups=dict(type='list', required=False),
-                send_to_users=dict(type='list', required=False),
+                op_message=dict(type='str', required=False),
+                send_to_groups=dict(type='list', required=False, elements='str'),
+                send_to_users=dict(type='list', required=False, elements='str'),
             ),
             required_if=[
                 ['type', 'remote_command', ['command_type']],
@@ -1921,19 +2273,19 @@ def main():
                 ),
                 password=dict(type='str', required=False, no_log=True),
                 port=dict(type='int', required=False),
-                run_on_groups=dict(type='list', required=False),
-                run_on_hosts=dict(type='list', required=False),
+                run_on_groups=dict(type='list', required=False, elements='str'),
+                run_on_hosts=dict(type='list', required=False, elements='str'),
                 script_name=dict(type='str', required=False),
                 ssh_auth_type=dict(type='str', required=False, choices=['password', 'public_key']),
                 ssh_privatekey_file=dict(type='str', required=False),
                 ssh_publickey_file=dict(type='str', required=False),
                 username=dict(type='str', required=False),
                 # when type is send_message
-                media_type=dict(type='str', required=False),
+                media_type=dict(type='str', required=False, default='all'),
                 subject=dict(type='str', required=False),
-                message=dict(type='str', required=False),
-                send_to_groups=dict(type='list', required=False),
-                send_to_users=dict(type='list', required=False),
+                op_message=dict(type='str', required=False),
+                send_to_groups=dict(type='list', required=False, elements='str'),
+                send_to_users=dict(type='list', required=False, elements='str'),
             ),
             required_if=[
                 ['type', 'remote_command', ['command_type']],
@@ -1953,7 +2305,8 @@ def main():
                 ['command_type', 'global_script', ['script_name']],
                 ['type', 'send_message', ['send_to_users', 'send_to_groups'], True]
             ]
-        )
+        ),
+        pause_symptoms=dict(type='bool', required=False, default=True)
     ))
     module = AnsibleModule(
         argument_spec=argument_spec,
@@ -1989,6 +2342,7 @@ def main():
     operations = module.params['operations']
     recovery_operations = module.params['recovery_operations']
     acknowledge_operations = module.params['acknowledge_operations']
+    pause_symptoms = module.params['pause_symptoms']
 
     zapi_wrapper = Zapi(module)
     action = Action(module)
@@ -2022,6 +2376,9 @@ def main():
                 recovery_operations=recovery_ops.construct_the_data(recovery_operations),
                 conditions=fltr.construct_the_data(eval_type, formula, conditions)
             )
+
+            if LooseVersion(zapi_wrapper._zbx_api_version) >= LooseVersion('6.4'):
+                kwargs['pause_symptoms'] = pause_symptoms
 
             if LooseVersion(zapi_wrapper._zbx_api_version) >= LooseVersion('6.0'):
                 kwargs[argument_spec['acknowledge_operations']['aliases'][0]] = acknowledge_ops.construct_the_data(acknowledge_operations)
@@ -2063,6 +2420,9 @@ def main():
                 kwargs[argument_spec['acknowledge_operations']['aliases'][0]] = acknowledge_ops.construct_the_data(acknowledge_operations)
             else:
                 kwargs['acknowledge_operations'] = acknowledge_ops.construct_the_data(acknowledge_operations)
+
+            if LooseVersion(zapi_wrapper._zbx_api_version) >= LooseVersion('6.4'):
+                kwargs['pause_symptoms'] = pause_symptoms
 
             action_id = action.add_action(**kwargs)
             module.exit_json(changed=True, msg="Action created: %s, ID: %s" % (name, action_id))

@@ -1,12 +1,49 @@
 zabbix_valid_proxy_versions:
   "9":
-    - 6.2
+    - 6.4
     - 6.0
   "8":
+    - 6.4
+    - 6.0
+  "7":
     - 6.2
     - 6.0
-    - 5.0
-    - 4.0
+
+pgsql_depenencies:
+  "9":
+    - python3-psycopg2
+    - postgresql
+  "8":
+    - python3-psycopg2
+    - postgresql
   "7":
-    - 5.0
-    - 4.0
+    - python-psycopg2
+    - postgresql
+
+mysql_client_pkgs:
+  "9":
+    - mysql
+    - python3-PyMySQL
+  "8":
+    - mysql
+    - python3-PyMySQL
+  "7":
+    - mariadb
+    - MySQL-python
+
+selinux_pkgs:
+  "9":
+    - policycoreutils
+    - checkpolicy
+    - python3-libsemanage
+  "8":
+    - policycoreutils
+    - checkpolicy
+    - python3-libsemanage
+  "7":
+    - policycoreutils-python
+    - libsemanage-python
+    - checkpolicy
+
+mysql_plugin:
+  "7": mysql_native_password

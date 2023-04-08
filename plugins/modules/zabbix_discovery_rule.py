@@ -180,16 +180,6 @@ extends_documentation_fragment:
 '''
 
 EXAMPLES = r'''
-# Set following variables for Zabbix Server host in play or inventory
-- name: Set connection specific variables
-  set_fact:
-    ansible_network_os: community.zabbix.zabbix
-    ansible_connection: httpapi
-    ansible_httpapi_port: 80
-    ansible_httpapi_use_ssl: false
-    ansible_httpapi_validate_certs: false
-    ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
-
 # If you want to use Username and Password to be authenticated by Zabbix Server
 - name: Set credentials to access Zabbix Server API
   set_fact:
@@ -204,6 +194,15 @@ EXAMPLES = r'''
 
 # Base create discovery rule example
 - name: Create discovery rule with ICMP and zabbix agent checks
+  # set task level variables as we change ansible_connection plugin here
+  vars:
+    ansible_network_os: community.zabbix.zabbix
+    ansible_connection: httpapi
+    ansible_httpapi_port: 443
+    ansible_httpapi_use_ssl: true
+    ansible_httpapi_validate_certs: false
+    ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
+    ansible_host: zabbix-example-fqdn.org
   community.zabbix.zabbix_discovery_rule:
     name: ACME
     state: present
@@ -218,6 +217,15 @@ EXAMPLES = r'''
 
 # Base update (add new dcheck) discovery rule example
 - name: Create discovery rule with ICMP and zabbix agent checks
+  # set task level variables as we change ansible_connection plugin here
+  vars:
+    ansible_network_os: community.zabbix.zabbix
+    ansible_connection: httpapi
+    ansible_httpapi_port: 443
+    ansible_httpapi_use_ssl: true
+    ansible_httpapi_validate_certs: false
+    ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
+    ansible_host: zabbix-example-fqdn.org
   community.zabbix.zabbix_discovery_rule:
     name: ACME
     state: present
@@ -240,6 +248,15 @@ EXAMPLES = r'''
 
 # Base delete discovery rule example
 - name: Delete discovery rule
+  # set task level variables as we change ansible_connection plugin here
+  vars:
+    ansible_network_os: community.zabbix.zabbix
+    ansible_connection: httpapi
+    ansible_httpapi_port: 443
+    ansible_httpapi_use_ssl: true
+    ansible_httpapi_validate_certs: false
+    ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
+    ansible_host: zabbix-example-fqdn.org
   community.zabbix.zabbix_discovery_rule:
     name: ACME
     state: absent
@@ -272,7 +289,7 @@ msg:
 from ansible.module_utils.basic import AnsibleModule
 
 from ansible_collections.community.zabbix.plugins.module_utils.base import ZabbixBase
-from ansible_collections.community.zabbix.plugins.module_utils.version import LooseVersion
+from ansible.module_utils.compat.version import LooseVersion
 
 import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabbix_utils
 
@@ -456,8 +473,9 @@ class DiscoveryRule(ZabbixBase):
         existing_drule = zabbix_utils.helper_convert_unicode_to_str(self.check_if_drule_exists(kwargs['name'])[0])
         parameters = zabbix_utils.helper_convert_unicode_to_str(self._construct_parameters(**kwargs))
         change_parameters = {}
-        if existing_drule['nextcheck']:
-            existing_drule.pop('nextcheck')
+        if LooseVersion(self._zbx_api_version) < LooseVersion('6.4'):
+            if existing_drule['nextcheck']:
+                existing_drule.pop('nextcheck')
         _diff = zabbix_utils.helper_cleanup_data(compare_dictionaries(parameters, existing_drule, change_parameters))
         return _diff
 

@@ -1,6 +1,6 @@
 ---
 sign_keys:
-  "62":
+  "64":
     bullseye:
       sign_key: E709712C
     buster:
@@ -14,6 +14,17 @@ sign_keys:
     xenial:
       sign_key: E709712C
     trusty:
+      sign_key: E709712C
+    jammy:
+      sign_key: E709712C
+  "62":
+    bullseye:
+      sign_key: E709712C
+    buster:
+      sign_key: E709712C
+    focal:
+      sign_key: E709712C
+    bionic:
       sign_key: E709712C
     jammy:
       sign_key: E709712C
@@ -22,217 +33,20 @@ sign_keys:
       sign_key: E709712C
     buster:
       sign_key: E709712C
-    stretch:
-      sign_key: E709712C
     focal:
       sign_key: E709712C
     bionic:
-      sign_key: E709712C
-    xenial:
-      sign_key: E709712C
-    trusty:
       sign_key: E709712C
     jammy:
-      sign_key: E709712C
-  "54":
-    bullseye:
-      sign_key: E709712C
-    buster:
-      sign_key: E709712C
-    jessie:
-      sign_key: E709712C
-    stretch:
-      sign_key: E709712C
-    focal:
-      sign_key: E709712C
-    bionic:
-      sign_key: E709712C
-    xenial:
-      sign_key: E709712C
-    trusty:
-      sign_key: E709712C
-    tricia:
-      sign_key: E709712C
-  "52":
-    # bullseye: not available upstream
-    buster:
-      sign_key: E709712C
-    jessie:
-      sign_key: E709712C
-    stretch:
-      sign_key: E709712C
-    focal:
-      sign_key: E709712C
-    bionic:
-      sign_key: E709712C
-    xenial:
-      sign_key: E709712C
-    trusty:
-      sign_key: E709712C
-    tricia:
       sign_key: E709712C
   "50":
     bullseye:
       sign_key: E709712C
     buster:
       sign_key: E709712C
-    jessie:
-      sign_key: E709712C
-    stretch:
-      sign_key: E709712C
     focal:
       sign_key: E709712C
     bionic:
       sign_key: E709712C
-    xenial:
+    jammy:
       sign_key: E709712C
-    trusty:
-      sign_key: E709712C
-    tricia:
-      sign_key: E709712C
-  "44":
-    buster:
-      sign_key: A14FE591
-    jessie:
-      sign_key: 79EA5ED4
-    stretch:
-      sign_key: A14FE591
-    focal:
-      sign_key: A14FE591
-    eoan:
-      sign_key: A14FE591
-    cosmic:
-      sign_key: A14FE591
-    bionic:
-      sign_key: A14FE591
-    sonya:
-      sign_key: A14FE591
-    serena:
-      sign_key: A14FE591
-    trusty:
-      sign_key: 79EA5ED4
-    xenial:
-      sign_key: E709712C
-  "42":
-    buster:
-      sign_key: A14FE591
-    jessie:
-      sign_key: 79EA5ED4
-    stretch:
-      sign_key: A14FE591
-    eoan:
-      sign_key: A14FE591
-    cosmic:
-      sign_key: A14FE591
-    bionic:
-      sign_key: A14FE591
-    sonya:
-      sign_key: A14FE591
-    serena:
-      sign_key: A14FE591
-    trusty:
-      sign_key: 79EA5ED4
-    xenial:
-      sign_key: E709712C
-  "40":
-    bullseye:
-      sign_key: A14FE591
-    buster:
-      sign_key: A14FE591
-    jessie:
-      sign_key: 79EA5ED4
-    stretch:
-      sign_key: A14FE591
-    focal:
-      sign_key: A14FE591
-    bionic:
-      sign_key: A14FE591
-    sonya:
-      sign_key: A14FE591
-    serena:
-      sign_key: A14FE591
-    trusty:
-      sign_key: 79EA5ED4
-    xenial:
-      sign_key: E709712C
-  "34":
-    jessie:
-      sign_key: 79EA5ED4
-    stretch:
-      sign_key: A14FE591
-    wheezy:
-      sign_key: A14FE591
-    bionic:
-      sign_key: A14FE591
-    sonya:
-      sign_key: A14FE591
-    serena:
-      sign_key: A14FE591
-    trusty:
-      sign_key: 79EA5ED4
-    xenial:
-      sign_key: E709712C
-  "32":
-    stretch:
-      sign_key: A14FE591
-    wheezy:
-      sign_key: 79EA5ED4
-    bionic:
-      sign_key: A14FE591
-    sonya:
-      sign_key: 79EA5ED4
-    serena:
-      sign_key: 79EA5ED4
-    trusty:
-      sign_key: 79EA5ED4
-    xenial:
-      sign_key: E709712C
-  "30":
-    buster:
-      sign_key: A14FE591
-    jessie:
-      sign_key: 79EA5ED4
-    stretch:
-      sign_key: A14FE591
-    wheezy:
-      sign_key: 79EA5ED4
-    bionic:
-      sign_key: A14FE591
-    trusty:
-      sign_key: 79EA5ED4
-    xenial:
-      sign_key: E709712C
-  "24":
-    jessie:
-      sign_key: 79EA5ED4
-    wheezy:
-      sign_key: 79EA5ED4
-    precise:
-      sign_key: 79EA5ED4
-    trusty:
-      sign_key: 79EA5ED4
-  "22":
-    squeeze:
-      sign_key: 79EA5ED4
-    wheezy:
-      sign_key: 79EA5ED4
-    precise:
-      sign_key: 79EA5ED4
-    trusty:
-      sign_key: 79EA5ED4
-    lucid:
-      sign_key: 79EA5ED4
-
-suse:
-  "openSUSE Leap":
-    "42":
-      name: server:monitoring
-      url: http://download.opensuse.org/repositories/server:/monitoring/openSUSE_Leap_{{ ansible_distribution_version }}/
-  "openSUSE":
-    "12":
-      name: server_monitoring
-      url: http://download.opensuse.org/repositories/server:/monitoring/openSUSE_{{ ansible_distribution_version }}
-  "SLES":
-    "11":
-      name: server_monitoring
-      url: http://download.opensuse.org/repositories/server:/monitoring/SLE_11_SP3/

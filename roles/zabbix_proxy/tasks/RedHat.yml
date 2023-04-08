@@ -1,109 +1,22 @@
 ---
 # Tasks specific for RedHat systems
 
-- name: "Set short version name"
+- name: "RedHat | Set short version name"
   set_fact:
-    zabbix_short_version: "{{ zabbix_version | regex_replace('\\.', '') }}"
-
-- name: "RedHat | Use EPEL package name"
-  set_fact:
-    zabbix_proxy_package: "zabbix{{ zabbix_version | regex_replace('\\.', '') }}-proxy"
-  when:
-    - zabbix_repo == "epel"
-  tags:
-    - zabbix-proxy
-    - init
-
-- name: "RedHat | Define package with version"
-  set_fact:
-    zabbix_proxy_package: "zabbix{{ zabbix_short_version }}-proxy-{{ zabbix_proxy_database }}"
-    cacheable: true
-  when:
-    - zabbix_proxy_rhel_version is defined
-    - zabbix_repo != "epel"
+    zabbix_short_version: "{{ zabbix_proxy_version | regex_replace('\\.', '') }}"
 
 - name: "RedHat | Define package without version"
   set_fact:
     zabbix_proxy_package: "zabbix-proxy-{{ zabbix_proxy_database }}"
     cacheable: true
-  when:
-    - zabbix_proxy_rhel_version is not defined
-    - zabbix_repo != "epel"
 
-- name: "RedHat | Set some facts Zabbix < 3.0"
+- name: "RedHat | Set facts for Zabbix"
   set_fact:
-    apache_log: httpd
-    datafiles_path: "/usr/share/doc/zabbix-proxy-{{ zabbix_proxy_database }}-{{ zabbix_version }}*/create"
-  when:
-    - zabbix_version is version('3.0', '<')
-  tags:
-    - zabbix-proxy
-
-- name: "RedHat | Set facts for Zabbix >= 3.0 && < 5.4"
-  set_fact:
-    apache_log: httpd
-    datafiles_path: "/usr/share/doc/zabbix-proxy-{{ zabbix_proxy_database }}-{{ zabbix_version }}*"
-  when:
-    - zabbix_version is version('3.0', '>=')
-    - zabbix_version is version('5.4', '<')
-  tags:
-    - zabbix-proxy
-
-- name: "RedHat | Set facts for Zabbix == 5.4"
-  set_fact:
-    datafiles_path: "/usr/share/doc/zabbix-sql-scripts/{{ zabbix_proxy_database_long }}"
-  when:
-    - zabbix_version is version('5.4', '==')
+    datafiles_path: "/usr/share/doc/zabbix-sql-scripts/{{ zabbix_proxy_db_long }}"
   tags:
     - zabbix-server
 
-- name: "RedHat | Set facts for Zabbix >= 6.0"
-  set_fact:
-    datafiles_path: "/usr/share/zabbix-sql-scripts/{{ zabbix_proxy_database_long }}"
-  when:
-    - zabbix_version is version('6.0', '>=')
-  tags:
-    - zabbix-server
-
-- name: "RedHat | Set facts for Zabbix >= 3.0 and RedHat 8"
-  set_fact:
-    apache_log: httpd
-    datafiles_path: "/usr/share/doc/zabbix-proxy-{{ zabbix_proxy_database }}"
-  when:
-    - zabbix_version is version('3.0', '>=')
-    - zabbix_version is version('5.4', '<')
-    - ansible_distribution_major_version == '8'
-  tags:
-    - zabbix-proxy
-
-- name: "RedHat | Set some facts EPEL"
-  set_fact:
-    datafiles_path: "/usr/share/zabbix-{{ zabbix_proxy_database_long }}"
-  when:
-    - zabbix_repo == "epel"
-  tags:
-    - zabbix-server
-
-- name: "RedHat | Create 'zabbix' group (EPEL)"
-  group:
-    name: "{{ zabbix_proxy_groupname | default('zabbix') }}"
-    gid: "{{ zabbix_proxy_groupid | default(omit) }}"
-    state: present
-  become: true
-  when:
-    - zabbix_repo == "epel"
-
-- name: "RedHat | Create 'zabbix' user (EPEL)"
-  user:
-    name: "{{ zabbix_proxy_username | default('zabbix') }}"
-    comment: Zabbix Monitoring System
-    uid: "{{ zabbix_proxy_userid | default(omit) }}"
-    group: zabbix
-  become: true
-  when:
-    - zabbix_repo == "epel"
-
-- name: "Make sure old file is absent"
+- name: "RedHat | Make sure old file is absent"
   file:
     path: /etc/yum.repos.d/zabbix-supported.repo
     state: absent
@@ -117,78 +30,48 @@
     gpgcheck: "{{ item.gpgcheck }}"
     gpgkey: "{{ item.gpgkey }}"
     mode: "{{ item.mode | default('0644') }}"
-    priority: "{{ item.priority | default('98') }}"
+    priority: "{{ item.priority | default('99') }}"
     state: "{{ item.state | default('present') }}"
     proxy: "{{ zabbix_http_proxy | default(omit) }}"
   with_items: "{{ zabbix_repo_yum }}"
   register: yum_repo_installed
   become: true
-  when:
-    - zabbix_repo == "zabbix"
   notify:
     - "clean repo files from proxy creds"
   tags:
     - zabbix-agent
 
-- name: "RedHat | Installing zabbix-proxy-{{ zabbix_proxy_database }}"
-  package:
-    pkg: "{{ zabbix_proxy_package }}-{{ zabbix_proxy_version }}.{{ zabbix_proxy_version_minor }}"
-    state: "{{ zabbix_proxy_package_state }}"
-    disablerepo: "{{ '*' if (zabbix_repo_yum_enabled | length>0) else omit }}"
-    enablerepo: "{{ zabbix_repo_yum_enabled if zabbix_repo_yum_enabled is iterable and (zabbix_repo_yum_enabled | length>0) else omit }}"
-  environment:
-    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
-    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
-  become: true
-  when:
-    zabbix_repo != "other"
-  register: is_zabbix_proxy_package_installed
-  until: is_zabbix_proxy_package_installed is succeeded
+- name: Install packages for Zabbix Repository
+  block:
+    - name: "RedHat | Installing zabbix-proxy-{{ zabbix_proxy_database }}"
+      yum:
+        pkg: "{{ zabbix_proxy_package }}-{{ zabbix_proxy_version }}.{{ zabbix_proxy_version_minor }}"
+        state: "{{ zabbix_proxy_package_state }}"
+        disablerepo: "epel"
+      environment:
+        http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+        https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
+      become: true
+      register: is_zabbix_proxy_package_installed
+      until: is_zabbix_proxy_package_installed is succeeded
 
-- name: "RedHat | Installing zabbix-proxy-{{ zabbix_proxy_database }} (When zabbix_repo == other)"
-  package:
-    pkg: "{{ zabbix_proxy_package }}-{{ zabbix_proxy_version }}.{{ zabbix_proxy_version_minor }}"
-    state: "{{ zabbix_proxy_package_state }}"
-  become: true
-  when:
-    zabbix_repo == "other"
-  register: is_zabbix_proxy_package_installed
-  until: is_zabbix_proxy_package_installed is succeeded
-
-- name: "RedHat | Installing zabbix-sql-scripts"
-  package:
-    pkg: "zabbix-sql-scripts-{{ zabbix_proxy_version }}.{{ zabbix_proxy_version_minor }}"
-    state: "{{ zabbix_proxy_package_state }}"
-    disablerepo: "{{ '*' if (zabbix_repo_yum_enabled | length>0) else omit }}"
-    enablerepo: "{{ zabbix_repo_yum_enabled if zabbix_repo_yum_enabled is iterable and (zabbix_repo_yum_enabled | length>0) else omit }}"
-  environment:
-    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
-    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
-  register: zabbix_proxy_sql_package_installed
-  until: zabbix_proxy_sql_package_installed is succeeded
-  when:
-    - zabbix_version is version('5.4', '>=')
-    - zabbix_repo != "other"
-  become: true
+    - name: "RedHat | Installing zabbix-sql-scripts"
+      yum:
+        pkg: "zabbix-sql-scripts-{{ zabbix_proxy_version }}.{{ zabbix_proxy_version_minor }}"
+        state: "{{ zabbix_proxy_package_state }}"
+        disablerepo: "epel"
+      environment:
+        http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+        https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
+      register: zabbix_proxy_sql_package_installed
+      until: zabbix_proxy_sql_package_installed is succeeded
+      become: true
   tags:
     - zabbix-server
 
-- name: "RedHat | Installing zabbix-sql-scripts (When zabbix_repo == other)"
-  package:
-    pkg: "zabbix-sql-scripts-{{ zabbix_proxy_version }}.{{ zabbix_proxy_version_minor }}"
-    state: "{{ zabbix_proxy_package_state }}"
-  register: zabbix_proxy_sql_package_installed
-  until: zabbix_proxy_sql_package_installed is succeeded
-  when:
-    - zabbix_version is version('5.4', '>=')
-    - zabbix_repo == "other"
-  become: true
-  tags:
-    - zabbix-server
-
-- name: "RedHat | Install Ansible PostgreSQL module dependencies"
+- name: "RedHat | Install Ansible PostgreSQL Client package"
   yum:
-    name: python-psycopg2
+    name: "{{ pgsql_depenencies[ansible_distribution_major_version] }}"
     state: present
   environment:
     http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
@@ -199,33 +82,13 @@
   when:
     - zabbix_database_creation or zabbix_database_sqlload
     - zabbix_proxy_database == 'pgsql'
-    - ansible_distribution_major_version == "7" or ansible_distribution_major_version == "6"
   tags:
     - zabbix-proxy
     - init
 
-- name: "RedHat | Install Ansible module dependencies on RHEL9 or RHEL8"
+- name: "RedHat | Install Mysql Client package"
   yum:
-    name: python3-psycopg2
-    state: present
-  environment:
-    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
-    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
-  register: zabbix_proxy_dependencies_installed
-  until: zabbix_proxy_dependencies_installed is succeeded
-  become: true
-  when:
-    - zabbix_database_creation
-    - zabbix_proxy_database == 'pgsql'
-    - ansible_distribution_major_version|int >= 8
-  tags:
-    - zabbix-server
-
-- name: "RedHat | Install Mysql Client package RHEL7"
-  yum:
-    name:
-      - mariadb
-      - MySQL-python
+    name: "{{ mysql_client_pkgs[ansible_distribution_major_version] }}"
     state: installed
   environment:
     http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
@@ -235,71 +98,11 @@
   until: are_zabbix_proxy_dependency_packages_installed is succeeded
   when:
     - zabbix_database_creation or zabbix_database_sqlload
-    - zabbix_proxy_database == 'mysql'
-    - ansible_distribution_major_version == '7'
-  tags:
-    - zabbix-proxy
-    - init
-
-- name: "RedHat | Install Mysql Client packages RHEL9 or RHEL8"
-  yum:
-    name:
-      - mysql
-      - python3-PyMySQL
-    state: present
-  environment:
-    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
-    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
-  register: zabbix_proxy_dependencies_installed
-  until: zabbix_proxy_dependencies_installed is succeeded
-  become: true
-  when:
-    - zabbix_proxy_database == 'mysql'
-    - ansible_distribution_major_version|int >= 8
-  tags:
-    - zabbix-proxy
-    - init
-
-- name: "RedHat | Install Mysql Client package RHEL5 - 6"
-  yum:
-    name:
-      - mysql
-      - MySQL-python
-    state: present
-  environment:
-    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
-    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
-  become: true
-  register: are_zabbix_proxy_dependency_packages_installed
-  until: are_zabbix_proxy_dependency_packages_installed is succeeded
-  when:
-    - zabbix_database_creation or zabbix_database_sqlload
-    - zabbix_proxy_database == 'mysql'
-    - ansible_distribution_major_version == "6" or ansible_distribution_major_version == "5"
     - zabbix_proxy_install_database_client
+    - zabbix_proxy_database == 'mysql'
   tags:
     - zabbix-proxy
     - init
-    - database
-
-- name: "RedHat | Install PostgreSQL client package"
-  yum:
-    name: postgresql
-    state: present
-  environment:
-    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
-    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
-  become: true
-  register: are_zabbix_proxy_dependency_packages_installed
-  until: are_zabbix_proxy_dependency_packages_installed is succeeded
-  when:
-    - zabbix_database_creation or zabbix_database_sqlload
-    - zabbix_proxy_database == 'pgsql'
-    - zabbix_proxy_install_database_client
-  tags:
-    - zabbix-proxy
-    - init
-    - database
 
 - name: "RedHat | Install sqlite3"
   yum:
@@ -317,7 +120,39 @@
   tags:
     - zabbix-proxy
 
+- name: "Ensure Service has Hard Link (Zabbix 6 RHEL 9 Only)"
+  block:
+    - name: Checking Source File
+      stat:
+        path: /etc/alternatives/zabbix-proxy-systemd
+      register: src_stat
+
+    - name: Checkiong Target File
+      stat:
+        path: /usr/lib/systemd/system/zabbix-proxy.service
+      register: dest_stat
+
+    - name: Updating File
+      block:
+        - name: Deleting Soft Link
+          file:
+            path: /usr/lib/systemd/system/zabbix-proxy.service
+            state: absent
+
+        - name: Adding Hard Link
+          file:
+            src: /etc/alternatives/zabbix-proxy-systemd
+            dest: /usr/lib/systemd/system/zabbix-proxy.service
+            state: hard
+            owner: root
+            group: root
+            mode: 0644
+      when: dest_stat.stat.inode | default(1) != src_stat.stat.inode | default(100)
+  when:
+    - zabbix_proxy_version is version('6.0', '==')
+    - ansible_distribution_major_version == "9"
+
 - name: "Configure SELinux when enabled"
-  include_tasks: selinux.yml
+  include: selinux.yml
   when:
     - zabbix_selinux | bool

@@ -1033,7 +1033,68 @@
     that:
       - update_params_without_role_name_result.changed is sameas false
 
+- name: test - Add user medias(Email) as list to existing user
+  zabbix_user:
+    alias: example2
+    name: example2
+    surname: test
+    usrgrps:
+      - Guests
+    passwd: G$jd_79!jw
+    user_medias:
+      - mediatype: Email
+        sendto:
+          - example@example.com
+          - example1@example.com
+        period: 1-7,00:00-24:00
+        severity:
+          not_classified: false
+          information: true
+          warning: true
+          average: true
+          high: true
+          disaster: true
+        active: true
+  register: add_user_email_media_as_list_to_existing_user_result
+
+- assert:
+    that:
+      - add_user_email_media_as_list_to_existing_user_result.changed is sameas true
+
+- name: test - Add user medias(Email) as list to existing user(again)
+  zabbix_user:
+    alias: example2
+    name: example2
+    surname: test
+    usrgrps:
+      - Guests
+    passwd: G$jd_79!jw
+    user_medias:
+      - mediatype: Email
+        sendto:
+          - example@example.com
+          - example1@example.com
+        period: 1-7,00:00-24:00
+        severity:
+          not_classified: false
+          information: true
+          warning: true
+          average: true
+          high: true
+          disaster: true
+        active: true
+  register: add_user_email_media_as_list_to_existing_user_result
+
+- assert:
+    that:
+      - add_user_email_media_as_list_to_existing_user_result.changed is sameas false
+
 - name: test - Delete existing user
   zabbix_user:
     alias: example2
+    state: absent
+
+- name: test prepare - Delete LDAP user group
+  zabbix_usergroup:
+    name: testLDAPgrp
     state: absent
