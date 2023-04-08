@@ -95,14 +95,8 @@ The following is an overview of all available configuration defaults for this ro
 
 * `zabbix_web_version`: This is the version of zabbix. Default: The highest supported version for the operating system. Can be overridden to 6.2, 6.0, 5.4, 5.2, 5.0, 4.4, 4.0, 3.4, 3.2, 3.0, 2.4, or 2.2. Previously the variable `zabbix_version` was used directly but it could cause [some inconvenience](https://github.com/dj-wasabi/ansible-zabbix-agent/pull/303). That variable is maintained by retrocompativility.
 * `zabbix_web_version_minor`: When you want to specify a minor version to be installed. RedHat only. Default set to: `*` (latest available)
-* `zabbix_repo`: Default: `zabbix`
-  * `epel`: install agent from EPEL repo
-  * `zabbix`: (default) install agent from Zabbix repo
-  * `other`: install agent from pre-existing or other repo
 * `zabbix_repo_yum`: A list with Yum repository configuration.
 * `zabbix_repo_yum_schema`: Default: `https`. Option to change the web schema for the yum repository(http/https)
-* `zabbix_repo_yum_disabled`: A string with repository names that should be disabled when installing Zabbix component specific packages. Is only used when `zabbix_repo_yum_enabled` contains 1 or more repositories. Default `*`.
-* `zabbix_repo_yum_enabled`: A list with repository names that should be enabled when installing Zabbix component specific packages.
 
 * `zabbix_web_package_state`: Default: `present`. Can be overridden to `latest` to update packages when needed.
 * `zabbix_web_centos_release`: Default: True. When the `centos-release-scl` repository needs to be enabled. This is required when using Zabbix 5.0 due to installation of a recent version of `PHP`.

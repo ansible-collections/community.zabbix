@@ -6,7 +6,6 @@ zabbix_proxy_version:
 zabbix_proxy_version_minor: "*"
 zabbix_selinux: false
 
-zabbix_repo: zabbix
 zabbix_proxy_apt_priority:
 zabbix_proxy_package_state: present
 zabbix_proxy_install_database_client: true
@@ -14,8 +13,6 @@ zabbix_install_pip_packages: true
 zabbix_repo_yum_schema: https
 zabbix_proxy_conf_mode: "0644"
 zabbix_repo_yum_gpgcheck: 0
-zabbix_repo_yum_disabled: "*"
-zabbix_repo_yum_enabled: []
 zabbix_repo_yum:
   - name: zabbix
     description: Zabbix Official Repository - $basearch

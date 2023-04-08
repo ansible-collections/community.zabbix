@@ -73,8 +73,6 @@
   apt_key:
     id: "{{ sign_keys[zabbix_short_version][ansible_distribution_release]['sign_key'] }}"
     url: http://repo.zabbix.com/zabbix-official-repo.key
-  when:
-    - zabbix_repo == "zabbix"
   become: true
   tags:
     - zabbix-web
@@ -85,7 +83,6 @@
   apt_repository:
     repo: "{{ item }} {{ zabbix_server_apt_repository | join(' ') }}"
     state: present
-  when: zabbix_repo == "zabbix"
   become: true
   with_items:
     - deb-src

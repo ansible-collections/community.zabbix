@@ -5,33 +5,9 @@
   set_fact:
     zabbix_short_version: "{{ zabbix_server_version | regex_replace('\\.', '') }}"
 
-- name: "RedHat | Setting Epel State (Installing from Zabbix)"
-  set_fact:
-    zabbix_repo_yum_disabled: "{{ zabbix_repo_yum_disabled if zabbix_repo_yum_disabled is defined and zabbix_repo_yum_disabled is iterable and (zabbix_repo_yum_disabled | length>0) else __epel_repo }}"
-  when:
-    - zabbix_repo == "zabbix"
-
-- name: "RedHat | Disable all Non-Explict Repos"
-  set_fact:
-    zabbix_repo_yum_disabled: "*"
-  when:
-    - zabbix_repo_yum_enabled is defined
-    - zabbix_repo_yum_enabled is iterable
-    - zabbix_repo_yum_enabled | length>0
-
 - name: "RedHat | Use Zabbix package name"
   set_fact:
     zabbix_server_package: "zabbix-server-{{ zabbix_server_database }}"
-  when:
-    - zabbix_repo == "zabbix" or zabbix_repo == "other"
-  tags:
-    - zabbix-server
-
-- name: "RedHat | Use EPEL package name"
-  set_fact:
-    zabbix_server_package: "zabbix{{ zabbix_short_version }}-server-{{ zabbix_server_database }}"
-  when:
-    - zabbix_repo == "epel"
   tags:
     - zabbix-server
 
@@ -40,33 +16,6 @@
     datafiles_path: "/usr/share/zabbix-sql-scripts/{{ 'postgresql' if zabbix_server_database == 'pgsql' else 'mysql' }}"
   tags:
     - zabbix-server
-
-- name: "RedHat | Set some facts EPEL"
-  set_fact:
-    datafiles_path: "/usr/share/zabbix-{{ 'postgresql' if zabbix_server_database == 'pgsql' else 'mysql' }}"
-  when:
-    - zabbix_repo == "epel"
-  tags:
-    - zabbix-server
-
-- name: "RedHat | Create 'zabbix' group (EPEL)"
-  group:
-    name: "{{ zabbix_server_groupname | default('zabbix') }}"
-    gid: "{{ zabbix_server_groupid | default(omit) }}"
-    state: present
-  become: true
-  when:
-    - zabbix_repo == "epel"
-
-- name: "RedHat | Create 'zabbix' user (EPEL)"
-  user:
-    name: "{{ zabbix_server_username | default('zabbix') }}"
-    comment: Zabbix Monitoring System
-    uid: "{{ zabbix_server_userid | default(omit) }}"
-    group: "{{ zabbix_server_groupname | default('zabbix') }}"
-  become: true
-  when:
-    - zabbix_repo == "epel"
 
 - name: "RedHat | Make sure old file is absent"
   file:
@@ -88,7 +37,6 @@
   with_items: "{{ zabbix_repo_yum }}"
   register: yum_repo_installed
   become: true
-  when: zabbix_repo == "zabbix"
   notify:
     - "clean repo files from proxy creds"
   tags:
@@ -98,25 +46,12 @@
   package:
     pkg: "{{ zabbix_server_package }}-{{ zabbix_server_version }}.{{ zabbix_server_version_minor }}"
     state: "{{ zabbix_server_package_state }}"
-    disablerepo: "{{ zabbix_repo_yum_disabled | default(omit) }}"
-    enablerepo: "{{ zabbix_repo_yum_enabled | default(omit) }}"
+    disablerepo: "epel"
   environment:
     http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
     https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   register: zabbix_server_package_installed
   until: zabbix_server_package_installed is succeeded
-  when: zabbix_repo != "other"
-  become: true
-  tags:
-    - zabbix-server
-
-- name: "RedHat | Installing zabbix-server-{{ zabbix_server_database }} (When zabbix_repo == other)"
-  package:
-    pkg: "{{ zabbix_server_package }}-{{ zabbix_server_version }}.{{ zabbix_server_version_minor }}"
-    state: "{{ zabbix_server_package_state }}"
-  register: zabbix_server_package_installed
-  until: zabbix_server_package_installed is succeeded
-  when: zabbix_repo == "other"
   become: true
   tags:
     - zabbix-server
@@ -125,8 +60,7 @@
   package:
     pkg: "zabbix-sql-scripts-{{ zabbix_server_version }}.{{ zabbix_server_version_minor }}"
     state: "{{ zabbix_server_package_state }}"
-    disablerepo: "{{ zabbix_repo_yum_disabled | default(omit) }}"
-    enablerepo: "{{ zabbix_repo_yum_enabled | default(omit) }}"
+    disablerepo: "epel"
   environment:
     http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
     https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
@@ -134,25 +68,6 @@
   until: zabbix_server_sql_package_installed is succeeded
   when:
     - zabbix_server_version is version('6.0', '>=')
-    - zabbix_repo != "other"
-  become: true
-  tags:
-    - zabbix-server
-
-- name: "RedHat | Installing zabbix-sql-scripts (When zabbix_repo == other)"
-  package:
-    pkg: "zabbix-sql-scripts-{{ zabbix_server_version }}.{{ zabbix_server_version_minor }}"
-    state: "{{ zabbix_server_package_state }}"
-    disablerepo: "{{ zabbix_repo_yum_disabled | default(omit) }}"
-    enablerepo: "{{ zabbix_repo_yum_enabled | default(omit) }}"
-  environment:
-    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
-    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
-  register: zabbix_server_sql_package_installed
-  until: zabbix_server_sql_package_installed is succeeded
-  when:
-    - zabbix_server_version is version('6.0', '>=')
-    - zabbix_repo == "other"
   become: true
   tags:
     - zabbix-server

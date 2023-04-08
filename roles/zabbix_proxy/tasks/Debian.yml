@@ -36,8 +36,7 @@
     url: http://repo.zabbix.com/zabbix-official-repo.key
   register: are_zabbix_proxy_dependency_packages_installed
   until: are_zabbix_proxy_dependency_packages_installed is succeeded
-  when:
-    - zabbix_repo == "zabbix"
+
   become: true
   tags:
     - zabbix-proxy
@@ -47,7 +46,6 @@
   apt_repository:
     repo: "{{ item }} http://repo.zabbix.com/zabbix/{{ zabbix_proxy_version }}/{{ ansible_distribution.lower() }}/ {{ ansible_distribution_release }} main"
     state: present
-  when: zabbix_repo == "zabbix"
   become: true
   with_items:
     - deb-src
