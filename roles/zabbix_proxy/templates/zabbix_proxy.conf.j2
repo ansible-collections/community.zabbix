@@ -30,7 +30,7 @@
 {{ (zabbix_proxy_externalscripts is defined and zabbix_proxy_externalscripts is not none) | ternary('','# ') }}ExternalScripts={{ zabbix_proxy_externalscripts | default('') }}
 {{ (zabbix_proxy_fping6location is defined and zabbix_proxy_fping6location is not none) | ternary('','# ') }}Fping6Location={{ zabbix_proxy_fping6location | default('') }}
 {{ (zabbix_proxy_fpinglocation is defined and zabbix_proxy_fpinglocation is not none) | ternary('','# ') }}FpingLocation={{ zabbix_proxy_fpinglocation | default('') }}
-{% if zabbix_version is version('6.4', '<') %}
+{% if zabbix_proxy_version is version('6.4', '<') %}
 {{ (zabbix_proxy_heartbeatfrequency is defined and zabbix_proxy_heartbeatfrequency is not none) | ternary('','# ') }}HeartbeatFrequency={{ zabbix_proxy_heartbeatfrequency | default('') }}
 {% endif %}
 {{ (zabbix_proxy_historycachesize is defined and zabbix_proxy_historycachesize is not none) | ternary('','# ') }}HistoryCacheSize={{ zabbix_proxy_historycachesize | default('') }}
