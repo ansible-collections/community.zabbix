@@ -3,19 +3,20 @@ _apache_user: apache
 _apache_group: apache
 _apache_log: httpd
 _apache_service: httpd
+_apache_vhost_location: /etc/httpd/conf.d/zabbix.conf
 
 _php_fpm_dir: /etc/php-fpm.d
-_php_fpm_session: /var/opt/rh/rh-php72/lib/php/session/
-_php_fpm_listen: /run/php-fpm/zabbix.sock
+_php_fpm_session: /var/lib/php/session
+_zabbix_php_fpm_listen: /run/php-fpm/zabbix.sock
 
 _nginx_user: nginx
 _nginx_group: nginx
-_nginx_config_path: /etc/nginx/conf.d
+_nginx_vhost_location: /etc/nginx/conf.d/zabbix.conf
 _nginx_log_path: /var/log/nginx
 _nginx_service: nginx
-_nginx_tls_crt: /etc/pki/server.crt
-_nginx_tls_key: /etc/pki/server.key
-_nginx_tls_dhparam: /etc/pki/dhparam-server.pem
+
+__epel_repo:
+  - epel
 
 zabbix_valid_web_versions:
   "9":
@@ -24,8 +25,17 @@ zabbix_valid_web_versions:
   "8":
     - 6.4
     - 6.0
-    - 5.0
-    - 4.0
-  "7":
-    - 5.0
-    - 4.0
+
+zabbix_web_php_dependencies:
+  - "php-gd"
+  - "php-bcmath"
+  - "php-xml"
+  - "php-mbstring"
+  - "php-ldap"
+  - "php-{{ 'pgsql' if zabbix_server_database == 'pgsql' else 'mysqlnd' }}"
+
+zabbix_selinux_dependencies:
+  "9":
+    - python3-libsemanage
+  "8":
+    - python3-libsemanage

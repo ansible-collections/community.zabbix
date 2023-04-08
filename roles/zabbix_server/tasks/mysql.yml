@@ -61,7 +61,6 @@
   changed_when: false
   when:
     - zabbix_database_sqlload | bool
-    - zabbix_repo != "epel"
   register: ls_output_create
   tags:
     - zabbix-server
@@ -108,7 +107,6 @@
     login_unix_socket: "{{ zabbix_server_mysql_login_unix_socket | default(omit) }}"
   when:
     - zabbix_database_sqlload | bool
-    - zabbix_repo != "epel"
     - mysql_schema_empty
     - mysql_innodb_default_row_format.msg != 'dynamic'
   delegate_to: "{{ delegated_dbhost }}"
@@ -127,7 +125,6 @@
     login_unix_socket: "{{ zabbix_server_mysql_login_unix_socket | default(omit) }}"
   when:
     - zabbix_database_sqlload | bool
-    - zabbix_repo != "epel"
     - mysql_schema_empty
     - ansible_distribution_release == "buster"
   delegate_to: "{{ delegated_dbhost }}"
@@ -143,7 +140,6 @@
   when:
     - delegated_dbhost != inventory_hostname
     - zabbix_database_sqlload | bool
-    - zabbix_repo != "epel"
     - mysql_schema_empty
 
 - name: "MySQL | Copy sql create file"
@@ -155,7 +151,6 @@
   when:
     - delegated_dbhost != inventory_hostname
     - zabbix_database_sqlload | bool
-    - zabbix_repo != "epel"
     - mysql_schema_empty
 
 - name: "MySQL | Create database and import file"
@@ -173,7 +168,6 @@
     use_shell: "{{ true if zabbix_server_version is version('5.0', '==') else false }}"
   when:
     - zabbix_database_sqlload | bool
-    - zabbix_repo != "epel"
     - mysql_schema_empty
   delegate_to: "{{ delegated_dbhost }}"
   tags:
@@ -191,7 +185,6 @@
     login_unix_socket: "{{ zabbix_server_mysql_login_unix_socket | default(omit) }}"
   when:
     - zabbix_database_sqlload | bool
-    - zabbix_repo != "epel"
     - mysql_schema_empty
     - mysql_innodb_default_row_format.msg != 'dynamic'
   delegate_to: "{{ delegated_dbhost }}"
@@ -206,5 +199,4 @@
     mode: "0644"
   when:
     - zabbix_database_sqlload | bool
-    - zabbix_repo != "epel"
     - mysql_schema_empty

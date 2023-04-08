@@ -3,16 +3,20 @@ _apache_user: www-data
 _apache_group: www-data
 _apache_log: apache2
 _apache_service: apache2
+_apache_vhost_location: /etc/apache2/sites-available/zabbix.conf
 
-_php_fpm_dir: /etc/php/{{ _zabbix_php_version }}/fpm/pool.d
+_php_fpm_dir: /etc/php/{{ zabbix_web_php_installed_version }}/fpm/pool.d
 _php_fpm_session: /tmp
-_php_fpm_listen: /run/php/zabbix.sock
+_zabbix_php_fpm_listen: /run/php/zabbix.sock
 _zabbix_php_fpm_mode: "0666"
 _zabbix_php_fpm_allowed_clients: 127.0.0.1
 
+_apache_php_dependencies: libapache2-mod-php{{ zabbix_web_php_installed_version }}
+_nginx_php_dependencies: []
+
 _nginx_user: www-data
 _nginx_group: www-data
-_nginx_config_path: /etc/nginx/conf.d
+_nginx_vhost_location: /etc/nginx/conf.d/zabbix.conf
 _nginx_log_path: /var/log/nginx
 _nginx_service: nginx
 _nginx_tls_crt: /etc/ssl/certs/ssl-cert-snakeoil.pem
@@ -24,14 +28,8 @@ zabbix_valid_web_versions:
   "11":
     - 6.4
     - 6.0
-    - 5.0
-    - 4.0
   "10":
     - 6.0
-    - 5.0
-    - 4.0
-  "9":
-    - 4.0
   # Ubuntu
   "22":
     - 6.4
@@ -39,9 +37,5 @@ zabbix_valid_web_versions:
   "20":
     - 6.4
     - 6.0
-    - 5.0
-    - 4.0
   "18":
     - 6.0
-    - 5.0
-    - 4.0
