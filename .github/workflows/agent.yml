@@ -24,8 +24,6 @@ jobs:
             image: geerlingguy/docker-rockylinux8-ansible:latest
           - container: centos7
             image: geerlingguy/docker-centos7-ansible:latest
-          - container: fedora32
-            image: geerlingguy/docker-fedora32-ansible:latest
           - container: ubuntu2004
             image: geerlingguy/docker-ubuntu2004-ansible
           - container: pgsql-ubuntu1804
@@ -34,8 +32,6 @@ jobs:
             image: geerlingguy/docker-debian11-ansible
           - container: debian10
             image: geerlingguy/docker-debian10-ansible
-          - container: debian9
-            image: geerlingguy/docker-debian9-ansible
         scenario_name:
           - default
           - autopsk
