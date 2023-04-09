@@ -53,6 +53,7 @@
     https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   register: zabbix_agent_package_installed
   until: zabbix_agent_package_installed is succeeded
+  when:
     - not zabbix_agent_install_agent_only
   become: true
   tags:

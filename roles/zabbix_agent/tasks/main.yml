@@ -8,23 +8,16 @@
 - name: Determine Latest Supported Zabbix Version
   set_fact:
     zabbix_agent_version: "{{ zabbix_valid_agent_versions[ansible_distribution_major_version][0] | default(6.0) }}"
-  when: zabbix_proxy_version is not defined or zabbix_proxy_version is none
+  when: zabbix_agent_version is not defined or zabbix_agent_version is none
 
 - name: Set More Variables
   set_fact:
-    zabbix_valid_version: "{{ zabbix_agent_version in zabbix_valid_agent_versions[ansible_distribution_major_version] }}"
+    zabbix_valid_version: "{{ zabbix_agent_version|float in zabbix_valid_agent_versions[ansible_distribution_major_version] }}"
 
 - name: Stopping Install of Invalid Version
   fail:
     msg: Zabbix version {{ zabbix_agent_version }} is not supported on {{ ansible_distribution }} {{ ansible_distribution_major_version }}
   when: not zabbix_valid_version
-
-- name: "Install the correct repository"
-  include_tasks: "{{ ansible_os_family }}.yml"
-  when:
-    - not (zabbix_agent_docker | bool)
-  tags:
-    - always
 
 - name: "Set variables specific for Zabbix Agent 2"
   set_fact:
@@ -33,6 +26,13 @@
   when:
     - zabbix_agent2 is defined
     - zabbix_agent2
+  tags:
+    - always
+
+- name: "Install the correct repository"
+  include_tasks: "{{ ansible_os_family }}.yml"
+  when:
+    - not (zabbix_agent_docker | bool)
   tags:
     - always
 
