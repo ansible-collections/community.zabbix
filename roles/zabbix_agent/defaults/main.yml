@@ -43,7 +43,7 @@ zabbix_apt_install_recommends: false
 # Override Ansible specific facts
 zabbix_agent_distribution_major_version: "{{ ansible_distribution_major_version }}"
 zabbix_agent_distribution_release: "{{ ansible_distribution_release }}"
-zabbix_agent_os_family: "{{ ansible_os_family }}"
+ansible_os_family: "{{ ansible_os_family }}"
 zabbix_repo_yum_gpgcheck: 0
 zabbix_repo_yum_schema: https
 zabbix_repo_yum_disabled: "*"

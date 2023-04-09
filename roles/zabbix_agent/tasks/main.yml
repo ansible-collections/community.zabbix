@@ -1,5 +1,23 @@
 ---
 # tasks file for zabbix_agent
+- name: "Include OS-specific variables"
+  include_vars: "{{ ansible_os_family }}.yml"
+  tags:
+    - always
+
+- name: Determine Latest Supported Zabbix Version
+  set_fact:
+    zabbix_agent_version: "{{ zabbix_valid_agent_versions[ansible_distribution_major_version][0] | default(6.0) }}"
+  when: zabbix_agent_version is not defined or zabbix_agent_version is none
+
+- name: Set More Variables
+  set_fact:
+    zabbix_valid_version: "{{ zabbix_agent_version|float in zabbix_valid_agent_versions[ansible_distribution_major_version] }}"
+
+- name: Stopping Install of Invalid Version
+  fail:
+    msg: Zabbix version {{ zabbix_agent_version }} is not supported on {{ ansible_distribution }} {{ ansible_distribution_major_version }}
+  when: not zabbix_valid_version
 
 - name: "Set variables specific for Zabbix Agent 2"
   set_fact:
@@ -11,77 +29,12 @@
   tags:
     - always
 
-- name: "Fix facts for linuxmint - distribution release"
-  set_fact:
-    zabbix_agent_distribution_release: xenial
-  when:
-    - ansible_os_family == "Linuxmint"
-    - ansible_distribution_release == "sonya" or ansible_distribution_release == "serena"
-  tags:
-    - always
-
-- name: "Fix facts for linuxmint - family"
-  set_fact:
-    zabbix_agent_os_family: Debian
-  when:
-    - ansible_os_family == "Linuxmint"
-  tags:
-    - always
-
-- name: "Fix facts for XCP-ng - family"
-  set_fact:
-    zabbix_agent_os_family: RedHat
-  when:
-    - ansible_os_family == "XCP-ng"
-
-- name: "Include OS-specific variables"
-  include_vars: "{{ zabbix_agent_os_family }}.yml"
-  tags:
-    - always
-
-- name: Determine Latest Supported Zabbix Version
-  set_fact:
-    zabbix_agent_version: "{{ zabbix_valid_agent_versions[ansible_distribution_major_version][0] | default(6.0) }}"
-  when: zabbix_agent_version is not defined
-
-- name: "Reset zabbix_agent_version for Ubuntu 22.04 to 6.0"
-  # README https://support.zabbix.com/browse/ZBXNEXT-7624
-  set_fact:
-    zabbix_version: 6.0
-    zabbix_agent_version: 6.0
-  when:
-    - ansible_distribution_release is defined
-    - ansible_distribution_release == "jammy"
-    - ( zabbix_agent_version is version ('6.0','lt') or
-      zabbix_version is version ('6.0','lt') )
-
 - name: "Install the correct repository"
-  include_tasks: "{{ zabbix_agent_os_family if (zabbix_agent_os_family not in ['Sangoma']) else 'RedHat' }}.yml"
+  include_tasks: "{{ ansible_os_family }}.yml"
   when:
     - not (zabbix_agent_docker | bool)
   tags:
     - always
-
-- name: "Set the 'ansible_python_interpreter' to the one we use for running this playbook."
-  set_fact:
-    ansible_python_interpreter: "{{ ansible_playbook_python }}"
-  delegate_to: localhost
-  delegate_facts: true
-  when:
-    - (zabbix_install_pip_packages | bool) or (zabbix_api_create_hostgroup | bool) or (zabbix_api_create_hosts | bool)
-
-- name: "Install local python-netaddr package"
-  pip:
-    name: netaddr
-    state: present
-  register: zabbix_python_netaddr_package_installed
-  until: zabbix_python_netaddr_package_installed is succeeded
-  delegate_to: localhost
-  run_once: true
-  become: "{{ zabbix_agent_become_on_localhost }}"
-  when:
-    - zabbix_install_pip_packages | bool
-    - ansible_all_ipv4_addresses is defined or (zabbix_agent_ip is not defined and total_private_ip_addresses is defined)
 
 - name: "Encrypt with TLS PSK auto management"
   include_tasks: tlspsk_auto.yml
@@ -102,21 +55,14 @@
 - name: "Configure Agent"
   include_tasks: Windows_conf.yml
   when:
-    - zabbix_agent_os_family == "Windows"
-  tags:
-    - always
-
-- name: "Configure Agent"
-  include_tasks: Darwin.yml
-  when:
-    - zabbix_agent_os_family == "Darwin"
+    - ansible_os_family == "Windows"
   tags:
     - always
 
 - name: "Configure Agent"
   include_tasks: Linux.yml
   when:
-    - (zabbix_agent_os_family != "Windows" and zabbix_agent_os_family != "Darwin") or (zabbix_agent_docker | bool)
+    - (ansible_os_family != "Windows" and ansible_os_family != "Darwin") or (zabbix_agent_docker | bool)
   tags:
     - always
 

@@ -1,5 +1,4 @@
 ---
-
 - name: "SELinux | Debian | Install policycoreutils-python"
   apt:
     pkg: policycoreutils-python-utils
@@ -15,7 +14,7 @@
   until: zabbix_agent_package_installed is succeeded
   become: true
   when:
-    - zabbix_agent_os_family == "Debian"
+    - ansible_os_family == "Debian"
 
 - name: "SELinux | RedHat | Install policycoreutils-python"
   package:
@@ -27,7 +26,7 @@
   register: zabbix_agent_policycoreutils_installed
   until: zabbix_agent_policycoreutils_installed is succeeded
   when:
-    - zabbix_agent_os_family == "RedHat"
+    - ansible_os_family == "RedHat"
     - (zabbix_agent_distribution_major_version == "6" or zabbix_agent_distribution_major_version == "7")
   become: true
   tags:
@@ -44,7 +43,7 @@
   register: zabbix_agent_policycoreutils_installed
   until: zabbix_agent_policycoreutils_installed is succeeded
   when:
-    - zabbix_agent_os_family == "RedHat"
+    - ansible_os_family == "RedHat"
     - ansible_distribution_major_version == "8"
   become: true
   tags:
@@ -58,7 +57,7 @@
   register: zabbix_agent_selinuxpolicytargeted_installed
   until: zabbix_agent_selinuxpolicytargeted_installed is succeeded
   when:
-    - zabbix_agent_os_family == "RedHat"
+    - ansible_os_family == "RedHat"
   become: true
   tags:
     - init
@@ -74,7 +73,7 @@
 - name: "SELinux | Collect getenforce output"
   command: /usr/sbin/getenforce
   register: sestatus
-  when: 'getenforce_bin.stat.exists'
+  when: "getenforce_bin.stat.exists"
   changed_when: false
   become: true
   check_mode: false

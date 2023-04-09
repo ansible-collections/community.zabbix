@@ -4,13 +4,13 @@
 
 # This configuration file is "minimalized", which means all the original comments 
 # are removed. The full documentation for your Zabbix Agent 2 can be found here:
-# https://www.zabbix.com/documentation/{{ zabbix_version }}/en/manual/appendix/config/zabbix_agent2{{ "_win" if zabbix_agent_os_family == "Windows" else "" }}
+# https://www.zabbix.com/documentation/{{ zabbix_version }}/en/manual/appendix/config/zabbix_agent2{{ "_win" if ansible_os_family == "Windows" else "" }}
 
-{% if zabbix_agent_os_family != "Windows" %}
+{% if ansible_os_family != "Windows" %}
 PidFile={{ zabbix_agent2_pidfile }}
 {% endif %}
 LogType={{ zabbix_agent2_logtype }}
-{% if zabbix_agent_os_family == "Windows" %}
+{% if ansible_os_family == "Windows" %}
 LogFile={{ zabbix_agent2_win_logfile }}
 {% else %}
 LogFile={{ zabbix_agent2_logfile }}
@@ -79,13 +79,13 @@ Alias={{ item }}
 {% endif %}
 {% endif %}
 Timeout={{ zabbix_agent2_timeout }}
-{% if zabbix_agent_os_family == "Windows" %}
+{% if ansible_os_family == "Windows" %}
 Include={{ zabbix_agent_win_include }}
 {% else %}
 Include={{ zabbix_agent2_include }}/{{ zabbix_agent2_include_pattern }}
 {% endif %}
 UnsafeUserParameters={{ zabbix_agent2_unsafeuserparameters }}
-{% if zabbix_agent_os_family != "Windows" %}
+{% if ansible_os_family != "Windows" %}
 ControlSocket={{ zabbix_agent2_controlsocket }}
 {% endif %}
 {% if zabbix_agent2_tlsconnect is defined and zabbix_agent2_tlsconnect %}
