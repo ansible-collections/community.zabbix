@@ -19,31 +19,23 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        molecule_distro:
-          - container: centos8
-            image: geerlingguy/docker-rockylinux8-ansible:latest
-          - container: centos7
-            image: geerlingguy/docker-centos7-ansible:latest
-          - container: ubuntu2004
-            image: geerlingguy/docker-ubuntu2004-ansible
-          - container: pgsql-ubuntu1804
-            image: geerlingguy/docker-ubuntu1804-ansible
-          - container: debian11
-            image: geerlingguy/docker-debian11-ansible
-          - container: debian10
-            image: geerlingguy/docker-debian10-ansible
+        container:
+          - rockylinux9
+          - rockylinux8
+          - ubuntu2204
+          - ubuntu2004
+          - ubuntu1804
+          - debian11
+          - debian10
+        version:
+            - v64
+            - v62
+            - v60
         scenario_name:
           - default
           - autopsk
           - agent2
           - agent2autopsk
-        exclude: # zabbix-agent2 is not supported on debian8
-          - molecule_distro:
-              container: debian8
-            scenario_name: agent2
-          - molecule_distro:
-              container: debian8
-            scenario_name: agent2autopsk
 
     steps:
       - name: Check out code
@@ -73,7 +65,8 @@ jobs:
       - name: Run role tests
         working-directory: molecule/zabbix_agent_tests
         run: >-
-          MY_MOLECULE_CONTAINER=${{ matrix.molecule_distro.container }}
-          MY_MOLECULE_IMAGE=${{ matrix.molecule_distro.image }}
-          MY_MOLECULE_DOCKER_COMMAND=${{ matrix.molecule_distro.command }}
+          MY_MOLECULE_CONTAINER=${{ matrix.container }}
+          MY_MOLECULE_IMAGE=${{ matrix.container }}
+          MY_MOLECULE_VERSION=${{ matrix.version }}
+          MY_MOLECULE_DOCKER_COMMAND=${{ matrix.command }}
           molecule -c common/molecule.yml test -s ${{ matrix.scenario_name }}
