@@ -34,8 +34,6 @@ provisioner:
         zabbix_proxy_version: 6.2
       v60:
         zabbix_proxy_version: 6.0
-      v50:
-        zabbix_proxy_version: 5.0
       mysql:
         zabbix_proxy_dbname: zabbix
         zabbix_proxy_dbuser: zabbix-dbuser
