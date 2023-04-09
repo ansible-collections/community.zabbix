@@ -60,13 +60,6 @@
     - always
 
 - name: "Configure Agent"
-  include_tasks: Darwin.yml
-  when:
-    - zabbix_agent_os_family == "Darwin"
-  tags:
-    - always
-
-- name: "Configure Agent"
   include_tasks: Linux.yml
   when:
     - (ansible_os_family != "Windows" and ansible_os_family != "Darwin") or (zabbix_agent_docker | bool)
