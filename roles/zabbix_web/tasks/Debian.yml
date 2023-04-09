@@ -79,7 +79,6 @@
   apt_repository:
     repo: "{{ item }} {{ zabbix_server_apt_repository | join(' ') }}"
     state: present
-  when: zabbix_repo == "zabbix"
   become: true
   with_items:
     - deb-src
