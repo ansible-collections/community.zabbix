@@ -29,6 +29,7 @@ jobs:
           - debian11
           - debian10
         version:
+          - v64
           - v62
           - v60
         include:

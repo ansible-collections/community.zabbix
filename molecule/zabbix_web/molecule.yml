@@ -40,15 +40,15 @@ provisioner:
         ansible_python_interpreter: /usr/bin/python3
       python:
         ansible_python_interpreter: /usr/bin/python
+      v64:
+        zabbix_server_version: 6.4
+        zabbix_web_version: 6.4
       v62:
         zabbix_server_version: 6.2
         zabbix_web_version: 6.2
       v60:
         zabbix_server_version: 6.0
         zabbix_web_version: 6.0
-      v50:
-        zabbix_server_version: 5.0
-        zabbix_web_version: 5.0
       mysql:
         zabbix_server_database: mysql
         zabbix_server_dbport: 3306
