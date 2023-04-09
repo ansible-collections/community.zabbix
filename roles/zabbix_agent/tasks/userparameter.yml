@@ -1,85 +1,84 @@
 ---
 - block:
-  - name: "Windows | Installing user-defined userparameters"
-    ansible.windows.win_template:
-      src: "{{ zabbix_agent_userparameters_templates_src }}/{{ item.name }}.j2"
-      dest: '{{ zabbix_agent_win_include }}\{{ item.name }}.conf'
-    notify:
-      - restart win zabbix agent
-    with_items: "{{ zabbix_agent_userparameters }}"
+    - name: "Windows | Installing user-defined userparameters"
+      ansible.windows.win_template:
+        src: "{{ zabbix_agent_userparameters_templates_src }}/{{ item.name }}.j2"
+        dest: '{{ zabbix_agent_win_include }}\{{ item.name }}.conf'
+      notify:
+        - restart win zabbix agent
+      with_items: "{{ zabbix_agent_userparameters }}"
 
-  - name: "Windows | Installing user-defined scripts"
-    ansible.windows.win_copy:
-      src: "{{ zabbix_agent_userparameters_scripts_src }}/{{ item.scripts_dir }}"
-      dest: '{{ zabbix_win_install_dir }}\scripts\'
-    notify:
-      - restart win zabbix agent
-    with_items: "{{ zabbix_agent_userparameters }}"
-    when: item.scripts_dir is defined
+    - name: "Windows | Installing user-defined scripts"
+      ansible.windows.win_copy:
+        src: "{{ zabbix_agent_userparameters_scripts_src }}/{{ item.scripts_dir }}"
+        dest: '{{ zabbix_win_install_dir }}\scripts\'
+      notify:
+        - restart win zabbix agent
+      with_items: "{{ zabbix_agent_userparameters }}"
+      when: item.scripts_dir is defined
 
-  when: zabbix_agent_os_family == "Windows"
-
+  when: ansible_os_family == "Windows"
 
 - block:
-  - name: "Installing user-defined userparameters"
-    template:
-      src: "{{ zabbix_agent_userparameters_templates_src }}/{{ item.name }}.j2"
-      dest: "{{ zabbix_agent_include }}/userparameter_{{ item.name }}.conf"
-      owner: zabbix
-      group: zabbix
-      mode: 0644
-    notify:
-      - restart zabbix-agent
-      - restart mac zabbix agent
-    become: true
-    with_items: "{{ zabbix_agent_userparameters }}"
+    - name: "Installing user-defined userparameters"
+      template:
+        src: "{{ zabbix_agent_userparameters_templates_src }}/{{ item.name }}.j2"
+        dest: "{{ zabbix_agent_include }}/userparameter_{{ item.name }}.conf"
+        owner: zabbix
+        group: zabbix
+        mode: 0644
+      notify:
+        - restart zabbix-agent
+        - restart mac zabbix agent
+      become: true
+      with_items: "{{ zabbix_agent_userparameters }}"
 
-  - name: "Installing user-defined scripts"
-    copy:
-      src: "{{ zabbix_agent_userparameters_scripts_src }}/{{ item.scripts_dir }}"
-      dest: "/etc/zabbix/scripts/"
-      owner: zabbix
-      group: zabbix
-      mode: 0755
-    notify:
-      - restart zabbix-agent
-      - restart mac zabbix agent
-    become: true
-    with_items: "{{ zabbix_agent_userparameters }}"
-    when: item.scripts_dir is defined
+    - name: "Installing user-defined scripts"
+      copy:
+        src: "{{ zabbix_agent_userparameters_scripts_src }}/{{ item.scripts_dir }}"
+        dest: "/etc/zabbix/scripts/"
+        owner: zabbix
+        group: zabbix
+        mode: 0755
+      notify:
+        - restart zabbix-agent
+        - restart mac zabbix agent
+      become: true
+      with_items: "{{ zabbix_agent_userparameters }}"
+      when: item.scripts_dir is defined
 
   when:
-    - zabbix_agent_os_family != "Windows"
+    - ansible_os_family != "Windows"
     - not zabbix_agent2
 
 - block:
-  - name: "Installing user-defined userparameters"
-    template:
-      src: "{{ zabbix_agent_userparameters_templates_src }}/{{ item.name }}.j2"
-      dest: "{{ zabbix_agent2_include }}/userparameter_{{ item.name }}.conf"
-      owner: zabbix
-      group: zabbix
-      mode: 0644
-    notify:
-      - restart zabbix-agent
-      - restart mac zabbix agent
-    become: true
-    with_items: "{{ zabbix_agent_userparameters }}"
+    - name: "Installing user-defined userparameters"
+      template:
+        src: "{{ zabbix_agent_userparameters_templates_src }}/{{ item.name }}.j2"
+        dest: "{{ zabbix_agent2_include }}/userparameter_{{ item.name }}.conf"
+        owner: zabbix
+        group: zabbix
+        mode: 0644
+      notify:
+        - restart zabbix-agent
+        - restart mac zabbix agent
+      become: true
+      with_items: "{{ zabbix_agent_userparameters }}"
 
-  - name: "Installing user-defined scripts"
-    copy:
-      src: "{{ zabbix_agent_userparameters_scripts_src }}/{{ item.scripts_dir }}"
-      dest: "/etc/zabbix/scripts/"
-      owner: zabbix
-      group: zabbix
-      mode: 0755
-    notify:
-      - restart zabbix-agent
-      - restart mac zabbix agent
-    become: true
-    with_items: "{{ zabbix_agent_userparameters }}"
-    when: item.scripts_dir is defined
+    - name: "Installing user-defined scripts"
+      copy:
+        src: "{{ zabbix_agent_userparameters_scripts_src }}/{{ item.scripts_dir }}"
+        dest: "/etc/zabbix/scripts/"
+        owner: zabbix
+        group: zabbix
+        mode: 0755
+      notify:
+        - restart zabbix-agent
+        - restart mac zabbix agent
+      become: true
+      with_items: "{{ zabbix_agent_userparameters }}"
+      when: item.scripts_dir is defined
 
   when:
-    - zabbix_agent_os_family != "Windows"
+    - ansible_os_family != "Windows"
     - zabbix_agent2

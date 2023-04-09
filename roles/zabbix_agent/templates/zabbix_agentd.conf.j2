@@ -4,15 +4,15 @@
 
 # This configuration file is "minimalized", which means all the original comments 
 # are removed. The full documentation for your Zabbix Agent can be found here:
-# https://www.zabbix.com/documentation/{{ zabbix_version }}/en/manual/appendix/config/zabbix_agentd{{ "_win" if zabbix_agent_os_family == "Windows" else "" }}
+# https://www.zabbix.com/documentation/{{ zabbix_version }}/en/manual/appendix/config/zabbix_agentd{{ "_win" if ansible_os_family == "Windows" else "" }}
 
-{% if zabbix_agent_os_family != "Windows" %}
+{% if ansible_os_family != "Windows" %}
 PidFile={{ zabbix_agent_pidfile }}
 {% endif %}
 {% if zabbix_agent_version is version('3.0', '>=') %}
 LogType={{ zabbix_agent_logtype }}
 {% endif %}
-{% if zabbix_agent_os_family == "Windows" %}
+{% if ansible_os_family == "Windows" %}
 LogFile={{ zabbix_agent_win_logfile }}
 {% else %}
 LogFile={{ zabbix_agent_logfile }}
@@ -79,20 +79,20 @@ Alias={{ item }}
 {% endif %}
 {% endif %}
 Timeout={{ zabbix_agent_timeout }}
-{% if zabbix_agent_os_family != "Windows" %}
+{% if ansible_os_family != "Windows" %}
 AllowRoot={{ zabbix_agent_allowroot }}
 {% endif %}
 {% if zabbix_agent_runas_user is defined and zabbix_agent_runas_user %}
 User={{ zabbix_agent_runas_user }}
 {% endif %}
-{% if zabbix_agent_os_family == "Windows" %}
+{% if ansible_os_family == "Windows" %}
 Include={{ zabbix_agent_win_include }}
 {% else %}
 Include={{ zabbix_agent_include }}/{{ zabbix_agent_include_pattern }}
 {% endif %}
 UnsafeUserParameters={{ zabbix_agent_unsafeuserparameters }}
 {% if zabbix_version is version_compare('2.2', '>=') %}
-{% if zabbix_agent_os_family != "Windows" %}
+{% if ansible_os_family != "Windows" %}
 LoadModulePath={{ zabbix_agent_loadmodulepath }}
 {% endif %}
 {% endif %}
