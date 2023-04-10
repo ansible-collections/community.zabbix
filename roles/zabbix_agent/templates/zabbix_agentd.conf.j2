@@ -4,7 +4,7 @@
 
 # This configuration file is "minimalized", which means all the original comments 
 # are removed. The full documentation for your Zabbix Agent can be found here:
-# https://www.zabbix.com/documentation/{{ zabbix_version }}/en/manual/appendix/config/zabbix_agentd{{ "_win" if ansible_os_family == "Windows" else "" }}
+# https://www.zabbix.com/documentation/{{ zabbix_agent_version }}/en/manual/appendix/config/zabbix_agentd{{ "_win" if ansible_os_family == "Windows" else "" }}
 
 {% if ansible_os_family != "Windows" %}
 PidFile={{ zabbix_agent_pidfile }}
@@ -66,7 +66,7 @@ RefreshActiveChecks={{ zabbix_agent_refreshactivechecks }}
 BufferSend={{ zabbix_agent_buffersend }}
 BufferSize={{ zabbix_agent_buffersize }}
 MaxLinesPerSecond={{ zabbix_agent_maxlinespersecond }}
-{% if zabbix_version is version_compare('6.2', '>=') %}
+{% if zabbix_agent_version is version_compare('6.2', '>=') %}
 HeartbeatFrequency={{ zabbix_agent_heartbeatfrequency }}
 {% endif %}
 {% if zabbix_agent_zabbix_alias is defined and zabbix_agent_zabbix_alias %}
@@ -91,7 +91,7 @@ Include={{ zabbix_agent_win_include }}
 Include={{ zabbix_agent_include }}/{{ zabbix_agent_include_pattern }}
 {% endif %}
 UnsafeUserParameters={{ zabbix_agent_unsafeuserparameters }}
-{% if zabbix_version is version_compare('2.2', '>=') %}
+{% if zabbix_agent_version is version_compare('2.2', '>=') %}
 {% if ansible_os_family != "Windows" %}
 LoadModulePath={{ zabbix_agent_loadmodulepath }}
 {% endif %}
@@ -105,7 +105,7 @@ LoadModule={{ module }}
 {% endfor %}
 {% endif %}
 {% endif %}
-{% if zabbix_version is version_compare('3.0', '>=') %}
+{% if zabbix_agent_version is version_compare('3.0', '>=') %}
 {% if zabbix_agent_tlsconnect is defined and zabbix_agent_tlsconnect %}
 TLSConnect={{ zabbix_agent_tlsconnect }}
 {% endif %}
@@ -137,7 +137,7 @@ TLSPSKIdentity={{ zabbix_agent_tlspskidentity }}
 TLSPSKFile={{ zabbix_agent_tlspskfile }}
 {% endif %}
 {% endif %}
-{% if zabbix_version is version('6.0', '>=') %}
+{% if zabbix_agent_version is version('6.0', '>=') %}
 {% if zabbix_agent_listenbacklog is defined and zabbix_agent_listenbacklog %}
 ListenBacklog={{ zabbix_agent_listenbacklog }}
 {% endif %}

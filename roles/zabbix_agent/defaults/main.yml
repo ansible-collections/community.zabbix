@@ -2,11 +2,9 @@
 # defaults file for zabbix_agent
 
 zabbix_agent2: false
-# zabbix_agent_version: 6.0
+# zabbix_agent_version: 6.4
 zabbix_agent_version_minor: "*"
-zabbix_version: "{{ zabbix_agent_version }}"
 zabbix_version_patch: 0
-zabbix_repo: zabbix
 zabbix_agent_package_remove: false
 zabbix_agent_package: zabbix-agent
 zabbix_sender_package: zabbix-sender
@@ -17,7 +15,6 @@ zabbix_agent_serveractive:
 zabbix_agent2_server: "{{ zabbix_agent_server }}"
 zabbix_agent2_serveractive: "{{ zabbix_agent_serveractive }}"
 zabbix_selinux: false
-zabbix_agent_src_reinstall: false
 zabbix_agent_apt_priority:
 zabbix_agent_conf_mode: "0644"
 zabbix_agent_dont_detect_ip: false
@@ -36,22 +33,18 @@ zabbix_agent_packages:
   - "{{ zabbix_get_package }}"
 
 # Zabbix role related vars
-zabbix_install_pip_packages: true
 zabbix_apt_force_apt_get: true
 zabbix_apt_install_recommends: false
 
 # Override Ansible specific facts
 zabbix_agent_distribution_major_version: "{{ ansible_distribution_major_version }}"
 zabbix_agent_distribution_release: "{{ ansible_distribution_release }}"
-ansible_os_family: "{{ ansible_os_family }}"
 zabbix_repo_yum_gpgcheck: 0
 zabbix_repo_yum_schema: https
-zabbix_repo_yum_disabled: "*"
-zabbix_repo_yum_enabled: []
 zabbix_repo_yum:
   - name: zabbix
     description: Zabbix Official Repository - $basearch
-    baseurl: "{{ zabbix_repo_yum_schema }}://repo.zabbix.com/zabbix/{{ zabbix_version }}/rhel/{{ zabbix_agent_distribution_major_version }}/$basearch/"
+    baseurl: "{{ zabbix_repo_yum_schema }}://repo.zabbix.com/zabbix/{{ zabbix_agent_version }}/rhel/{{ zabbix_agent_distribution_major_version }}/$basearch/"
     mode: "0644"
     gpgcheck: "{{ zabbix_repo_yum_gpgcheck }}"
     gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-ZABBIX
@@ -72,23 +65,14 @@ zabbix_repo_yum:
     state: present
 
 # Zabbix API stuff
-zabbix_validate_certs: true # Will be deprecated in 2.0.0
-zabbix_api_validate_certs: "{{ zabbix_validate_certs }}"
-zabbix_agent_server_url: http://localhost # Will be deprecated in 2.0.0
-zabbix_url: "{{ zabbix_agent_server_url }}" # Will be deprecated in 2.0.0
-zabbix_api_server_url: "{{ zabbix_agent_server_url }}"
+zabbix_api_validate_certs: true
+zabbix_api_server_url: http://localhost
 zabbix_api_server_host: "{{ zabbix_api_server_url | urlsplit('hostname') }}"
 zabbix_api_port_from_url: "{{ zabbix_api_server_port | default(zabbix_api_server_url | urlsplit('port')) }}"
 zabbix_api_scheme_from_url: "{{ zabbix_api_server_url | urlsplit('scheme') }}"
 zabbix_api_port_from_shema: "{{ (zabbix_api_scheme_from_url == 'https') | ternary(443, 80) }}"
-# zabbix_http_user: admin                          # Will be deprecated in 2.0.0
-# zabbix_http_password: admin                      # Will be deprecated in 2.0.0
-# zabbix_api_http_user: admin
-# zabbix_api_http_password: admin
-zabbix_api_user: Admin # Will be deprecated in 2.0.0
-zabbix_api_pass: !unsafe zabbix # Will be deprecated in 2.0.0
-zabbix_api_login_user: "{{ zabbix_api_user }}"
-zabbix_api_login_pass: "{{ zabbix_api_pass }}"
+zabbix_api_login_user: Admin
+zabbix_api_login_pass: !unsafe zabbix
 ansible_httpapi_pass: "{{ zabbix_api_login_pass }}"
 ansible_httpapi_port: "{{ (zabbix_api_port_from_url == '') | ternary(zabbix_api_port_from_shema, zabbix_api_port_from_url) }}"
 ansible_httpapi_use_ssl: "{{ zabbix_api_use_ssl | default((zabbix_api_scheme_from_url == 'https') | ternary(true, false)) }}"
@@ -96,23 +80,17 @@ ansible_httpapi_validate_certs: "{{ zabbix_api_validate_certs }}"
 zabbix_api_create_hostgroup: false
 zabbix_api_create_hosts: false
 zabbix_api_timeout: 30
-zabbix_create_hostgroup: present # or absent      # Will be deprecated in 2.0.0
-zabbix_agent_hostgroups_state: "{{ zabbix_create_hostgroup }}"
-zabbix_create_host: present # or absent      # Will be deprecated in 2.0.0
-zabbix_agent_host_state: "{{ zabbix_create_host }}"
-zabbix_update_host: true # Will be deprecated in 2.0.0
-zabbix_agent_host_update: "{{ zabbix_update_host }}"
+zabbix_agent_hostgroups_state: present # or absent
+zabbix_agent_host_state: present # or absent
+zabbix_agent_host_update: true
 zabbix_host_status: enabled # or disabled
-zabbix_proxy: null # Will be deprecated in 2.0.0
-zabbix_agent_proxy: "{{ zabbix_proxy }}"
-zabbix_inventory_mode: disabled # Will be deprecated in 2.0.0
-zabbix_agent_inventory_mode: "{{ zabbix_inventory_mode }}"
+zabbix_agent_proxy: null
+zabbix_agent_inventory_mode: disabled
 zabbix_useuip: 1
 zabbix_host_groups:
   - Linux servers
-zabbix_link_templates: # Will be deprecated in 2.0.0
+zabbix_agent_link_templates:
   - Template Linux by Zabbix agent
-zabbix_agent_link_templates: "{{ zabbix_link_templates }}"
 
 zabbix_agent_interfaces:
   - type: 1
@@ -122,14 +100,6 @@ zabbix_agent_interfaces:
     dns: "{{ ansible_fqdn }}"
     port: "{{ (zabbix_agent2 == True) | ternary(zabbix_agent2_listenport, zabbix_agent_listenport) }}"
 
-zabbix_agent_firewall_enable: false
-zabbix_agent_firewalld_enable: false
-zabbix_agent_firewalld_source: "{{ zabbix_agent_server }}"
-zabbix_agent_firewall_action: insert
-zabbix_agent_firewall_chain: INPUT
-
-# By default, a null zone will trigger the use of the default zone on the remote host
-zabbix_agent_firewalld_zone:
 # Zabbix configuration variables
 zabbix_agent_pidfile: /var/run/zabbix/zabbix_agentd.pid
 zabbix_agent_logtype: file
@@ -171,8 +141,7 @@ zabbix_agent_become_on_localhost: true
 zabbix_agent_description:
 zabbix_agent_inventory_zabbix: {}
 zabbix_agent_heartbeatfrequency: 60
-zabbix_macros: [] # Will be deprecated in 2.0.0
-zabbix_agent_macros: "{{ zabbix_macros }}"
+zabbix_agent_macros: []
 zabbix_agent_tags: []
 zabbix_agent_chassis: false
 
@@ -272,7 +241,7 @@ zabbix_agent_docker: false
 zabbix_agent_docker_state: started
 zabbix_agent_docker_name: zabbix-agent
 zabbix_agent_docker_image: "zabbix/zabbix-agent"
-zabbix_agent_docker_image_tag: "ubuntu-{{ zabbix_version }}.{{ zabbix_version_patch }}"
+zabbix_agent_docker_image_tag: "ubuntu-{{ zabbix_agent_version }}.{{ zabbix_version_patch }}"
 zabbix_agent_docker_user_gid: 101
 zabbix_agent_docker_user_uid: 101
 zabbix_agent_docker_network_mode: host
