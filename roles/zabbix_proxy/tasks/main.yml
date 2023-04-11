@@ -37,7 +37,7 @@
   shell: ls -1 {{ db_file_path[zabbix_short_version] }}
   changed_when: false
   when:
-    - zabbix_database_sqlload
+    - zabbix_proxy_database_sqlload
   register: ls_output_schema
   tags:
     - zabbix-proxy

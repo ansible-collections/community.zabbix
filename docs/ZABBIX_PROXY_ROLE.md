@@ -94,22 +94,12 @@ See the following list of supported Operating systems with the Zabbix releases.
 
 The following is an overview of all available configuration default for this role.
 
-### Overall Zabbix
+### Zabbix Proxy
 
 * `zabbix_proxy_version`:  Optional. The latest available major.minor version of Zabbix will be installed on the host(s). If you want to use an older version, please specify this in the major.minor format. Example: `zabbix_proxy_version: 6.0`.
 * `zabbix_proxy_version_minor`: When you want to specify a minor version to be installed. RedHat only. Default set to: `*` (latest available)
-* `zabbix_repo_yum`: A list with Yum repository configuration.
-* `zabbix_repo_yum_schema`: Default: `https`. Option to change the web schema for the yum repository(http/https)
-
-### SElinux
-
-* `zabbix_selinux`: Default: `False`. Enables an SELinux policy so that the Proxy will run.
-
-### Zabbix Proxy
-
 * `zabbix_proxy_ip`: The IP address of the host. When not provided, it will be determined via the `ansible_default_ipv4` fact.
 * `zabbix_proxy_server`: The ip or dns name for the zabbix-server machine.
-* `*zabbix_proxy_package_state`: Default: `present`. Can be overridden to `latest` to update packages
 * `zabbix_proxy_install_database_client`: Default: `True`. False does not install database client.
 * `zabbix_proxy_manage_service`: Default: `True`. When you run multiple Zabbix proxies in a High Available cluster setup (e.g. pacemaker), you don't want Ansible to manage the zabbix-proxy service, because Pacemaker is in control of zabbix-proxy service.
 * `zabbix_proxy_include_mode`: Default: `0755`. The "mode" for the directory configured with `zabbix_proxy_include`.
@@ -119,17 +109,28 @@ The following is an overview of all available configuration default for this rol
 
 * `zabbix_proxy_dbhost_run_install`: Default: `True`. When set to `True`, sql files will be executed on the host running the database.
 * `zabbix_proxy_database`: Default: `mysql`. The type of database used. Can be: `mysql`, `pgsql` or `sqlite3`
-* `zabbix_proxy_dbhost`: The hostname on which the database is running. Will be ignored when `sqlite3` is used as database.
+* `zabbix_proxy_dbhost`: Default: localhost. The hostname on which the database is running. Will be ignored when `sqlite3` is used as database.
 * `zabbix_proxy_real_dbhost`: The hostname of the dbhost that is running behind a loadbalancer/VIP (loadbalancers doesn't accept ssh connections) Will be ignored when `sqlite3` is used as database.
-* `zabbix_proxy_dbname`: The database name which is used by the Zabbix Proxy.
-* `zabbix_proxy_dbuser`: The database username which is used by the Zabbix Proxy. Will be ignored when `sqlite3` is used as database.
-* `zabbix_proxy_dbpassword`: The database user password which is used by the Zabbix Proxy. Will be ignored when `sqlite3` is used as database.
+* `zabbix_proxy_dbname`: Default: zabbix_proxy. The database name which is used by the Zabbix Proxy.
+* `zabbix_proxy_dbuser`: Default: zabbix_proxy. The database username which is used by the Zabbix Proxy. Will be ignored when `sqlite3` is used as database.
+* `zabbix_proxy_dbpassword`: Default: zabbix_proxy. The database user password which is used by the Zabbix Proxy. Will be ignored when `sqlite3` is used as database.
 * `zabbix_proxy_dbport`: The database port which is used by the Zabbix Proxy. Will be ignored when `sqlite3` is used as database.
-* `zabbix_database_creation`: Default: `True`. When you don't want to create the database including user, you can set it to False.
+* `zabbix_proxy_database_creation`: Default: `True`. When you don't want to create the database including user, you can set it to False.
 * `zabbix_proxy_install_database_client`: Default: `True`. False does not install database client. Default true
-* `zabbix_database_sqlload`:True / False. When you don't want to load the sql files into the database, you can set it to False.
+* `zabbix_proxy_database_sqlload`:True / False. When you don't want to load the sql files into the database, you can set it to False.
 * `zabbix_proxy_dbencoding`: Default: `utf8`. The encoding for the MySQL database.
 * `zabbix_proxy_dbcollation`: Default: `utf8_bin`. The collation for the MySQL database.zabbix_proxy_
+
+
+### Yum/APT
+* `zabbix_repo_yum`: A list with Yum repository configuration.
+* `zabbix_repo_yum_schema`: Default: `https`. Option to change the web schema for the yum repository(http/https)
+* `zabbix_repo_yum_gpgcheck`: Default: `0`.  Should yum perform a GPG check on the repository
+* `zabbix_proxy_apt_priority`: APT priority for the zabbix repository
+* `*zabbix_proxy_package_state`: Default: `present`. Can be overridden to `latest` to update packages
+### SElinux
+
+* `zabbix_proxy_selinux`: Default: `False`. Enables an SELinux policy so that the Proxy will run.
 
 ## Proxy
 
@@ -282,108 +283,110 @@ These variables need to be overridden when you want to make use of the Zabbix AP
 
 The following table lists all variables that are exposed to modify the configuration of the zabbix_proxy.conf file.  Specific details of each variable can be found in the Zabbix documentation.
 
-| Zabbix Name | Variable Name | Notes |
-|-----------|------------------|--------|
-| AllowRoot | zabbix_proxy_allowroot | |
-| AllowUnsupportedDBVersions | zabbix_proxy_allowunsupporteddbversions | |
-| CacheSize | zabbix_proxy_cachesize | |
-| ConfigFrequency | zabbix_proxy_configfrequency | |
-| DataSenderFrequency | zabbix_proxy_datasenderfrequency | |
-| DBHost | zabbix_proxy_dbhost | |
-| DBName | zabbix_proxy_dbname | |
-| DBPassword | zabbix_proxy_dbpassword | |
-| DBSchema | zabbix_proxy_dbschema | |
-| DBSocket | zabbix_proxy_dbsocket | |
-| DBTLSCAFile | zabbix_proxy_dbtlscafile | |
-| DBTLSCertFile | zabbix_proxy_dbtlscertfile | |
-| DBTLSCipher | zabbix_proxy_dbtlscipher | |
-| DBTLSCipher13 | zabbix_proxy_dbtlscipher13 | |
-| DBTLSConnect | zabbix_proxy_dbtlsconnect | |
-| DBTLSKeyFile | zabbix_proxy_dbtlskeyfile | |
-| DBUser | zabbix_proxy_dbuser | |
-| DebugLevel | zabbix_proxy_debuglevel | |
-| EnableRemoteCommands | zabbix_proxy_enableremotecommands | |
-| ExternalScripts | zabbix_proxy_externalscripts | |
-| Fping6Location | zabbix_proxy_fping6location | |
-| FpingLocation | zabbix_proxy_fpinglocation | |
-| HeartbeatFrequency | zabbix_proxy_heartbeatfrequency | Version 6.2 or Lower |
-| HistoryCacheSize | zabbix_proxy_historycachesize | |
-| HistoryIndexCacheSize | zabbix_proxy_historyindexcachesize | |
-| Hostname | zabbix_proxy_hostname | |
-| HostnameItem | zabbix_proxy_hostnameitem | |
-| HousekeepingFrequency | zabbix_proxy_housekeepingfrequency | |
-| Include | zabbix_proxy_include | |
-| JavaGateway | zabbix_proxy_javagateway | |
-| JavaGatewayPort | zabbix_proxy_javagatewayport | |
-| ListenBacklog | zabbix_proxy_listenbacklog | |
-| ListenIP | zabbix_proxy_listenip | |
-| ListenPort | zabbix_proxy_listenport | |
-| LoadModule | zabbix_proxy_loadmodule | |
-| LoadModulePath | zabbix_proxy_loadmodulepath | |
-| LogFile | zabbix_proxy_logfile | |
-| LogFileSize | zabbix_proxy_logfilesize | |
-| LogRemoteCommands | zabbix_proxy_logremotecommands | |
-| LogSlowQueries | zabbix_proxy_logslowqueries | |
-| LogType | zabbix_proxy_logtype | |
-| PidFile | zabbix_proxy_pidfile | |
-| ProxyLocalBuffer | zabbix_proxy_proxylocalbuffer | |
-| ProxyMode | zabbix_proxy_proxymode | |
-| ProxyOfflineBuffer | zabbix_proxy_proxyofflinebuffer | |
-| Server | zabbix_proxy_server | |
-| SNMPTrapperFile | zabbix_proxy_snmptrapperfile | |
-| SocketDir | zabbix_proxy_socketdir | |
-| SourceIP | zabbix_proxy_sourceip | |
-| SSHKeyLocation | zabbix_proxy_sshkeylocation | |
-| SSLCALocation | zabbix_proxy_sslcalocation | |
-| SSLCertLocation | zabbix_proxy_sslcertlocation | |
-| SSLKeyLocation | zabbix_proxy_sslkeylocation | |
-| StartDBSyncers | zabbix_proxy_startdbsyncers | |
-| StartDiscoverers | zabbix_proxy_startdiscoverers | |
-| StartHTTPPollers | zabbix_proxy_starthttppollers | |
-| StartIPMIPollers | zabbix_proxy_startipmipollers | |
-| StartJavaPollers | zabbix_proxy_startjavapollers | |
-| StartODBCPollers | zabbix_proxy_startodbcpollers | |
-| StartPingers | zabbix_proxy_startpingers | |
-| StartPollers | zabbix_proxy_startpollers | |
-| StartPollersUnreachable | zabbix_proxy_startpollersunreachable | |
-| StartPreprocessors | zabbix_proxy_startpreprocessors | |
-| StartSNMPTrapper | zabbix_proxy_startsnmptrapper | |
-| StartTrappers | zabbix_proxy_starttrappers | |
-| StartVMwareCollectors | zabbix_proxy_startvmwarecollectors | |
-| StatsAllowedIP | zabbix_proxy_statsallowedip | |
-| Timeout | zabbix_proxy_timeout | |
-| TLSAccept | zabbix_proxy_tlsaccept | |
-| TLSCAFile | zabbix_proxy_tlscafile | |
-| TLSCertFile | zabbix_proxy_tlscertfile | |
-| TLSCipherAll | zabbix_proxy_tlscipherall | |
-| TLSCipherAll13 | zabbix_proxy_tlscipherall13 | |
-| TLSCipherCert | zabbix_proxy_tlsciphercert | |
-| TLSCipherCert13 | zabbix_proxy_tlsciphercert13 | |
-| TLSCipherPSK | zabbix_proxy_tlscipherpsk | |
-| TLSCipherPSK13 | zabbix_proxy_tlscipherpsk13 | |
-| TLSConnect | zabbix_proxy_tlsconnect | |
-| TLSCRLFile | zabbix_proxy_tlscrlfile | |
-| TLSKeyFile | zabbix_proxy_tlskeyfile | |
-| TLSPSKFile | zabbix_proxy_tlspskfile | |
-| TLSPSKIdentity | zabbix_proxy_tlspskidentity | |
-| TLSServerCertIssuer | zabbix_proxy_tlsservercertissuer | |
-| TLSServerCertSubject | zabbix_proxy_tlsservercertsubject | |
-| TmpDir | zabbix_proxy_tmpdir | |
-| TrapperTimeout | zabbix_proxy_trappertimeout | |
-| UnavailableDelay | zabbix_proxy_unavailabledelay | |
-| UnreachableDelay | zabbix_proxy_unreachabledelay | |
-| UnreachablePeriod | zabbix_proxy_unreachableperiod | |
-| User | zabbix_proxy_user | |
-| Vault | zabbix_proxy_vault | Version 6.2 or Greater |
-| VaultDBPath | zabbix_proxy_vaultdbpath | |
-| VaultTLSCertFile | zabbix_proxy_vaulttlscertfile | Version 6.2 or Greater |
-| VaultTLSKeyFile | zabbix_proxy_vaulttlskeyfile | Version 6.2 or Greater |
-| VaultToken | zabbix_proxy_vaulttoken | |
-| VaultURL | zabbix_proxy_vaulturl | |
-| VMwareCacheSize | zabbix_proxy_vmwarecachesize | |
-| VMwareFrequency | zabbix_proxy_vmwarefrequency | |
-| VMwarePerfFrequency | zabbix_proxy_vmwareperffrequency | |
-| VMwareTimeout | zabbix_proxy_vmwaretimeout | |
+**NOTE**:  Only variables with a default value appear in the defaults file, all others must be added.
+
+| Zabbix Name | Variable Name | Default Value |Notes |
+|-----------|------------------|--------|--------|
+| AllowRoot | zabbix_proxy_allowroot |0| |
+| AllowUnsupportedDBVersions | zabbix_proxy_allowunsupporteddbversions |0| |
+| CacheSize | zabbix_proxy_cachesize | 8M| |
+| ConfigFrequency | zabbix_proxy_configfrequency |3600| |
+| DataSenderFrequency | zabbix_proxy_datasenderfrequency |1| |
+| DBHost | zabbix_proxy_dbhost | localhost| |
+| DBName | zabbix_proxy_dbname | zabbix_proxy| |
+| DBPassword | zabbix_proxy_dbpassword | zabbix_proxy| |
+| DBSchema | zabbix_proxy_dbschema || |
+| DBSocket | zabbix_proxy_dbsocket || |
+| DBTLSCAFile | zabbix_proxy_dbtlscafile || |
+| DBTLSCertFile | zabbix_proxy_dbtlscertfile || |
+| DBTLSCipher | zabbix_proxy_dbtlscipher || |
+| DBTLSCipher13 | zabbix_proxy_dbtlscipher13 || |
+| DBTLSConnect | zabbix_proxy_dbtlsconnect || |
+| DBTLSKeyFile | zabbix_proxy_dbtlskeyfile || |
+| DBUser | zabbix_proxy_dbuser | zabbix_proxy| |
+| DebugLevel | zabbix_proxy_debuglevel |3| |
+| EnableRemoteCommands | zabbix_proxy_enableremotecommands |0| |
+| ExternalScripts | zabbix_proxy_externalscripts | /usr/lib/zabbix/externalscripts| |
+| Fping6Location | zabbix_proxy_fping6location | /usr/sbin/fping6| |
+| FpingLocation | zabbix_proxy_fpinglocation | /usr/sbin/fping| |
+| HeartbeatFrequency | zabbix_proxy_heartbeatfrequency |60| Version 6.2 or Lower|
+| HistoryCacheSize | zabbix_proxy_historycachesize | 8M| |
+| HistoryIndexCacheSize | zabbix_proxy_historyindexcachesize | 4M| |
+| Hostname | zabbix_proxy_hostname | "{{ inventory_hostname }}"| |
+| HostnameItem | zabbix_proxy_hostnameitem || |
+| HousekeepingFrequency | zabbix_proxy_housekeepingfrequency |1| |
+| Include | zabbix_proxy_include | /etc/zabbix/zabbix_proxy.conf.d| |
+| JavaGateway | zabbix_proxy_javagateway || |
+| JavaGatewayPort | zabbix_proxy_javagatewayport |10052| |
+| ListenBacklog | zabbix_proxy_listenbacklog || |
+| ListenIP | zabbix_proxy_listenip || |
+| ListenPort | zabbix_proxy_listenport |10051| |
+| LoadModule | zabbix_proxy_loadmodule || |
+| LoadModulePath | zabbix_proxy_loadmodulepath | /usr/lib/zabbix/modules| |
+| LogFile | zabbix_proxy_logfile | /var/log/zabbix/zabbix_proxy.log| |
+| LogFileSize | zabbix_proxy_logfilesize |10| |
+| LogRemoteCommands | zabbix_proxy_logremotecommands || |
+| LogSlowQueries | zabbix_proxy_logslowqueries || |
+| LogType | zabbix_proxy_logtype | file| |
+| PidFile | zabbix_proxy_pidfile | /var/run/zabbix/zabbix_proxy.pid| |
+| ProxyLocalBuffer | zabbix_proxy_proxylocalbuffer |0| |
+| ProxyMode | zabbix_proxy_proxymode || |
+| ProxyOfflineBuffer | zabbix_proxy_proxyofflinebuffer |1| |
+| Server | zabbix_proxy_server | 192.168.1.1| |
+| SNMPTrapperFile | zabbix_proxy_snmptrapperfile | /tmp/zabbix_traps.tmp| |
+| SocketDir | zabbix_proxy_socketdir | /var/run/zabbix| |
+| SourceIP | zabbix_proxy_sourceip || |
+| SSHKeyLocation | zabbix_proxy_sshkeylocation || |
+| SSLCALocation | zabbix_proxy_sslcalocation || |
+| SSLCertLocation | zabbix_proxy_sslcertlocation || |
+| SSLKeyLocation | zabbix_proxy_sslkeylocation || |
+| StartDBSyncers | zabbix_proxy_startdbsyncers |4| |
+| StartDiscoverers | zabbix_proxy_startdiscoverers |1| |
+| StartHTTPPollers | zabbix_proxy_starthttppollers |1| |
+| StartIPMIPollers | zabbix_proxy_startipmipollers |0| |
+| StartJavaPollers | zabbix_proxy_startjavapollers || |
+| StartODBCPollers | zabbix_proxy_startodbcpollers |1| |
+| StartPingers | zabbix_proxy_startpingers |1| |
+| StartPollers | zabbix_proxy_startpollers |5| |
+| StartPollersUnreachable | zabbix_proxy_startpollersunreachable |1| |
+| StartPreprocessors | zabbix_proxy_startpreprocessors |3| |
+| StartSNMPTrapper | zabbix_proxy_startsnmptrapper || |
+| StartTrappers | zabbix_proxy_starttrappers |5| |
+| StartVMwareCollectors | zabbix_proxy_startvmwarecollectors || |
+| StatsAllowedIP | zabbix_proxy_statsallowedip | "127.0.0.1"| |
+| Timeout | zabbix_proxy_timeout |3| |
+| TLSAccept | zabbix_proxy_tlsaccept || |
+| TLSCAFile | zabbix_proxy_tlscafile || |
+| TLSCertFile | zabbix_proxy_tlscertfile || |
+| TLSCipherAll | zabbix_proxy_tlscipherall || |
+| TLSCipherAll13 | zabbix_proxy_tlscipherall13 || |
+| TLSCipherCert | zabbix_proxy_tlsciphercert || |
+| TLSCipherCert13 | zabbix_proxy_tlsciphercert13 || |
+| TLSCipherPSK | zabbix_proxy_tlscipherpsk || |
+| TLSCipherPSK13 | zabbix_proxy_tlscipherpsk13 || |
+| TLSConnect | zabbix_proxy_tlsconnect || |
+| TLSCRLFile | zabbix_proxy_tlscrlfile || |
+| TLSKeyFile | zabbix_proxy_tlskeyfile || |
+| TLSPSKFile | zabbix_proxy_tlspskfile || |
+| TLSPSKIdentity | zabbix_proxy_tlspskidentity || |
+| TLSServerCertIssuer | zabbix_proxy_tlsservercertissuer || |
+| TLSServerCertSubject | zabbix_proxy_tlsservercertsubject || |
+| TmpDir | zabbix_proxy_tmpdir | /tmp| |
+| TrapperTimeout | zabbix_proxy_trappertimeout |300| |
+| UnavailableDelay | zabbix_proxy_unavailabledelay || |
+| UnreachableDelay | zabbix_proxy_unreachabledelay || |
+| UnreachablePeriod | zabbix_proxy_unreachableperiod |45| |
+| User | zabbix_proxy_user || |
+| Vault | zabbix_proxy_vault || Version 6.2 or Greater |
+| VaultDBPath | zabbix_proxy_vaultdbpath || |
+| VaultTLSCertFile | zabbix_proxy_vaulttlscertfile || Version 6.2 or Greater |
+| VaultTLSKeyFile | zabbix_proxy_vaulttlskeyfile || Version 6.2 or Greater |
+| VaultToken | zabbix_proxy_vaulttoken || |
+| VaultURL | zabbix_proxy_vaulturl |https://127.0.0.1:8200| |
+| VMwareCacheSize | zabbix_proxy_vmwarecachesize | 8M| |
+| VMwareFrequency | zabbix_proxy_vmwarefrequency |60| |
+| VMwarePerfFrequency | zabbix_proxy_vmwareperffrequency | | |
+| VMwareTimeout | zabbix_proxy_vmwaretimeout | | |
 
 
 # Example Playbook

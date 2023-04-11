@@ -34,7 +34,7 @@
   become_user: postgres
   delegate_to: "{{ delegated_dbhost }}"
   when:
-    - zabbix_database_creation
+    - zabbix_proxy_database_creation
     - zabbix_proxy_pgsql_login_host is not defined
   tags:
     - zabbix-proxy
@@ -64,7 +64,7 @@
         state: present
         encrypted: true
   when:
-    - zabbix_database_creation
+    - zabbix_proxy_database_creation
     - zabbix_proxy_pgsql_login_host is defined
   tags:
     - zabbix-proxy
@@ -86,4 +86,4 @@
   environment:
     PGPASSWORD: "{{ zabbix_proxy_dbpassword }}"
   when:
-    - zabbix_database_creation
+    - zabbix_proxy_database_creation

@@ -19,7 +19,7 @@
     state: directory
   become: true
   when:
-    - zabbix_database_creation
+    - zabbix_proxy_database_creation
 
 - name: "Sqlite3 | Handle Compressed Schema File"
   set_fact:
@@ -38,7 +38,7 @@
   environment:
     PGPASSWORD: "{{ zabbix_proxy_dbpassword }}"
   when:
-    - zabbix_database_creation
+    - zabbix_proxy_database_creation
 
 - name: "Sqlite3 | Fix zabbix db file permission (SELinux)"
   file:
@@ -50,5 +50,5 @@
   become: true
   when:
     - ansible_selinux.status == "enabled"
-    - zabbix_database_creation
+    - zabbix_proxy_database_creation
   tags: selinux

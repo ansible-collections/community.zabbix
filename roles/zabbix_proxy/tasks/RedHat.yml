@@ -80,7 +80,7 @@
   register: are_zabbix_proxy_dependency_packages_installed
   until: are_zabbix_proxy_dependency_packages_installed is succeeded
   when:
-    - zabbix_database_creation or zabbix_database_sqlload
+    - zabbix_proxy_database_creation or zabbix_proxy_database_sqlload
     - zabbix_proxy_database == 'pgsql'
   tags:
     - zabbix-proxy
@@ -97,7 +97,7 @@
   register: are_zabbix_proxy_dependency_packages_installed
   until: are_zabbix_proxy_dependency_packages_installed is succeeded
   when:
-    - zabbix_database_creation or zabbix_database_sqlload
+    - zabbix_proxy_database_creation or zabbix_proxy_database_sqlload
     - zabbix_proxy_install_database_client
     - zabbix_proxy_database == 'mysql'
   tags:
@@ -123,4 +123,4 @@
 - name: "Configure SELinux when enabled"
   include: selinux.yml
   when:
-    - zabbix_selinux | bool
+    - zabbix_proxy_selinux | bool
