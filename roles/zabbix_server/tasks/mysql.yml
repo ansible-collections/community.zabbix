@@ -90,6 +90,7 @@
     login_password: "{{ zabbix_server_mysql_login_password | default(omit) }}"
     login_port: "{{ zabbix_server_mysql_login_port | default(omit) }}"
     login_unix_socket: "{{ zabbix_server_mysql_login_unix_socket | default(omit) }}"
+    check_hostname: "{{ zabbix_server_dbtlsconnect != '' }}"
   delegate_to: "{{ delegated_dbhost }}"
   register: install_mysql_version
   tags:
@@ -104,6 +105,7 @@
     login_password: "{{ zabbix_server_mysql_login_password | default(omit) }}"
     login_port: "{{ zabbix_server_mysql_login_port | default(omit) }}"
     login_unix_socket: "{{ zabbix_server_mysql_login_unix_socket | default(omit) }}"
+    check_hostname: "{{ zabbix_server_dbtlsconnect != '' }}"
   delegate_to: "{{ delegated_dbhost }}"
   register: mysql_innodb_default_row_format
   when:
@@ -122,6 +124,7 @@
     login_password: "{{ zabbix_server_mysql_login_password | default(omit) }}"
     login_port: "{{ zabbix_server_mysql_login_port | default(omit) }}"
     login_unix_socket: "{{ zabbix_server_mysql_login_unix_socket | default(omit) }}"
+    check_hostname: "{{ zabbix_server_dbtlsconnect != '' }}"
   when:
     - zabbix_version is version('3.0', '>=')
     - zabbix_database_sqlload | bool
@@ -143,6 +146,7 @@
     login_password: "{{ zabbix_server_mysql_login_password | default(omit) }}"
     login_port: "{{ zabbix_server_mysql_login_port | default(omit) }}"
     login_unix_socket: "{{ zabbix_server_mysql_login_unix_socket | default(omit) }}"
+    check_hostname: "{{ zabbix_server_dbtlsconnect != '' }}"
   when:
     - zabbix_version is version('3.0', '>=')
     - zabbix_database_sqlload | bool
@@ -190,6 +194,7 @@
     collation: "{{ zabbix_server_dbcollation }}"
     state: import
     target: "{{ ls_output_create.stdout }}"
+    check_hostname: "{{ zabbix_server_dbtlsconnect != '' }}"
   when:
     - zabbix_version is version('3.0', '>=')
     - zabbix_database_sqlload | bool
@@ -209,6 +214,7 @@
     login_password: "{{ zabbix_server_mysql_login_password | default(omit) }}"
     login_port: "{{ zabbix_server_mysql_login_port | default(omit) }}"
     login_unix_socket: "{{ zabbix_server_mysql_login_unix_socket | default(omit) }}"
+    check_hostname: "{{ zabbix_server_dbtlsconnect != '' }}"
   when:
     - zabbix_version is version('3.0', '>=')
     - zabbix_database_sqlload | bool
@@ -279,6 +285,7 @@
     collation: "{{ zabbix_server_dbcollation }}"
     state: import
     target: "{{ item.stdout }}"
+    check_hostname: "{{ zabbix_server_dbtlsconnect != '' }}"
   with_items: "{{ ls_output_schema.results }}"
   when:
     - zabbix_version is version('3.0', '<')
