@@ -33,12 +33,12 @@
       community.postgresql.postgresql_ext:
         db: "{{ zabbix_server_dbname }}"
         name: timescaledb
-      when: zabbix_database_timescaledb
+      when: zabbix_server_database_timescaledb
   become: true
   become_user: postgres
   delegate_to: "{{ delegated_dbhost }}"
   when:
-    - zabbix_database_creation
+    - zabbix_server_database_creation
     - zabbix_server_pgsql_login_host is not defined
   tags:
     - zabbix-server
@@ -75,9 +75,9 @@
         login_unix_socket: "{{ zabbix_server_pgsql_login_unix_socket | default(omit) }}"
         db: "{{ zabbix_server_dbname }}"
         name: timescaledb
-      when: zabbix_database_timescaledb
+      when: zabbix_server_database_timescaledb
   when:
-    - zabbix_database_creation
+    - zabbix_server_database_creation
     - zabbix_server_pgsql_login_host is defined
   tags:
     - zabbix-server
@@ -106,7 +106,7 @@
   environment:
     PGPASSWORD: "{{ zabbix_server_dbpassword }}"
   when:
-    - zabbix_database_sqlload
+    - zabbix_server_database_sqlload
   tags:
     - zabbix-server
     - database
@@ -129,7 +129,7 @@
   environment:
     PGPASSWORD: "{{ zabbix_server_dbpassword }}"
   when:
-    - zabbix_database_timescaledb
+    - zabbix_server_database_timescaledb
   tags:
     - zabbix-server
     - database

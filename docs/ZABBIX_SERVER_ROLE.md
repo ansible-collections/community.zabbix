@@ -75,26 +75,15 @@ ansible-galaxy collection install community.postgresql
 
 See the following list of supported Operating systems with the Zabbix releases:
 
-| Zabbix              | 6.4 | 6.2 | 6.0 | 5.4 | 5.2 | 5.0 (LTS) | 4.4 | 4.0 (LTS) | 3.0 (LTS) |
-|---------------------|-----|-----|-----|-----|-----|-----------|-----|-----------|-----------|
-| Red Hat Fam 9       |  V  |  V  |  V  |     |     |           |     |           |           |
-| Red Hat Fam 8       |  V  |  V  |  V  |  V  |  V  |  V        | V   |           |           |
-| Red Hat Fam 7       |     |     |     |     |     |  V        | V   | V         | V         |
-| Red Hat Fam 6       |     |     |     |     |  V  |  V        |     |           | V         |
-| Red Hat Fam 5       |     |     |     |     |  V  |  V        |     |           | V         |
-| Fedora              |     |     |     |     |     |           | V   | V         |           |
-| Ubuntu 20.04 focal  |  V  |  V  |  V  |  V  |  V  |  V        |     | V         |           |
-| Ubuntu 18.04 bionic |     |     |  V  |  V  |  V  |  V        | V   | V         |           |
-| Ubuntu 16.04 xenial |     |     |     |     |  V  |  V        | V   | V         |           |
-| Ubuntu 14.04 trusty |     |     |     |     |  V  |  V        | V   | V         | V         |
-| Debian 10 buster    |     |     |  V  |  V  |  V  |  V        | V   |           |           |
-| Debian 9 stretch    |     |     |  V  |  V  |  V  |  V        | V   | V         |           |
-| Debian 8 jessie     |     |     |     |     |  V  |  V        | V   | V         | V         |
-| Debian 7 wheezy     |     |     |     |     |     |           |     | V         | V         |
-| macOS 10.15         |     |     |     |     |     |           | V   | V         |           |
-| macOS 10.14         |     |     |     |     |     |           | V   | V         |           |
-
-See https://support.zabbix.com/browse/ZBX-18790 why RHEL7 is not supported anymore.
+| Zabbix              | 6.4 | 6.2 | 6.0 |
+|---------------------|-----|-----|-----|
+| Red Hat Fam 9       |  V  |  V  |  V  |
+| Red Hat Fam 8       |  V  |  V  |  V  |
+| Ubuntu 22.04 jammy  |  V  |  V  |  V  |
+| Ubuntu 20.04 focal  |  V  |  V  |  V  |
+| Ubuntu 18.04 bionic |     |     |  V  |
+| Debian 11 bullseye  |  V  |  V  |  V  |
+| Debian 10 buster    |     |     |  V  |
 
 # Installation
 
@@ -110,7 +99,7 @@ The following is an overview of all available configuration default for this rol
 
 ### Overall Zabbix
 
-* `zabbix_server_version`: This is the version of zabbix. Default: The highest supported version for the operating system. Can be overridden to 6.2, 6.0, 5.4, 5.2, 5.0, 4.4, 4.0, 3.4, 3.2, 3.0, 2.4, or 2.2. Previously the variable `zabbix_version` was used directly but it could cause [some inconvenience](https://github.com/dj-wasabi/ansible-zabbix-agent/pull/303). That variable is maintained by retrocompativility.
+* `zabbix_server_version`: Optional. The latest available major.minor version of Zabbix will be installed on the host(s). If you want to use an older version, please specify this in the major.minor format. Example: `zabbix_proxy_version: 6.0`.
 * `zabbix_server_version_minor`: When you want to specify a minor version to be installed. RedHat only. Default set to: `*` (latest available)
 * `zabbix_repo_yum`: A list with Yum repository configuration.
 * `zabbix_repo_yum_schema`: Default: `https`. Option to change the web schema for the yum repository(http/https)
@@ -119,43 +108,22 @@ The following is an overview of all available configuration default for this rol
 
 ### SElinux
 
-* `zabbix_selinux`: Default: `False`. Enables an SELinux policy so that the server will run.
+* `zabbix_server_selinux`: Default: `False`. Enables an SELinux policy so that the server will run.
 * `selinux_allow_zabbix_can_network`: Default: `False`. 
 * `selinux_allow_zabbix_can_http`: Default: `False`. 
 
 ### Zabbix Server
 
 * `zabbix_server_package_state`: Default: `present`. Can be overridden to `latest` to update packages when needed.
-* `zabbix_server_listenport`: Default: `10051`. On which port the Zabbix Server is available.
 * `zabbix_server_install_recommends`: Default: `True`. `False` does not install the recommended packages that come with the zabbix-server install.
 * `zabbix_server_manage_service`: Default: `True`. When you run multiple Zabbix servers in a High Available cluster setup (e.g. pacemaker), you don't want Ansible to manage the zabbix-server service, because Pacemaker is in control of zabbix-server service and in this case, it needs to be set to `False`.
-* `zabbix_proxy_startpreprocessors`: Number of pre-forked instances of preprocessing workers. The preprocessing manager process is automatically started when a preprocessor worker is started. This parameter is supported since Zabbix 4.2.0.
 * `zabbix_server_include_mode`: Default: `0755`. The "mode" for the directory configured with `zabbix_server_include`.
 * `zabbix_server_conf_mode`: Default: `0640`. The "mode" for the Zabbix configuration file.
-* `zabbix_server_listenbacklog`: The maximum number of pending connections in the queue.
-* `zabbix_server_trendcachesize`: Size of trend cache, in bytes.
-* `zabbix_server_trendfunctioncachesize`: Size of trend function cache, in bytes.
-* `zabbix_server_vaulttoken`: Vault authentication token that should have been generated exclusively for Zabbix server with read only permission
-* `zabbix_server_vaulturl`: Vault server HTTP[S] URL. System-wide CA certificates directory will be used if SSLCALocation is not specified.
-* `zabbix_server_vaultdbpath`: Vault path from where credentials for database will be retrieved by keys 'password' and 'username'.
-* `zabbix_server_startreportwriters`: Number of pre-forked report writer instances.
-* `zabbix_server_webserviceurl`: URL to Zabbix web service, used to perform web related tasks.
-* `zabbix_server_servicemanagersyncfrequency`: How often Zabbix will synchronize configuration of a service manager (in seconds).
-* `zabbix_server_problemhousekeepingfrequency`: How often Zabbix will delete problems for deleted triggers (in seconds).
-* `zabbix_server_connectors`: Number of pre-forked instances of preprocessing workers.
-
-### High Availability
-
-These variables are specific for Zabbix 6.0 and higher:
-
-* `zabbix_server_hanodename`: The high availability cluster node name. When empty, server is working in standalone mode; a node with empty name is registered with address for the frontend to connect to. (Default: empty)
-* `zabbix_server_nodeaddress`: IP or hostname with optional port to specify how frontend should connect to the server.
 
 ### Database specific
 
 * `zabbix_server_dbhost_run_install`: Default: `True`. When set to `True`, sql files will be executed on the host running the database.
 * `zabbix_server_database`: Default: `pgsql`. The type of database used. Can be: `mysql` or `pgsql`
-* `zabbix_server_database_long`: Default: `postgresql`. The type of database used, but long name. Can be: `mysql` or `postgresql`
 * `zabbix_server_dbhost`: The hostname on which the database is running.
 * `zabbix_server_real_dbhost`: The hostname of the dbhost that is running behind a loadbalancer/VIP (loadbalancers doesn't accept ssh connections)
 * `zabbix_server_dbname`: The database name which is used by the Zabbix Server.
@@ -163,49 +131,12 @@ These variables are specific for Zabbix 6.0 and higher:
 * `zabbix_server_dbpassword`: The database user password which is used by the Zabbix Server.
 * `zabbix_server_dbport`: The database port which is used by the Zabbix Server.
 * `zabbix_server_dbpassword_hash_method`: Default: `md5`. Allow switching postgresql user password creation to `scram-sha-256`, when anything other than `md5` is used then ansible won't hash the password with `md5`.
-* `zabbix_database_creation`: Default: `True`. When you don't want to create the database including user, you can set it to False.
+* `zabbix_server_database_creation`: Default: `True`. When you don't want to create the database including user, you can set it to False.
 * `zabbix_server_install_database_client`: Default: `True`. False does not install database client. Default true
-* `zabbix_database_sqlload`:True / False. When you don't want to load the sql files into the database, you can set it to False.
-* `zabbix_database_timescaledb`:False / True. When you want to use timescaledb extension into the database, you can set it to True (this option only works for postgreSQL database).
+* `zabbix_server_database_sqlload`:True / False. When you don't want to load the sql files into the database, you can set it to False.
+* `zabbix_server_database_timescaledb`:False / True. When you want to use timescaledb extension into the database, you can set it to True (this option only works for postgreSQL database).
 * `zabbix_server_dbencoding`: Default: `utf8`. The encoding for the MySQL database.
 * `zabbix_server_dbcollation`: Default: `utf8_bin`. The collation for the MySQL database.
-* `zabbix_server_allowunsupporteddbversions`: Allow server to work with unsupported database versions.
-
-### TLS Specific configuration
-
-These variables are specific for Zabbix 3.0 and higher:
-
-* `zabbix_server_tlsconnect`: How the agent should connect to server or proxy. Used for active checks.
-    Possible values:
-    * unencrypted
-    * psk
-    * cert
-* `zabbix_server_tlsaccept`: What incoming connections to accept.
-    Possible values:
-    * unencrypted
-    * psk
-    * cert
-* `zabbix_server_tlscafile`: Full pathname of a file containing the top-level CA(s) certificates for peer certificate verification.
-* `zabbix_server_tlscrlfile`: Full pathname of a file containing revoked certificates.
-* `zabbix_server_tlsservercertissuer`: Allowed server certificate issuer.
-* `zabbix_server_tlsservercertsubject`: Allowed server certificate subject.
-* `zabbix_server_tlscertfile`: Full pathname of a file containing the agent certificate or certificate chain.
-* `zabbix_server_tlskeyfile`: Full pathname of a file containing the agent private key.
-* `zabbix_server_dbtlsconnect`: Setting this option enforces to use TLS connection to database:
-
-`required` - connect using TLS
-`verify_ca` - connect using TLS and verify certificate
-`verify_full` - connect using TLS, verify certificate and verify that database identity specified by DBHost matches its certificate
-
-On `MySQL` starting from 5.7.11 and `PostgreSQL` the following values are supported: `required`, `verify`, `verify_full`. On MariaDB starting from version 10.2.6 `required` and `verify_full` values are supported.
-By default not set to any option and the behaviour depends on database configuration.
-This parameter is supported since Zabbix 5.0.0.
-
-* `zabbix_server_dbtlscafile`: Full pathname of a file containing the top-level CA(s) certificates for database certificate verification. This parameter is supported since Zabbix 5.0.0.
-* `zabbix_server_dbtlscertfile`: Full pathname of file containing Zabbix server certificate for authenticating to database. This parameter is supported since Zabbix 5.0.0.
-* `zabbix_server_dbtlskeyfile`: Full pathname of file containing the private key for authenticating to database. This parameter is supported since Zabbix 5.0.0.
-* `zabbix_server_dbtlscipher`: The list of encryption ciphers that Zabbix server permits for TLS protocols up through TLSv1.2. Supported only for MySQL.This parameter is supported since Zabbix 5.0.0.
-* `zabbix_server_dbtlscipher13`: The list of encryption ciphersuites that Zabbix server permits for TLSv1.3 protocol. Supported only for MySQL, starting from version 8.0.16. This parameter is supported since Zabbix 5.0.0.
 
 ### Custom Zabbix Scripts
 
@@ -339,6 +270,125 @@ Please generate a value for the `zabbix_server_dbpassword` property (Maybe use `
 The `zabbix_server_privileged_host` can be set to the hostname/ip of the host running Zabbix Server for security related purposes. Also make sure that `zabbix_server_mysql_login_password` is set to the correct password for the user provided with `zabbix_server_mysql_login_host` to create a database and user in the `PgSQL` instance.
 
 3. Execute the role by running the Ansible playbook that calls this role. At the end of this run, the Zabbix Server with `PgSQL` on a different host will be running.
+
+## Configuration Variables
+
+The following table lists all variables that are exposed to modify the configuration of the zabbix_server.conf file.  Specific details of each variable can be found in the Zabbix documentation.
+
+**NOTE**:  Only variables with a default value appear in the defaults file, all others must be added.
+
+| Zabbix Name | Variable Name | Default Value |Notes |
+|-----------|------------------|--------|--------|
+|AlertScriptsPath | zabbix_server_alertscriptspath | /usr/lib/zabbix/alertscripts |  |
+|AllowRoot | zabbix_server_allowroot | 0 |  |
+|AllowUnsupportedDBVersions | zabbix_server_allowunsupporteddbversions |0  |  |
+|CacheSize | zabbix_server_cachesize | |  |
+|CacheUpdateFrequency | zabbix_server_cacheupdatefrequency | |  |
+|DBHost | zabbix_server_dbhost | localhost |  |
+|DBName | zabbix_server_dbname | zabbix-server |  |
+|DBPassword | zabbix_server_dbpassword | zabbix-server |  |
+|DBPort | zabbix_server_dbport | 5432 |  |
+|DBSchema | zabbix_server_dbschema | |  |
+|DBSocket | zabbix_server_dbsocket | |  |
+|DBTLSCAFile | zabbix_server_dbtlscafile | |  |
+|DBTLSCertFile | zabbix_server_dbtlscertfile | |  |
+|DBTLSCipher | zabbix_server_dbtlscipher | |  |
+|DBTLSCipher13 | zabbix_server_dbtlscipher13 | |  |
+|DBTLSConnect | zabbix_server_dbtlsconnect | |  |
+|DBTLSKeyFile | zabbix_server_dbtlskeyfile | |  |
+|DBUser | zabbix_server_dbuser | zabbix-server |  |
+|DebugLevel | zabbix_server_debuglevel | 3 |  |
+|ExportDir | zabbix_server_exportdir | |  |
+|ExportFileSize | zabbix_server_exportfilesize | 1G |  |
+|ExportType | zabbix_server_exporttype | |  |
+|ExternalScripts | zabbix_server_externalscriptspath | /usr/lib/zabbix/externalscripts |  |
+|Fping6Location | zabbix_server_fping6location | /usr/sbin/fping6 |  |
+|FpingLocation | zabbix_server_fpinglocation | /usr/sbin/fping |  |
+|HANodeName | zabbix_server_hanodename | |  |
+|HistoryCacheSize | zabbix_server_historycachesize | |  |
+|HistoryIndexCacheSize | zabbix_server_historyindexcachesize | |  |
+|HistoryStorageDateIndex | zabbix_server_historystoragedateindex | 0 |  |
+|HistoryStorageTypes | zabbix_server_historystoragetypes |  uint,dbl,str,log,text |  |
+|HistoryStorageURL | zabbix_server_historystorageurl | |  |
+|HousekeepingFrequency | zabbix_server_housekeepingfrequency | 1 |  |
+|Include | zabbix_server_include | /etc/zabbix/zabbix_server.conf.d |  |
+|JavaGateway | zabbix_server_javagateway | |  |
+|JavaGatewayPort | zabbix_server_javagatewayport | 10052 |  |
+|ListenBacklog | zabbix_server_listenbacklog | |  |
+|ListenIP | zabbix_server_listenip | |  |
+|ListenPort | zabbix_server_listenport | 10051 |  |
+|LoadModule | zabbix_server_loadmodule | |  |
+|LoadModulePath | zabbix_server_loadmodulepath | ${libdir}/modules |  |
+|LogFile | zabbix_server_logfile | /var/log/zabbix/zabbix_server.log |  |
+|LogFileSize | zabbix_server_logfilesize | 10 |  |
+|LogSlowQueries | zabbix_server_logslowqueries | 0 |  |
+|LogType | zabbix_server_logtype | file |  |
+|MaxHousekeeperDelete | zabbix_server_maxhousekeeperdelete | 500 |  |
+|NodeAddress | zabbix_server_nodeaddress | |  |
+|PidFile | zabbix_server_pidfile | /var/run/zabbix/zabbix_server.pid |  |
+|ProxyConfigFrequency | zabbix_server_proxyconfigfrequency | |  |
+|ProxyDataFrequency | zabbix_server_proxydatafrequency | 1 |  |
+|SNMPTrapperFile | zabbix_server_snmptrapperfile | |  |
+|SocketDir | zabbix_server_socketdir | /var/run/zabbix |  |
+|SourceIP | zabbix_server_sourceip | |  |
+|SSHKeyLocation | zabbix_server_sshkeylocation | |  |
+|SSLCALocation | zabbix_server_sslcalocation | |  |
+|SSLCertLocation | zabbix_server_sslcertlocation | ${datadir}/zabbix/ssl/certs |  |
+|SSLKeyLocation | zabbix_server_sslkeylocation | ${datadir}/zabbix/ssl/keys |  |
+|StartAlerters | zabbix_server_startalerters | |  |
+|StartConnectors | zabbix_server_connectors | | Version 6.4 or later |
+|StartDBSyncers | zabbix_server_startdbsyncers | 4 |  |
+|StartDiscoverers | zabbix_server_startdiscoverers | 1 |  |
+|StartEscalators | zabbix_server_startescalators | 1 |  |
+|StartHistoryPollers | zabbix_server_starthistorypollers | |  |
+|StartHTTPPollers | zabbix_server_starthttppollers | 1 |  |
+|StartIPMIPollers | zabbix_server_startipmipollers | 0 |  |
+|StartJavaPollers | zabbix_server_startjavapollers | 0 |  |
+|StartLLDProcessors | zabbix_server_startlldprocessors | |  |
+|StartODBCPollers | zabbix_server_startodbcpollers | |  |
+|StartPingers | zabbix_server_startpingers | 1 |  |
+|StartPollers | zabbix_server_startpollers | 5 |  |
+|StartPollersUnreachable | zabbix_server_startpollersunreachable | 1 |  |
+|StartPreprocessors | zabbix_server_startpreprocessors | |  |
+|StartProxyPollers | zabbix_server_startproxypollers | |  |
+|StartReportWriters | zabbix_server_startreportwriters | 0 |  |
+|StartSNMPTrapper | zabbix_server_startsnmptrapper | 0 |  |
+|StartTimers | zabbix_server_starttimers | 1 |  |
+|StartTrappers | zabbix_server_starttrappers | 5 |  |
+|StartVMwareCollectors | zabbix_server_startvmwarecollectors | 0 |  |
+|StasAllowedIP | zabbix_server_statsallowedip | |  |
+|Timeout | zabbix_server_timeout | 3 |  |
+|TLSCAFile | zabbix_server_tlscafile | |  |
+|TLSCertFile | zabbix_server_tlscertfile | |  |
+|TLSCipherAll | zabbix_server_tlscipherall | |  |
+|TLSCipherAll13 | zabbix_server_tlscipherall13 | |  |
+|TLSCipherCert | zabbix_server_tlsciphercert | |  |
+|TLSCipherCert13 | zabbix_server_tlsciphercert13 | |  |
+|TLSCipherPSK | zabbix_server_tlscipherpsk | |  |
+|TLSCipherPSK13 | zabbix_server_tlscipherpsk13 | |  |
+|TLSCRLFile | zabbix_server_tlscrlfile | |  |
+|TLSKeyFile | zabbix_server_tlskeyfile | |  |
+|TmpDir | zabbix_server_tmpdir | /tmp |  |
+|TrapperTimeout | zabbix_server_trappertimeout | 300 |  |
+|TrendCacheSize | zabbix_server_trendcachesize | |  |
+|TrendFunctionCacheSize | zabbix_server_trendfunctioncachesize | |  |
+|UnavailableDelay | zabbix_server_unavailabledelay | 60 |  |
+|UnreachableDelay | zabbix_server_unreachabledelay | 15 |  |
+|UnreachablePeriod | zabbix_server_unreachableperiod | 45 |  |
+|User | zabbix_server_user | zabbix |  |
+|ValueCacheSize | zabbix_server_valuecachesize | |  |
+|Vault | zabbix_server_vault | | Version 6.2 or later  |
+|VaultDBPath | zabbix_server_vaultdbpath | |  |
+|VaultTLSKeyFile | zabbix_server_vaulttlskeyfile | | Version 6.2 or later |
+|VaultTLSCertFile | zabbix_server_vaulttlscertfile | | Version 6.2 or later |
+|VaultToken | zabbix_server_vaulttoken | |  |
+|VaultURL | zabbix_server_vaulturl | https://127.0.0.1:8200 |  |
+|VMwareCacheSize | zabbix_server_vmwarecachesize | |  |
+|VMwareFrequency | zabbix_server_vmwarefrequency | 60 |  |
+|VMwarePerfFrequency | zabbix_server_vmwareperffrequency | 60 |  |
+|VMwareTimeout | zabbix_server_vmwaretimeout | 10 |  |
+|WebServiceURL | zabbix_server_webserviceurl | |  |
+
 
 # Example Playbook
 
