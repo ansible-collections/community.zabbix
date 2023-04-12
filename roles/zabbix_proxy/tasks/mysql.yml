@@ -28,7 +28,7 @@
     login_port: "{{ zabbix_proxy_mysql_login_port | default(omit) }}"
     login_unix_socket: "{{ zabbix_proxy_mysql_login_unix_socket | default(omit) }}"
     state: present
-  when: zabbix_database_creation
+  when: zabbix_proxy_database_creation
   register: zabbix_database_created
   delegate_to: "{{ delegated_dbhost }}"
   tags:
@@ -48,7 +48,7 @@
     priv: "{{ zabbix_proxy_dbname }}.*:ALL"
     host: "{{ zabbix_proxy_privileged_host }}"
     state: present
-  when: zabbix_database_creation
+  when: zabbix_proxy_database_creation
   delegate_to: "{{ delegated_dbhost }}"
   tags:
     - zabbix-proxy
@@ -59,7 +59,7 @@
     path: /etc/zabbix/schema.done
   register: done_file
   when:
-    - zabbix_database_sqlload
+    - zabbix_proxy_database_sqlload
 
 - name: "MySQL | Get version_comment"
   community.mysql.mysql_variables:
@@ -101,7 +101,7 @@
     login_port: "{{ zabbix_proxy_mysql_login_port | default(omit) }}"
     login_unix_socket: "{{ zabbix_proxy_mysql_login_unix_socket | default(omit) }}"
   when:
-    - zabbix_database_sqlload | bool
+    - zabbix_proxy_database_sqlload | bool
     - not done_file.stat.exists
     - install_mysql_version.msg is version('5.6', '>=')
     - mysql_innodb_default_row_format.msg != 'dynamic'
@@ -123,7 +123,7 @@
     state: import
     target: "{{ ls_output_schema.stdout }}"
   when:
-    - zabbix_database_sqlload
+    - zabbix_proxy_database_sqlload
     - not done_file.stat.exists
   delegate_to: "{{ delegated_dbhost }}"
   tags:
@@ -140,7 +140,7 @@
     login_port: "{{ zabbix_proxy_mysql_login_port | default(omit) }}"
     login_unix_socket: "{{ zabbix_proxy_mysql_login_unix_socket | default(omit) }}"
   when:
-    - zabbix_database_sqlload | bool
+    - zabbix_proxy_database_sqlload | bool
     - not done_file.stat.exists
     - mysql_innodb_default_row_format.msg != 'dynamic'
   delegate_to: "{{ delegated_dbhost }}"
@@ -154,5 +154,5 @@
     state: touch
     mode: "0644"
   when:
-    - zabbix_database_sqlload
+    - zabbix_proxy_database_sqlload
     - not done_file.stat.exists

@@ -14,9 +14,9 @@
   become: true
   check_mode: false
 
-- name: "Set zabbix_selinux to true if getenforce returns Enforcing or Permissive"
+- name: "Set zabbix_server_selinux to true if getenforce returns Enforcing or Permissive"
   set_fact:
-    zabbix_selinux: "{{ true }}"
+    zabbix_server_selinux: "{{ true }}"
   when: 'getenforce_bin.stat.exists and ("Enforcing" in sestatus.stdout or "Permissive" in sestatus.stdout)'
 
 - name: "SELinux | RedHat | Install related SELinux package"

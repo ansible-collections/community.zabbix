@@ -1,5 +1,4 @@
 ---
-
 - name: "Set default ip address for zabbix_agent_ip"
   set_fact:
     zabbix_agent_ip: "{{ hostvars[inventory_hostname]['ansible_default_ipv4'].address }}"
@@ -64,7 +63,7 @@
 
 - name: "Default agent_listenip to all when not specified"
   set_fact:
-    zabbix_agent_listenip: '0.0.0.0'
+    zabbix_agent_listenip: "0.0.0.0"
   when:
     - not (zabbix_agent_listenip)
   tags:
@@ -134,7 +133,7 @@
   become: true
   when:
     - zabbix_agent_tlspskfile is defined
-    - zabbix_agent_tlspskfile  # https://github.com/ansible-collections/community.zabbix/issues/680
+    - zabbix_agent_tlspskfile # https://github.com/ansible-collections/community.zabbix/issues/680
     - not (zabbix_agent2 | bool)
 
 - name: "Create directory for PSK file if not exist (zabbix-agent2)"
@@ -145,7 +144,7 @@
   become: true
   when:
     - zabbix_agent2_tlspskfile is defined
-    - zabbix_agent2_tlspskfile  # https://github.com/ansible-collections/community.zabbix/issues/680
+    - zabbix_agent2_tlspskfile # https://github.com/ansible-collections/community.zabbix/issues/680
     - zabbix_agent2 | bool
 
 - name: "Place TLS PSK File"
@@ -158,7 +157,7 @@
   become: true
   when:
     - zabbix_agent_tlspskfile is defined
-    - zabbix_agent_tlspskfile  # https://github.com/ansible-collections/community.zabbix/issues/680
+    - zabbix_agent_tlspskfile # https://github.com/ansible-collections/community.zabbix/issues/680
     - zabbix_agent_tlspsk_secret is defined
     - not (zabbix_agent2 | bool)
   notify:
@@ -174,7 +173,7 @@
   become: true
   when:
     - zabbix_agent2_tlspskfile is defined
-    - zabbix_agent2_tlspskfile  # https://github.com/ansible-collections/community.zabbix/issues/680
+    - zabbix_agent2_tlspskfile # https://github.com/ansible-collections/community.zabbix/issues/680
     - zabbix_agent2_tlspsk_secret is defined
     - zabbix_agent2 | bool
   notify:
@@ -196,11 +195,6 @@
   include_tasks: Docker.yml
   when:
     - zabbix_agent_docker | bool
-
-- name: "Configure the firewall(d|iptables)"
-  include_tasks: firewall.yml
-  when:
-    - (zabbix_agent_firewall_enable | bool) or (zabbix_agent_firewalld_enable | bool)
 
 - name: "Remove zabbix-agent installation when zabbix-agent2 is used."
   include_tasks: remove.yml
