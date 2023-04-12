@@ -81,8 +81,10 @@ zabbix_server_history_types:
   - "log"
   - "uint"
   - "dbl"
+
+zabbix_selinux: false
 # selinux_allow_zabbix_can_network: false
-# _zabbix_web_apache_php_addition: false
+# zabbix_apache_can_connect_ldap: false
 
 zabbix_selinux: false
 # selinux_allow_zabbix_can_network: false

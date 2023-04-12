@@ -26,11 +26,6 @@
     zabbix_proxy_cat_cmd: zcat
   when: "'.gz' in ls_output_schema.stdout"
 
-- name: "Sqlite3 | Handle Compressed Schema File"
-  set_fact:
-    zabbix_proxy_cat_cmd: zcat
-  when: "'.gz' in ls_output_schema.stdout"
-
 - name: "Sqlite3 | Importing schema file"
   become: true
   become_user: "{{ zabbix_os_user }}"
