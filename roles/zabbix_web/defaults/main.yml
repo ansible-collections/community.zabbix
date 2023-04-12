@@ -86,10 +86,6 @@ zabbix_selinux: false
 # selinux_allow_zabbix_can_network: false
 # zabbix_apache_can_connect_ldap: false
 
-zabbix_selinux: false
-# selinux_allow_zabbix_can_network: false
-# zabbix_apache_can_connect_ldap: false
-
 # SAML certificates
 # zabbix_saml_idp_crt:
 # zabbix_saml_sp_crt:
