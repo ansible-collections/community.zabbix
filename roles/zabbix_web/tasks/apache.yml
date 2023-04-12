@@ -63,7 +63,7 @@
     owner: "{{ zabbix_web_user }}"
     group: "{{ zabbix_web_group }}"
     mode: 0644
-  when: zabbix_vhost
+  when: zabbix_web_create_vhost
   become: true
   notify:
     - restart apache
