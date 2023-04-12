@@ -121,7 +121,7 @@
   until: zabbix_proxy_dependencies_installed is succeeded
   become: true
   when:
-    - zabbix_database_creation
+    - zabbix_proxy_database_creation
   tags:
     - zabbix-server
     - init
@@ -155,7 +155,7 @@
   until: are_zabbix_proxy_dependency_packages_installed is succeeded
   become: true
   when:
-    - zabbix_database_creation or zabbix_database_sqlload
+    - zabbix_proxy_database_creation or zabbix_proxy_database_sqlload
     - zabbix_proxy_database == 'pgsql'
     - zabbix_proxy_install_database_client
   tags:

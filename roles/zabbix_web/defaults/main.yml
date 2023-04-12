@@ -1,52 +1,54 @@
 ---
 # defaults file for zabbix-web
 
-# zabbix_web_version: 6.0
-zabbix_web_version_minor: "*"
+# zabbix_web_version: 6.4
 zabbix_web_package_state: present
-zabbix_selinux: false
 zabbix_web_doubleprecision: false
 zabbix_web_conf_mode: "0644"
 zabbix_web_connect_ha_backend: false
-zabbix_web_server_name: zabbix.example.com
 zabbix_api_server_url: zabbix.example.com
 zabbix_web_http_server: apache
 zabbix_url_aliases: []
-zabbix_web_htpasswd: false
-zabbix_web_htpasswd_file: /etc/zabbix/web/htpasswd
-zabbix_timezone: Europe/Amsterdam
-zabbix_vhost: true
+zabbix_web_create_vhost: true
 
-# Deb Variables
-zabbix_web_apt_priority:
-
-zabbix_apache_custom_includes: []
-# zabbix_php_fpm: false
-# zabbix_php_fpm_dir_etc: /etc/opt/rh/rh-php72/
-# zabbix_php_fpm_dir_var: /var/opt/rh/rh-php72/
-zabbix_php_fpm_conf_listen: true
+zabbix_server_name: "{{ inventory_hostname }}"
+zabbix_server_hostname: "{{ inventory_hostname }}"
+zabbix_server_listenport: 10051
 
 zabbix_web_vhost_port: 80
 zabbix_web_vhost_tls_port: 443
 zabbix_web_vhost_listen_ip: "*"
 zabbix_web_tls: false
-zabbix_web_redirect_secure: false
+zabbix_timezone: Europe/Amsterdam
+zabbix_php_fpm_conf_listen: true
 # zabbix_web_tls_crt: /etc/pki/server.crt
 # zabbix_web_tls_key: /etc/pki/server.key
 # zabbix_web_tls_chain:
-# zabbix_apache_can_connect_ldap: false
-# zabbix_apache_include_custom_fragment: true
 # zabbix_web_SSLPassPhraseDialog: exec:/usr/libexec/httpd-ssl-pass-dialog
 # zabbix_web_SSLSessionCache: shmcb:/run/httpd/sslcache(512000)
 # zabbix_web_SSLSessionCacheTimeout: 300
 # zabbix_web_SSLCryptoDevice: builtin
+# zabbix_web_max_execution_time: 300
+# zabbix_web_memory_limit: 128M
+# zabbix_web_post_max_size: 16M
+# zabbix_web_upload_max_filesize: 2M
+# zabbix_web_max_input_time: 300
+# zabbix_web_max_input_vars: 10000
 
-# zabbix_nginx_tls_session_timeout: 1d
-# zabbix_nginx_tls_session_cache: shared:MySSL:10m
-# zabbix_nginx_tls_session_tickets: !!str off
-# zabbix_nginx_tls_protocols: TLSv1.2
-# zabbix_nginx_tls_ciphers: ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384
+# Database
+zabbix_server_database: pgsql
+zabbix_server_dbhost: localhost
+zabbix_server_dbname: zabbix-server
+zabbix_server_dbuser: zabbix-server
+zabbix_server_dbpassword: zabbix-server
+zabbix_server_dbport: 5432
+zabbix_server_dbencryption: false
+zabbix_server_dbverifyhost: false
+zabbix_server_dbschema:
 
+# Yum/APT Variables
+zabbix_web_apt_priority:
+zabbix_web_version_minor: "*"
 zabbix_repo_yum_gpgcheck: 0
 zabbix_repo_yum_schema: https
 zabbix_repo_yum_enabled: []
@@ -66,36 +68,6 @@ zabbix_repo_yum:
     gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-ZABBIX
     state: present
 
-zabbix_5_repo_yum:
-  - name: zabbix-frontend
-    description: Zabbix Official Repository - $basearch
-    baseurl: "{{ zabbix_repo_yum_schema }}://repo.zabbix.com/zabbix/{{ zabbix_web_version | regex_search('^[0-9]+.[0-9]+') }}/rhel/{{ ansible_distribution_major_version }}/$basearch/frontend/"
-    mode: "0644"
-    gpgcheck: "{{ zabbix_repo_yum_gpgcheck | default('0') }}"
-    gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-ZABBIX
-    state: present
-
-# zabbix_web_max_execution_time: 300
-# zabbix_web_memory_limit: 128M
-# zabbix_web_post_max_size: 16M
-# zabbix_web_upload_max_filesize: 2M
-# zabbix_web_max_input_time: 300
-# zabbix_web_max_input_vars: 10000
-
-# # Database
-zabbix_server_database: pgsql
-zabbix_server_name: "{{ inventory_hostname }}"
-zabbix_server_hostname: "{{ inventory_hostname }}"
-zabbix_server_listenport: 10051
-zabbix_server_dbhost: localhost
-zabbix_server_dbname: zabbix-server
-zabbix_server_dbuser: zabbix-server
-zabbix_server_dbpassword: zabbix-server
-zabbix_server_dbport: 5432
-zabbix_server_dbencryption: false
-zabbix_server_dbverifyhost: false
-zabbix_server_dbschema:
-
 # Elasticsearch
 # zabbix_server_history_url:
 #  - "'uint' => 'http://localhost:9200'"
@@ -109,14 +81,14 @@ zabbix_server_history_types:
   - "log"
   - "uint"
   - "dbl"
+
+zabbix_selinux: false
 # selinux_allow_zabbix_can_network: false
-# _zabbix_web_apache_php_addition: false
+# zabbix_apache_can_connect_ldap: false
 
-# # SAML certificates
-# # zabbix_saml_idp_crt:
-# # zabbix_saml_sp_crt:
-# # zabbix_saml_sp_key:
+# SAML certificates
+# zabbix_saml_idp_crt:
+# zabbix_saml_sp_crt:
+# zabbix_saml_sp_key:
 
-# # When the `geerlingguys apache role` is not provided, we have some defaults.
 # zabbix_web_ssl_cipher_suite: ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384
-# apache_ssl_protocol: all -SSLv3 -TLSv1 -TLSv1.1

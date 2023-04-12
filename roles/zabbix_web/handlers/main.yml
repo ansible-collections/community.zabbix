@@ -27,15 +27,6 @@
     - zabbix_web_http_server == 'nginx'
     - zabbix_nginx_cfg_check.rc == 0
 
-- name: restart redhat-php-fpm
-  service:
-    name: "{{ 'rh-php72-php-fpm' if zabbix_php_fpm else 'php-fpm' }}"
-    state: restarted
-    enabled: true
-  become: true
-  when:
-    - zabbix_web_version is version('5.0', '>=')
-
 - name: restart php-fpm-version
   service:
     name: php{{ zabbix_web_php_installed_version }}-fpm

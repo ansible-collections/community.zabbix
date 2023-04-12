@@ -7,9 +7,6 @@
     zabbix_web_vhost_location: "{{ zabbix_web_vhost_location if zabbix_web_vhost_location is defined else _nginx_vhost_location }}"
     zabbix_nginx_log_path: "{{ zabbix_nginx_log_path if zabbix_nginx_log_path is defined else _nginx_log_path }}"
     zabbix_nginx_service: "{{ zabbix_nginx_service if zabbix_nginx_service is defined else _nginx_service }}"
-    # zabbix_nginx_tls_crt: "{{ zabbix_nginx_tls_crt if zabbix_nginx_tls_crt is defined else _nginx_tls_crt }}"
-    # zabbix_nginx_tls_key: "{{ zabbix_nginx_tls_key if zabbix_nginx_tls_key is defined else _nginx_tls_key }}"
-    # zabbix_nginx_tls_dhparam: "{{ zabbix_nginx_tls_dhparam if zabbix_nginx_tls_dhparam is defined else _nginx_tls_dhparam }}"
 
 - name: "Nginx | Installing Zabbix Nginx Conf"
   block:
@@ -51,7 +48,7 @@
     group: "{{ zabbix_web_group }}"
     mode: 0644
   when:
-    - zabbix_vhost
+    - zabbix_web_create_vhost
   become: true
   notify:
     - restart nginx

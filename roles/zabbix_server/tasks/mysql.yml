@@ -29,7 +29,7 @@
     login_port: "{{ zabbix_server_mysql_login_port | default(omit) }}"
     login_unix_socket: "{{ zabbix_server_mysql_login_unix_socket | default(omit) }}"
     state: present
-  when: zabbix_database_creation
+  when: zabbix_server_database_creation
   register: zabbix_database_created
   delegate_to: "{{ delegated_dbhost }}"
   tags:
@@ -50,7 +50,7 @@
     priv: "{{ zabbix_server_dbname }}.*:ALL"
     host: "{{ zabbix_server_privileged_host }}"
     state: present
-  when: zabbix_database_creation
+  when: zabbix_server_database_creation
   delegate_to: "{{ delegated_dbhost }}"
   tags:
     - zabbix-server
@@ -60,7 +60,7 @@
   shell: ls -1 {{ datafiles_path }}/{{ 'create' if zabbix_server_version is version('6.0', '<') else 'server' }}.sq*
   changed_when: false
   when:
-    - zabbix_database_sqlload | bool
+    - zabbix_server_database_sqlload | bool
   register: ls_output_create
   tags:
     - zabbix-server
@@ -106,7 +106,7 @@
     login_port: "{{ zabbix_server_mysql_login_port | default(omit) }}"
     login_unix_socket: "{{ zabbix_server_mysql_login_unix_socket | default(omit) }}"
   when:
-    - zabbix_database_sqlload | bool
+    - zabbix_server_database_sqlload | bool
     - mysql_schema_empty
     - mysql_innodb_default_row_format.msg != 'dynamic'
   delegate_to: "{{ delegated_dbhost }}"
@@ -124,7 +124,7 @@
     login_port: "{{ zabbix_server_mysql_login_port | default(omit) }}"
     login_unix_socket: "{{ zabbix_server_mysql_login_unix_socket | default(omit) }}"
   when:
-    - zabbix_database_sqlload | bool
+    - zabbix_server_database_sqlload | bool
     - mysql_schema_empty
     - ansible_distribution_release == "buster"
   delegate_to: "{{ delegated_dbhost }}"
@@ -139,7 +139,7 @@
     flat: true
   when:
     - delegated_dbhost != inventory_hostname
-    - zabbix_database_sqlload | bool
+    - zabbix_server_database_sqlload | bool
     - mysql_schema_empty
 
 - name: "MySQL | Copy sql create file"
@@ -150,7 +150,7 @@
   delegate_to: "{{ delegated_dbhost }}"
   when:
     - delegated_dbhost != inventory_hostname
-    - zabbix_database_sqlload | bool
+    - zabbix_server_database_sqlload | bool
     - mysql_schema_empty
 
 - name: "MySQL | Create database and import file"
@@ -167,7 +167,7 @@
     target: "{{ ls_output_create.stdout }}"
     use_shell: "{{ true if zabbix_server_version is version('5.0', '==') else false }}"
   when:
-    - zabbix_database_sqlload | bool
+    - zabbix_server_database_sqlload | bool
     - mysql_schema_empty
   delegate_to: "{{ delegated_dbhost }}"
   tags:
@@ -184,7 +184,7 @@
     login_port: "{{ zabbix_server_mysql_login_port | default(omit) }}"
     login_unix_socket: "{{ zabbix_server_mysql_login_unix_socket | default(omit) }}"
   when:
-    - zabbix_database_sqlload | bool
+    - zabbix_server_database_sqlload | bool
     - mysql_schema_empty
     - mysql_innodb_default_row_format.msg != 'dynamic'
   delegate_to: "{{ delegated_dbhost }}"
@@ -198,5 +198,5 @@
     state: touch
     mode: "0644"
   when:
-    - zabbix_database_sqlload | bool
+    - zabbix_server_database_sqlload | bool
     - mysql_schema_empty

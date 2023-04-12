@@ -1,17 +1,44 @@
 ---
 # defaults file for zabbix_proxy
+# zabbix_proxy_version: 6.4
 zabbix_os_user: zabbix
-zabbix_proxy_config: /etc/zabbix/zabbix_proxy.conf
-zabbix_proxy_version:
-zabbix_proxy_version_minor: "*"
-zabbix_selinux: false
+zabbix_proxy_selinux: false
+zabbix_proxy_interface:
+  useip: "{{ zabbix_useuip }}"
+  ip: "{{ zabbix_proxy_ip }}"
+  dns: "{{ ansible_fqdn }}"
+  port: "{{ zabbix_proxy_listenport }}"
+zabbix_useuip: 1
 
-zabbix_proxy_apt_priority:
-zabbix_proxy_package_state: present
+# Database
+zabbix_proxy_database: mysql
+zabbix_proxy_database_creation: true
+zabbix_proxy_database_sqlload: true
+zabbix_proxy_dbhost_run_install: true
+zabbix_proxy_dbcollation: utf8_bin
+zabbix_proxy_dbencoding: utf8
+zabbix_proxy_dbhost: localhost
+zabbix_proxy_dbname: zabbix_proxy
+zabbix_proxy_dbpassword: zabbix_proxy
+zabbix_proxy_dbuser: zabbix_proxy
 zabbix_proxy_install_database_client: true
-zabbix_install_pip_packages: true
-zabbix_repo_yum_schema: https
+
+# Misc.
+zabbix_proxy_cat_cmd: cat
 zabbix_proxy_conf_mode: "0644"
+zabbix_proxy_config: /etc/zabbix/zabbix_proxy.conf
+zabbix_proxy_include_mode: "0755"
+zabbix_proxy_manage_service: true
+zabbix_proxy_privileged_host: localhost
+zabbix_proxy_server: 192.168.1.1
+zabbix_proxy_tls_config:
+  no_encryption: "no_encryption"
+  psk: "PSK"
+  cert: "certificate"
+zabbix_proxy_version_minor: "*"
+
+# Yum/APT Variables
+zabbix_repo_yum_schema: https
 zabbix_repo_yum_gpgcheck: 0
 zabbix_repo_yum:
   - name: zabbix
@@ -28,122 +55,59 @@ zabbix_repo_yum:
     gpgcheck: "{{ zabbix_repo_yum_gpgcheck }}"
     gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-ZABBIX
     state: present
+zabbix_proxy_apt_priority:
+zabbix_proxy_package_state: present
 
-# User (EPEL specific)
-zabbix_proxy_username: zabbix
-zabbix_proxy_groupname: zabbix
-
-zabbix_proxy_server: 192.168.1.1
-zabbix_proxy_serverport: 10051
-zabbix_database_creation: true
-zabbix_database_sqlload: true
-zabbix_proxy_dbtlsconnect:
-zabbix_proxy_dbtlscafile:
-zabbix_proxy_dbtlscertfile:
-zabbix_proxy_dbtlskeyfile:
-zabbix_proxy_dbtlscipher:
-zabbix_proxy_dbtlscipher13:
+# Proxy Configuration Variables (Only ones with role provided defaults)
+zabbix_proxy_allowroot: 0
 zabbix_proxy_allowunsupporteddbversions: 0
-
-# Some role specific vars
-zabbix_proxy_database: mysql
-# zabbix_proxy_database: pgsql
-# zabbix_proxy_database: sqlite3
-
-# zabbix-proxy specific vars
-zabbix_proxy_mode: 0
-zabbix_proxy_hostname: "{{ inventory_hostname }}"
-zabbix_proxy_listenport: 10051
-zabbix_proxy_sourceip:
-zabbix_proxy_logtype: file
-zabbix_proxy_logfile: /var/log/zabbix/zabbix_proxy.log
-zabbix_proxy_logfilesize: 10
-zabbix_proxy_enableremotecommands: 0
-zabbix_proxy_debuglevel: 3
-zabbix_proxy_pidfile: /var/run/zabbix/zabbix_proxy.pid
-zabbix_proxy_socketdir: /var/run/zabbix
-zabbix_proxy_dbencoding: utf8
-zabbix_proxy_dbcollation: utf8_bin
-zabbix_proxy_dbhost: localhost
-zabbix_proxy_dbname: zabbix_proxy
-zabbix_proxy_dbschema:
-zabbix_proxy_dbuser: zabbix_proxy
-zabbix_proxy_dbpassword: zabbix_proxy
-zabbix_proxy_dbsocket:
-zabbix_proxy_dbport: 5432
-zabbix_proxy_startodbcpollers: 1
-zabbix_proxy_dbhost_run_install: true
-zabbix_proxy_privileged_host: localhost
-zabbix_proxy_proxylocalbuffer: 0
-zabbix_proxy_proxyofflinebuffer: 1
-zabbix_proxy_heartbeatfrequency: 60
+zabbix_proxy_cachesize: 8M
 zabbix_proxy_configfrequency: 3600
 zabbix_proxy_datasenderfrequency: 1
-zabbix_proxy_startpollers: 5
-zabbix_proxy_startipmipollers: 0
-zabbix_proxy_startpollersunreachable: 1
-zabbix_proxy_starttrappers: 5
-zabbix_proxy_startpingers: 1
-zabbix_proxy_startdiscoverers: 1
-zabbix_proxy_starthttppollers: 1
-zabbix_proxy_startpreprocessors: 3
-zabbix_proxy_javagateway:
-zabbix_proxy_javagatewayport: 10052
-zabbix_proxy_startjavapollers:
-zabbix_proxy_startvmwarecollector: 0
-zabbix_proxy_vmwarefrequency: 60
-zabbix_proxy_vmwarecachesize: 8M
-zabbix_proxy_snmptrapperfile: /tmp/zabbix_traps.tmp
-zabbix_proxy_snmptrapper: 0
-zabbix_proxy_listenip:
-zabbix_proxy_housekeepingfrequency: 1
-zabbix_proxy_cachesize: 8M
-zabbix_proxy_startdbsyncers: 4
+zabbix_proxy_dbport: 5432
+zabbix_proxy_debuglevel: 3
+zabbix_proxy_enableremotecommands: 0
+zabbix_proxy_externalscripts: /usr/lib/zabbix/externalscripts
+zabbix_proxy_fping6location: /usr/sbin/fping6
+zabbix_proxy_fpinglocation: /usr/sbin/fping
+zabbix_proxy_heartbeatfrequency: 60
 zabbix_proxy_historycachesize: 8M
 zabbix_proxy_historyindexcachesize: 4M
-zabbix_proxy_historytextcachesize: 16M
+zabbix_proxy_hostname: "{{ inventory_hostname }}"
+zabbix_proxy_housekeepingfrequency: 1
+zabbix_proxy_include: /etc/zabbix/zabbix_proxy.conf.d
+zabbix_proxy_javagatewayport: 10052
+zabbix_proxy_libdir: /usr/lib/zabbix
+zabbix_proxy_listenport: 10051
+zabbix_proxy_loadmodulepath: "{{ zabbix_proxy_libdir }}/modules"
+zabbix_proxy_logfile: /var/log/zabbix/zabbix_proxy.log
+zabbix_proxy_logfilesize: 10
+zabbix_proxy_logtype: file
+zabbix_proxy_pidfile: /var/run/zabbix/zabbix_proxy.pid
+zabbix_proxy_proxylocalbuffer: 0
+zabbix_proxy_proxyofflinebuffer: 1
+zabbix_proxy_snmptrapperfile: /tmp/zabbix_traps.tmp
+zabbix_proxy_socketdir: /var/run/zabbix
+zabbix_proxy_startdbsyncers: 4
+zabbix_proxy_startdiscoverers: 1
+zabbix_proxy_starthttppollers: 1
+zabbix_proxy_startipmipollers: 0
+zabbix_proxy_startodbcpollers: 1
+zabbix_proxy_startpingers: 1
+zabbix_proxy_startpollers: 5
+zabbix_proxy_startpollersunreachable: 1
+zabbix_proxy_startpreprocessors: 3
+zabbix_proxy_starttrappers: 5
+zabbix_proxy_statsallowedip: "127.0.0.1"
 zabbix_proxy_timeout: 3
+zabbix_proxy_tmpdir: /tmp
 zabbix_proxy_trappertimeout: 300
 zabbix_proxy_unreachableperiod: 45
-zabbix_proxy_unavaliabledelay: 60
-zabbix_proxy_unreachabedelay: 15
-zabbix_proxy_externalscripts: /usr/lib/zabbix/externalscripts
-zabbix_proxy_fpinglocation: /usr/sbin/fping
-zabbix_proxy_fping6location: /usr/sbin/fping6
-zabbix_proxy_sshkeylocation:
-zabbix_proxy_loglowqueries: 0
-zabbix_proxy_tmpdir: /tmp
-zabbix_proxy_allowroot: 0
-zabbix_proxy_include: /etc/zabbix/zabbix_proxy.conf.d
-zabbix_proxy_include_mode: "0755"
-zabbix_proxy_libdir: /usr/lib/zabbix
-zabbix_proxy_loadmodulepath: "{{ zabbix_proxy_libdir }}/modules"
-zabbix_proxy_manage_service: true
-zabbix_proxy_statsallowedip: "127.0.0.1"
-zabbix_proxy_vaulttoken:
 zabbix_proxy_vaulturl: https://127.0.0.1:8200
-zabbix_proxy_vaultdbpath:
-zabbix_proxy_listenbacklog:
-
-# TLS settings
-zabbix_proxy_tlsconnect:
-zabbix_proxy_tlsaccept:
-zabbix_proxy_tlscafile:
-zabbix_proxy_tlscrlfile:
-zabbix_proxy_tlsservercertissuer:
-zabbix_proxy_tlsservercertsubject:
-zabbix_proxy_tlscertfile:
-zabbix_proxy_tlskeyfile:
-zabbix_proxy_tlspskidentity:
-
-zabbix_proxy_tls_config:
-  no_encryption: "no_encryption"
-  psk: "PSK"
-  cert: "certificate"
+zabbix_proxy_vmwarecachesize: 8M
+zabbix_proxy_vmwarefrequency: 60
 
 # Zabbix API stuff
-zabbix_api_validate_certs: true
-zabbix_api_server_url: http://localhost
 zabbix_api_http_user: admin
 zabbix_api_http_password: admin
 zabbix_api_login_user: "{{ zabbix_api_user }}"
@@ -151,18 +115,8 @@ zabbix_api_login_pass: "{{ zabbix_api_pass }}"
 ansible_httpapi_pass: "{{ zabbix_api_login_pass }}"
 ansible_httpapi_port: "{{ (zabbix_api_port_from_url == '') | ternary(zabbix_api_port_from_shema, zabbix_api_port_from_url) }}"
 ansible_httpapi_use_ssl: "{{ zabbix_api_use_ssl | default((zabbix_api_scheme_from_url == 'https') | ternary(true, false)) }}"
-ansible_httpapi_validate_certs: "{{ zabbix_api_validate_certs }}"
 zabbix_api_create_proxy: false
 zabbix_api_timeout: 30
 zabbix_proxy_state: present
 zabbix_proxy_status: active # or passive
 
-zabbix_useuip: 1
-zabbix_proxy_become_on_localhost: true
-zabbix_proxy_interface:
-  useip: "{{ zabbix_useuip }}"
-  ip: "{{ zabbix_proxy_ip }}"
-  dns: "{{ ansible_fqdn }}"
-  port: "{{ zabbix_proxy_listenport }}"
-
-zabbix_proxy_cat_cmd: cat

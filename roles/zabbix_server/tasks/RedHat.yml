@@ -83,7 +83,7 @@
   until: zabbix_server_dependencies_installed is succeeded
   become: true
   when:
-    - zabbix_database_creation
+    - zabbix_server_database_creation
     - zabbix_server_database == 'pgsql'
   tags:
     - zabbix-server
@@ -123,4 +123,4 @@
 - name: "RedHat | Configure SELinux when enabled"
   include: selinux.yml
   when:
-    - zabbix_selinux | bool
+    - zabbix_server_selinux | bool
