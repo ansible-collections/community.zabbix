@@ -719,8 +719,12 @@ class Host(ZabbixBase):
         if len(exist_interfaces) != len(interfaces):
             return True
 
+        # If there are no interfaces and we require none (when using active checks only)
+        if len(exist_interfaces) == 0 and len(interfaces) == 0:
+            return False
+
+        found = False
         for iface in interfaces:
-            found = False
             for e_int in exist_interfaces:
                 diff_dict = {}
                 zabbix_utils.helper_cleanup_data(zabbix_utils.helper_compare_dictionaries(iface, e_int, diff_dict))
