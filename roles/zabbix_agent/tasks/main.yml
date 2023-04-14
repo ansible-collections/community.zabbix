@@ -79,6 +79,9 @@
   delegate_to: localhost
   run_once: true
   become: "{{ zabbix_agent_become_on_localhost }}"
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   when:
     - zabbix_install_pip_packages | bool
     - ansible_all_ipv4_addresses is defined or (zabbix_agent_ip is not defined and total_private_ip_addresses is defined)
