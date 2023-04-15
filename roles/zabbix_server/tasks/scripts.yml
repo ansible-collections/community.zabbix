@@ -8,6 +8,8 @@
     mode: 0755
   with_items: "{{ zabbix_server_alertscripts }}"
   when: zabbix_server_alertscripts is defined
+  tags:
+    - config
 
 - name: "Configure zabbix-server externalscripts"
   template:
@@ -18,3 +20,5 @@
     mode: 0755
   with_items: "{{ zabbix_server_externalscripts }}"
   when: zabbix_server_externalscripts is defined
+  tags:
+    - config

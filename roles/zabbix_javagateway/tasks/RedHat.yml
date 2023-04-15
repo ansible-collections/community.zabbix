@@ -17,6 +17,9 @@
   become: true
   notify:
     - "clean repo files from proxy creds"
+  tags:
+    - install
+    - repo
 
 - name: "RedHat | Installing zabbix-java-gateway"
   package:
@@ -29,3 +32,5 @@
   register: zabbix_java_gateway_install
   until: zabbix_java_gateway_install is succeeded
   become: true
+  tags:
+    - install

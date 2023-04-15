@@ -3,23 +3,33 @@
 
 - name: Include OS-specific variables
   include_vars: "{{ ansible_os_family }}.yml"
+  tags:
+    - always
 
 - name: Determine Latest Supported Zabbix Version
   set_fact:
     zabbix_javagateway_version: "{{ zabbix_valid_javagateway_versions[ansible_distribution_major_version][0] | default(6.2) }}"
   when: zabbix_javagateway_version is not defined
+  tags:
+    - always
 
 - name: Set More Variables
   set_fact:
     zabbix_valid_version: "{{ zabbix_javagateway_version|float in zabbix_valid_javagateway_versions[ansible_distribution_major_version] }}"
+  tags:
+    - always
 
 - name: Stopping Install of Invalid Version
   fail:
     msg: Zabbix version {{ zabbix_javagateway_version }} is not supported on {{ ansible_distribution }} {{ ansible_distribution_major_version }}
   when: not zabbix_valid_version
+  tags:
+    - always
 
 - name: "Install the correct repository"
   include: "{{ ansible_os_family }}.yml"
+  tags:
+    - always
 
 - name: "Configure zabbix-proxy"
   template:
@@ -30,6 +40,8 @@
     mode: "{{ zabbix_java_gateway_conf_mode }}"
   notify:
     - zabbix-java-gateway restarted
+  tags:
+    - config
 
 - name: "Make sure Zabbix Java Gateway is running"
   systemd:
@@ -37,3 +49,5 @@
     state: started
     enabled: true
     daemon_reload: true
+  tags:
+    - service

@@ -6,6 +6,8 @@
     zabbix_proxy_dbname: /var/lib/zabbix/zabbix_proxy.db
   when:
     - zabbix_proxy_dbname == "zabbix_proxy"
+  tags:
+    - always
 
 - name: "Sqlite3 | Create database"
   file:
@@ -20,11 +22,17 @@
   become: true
   when:
     - zabbix_proxy_database_creation
+  tags:
+    - init
+    - database
 
 - name: "Sqlite3 | Handle Compressed Schema File"
   set_fact:
     zabbix_proxy_cat_cmd: zcat
   when: "'.gz' in ls_output_schema.stdout"
+  tags:
+    - init
+    - database
 
 - name: "Sqlite3 | Importing schema file"
   become: true
@@ -39,6 +47,9 @@
     PGPASSWORD: "{{ zabbix_proxy_dbpassword }}"
   when:
     - zabbix_proxy_database_creation
+  tags:
+    - init
+    - database
 
 - name: "Sqlite3 | Fix zabbix db file permission (SELinux)"
   file:
@@ -51,4 +62,6 @@
   when:
     - ansible_selinux.status == "enabled"
     - zabbix_proxy_database_creation
-  tags: selinux
+  tags:
+    - init
+    - database

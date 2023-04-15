@@ -1,10 +1,14 @@
 ---
 - name: "Debian | Include Zabbix gpg ids"
   include_vars: zabbix.yml
+  tags:
+    - always
 
 - name: "Debian | Set some variables"
   set_fact:
     zabbix_short_version: "{{ zabbix_javagateway_version | regex_replace('\\.', '') }}"
+  tags:
+    - always
 
 - name: "Debian | Set some variables"
   set_fact:
@@ -14,6 +18,8 @@
       - "main"
   when:
     - ansible_machine != "aarch64"
+  tags:
+    - always
 
 - name: "Debian | Set some variables"
   set_fact:
@@ -23,12 +29,17 @@
       - "main"
   when:
     - ansible_machine == "aarch64"
+  tags:
+    - always
 
 - name: "Debian | Install gpg key"
   apt_key:
     id: "{{ sign_keys[zabbix_short_version][ansible_distribution_release]['sign_key'] }}"
     url: http://repo.zabbix.com/zabbix-official-repo.key
   become: true
+  tags:
+    - install
+    - repo
 
 - name: "Debian | Installing repository Debian"
   apt_repository:
@@ -38,6 +49,9 @@
   with_items:
     - deb-src
     - deb
+  tags:
+    - install
+    - repo
 
 - name: "Debian | Installing zabbix-java-gateway"
   apt:
@@ -52,6 +66,8 @@
   register: zabbix_java_gateway_install
   until: zabbix_java_gateway_install is succeeded
   become: true
+  tags:
+    - install
 
 - name: "Debian | Make sure Zabbix Java Gateway is not yet running"
   systemd:
@@ -61,3 +77,5 @@
     daemon_reload: true
   when:
     - zabbix_java_gateway_install.changed
+  tags:
+    - service

@@ -1,26 +1,14 @@
 ---
 # Tasks specific for RedHat systems
 
-- name: "RedHat | Set short version name"
-  set_fact:
-    zabbix_short_version: "{{ zabbix_proxy_version | regex_replace('\\.', '') }}"
-
-- name: "RedHat | Define package without version"
-  set_fact:
-    zabbix_proxy_package: "zabbix-proxy-{{ zabbix_proxy_database }}"
-    cacheable: true
-
 - name: "RedHat | Set facts for Zabbix"
   set_fact:
+    zabbix_short_version: "{{ zabbix_proxy_version | regex_replace('\\.', '') }}"
     datafiles_path: "/usr/share/doc/zabbix-sql-scripts/{{ zabbix_proxy_db_long }}"
+    zabbix_proxy_package: "zabbix-proxy-{{ zabbix_proxy_database }}"
+    cacheable: true
   tags:
-    - zabbix-server
-
-- name: "RedHat | Make sure old file is absent"
-  file:
-    path: /etc/yum.repos.d/zabbix-supported.repo
-    state: absent
-  become: true
+    - always
 
 - name: "RedHat | Install basic repo file"
   yum_repository:
@@ -39,7 +27,7 @@
   notify:
     - "clean repo files from proxy creds"
   tags:
-    - zabbix-agent
+    - install
 
 - name: Install packages for Zabbix Repository
   block:
@@ -67,7 +55,7 @@
       until: zabbix_proxy_sql_package_installed is succeeded
       become: true
   tags:
-    - zabbix-server
+    - install
 
 - name: "RedHat | Install Ansible PostgreSQL Client package"
   yum:
@@ -83,8 +71,7 @@
     - zabbix_proxy_database_creation or zabbix_proxy_database_sqlload
     - zabbix_proxy_database == 'pgsql'
   tags:
-    - zabbix-proxy
-    - init
+    - install
 
 - name: "RedHat | Install Mysql Client package"
   yum:
@@ -101,8 +88,7 @@
     - zabbix_proxy_install_database_client
     - zabbix_proxy_database == 'mysql'
   tags:
-    - zabbix-proxy
-    - init
+    - install
 
 - name: "RedHat | Install sqlite3"
   yum:
@@ -118,7 +104,7 @@
   when:
     - zabbix_proxy_database == 'sqlite3'
   tags:
-    - zabbix-proxy
+    - install
 
 - name: "Configure SELinux when enabled"
   include: selinux.yml

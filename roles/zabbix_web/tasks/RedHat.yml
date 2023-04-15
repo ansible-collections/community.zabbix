@@ -1,6 +1,8 @@
 - name: "RedHat | Setting Short PHP Version"
   set_fact:
     zabbix_web_php_installed_version: "{{ zabbix_web_php_installed_version | regex_replace('\\.', '') }}"
+  tags:
+    - always
 
 - name: "RedHat | Install basic repo file"
   yum_repository:
@@ -19,7 +21,7 @@
   notify:
     - "clean repo files from proxy creds"
   tags:
-    - zabbix-web
+    - install
 
 - name: "RedHat | Install zabbix-web-{{ zabbix_server_database }}"
   yum:
@@ -35,7 +37,7 @@
   until: zabbix_web_package_install is succeeded
   become: true
   tags:
-    - zabbix-web
+    - install
 
 - name: "RedHat | Install zabbix-web-configuration"
   yum:
@@ -54,4 +56,4 @@
     - zabbix_web_version is version('6.0', '!=')
     - ansible_distribution_major_version == '9'
   tags:
-    - zabbix-web
+    - install

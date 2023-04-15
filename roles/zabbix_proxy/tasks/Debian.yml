@@ -1,20 +1,22 @@
 ---
 - name: "Debian | Include Zabbix gpg ids"
   include_vars: zabbix.yml
+  tags:
+    - always
 
 - name: "Debian | Set short version name"
   set_fact:
     zabbix_short_version: "{{ zabbix_proxy_version | regex_replace('\\.', '') }}"
     zabbix_python_prefix: "python{% if ansible_python_version is version('3', '>=') %}3{% endif %}"
     zabbix_underscore_version: "{{ zabbix_proxy_version | regex_replace('\\.', '_') }}"
+  tags:
+    - always
 
 - name: "Debian | Set some facts for Zabbix"
   set_fact:
     datafiles_path: /usr/share/doc/zabbix-sql-scripts/{{ zabbix_proxy_db_long }}
   tags:
-    - zabbix-server
-    - init
-    - config
+    - always
 
 - name: "Debian | Installing gnupg"
   apt:
@@ -29,6 +31,8 @@
   register: gnupg_installed
   until: gnupg_installed is succeeded
   become: true
+  tags:
+    - install
 
 - name: "Debian | Install gpg key"
   apt_key:
@@ -36,11 +40,9 @@
     url: http://repo.zabbix.com/zabbix-official-repo.key
   register: are_zabbix_proxy_dependency_packages_installed
   until: are_zabbix_proxy_dependency_packages_installed is succeeded
-
   become: true
   tags:
-    - zabbix-proxy
-    - init
+    - install
 
 - name: "Debian | Installing repository {{ ansible_distribution }}"
   apt_repository:
@@ -51,8 +53,7 @@
     - deb-src
     - deb
   tags:
-    - zabbix-proxy
-    - init
+    - install
 
 - name: "Debian | Create /etc/apt/preferences.d/"
   file:
@@ -62,6 +63,8 @@
   when:
     - zabbix_proxy_apt_priority | int
   become: true
+  tags:
+    - install
 
 - name: "Debian | Configuring the weight for APT"
   copy:
@@ -75,6 +78,8 @@
   when:
     - zabbix_proxy_apt_priority | int
   become: true
+  tags:
+    - install
 
 - name: "Debian | Installing zabbix-proxy-{{ zabbix_proxy_database }}"
   apt:
@@ -90,6 +95,8 @@
   register: is_zabbix_proxy_package_installed
   until: is_zabbix_proxy_package_installed is succeeded
   become: true
+  tags:
+    - install
 
 - name: "Debian | Installing zabbix-sql-scripts"
   apt:
@@ -107,8 +114,7 @@
     - zabbix_proxy_version is version('6.0', '>=')
   become: true
   tags:
-    - zabbix-server
-    - init
+    - install
 
 - name: "Debian | Install Ansible module dependencies"
   apt:
@@ -123,8 +129,8 @@
   when:
     - zabbix_proxy_database_creation
   tags:
-    - zabbix-server
-    - init
+    - install
+    - dependency
 
 - name: "Debian | Install Mysql Client package"
   apt:
@@ -140,8 +146,8 @@
     - zabbix_proxy_database == 'mysql'
     - zabbix_proxy_install_database_client
   tags:
-    - zabbix-server
-    - init
+    - install
+    - dependency
     - database
 
 - name: "Debian | Install PostgreSQL Client package"
@@ -159,8 +165,8 @@
     - zabbix_proxy_database == 'pgsql'
     - zabbix_proxy_install_database_client
   tags:
-    - zabbix-proxy
-    - init
+    - install
+    - dependency
     - database
 
 - name: "Debian | Install sqlite3"
@@ -176,4 +182,6 @@
   when:
     - zabbix_proxy_database == 'sqlite3'
   tags:
-    - zabbix-proxy
+    - install
+    - dependency
+    - database
