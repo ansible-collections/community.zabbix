@@ -39,7 +39,7 @@
   register: zabbix_server_package_installed
   until: zabbix_server_package_installed is succeeded
   become: true
-  ags:
+  tags:
     - install
 
 - name: "RedHat | Installing zabbix-sql-scripts"
@@ -55,7 +55,7 @@
   when:
     - zabbix_server_version is version('6.0', '>=')
   become: true
-  ags:
+  tags:
     - install
 
 - name: "RedHat | Install Ansible module dependencies"
@@ -71,7 +71,7 @@
   when:
     - zabbix_server_database_creation
     - zabbix_server_database == 'pgsql'
-  ags:
+  tags:
     - install
     - dependencies
 
