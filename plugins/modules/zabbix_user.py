@@ -216,9 +216,9 @@ options:
 extends_documentation_fragment:
 - community.zabbix.zabbix
 
-'''
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 # If you want to use Username and Password to be authenticated by Zabbix Server
 - name: Set credentials to access Zabbix Server API
   set_fact:
@@ -425,26 +425,6 @@ class User(ZabbixBase):
                         user_media["sendto"] = [user_media["sendto"]]
                 else:
                     if not isinstance(user_media["sendto"], str):
-                        self._module.fail_json(user_media)
-                        self._module.fail_json(
-                            "For any other than Email media type sendto parameter must be of type str."
-                        )
-                del user_media["mediatype"]
-
-            severity_binary_number = ""
-            for severity_key in (
-                "disaster",
-                "high",
-                "average",
-                "warning",
-                "information",
-                "not_classified",
-            ):
-                if user_media["severity"][severity_key]:
-                    severity_binary_number = severity_binary_number + "1"
-                else:
-                    if not isinstance(user_media["sendto"], str):
-                        self._module.fail_json(user_media)
                         self._module.fail_json(
                             "For any other than Email media type sendto parameter must be of type str."
                         )
@@ -762,14 +742,6 @@ class User(ZabbixBase):
                 self._module.fail_json(
                     msg="Failed to update user %s: %s" % (username, e)
                 )
-
-        if LooseVersion(self._zbx_api_version) >= LooseVersion('6.4'):
-            try:
-                if user_medias:
-                    request_data['medias'] = user_medias
-                user_ids = self._zapi.user.update(request_data)
-            except Exception as e:
-                self._module.fail_json(msg="Failed to update user %s: %s" % (username, e))
 
         return user_ids
 
