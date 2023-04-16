@@ -188,10 +188,10 @@ def main():
     argument_spec = zabbix_utils.zabbix_common_argument_spec()
     argument_spec.update(dict(
         host_name=dict(type='str', default='', required=False),
-        host_ip=dict(type='list', default=[], required=False),
+        host_ip=dict(type='list', default=[], required=False, elements='str'),
         exact_match=dict(type='bool', required=False, default=False),
         remove_duplicate=dict(type='bool', required=False, default=True),
-        host_inventory=dict(type='list', default=[], required=False)
+        host_inventory=dict(type='list', default=[], required=False, elements='str')
     ))
     module = AnsibleModule(
         argument_spec=argument_spec,

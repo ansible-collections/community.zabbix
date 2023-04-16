@@ -391,8 +391,7 @@
   zabbix_host:
     timeout: 60     # slower with py2.7
     host_name: ExampleHost
-    link_templates:
-      -
+    link_templates: []
   register: zabbix_host1
 
 - name: expect to succeed and that things have changed
@@ -403,8 +402,7 @@
 - name: "test: change host linked templates (check we have no templates left)"
   zabbix_host:
     host_name: ExampleHost
-    link_templates:
-      -
+    link_templates: []
   register: zabbix_host1
 
 - name: expect to succeed and that things have not changed
