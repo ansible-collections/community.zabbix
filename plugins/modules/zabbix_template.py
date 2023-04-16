@@ -773,9 +773,9 @@ def main():
         template_name=dict(type='str', required=False),
         template_json=dict(type='json', required=False),
         template_xml=dict(type='str', required=False),
-        template_groups=dict(type='list', required=False),
-        link_templates=dict(type='list', required=False),
-        clear_templates=dict(type='list', required=False),
+        template_groups=dict(type='list', required=False, elements='str'),
+        link_templates=dict(type='list', required=False, elements='str'),
+        clear_templates=dict(type='list', required=False, elements='str'),
         macros=dict(
             type='list',
             elements='dict',

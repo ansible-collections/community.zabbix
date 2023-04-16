@@ -40,7 +40,7 @@
       operations:
         - type: send_message
           subject: ExampleSubject
-          message: ExampleMessage
+          op_message: ExampleMessage
           media_type: ExampleMediaTypeForActionModule
           send_to_users:
             - Admin
@@ -261,7 +261,7 @@
       operations:
         - type: send_message
           subject: ExampleSubject
-          message: ExampleMessage
+          op_message: ExampleMessage
           media_type: ExampleMediaTypeForActionModule
           send_to_users:
             - Admin
@@ -517,7 +517,7 @@
           send_to_users:
             - Admin
           subject: test_subject
-          message: test_message
+          op_message: test_message
           media_type: ExampleMediaTypeForActionModule
           operation_condition: not_acknowledged
           esc_step_from: 1
@@ -526,7 +526,7 @@
           send_to_users:
             - Admin
           subject: test_subject
-          message: test_message
+          op_message: test_message
           media_type: SMS
           operation_condition: not_acknowledged
           esc_step_from: 2
@@ -544,7 +544,7 @@
           send_to_users:
             - Admin
           subject: test_subject
-          message: test_message
+          op_message: test_message
           media_type: ExampleMediaTypeForActionModule
           operation_condition: not_acknowledged
           esc_step_from: 1
@@ -553,7 +553,7 @@
           send_to_users:
             - Admin
           subject: test_subject
-          message: test_message
+          op_message: test_message
           media_type: SMS
           operation_condition: not_acknowledged
           esc_step_from: 2
@@ -833,7 +833,7 @@
           send_to_users:
             - Admin
           subject: test_subject
-          message: test_message
+          op_message: test_message
           media_type: ExampleMediaTypeForActionModule
           operation_condition: not_acknowledged
           esc_step_from: 1
@@ -872,7 +872,7 @@
           send_to_users:
             - Admin
           subject: test_subject
-          message: test_message
+          op_message: test_message
           media_type: ExampleMediaTypeForActionModule
           operation_condition: not_acknowledged
           esc_step_from: 1
@@ -991,7 +991,7 @@
           send_to_users:
             - Admin
           subject: test_subject
-          message: test_message
+          op_message: test_message
           media_type: ExampleMediaTypeForActionModule
 
   block:
@@ -1083,7 +1083,7 @@
       operations:
         - type: send_message
           subject: ExampleSubject
-          message: ExampleMessage
+          op_message: ExampleMessage
           media_type: ExampleMediaTypeForActionModule
           send_to_users:
             - Admin
@@ -1094,7 +1094,7 @@
       recovery_operations:
         - type: send_message
           subject: ExampleSubject
-          message: ExampleMessage
+          op_message: ExampleMessage
           media_type: ExampleMediaTypeForActionModule
           send_to_users:
             - Admin
@@ -1112,11 +1112,11 @@
           password: zabbix
         - type: notify_all_involved
           subject: RecoverySubject
-          message: RecoveryMessage
+          op_message: RecoveryMessage
       acknowledge_operations:
         - type: send_message
           subject: ExampleSubject
-          message: ExampleMessage
+          op_message: ExampleMessage
           media_type: ExampleMediaTypeForActionModule
           send_to_users:
             - Admin
@@ -1134,7 +1134,7 @@
           run_on_hosts: 0
         - type: notify_all_involved
           subject: RecoverySubject
-          message: RecoveryMessage
+          op_message: RecoveryMessage
           media_type: ExampleMediaTypeForActionModule
     register: zbxaction_recack_new
 
@@ -1146,7 +1146,7 @@
       recovery_operations:
         - type: send_message
           subject: ExampleSubject
-          message: ExampleMessage
+          op_message: ExampleMessage
           media_type: ExampleMediaTypeForActionModule
           send_to_users:
             - Admin
@@ -1164,11 +1164,11 @@
           password: zabbix
         - type: notify_all_involved
           subject: RecoverySubject
-          message: RecoveryMessage
+          op_message: RecoveryMessage
       acknowledge_operations:
         - type: send_message
           subject: ExampleSubject
-          message: ExampleMessage
+          op_message: ExampleMessage
           media_type: ExampleMediaTypeForActionModule
           send_to_users:
             - Admin
@@ -1186,7 +1186,7 @@
           run_on_hosts: 0
         - type: notify_all_involved
           subject: RecoverySubject
-          message: RecoveryMessage
+          op_message: RecoveryMessage
           media_type: ExampleMediaTypeForActionModule
     register: zbxaction_recack_new
 
@@ -1218,7 +1218,7 @@
       operations:
         - type: send_message
           subject: ExampleSubject
-          message: ExampleMessage
+          op_message: ExampleMessage
           media_type: ExampleMediaTypeForActionModule
           send_to_users:
             - Admin
@@ -1229,23 +1229,23 @@
       recovery_operations:
         - type: send_message
           subject: ExampleSubject
-          message: ExampleMessage
+          op_message: ExampleMessage
           media_type: ExampleMediaTypeForActionModule
           send_to_users:
             - Admin
         - type: notify_all_involved
           subject: RecoverySubject
-          message: RecoveryMessage
+          op_message: RecoveryMessage
       acknowledge_operations:
         - type: send_message
           subject: ExampleSubject
-          message: ExampleMessage
+          op_message: ExampleMessage
           media_type: ExampleMediaTypeForActionModule
           send_to_users:
             - Admin
         - type: notify_all_involved
           subject: RecoverySubject
-          message: RecoveryMessage
+          op_message: RecoveryMessage
           media_type: ExampleMediaTypeForActionModule
     register: zbxaction_recack_new
 
@@ -1257,23 +1257,23 @@
       recovery_operations:
         - type: send_message
           subject: ExampleSubject
-          message: ExampleMessage
+          op_message: ExampleMessage
           media_type: ExampleMediaTypeForActionModule
           send_to_users:
             - Admin
         - type: notify_all_involved
           subject: RecoverySubject
-          message: RecoveryMessage
+          op_message: RecoveryMessage
       acknowledge_operations:
         - type: send_message
           subject: ExampleSubject
-          message: ExampleMessage
+          op_message: ExampleMessage
           media_type: ExampleMediaTypeForActionModule
           send_to_users:
             - Admin
         - type: notify_all_involved
           subject: RecoverySubject
-          message: RecoveryMessage
+          op_message: RecoveryMessage
           media_type: ExampleMediaTypeForActionModule
     register: zbxaction_recack_new
 
@@ -1287,23 +1287,23 @@
         recovery_operations:
           - type: send_message
             subject: ExampleSubject
-            message: ExampleMessage
+            op_message: ExampleMessage
             media_type: ExampleMediaTypeForActionModule
             send_to_users:
               - Admin
           - type: notify_all_involved
             subject: RecoverySubject
-            message: RecoveryMessage
+            op_message: RecoveryMessage
         acknowledge_operations:
           - type: send_message
             subject: ExampleSubject
-            message: ExampleMessage
+            op_message: ExampleMessage
             media_type: ExampleMediaTypeForActionModule
             send_to_users:
               - Admin
           - type: notify_all_involved
             subject: RecoverySubject
-            message: RecoveryMessage
+            op_message: RecoveryMessage
             media_type: ExampleMediaTypeForActionModule
         pause_symptoms: False
       register: zbxaction_pause_symptoms
@@ -1316,23 +1316,23 @@
         recovery_operations:
           - type: send_message
             subject: ExampleSubject
-            message: ExampleMessage
+            op_message: ExampleMessage
             media_type: ExampleMediaTypeForActionModule
             send_to_users:
               - Admin
           - type: notify_all_involved
             subject: RecoverySubject
-            message: RecoveryMessage
+            op_message: RecoveryMessage
         acknowledge_operations:
           - type: send_message
             subject: ExampleSubject
-            message: ExampleMessage
+            op_message: ExampleMessage
             media_type: ExampleMediaTypeForActionModule
             send_to_users:
               - Admin
           - type: notify_all_involved
             subject: RecoverySubject
-            message: RecoveryMessage
+            op_message: RecoveryMessage
             media_type: ExampleMediaTypeForActionModule
         pause_symptoms: False
       register: zbxaction_pause_symptoms
@@ -1360,7 +1360,7 @@
     operations:
       - type: send_message
         subject: ExampleSubject
-        message: ExampleMessage
+        op_message: ExampleMessage
         media_type: ExampleMediaTypeForActionModule
         send_to_users:
           - Admin
