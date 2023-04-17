@@ -23,22 +23,6 @@ def zabbix_common_argument_spec():
     The options are commonly used by most of Zabbix modules.
     """
     return dict(
-        server_url=dict(
-            type='str',
-            required=False,
-            aliases=['url'],
-            fallback=(env_fallback, ['ZABBIX_SERVER'])
-        ),
-        login_user=dict(
-            type='str', required=False,
-            fallback=(env_fallback, ['ZABBIX_USERNAME'])
-        ),
-        login_password=dict(
-            type='str',
-            required=False,
-            no_log=True,
-            fallback=(env_fallback, ['ZABBIX_PASSWORD'])
-        ),
         http_login_user=dict(
             type='str',
             required=False,
@@ -49,15 +33,7 @@ def zabbix_common_argument_spec():
             required=False,
             default=None,
             no_log=True
-        ),
-        timeout=dict(
-            type='int'
-        ),
-        validate_certs=dict(
-            type='bool',
-            required=False,
-            fallback=(env_fallback, ['ZABBIX_VALIDATE_CERTS'])
-        ),
+        )
     )
 
 

@@ -243,10 +243,6 @@ def main():
 
     zabbix_utils.require_creds_params(module)
 
-    for p in ['server_url', 'login_user', 'login_password', 'timeout', 'validate_certs']:
-        if p in module.params and not module.params[p] is None:
-            module.warn('Option "%s" is deprecated with the move to httpapi connection and will be removed in the next release' % p)
-
     host_name = module.params['host_name']
     macro_name = normalize_macro_name(module.params['macro_name'])
     macro_value = module.params['macro_value']
