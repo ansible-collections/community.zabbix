@@ -1,7 +1,6 @@
 ---
 - name: "test: create host with many options set"
   zabbix_host:
-    timeout: 30     # slower with py2.7
     host_name: ExampleHost
     visible_name: ExampleName
     description: My ExampleHost Description
@@ -60,7 +59,6 @@
 
 - name: "test: try to create the same host with the same settings"
   zabbix_host:
-    timeout: 30     # slower with py2.7
     host_name: ExampleHost
     visible_name: ExampleName
     description: My ExampleHost Description
@@ -120,7 +118,6 @@
 - name: "test: try to create the same host with the same settings and force false"
   zabbix_host:
     force: false
-    timeout: 30     # slower with py2.7
     host_name: ExampleHost
     visible_name: ExampleName
     description: My ExampleHost Description
@@ -171,7 +168,6 @@
 - name: "test: try to create the same host changing one parameter in the inventory with force false"
   zabbix_host:
     force: false
-    timeout: 30     # slower with py2.7
     host_name: ExampleHost
     visible_name: ExampleName
     description: My ExampleHost Description
@@ -389,7 +385,6 @@
 
 - name: "test: change host linked templates (remove all templates)"
   zabbix_host:
-    timeout: 60     # slower with py2.7
     host_name: ExampleHost
     link_templates: []
   register: zabbix_host1
@@ -1361,9 +1356,6 @@
   
   - name: "test: create host without host interfaces (again)"
     zabbix_host:
-      server_url: "{{ zabbix_api_server_url }}"
-      login_user: "{{ zabbix_api_login_user }}"
-      login_password: "{{ zabbix_api_login_pass }}"
       host_name: ExampleHost
       visible_name: ExampleName
       description: My ExampleHost Description

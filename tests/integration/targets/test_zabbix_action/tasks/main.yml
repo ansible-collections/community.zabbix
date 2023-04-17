@@ -5,9 +5,6 @@
 
 - name: test - prepare example template for zabbix_action module
   zabbix_template:
-    server_url: "{{ zabbix_api_server_url }} "
-    login_user: "{{ zabbix_api_login_user }}"
-    login_password: "{{ zabbix_api_login_pass }}"
     template_name: ExampleTemplateForActionModule
     template_groups:
       - Templates
@@ -16,9 +13,6 @@
 
 - name: test - prepare example mediatype for zabbix_action module
   zabbix_mediatype:
-    server_url: "{{ zabbix_api_server_url }} "
-    login_user: "{{ zabbix_api_login_user }}"
-    login_password: "{{ zabbix_api_login_pass }}"
     name: ExampleMediaTypeForActionModule
     smtp_email: zabbix@example.com
     type: email
@@ -1381,7 +1375,6 @@
 - name: test - cleanup example template for zabbix_action module
   zabbix_template:
     template_name: ExampleTemplateForActionModule
-    timeout: 20
     state: absent
   register: zbxaction_prep_template
 
