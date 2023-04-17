@@ -7,7 +7,7 @@
 class ModuleDocFragment(object):
 
     # Standard documentation fragment
-    DOCUMENTATION = r'''
+    DOCUMENTATION = r"""
 options:
     http_login_user:
         description:
@@ -19,3 +19,4 @@ options:
             - Basic Auth password
         type: str
         required: false
+    """

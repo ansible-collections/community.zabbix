@@ -207,10 +207,21 @@ EXAMPLES = r'''
 from ansible.module_utils.basic import AnsibleModule
 
 from ansible_collections.community.zabbix.plugins.module_utils.base import ZabbixBase
-from ansible_collections.community.zabbix.plugins.module_utils.wrappers import ScreenItem
 from ansible.module_utils.compat.version import LooseVersion
 
 import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabbix_utils
+
+
+class ScreenItem(object):
+    @staticmethod
+    def create(zapi_wrapper, data):
+        zapi_wrapper._zapi.screenitem.create(data)
+
+    @staticmethod
+    def delete(zapi_wrapper, id_list=None):
+        if id_list is None:
+            id_list = []
+        zapi_wrapper._zapi.screenitem.delete(id_list)
 
 
 class Screen(ZabbixBase):
