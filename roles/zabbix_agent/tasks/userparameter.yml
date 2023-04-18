@@ -16,8 +16,9 @@
         - restart win zabbix agent
       with_items: "{{ zabbix_agent_userparameters }}"
       when: item.scripts_dir is defined
-
   when: ansible_os_family == "Windows"
+  tags:
+    - config
 
 - block:
     - name: "Installing user-defined userparameters"
@@ -46,10 +47,11 @@
       become: true
       with_items: "{{ zabbix_agent_userparameters }}"
       when: item.scripts_dir is defined
-
   when:
     - ansible_os_family != "Windows"
     - not zabbix_agent2
+  tags:
+    - config
 
 - block:
     - name: "Installing user-defined userparameters"
@@ -78,7 +80,8 @@
       become: true
       with_items: "{{ zabbix_agent_userparameters }}"
       when: item.scripts_dir is defined
-
   when:
     - ansible_os_family != "Windows"
     - zabbix_agent2
+  tags:
+    - config

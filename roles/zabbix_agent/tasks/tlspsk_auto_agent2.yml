@@ -10,3 +10,5 @@
     zabbix_agent2_tlsaccept: psk
     zabbix_agent2_tlsconnect: psk
   when: zabbix_api_create_hosts
+  tags:
+    - config

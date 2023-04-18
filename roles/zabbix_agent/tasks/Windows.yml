@@ -2,35 +2,43 @@
 - name: "Windows | Set default architecture"
   set_fact:
     windows_arch: 32
+  tags:
+    - always
 
 - name: "Windows | Override architecture if 64-bit"
   set_fact:
     windows_arch: 64
   when:
     - ansible_architecture == "64-bit"
+  tags:
+    - always
 
 - name: "Windows | Set path to zabbix.exe"
   set_fact:
     zabbix_win_exe_path: '{{ zabbix_win_install_dir }}\bin\win{{ windows_arch }}\zabbix_agentd.exe'
+  tags:
+    - always
 
-- name: "Windows | Set variables specific to Zabbix >= 4"
+- name: "Windows | Set variables specific to Zabbix"
   set_fact:
     zabbix_win_svc_name: Zabbix Agent
     zabbix_win_exe_path: '{{ zabbix_win_install_dir }}\bin\zabbix_agentd.exe'
-    zabbix_win_config_name: 'zabbix_agentd.conf'
+    zabbix_win_config_name: "zabbix_agentd.conf"
     zabbix2_win_svc_name: Zabbix Agent 2
     zabbix2_win_exe_path: '{{ zabbix_win_install_dir }}\bin\zabbix_agent2.exe'
-    zabbix2_win_config_name: 'zabbix_agent2.conf'
-  when:
-    - zabbix_version_long is version('4.0.0', '>=')
+    zabbix2_win_config_name: "zabbix_agent2.conf"
+  tags:
+    - always
 
 - name: "Windows | Check if Zabbix agent is present"
   ansible.windows.win_stat:
-    path: '{{ item }}'
+    path: "{{ item }}"
   with_items:
     - "{{ zabbix_win_exe_path }}"
     - "{{ zabbix2_win_exe_path }}"
   register: agent_file_info
+  tags:
+    - always
 
 - name: "Windows | Get Installed Zabbix Agent Version"
   community.windows.win_file_version:
@@ -39,6 +47,8 @@
   when:
     - item.stat.exists | bool
   with_items: "{{ agent_file_info.results }}"
+  tags:
+    - always
 
 - name: "Windows | Set facts current zabbix agent installation"
   set_fact:
@@ -49,6 +59,8 @@
     - zabbix_win_exe_info.results[0].item.stat.exists
     - zabbix_win_exe_info.results[0].item.stat.path == zabbix_win_exe_path
     - zabbix_win_exe_info.results[0].win_file_version.product_version
+  tags:
+    - always
 
 - name: "Windows | Set facts current zabbix agent installation (agent 2)"
   set_fact:
@@ -59,6 +71,8 @@
     - zabbix_win_exe_info.results[1].item.stat.exists
     - zabbix_win_exe_info.results[1].item.stat.path == zabbix2_win_exe_path
     - zabbix_win_exe_info.results[1].win_file_version.product_version
+  tags:
+    - always
 
 - name: "Windows | Check Zabbix service"
   ansible.windows.win_service:
@@ -66,6 +80,8 @@
   register: zabbix_service_info
   when: item.item.stat.exists
   with_items: "{{ zabbix_win_exe_info.results }}"
+  tags:
+    - always
 
 - name: "Windows | Set facts about current zabbix agent service state"
   set_fact:
@@ -74,6 +90,8 @@
     - zabbix_service_info.results[0].exists is defined
     - zabbix_service_info.results[0].exists
     - zabbix_service_info.results[0].display_name == zabbix_win_svc_name
+  tags:
+    - always
 
 - name: "Windows | Set facts about current zabbix agent service state (agent 2)"
   set_fact:
@@ -82,6 +100,8 @@
     - zabbix_service_info.results[1].exists is defined
     - zabbix_service_info.results[1].exists
     - zabbix_service_info.results[1].display_name == zabbix2_win_svc_name
+  tags:
+    - always
 
 - name: "Windows | Set fact about version change requirement"
   set_fact:
@@ -94,6 +114,8 @@
      zabbix_win_exe_info.results[1].win_file_version.product_version is version(zabbix_version_long, '<>'))
     or (zabbix_agent_1_binary_exist | default(false) and zabbix_agent2)
     or (zabbix_agent_2_binary_exist | default(false) and not zabbix_agent2)
+  tags:
+    - always
 
 ##################
 # delete section #
@@ -131,10 +153,11 @@
 
 - name: "Windows | Removing Zabbix Directory"
   ansible.windows.win_file:
-    path: '{{ zabbix_win_install_dir }}'
+    path: "{{ zabbix_win_install_dir }}"
     state: absent
-  when: ((zabbix_agent_version_change | default(false) or zabbix_agent2) and zabbix_agent_1_binary_exist | default(false)) or
-        ((zabbix_agent_version_change | default(false) or not zabbix_agent2) and zabbix_agent_2_binary_exist | default(false))
+  when:
+    ((zabbix_agent_version_change | default(false) or zabbix_agent2) and zabbix_agent_1_binary_exist | default(false)) or
+    ((zabbix_agent_version_change | default(false) or not zabbix_agent2) and zabbix_agent_2_binary_exist | default(false))
 
 ###################
 # install section #
@@ -146,6 +169,8 @@
     state: directory
   with_items:
     - "{{ zabbix_win_install_dir }}"
+  tags:
+    - install
 
 - name: "Windows | Create directory structure, includes"
   ansible.windows.win_file:
@@ -155,6 +180,8 @@
     - "{{ zabbix_agent_win_include }}"
   when:
     - ('.conf' not in zabbix_agent_win_include)
+  tags:
+    - install
 
 - name: "Windows | Set installation settings (agent 2)"
   set_fact:
@@ -164,16 +191,22 @@
     zabbix_win_config_name: "{{ zabbix2_win_config_name }}"
     zabbix_win_svc_name: "{{ zabbix2_win_svc_name }}"
   when: zabbix_agent2 | bool
+  tags:
+    - install
 
 - name: "Windows | Check if agent file is already downloaded"
   ansible.windows.win_stat:
     path: '{{ zabbix_win_install_dir }}\{{ zabbix_win_package }}'
   register: file_info
+  tags:
+    - install
 
 - name: "Windows | Check if agent binaries in place"
   ansible.windows.win_stat:
     path: "{{ zabbix_win_exe_path }}"
   register: zabbix_windows_binaries
+  tags:
+    - install
 
 - name: "Windows | Download Zabbix Agent Zip file"
   ansible.windows.win_get_url:
@@ -192,12 +225,16 @@
   register: zabbix_agent_win_download_zip
   until: zabbix_agent_win_download_zip is succeeded
   throttle: "{{ zabbix_download_throttle | default(5) | int }}"
+  tags:
+    - install
 
 - name: "Windows | Unzip file"
   community.windows.win_unzip:
     src: '{{ zabbix_win_install_dir }}\{{ zabbix_win_package }}'
     dest: "{{ zabbix_win_install_dir }}"
     creates: "{{ zabbix_win_exe_path }}"
+  tags:
+    - install
 
 - name: "Windows | Cleanup downloaded Zabbix Agent Zip file"
   ansible.windows.win_file:
@@ -205,6 +242,8 @@
     state: absent
   when:
     - zabbix_agent_win_download_zip.changed
+  tags:
+    - install
 
 - name: "Windows | Copy binary files to expected location"
   ansible.windows.win_copy:
@@ -217,6 +256,8 @@
   when:
     - zabbix_win_install_dir_bin is defined
     - not (zabbix_agent2 | bool)
+  tags:
+    - install
 
 - name: "Windows | Copy binary files to expected location (zabbix-agent2)"
   ansible.windows.win_copy:
@@ -228,18 +269,24 @@
   when:
     - zabbix_win_install_dir_bin is defined
     - zabbix_agent2 | bool
+  tags:
+    - install
 
 - set_fact:
     zabbix_win_exe_path: "{{ zabbix_win_install_dir_bin }}\\zabbix_agentd.exe"
   when:
     - zabbix_win_install_dir_bin is defined
     - not (zabbix_agent2 | bool)
+  tags:
+    - install
 
 - set_fact:
     zabbix_win_exe_path: "{{ zabbix_win_install_dir_bin }}\\zabbix_agent2.exe"
   when:
     - zabbix_win_install_dir_bin is defined
     - zabbix_agent2 | bool
+  tags:
+    - install
 
 - name: "Create directory for PSK file if not exist."
   win_file:
@@ -249,6 +296,8 @@
     - zabbix_agent_tlspskfile is defined
     - zabbix_agent_tlspskfile
     - not (zabbix_agent2 | bool)
+  tags:
+    - config
 
 - name: "Create directory for PSK file if not exist (zabbix-agent2)"
   win_file:
@@ -258,6 +307,8 @@
     - zabbix_agent2_tlspskfile is defined
     - zabbix_agent2_tlspskfile
     - zabbix_agent2 | bool
+  tags:
+    - config
 
 - name: "Place TLS PSK File"
   win_copy:
@@ -270,6 +321,8 @@
     - not (zabbix_agent2 | bool)
   notify:
     - restart win zabbix agent
+  tags:
+    - config
 
 - name: "Place TLS PSK File (zabbix-agent2)"
   win_copy:
@@ -282,25 +335,33 @@
     - zabbix_agent2 | bool
   notify:
     - restart win zabbix agent
+  tags:
+    - config
 
 - name: "Windows | Check if windows service exist"
   ansible.windows.win_service:
     name: "{{ zabbix_win_svc_name }}"
   register: zabbix_windows_service
+  tags:
+    - service
 
 - name: "Windows | Register Service"
   ansible.windows.win_command: '"{{ zabbix_win_exe_path }}" --config "{{ zabbix_win_install_dir_conf }}\{{ zabbix_win_config_name }}" --install'
   when: not zabbix_windows_service.exists
+  tags:
+    - service
 
 - name: "Windows | Set service startup mode to auto, ensure it is started and set auto-recovery"
   ansible.windows.win_service:
     name: "{{ zabbix_win_svc_name }}"
     start_mode: auto
     failure_actions:
-    - type: restart
-      delay_ms: 5000
-    - type: restart
-      delay_ms: 10000
-    - type: restart
-      delay_ms: 20000
+      - type: restart
+        delay_ms: 5000
+      - type: restart
+        delay_ms: 10000
+      - type: restart
+        delay_ms: 20000
     failure_reset_period_sec: 86400
+  tags:
+    - service

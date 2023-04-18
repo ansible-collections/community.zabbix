@@ -5,6 +5,8 @@
   when:
     - zabbix_agent_ip is not defined
     - "'ansible_default_ipv4' in hostvars[inventory_hostname]"
+  tags:
+    - config
 
 - name: "Get Total Private IP Addresses"
   set_fact:
@@ -12,6 +14,8 @@
   when:
     - ansible_all_ipv4_addresses is defined
     - not (zabbix_agent_dont_detect_ip)
+  tags:
+    - config
 
 - name: "Set first public ip address for zabbix_agent_ip"
   set_fact:
@@ -24,6 +28,8 @@
     - zabbix_agent_ip is not defined
     - total_private_ip_addresses is defined
     - total_private_ip_addresses == '0'
+  tags:
+    - config
 
 - name: "Set first private ip address for zabbix_agent_ip"
   set_fact:
@@ -32,6 +38,8 @@
     - zabbix_agent_ip is not defined
     - total_private_ip_addresses is defined
     - total_private_ip_addresses != '0'
+  tags:
+    - config
 
 - name: "Fail invalid specified agent_listeninterface"
   fail:
@@ -40,7 +48,6 @@
     - (zabbix_agent_listeninterface)
     - (zabbix_agent_listeninterface not in ansible_interfaces)
   tags:
-    - zabbix-agent
     - config
 
 - name: "Set network interface"
@@ -49,6 +56,8 @@
   when:
     - (zabbix_agent_listeninterface)
     - not zabbix_agent_listenip
+  tags:
+    - config
 
 - name: "Get IP of agent_listeninterface when no agent_listenip specified"
   set_fact:
@@ -57,7 +66,6 @@
     - (zabbix_agent_listeninterface)
     - not zabbix_agent_listenip
   tags:
-    - zabbix-agent
     - config
     - api
 
@@ -67,7 +75,6 @@
   when:
     - not (zabbix_agent_listenip)
   tags:
-    - zabbix-agent
     - config
 
 - name: "Fail invalid specified agent_listenip"
@@ -78,7 +85,6 @@
     - zabbix_agent_listenip != '127.0.0.1'
     - (zabbix_agent_listenip not in ansible_all_ipv4_addresses)
   tags:
-    - zabbix-agent
     - config
 
 - name: "Configure SELinux when enabled"
@@ -94,6 +100,8 @@
   become: true
   when:
     - zabbix_agent_docker | bool
+  tags:
+    - config
 
 - name: "Adding zabbix user"
   user:
@@ -107,6 +115,8 @@
   become: true
   when:
     - zabbix_agent_docker | bool
+  tags:
+    - config
 
 - name: "Configure zabbix-agent"
   template:
@@ -121,9 +131,7 @@
   when:
     - not (zabbix_agent_docker | bool)
   tags:
-    - zabbix-agent
     - config
-    - init
 
 - name: "Create directory for PSK file if not exist."
   file:
@@ -135,6 +143,8 @@
     - zabbix_agent_tlspskfile is defined
     - zabbix_agent_tlspskfile # https://github.com/ansible-collections/community.zabbix/issues/680
     - not (zabbix_agent2 | bool)
+  tags:
+    - config
 
 - name: "Create directory for PSK file if not exist (zabbix-agent2)"
   file:
@@ -146,6 +156,8 @@
     - zabbix_agent2_tlspskfile is defined
     - zabbix_agent2_tlspskfile # https://github.com/ansible-collections/community.zabbix/issues/680
     - zabbix_agent2 | bool
+  tags:
+    - config
 
 - name: "Place TLS PSK File"
   copy:
@@ -162,6 +174,8 @@
     - not (zabbix_agent2 | bool)
   notify:
     - restart zabbix-agent
+  tags:
+    - config
 
 - name: "Place TLS PSK File (zabbix-agent2)"
   copy:
@@ -178,6 +192,8 @@
     - zabbix_agent2 | bool
   notify:
     - restart zabbix-agent
+  tags:
+    - config
 
 - name: "Create include dir zabbix-agent"
   file:
@@ -189,7 +205,6 @@
   become: true
   tags:
     - config
-    - include
 
 - name: "Install the Docker container"
   include_tasks: Docker.yml
@@ -211,7 +226,6 @@
   when:
     - not (zabbix_agent_docker | bool)
   tags:
-    - init
     - service
 
 - name: "Give zabbix-agent access to system.hw.chassis info"
@@ -220,3 +234,5 @@
     owner: root
     group: zabbix
   when: zabbix_agent_chassis | bool
+  tags:
+    - config

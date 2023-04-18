@@ -18,12 +18,14 @@
   notify:
     - "clean repo files from proxy creds"
   tags:
-    - zabbix-agent
+    - install
 
 - name: Check if warn parameter can be used for shell module
   set_fact:
     produce_warn: False
   when: ansible_version.full is version("2.14", "<")
+  tags:
+    - always
 
 - name: "RedHat | Installing zabbix-agent"
   package:
@@ -38,8 +40,7 @@
   until: zabbix_agent_package_installed is succeeded
   become: true
   tags:
-    - init
-    - zabbix-agent
+    - install
 
 - name: "RedHat | Installing zabbix-{sender,get}"
   package:
@@ -57,8 +58,7 @@
     - not zabbix_agent_install_agent_only
   become: true
   tags:
-    - init
-    - zabbix-agent
+    - install
 
 - name: "RedHat | Enable the service"
   service:
@@ -67,6 +67,4 @@
     use: service
   become: true
   tags:
-    - zabbix-agent
-    - init
     - service
