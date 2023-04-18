@@ -83,9 +83,6 @@ EXAMPLES = '''
     ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
     ansible_host: zabbix-example-fqdn.org
   community.zabbix.zabbix_autoregister:
-    server_url: "http://zabbix.example.com/zabbix/"
-    login_user: Admin
-    login_password: secret
     tls_accept:
       - unsecure
       - tls_with_psk
@@ -103,9 +100,6 @@ EXAMPLES = '''
     ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
     ansible_host: zabbix-example-fqdn.org
   community.zabbix.zabbix_autoregister:
-    server_url: "http://zabbix.example.com/zabbix/"
-    login_user: Admin
-    login_password: secret
     tls_accept: unsecure
 '''
 
@@ -205,10 +199,6 @@ def main():
     )
 
     zabbix_utils.require_creds_params(module)
-
-    for p in ['server_url', 'login_user', 'login_password', 'timeout', 'validate_certs']:
-        if p in module.params and not module.params[p] is None:
-            module.warn('Option "%s" is deprecated with the move to httpapi connection and will be removed in the next release' % p)
 
     tls_accept = module.params['tls_accept']
     tls_psk_identity = module.params['tls_psk_identity']

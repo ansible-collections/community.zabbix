@@ -7,8 +7,6 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-from ansible.module_utils.basic import env_fallback
-
 
 def require_creds_params(module):
     if module._socket_path is None:
@@ -23,22 +21,6 @@ def zabbix_common_argument_spec():
     The options are commonly used by most of Zabbix modules.
     """
     return dict(
-        server_url=dict(
-            type='str',
-            required=False,
-            aliases=['url'],
-            fallback=(env_fallback, ['ZABBIX_SERVER'])
-        ),
-        login_user=dict(
-            type='str', required=False,
-            fallback=(env_fallback, ['ZABBIX_USERNAME'])
-        ),
-        login_password=dict(
-            type='str',
-            required=False,
-            no_log=True,
-            fallback=(env_fallback, ['ZABBIX_PASSWORD'])
-        ),
         http_login_user=dict(
             type='str',
             required=False,
@@ -49,15 +31,7 @@ def zabbix_common_argument_spec():
             required=False,
             default=None,
             no_log=True
-        ),
-        timeout=dict(
-            type='int'
-        ),
-        validate_certs=dict(
-            type='bool',
-            required=False,
-            fallback=(env_fallback, ['ZABBIX_VALIDATE_CERTS'])
-        ),
+        )
     )
 
 

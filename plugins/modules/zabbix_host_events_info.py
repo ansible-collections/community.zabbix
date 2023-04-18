@@ -273,10 +273,6 @@ def main():
 
     zabbix_utils.require_creds_params(module)
 
-    for p in ['server_url', 'login_user', 'login_password', 'timeout', 'validate_certs']:
-        if p in module.params and not module.params[p] is None:
-            module.warn('Option "%s" is deprecated with the move to httpapi connection and will be removed in the next release' % p)
-
     trigger_severity_map = {'not_classified': 0, 'information': 1, 'warning': 2, 'average': 3, 'high': 4, 'disaster': 5}
     host_id = module.params['host_identifier']
     host_id_type = module.params['host_id_type']
