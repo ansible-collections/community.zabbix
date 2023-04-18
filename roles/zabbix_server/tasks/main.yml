@@ -4,7 +4,7 @@
 
 - name: Determine Latest Supported Zabbix Version
   set_fact:
-    zabbix_server_version: "{{ zabbix_valid_server_versions[ansible_distribution_major_version][0] | default(6.2) }}"
+    zabbix_server_version: "{{ zabbix_valid_server_versions[ansible_distribution_major_version][0] | default(6.4) }}"
   when: zabbix_server_version is not defined
 
 - name: Set More Variables
