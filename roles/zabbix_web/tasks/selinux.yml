@@ -1,5 +1,4 @@
 ---
-
 - name: "SELinux | RedHat | Install related SELinux package"
   yum:
     name:
@@ -16,7 +15,7 @@
     - selinux_allow_zabbix_can_network
     - ansible_distribution_major_version == "7" or ansible_distribution_major_version == "6"
   tags:
-    - zabbix-web
+    - install
 
 - name: "SELinux | RedHat | Install related SELinux package on RHEL9 and RHEL8"
   yum:
@@ -34,7 +33,7 @@
     - selinux_allow_zabbix_can_network
     - ansible_distribution_major_version|int >= 8
   tags:
-    - zabbix-web
+    - install
 
 - name: "SELinux | RedHat | Enable zabbix_can_network SELinux boolean"
   ansible.posix.seboolean:
@@ -46,7 +45,7 @@
     - ansible_os_family == "RedHat"
     - selinux_allow_zabbix_can_network
   tags:
-    - zabbix-web
+    - config
 
 - name: "SELinux | Allow httpd to connect to db (SELinux)"
   ansible.posix.seboolean:
@@ -57,7 +56,8 @@
   when:
     - ansible_selinux.status == "enabled"
     - selinux_allow_zabbix_can_network
-  tags: selinux
+  tags:
+    - config
 
 - name: "SELinux | Allow httpd to connect to zabbix (SELinux)"
   ansible.posix.seboolean:
@@ -68,7 +68,8 @@
   when:
     - ansible_selinux.status == "enabled"
     - selinux_allow_zabbix_can_network
-  tags: selinux
+  tags:
+    - config
 
 - name: "SELinux | Allow httpd to connect to ldap (SELinux)"
   ansible.posix.seboolean:
@@ -79,4 +80,5 @@
   when:
     - ansible_selinux.status == "enabled"
     - zabbix_apache_can_connect_ldap | bool
-  tags: selinux
+  tags:
+    - config

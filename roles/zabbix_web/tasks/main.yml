@@ -8,39 +8,52 @@
   set_fact:
     zabbix_web_version: "{{ zabbix_valid_web_versions[ansible_distribution_major_version][0] | default(6.2) }}"
   when: zabbix_web_version is not defined
+  tags:
+    - always
 
 - name: Set More Variables
   set_fact:
     zabbix_valid_version: "{{ zabbix_web_version|float in zabbix_valid_web_versions[ansible_distribution_major_version] }}"
     zabbix_db_type_long: "{{ 'postgresql' if zabbix_server_database == 'pgsql' else 'mysql' }}"
+  tags:
+    - always
 
 - name: Stopping Install of Invalid Version
   fail:
     msg: Zabbix version {{ zabbix_web_version }} is not supported on {{ ansible_distribution }} {{ ansible_distribution_major_version }}
   when: not zabbix_valid_version
+  tags:
+    - always
 
 - name: Determine PHP Version
   shell: php --version | head -1 | awk '{ print $2 }' | awk -F '.' '{print $1"."$2}'
   register: _zabbix_web_php_installed_version
   changed_when: false
+  tags:
+    - config
+    - install
 
 - name: Set PHP Version
   set_fact:
     zabbix_web_php_installed_version: "{{ _zabbix_web_php_installed_version.stdout }}"
+  tags:
+    - config
+    - install
 
 - name: Set PHP Variables
   set_fact:
     zabbix_php_fpm_listen: "{{ zabbix_php_fpm_listen if zabbix_php_fpm_listen is defined else _zabbix_php_fpm_listen }}"
     zabbix_php_fpm_dir: "{{ zabbix_php_fpm_dir if zabbix_php_fpm_dir is defined else _php_fpm_dir }}"
     zabbix_php_fpm_session: "{{ zabbix_php_fpm_session if zabbix_php_fpm_session is defined else _php_fpm_session }}"
+  tags:
+    - config
+    - install
 
 - name: Include OS Specific Tasks
   include_tasks: "{{ ansible_os_family }}.yml"
 
 - name: "Install the web server specific tasks"
   include_tasks: "{{ zabbix_web_http_server }}.yml"
-  tags:
-    - zabbix-web
 
 - name: "Create zabbix-web directory"
   file:
@@ -50,8 +63,7 @@
     state: directory
     mode: 0755
   tags:
-    - zabbix-web
-    - init
+    - install
     - config
 
 - name: "Configure zabbix-web"
@@ -64,8 +76,6 @@
   notify:
     - "restart {{ zabbix_web_http_server }}"
   tags:
-    - zabbix-web
-    - init
     - config
 
 - name: "Debian | Install PHP"
@@ -81,3 +91,5 @@
     - ansible_os_family == "Debian"
   notify:
     - restart php-fpm-version
+  tags:
+    - config

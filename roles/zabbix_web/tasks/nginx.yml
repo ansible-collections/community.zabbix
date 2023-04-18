@@ -7,6 +7,9 @@
     zabbix_web_vhost_location: "{{ zabbix_web_vhost_location if zabbix_web_vhost_location is defined else _nginx_vhost_location }}"
     zabbix_nginx_log_path: "{{ zabbix_nginx_log_path if zabbix_nginx_log_path is defined else _nginx_log_path }}"
     zabbix_nginx_service: "{{ zabbix_nginx_service if zabbix_nginx_service is defined else _nginx_service }}"
+  tags:
+    - config
+    - install
 
 - name: "Nginx | Installing Zabbix Nginx Conf"
   block:
@@ -39,6 +42,8 @@
       until: zabbix_apache_conf_install is succeeded
       become: true
       when: ansible_os_family == "RedHat"
+  tags:
+    - install
 
 - name: "Nginx | Install vhost in conf.d"
   template:
@@ -52,3 +57,5 @@
   become: true
   notify:
     - restart nginx
+  tags:
+    - config
