@@ -1,6 +1,8 @@
 ---
 - name: "Debian | Include Zabbix gpg ids"
   include_vars: zabbix.yml
+  tags:
+    - always
 
 - name: "Debian | Set some variables"
   set_fact:
@@ -13,6 +15,8 @@
     zabbix_python_prefix: "python{% if ansible_python_version is version('3', '>=') %}3{% endif %}"
   when:
     - ansible_machine != "aarch64"
+  tags:
+    - always
 
 - name: "Debian | Set some variables"
   set_fact:
@@ -25,26 +29,14 @@
     zabbix_python_prefix: "python{% if ansible_python_version is version('3', '>=') %}3{% endif %}"
   when:
     - ansible_machine == "aarch64"
-
-- name: "Debian | Set some facts for Zabbix < 6.0"
-  set_fact:
-    datafiles_path: /usr/share/doc/zabbix-server-{{ zabbix_server_database }}
-  when:
-    - zabbix_server_version is version('6.0', '<')
   tags:
-    - zabbix-server
-    - init
-    - config
+    - always
 
-- name: "Debian | Set some facts for Zabbix >= 6.0"
+- name: "Debian | Set some facts for Zabbix"
   set_fact:
     datafiles_path: /usr/share/zabbix-sql-scripts/{{ 'postgresql' if zabbix_server_database == 'pgsql' else 'mysql' }}
-  when:
-    - zabbix_server_version is version('6.0', '>=')
   tags:
-    - zabbix-server
-    - init
-    - config
+    - always
 
 - name: "Debian | Installing gnupg"
   apt:
@@ -59,6 +51,8 @@
   register: gnupg_installed
   until: gnupg_installed is succeeded
   become: true
+  tags:
+    - install
 
 - name: "Debian | Install gpg key"
   apt_key:
@@ -68,8 +62,7 @@
   until: zabbix_server_repo_files_installed is succeeded
   become: true
   tags:
-    - zabbix-server
-    - init
+    - install
 
 - name: "Debian | Installing repository {{ ansible_distribution }}"
   apt_repository:
@@ -80,8 +73,7 @@
     - deb-src
     - deb
   tags:
-    - zabbix-server
-    - init
+    - install
 
 - name: "Debian | Create /etc/apt/preferences.d/"
   file:
@@ -91,6 +83,8 @@
   when:
     - zabbix_server_apt_priority | int
   become: true
+  tags:
+    - install
 
 - name: "Debian | Configuring the weight for APT"
   copy:
@@ -104,6 +98,8 @@
   when:
     - zabbix_server_apt_priority | int
   become: true
+  tags:
+    - install
 
 - name: "Debian | apt-get clean"
   shell: apt-get clean; apt-get update
@@ -113,6 +109,7 @@
   become: true
   tags:
     - skip_ansible_lint
+    - install
 
 # On certain 18.04 images, such as docker or lxc, dpkg is configured not to
 # install files into paths /usr/share/doc/*
@@ -124,6 +121,8 @@
   failed_when: false
   changed_when: false
   check_mode: false
+  tags:
+    - install
 
 - name: "Debian | Allow Zabbix dpkg installs to /usr/share/doc/zabbix*"
   lineinfile:
@@ -132,6 +131,8 @@
   become: true
   when:
     - dpkg_exclude_line.rc == 0
+  tags:
+    - install
 
 - name: "Debian | Installing zabbix-server-{{ zabbix_server_database }}"
   apt:
@@ -148,8 +149,7 @@
   until: zabbix_server_package_installed is succeeded
   become: true
   tags:
-    - zabbix-server
-    - init
+    - install
 
 - name: "Debian | Installing zabbix-sql-scripts"
   apt:
@@ -168,8 +168,7 @@
     - zabbix_server_version is version('5.4', '>=')
   become: true
   tags:
-    - zabbix-server
-    - init
+    - install
 
 - name: "Debian | Install Database Client Package"
   block:
@@ -221,6 +220,6 @@
         - zabbix_server_database == 'pgsql'
   when: zabbix_server_install_database_client
   tags:
-    - zabbix-server
-    - init
+    - install
     - database
+    - dependencies

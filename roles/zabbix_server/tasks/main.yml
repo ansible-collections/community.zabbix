@@ -1,21 +1,29 @@
 ---
 - name: Include OS-specific variables
   include_vars: "{{ ansible_os_family }}.yml"
+  tags:
+    - always
 
 - name: Determine Latest Supported Zabbix Version
   set_fact:
     zabbix_server_version: "{{ zabbix_valid_server_versions[ansible_distribution_major_version][0] | default(6.2) }}"
   when: zabbix_server_version is not defined
+  tags:
+    - always
 
 - name: Set More Variables
   set_fact:
     zabbix_db_type_long: "{{ 'postgresql' if zabbix_server_database == 'pgsql' else 'mysql' }}"
     zabbix_valid_version: "{{ zabbix_server_version|float in zabbix_valid_server_versions[ansible_distribution_major_version] }}"
+  tags:
+    - always
 
 - name: Stopping Install of Invalid Version
   fail:
     msg: Zabbix version {{ zabbix_server_version }} is not supported on {{ ansible_distribution }} {{ ansible_distribution_major_version }}
   when: not zabbix_valid_version
+  tags:
+    - always
 
 - name: Install the correct repository
   include_tasks: "{{ ansible_os_family }}.yml"
@@ -33,8 +41,6 @@
   notify:
     - zabbix-server restarted
   tags:
-    - zabbix-server
-    - init
     - config
 
 - name: "Create include dir zabbix-server"
@@ -45,8 +51,7 @@
     state: directory
     mode: "{{ zabbix_server_include_mode }}"
   tags:
-    - zabbix-server
-    - init
+    - install
     - config
 
 - name: "Add zabbix-server scripts"
@@ -60,5 +65,5 @@
     state: "{{ zabbix_service_state }}"
     enabled: "{{ zabbix_service_enabled }}"
   tags:
-    - zabbix-server
+    - service
   when: zabbix_server_manage_service | bool

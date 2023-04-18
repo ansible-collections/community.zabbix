@@ -6,17 +6,23 @@
     delegated_dbhost: "{{ zabbix_server_dbhost if (zabbix_server_dbhost != 'localhost') else inventory_hostname }}"
   when:
     - zabbix_server_dbhost_run_install
+  tags:
+    - database
 
 - name: "MySQL | Set the correct delegated_dbhost (to support MySQL db deployment on a remote dbhost)"
   set_fact:
     delegated_dbhost: "{{ inventory_hostname }}"
   when:
     - not zabbix_server_dbhost_run_install
+  tags:
+    - database
 
 - name: "MySQL | Override delegated_dbhost with real dbhost when dbhost is behind loadbalancer"
   set_fact:
     delegated_dbhost: "{{ zabbix_server_real_dbhost }}"
   when: zabbix_server_real_dbhost | default(false)
+  tags:
+    - database
 
 - name: "MySQL | Create database"
   community.mysql.mysql_db:
@@ -33,7 +39,6 @@
   register: zabbix_database_created
   delegate_to: "{{ delegated_dbhost }}"
   tags:
-    - zabbix-server
     - database
     - skip_ansible_lint
 
@@ -53,7 +58,6 @@
   when: zabbix_server_database_creation
   delegate_to: "{{ delegated_dbhost }}"
   tags:
-    - zabbix-server
     - database
 
 - name: "MySQL | Get the file for create.sql"
@@ -63,7 +67,6 @@
     - zabbix_server_database_sqlload | bool
   register: ls_output_create
   tags:
-    - zabbix-server
     - database
 
 - name: MySQL | Get current database version
@@ -74,6 +77,8 @@
   register: mysql_db_version
   changed_when: false
   ignore_errors: true
+  tags:
+    - database
 
 # If the above check failed, then there was no dbversion table in the database.
 # We'll create it, below. Otherwise, we can access the database version in
@@ -93,7 +98,6 @@
   delegate_to: "{{ delegated_dbhost }}"
   register: mysql_innodb_default_row_format
   tags:
-    - zabbix-server
     - database
 
 - name: "MySQL | Set innodb_default_row_format to dynamic"
@@ -111,7 +115,6 @@
     - mysql_innodb_default_row_format.msg != 'dynamic'
   delegate_to: "{{ delegated_dbhost }}"
   tags:
-    - zabbix-server
     - database
 
 - name: "MySQL | Disable InnoDB Strict Mode"
@@ -129,7 +132,6 @@
     - ansible_distribution_release == "buster"
   delegate_to: "{{ delegated_dbhost }}"
   tags:
-    - zabbix-server
     - database
 
 - name: "MySQL | Fetch sql create file"
@@ -141,6 +143,8 @@
     - delegated_dbhost != inventory_hostname
     - zabbix_server_database_sqlload | bool
     - mysql_schema_empty
+  tags:
+    - database
 
 - name: "MySQL | Copy sql create file"
   copy:
@@ -152,6 +156,8 @@
     - delegated_dbhost != inventory_hostname
     - zabbix_server_database_sqlload | bool
     - mysql_schema_empty
+  tags:
+    - database
 
 - name: "MySQL | Create database and import file"
   community.mysql.mysql_db:
@@ -171,7 +177,6 @@
     - mysql_schema_empty
   delegate_to: "{{ delegated_dbhost }}"
   tags:
-    - zabbix-server
     - database
 
 - name: "MySQL | Revert innodb_default_row_format to previous value"
@@ -189,7 +194,6 @@
     - mysql_innodb_default_row_format.msg != 'dynamic'
   delegate_to: "{{ delegated_dbhost }}"
   tags:
-    - zabbix-server
     - database
 
 - name: "MySQL | Check if we have sql_done files"
@@ -200,3 +204,5 @@
   when:
     - zabbix_server_database_sqlload | bool
     - mysql_schema_empty
+  tags:
+    - database
