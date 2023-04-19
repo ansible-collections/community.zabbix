@@ -174,6 +174,17 @@ When the target host does not have access to the internet, but you do have a pro
 * `zabbix_http_proxy`
 * `zabbix_https_proxy`
 
+## Tags
+
+The majority of tasks within this role are tagged as follows:
+
+* `install`:  Tasks associated with the installation of software.
+* `dependencies`:  Installation tasks related to dependencies that aren't part of the core zabbix installation.
+* `database`: Tasks associated with the installation or configuration of the database.
+* `api`:  Tasks associated with using the Zabbix API to connect and modify the Zabbix server.
+* `config`:  Tasks associated with the configuration of Zabbix or a supporting service.
+* `service`:  Tasks associated with managing a service.
+
 # Example Playbook
 
 There are two ways of using the zabbix-web:
