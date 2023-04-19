@@ -1,8 +1,4 @@
 ---
-- name: test - do not run tests for Zabbix 3.0
-  meta: end_play
-  when: zabbix_version is version('3.0', '=')
-
 - name: test - prepare example template for zabbix_action module
   zabbix_template:
     template_name: ExampleTemplateForActionModule
@@ -54,39 +50,37 @@
   - assert:
       that: zbxaction_new.changed is sameas False
 
-  - when: zabbix_version is version('3.4', '>=')
-    block:
-    - name: test - update action with esc_period as string
-      zabbix_action:
-        esc_period: 2m
-      register: zbxaction_escperiod_str
+  - name: test - update action with esc_period as string
+    zabbix_action:
+      esc_period: 2m
+    register: zbxaction_escperiod_str
 
-    - assert:
-        that: zbxaction_escperiod_str.changed is sameas True
+  - assert:
+      that: zbxaction_escperiod_str.changed is sameas True
 
-    - name: test - update action with esc_period as string (again)
-      zabbix_action:
-        esc_period: 2m
-      register: zbxaction_escperiod_str
+  - name: test - update action with esc_period as string (again)
+    zabbix_action:
+      esc_period: 2m
+    register: zbxaction_escperiod_str
 
-    - assert:
-        that: zbxaction_escperiod_str.changed is sameas False
+  - assert:
+      that: zbxaction_escperiod_str.changed is sameas False
 
-    - name: test - update action with esc_period as macro
-      zabbix_action:
-        esc_period: '{$MYMACRO}'
-      register: zbxaction_escperiod_macro
+  - name: test - update action with esc_period as macro
+    zabbix_action:
+      esc_period: '{$MYMACRO}'
+    register: zbxaction_escperiod_macro
 
-    - assert:
-        that: zbxaction_escperiod_macro.changed is sameas True
+  - assert:
+      that: zbxaction_escperiod_macro.changed is sameas True
 
-    - name: test - update action with esc_period as macro (again)
-      zabbix_action:
-        esc_period: '{$MYMACRO}'
-      register: zbxaction_escperiod_macro
+  - name: test - update action with esc_period as macro (again)
+    zabbix_action:
+      esc_period: '{$MYMACRO}'
+    register: zbxaction_escperiod_macro
 
-    - assert:
-        that: zbxaction_escperiod_macro.changed is sameas False
+  - assert:
+      that: zbxaction_escperiod_macro.changed is sameas False
 
   - name: test - update action with esc_period
     zabbix_action:
@@ -128,89 +122,6 @@
 
   - assert:
       that: zbxaction_reset.changed is sameas True
-
-  - when: zabbix_version is version('5.0', '<')
-    block:
-    - name: test - update action with default_subject and default_message
-      zabbix_action:
-        default_subject: Example default subject
-        default_message: Example default message
-      register: zbxaction_def_msgsubj
-
-    - assert:
-        that: zbxaction_def_msgsubj.changed is sameas True
-
-    - name: test - update action with default_subject and default_message (again)
-      zabbix_action:
-        default_subject: Example default subject
-        default_message: Example default message
-      register: zbxaction_def_msgsubj
-
-    - assert:
-        that: zbxaction_def_msgsubj.changed is sameas False
-
-  - when:
-      - zabbix_version is version('3.2', '>=')
-      - zabbix_version is version('5.0', '<')
-    block:
-    - name: test - update action with recovery_default_subject and recovery_default_message
-      zabbix_action:
-        default_subject: Example default subject
-        default_message: Example default message
-        recovery_default_subject: Example recovery subject
-        recovery_default_message: Example recovery message
-      register: zbxaction_rec_msgsubj
-
-    - assert:
-        that: zbxaction_rec_msgsubj.changed is sameas True
-
-    - name: test - update action with recovery_default_subject and recovery_default_message (again)
-      zabbix_action:
-        default_subject: Example default subject
-        default_message: Example default message
-        recovery_default_subject: Example recovery subject
-        recovery_default_message: Example recovery message
-      register: zbxaction_rec_msgsubj
-
-    - assert:
-        that: zbxaction_rec_msgsubj.changed is sameas False
-
-  - when:
-      - zabbix_version is version('3.4', '>=')
-      - zabbix_version is version('5.0', '<')
-    block:
-    - name: test - update action with acknowledge_default_subject and acknowledge_default_message
-      zabbix_action:
-        default_subject: Example default subject
-        default_message: Example default message
-        recovery_default_subject: Example recovery subject
-        recovery_default_message: Example recovery message
-        acknowledge_default_subject: Example acknowledge subject
-        acknowledge_default_message: Example acknowledge message
-      register: zbxaction_ack_msgsubj
-
-    - assert:
-        that: zbxaction_ack_msgsubj.changed is sameas True
-
-    - name: test - update action with acknowledge_default_subject and acknowledge_default_message (again)
-      zabbix_action:
-        default_subject: Example default subject
-        default_message: Example default message
-        recovery_default_subject: Example recovery subject
-        recovery_default_message: Example recovery message
-        acknowledge_default_subject: Example acknowledge subject
-        acknowledge_default_message: Example acknowledge message
-      register: zbxaction_ack_msgsubj
-
-    - assert:
-        that: zbxaction_ack_msgsubj.changed is sameas False
-
-    - name: test - reset action to default
-      zabbix_action:
-      register: zbxaction_reset
-
-    - assert:
-        that: zbxaction_reset.changed is sameas True
 
   - name: test - disable action
     zabbix_action:
@@ -630,101 +541,6 @@
 
   - assert:
       that: zbxaction_delete.changed is sameas True
-- name: test - trigger actions with remote_script operations with < Zabbix 6.0
-  when: zabbix_version is version('6.0', '<')
-  module_defaults:
-    community.zabbix.zabbix_action:
-      state: present
-      status: enabled
-      name: ExampleTriggerActionOperations
-      event_source: trigger
-      esc_period: 60
-      conditions:
-        - type: trigger_severity
-          operator: '>='
-          value: Average
-
-  block:
-  - name: test - create new action with remote_command operations
-    zabbix_action:
-      operations:
-        - type: remote_command
-          command_type: custom_script
-          command: /usr/local/bin/do_something.sh
-          execute_on: agent
-          run_on_hosts: 0
-        - type: remote_command
-          command_type: ssh
-          command: /usr/local/bin/do_something.sh
-          run_on_hosts: 0
-          ssh_auth_type: password
-          username: root
-          password: zabbix
-        - type: remote_command
-          command_type: global_script
-          script_name: Ping
-          run_on_hosts: 0
-    register: zbxaction_rmtcmd
-
-  - assert:
-      that: zbxaction_rmtcmd.changed is sameas True
-
-  - name: test - create new action with remote_command operations (again)
-    zabbix_action:
-      operations:
-        - type: remote_command
-          command_type: custom_script
-          command: /usr/local/bin/do_something.sh
-          execute_on: agent
-          run_on_hosts: 0
-        - type: remote_command
-          command_type: ssh
-          command: /usr/local/bin/do_something.sh
-          run_on_hosts: 0
-          ssh_auth_type: password
-          username: root
-          password: zabbix
-        - type: remote_command
-          command_type: global_script
-          script_name: Ping
-          run_on_hosts: 0
-    register: zbxaction_rmtcmd
-
-  - assert:
-      that: zbxaction_rmtcmd.changed is sameas False
-
-  - name: test - update ssh remote_command auth in action with remote_command operations
-    zabbix_action:
-      operations:
-        - type: remote_command
-          command_type: custom_script
-          command: /usr/local/bin/do_something.sh
-          execute_on: agent
-          run_on_hosts: 0
-        - type: remote_command
-          command_type: ssh
-          command: /usr/local/bin/do_something.sh
-          run_on_hosts: 0
-          ssh_auth_type: public_key
-          username: root
-          ssh_privatekey_file: /etc/zabbix/.ssh/id_test
-          ssh_publickey_file: /etc/zabbix/.ssh/id_test.pub
-        - type: remote_command
-          command_type: global_script
-          script_name: Ping
-          run_on_hosts: 0
-    register: zbxaction_rmtcmd
-
-  - assert:
-      that: zbxaction_rmtcmd.changed is sameas True
-
-  - name: test - delete action
-    zabbix_action:
-      state: absent
-    register: zbxaction_delete
-
-  - assert:
-      that: zbxaction_delete.changed is sameas True
 
 - name: test - discovery actions
   module_defaults:
@@ -1059,146 +875,7 @@
   - assert:
       that: zbxaction_delete.changed is sameas True
 
-- name: test - actions with recovery and acknowledge operations with < Zabbix 6.0
-  when:
-    - zabbix_version is version('3.4', '>=')
-    - zabbix_version is version('6.0', '<')
-  module_defaults:
-    community.zabbix.zabbix_action:
-      state: present
-      status: enabled
-      name: ExampleTriggerActionRecAckOps
-      event_source: trigger
-      esc_period: 60
-      conditions:
-        - type: trigger_severity
-          operator: '>='
-          value: Information
-      operations:
-        - type: send_message
-          subject: ExampleSubject
-          op_message: ExampleMessage
-          media_type: ExampleMediaTypeForActionModule
-          send_to_users:
-            - Admin
-
-  block:
-  - name: test - create new action with recovery and acknowledge operations
-    zabbix_action:
-      recovery_operations:
-        - type: send_message
-          subject: ExampleSubject
-          op_message: ExampleMessage
-          media_type: ExampleMediaTypeForActionModule
-          send_to_users:
-            - Admin
-        - type: remote_command
-          command_type: custom_script
-          command: /usr/local/bin/do_something.sh
-          execute_on: agent
-          run_on_hosts: 0
-        - type: remote_command
-          command_type: ssh
-          command: /usr/local/bin/do_something.sh
-          run_on_hosts: 0
-          ssh_auth_type: password
-          username: root
-          password: zabbix
-        - type: notify_all_involved
-          subject: RecoverySubject
-          op_message: RecoveryMessage
-      acknowledge_operations:
-        - type: send_message
-          subject: ExampleSubject
-          op_message: ExampleMessage
-          media_type: ExampleMediaTypeForActionModule
-          send_to_users:
-            - Admin
-        - type: remote_command
-          command_type: ssh
-          command: /usr/local/bin/do_something.sh
-          run_on_hosts: 0
-          ssh_auth_type: public_key
-          username: root
-          ssh_privatekey_file: /etc/zabbix/.ssh/id_test
-          ssh_publickey_file: /etc/zabbix/.ssh/id_test.pub
-        - type: remote_command
-          command_type: global_script
-          script_name: Ping
-          run_on_hosts: 0
-        - type: notify_all_involved
-          subject: RecoverySubject
-          op_message: RecoveryMessage
-          media_type: ExampleMediaTypeForActionModule
-    register: zbxaction_recack_new
-
-  - assert:
-      that: zbxaction_recack_new.changed is sameas True
-
-  - name: test - create new action with recovery and acknowledge operations (again)
-    zabbix_action:
-      recovery_operations:
-        - type: send_message
-          subject: ExampleSubject
-          op_message: ExampleMessage
-          media_type: ExampleMediaTypeForActionModule
-          send_to_users:
-            - Admin
-        - type: remote_command
-          command_type: custom_script
-          command: /usr/local/bin/do_something.sh
-          execute_on: agent
-          run_on_hosts: 0
-        - type: remote_command
-          command_type: ssh
-          command: /usr/local/bin/do_something.sh
-          run_on_hosts: 0
-          ssh_auth_type: password
-          username: root
-          password: zabbix
-        - type: notify_all_involved
-          subject: RecoverySubject
-          op_message: RecoveryMessage
-      acknowledge_operations:
-        - type: send_message
-          subject: ExampleSubject
-          op_message: ExampleMessage
-          media_type: ExampleMediaTypeForActionModule
-          send_to_users:
-            - Admin
-        - type: remote_command
-          command_type: ssh
-          command: /usr/local/bin/do_something.sh
-          run_on_hosts: 0
-          ssh_auth_type: public_key
-          username: root
-          ssh_privatekey_file: /etc/zabbix/.ssh/id_test
-          ssh_publickey_file: /etc/zabbix/.ssh/id_test.pub
-        - type: remote_command
-          command_type: global_script
-          script_name: Ping
-          run_on_hosts: 0
-        - type: notify_all_involved
-          subject: RecoverySubject
-          op_message: RecoveryMessage
-          media_type: ExampleMediaTypeForActionModule
-    register: zbxaction_recack_new
-
-  - assert:
-      that: zbxaction_recack_new.changed is sameas False
-
-  - name: test - delete action
-    zabbix_action:
-      state: absent
-    register: zbxaction_delete
-
-  - assert:
-      that: zbxaction_delete.changed is sameas True
-
-- name: test - actions with recovery and acknowledge operations with >= Zabbx 6.0
-  when:
-    - zabbix_version is version('6.0', '>=')
-  module_defaults:
+- module_defaults:
     community.zabbix.zabbix_action:
       state: present
       status: enabled
@@ -1341,31 +1018,6 @@
 
   - assert:
       that: zbxaction_delete.changed is sameas True
-
-- name: test - Output error message when user sets application to conditions with >= Zabbix 5.4
-  community.zabbix.zabbix_action:
-    name: ExampleApplicationAction
-    event_source: trigger
-    esc_period: 60
-    conditions:
-      - type: application
-        operator: like
-        value: AnsibleTest
-    operations:
-      - type: send_message
-        subject: ExampleSubject
-        op_message: ExampleMessage
-        media_type: ExampleMediaTypeForActionModule
-        send_to_users:
-          - Admin
-  ignore_errors: true
-  register: zbxaction_application
-
-- assert:
-    that:
-      - zbxaction_application.failed is sameas True
-      - zbxaction_application.msg == "'application' is disabled for condition type since 5.4 version."
-  when: zabbix_version is version('5.4', '>=')
 
 - name: delete ExampleApplicationAction action
   community.zabbix.zabbix_action:
