@@ -1,8 +1,4 @@
 ---
-- name: test - do not run tests for Zabbix 3.0
-  meta: end_play
-  when: zabbix_version is version('3.0', '=')
-
 - name: test - Zabbix discovery rule
   module_defaults:
     community.zabbix.zabbix_discovery_rule:
@@ -11,7 +7,6 @@
       iprange: 192.168.1.1-255
       dchecks:
         - type: ICMP
-      delay: "{{ 3600 if zabbix_version is version('3.4', '<=') else omit }}"
 
   block:
   - name: test - create new Zabbix discovery rule (checkmode)
