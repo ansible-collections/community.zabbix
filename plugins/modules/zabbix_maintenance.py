@@ -8,7 +8,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = r'''
+DOCUMENTATION = r"""
 ---
 module: zabbix_maintenance
 short_description: Create Zabbix maintenance windows
@@ -57,13 +57,13 @@ options:
         description:
             - Type of maintenance. With data collection, or without.
         type: bool
-        default: 'yes'
+        default: "yes"
     visible_name:
         description:
             - Type of zabbix host name to use for identifying hosts to include in the maintenance.
             - I(visible_name=yes) to search by visible name,  I(visible_name=no) to search by technical name.
         type: bool
-        default: 'yes'
+        default: "yes"
     tags:
         description:
             - List of tags to assign to the hosts in maintenance.
@@ -80,7 +80,7 @@ options:
                 description:
                     - Value of the tag.
                 type: str
-                default: ''
+                default: ""
             operator:
                 description:
                     - Condition operator.
@@ -100,9 +100,9 @@ notes:
     - Module creates maintenance window from now() to now() + minutes,
       so if Zabbix server's time and host's time are not synchronized,
       you will get strange results.
-'''
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 # If you want to use Username and Password to be authenticated by Zabbix Server
 - name: Set credentials to access Zabbix Server API
   set_fact:
@@ -123,7 +123,7 @@ EXAMPLES = r'''
     ansible_httpapi_port: 443
     ansible_httpapi_use_ssl: true
     ansible_httpapi_validate_certs: false
-    ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
+    ansible_zabbix_url_path: "zabbixeu"  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
     ansible_host: zabbix-example-fqdn.org
   community.zabbix.zabbix_maintenance:
     name: Update of www1
@@ -139,7 +139,7 @@ EXAMPLES = r'''
     ansible_httpapi_port: 443
     ansible_httpapi_use_ssl: true
     ansible_httpapi_validate_certs: false
-    ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
+    ansible_zabbix_url_path: "zabbixeu"  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
     ansible_host: zabbix-example-fqdn.org
   community.zabbix.zabbix_maintenance:
     name: Update of www1
@@ -164,7 +164,7 @@ EXAMPLES = r'''
     ansible_httpapi_port: 443
     ansible_httpapi_use_ssl: true
     ansible_httpapi_validate_certs: false
-    ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
+    ansible_zabbix_url_path: "zabbixeu"  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
     ansible_host: zabbix-example-fqdn.org
   community.zabbix.zabbix_maintenance:
     name: update
@@ -182,12 +182,12 @@ EXAMPLES = r'''
     ansible_httpapi_port: 443
     ansible_httpapi_use_ssl: true
     ansible_httpapi_validate_certs: false
-    ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
+    ansible_zabbix_url_path: "zabbixeu"  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
     ansible_host: zabbix-example-fqdn.org
   community.zabbix.zabbix_maintenance:
     name: Test1
     state: absent
-'''
+"""
 
 import datetime
 import time
@@ -217,7 +217,7 @@ class MaintenanceModule(ZabbixBase):
             }]
         }
         if tags is not None:
-            parameters['tags'] = tags
+            parameters["tags"] = tags
         self._zapi.maintenance.create(parameters)
         return 0, None, None
 
@@ -239,7 +239,7 @@ class MaintenanceModule(ZabbixBase):
             }]
         }
         if tags is not None:
-            parameters['tags'] = tags
+            parameters["tags"] = tags
         self._zapi.maintenance.update(parameters)
         return 0, None, None
 
@@ -321,35 +321,35 @@ class MaintenanceModule(ZabbixBase):
             return True
         if str(int(start_time + period)) != maintenance["active_till"]:
             return True
-        if str(desc) != maintenance['description']:
+        if str(desc) != maintenance["description"]:
             return True
-        if tags is not None and 'tags' in maintenance:
-            if sorted(tags, key=lambda k: k['tag']) != sorted(maintenance['tags'], key=lambda k: k['tag']):
+        if tags is not None and "tags" in maintenance:
+            if sorted(tags, key=lambda k: k["tag"]) != sorted(maintenance["tags"], key=lambda k: k["tag"]):
                 return True
 
 
 def main():
     argument_spec = zabbix_utils.zabbix_common_argument_spec()
     argument_spec.update(dict(
-        state=dict(type='str', required=False, default='present',
-                   choices=['present', 'absent']),
-        host_names=dict(type='list', required=False,
-                        default=None, aliases=['host_name'], elements='str'),
-        minutes=dict(type='int', required=False, default=10),
-        host_groups=dict(type='list', required=False,
-                         default=None, aliases=['host_group'], elements='str'),
-        name=dict(type='str', required=True),
-        desc=dict(type='str', required=False, default="Created by Ansible"),
-        collect_data=dict(type='bool', required=False, default=True),
-        visible_name=dict(type='bool', required=False, default=True),
+        state=dict(type="str", required=False, default="present",
+                   choices=["present", "absent"]),
+        host_names=dict(type="list", required=False,
+                        default=None, aliases=["host_name"], elements="str"),
+        minutes=dict(type="int", required=False, default=10),
+        host_groups=dict(type="list", required=False,
+                         default=None, aliases=["host_group"], elements="str"),
+        name=dict(type="str", required=True),
+        desc=dict(type="str", required=False, default="Created by Ansible"),
+        collect_data=dict(type="bool", required=False, default=True),
+        visible_name=dict(type="bool", required=False, default=True),
         tags=dict(
-            type='list',
-            elements='dict',
+            type="list",
+            elements="dict",
             required=False,
             options=dict(
-                tag=dict(type='str', required=True),
-                operator=dict(type='int', default=2),
-                value=dict(type='str', default='')
+                tag=dict(type="str", required=True),
+                operator=dict(type="int", default=2),
+                value=dict(type="str", default="")
             )
         )
     ))
@@ -362,15 +362,15 @@ def main():
 
     maint = MaintenanceModule(module)
 
-    host_names = module.params['host_names']
-    host_groups = module.params['host_groups']
-    state = module.params['state']
-    minutes = module.params['minutes']
-    name = module.params['name']
-    desc = module.params['desc']
-    collect_data = module.params['collect_data']
-    visible_name = module.params['visible_name']
-    tags = module.params['tags']
+    host_names = module.params["host_names"]
+    host_groups = module.params["host_groups"]
+    state = module.params["state"]
+    minutes = module.params["minutes"]
+    name = module.params["name"]
+    desc = module.params["desc"]
+    collect_data = module.params["collect_data"]
+    visible_name = module.params["visible_name"]
+    tags = module.params["tags"]
 
     if collect_data:
         maintenance_type = 0
@@ -461,5 +461,5 @@ def main():
     module.exit_json(changed=changed)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
