@@ -10,8 +10,8 @@
       - Linux servers
       - Zabbix servers
     link_templates:
-      - "{{ 'IMAP Service' if zabbix_version | float >= 5.2 else 'Template App IMAP Service' }}"
-      - "{{ 'NTP Service' if zabbix_version | float >= 5.2 else 'Template App NTP Service' }}"
+      - 'IMAP Service'
+      - 'NTP Service'
     status: enabled
     state: present
     inventory_mode: manual
@@ -45,7 +45,7 @@
         value: ExampleMacroValue
       - macro: EXAMPLEMACRO2
         value: ExampleMacroValue2
-        description: Example desc that work only with Zabbix 4.4 and higher
+        description: Example desc
     tags:
       - tag: ExampleHostsTag
       - tag: ExampleHostsTag2
