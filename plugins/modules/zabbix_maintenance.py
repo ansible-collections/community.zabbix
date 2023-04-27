@@ -16,7 +16,7 @@ description:
     - This module will let you create Zabbix maintenance windows.
 author: "Alexander Bulimov (@abulimov)"
 requirements:
-    - "python >= 2.6"
+    - "python >= 3.9"
 options:
     state:
         description:
@@ -64,7 +64,6 @@ options:
             - I(visible_name=yes) to search by visible name,  I(visible_name=no) to search by technical name.
         type: bool
         default: 'yes'
-        version_added: '2.0.0'
     tags:
         description:
             - List of tags to assign to the hosts in maintenance.
@@ -197,7 +196,6 @@ from ansible.module_utils.basic import AnsibleModule
 
 from ansible_collections.community.zabbix.plugins.module_utils.base import ZabbixBase
 import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabbix_utils
-from ansible.module_utils.compat.version import LooseVersion
 
 
 class MaintenanceModule(ZabbixBase):
@@ -242,9 +240,6 @@ class MaintenanceModule(ZabbixBase):
         }
         if tags is not None:
             parameters['tags'] = tags
-        else:
-            if LooseVersion(self._zbx_api_version) < LooseVersion('6.0'):
-                parameters['tags'] = []
         self._zapi.maintenance.update(parameters)
         return 0, None, None
 
