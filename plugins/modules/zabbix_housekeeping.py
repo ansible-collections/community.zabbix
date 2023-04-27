@@ -8,7 +8,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
+DOCUMENTATION = """
 ---
 module: zabbix_housekeeping
 
@@ -21,7 +21,7 @@ author:
     - ONODERA Masaru(@masa-orca)
 
 requirements:
-    - "python >= 2.6"
+    - "python >= 3.9"
 
 version_added: 1.6.0
 
@@ -39,7 +39,6 @@ options:
     hk_events_service:
         description:
             - Storage period of service data (e.g. 365d).
-            - This parameter is available since Zabbix 6.0.
         required: false
         type: str
     hk_events_internal:
@@ -128,14 +127,11 @@ options:
         required: false
         type: str
 
-notes:
-    - Zabbix 5.2 version and higher are supported.
-
 extends_documentation_fragment:
     - community.zabbix.zabbix
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = """
 # If you want to use Username and Password to be authenticated by Zabbix Server
 - name: Set credentials to access Zabbix Server API
   set_fact:
@@ -156,7 +152,7 @@ EXAMPLES = '''
     ansible_httpapi_port: 443
     ansible_httpapi_use_ssl: true
     ansible_httpapi_validate_certs: false
-    ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
+    ansible_zabbix_url_path: "zabbixeu"  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
     ansible_host: zabbix-example-fqdn.org
   community.zabbix.zabbix_housekeeping:
     login_user: Admin
@@ -181,35 +177,29 @@ EXAMPLES = '''
     hk_trends: 365d
     compression_status: off
     compress_older: 7d
-'''
+"""
 
-RETURN = '''
+RETURN = """
 msg:
     description: The result of the operation
     returned: success
     type: str
-    sample: 'Successfully update housekeeping setting'
-'''
+    sample: "Successfully update housekeeping setting"
+"""
 
 import re
 
 from ansible.module_utils.basic import AnsibleModule
 
 from ansible_collections.community.zabbix.plugins.module_utils.base import ZabbixBase
-from ansible.module_utils.compat.version import LooseVersion
 import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabbix_utils
 
 
 class Housekeeping(ZabbixBase):
-    def __init__(self, module, zbx=None, zapi_wrapper=None):
-        super(Housekeeping, self).__init__(module, zbx, zapi_wrapper)
-        if LooseVersion(self._zbx_api_version) < LooseVersion('5.2.0'):
-            module.fail_json(msg="This module doesn't support Zabbix versions lower than 5.2.0")
-
     # get housekeeping setting
     def get_housekeeping(self):
         try:
-            return self._zapi.housekeeping.get({'output': 'extend'})
+            return self._zapi.housekeeping.get({"output": "extend"})
         except Exception as e:
             self._module.fail_json(msg="Failed to get housekeeping setting: %s" % e)
 
@@ -247,78 +237,75 @@ class Housekeeping(ZabbixBase):
             params = {}
 
             if isinstance(hk_events_mode, bool):
-                params['hk_events_mode'] = str(int(hk_events_mode))
+                params["hk_events_mode"] = str(int(hk_events_mode))
 
             if hk_events_trigger:
-                self.check_time_parameter('hk_events_trigger', hk_events_trigger)
-                params['hk_events_trigger'] = hk_events_trigger
+                self.check_time_parameter("hk_events_trigger", hk_events_trigger)
+                params["hk_events_trigger"] = hk_events_trigger
 
             if hk_events_service:
-                if LooseVersion(self._zbx_api_version) < LooseVersion('6.0'):
-                    self._module.warn('hk_events_service is ignored with <= Zabbix 5.4.')
-                else:
-                    self.check_time_parameter('hk_events_service', hk_events_service)
-                    params['hk_events_service'] = hk_events_service
+                self.check_time_parameter("hk_events_service", hk_events_service)
+                params["hk_events_service"] = hk_events_service
 
             if hk_events_internal:
-                self.check_time_parameter('hk_events_internal', hk_events_internal)
-                params['hk_events_internal'] = hk_events_internal
+                self.check_time_parameter("hk_events_internal", hk_events_internal)
+                params["hk_events_internal"] = hk_events_internal
 
             if hk_events_discovery:
-                self.check_time_parameter('hk_events_discovery', hk_events_discovery)
-                params['hk_events_discovery'] = hk_events_discovery
+                self.check_time_parameter("hk_events_discovery", hk_events_discovery)
+                params["hk_events_discovery"] = hk_events_discovery
 
             if hk_events_autoreg:
-                self.check_time_parameter('hk_events_autoreg', hk_events_autoreg)
-                params['hk_events_autoreg'] = hk_events_autoreg
+                self.check_time_parameter("hk_events_autoreg", hk_events_autoreg)
+                params["hk_events_autoreg"] = hk_events_autoreg
 
             if isinstance(hk_services_mode, bool):
-                params['hk_services_mode'] = str(int(hk_services_mode))
+                params["hk_services_mode"] = str(int(hk_services_mode))
 
             if hk_services:
-                self.check_time_parameter('hk_services', hk_services)
-                params['hk_services'] = hk_services
+                self.check_time_parameter("hk_services", hk_services)
+                params["hk_services"] = hk_services
 
             if isinstance(hk_audit_mode, bool):
-                params['hk_audit_mode'] = str(int(hk_audit_mode))
+                params["hk_audit_mode"] = str(int(hk_audit_mode))
 
             if hk_audit:
-                self.check_time_parameter('hk_audit', hk_audit)
-                params['hk_audit'] = hk_audit
+                self.check_time_parameter("hk_audit", hk_audit)
+                params["hk_audit"] = hk_audit
 
             if isinstance(hk_sessions_mode, bool):
-                params['hk_sessions_mode'] = str(int(hk_sessions_mode))
+                params["hk_sessions_mode"] = str(int(hk_sessions_mode))
 
             if hk_sessions:
-                self.check_time_parameter('hk_sessions', hk_sessions)
-                params['hk_sessions'] = hk_sessions
+                self.check_time_parameter("hk_sessions", hk_sessions)
+                params["hk_sessions"] = hk_sessions
 
             if isinstance(hk_history_mode, bool):
-                params['hk_history_mode'] = str(int(hk_history_mode))
+                params["hk_history_mode"] = str(int(hk_history_mode))
 
             if isinstance(hk_history_global, bool):
-                params['hk_history_global'] = str(int(hk_history_global))
+                params["hk_history_global"] = str(int(hk_history_global))
 
             if hk_history:
-                self.check_time_parameter('hk_history', hk_history)
-                params['hk_history'] = hk_history
+                self.check_time_parameter("hk_history", hk_history)
+                params["hk_history"] = hk_history
 
             if isinstance(hk_trends_mode, bool):
-                params['hk_trends_mode'] = str(int(hk_trends_mode))
+                params["hk_trends_mode"] = str(int(hk_trends_mode))
 
             if isinstance(hk_trends_global, bool):
-                params['hk_trends_global'] = str(int(hk_trends_global))
+                params["hk_trends_global"] = str(int(hk_trends_global))
 
             if hk_trends:
-                self.check_time_parameter('hk_trends', hk_trends)
-                params['hk_trends'] = hk_trends
+                self.check_time_parameter("hk_trends", hk_trends)
+                params["hk_trends"] = hk_trends
 
             if isinstance(compression_status, bool):
-                params['compression_status'] = str(int(compression_status))
+                params["compression_status"] = str(int(compression_status))
 
             if compress_older:
-                self.check_time_parameter('compress_older', compress_older)
-                params['compress_older'] = compress_older
+                self.check_time_parameter("compress_older", compress_older)
+                params["compress_older"] = compress_older
 
             future_housekeeping = current_housekeeping.copy()
             future_housekeeping.update(params)
@@ -338,26 +325,26 @@ class Housekeeping(ZabbixBase):
 def main():
     argument_spec = zabbix_utils.zabbix_common_argument_spec()
     argument_spec.update(dict(
-        hk_events_mode=dict(type='bool'),
-        hk_events_trigger=dict(type='str'),
-        hk_events_service=dict(type='str'),
-        hk_events_internal=dict(type='str'),
-        hk_events_discovery=dict(type='str'),
-        hk_events_autoreg=dict(type='str'),
-        hk_services_mode=dict(type='bool'),
-        hk_services=dict(type='str'),
-        hk_audit_mode=dict(type='bool'),
-        hk_audit=dict(type='str'),
-        hk_sessions_mode=dict(type='bool'),
-        hk_sessions=dict(type='str'),
-        hk_history_mode=dict(type='bool'),
-        hk_history_global=dict(type='bool'),
-        hk_history=dict(type='str'),
-        hk_trends_mode=dict(type='bool'),
-        hk_trends_global=dict(type='bool'),
-        hk_trends=dict(type='str'),
-        compression_status=dict(type='bool'),
-        compress_older=dict(type='str')
+        hk_events_mode=dict(type="bool"),
+        hk_events_trigger=dict(type="str"),
+        hk_events_service=dict(type="str"),
+        hk_events_internal=dict(type="str"),
+        hk_events_discovery=dict(type="str"),
+        hk_events_autoreg=dict(type="str"),
+        hk_services_mode=dict(type="bool"),
+        hk_services=dict(type="str"),
+        hk_audit_mode=dict(type="bool"),
+        hk_audit=dict(type="str"),
+        hk_sessions_mode=dict(type="bool"),
+        hk_sessions=dict(type="str"),
+        hk_history_mode=dict(type="bool"),
+        hk_history_global=dict(type="bool"),
+        hk_history=dict(type="str"),
+        hk_trends_mode=dict(type="bool"),
+        hk_trends_global=dict(type="bool"),
+        hk_trends=dict(type="str"),
+        compression_status=dict(type="bool"),
+        compress_older=dict(type="str")
     ))
     module = AnsibleModule(
         argument_spec=argument_spec,
@@ -366,26 +353,26 @@ def main():
 
     zabbix_utils.require_creds_params(module)
 
-    hk_events_mode = module.params['hk_events_mode']
-    hk_events_trigger = module.params['hk_events_trigger']
-    hk_events_service = module.params['hk_events_service']
-    hk_events_internal = module.params['hk_events_internal']
-    hk_events_discovery = module.params['hk_events_discovery']
-    hk_events_autoreg = module.params['hk_events_autoreg']
-    hk_services_mode = module.params['hk_services_mode']
-    hk_services = module.params['hk_services']
-    hk_audit_mode = module.params['hk_audit_mode']
-    hk_audit = module.params['hk_audit']
-    hk_sessions_mode = module.params['hk_sessions_mode']
-    hk_sessions = module.params['hk_sessions']
-    hk_history_mode = module.params['hk_history_mode']
-    hk_history_global = module.params['hk_history_global']
-    hk_history = module.params['hk_history']
-    hk_trends_mode = module.params['hk_trends_mode']
-    hk_trends_global = module.params['hk_trends_global']
-    hk_trends = module.params['hk_trends']
-    compression_status = module.params['compression_status']
-    compress_older = module.params['compress_older']
+    hk_events_mode = module.params["hk_events_mode"]
+    hk_events_trigger = module.params["hk_events_trigger"]
+    hk_events_service = module.params["hk_events_service"]
+    hk_events_internal = module.params["hk_events_internal"]
+    hk_events_discovery = module.params["hk_events_discovery"]
+    hk_events_autoreg = module.params["hk_events_autoreg"]
+    hk_services_mode = module.params["hk_services_mode"]
+    hk_services = module.params["hk_services"]
+    hk_audit_mode = module.params["hk_audit_mode"]
+    hk_audit = module.params["hk_audit"]
+    hk_sessions_mode = module.params["hk_sessions_mode"]
+    hk_sessions = module.params["hk_sessions"]
+    hk_history_mode = module.params["hk_history_mode"]
+    hk_history_global = module.params["hk_history_global"]
+    hk_history = module.params["hk_history"]
+    hk_trends_mode = module.params["hk_trends_mode"]
+    hk_trends_global = module.params["hk_trends_global"]
+    hk_trends = module.params["hk_trends"]
+    compression_status = module.params["compression_status"]
+    compress_older = module.params["compress_older"]
 
     housekeeping = Housekeeping(module)
 
@@ -415,5 +402,5 @@ def main():
     )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
