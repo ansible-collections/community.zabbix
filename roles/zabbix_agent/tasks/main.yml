@@ -9,15 +9,21 @@
   set_fact:
     zabbix_agent_version: "{{ zabbix_valid_agent_versions[ansible_distribution_major_version][0] | default(6.0) }}"
   when: zabbix_agent_version is not defined or zabbix_agent_version is none
+  tags:
+    - always
 
 - name: Set More Variables
   set_fact:
     zabbix_valid_version: "{{ zabbix_agent_version|float in zabbix_valid_agent_versions[ansible_distribution_major_version] }}"
+  tags:
+    - always
 
 - name: Stopping Install of Invalid Version
   fail:
     msg: Zabbix version {{ zabbix_agent_version }} is not supported on {{ ansible_distribution }} {{ ansible_distribution_major_version }}
   when: not zabbix_valid_version
+  tags:
+    - always
 
 - name: "Set variables specific for Zabbix Agent 2"
   set_fact:
@@ -33,8 +39,6 @@
   include_tasks: "{{ ansible_os_family }}.yml"
   when:
     - not (zabbix_agent_docker | bool)
-  tags:
-    - always
 
 - name: "Encrypt with TLS PSK auto management"
   include_tasks: tlspsk_auto.yml
@@ -56,15 +60,11 @@
   include_tasks: Windows_conf.yml
   when:
     - ansible_os_family == "Windows"
-  tags:
-    - always
 
 - name: "Configure Agent"
   include_tasks: Linux.yml
   when:
     - (ansible_os_family != "Windows" and ansible_os_family != "Darwin") or (zabbix_agent_docker | bool)
-  tags:
-    - always
 
 - name: "Run the API calls to Zabbix Server"
   vars:
@@ -85,5 +85,4 @@
   include_tasks: "userparameter.yml"
   when: zabbix_agent_userparameters|length > 0
   tags:
-    - zabbix-agent
-    - userparameter
+    - config

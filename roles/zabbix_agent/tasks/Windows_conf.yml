@@ -1,17 +1,20 @@
 ---
-
 - name: "Set default ip address for zabbix_agent_ip"
   set_fact:
     zabbix_agent_ip: "{{ hostvars[inventory_hostname]['ansible_ip_addresses'] | ansible.utils.ipv4 | first }}"
   when:
     - zabbix_agent_ip is not defined
     - "'ansible_ip_addresses' in hostvars[inventory_hostname]"
+  tags:
+    - config
 
 - name: "Windows | Configure zabbix-agent"
   ansible.windows.win_template:
     src: "{{ zabbix_win_config_name }}.j2"
     dest: "{{ zabbix_win_install_dir_conf }}\\{{ zabbix_win_config_name }}"
   notify: restart win zabbix agent
+  tags:
+    - config
 
 - name: "Windows | Set service startup mode to auto, ensure it is started and set auto-recovery"
   ansible.windows.win_service:
@@ -19,19 +22,23 @@
     start_mode: auto
     state: started
     failure_actions:
-    - type: restart
-      delay_ms: 5000
-    - type: restart
-      delay_ms: 10000
-    - type: restart
-      delay_ms: 20000
+      - type: restart
+        delay_ms: 5000
+      - type: restart
+        delay_ms: 10000
+      - type: restart
+        delay_ms: 20000
     failure_reset_period_sec: 86400
+  tags:
+    - config
 
 - name: "Windows | Check firewall service"
   ansible.windows.win_service_info:
     name: MpsSvc
   register: firewall_info
   when: zabbix_win_firewall_management
+  tags:
+    - config
 
 - name: "Windows | Firewall rule"
   community.windows.win_firewall_rule:
@@ -45,3 +52,5 @@
   when:
     - zabbix_win_firewall_management
     - firewall_info.services[0].state == 'started' or firewall_info.services[0].start_mode == 'auto'
+  tags:
+    - config

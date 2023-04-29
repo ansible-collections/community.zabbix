@@ -2,26 +2,37 @@
 # tasks file for zabbix_proxy
 - name: "Include OS-specific variables"
   include_vars: "{{ ansible_os_family }}.yml"
+  tags:
+    - always
 
 - name: Determine Latest Supported Zabbix Version
   set_fact:
     zabbix_proxy_version: "{{ zabbix_valid_proxy_versions[ansible_distribution_major_version][0] | default(6.2) }}"
   when: zabbix_proxy_version is not defined or zabbix_proxy_version is none
+  tags:
+    - always
 
 - name: Set More Variables
   set_fact:
     zabbix_proxy_db_long: "{{ 'postgresql' if zabbix_proxy_database == 'pgsql' else zabbix_proxy_database }}"
     zabbix_valid_version: "{{ zabbix_proxy_version in zabbix_valid_proxy_versions[ansible_distribution_major_version] }}"
     zabbix_short_version: "{{ zabbix_proxy_version | regex_replace('\\.', '') }}"
+  tags:
+    - always
 
 - name: Stopping Install of Invalid Version
   fail:
     msg: Zabbix version {{ zabbix_proxy_version }} is not supported on {{ ansible_distribution }} {{ ansible_distribution_major_version }}
   when: not zabbix_valid_version
+  tags:
+    - always
 
 - name: Set Path to SQL File
   set_fact:
     datafile_path: "{{ db_file_path[zabbix_short_version] }}"
+  tags:
+    - install
+    - config
 
 - name: "Set default ip address for zabbix_proxy_ip"
   set_fact:
@@ -29,6 +40,10 @@
   when:
     - zabbix_proxy_ip is not defined
     - "'ansible_default_ipv4' in hostvars[inventory_hostname]"
+  tags:
+    - install
+    - config
+    - api
 
 - name: "Complete OS Specific Tasks"
   include: "{{ ansible_os_family }}.yml"
@@ -40,7 +55,6 @@
     - zabbix_proxy_database_sqlload
   register: ls_output_schema
   tags:
-    - zabbix-proxy
     - database
 
 - name: "Installing the database"
@@ -54,6 +68,9 @@
     mode: "{{ zabbix_proxy_include_mode }}"
     state: directory
   become: true
+  tags:
+    - install
+    - config
 
 - name: "Create module dir zabbix-proxy"
   file:
@@ -63,6 +80,9 @@
     state: directory
     mode: "0755"
   become: true
+  tags:
+    - install
+    - config
 
 - name: "Create directory for PSK file if not exist."
   file:
@@ -72,6 +92,8 @@
   become: true
   when:
     - zabbix_proxy_tlspskfile is defined
+  tags:
+    - config
 
 - name: "Place TLS PSK File"
   copy:
@@ -86,6 +108,8 @@
     - zabbix_proxy_tlspsk_secret is defined
   notify:
     - restart zabbix-proxy
+  tags:
+    - config
 
 - name: "Configure zabbix-proxy"
   template:
@@ -96,6 +120,8 @@
     mode: "{{ zabbix_proxy_conf_mode }}"
   notify: restart zabbix-proxy
   become: true
+  tags:
+    - config
 
 - name: Ensure proxy definition is up-to-date (added/updated/removed)
   vars:
@@ -130,3 +156,5 @@
     enabled: true
   become: true
   when: zabbix_proxy_manage_service | bool
+  tags:
+    - service

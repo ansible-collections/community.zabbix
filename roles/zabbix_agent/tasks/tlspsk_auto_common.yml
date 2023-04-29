@@ -5,6 +5,8 @@
     zabbix_agent_tlspsk_read: "{{ zabbix_agent_tlspsk_base64['content'] | b64decode | trim }}"
   when: zabbix_agent_tlspskcheck.stat.exists
   no_log: "{{ ansible_verbosity < 3 }}"
+  tags:
+    - config
 
 - name: AutoPSK | Use existing TLS PSK secret
   set_fact:
@@ -13,6 +15,8 @@
     - zabbix_agent_tlspskcheck.stat.exists
     - zabbix_agent_tlspsk_read|length >= 32
   no_log: "{{ ansible_verbosity < 3 }}"
+  tags:
+    - config
 
 - name: AutoPSK | Generate new TLS PSK secret
   set_fact:
@@ -20,7 +24,8 @@
   when:
     - (not zabbix_agent_tlspskcheck.stat.exists) or (zabbix_agent_tlspsk_read|length < 32)
   no_log: "{{ ansible_verbosity < 3 }}"
-
+  tags:
+    - config
 
 # Process PSK Identity
 - name: AutoPSK | Use existing TLS PSK identity
@@ -29,6 +34,8 @@
   when:
     - zabbix_agent_tlspskidentity_check.stat.exists
   no_log: "{{ ansible_verbosity < 3 }}"
+  tags:
+    - config
 
 - name: AutoPSK | Generate new TLS PSK identity
   set_fact:
@@ -41,3 +48,5 @@
       }}
   when: not zabbix_agent_tlspskidentity_check.stat.exists
   no_log: "{{ ansible_verbosity < 3 }}"
+  tags:
+    - config

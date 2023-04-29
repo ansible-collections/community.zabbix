@@ -5,6 +5,8 @@
     path: /usr/sbin/getenforce
   register: getenforce_bin
   become: true
+  tags:
+    - always
 
 - name: "SELinux | Collect getenforce output"
   command: getenforce
@@ -13,11 +15,15 @@
   changed_when: false
   become: true
   check_mode: false
+  tags:
+    - always
 
 - name: "Set zabbix_server_selinux to true if getenforce returns Enforcing or Permissive"
   set_fact:
     zabbix_server_selinux: "{{ true }}"
   when: 'getenforce_bin.stat.exists and ("Enforcing" in sestatus.stdout or "Permissive" in sestatus.stdout)'
+  tags:
+    - config
 
 - name: "SELinux | RedHat | Install related SELinux package"
   yum:
@@ -37,7 +43,7 @@
     - selinux_allow_zabbix_can_network
     - ansible_distribution_major_version == "7" or ansible_distribution_major_version == "6"
   tags:
-    - zabbix-server
+    - install
 
 - name: "SELinux | RedHat | Install related SELinux package on RHEL8"
   yum:
@@ -55,7 +61,7 @@
     - selinux_allow_zabbix_can_network
     - ansible_distribution_major_version == "8"
   tags:
-    - zabbix-server
+    - install
 
 - name: "SELinux | RedHat | Enable httpd_can_connect_zabbix SELinux boolean"
   ansible.posix.seboolean:
@@ -66,7 +72,7 @@
   when:
     - selinux_allow_zabbix_can_http
   tags:
-    - zabbix-server
+    - config
 
 - name: "SELinux | RedHat | Enable zabbix_can_network SELinux boolean"
   ansible.posix.seboolean:
@@ -77,7 +83,7 @@
   when:
     - selinux_allow_zabbix_can_network
   tags:
-    - zabbix-server
+    - config
 
 - name: "SELinux | RedHat | Install related SELinux package to fix issues"
   yum:
@@ -94,7 +100,7 @@
     - ansible_os_family == "RedHat"
     - ansible_distribution_major_version == "7" or ansible_distribution_major_version == "6"
   tags:
-    - zabbix-server
+    - install
 
 - name: "SELinux | RedHat | Install related SELinux package to fix issues on RHEL8"
   yum:
@@ -113,7 +119,7 @@
     - ansible_os_family == "RedHat"
     - ansible_distribution_major_version == "8"
   tags:
-    - zabbix-server
+    - install
 
 - name: "SELinux | RedHat | Add SEmodule to fix SELinux issue: zabbix_server_alerter.sock"
   script:
@@ -121,3 +127,5 @@
   args:
     creates: /etc/selinux/targeted/active/modules/400/zabbix_server_add/cil
     become: true
+  tags:
+    - config

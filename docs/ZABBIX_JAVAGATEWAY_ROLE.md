@@ -92,6 +92,17 @@ or when using the zabbix-proxy:
       zabbix_proxy_javagateway: 192.168.1.2
 ```
 
+## Tags
+
+The majority of tasks within this role are tagged as follows:
+
+* `install`:  Tasks associated with the installation of software.
+* `dependencies`:  Installation tasks related to dependencies that aren't part of the core zabbix installation.
+* `database`: Tasks associated with the installation or configuration of the database.
+* `api`:  Tasks associated with using the Zabbix API to connect and modify the Zabbix server.
+* `config`:  Tasks associated with the configuration of Zabbix or a supporting service.
+* `service`:  Tasks associated with managing a service.
+
 # Example Playbook
 
 Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:

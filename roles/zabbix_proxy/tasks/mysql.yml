@@ -5,17 +5,23 @@
     delegated_dbhost: "{{ zabbix_proxy_dbhost if (zabbix_proxy_dbhost != 'localhost') else inventory_hostname }}"
   when:
     - zabbix_proxy_dbhost_run_install
+  tags:
+    - database
 
 - name: "MySQL | Set the correct delegated_dbhost (to support MySQL db deployment on a remote dbhost)"
   set_fact:
     delegated_dbhost: "{{ inventory_hostname }}"
   when:
     - not zabbix_proxy_dbhost_run_install
+  tags:
+    - database
 
 - name: "MySQL | Override delegated_dbhost with real dbhost when dbhost is behind loadbalancer"
   set_fact:
     delegated_dbhost: "{{ zabbix_proxy_real_dbhost }}"
   when: zabbix_proxy_real_dbhost | default(false)
+  tags:
+    - database
 
 - name: "MySQL | Create database"
   community.mysql.mysql_db:
@@ -32,7 +38,6 @@
   register: zabbix_database_created
   delegate_to: "{{ delegated_dbhost }}"
   tags:
-    - zabbix-proxy
     - database
     - skip_ansible_lint
 
@@ -51,7 +56,6 @@
   when: zabbix_proxy_database_creation
   delegate_to: "{{ delegated_dbhost }}"
   tags:
-    - zabbix-proxy
     - database
 
 - name: "MySQL | Check if we have done files"
@@ -60,6 +64,8 @@
   register: done_file
   when:
     - zabbix_proxy_database_sqlload
+  tags:
+    - database
 
 - name: "MySQL | Get version_comment"
   community.mysql.mysql_variables:
@@ -72,7 +78,6 @@
   delegate_to: "{{ delegated_dbhost }}"
   register: install_mysql_version
   tags:
-    - zabbix-proxy
     - database
 
 - name: "MySQL | Get current value for innodb_default_row_format"
@@ -88,7 +93,6 @@
   when:
     - install_mysql_version.msg is version('5.6', '>=')
   tags:
-    - zabbix-proxy
     - database
 
 - name: "MySQL | Set innodb_default_row_format to dynamic"
@@ -107,7 +111,6 @@
     - mysql_innodb_default_row_format.msg != 'dynamic'
   delegate_to: "{{ delegated_dbhost }}"
   tags:
-    - zabbix-proxy
     - database
 
 - name: "MySQL | Create database and import file"
@@ -127,7 +130,6 @@
     - not done_file.stat.exists
   delegate_to: "{{ delegated_dbhost }}"
   tags:
-    - zabbix-proxy
     - database
 
 - name: "MySQL | Revert innodb_default_row_format to previous value"
@@ -145,7 +147,6 @@
     - mysql_innodb_default_row_format.msg != 'dynamic'
   delegate_to: "{{ delegated_dbhost }}"
   tags:
-    - zabbix-proxy
     - database
 
 - name: "MySQL | Create done file"
@@ -156,3 +157,5 @@
   when:
     - zabbix_proxy_database_sqlload
     - not done_file.stat.exists
+  tags:
+    - database

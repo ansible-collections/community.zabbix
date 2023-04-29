@@ -14,6 +14,8 @@
     zabbix_underscore_version: "{{ zabbix_agent_version | regex_replace('\\.', '_') }}"
   when:
     - ansible_machine != "aarch64"
+  tags:
+    - always
 
 - name: "Debian | Set some variables"
   set_fact:
@@ -25,6 +27,8 @@
     zabbix_underscore_version: "{{ zabbix_agent_version | regex_replace('\\.', '_') }}"
   when:
     - ansible_machine == "aarch64"
+  tags:
+    - always
 
 - name: "Debian | Installing gnupg"
   apt:
@@ -39,6 +43,8 @@
   register: gnupg_installed
   until: gnupg_installed is succeeded
   become: true
+  tags:
+    - install
 
 - name: "Debian | Install gpg key"
   apt_key:
@@ -49,8 +55,7 @@
     https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   become: true
   tags:
-    - zabbix-agent
-    - init
+    - install
 
 - name: "Debian | Installing repository {{ ansible_distribution }}"
   apt_repository:
@@ -61,8 +66,7 @@
     - deb-src
     - deb
   tags:
-    - zabbix-server
-    - init
+    - install
 
 - name: "Debian | Create /etc/apt/preferences.d/"
   file:
@@ -72,6 +76,8 @@
   when:
     - zabbix_agent_apt_priority | int
   become: true
+  tags:
+    - install
 
 - name: "Debian | Configuring the weight for APT"
   copy:
@@ -85,6 +91,8 @@
   when:
     - zabbix_agent_apt_priority | int
   become: true
+  tags:
+    - install
 
 - name: "Debian | apt-get clean"
   shell: apt-get clean; apt-get update
@@ -94,6 +102,7 @@
   become: true
   tags:
     - skip_ansible_lint
+    - install
 
 - name: "Debian | Installing zabbix-agent"
   apt:
@@ -110,8 +119,7 @@
   until: zabbix_agent_package_installed is succeeded
   become: true
   tags:
-    - zabbix-agent
-    - init
+    - install
 
 - name: "Debian | Installing zabbix-{sender,get}"
   apt:
@@ -133,8 +141,7 @@
   become: true
   check_mode: false
   tags:
-    - zabbix-agent
-    - init
+    - install
 
 - name: "Debian | Enable the service"
   service:
@@ -143,6 +150,4 @@
     use: service
   become: true
   tags:
-    - zabbix-agent
-    - init
     - service

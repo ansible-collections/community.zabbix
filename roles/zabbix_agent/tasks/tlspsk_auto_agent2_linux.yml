@@ -3,27 +3,35 @@
   set_fact:
     zabbix_agent2_tlspskfile: "/etc/zabbix/tls_psk_auto.secret"
     zabbix_agent2_tlspskidentity_file: "/etc/zabbix/tls_psk_auto.identity"
+  tags:
+    - config
 
 - name: AutoPSK | Check for existing TLS PSK file (Linux)
   stat:
     path: "{{ zabbix_agent2_tlspskfile }}"
   register: zabbix_agent2_tlspskcheck
   become: true
+  tags:
+    - config
 
 - name: AutoPSK | Check for existing TLS PSK identity (Linux)
   stat:
     path: "{{ zabbix_agent2_tlspskidentity_file }}"
   register: zabbix_agent2_tlspskidentity_check
   become: true
+  tags:
+    - config
 
 - name: AutoPSK | read existing TLS PSK file (Linux)
   slurp:
     src: "{{ zabbix_agent2_tlspskfile }}"
   register: zabbix_agent2_tlspsk_base64
   become: true
-  when: 
+  when:
     - zabbix_agent2_tlspskcheck.stat.exists
   no_log: "{{ ansible_verbosity < 3 }}"
+  tags:
+    - config
 
 - name: AutoPSK | Read existing TLS PSK identity file (Linux)
   slurp:
@@ -32,6 +40,8 @@
   become: true
   when: zabbix_agent2_tlspskidentity_check.stat.exists
   no_log: "{{ ansible_verbosity < 3 }}"
+  tags:
+    - config
 
 - include_tasks: tlspsk_auto_agent2_common.yml
 
@@ -49,7 +59,9 @@
   notify:
     - restart zabbix-agent
     - restart mac zabbix agent
-    
+  tags:
+    - config
+
 - name: AutoPSK | Template TLS PSK secret in file (Linux)
   copy:
     dest: "{{ zabbix_agent2_tlspskfile }}"
@@ -64,3 +76,5 @@
   notify:
     - restart zabbix-agent
     - restart mac zabbix agent
+  tags:
+    - config

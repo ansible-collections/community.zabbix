@@ -6,12 +6,16 @@
     delegated_dbhost: "{{ zabbix_proxy_dbhost if (zabbix_proxy_dbhost != 'localhost') else inventory_hostname }}"
   when:
     - zabbix_proxy_dbhost_run_install
+  tags:
+    - database
 
 - name: "PostgreSQL | Set the correct delegated_dbhost (to support postgres db deployment on a remote dbhost)"
   set_fact:
     delegated_dbhost: "{{ inventory_hostname }}"
   when:
     - not zabbix_proxy_dbhost_run_install
+  tags:
+    - database
 
 - name: "PostgreSQL | Delegated"
   block:
@@ -37,7 +41,6 @@
     - zabbix_proxy_database_creation
     - zabbix_proxy_pgsql_login_host is not defined
   tags:
-    - zabbix-proxy
     - database
 
 - name: "PostgreSQL | Remote"
@@ -67,13 +70,14 @@
     - zabbix_proxy_database_creation
     - zabbix_proxy_pgsql_login_host is defined
   tags:
-    - zabbix-proxy
     - database
 
 - name: "PostgreSQL | Handle Compressed Schema File"
   set_fact:
     zabbix_proxy_cat_cmd: zcat
   when: "'.gz' in ls_output_schema.stdout"
+  tags:
+    - database
 
 - name: "PostgreSQL | Importing schema file"
   shell: |
@@ -87,3 +91,5 @@
     PGPASSWORD: "{{ zabbix_proxy_dbpassword }}"
   when:
     - zabbix_proxy_database_creation
+  tags:
+    - database
