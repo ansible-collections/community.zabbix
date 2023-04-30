@@ -17,14 +17,12 @@ author:
 description:
     - This module allows you to create, modify and delete Zabbix users.
 requirements:
-    - "python >= 2.6"
+    - "python >= 3.9"
 options:
     username:
         description:
-            - Name of the user alias in Zabbix.
+            - Username.
             - username is the unique identifier used and cannot be updated using this module.
-            - alias must be replaced with username since Zabbix 6.4.
-        aliases: [ alias ]
         required: true
         type: str
     name:
@@ -46,7 +44,6 @@ options:
         description:
             - User's password.
             - Required unless all of the I(usrgrps) are set to use LDAP as frontend access.
-            - Always required for Zabbix versions lower than 4.0.
         required: false
         type: str
     override_passwd:
@@ -58,34 +55,33 @@ options:
     lang:
         description:
             - Language code of the user's language.
-            - C(default) can be used with Zabbix version 5.2 or higher.
         choices:
-            - 'en_GB'
-            - 'en_US'
-            - 'zh_CN'
-            - 'cs_CZ'
-            - 'fr_FR'
-            - 'he_IL'
-            - 'it_IT'
-            - 'ko_KR'
-            - 'ja_JP'
-            - 'nb_NO'
-            - 'pl_PL'
-            - 'pt_BR'
-            - 'pt_PT'
-            - 'ru_RU'
-            - 'sk_SK'
-            - 'tr_TR'
-            - 'uk_UA'
-            - 'default'
+            - "en_GB"
+            - "en_US"
+            - "zh_CN"
+            - "cs_CZ"
+            - "fr_FR"
+            - "he_IL"
+            - "it_IT"
+            - "ko_KR"
+            - "ja_JP"
+            - "nb_NO"
+            - "pl_PL"
+            - "pt_BR"
+            - "pt_PT"
+            - "ru_RU"
+            - "sk_SK"
+            - "tr_TR"
+            - "uk_UA"
+            - "default"
         type: str
     theme:
         description:
             - User's theme.
         choices:
-            - 'default'
-            - 'blue-theme'
-            - 'dark-theme'
+            - "default"
+            - "blue-theme"
+            - "dark-theme"
         type: str
     autologin:
         description:
@@ -117,7 +113,7 @@ options:
             mediatype:
                 description:
                     - Media type name to set.
-                default: 'Email'
+                default: "Email"
                 type: str
             sendto:
                 description:
@@ -129,8 +125,8 @@ options:
                 description:
                     - Time when the notifications can be sent as a time period or user macros separated by a semicolon.
                     - Please review the documentation for more information on the supported time period.
-                    - https://www.zabbix.com/documentation/4.0/manual/appendix/time_period
-                default: '1-7,00:00-24:00'
+                    - https://www.zabbix.com/documentation/current/en/manual/appendix/time_period
+                default: "1-7,00:00-24:00"
                 type: str
             severity:
                 description:
@@ -181,26 +177,15 @@ options:
                 type: bool
         type: list
         elements: dict
-    type:
-        description:
-            - Type of the user.
-            - I(type) can be used when Zabbix version is 5.0 or lower.
-        choices:
-            - 'Zabbix user'
-            - 'Zabbix admin'
-            - 'Zabbix super admin'
-        type: str
     timezone:
         description:
             - User's time zone.
-            - I(timezone) can be used with Zabbix version 5.2 or higher.
             - For the full list of supported time zones please refer to U(https://www.php.net/manual/en/timezones.php)
         type: str
         version_added: 1.2.0
     role_name:
         description:
             - User's role.
-            - I(role_name) can be used when Zabbix version is 5.2 or higher.
             - Default is C(User role) when creating a new user.
             - The default value will be removed at the version 2.0.0.
         type: str
@@ -210,8 +195,8 @@ options:
             - State of the user.
             - On C(present), it will create if user does not exist or update the user if the associated data is different.
             - On C(absent) will remove a user if it exists.
-        default: 'present'
-        choices: ['present', 'absent']
+        default: "present"
+        choices: ["present", "absent"]
         type: str
 extends_documentation_fragment:
 - community.zabbix.zabbix
@@ -239,7 +224,7 @@ EXAMPLES = r"""
     ansible_httpapi_port: 443
     ansible_httpapi_use_ssl: true
     ansible_httpapi_validate_certs: false
-    ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
+    ansible_zabbix_url_path: "zabbixeu"  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
     ansible_host: zabbix-example-fqdn.org
   community.zabbix.zabbix_user:
     username: example
@@ -252,10 +237,10 @@ EXAMPLES = r"""
     lang: en_GB
     theme: blue-theme
     autologin: no
-    autologout: '0'
-    refresh: '30'
-    rows_per_page: '200'
-    after_login_url: ''
+    autologout: "0"
+    refresh: "30"
+    rows_per_page: "200"
+    after_login_url: ""
     user_medias:
       - mediatype: Email
         sendto:
@@ -281,7 +266,7 @@ EXAMPLES = r"""
     ansible_httpapi_port: 443
     ansible_httpapi_use_ssl: true
     ansible_httpapi_validate_certs: false
-    ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
+    ansible_zabbix_url_path: "zabbixeu"  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
     ansible_host: zabbix-example-fqdn.org
   community.zabbix.zabbix_user:
     username: example
@@ -311,14 +296,6 @@ import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabb
 
 
 class User(ZabbixBase):
-    def username_key(self):
-        """Returns the key name for 'username', which was 'alias'
-        before Zabbix 5.4.
-        """
-        if LooseVersion(self._zbx_api_version) < LooseVersion("5.4"):
-            return "alias"
-        return "username"
-
     def get_default_authentication(self):
         auth = self._zapi.authentication.get({"output": "extend"})
         try:
@@ -360,14 +337,10 @@ class User(ZabbixBase):
             elif bool([g for g in res if g["gui_access"] == "0"]):
                 # Zabbix API for versions < 5.2 does not have a way to query the default auth type
                 # so we must assume its set to internal
-                if LooseVersion(self._zbx_api_version) >= LooseVersion("5.2"):
-                    default_authentication = self.get_default_authentication()
-                    require_password = (
-                        True if default_authentication == "internal" else False
-                    )
-                else:
-                    default_authentication = "internal"
-                    require_password = True
+                default_authentication = self.get_default_authentication()
+                require_password = (
+                    True if default_authentication == "internal" else False
+                )
 
             not_found_groups = set(usrgrps) - set([g["name"] for g in res])
             if not_found_groups:
@@ -382,7 +355,7 @@ class User(ZabbixBase):
         zbx_user = self._zapi.user.get(
             {
                 "output": "extend",
-                "filter": {self.username_key(): username},
+                "filter": {"username": username},
                 "getAccess": True,
                 "selectMedias": "extend",
                 "selectUsrgrps": "extend",
@@ -396,16 +369,10 @@ class User(ZabbixBase):
         for user_media in copy_user_medias:
             media_types = self._zapi.mediatype.get({"output": "extend"})
             for media_type in media_types:
-                if LooseVersion(self._zbx_api_version) < LooseVersion("4.4"):
-                    if media_type["description"] == user_media["mediatype"]:
-                        user_media["mediatypeid"] = media_type["mediatypeid"]
-                        user_media["mediatype"] = media_type["type"]
-                        break
-                else:
-                    if media_type["name"] == user_media["mediatype"]:
-                        user_media["mediatypeid"] = media_type["mediatypeid"]
-                        user_media["mediatype"] = media_type["type"]
-                        break
+                if media_type["name"] == user_media["mediatype"]:
+                    user_media["mediatypeid"] = media_type["mediatypeid"]
+                    user_media["mediatype"] = media_type["type"]
+                    break
             if "mediatypeid" not in user_media:
                 self._module.fail_json(
                     msg="Media type not found: %s" % user_media["mediatype"]
@@ -476,7 +443,6 @@ class User(ZabbixBase):
         rows_per_page,
         url,
         user_medias,
-        user_type,
         timezone,
         role_name,
         override_passwd,
@@ -508,7 +474,7 @@ class User(ZabbixBase):
         # request data
         request_data = {
             "userid": zbx_user[0]["userid"],
-            self.username_key(): username,
+            "username": username,
             "name": name,
             "surname": surname,
             "usrgrps": sorted(user_group_ids, key=lambda x: x["usrgrpid"]),
@@ -530,14 +496,10 @@ class User(ZabbixBase):
         if override_passwd:
             request_data["passwd"] = passwd
 
-        # The type key has changed to roleid key since Zabbix 5.2
-        if LooseVersion(self._zbx_api_version) < LooseVersion("5.2"):
-            request_data["type"] = user_type
-        else:
-            request_data["roleid"] = (
-                self.get_roleid_by_name(role_name) if role_name else None
-            )
-            request_data["timezone"] = timezone
+        request_data["roleid"] = (
+            self.get_roleid_by_name(role_name) if role_name else None
+        )
+        request_data["timezone"] = timezone
 
         request_data, del_keys = helper_normalize_data(request_data)
         existing_data, _del_keys = helper_normalize_data(existing_data, del_keys)
@@ -573,24 +535,18 @@ class User(ZabbixBase):
         rows_per_page,
         url,
         user_medias,
-        user_type,
         require_password,
         timezone,
         role_name,
     ):
 
-        if role_name is None and LooseVersion(self._zbx_api_version) >= LooseVersion(
-            "5.2"
-        ):
-            # This variable is to set the default value because the module must have a backward-compatible.
-            # The default value will be removed at the version 2.0.0.
-            # https://github.com/ansible-collections/community.zabbix/pull/382
+        if role_name is None:
             role_name = "User role"
 
         user_ids = {}
 
         request_data = {
-            self.username_key(): username,
+            "username": username,
             "name": name,
             "surname": surname,
             "usrgrps": user_group_ids,
@@ -608,18 +564,12 @@ class User(ZabbixBase):
             else:
                 request_data["medias"] = user_medias
 
-        if (
-            LooseVersion(self._zbx_api_version) < LooseVersion("4.0")
-            or require_password
-        ):
+        if (require_password):
             request_data["passwd"] = passwd
 
         # The type key has changed to roleid key since Zabbix 5.2
-        if LooseVersion(self._zbx_api_version) < LooseVersion("5.2"):
-            request_data["type"] = user_type
-        else:
-            request_data["roleid"] = self.get_roleid_by_name(role_name)
-            request_data["timezone"] = timezone
+        request_data["roleid"] = self.get_roleid_by_name(role_name)
+        request_data["timezone"] = timezone
 
         request_data, _del_keys = helper_normalize_data(request_data)
 
@@ -652,7 +602,6 @@ class User(ZabbixBase):
         rows_per_page,
         url,
         user_medias,
-        user_type,
         timezone,
         role_name,
         override_passwd,
@@ -662,7 +611,7 @@ class User(ZabbixBase):
 
         request_data = {
             "userid": zbx_user[0]["userid"],
-            self.username_key(): username,
+            "username": username,
             "name": name,
             "surname": surname,
             "usrgrps": user_group_ids,
@@ -678,55 +627,17 @@ class User(ZabbixBase):
         if override_passwd:
             request_data["passwd"] = passwd
 
-        # The type key has changed to roleid key since Zabbix 5.2
-        if LooseVersion(self._zbx_api_version) < LooseVersion("5.2"):
-            request_data["type"] = user_type
-        else:
-            request_data["roleid"] = (
-                self.get_roleid_by_name(role_name) if role_name else None
-            )
-            request_data["timezone"] = timezone
+        request_data["roleid"] = (
+            self.get_roleid_by_name(role_name) if role_name else None
+        )
+        request_data["timezone"] = timezone
 
         request_data, _del_keys = helper_normalize_data(request_data)
 
-        # In the case of zabbix 3.2 or less, it is necessary to use updatemedia method to update media.
-        if LooseVersion(self._zbx_api_version) <= LooseVersion("3.2"):
-            try:
-                user_ids = self._zapi.user.update(request_data)
-            except Exception as e:
-                self._module.fail_json(
-                    msg="Failed to update user %s: %s" % (username, e)
-                )
-
-            try:
-                if user_medias:
-                    user_ids = self._zapi.user.updatemedia(
-                        {
-                            "users": [{"userid": zbx_user[0]["userid"]}],
-                            "medias": user_medias,
-                        }
-                    )
-            except Exception as e:
-                self._module.fail_json(
-                    msg="Failed to update user medias %s: %s" % (username, e)
-                )
-
-        if LooseVersion(self._zbx_api_version) >= LooseVersion("3.4") and LooseVersion(
-            self._zbx_api_version
-        ) < LooseVersion("6.4"):
+        if LooseVersion(self._zbx_api_version) < LooseVersion("6.4"):
             try:
                 if user_medias:
                     request_data["user_medias"] = user_medias
-                user_ids = self._zapi.user.update(request_data)
-            except Exception as e:
-                self._module.fail_json(
-                    msg="Failed to update user %s: %s" % (username, e)
-                )
-
-        if LooseVersion(self._zbx_api_version) >= LooseVersion("6.4"):
-            try:
-                if user_medias:
-                    request_data["medias"] = user_medias
                 user_ids = self._zapi.user.update(request_data)
             except Exception as e:
                 self._module.fail_json(
@@ -766,7 +677,7 @@ def main():
     argument_spec = zabbix_utils.zabbix_common_argument_spec()
     argument_spec.update(
         dict(
-            username=dict(type="str", required=True, aliases=["alias"]),
+            username=dict(type="str", required=True),
             name=dict(type="str"),
             surname=dict(type="str"),
             usrgrps=dict(type="list", elements="str"),
@@ -834,10 +745,6 @@ def main():
             ),
             timezone=dict(type="str"),
             role_name=dict(type="str"),
-            type=dict(
-                type="str",
-                choices=["Zabbix user", "Zabbix admin", "Zabbix super admin"],
-            ),
             state=dict(type="str", default="present", choices=["present", "absent"]),
         )
     )
@@ -863,7 +770,6 @@ def main():
     rows_per_page = module.params["rows_per_page"]
     after_login_url = module.params["after_login_url"]
     user_medias = module.params["user_medias"]
-    user_type = module.params["type"]
     timezone = module.params["timezone"]
     role_name = module.params["role_name"]
     state = module.params["state"]
@@ -874,13 +780,6 @@ def main():
         else:
             autologin = "0"
 
-    user_type_dict = {
-        "Zabbix user": "1",
-        "Zabbix admin": "2",
-        "Zabbix super admin": "3",
-    }
-    user_type = user_type_dict[user_type] if user_type else None
-
     user = User(module)
 
     if user_medias:
@@ -890,10 +789,7 @@ def main():
     zbx_user = user.check_user_exist(username)
     if state == "present":
         user_group_ids, require_password = user.get_usergroups_by_name(usrgrps)
-        if (
-            LooseVersion(user._zbx_api_version) < LooseVersion("4.0")
-            or require_password
-        ):
+        if (require_password):
             if passwd is None:
                 module.fail_json(
                     msg="User password is required. One or more groups are not LDAP based."
@@ -915,7 +811,6 @@ def main():
                 rows_per_page,
                 after_login_url,
                 user_medias,
-                user_type,
                 timezone,
                 role_name,
                 override_passwd,
@@ -937,7 +832,6 @@ def main():
                     rows_per_page,
                     after_login_url,
                     user_medias,
-                    user_type,
                     timezone,
                     role_name,
                     override_passwd,
@@ -958,7 +852,6 @@ def main():
                 rows_per_page,
                 after_login_url,
                 user_medias,
-                user_type,
                 require_password,
                 timezone,
                 role_name,
