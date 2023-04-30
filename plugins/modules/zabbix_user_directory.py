@@ -30,7 +30,7 @@ options:
             - This parameter is available since Zabbix 6.4.
         required: false
         type: str
-        choices: ['ldap', 'saml']
+        choices: ["ldap", "saml"]
     provision_status:
         description:
             - User directory provisioning status.
@@ -64,7 +64,7 @@ options:
             - User directory description.
         required: false
         type: str
-        default: ''
+        default: ""
     group_membership:
         description:
             - LDAP property containing groups of user. E.g. I(memberOf)
@@ -151,7 +151,7 @@ options:
             - LDAP bind distinguished name string. Can be empty for anonymous binding.
         required: false
         type: str
-        default: ''
+        default: ""
     idp_entityid:
         description:
             - SAML URI that identifies the IdP in SAML messages.
@@ -168,7 +168,7 @@ options:
         type: str
     sso_url:
         description:
-            - SAML URL of the IdP's SAML SSO service, to which Zabbix will send SAML authentication requests.
+            - SAML URL of the IdP"s SAML SSO service, to which Zabbix will send SAML authentication requests.
             - required if C(idp_type) is set to I(saml).
             - This parameter is available since Zabbix 6.4.
         required: false
@@ -303,8 +303,8 @@ options:
             - State of the user directory.
             - On C(present), it will create if user directory does not exist or update it if the associated data is different.
             - On C(absent) will remove the user directory if it exists.
-        choices: ['present', 'absent']
-        default: 'present'
+        choices: ["present", "absent"]
+        default: "present"
         type: str
 
 extends_documentation_fragment:
@@ -334,18 +334,18 @@ EXAMPLES = r"""
     ansible_httpapi_port: 443
     ansible_httpapi_use_ssl: true
     ansible_httpapi_validate_certs: false
-    ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
+    ansible_zabbix_url_path: "zabbixeu"  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
     ansible_host: zabbix-example-fqdn.org
   community.zabbix.zabbix_user_directory:
     state: present
     name: TestUserDirectory
-    host: 'test.com'
+    host: "test.com"
     port: 389
-    base_dn: 'ou=Users,dc=example,dc=org'
-    search_attribute: 'uid'
-    bind_dn: 'cn=ldap_search,dc=example,dc=org'
-    description: 'Test user directory'
-    search_filter: '(%{attr}=test_user)'
+    base_dn: "ou=Users,dc=example,dc=org"
+    search_attribute: "uid"
+    bind_dn: "cn=ldap_search,dc=example,dc=org"
+    description: "Test user directory"
+    search_filter: "(%{attr}=test_user)"
     start_tls: 0
 
 - name: Create new user directory with LDAP IDP or update existing info (Zabbix >= 6.4)
@@ -356,22 +356,22 @@ EXAMPLES = r"""
     ansible_httpapi_port: 443
     ansible_httpapi_use_ssl: true
     ansible_httpapi_validate_certs: false
-    ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
+    ansible_zabbix_url_path: "zabbixeu"  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
     ansible_host: zabbix-example-fqdn.org
   community.zabbix.zabbix_user_directory:
     state: present
     name: TestUserDirectory
     idp_type: ldap
-    host: 'test.ca'
+    host: "test.ca"
     port: 389
-    base_dn: 'ou=Users,dc=example,dc=org'
-    search_attribute: 'uid'
+    base_dn: "ou=Users,dc=example,dc=org"
+    search_attribute: "uid"
     provision_status: true
     group_name: cn
     group_basedn: ou=Group,dc=example,dc=org
     group_member: member
     user_ref_attr: uid
-    group_filter: '(member=uid=%{ref},ou=Users,dc=example,dc=com)'
+    group_filter: "(member=uid=%{ref},ou=Users,dc=example,dc=com)"
     user_username: first_name
     user_lastname: last_name
     provision_media:
@@ -392,7 +392,7 @@ EXAMPLES = r"""
     ansible_httpapi_port: 443
     ansible_httpapi_use_ssl: true
     ansible_httpapi_validate_certs: false
-    ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
+    ansible_zabbix_url_path: "zabbixeu"  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
     ansible_host: zabbix-example-fqdn.org
   community.zabbix.zabbix_user_directory:
     state: present
@@ -493,10 +493,10 @@ def main():
         argument_spec=argument_spec,
         supports_check_mode=True,
         required_if=[
-            ('state', 'present', ('idp_type',)),
-            ('idp_type', 'ldap', ('host', 'port', 'base_dn', 'search_attribute'), False),
-            ('idp_type', 'saml', ('idp_entityid', 'sp_entityid', 'sso_url', 'username_attribute'), False),
-            ('provision_status', 'true', ('provision_groups'))
+            ("state", "present", ("idp_type",)),
+            ("idp_type", "ldap", ("host", "port", "base_dn", "search_attribute"), False),
+            ("idp_type", "saml", ("idp_entityid", "sp_entityid", "sso_url", "username_attribute"), False),
+            ("provision_status", "true", ("provision_groups"))
         ]
     )
     """
@@ -537,7 +537,7 @@ def main():
         # Mandatory parameters check
         if state == "present" and not module.params["idp_type"]:
             module.fail_json(
-                '"idp_type" parameter must be provided when state is "present"'
+                "'idp_type' parameter must be provided when state is 'present'"
             )
         if module.params["idp_type"]:
             if module.params["idp_type"] == "ldap" and (
@@ -547,7 +547,7 @@ def main():
                 or not module.params["search_attribute"]
             ):
                 module.fail_json(
-                    '"host", "port", "base_dn", "search_attribute" must be provided when idp_type is "ldap"'
+                    "'host', 'port', 'base_dn', 'search_attribute' must be provided when idp_type is 'ldap'"
                 )
             if module.params["idp_type"] == "saml" and (
                 not module.params["idp_entityid"]
@@ -556,7 +556,7 @@ def main():
                 or not module.params["username_attribute"]
             ):
                 module.fail_json(
-                    '"idp_entityid", "sp_entityid", "sso_url", "username_attribute" must be provided when idp_type is "ldap"'
+                    "'idp_entityid', 'sp_entityid', 'sso_url', 'username_attribute' must be provided when idp_type is 'ldap'"
                 )
 
         directory = user_directory._zapi.userdirectory.get(
@@ -610,7 +610,7 @@ def main():
                 or not parameters["provision_status"]
             ):
                 module.fail_json(
-                    '"provision_status" must be True to define "provision_media"'
+                    "'provision_status' must be True to define 'provision_media'"
                 )
             parameters["provision_media"] = []
             for media in module.params["provision_media"]:
@@ -619,7 +619,7 @@ def main():
                     {"filter": {"name": media_type_name}}
                 )
                 if not media_type_ids:
-                    module.fail_json('Mediatype "%s" cannot be found' % media_type_name)
+                    module.fail_json("Mediatype '%s' cannot be found" % media_type_name)
                 parameters["provision_media"].append(
                     {
                         "name": media["name"],
@@ -634,7 +634,7 @@ def main():
                 or not parameters["provision_status"]
             ):
                 module.fail_json(
-                    '"provision_status" must be True to define "provision_groups"'
+                    "'provision_status' must be True to define 'provision_groups'"
                 )
             parameters["provision_groups"] = []
             for group in module.params["provision_groups"]:
@@ -643,14 +643,14 @@ def main():
                     {"filter": {"name": role_name}}
                 )
                 if not role_ids:
-                    module.fail_json('Role "%s" cannot be found' % role_name)
+                    module.fail_json("Role '%s' cannot be found" % role_name)
                 user_groups = []
                 for user_group in group["user_groups"]:
                     ug_ids = user_directory._zapi.usergroup.get(
                         {"filter": {"name": user_group}}
                     )
                     if not ug_ids:
-                        module.fail_json('User group "%s" cannot be found' % user_group)
+                        module.fail_json("User group '%s' cannot be found" % user_group)
                     user_groups.append({"usrgrpid": ug_ids[0]["usrgrpid"]})
                 parameters["provision_groups"].append(
                     {
