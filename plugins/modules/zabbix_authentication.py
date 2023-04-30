@@ -294,7 +294,7 @@ EXAMPLES = """
       - any
     http_case_sensitive: true
     ldap_configured: true
-    ldap_host: "ldap://localhost:
+    ldap_host: "ldap://localhost"
     ldap_port: 389
     ldap_base_dn: "ou=Users,ou=system"
     ldap_search_attribute: "uid"
@@ -642,12 +642,12 @@ class Authentication(ZabbixBase):
                             self._module.fail_json(
                                 msg="%s is invalid value for passwd_check_rules."
                                 % _passwd_check_rules_value
-                               )
+                            )
                             params[
                                 "passwd_check_rules"
                             ] += 2 ** zabbix_utils.helper_to_numeric_value(
-                            passwd_check_rules_values, _passwd_check_rules_value
-                        )
+                                passwd_check_rules_values, _passwd_check_rules_value
+                            )
 
                 params["passwd_check_rules"] = str(params["passwd_check_rules"])
 

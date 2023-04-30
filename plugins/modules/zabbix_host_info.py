@@ -9,7 +9,7 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 
-RETURN = """r
+RETURN = r"""
 ---
 hosts:
   description: List of Zabbix hosts. See https://www.zabbix.com/documentation/4.0/manual/api/reference/host/get for list of host values.

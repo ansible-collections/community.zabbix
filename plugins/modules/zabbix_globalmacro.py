@@ -47,7 +47,7 @@ options:
         description:
             - Text Description of the global macro.
         type: str
-        default: "" 
+        default: ""
     state:
         description:
             - State of the macro.
@@ -138,7 +138,6 @@ class GlobalMacro(ZabbixBase):
     def get_global_macro(self, macro_name):
         try:
             all_global_macro_list = self._zapi.usermacro.get({"globalmacro": "true"})
-            #self._module.fail_json(all_global_macro_list)
             global_macro_list = [d for d in all_global_macro_list if d["macro"] == macro_name]
             if len(global_macro_list) > 0:
                 return global_macro_list[0]

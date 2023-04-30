@@ -102,7 +102,7 @@ EXAMPLES = """
     tls_accept: unsecure
 """
 
-RETURN = """ 
+RETURN = """
 msg:
     description: The result of the operation
     returned: success
