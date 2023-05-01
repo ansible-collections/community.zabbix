@@ -79,14 +79,12 @@
     template_name: ExampleTemplateForTempleteInfoModule
     format: yaml
   register: fetch_template_yaml_format_result
-  when: zabbix_version is version('5.2', '>=')
 
 - assert:
     that:
       - fetch_template_yaml_format_result.template_yaml | regex_search('date: .+') is defined
       - fetch_template_yaml_format_result.template_yaml | regex_search('name: Templates') is defined
       - fetch_template_yaml_format_result.template_yaml | regex_search('template: ExampleTemplateForTempleteInfoModule') is defined
-  when: zabbix_version is version('5.2', '>=')
 
 - name: "test - Fetch template info as a YAML format with omit_date parameter from Zabbix Server"
   zabbix_template_info:
@@ -94,14 +92,12 @@
     format: yaml
     omit_date: true
   register: fetch_template_yaml_format_omit_date_result
-  when: zabbix_version is version('5.2', '>=')
 
 - assert:
     that:
       - fetch_template_yaml_format_result.template_yaml | regex_search('date: .+') is not defined
       - fetch_template_yaml_format_result.template_yaml | regex_search('name: Templates') is defined
       - fetch_template_yaml_format_result.template_yaml | regex_search('template: ExampleTemplateForTempleteInfoModule') is defined
-  when: zabbix_version is version('5.2', '>=')
 
 - name: "test - Fetch template info with none format from Zabbix Server"
   zabbix_template_info:

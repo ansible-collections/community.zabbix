@@ -19,7 +19,7 @@ description:
 author:
     - "Tobias Birkefeld (@tcraxs)"
 requirements:
-    - "python >= 2.6"
+    - "python >= 3.9"
 options:
     name:
         description:
@@ -127,13 +127,13 @@ options:
                     - Tag name.
                 required: false
                 type: str
-                default: ''
+                default: ""
             value:
                 description:
                     - Tag value.
                 required: false
                 type: str
-                default: ''
+                default: ""
     userdirectory:
         description:
             - Authentication user directory when gui_access set to LDAP or System default.
@@ -149,8 +149,7 @@ options:
         type: str
         default: "present"
         choices: [ "present", "absent" ]
-notes:
-    - Only Zabbix >= 4.0 is supported.
+
 extends_documentation_fragment:
 - community.zabbix.zabbix
 """
@@ -177,7 +176,7 @@ EXAMPLES = r"""
     ansible_httpapi_port: 443
     ansible_httpapi_use_ssl: true
     ansible_httpapi_validate_certs: false
-    ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
+    ansible_zabbix_url_path: "zabbixeu"  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
     ansible_host: zabbix-example-fqdn.org
   community.zabbix.zabbix_usergroup:
     name: ACME
@@ -193,7 +192,7 @@ EXAMPLES = r"""
     ansible_httpapi_port: 443
     ansible_httpapi_use_ssl: true
     ansible_httpapi_validate_certs: false
-    ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
+    ansible_zabbix_url_path: "zabbixeu"  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
     ansible_host: zabbix-example-fqdn.org
   community.zabbix.zabbix_usergroup:
     name: ACME
@@ -209,7 +208,7 @@ EXAMPLES = r"""
     ansible_httpapi_port: 443
     ansible_httpapi_use_ssl: true
     ansible_httpapi_validate_certs: false
-    ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
+    ansible_zabbix_url_path: "zabbixeu"  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
     ansible_host: zabbix-example-fqdn.org
   community.zabbix.zabbix_usergroup:
     name: ACME
@@ -224,7 +223,7 @@ EXAMPLES = r"""
     ansible_httpapi_port: 443
     ansible_httpapi_use_ssl: true
     ansible_httpapi_validate_certs: false
-    ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
+    ansible_zabbix_url_path: "zabbixeu"  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
     ansible_host: zabbix-example-fqdn.org
   community.zabbix.zabbix_usergroup:
     name: ACME
@@ -244,7 +243,7 @@ EXAMPLES = r"""
     ansible_httpapi_port: 443
     ansible_httpapi_use_ssl: true
     ansible_httpapi_validate_certs: false
-    ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
+    ansible_zabbix_url_path: "zabbixeu"  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
     ansible_host: zabbix-example-fqdn.org
   community.zabbix.zabbix_usergroup:
     name: ACME
@@ -269,7 +268,7 @@ EXAMPLES = r"""
     ansible_httpapi_port: 443
     ansible_httpapi_use_ssl: true
     ansible_httpapi_validate_certs: false
-    ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
+    ansible_zabbix_url_path: "zabbixeu"  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
     ansible_host: zabbix-example-fqdn.org
   community.zabbix.zabbix_usergroup:
     name: ACME
@@ -291,7 +290,7 @@ EXAMPLES = r"""
     ansible_httpapi_port: 443
     ansible_httpapi_use_ssl: true
     ansible_httpapi_validate_certs: false
-    ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
+    ansible_zabbix_url_path: "zabbixeu"  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
     ansible_host: zabbix-example-fqdn.org
   community.zabbix.zabbix_usergroup:
     name: ACME
@@ -303,22 +302,22 @@ state:
   description: User group state at the end of execution.
   returned: on success
   type: str
-  sample: 'present'
+  sample: "present"
 usergroup:
   description: User group name.
   returned: on success
   type: str
-  sample: 'ACME'
+  sample: "ACME"
 usrgrpid:
     description: User group id, if created, changed or deleted.
     returned: on success
     type: str
-    sample: '42'
+    sample: "42"
 msg:
     description: The result of the operation
     returned: always
     type: str
-    sample: 'User group created: ACME, ID: 42'
+    sample: "User group created: ACME, ID: 42"
 """
 
 from ansible.module_utils.basic import AnsibleModule
@@ -351,7 +350,7 @@ class Rights(ZabbixBase):
             else:
                 return _hostgroup[0]
         except Exception as e:
-            self._module.fail_json(msg='Failed to get host group "%s": %s' % (name, e))
+            self._module.fail_json(msg="Failed to get host group '%s': %s" % (name, e))
 
     def construct_the_data(self, _rights):
         """Construct the user defined rights to fit the Zabbix API requirements
@@ -394,15 +393,15 @@ class HostgroupRights(ZabbixBase):
         """
         try:
             _hostgroup = self._zapi.hostgroup.get({
-                'output': 'extend',
-                'filter': {'name': [name]}
+                "output": "extend",
+                "filter": {"name": [name]}
             })
             if len(_hostgroup) < 1:
-                self._module.fail_json(msg='Host group not found: %s' % name)
+                self._module.fail_json(msg="Host group not found: %s" % name)
             else:
                 return _hostgroup[0]
         except Exception as e:
-            self._module.fail_json(msg='Failed to get host group "%s": %s' % (name, e))
+            self._module.fail_json(msg="Failed to get host group '%s': %s" % (name, e))
 
     def construct_the_data(self, _rights):
         """Construct the user defined host group rights to fit the Zabbix API requirements
@@ -418,12 +417,12 @@ class HostgroupRights(ZabbixBase):
         constructed_data = []
         for right in _rights:
             constructed_right = {
-                'id': self.get_hostgroup_by_hostgroup_name(right.get('host_group'))['groupid'],
-                'permission': zabbix_utils.helper_to_numeric_value([
-                    'denied',
+                "id": self.get_hostgroup_by_hostgroup_name(right.get("host_group"))["groupid"],
+                "permission": zabbix_utils.helper_to_numeric_value([
+                    "denied",
                     None,
-                    'read-only',
-                    'read-write'], right.get('permission')
+                    "read-only",
+                    "read-write"], right.get("permission")
                 )
             }
             constructed_data.append(constructed_right)
@@ -446,15 +445,15 @@ class TemplategroupRights(ZabbixBase):
         """
         try:
             _templategroup = self._zapi.templategroup.get({
-                'output': 'extend',
-                'filter': {'name': [name]}
+                "output": "extend",
+                "filter": {"name": [name]}
             })
             if len(_templategroup) < 1:
-                self._module.fail_json(msg='Template group not found: %s' % name)
+                self._module.fail_json(msg="Template group not found: %s" % name)
             else:
                 return _templategroup[0]
         except Exception as e:
-            self._module.fail_json(msg='Failed to get template group "%s": %s' % (name, e))
+            self._module.fail_json(msg="Failed to get template group '%s': %s" % (name, e))
 
     def construct_the_data(self, _rights):
         """Construct the user defined template rights to fit the Zabbix API requirements
@@ -470,12 +469,12 @@ class TemplategroupRights(ZabbixBase):
         constructed_data = []
         for right in _rights:
             constructed_right = {
-                'id': self.get_templategroup_by_templategroup_name(right.get('template_group'))['groupid'],
-                'permission': zabbix_utils.helper_to_numeric_value([
-                    'denied',
+                "id": self.get_templategroup_by_templategroup_name(right.get("template_group"))["groupid"],
+                "permission": zabbix_utils.helper_to_numeric_value([
+                    "denied",
                     None,
-                    'read-only',
-                    'read-write'], right.get('permission')
+                    "read-only",
+                    "read-write"], right.get("permission")
                 )
             }
             constructed_data.append(constructed_right)
@@ -558,12 +557,12 @@ class UserGroup(ZabbixBase):
                         )
                 except Exception as e:
                     self._module.fail_json(
-                        msg='Failed to get user directory "%s": %s'
+                        msg="Failed to get user directory '%s': %s"
                         % (kwargs["userdirectory"], e)
                     )
                 if len(_userdir) == 0:
                     self._module.fail_json(
-                        msg='User directory "%s" not found' % kwargs["userdirectory"]
+                        msg="User directory '%s' not found" % kwargs["userdirectory"]
                     )
                 _params["userdirectoryid"] = _userdir[0]["userdirectoryid"]
 
@@ -586,7 +585,7 @@ class UserGroup(ZabbixBase):
                 return _usergroup
         except Exception as e:
             self._module.fail_json(
-                msg='Failed to check if user group "%s" exists: %s' % (name, e)
+                msg="Failed to check if user group '%s' exists: %s" % (name, e)
             )
 
     def get_usergroup_by_usergroup_name(self, name):
@@ -624,7 +623,7 @@ class UserGroup(ZabbixBase):
             else:
                 return _usergroup[0]
         except Exception as e:
-            self._module.fail_json(msg='Failed to get user group "%s": %s' % (name, e))
+            self._module.fail_json(msg="Failed to get user group '%s': %s" % (name, e))
 
     def check_difference(self, **kwargs):
         """Check difference between user group and user specified parameters.
@@ -662,7 +661,7 @@ class UserGroup(ZabbixBase):
             return self._zapi.usergroup.update(kwargs)
         except Exception as e:
             self._module.fail_json(
-                msg='Failed to update user group "%s": %s' % (kwargs["usrgrpid"], e)
+                msg="Failed to update user group '%s': %s" % (kwargs["usrgrpid"], e)
             )
 
     def add(self, **kwargs):
@@ -682,7 +681,7 @@ class UserGroup(ZabbixBase):
             return usergroup["usrgrpids"][0]
         except Exception as e:
             self._module.fail_json(
-                msg='Failed to create user group "%s": %s' % (kwargs["name"], e)
+                msg="Failed to create user group '%s': %s" % (kwargs["name"], e)
             )
 
     def delete(self, usrgrpid):
@@ -701,7 +700,7 @@ class UserGroup(ZabbixBase):
                 return self._zapi.usergroup.delete([usrgrpid])
         except Exception as e:
             self._module.fail_json(
-                msg='Failed to delete user group "%s": %s' % (usrgrpid, e)
+                msg="Failed to delete user group '%s': %s" % (usrgrpid, e)
             )
 
 

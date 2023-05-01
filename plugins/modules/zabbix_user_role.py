@@ -8,7 +8,7 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = r'''
+DOCUMENTATION = r"""
 module: zabbix_user_role
 short_description: Adds or removes zabbix roles
 author:
@@ -16,15 +16,15 @@ author:
 description:
     - This module adds or removes zabbix roles
 requirements:
-    - "python >= 2.6"
+    - "python >= 3.9"
 options:
     state:
         description:
             - State of the user_role.
             - On C(present), it will create if user_role does not exist or update the user_role if the associated data is different.
             - On C(absent) will remove a user_role if it exists.
-        default: 'present'
-        choices: ['present', 'absent']
+        default: "present"
+        choices: ["present", "absent"]
         type: str
         required: false
     name:
@@ -47,9 +47,9 @@ options:
         required: false
 extends_documentation_fragment:
 - community.zabbix.zabbix
-'''
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 # If you want to use Username and Password to be authenticated by Zabbix Server
 - name: Set credentials to access Zabbix Server API
   set_fact:
@@ -73,7 +73,7 @@ EXAMPLES = r'''
     ansible_httpapi_port: 443
     ansible_httpapi_use_ssl: true
     ansible_httpapi_validate_certs: false
-    ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
+    ansible_zabbix_url_path: "zabbixeu"  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
     ansible_host: zabbix-example-fqdn.org
   community.zabbix.zabbix_user_role:
     state: present
@@ -86,21 +86,21 @@ EXAMPLES = r'''
           status: 0
         - name: "monitoring.maps"
           status: 1
-'''
+"""
 
-RETURN = r'''
+RETURN = r"""
 # Return values
 msg:
     description: The result of the action
     type: str
     returned: always
-    sample: 'No action'
+    sample: "No action"
 changed:
     description: The consequence of the action
     type: bool
     returned: always
     sample: false
-'''
+"""
 
 from ansible.module_utils.basic import AnsibleModule
 
@@ -135,7 +135,7 @@ class UserRole(ZabbixBase):
         verdict = True
         for rule, value in inp.items():
             if not isinstance(value, list):
-                verdict = verdict and self.__find_val(out.get(rule, ''), value)
+                verdict = verdict and self.__find_val(out.get(rule, ""), value)
             else:
                 if len(value):
                     if not isinstance(value[0], dict):
@@ -162,10 +162,10 @@ def main():
 
     argument_spec = zabbix_utils.zabbix_common_argument_spec()
     argument_spec.update(dict(
-        state=dict(type='str', required=False, default='present', choices=['present', 'absent']),
-        name=dict(type='str', required=True),
-        type=dict(type='str', required=False, choices=["User", "Admin", "Super Admin"], default='User'),
-        rules=dict(type='dict', required=False, default={}),
+        state=dict(type="str", required=False, default="present", choices=["present", "absent"]),
+        name=dict(type="str", required=True),
+        type=dict(type="str", required=False, choices=["User", "Admin", "Super Admin"], default="User"),
+        rules=dict(type="dict", required=False, default={}),
     ))
 
     # the AnsibleModule object
@@ -176,12 +176,12 @@ def main():
 
     zabbix_utils.require_creds_params(module)
 
-    state = module.params['state']
-    name = module.params['name']
+    state = module.params["state"]
+    name = module.params["name"]
     type = zabbix_utils.helper_to_numeric_value(
-        ['', 'user', 'admin', 'super admin'], module.params['type'].lower()
+        ["", "user", "admin", "super admin"], module.params["type"].lower()
     )
-    rules = module.params['rules']
+    rules = module.params["rules"]
 
     user_role = UserRole(module)
 
@@ -189,19 +189,19 @@ def main():
     if result:
         if len(result) == 1:
             role = result[0]
-            if role['readonly'] != 1:
-                roleid = role['roleid']
-                if state == 'absent':
+            if role["readonly"] != 1:
+                roleid = role["roleid"]
+                if state == "absent":
                     result = user_role._zapi.role.delete([f"{roleid}"])
                     changed = True
                     msg = "Role deleted"
                 else:
-                    if not user_role.is_part_of(rules, role['rules']):
+                    if not user_role.is_part_of(rules, role["rules"]):
                         result = user_role._zapi.role.update({"roleid": roleid, "rules": rules})
                         changed = True
                         msg = "Role updated"
         else:
-            module.fail_json(msg='Too many role matches')
+            module.fail_json(msg="Too many role matches")
     else:
         user_role._zapi.role.create({
             "name": name,
@@ -214,5 +214,5 @@ def main():
     module.exit_json(msg=msg, changed=changed)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

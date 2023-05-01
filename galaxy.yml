@@ -18,7 +18,7 @@ homepage: https://github.com/ansible-collections/community.zabbix
 issues: https://github.com/ansible-collections/community.zabbix/issues
 dependencies:
   ansible.windows: "*"
-  ansible.netcommon: "*"
+  ansible.netcommon: ">=3.1.1"
   ansible.posix: "*"
   community.general: "*"
   community.mysql: "*"

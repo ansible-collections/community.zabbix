@@ -22,7 +22,7 @@ author:
     - ONODERA Masaru(@masa-orca)
 
 requirements:
-    - "python >= 2.6"
+    - "python >= 3.9"
 
 version_added: 1.6.0
 
@@ -258,9 +258,6 @@ options:
         type: list
         elements: str
 
-notes:
-    - Zabbix 5.4 version and higher are supported.
-
 extends_documentation_fragment:
     - community.zabbix.zabbix
 """
@@ -286,7 +283,7 @@ EXAMPLES = """
     ansible_httpapi_port: 443
     ansible_httpapi_use_ssl: true
     ansible_httpapi_validate_certs: false
-    ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
+    ansible_zabbix_url_path: "zabbixeu"  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
     ansible_host: zabbix-example-fqdn.org
   zabbix_authentication:
     authentication_type: internal
@@ -297,20 +294,20 @@ EXAMPLES = """
       - any
     http_case_sensitive: true
     ldap_configured: true
-    ldap_host: 'ldap://localhost'
+    ldap_host: "ldap://localhost"
     ldap_port: 389
-    ldap_base_dn: 'ou=Users,ou=system'
-    ldap_search_attribute: 'uid'
-    ldap_bind_dn: 'uid=ldap_search,ou=system'
+    ldap_base_dn: "ou=Users,ou=system"
+    ldap_search_attribute: "uid"
+    ldap_bind_dn: "uid=ldap_search,ou=system"
     ldap_case_sensitive: true
-    ldap_bind_password: 'password'
+    ldap_bind_password: "password"
     saml_auth_enabled: true
-    saml_idp_entityid: ''
-    saml_sso_url: 'https://localhost/SAML2/SSO'
-    saml_slo_url: 'https://localhost/SAML2/SLO'
-    saml_username_attribute: 'uid'
-    saml_sp_entityid: 'https://localhost'
-    saml_nameid_format: 'urn:oasis:names:tc:SAML:2.0:nameid-format:entity'
+    saml_idp_entityid: ""
+    saml_sso_url: "https://localhost/SAML2/SSO"
+    saml_slo_url: "https://localhost/SAML2/SLO"
+    saml_username_attribute: "uid"
+    saml_sp_entityid: "https://localhost"
+    saml_nameid_format: "urn:oasis:names:tc:SAML:2.0:nameid-format:entity"
     saml_sign_messages: true
     saml_sign_assertions: true
     saml_sign_authn_requests: true
@@ -334,7 +331,7 @@ EXAMPLES = """
     ansible_httpapi_port: 443
     ansible_httpapi_use_ssl: true
     ansible_httpapi_validate_certs: false
-    ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
+    ansible_zabbix_url_path: "zabbixeu"  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
     ansible_host: zabbix-example-fqdn.org
   zabbix_authentication:
     authentication_type: internal
@@ -347,12 +344,12 @@ EXAMPLES = """
     ldap_configured: true
     ldap_case_sensitive: true
     saml_auth_enabled: true
-    saml_idp_entityid: ''
-    saml_sso_url: 'https://localhost/SAML2/SSO'
-    saml_slo_url: 'https://localhost/SAML2/SLO'
-    saml_username_attribute: 'uid'
-    saml_sp_entityid: 'https://localhost'
-    saml_nameid_format: 'urn:oasis:names:tc:SAML:2.0:nameid-format:entity'
+    saml_idp_entityid: ""
+    saml_sso_url: "https://localhost/SAML2/SSO"
+    saml_slo_url: "https://localhost/SAML2/SLO"
+    saml_username_attribute: "uid"
+    saml_sp_entityid: "https://localhost"
+    saml_nameid_format: "urn:oasis:names:tc:SAML:2.0:nameid-format:entity"
     saml_sign_messages: true
     saml_sign_assertions: true
     saml_sign_authn_requests: true
@@ -376,7 +373,7 @@ EXAMPLES = """
     ansible_httpapi_port: 443
     ansible_httpapi_use_ssl: true
     ansible_httpapi_validate_certs: false
-    ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
+    ansible_zabbix_url_path: "zabbixeu"  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
     ansible_host: zabbix-example-fqdn.org
   zabbix_authentication:
     authentication_type: internal
@@ -407,7 +404,7 @@ msg:
     description: The result of the operation
     returned: success
     type: str
-    sample: 'Successfully update authentication setting'
+    sample: "Successfully update authentication setting"
 """
 
 from ansible.module_utils.basic import AnsibleModule
@@ -418,12 +415,6 @@ import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabb
 
 
 class Authentication(ZabbixBase):
-    def __init__(self, module, zbx=None, zapi_wrapper=None):
-        super(Authentication, self).__init__(module, zbx, zapi_wrapper)
-        if LooseVersion(self._zbx_api_version) < LooseVersion("5.4.0"):
-            module.fail_json(
-                msg="This module doesn't support Zabbix versions lower than 5.4.0"
-            )
 
     # get authentication setting
     def get_authentication(self):
@@ -506,7 +497,7 @@ class Authentication(ZabbixBase):
                 if isinstance(ldap_auth_enabled, bool):
                     params["ldap_auth_enabled"] = str(int(ldap_auth_enabled))
 
-            if LooseVersion(self._zbx_api_version) < LooseVersion("6.2.0"):
+            if LooseVersion(self._zbx_api_version) < LooseVersion("6.2"):
                 if ldap_host:
                     params["ldap_host"] = ldap_host
 
@@ -608,62 +599,57 @@ class Authentication(ZabbixBase):
                     )
                     if not usrgrpids:
                         self._module.fail_json(
-                            'User group "%s" cannot be found' % disabled_usrgroup
+                            "User group '%s' cannot be found" % disabled_usrgroup
                         )
                     params["disabled_usrgrpid"] = str(int(usrgrpids[0]["usrgrpid"]))
 
                 if (ldap_jit_status or saml_jit_status) and not disabled_usrgroup:
                     self._module.fail_json(
-                        '"disabled_usrgroup" must be provided if "ldap_jit_status" or "saml_jit_status" enabled'
+                        "'disabled_usrgroup' must be provided if 'ldap_jit_status' or 'saml_jit_status' enabled"
                     )
 
             if passwd_min_length:
-                if LooseVersion(self._zbx_api_version) < LooseVersion("6.0"):
-                    self._module.warn("passwd_min_length is ignored with Zabbix 5.4.")
-                elif passwd_min_length < 1 or passwd_min_length > 70:
+                if passwd_min_length < 1 or passwd_min_length > 70:
                     self._module.fail_json(msg="Please set 0-70 to passwd_min_length.")
                 else:
                     params["passwd_min_length"] = str(passwd_min_length)
 
             if passwd_check_rules:
-                if LooseVersion(self._zbx_api_version) < LooseVersion("6.0"):
-                    self._module.warn("passwd_check_rules is ignored with Zabbix 5.4.")
-                else:
-                    passwd_check_rules_values = [
-                        "contain_uppercase_and_lowercase_letters",
-                        "contain_digits",
-                        "contain_special_characters",
-                        "avoid_easy_to_guess",
-                    ]
-                    params["passwd_check_rules"] = 0
-                    if isinstance(passwd_check_rules, str):
-                        if passwd_check_rules not in passwd_check_rules_values:
+                passwd_check_rules_values = [
+                    "contain_uppercase_and_lowercase_letters",
+                    "contain_digits",
+                    "contain_special_characters",
+                    "avoid_easy_to_guess",
+                ]
+                params["passwd_check_rules"] = 0
+                if isinstance(passwd_check_rules, str):
+                    if passwd_check_rules not in passwd_check_rules_values:
+                        self._module.fail_json(
+                            msg="%s is invalid value for passwd_check_rules."
+                            % passwd_check_rules
+                        )
+                    params[
+                        "passwd_check_rules"
+                    ] += 2 ** zabbix_utils.helper_to_numeric_value(
+                        passwd_check_rules_values, passwd_check_rules
+                    )
+                elif isinstance(passwd_check_rules, list):
+                    for _passwd_check_rules_value in passwd_check_rules:
+                        if (
+                            _passwd_check_rules_value
+                            not in passwd_check_rules_values
+                        ):
                             self._module.fail_json(
                                 msg="%s is invalid value for passwd_check_rules."
-                                % passwd_check_rules
+                                % _passwd_check_rules_value
                             )
-                        params[
-                            "passwd_check_rules"
-                        ] += 2 ** zabbix_utils.helper_to_numeric_value(
-                            passwd_check_rules_values, passwd_check_rules
-                        )
-                    elif isinstance(passwd_check_rules, list):
-                        for _passwd_check_rules_value in passwd_check_rules:
-                            if (
-                                _passwd_check_rules_value
-                                not in passwd_check_rules_values
-                            ):
-                                self._module.fail_json(
-                                    msg="%s is invalid value for passwd_check_rules."
-                                    % _passwd_check_rules_value
-                                )
                             params[
                                 "passwd_check_rules"
                             ] += 2 ** zabbix_utils.helper_to_numeric_value(
                                 passwd_check_rules_values, _passwd_check_rules_value
                             )
 
-                    params["passwd_check_rules"] = str(params["passwd_check_rules"])
+                params["passwd_check_rules"] = str(params["passwd_check_rules"])
 
             future_authentication = current_authentication.copy()
             future_authentication.update(params)
@@ -673,7 +659,7 @@ class Authentication(ZabbixBase):
                     current_authentication["ldap_configured"] == "0"
                     and future_authentication["ldap_configured"] == "1"
                 ):
-                    if LooseVersion(self._zbx_api_version) < LooseVersion("6.2.0"):
+                    if LooseVersion(self._zbx_api_version) < LooseVersion("6.2"):
                         if (
                             not ldap_host
                             or not ldap_port

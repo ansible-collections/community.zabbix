@@ -8,7 +8,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
+DOCUMENTATION = """
 module: zabbix_template_info
 short_description: Gather information about Zabbix template
 author:
@@ -16,7 +16,7 @@ author:
 description:
     - This module allows you to search for Zabbix template.
 requirements:
-    - "python >= 2.6"
+    - "python >= 3.9"
 options:
     template_name:
         description:
@@ -26,8 +26,7 @@ options:
     format:
         description:
             - Format to use when dumping template.
-            - C(yaml) works only with Zabbix >= 5.2.
-        choices: ['json', 'xml', 'yaml', 'none']
+        choices: ["json", "xml", "yaml", "none"]
         default: json
         type: str
     omit_date:
@@ -38,13 +37,9 @@ options:
         default: false
 extends_documentation_fragment:
 - community.zabbix.zabbix
+"""
 
-notes:
-- there where breaking changes in the Zabbix API with version 5.4 onwards (especially UUIDs) which may
-  require you to export the templates again (see version tag >= 5.4 in the resulting file/data).
-'''
-
-EXAMPLES = '''
+EXAMPLES = """
 # If you want to use Username and Password to be authenticated by Zabbix Server
 - name: Set credentials to access Zabbix Server API
   set_fact:
@@ -65,7 +60,7 @@ EXAMPLES = '''
     ansible_httpapi_port: 443
     ansible_httpapi_use_ssl: true
     ansible_httpapi_validate_certs: false
-    ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
+    ansible_zabbix_url_path: "zabbixeu"  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
     ansible_host: zabbix-example-fqdn.org
   community.zabbix.zabbix_template_info:
     template_name: Template
@@ -81,7 +76,7 @@ EXAMPLES = '''
     ansible_httpapi_port: 443
     ansible_httpapi_use_ssl: true
     ansible_httpapi_validate_certs: false
-    ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
+    ansible_zabbix_url_path: "zabbixeu"  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
     ansible_host: zabbix-example-fqdn.org
   community.zabbix.zabbix_template_info:
     template_name: Template
@@ -97,7 +92,7 @@ EXAMPLES = '''
     ansible_httpapi_port: 443
     ansible_httpapi_use_ssl: true
     ansible_httpapi_validate_certs: false
-    ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
+    ansible_zabbix_url_path: "zabbixeu"  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
     ansible_host: zabbix-example-fqdn.org
   community.zabbix.zabbix_template_info:
     template_name: Template
@@ -113,15 +108,15 @@ EXAMPLES = '''
     ansible_httpapi_port: 443
     ansible_httpapi_use_ssl: true
     ansible_httpapi_validate_certs: false
-    ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
+    ansible_zabbix_url_path: "zabbixeu"  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
     ansible_host: zabbix-example-fqdn.org
   community.zabbix.zabbix_template_info:
     template_name: Template
     format: none
   register: template
-'''
+"""
 
-RETURN = '''
+RETURN = """
 ---
 template_id:
   description: The ID of the template
@@ -133,38 +128,33 @@ template_json:
   returned: when format is json and omit_date is true
   type: str
   sample: {
+        "changed": false,
+        "failed": false,
+        "template_id": "10529",
+        "template_json": {
             "zabbix_export": {
-              "version": "4.0",
-              "groups": [
-                {
-                  "name": "Templates"
-                }
-              ],
-              "templates": [
-                {
-                  "template": "Test Template",
-                  "name": "Template for Testing",
-                  "description": "Testing template import",
-                  "groups": [
+                "groups": [
                     {
-                      "name": "Templates"
+                        "name": "Templates",
+                        "uuid": "7df96b18c230490a9a0a9e2307226338"
                     }
-                  ],
-                  "applications": [
+                ],
+                "templates": [
                     {
-                      "name": "Test Application"
+                        "groups": [
+                            {
+                                "name": "Templates"
+                            }
+                        ],
+                        "name": "ExampleTemplateForTempleteInfoModule",
+                        "template": "ExampleTemplateForTempleteInfoModule",
+                        "uuid": "615e9b0662bb4399a2503a9aaa743517"
                     }
-                  ],
-                  "items": [],
-                  "discovery_rules": [],
-                  "httptests": [],
-                  "macros": [],
-                  "templates": [],
-                  "screens": []
-                }
-              ]
+                ],
+                "version": "6.0"
             }
-          }
+        }
+    }
 
 template_xml:
   description: The XML of the template
@@ -172,34 +162,23 @@ template_xml:
   type: str
   sample: >-
     <zabbix_export>
-        <version>4.0</version>
-        <date>2019-10-27T14:49:57Z</date>
+        <version>6.0</version>
         <groups>
             <group>
+                <uuid>7df96b18c230490a9a0a9e2307226338</uuid>
                 <name>Templates</name>
             </group>
         </groups>
         <templates>
             <template>
-                <template>Test Template</template>
-                <name>Template for Testing</name>
-                <description>Testing template import</description>
+                <uuid>9a83162273f74032a1005fdb13943038</uuid>
+                <template>ExampleTemplateForTempleteInfoModule</template>
+                <name>ExampleTemplateForTempleteInfoModule</name>
                 <groups>
                     <group>
                         <name>Templates</name>
                     </group>
                 </groups>
-                <applications>
-                    <application>
-                        <name>Test Application</name>
-                    </application>
-                </applications>
-                <items />
-                <discovery_rules />
-                <httptests />
-                <macros />
-                <templates />
-                <screens />
             </template>
         </templates>
     </zabbix_export>
@@ -210,22 +189,20 @@ template_yaml:
   type: str
   sample: >-
     zabbix_export:
-      version: '6.0'
-      date: '2022-07-09T13:25:18Z'
+      version: "6.0"
       groups:
         -
           uuid: 7df96b18c230490a9a0a9e2307226338
           name: Templates
-      templates:
-        -
-          uuid: 88a9ad240f924f669eb7d4eed736320c
-          template: 'Test Template'
-          name: 'Template for Testing'
-          description: 'Testing template import'
-          groups:
+          templates:
             -
-              name: Templates
-'''
+              uuid: 67b075276bf047d3aeb8f7d5c2121c6a
+              template: ExampleTemplateForTempleteInfoModule
+              name: ExampleTemplateForTempleteInfoModule
+              groups:
+                -
+                  name: Templatesn
+"""
 
 
 import traceback
@@ -244,13 +221,13 @@ class TemplateInfo(ZabbixBase):
     def get_template_id(self, template_name):
         template_id = []
         try:
-            template_list = self._zapi.template.get({'output': ['templateid'],
-                                                     'filter': {'host': template_name}})
+            template_list = self._zapi.template.get({"output": ["templateid"],
+                                                     "filter": {"host": template_name}})
         except Exception as e:
-            self._module.fail_json(msg='Failed to get template: %s' % e)
+            self._module.fail_json(msg="Failed to get template: %s" % e)
 
         if template_list:
-            template_id.append(template_list[0]['templateid'])
+            template_id.append(template_list[0]["templateid"])
 
         return template_id
 
@@ -258,50 +235,50 @@ class TemplateInfo(ZabbixBase):
         try:
             jsondoc = json.loads(template_json)
             # remove date field if requested
-            if omit_date and 'date' in jsondoc['zabbix_export']:
-                del jsondoc['zabbix_export']['date']
+            if omit_date and "date" in jsondoc["zabbix_export"]:
+                del jsondoc["zabbix_export"]["date"]
             return jsondoc
         except ValueError as e:
-            self._module.fail_json(msg='Invalid JSON provided', details=to_native(e), exception=traceback.format_exc())
+            self._module.fail_json(msg="Invalid JSON provided", details=to_native(e), exception=traceback.format_exc())
 
     def load_yaml_template(self, template_yaml, omit_date=False):
         if omit_date:
             yaml_lines = template_yaml.splitlines(True)
             for index, line in enumerate(yaml_lines):
-                if 'date:' in line:
+                if "date:" in line:
                     del yaml_lines[index]
-                    return ''.join(yaml_lines)
+                    return "".join(yaml_lines)
         else:
             return template_yaml
 
-    def dump_template(self, template_id, template_type='json', omit_date=False):
+    def dump_template(self, template_id, template_type="json", omit_date=False):
         try:
-            dump = self._zapi.configuration.export({'format': template_type, 'options': {'templates': template_id}})
-            if template_type == 'xml':
-                xmlroot = ET.fromstring(dump.encode('utf-8'))
+            dump = self._zapi.configuration.export({"format": template_type, "options": {"templates": template_id}})
+            if template_type == "xml":
+                xmlroot = ET.fromstring(dump.encode("utf-8"))
                 # remove date field if requested
                 if omit_date:
                     date = xmlroot.find(".date")
                     if date is not None:
                         xmlroot.remove(date)
                 if PY2:
-                    return str(ET.tostring(xmlroot, encoding='utf-8'))
+                    return str(ET.tostring(xmlroot, encoding="utf-8"))
                 else:
-                    return str(ET.tostring(xmlroot, encoding='utf-8').decode('utf-8'))
-            elif template_type == 'yaml':
+                    return str(ET.tostring(xmlroot, encoding="utf-8").decode("utf-8"))
+            elif template_type == "yaml":
                 return self.load_yaml_template(dump, omit_date)
             else:
                 return self.load_json_template(dump, omit_date)
         except Exception as e:
-            self._module.fail_json(msg='Unable to export template: %s' % e)
+            self._module.fail_json(msg="Unable to export template: %s" % e)
 
 
 def main():
     argument_spec = zabbix_utils.zabbix_common_argument_spec()
     argument_spec.update(dict(
-        template_name=dict(type='str', required=True),
-        omit_date=dict(type='bool', required=False, default=False),
-        format=dict(type='str', choices=['json', 'xml', 'yaml', 'none'], default='json')
+        template_name=dict(type="str", required=True),
+        omit_date=dict(type="bool", required=False, default=False),
+        format=dict(type="str", choices=["json", "xml", "yaml", "none"], default="json")
     ))
     module = AnsibleModule(
         argument_spec=argument_spec,
@@ -310,36 +287,36 @@ def main():
 
     zabbix_utils.require_creds_params(module)
 
-    template_name = module.params['template_name']
-    omit_date = module.params['omit_date']
-    format = module.params['format']
+    template_name = module.params["template_name"]
+    omit_date = module.params["omit_date"]
+    format = module.params["format"]
 
     template_info = TemplateInfo(module)
 
     template_id = template_info.get_template_id(template_name)
 
     if not template_id:
-        module.fail_json(msg='Template not found: %s' % template_name)
+        module.fail_json(msg="Template not found: %s" % template_name)
 
-    if format == 'json':
+    if format == "json":
         module.exit_json(
             changed=False,
             template_id=template_id[0],
-            template_json=template_info.dump_template(template_id, template_type='json', omit_date=omit_date)
+            template_json=template_info.dump_template(template_id, template_type="json", omit_date=omit_date)
         )
-    elif format == 'xml':
+    elif format == "xml":
         module.exit_json(
             changed=False,
             template_id=template_id[0],
-            template_xml=template_info.dump_template(template_id, template_type='xml', omit_date=omit_date)
+            template_xml=template_info.dump_template(template_id, template_type="xml", omit_date=omit_date)
         )
-    elif format == 'yaml':
+    elif format == "yaml":
         module.exit_json(
             changed=False,
             template_id=template_id[0],
-            template_yaml=template_info.dump_template(template_id, template_type='yaml', omit_date=omit_date)
+            template_yaml=template_info.dump_template(template_id, template_type="yaml", omit_date=omit_date)
         )
-    elif format == 'none':
+    elif format == "none":
         module.exit_json(changed=False, template_id=template_id[0])
 
 
