@@ -501,8 +501,6 @@ def main():
     )
     """
 
-    zabbix_utils.require_creds_params(module)
-
     parameters = {"name": module.params["name"]}
     for p in [
         "host",

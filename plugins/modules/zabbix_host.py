@@ -1011,8 +1011,6 @@ def main():
         supports_check_mode=True
     )
 
-    zabbix_utils.require_creds_params(module)
-
     host_name = module.params["host_name"]
     visible_name = module.params["visible_name"]
     description = module.params["description"]

@@ -781,8 +781,6 @@ def main():
 
     module = AnsibleModule(argument_spec=argument_spec, supports_check_mode=True)
 
-    zabbix_utils.require_creds_params(module)
-
     name = module.params["name"]
     gui_access = module.params["gui_access"]
     debug_mode = module.params["debug_mode"]

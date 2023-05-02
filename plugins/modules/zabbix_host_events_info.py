@@ -270,8 +270,6 @@ def main():
         supports_check_mode=True
     )
 
-    zabbix_utils.require_creds_params(module)
-
     trigger_severity_map = {"not_classified": 0, "information": 1, "warning": 2, "average": 3, "high": 4, "disaster": 5}
     host_id = module.params["host_identifier"]
     host_id_type = module.params["host_id_type"]

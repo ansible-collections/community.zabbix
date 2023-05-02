@@ -94,8 +94,6 @@ def main():
         supports_check_mode=True
     )
 
-    zabbix_utils.require_creds_params(module)
-
     hostgroup_name = module.params["hostgroup_name"]
 
     host = Host(module)

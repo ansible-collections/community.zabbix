@@ -2189,8 +2189,6 @@ def main():
         supports_check_mode=True
     )
 
-    zabbix_utils.require_creds_params(module)
-
     name = module.params["name"]
     esc_period = module.params["esc_period"]
     event_source = module.params["event_source"]

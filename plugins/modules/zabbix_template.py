@@ -659,8 +659,6 @@ def main():
         supports_check_mode=True
     )
 
-    zabbix_utils.require_creds_params(module)
-
     template_name = module.params["template_name"]
     template_json = module.params["template_json"]
     template_xml = module.params["template_xml"]

@@ -198,8 +198,6 @@ def main():
         supports_check_mode=True
     )
 
-    zabbix_utils.require_creds_params(module)
-
     host_name = module.params["host_name"]
     host_ips = module.params["host_ip"]
     exact_match = module.params["exact_match"]

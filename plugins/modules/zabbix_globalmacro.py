@@ -217,8 +217,6 @@ def main():
         supports_check_mode=True
     )
 
-    zabbix_utils.require_creds_params(module)
-
     macro_name = normalize_macro_name(module.params["macro_name"])
     macro_value = module.params["macro_value"]
     macro_type = module.params["macro_type"]
