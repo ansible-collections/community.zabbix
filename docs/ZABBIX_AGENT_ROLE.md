@@ -426,10 +426,11 @@ Including an example of how to use your role (for instance, with variables passe
          - role: community.zabbix.zabbix_agent
            zabbix_agent_server: 192.168.33.30
            zabbix_agent_serveractive: 192.168.33.30
-           zabbix_api_server_url: http://zabbix.example.com
-           zabbix_api_use: true # use zabbix_api_create_hosts and/or zabbix_api_create_hostgroup from 0.8.0
+           zabbix_api_server_host: zabbix.example.com
            zabbix_api_login_user: Admin
            zabbix_api_login_pass: zabbix
+           zabbix_api_create_hostgroup: true
+           zabbix_api_create_hosts: true
            zabbix_agent_host_state: present
            zabbix_host_groups:
              - Linux Servers
@@ -451,10 +452,11 @@ You can also use the group_vars or the host_vars files for setting the variables
 ```yaml
     zabbix_agent_server: 192.168.33.30
     zabbix_agent_serveractive: 192.168.33.30
-    zabbix_api_server_url: http://zabbix.example.com
-    zabbix_api_use: true # use zabbix_api_create_hosts and/or zabbix_api_create_hostgroup from 0.8.0
+    zabbix_api_server_host: zabbix.example.com
     zabbix_api_login_user: Admin
     zabbix_api_login_pass: zabbix
+    zabbix_api_create_hostgroup: true
+    zabbix_api_create_hosts: true
     zabbix_agent_host_state: present
     zabbix_host_groups:
       - Linux Servers
