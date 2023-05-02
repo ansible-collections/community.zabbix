@@ -106,6 +106,7 @@
   when:
     - ansible_distribution == "Debian"
     - zabbix_repo == "zabbix"
+    - zabbix_agent2
   become: true
   tags:
     - zabbix-agent
@@ -121,6 +122,7 @@
   when:
     - ansible_distribution == "Debian"
     - zabbix_repo == "zabbix"
+    - zabbix_agent2
   become: true
   tags:
     - zabbix-agent
@@ -171,6 +173,7 @@
     - ansible_distribution == "Ubuntu"
     - ansible_machine == "aarch64"
     - zabbix_repo == "zabbix"
+    - zabbix_agent2
   become: true
   tags:
     - zabbix-agent
@@ -187,6 +190,7 @@
     - ansible_distribution == "Ubuntu"
     - ansible_machine == "aarch64"
     - zabbix_repo == "zabbix"
+    - zabbix_agent2
   become: true
   tags:
     - zabbix-agent
@@ -237,6 +241,7 @@
     - ansible_distribution == "Ubuntu"
     - ansible_machine != "aarch64"
     - zabbix_repo == "zabbix"
+    - zabbix_agent2
   become: true
   tags:
     - zabbix-agent
@@ -253,6 +258,7 @@
     - ansible_distribution == "Ubuntu"
     - ansible_machine != "aarch64"
     - zabbix_repo == "zabbix"
+    - zabbix_agent2
   become: true
   tags:
     - zabbix-agent
