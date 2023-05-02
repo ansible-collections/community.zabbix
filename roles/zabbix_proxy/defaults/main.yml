@@ -108,14 +108,15 @@ zabbix_proxy_vmwarecachesize: 8M
 zabbix_proxy_vmwarefrequency: 60
 
 # Zabbix API stuff
-zabbix_api_http_user: admin
-zabbix_api_http_password: admin
-zabbix_api_login_user: "{{ zabbix_api_user }}"
-zabbix_api_login_pass: "{{ zabbix_api_pass }}"
+zabbix_api_server_host: localhost
+zabbix_api_server_port: 80
+zabbix_api_login_user: Admin
+zabbix_api_login_pass: !unsafe zabbix
+zabbix_api_validate_certs: false
 ansible_httpapi_pass: "{{ zabbix_api_login_pass }}"
-ansible_httpapi_port: "{{ (zabbix_api_port_from_url == '') | ternary(zabbix_api_port_from_shema, zabbix_api_port_from_url) }}"
-ansible_httpapi_use_ssl: "{{ zabbix_api_use_ssl | default((zabbix_api_scheme_from_url == 'https') | ternary(true, false)) }}"
-zabbix_api_create_proxy: false
+ansible_httpapi_port: "{{ zabbix_api_server_port }}"
+ensible_httpapi_validate_certs: "{{ zabbix_api_validate_certs }}"
 zabbix_api_timeout: 30
+zabbix_api_create_proxy: false
 zabbix_proxy_state: present
 zabbix_proxy_status: active # or passive
