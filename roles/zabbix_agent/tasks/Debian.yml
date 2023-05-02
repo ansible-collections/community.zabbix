@@ -95,6 +95,38 @@
     - zabbix-agent
     - init
 
+###debian agent2
+- name: "Debian | Installing deb-src repository Debian"
+  apt_repository:
+    repo: "deb-src https://repo.zabbix.com/zabbix-agent2-plugins/1/debian/ {{ zabbix_agent_distribution_release }} main"
+    state: present
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
+  when:
+    - ansible_distribution == "Debian"
+    - zabbix_repo == "zabbix"
+  become: true
+  tags:
+    - zabbix-agent
+    - init
+
+- name: "Debian | Installing deb repository Debian"
+  apt_repository:
+    repo: "deb https://repo.zabbix.com/zabbix-agent2-plugins/1/debian/ {{ zabbix_agent_distribution_release }} main"
+    state: present
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
+  when:
+    - ansible_distribution == "Debian"
+    - zabbix_repo == "zabbix"
+  become: true
+  tags:
+    - zabbix-agent
+    - init
+###
+
 - name: "Debian | Installing deb-src repository Ubuntu Arm64"
   apt_repository:
     repo: "deb-src http://repo.zabbix.com/zabbix/{{ zabbix_version }}/ubuntu-arm64/ {{ zabbix_agent_distribution_release }} main"
@@ -127,6 +159,40 @@
     - zabbix-agent
     - init
 
+###ubuntu arm64 agent2
+- name: "Debian | Installing deb-src repository Ubuntu Arm64"
+  apt_repository:
+    repo: "deb-src https://repo.zabbix.com/zabbix-agent2-plugins/1//ubuntu-arm64/ {{ zabbix_agent_distribution_release }} main"
+    state: present
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
+  when:
+    - ansible_distribution == "Ubuntu"
+    - ansible_machine == "aarch64"
+    - zabbix_repo == "zabbix"
+  become: true
+  tags:
+    - zabbix-agent
+    - init
+
+- name: "Debian | Installing deb repository Ubuntu Arm64"
+  apt_repository:
+    repo: "deb https://repo.zabbix.com/zabbix-agent2-plugins/1/ubuntu-arm64/ {{ zabbix_agent_distribution_release }} main"
+    state: present
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
+  when:
+    - ansible_distribution == "Ubuntu"
+    - ansible_machine == "aarch64"
+    - zabbix_repo == "zabbix"
+  become: true
+  tags:
+    - zabbix-agent
+    - init
+####
+
 - name: "Debian | Installing deb-src repository Ubuntu"
   apt_repository:
     repo: "deb-src http://repo.zabbix.com/zabbix/{{ zabbix_version }}/ubuntu/ {{ zabbix_agent_distribution_release }} main"
@@ -158,6 +224,40 @@
   tags:
     - zabbix-agent
     - init
+
+###ubuntu agent2
+- name: "Debian | Installing deb-src repository Ubuntu"
+  apt_repository:
+    repo: "deb-src https://repo.zabbix.com/zabbix-agent2-plugins/1/ubuntu/ {{ zabbix_agent_distribution_release }} main"
+    state: present
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
+  when:
+    - ansible_distribution == "Ubuntu"
+    - ansible_machine != "aarch64"
+    - zabbix_repo == "zabbix"
+  become: true
+  tags:
+    - zabbix-agent
+    - init
+
+- name: "Debian | Installing deb repository Ubuntu"
+  apt_repository:
+    repo: "deb https://repo.zabbix.com/zabbix-agent2-plugins/1/ubuntu/ {{ zabbix_agent_distribution_release }} main"
+    state: present
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
+  when:
+    - ansible_distribution == "Ubuntu"
+    - ansible_machine != "aarch64"
+    - zabbix_repo == "zabbix"
+  become: true
+  tags:
+    - zabbix-agent
+    - init
+###
 
 - name: "Debian | Create /etc/apt/preferences.d/"
   file:
