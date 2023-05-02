@@ -242,16 +242,17 @@ These variables need to be overridden when you want to make use of the Zabbix AP
 
 Host encryption configuration will be set to match agent configuration.
 
-* `zabbix_api_http_user`: The http user to access zabbix url with Basic Auth.
-* `zabbix_api_http_password`: The http password to access zabbix url with Basic Auth.
-* `zabbix_api_create_hosts`: Default: `False`. When you want to enable the Zabbix API to create/delete the host. This has to be set to `True` if you want to make use of `zabbix_agent_host_state`.
-* `zabbix_api_create_hostgroup`: When you want to enable the Zabbix API to create/delete the hostgroups. This has to be set to `True` if you want to make use of `zabbix_agent_hostgroups_state`.Default: `False`
 * `zabbix_api_server_host`: The IP or hostname/FQDN of Zabbix server. Example: zabbix.example.com
 * `zabbix_api_server_port`: TCP port to use to connect to Zabbix server. Example: 8080
-* `zabbix_api_use_ssl`: yes (Default) if we need to connect to Zabbix server over HTTPS
-* `zabbix_api_validate_certs` : yes (Default) if we need to validate tls certificates of the API. Use `no` in case self-signed certificates are used
 * `zabbix_api_login_user`: Username of user which has API access.
 * `zabbix_api_login_pass`: Password for the user which has API access.
+* `zabbix_api_http_user`: The http user to access zabbix url with Basic Auth (if your Zabbix is behind a proxy with HTTP Basic Auth).
+* `zabbix_api_http_password`: The http password to access zabbix url with Basic Auth (if your Zabbix is behind a proxy with HTTP Basic Auth).
+* `zabbix_api_validate_certs`: yes (Default) if we need to validate tls certificates of the API. Use `no` in case self-signed certificates are used.
+* `zabbix_api_timeout`: How many seconds to wait for API response (default 30s).
+* `zabbix_api_create_hosts`: Default: `False`. When you want to enable the Zabbix API to create/delete the host. This has to be set to `True` if you want to make use of `zabbix_agent_host_state`.
+* `zabbix_api_create_hostgroup`: When you want to enable the Zabbix API to create/delete the hostgroups. This has to be set to `True` if you want to make use of `zabbix_agent_hostgroups_state`.Default: `False`
+* `zabbix_api_use_ssl`: yes (Default) if we need to connect to Zabbix server over HTTPS
 * `ansible_zabbix_url_path`: URL path if Zabbix WebUI running on non-default (zabbix) path, e.g. if http://<FQDN>/zabbixeu then set to `zabbixeu`
 * `zabbix_agent_hostgroups_state`: present (Default) if the hostgroup needs to be created or absent if you want to delete it. This only works when `zabbix_api_create_hostgroup` is set to `True`.
 * `zabbix_host_status`: enabled (Default) when host in monitored, disabled when host is disabled for monitoring.

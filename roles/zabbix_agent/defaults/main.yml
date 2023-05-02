@@ -65,7 +65,6 @@ zabbix_repo_yum:
     state: present
 
 # Zabbix API stuff
-zabbix_api_validate_certs: true
 zabbix_api_server_host: localhost
 zabbix_api_server_port: 80
 zabbix_api_login_user: Admin
