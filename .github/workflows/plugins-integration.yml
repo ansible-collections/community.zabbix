@@ -20,9 +20,6 @@ jobs:
       fail-fast: false
       matrix:
         zabbix_container:
-          - version: "4.0"
-          - version: "5.0"
-          # - version: "5.4" # only activate after basic compatibility
           - version: "6.0"
           - version: "6.2"
           - version: "6.4"
@@ -53,7 +50,7 @@ jobs:
         run: pip install docker-compose zabbix-api
 
       - name: Install ansible.netcommon collection
-        run: ansible-galaxy collection install ansible.netcommon -p /home/runner/work/community.zabbix/community.zabbix
+        run: ansible-galaxy collection install ansible.netcommon -p $GITHUB_WORKSPACE
         working-directory: ./ansible_collections/community/zabbix
 
       # For Zabbix integration tests we need to test against different versions of

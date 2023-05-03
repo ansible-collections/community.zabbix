@@ -1,24 +1,6 @@
 ---
-- name: test - do not run tests with < Zabbix 4.0
-  meta: end_play
-  when: zabbix_version is version('4.0', '<')
-
-- when: zabbix_version is version('5.4', '<')
-  name: Unsupport Zabbix version (<5.4)
-  block:
-    - name: test - fail to update authentication setting
-      zabbix_authentication:
-        authentication_type: internal
-      ignore_errors: true
-      register: zbxauth_update
-
-    - assert:
-        that: zbxauth_update.failed is sameas True
-
-- when:
-  - zabbix_version is version('5.4', '>=')
-  - zabbix_version is version('6.0', '<=')
-  name: support Zabbix version (>=5.4 <=6.0)
+- when: zabbix_version is version('6.0', '=')
+  name: support Zabbix version (=6.0)
   block:
     - name: test - update ldap_configured without mandatory paramters 
       zabbix_authentication:
@@ -169,8 +151,7 @@
       assert:
         that: zbxauth_update.changed is sameas True
 
-- when:
-  - zabbix_version is version('6.2', '=')
+- when: zabbix_version is version('6.2', '=')
   name: support Zabbix version (=6.2)
   block:
     - name: test - create user directory

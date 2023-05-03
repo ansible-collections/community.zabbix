@@ -3,11 +3,10 @@
   hosts: localhost
   connection: local
   pre_tasks:
-
     - name: "Create MySQL Container"
       docker_container:
         name: mysql-host
-        image: mysql:8.0
+        image: mysql:8.0.32
         state: started
         recreate: true
         networks:
@@ -32,12 +31,11 @@
       no_log: true
       with_items: "{{ molecule_yml.platforms }}"
       when:
-        - '"postgresql" in item.groups'
+        - '"pgsql" in item.groups'
 
 - name: Prepare
   hosts: all
   tasks:
-
     - name: "Create group for imaginary host"
       add_host:
         name: imaginary-host
@@ -71,7 +69,7 @@
 
     - name: Check if warn parameter can be used for shell module
       set_fact:
-        produce_warn: False
+        produce_warn: false
       when: ansible_version.full is version("2.14", "<")
 
     - name: "Apt update"

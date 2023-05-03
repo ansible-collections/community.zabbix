@@ -5,10 +5,11 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
+
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
+DOCUMENTATION = """
 ---
 module: zabbix_authentication
 
@@ -21,7 +22,7 @@ author:
     - ONODERA Masaru(@masa-orca)
 
 requirements:
-    - "python >= 2.6"
+    - "python >= 3.9"
 
 version_added: 1.6.0
 
@@ -257,14 +258,11 @@ options:
         type: list
         elements: str
 
-notes:
-    - Zabbix 5.4 version and higher are supported.
-
 extends_documentation_fragment:
     - community.zabbix.zabbix
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = """
 # If you want to use Username and Password to be authenticated by Zabbix Server
 - name: Set credentials to access Zabbix Server API
   set_fact:
@@ -285,7 +283,7 @@ EXAMPLES = '''
     ansible_httpapi_port: 443
     ansible_httpapi_use_ssl: true
     ansible_httpapi_validate_certs: false
-    ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
+    ansible_zabbix_url_path: "zabbixeu"  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
     ansible_host: zabbix-example-fqdn.org
   zabbix_authentication:
     authentication_type: internal
@@ -296,20 +294,20 @@ EXAMPLES = '''
       - any
     http_case_sensitive: true
     ldap_configured: true
-    ldap_host: 'ldap://localhost'
+    ldap_host: "ldap://localhost"
     ldap_port: 389
-    ldap_base_dn: 'ou=Users,ou=system'
-    ldap_search_attribute: 'uid'
-    ldap_bind_dn: 'uid=ldap_search,ou=system'
+    ldap_base_dn: "ou=Users,ou=system"
+    ldap_search_attribute: "uid"
+    ldap_bind_dn: "uid=ldap_search,ou=system"
     ldap_case_sensitive: true
-    ldap_bind_password: 'password'
+    ldap_bind_password: "password"
     saml_auth_enabled: true
-    saml_idp_entityid: ''
-    saml_sso_url: 'https://localhost/SAML2/SSO'
-    saml_slo_url: 'https://localhost/SAML2/SLO'
-    saml_username_attribute: 'uid'
-    saml_sp_entityid: 'https://localhost'
-    saml_nameid_format: 'urn:oasis:names:tc:SAML:2.0:nameid-format:entity'
+    saml_idp_entityid: ""
+    saml_sso_url: "https://localhost/SAML2/SSO"
+    saml_slo_url: "https://localhost/SAML2/SLO"
+    saml_username_attribute: "uid"
+    saml_sp_entityid: "https://localhost"
+    saml_nameid_format: "urn:oasis:names:tc:SAML:2.0:nameid-format:entity"
     saml_sign_messages: true
     saml_sign_assertions: true
     saml_sign_authn_requests: true
@@ -333,7 +331,7 @@ EXAMPLES = '''
     ansible_httpapi_port: 443
     ansible_httpapi_use_ssl: true
     ansible_httpapi_validate_certs: false
-    ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
+    ansible_zabbix_url_path: "zabbixeu"  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
     ansible_host: zabbix-example-fqdn.org
   zabbix_authentication:
     authentication_type: internal
@@ -346,12 +344,12 @@ EXAMPLES = '''
     ldap_configured: true
     ldap_case_sensitive: true
     saml_auth_enabled: true
-    saml_idp_entityid: ''
-    saml_sso_url: 'https://localhost/SAML2/SSO'
-    saml_slo_url: 'https://localhost/SAML2/SLO'
-    saml_username_attribute: 'uid'
-    saml_sp_entityid: 'https://localhost'
-    saml_nameid_format: 'urn:oasis:names:tc:SAML:2.0:nameid-format:entity'
+    saml_idp_entityid: ""
+    saml_sso_url: "https://localhost/SAML2/SSO"
+    saml_slo_url: "https://localhost/SAML2/SLO"
+    saml_username_attribute: "uid"
+    saml_sp_entityid: "https://localhost"
+    saml_nameid_format: "urn:oasis:names:tc:SAML:2.0:nameid-format:entity"
     saml_sign_messages: true
     saml_sign_assertions: true
     saml_sign_authn_requests: true
@@ -375,7 +373,7 @@ EXAMPLES = '''
     ansible_httpapi_port: 443
     ansible_httpapi_use_ssl: true
     ansible_httpapi_validate_certs: false
-    ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
+    ansible_zabbix_url_path: "zabbixeu"  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
     ansible_host: zabbix-example-fqdn.org
   zabbix_authentication:
     authentication_type: internal
@@ -399,15 +397,15 @@ EXAMPLES = '''
       - contain_digits
       - contain_special_characters
       - avoid_easy_to_guess
-'''
+"""
 
-RETURN = '''
+RETURN = """
 msg:
     description: The result of the operation
     returned: success
     type: str
-    sample: 'Successfully update authentication setting'
-'''
+    sample: "Successfully update authentication setting"
+"""
 
 from ansible.module_utils.basic import AnsibleModule
 
@@ -417,251 +415,291 @@ import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabb
 
 
 class Authentication(ZabbixBase):
-    def __init__(self, module, zbx=None, zapi_wrapper=None):
-        super(Authentication, self).__init__(module, zbx, zapi_wrapper)
-        if LooseVersion(self._zbx_api_version) < LooseVersion('5.4.0'):
-            module.fail_json(msg="This module doesn't support Zabbix versions lower than 5.4.0")
 
     # get authentication setting
     def get_authentication(self):
         try:
-            return self._zapi.authentication.get({'output': 'extend'})
+            return self._zapi.authentication.get({"output": "extend"})
         except Exception as e:
             self._module.fail_json(msg="Failed to get authentication setting: %s" % e)
 
     # update authentication setting
     def update_authentication(
-            self,
-            current_authentication,
-            authentication_type,
-            http_auth_enabled,
-            http_login_form,
-            http_strip_domains,
-            http_case_sensitive,
-            ldap_configured,
-            ldap_auth_enabled,
-            ldap_host,
-            ldap_port,
-            ldap_base_dn,
-            ldap_search_attribute,
-            ldap_bind_dn,
-            ldap_case_sensitive,
-            ldap_bind_password,
-            ldap_userdirectory,
-            saml_auth_enabled,
-            saml_idp_entityid,
-            saml_sso_url,
-            saml_slo_url,
-            saml_username_attribute,
-            saml_sp_entityid,
-            saml_nameid_format,
-            saml_sign_messages,
-            saml_sign_assertions,
-            saml_sign_authn_requests,
-            saml_sign_logout_requests,
-            saml_sign_logout_responses,
-            saml_encrypt_nameid,
-            saml_encrypt_assertions,
-            saml_case_sensitive,
-            passwd_min_length,
-            passwd_check_rules,
-            ldap_jit_status,
-            saml_jit_status,
-            jit_provision_interval,
-            disabled_usrgroup):
+        self,
+        current_authentication,
+        authentication_type,
+        http_auth_enabled,
+        http_login_form,
+        http_strip_domains,
+        http_case_sensitive,
+        ldap_configured,
+        ldap_auth_enabled,
+        ldap_host,
+        ldap_port,
+        ldap_base_dn,
+        ldap_search_attribute,
+        ldap_bind_dn,
+        ldap_case_sensitive,
+        ldap_bind_password,
+        ldap_userdirectory,
+        saml_auth_enabled,
+        saml_idp_entityid,
+        saml_sso_url,
+        saml_slo_url,
+        saml_username_attribute,
+        saml_sp_entityid,
+        saml_nameid_format,
+        saml_sign_messages,
+        saml_sign_assertions,
+        saml_sign_authn_requests,
+        saml_sign_logout_requests,
+        saml_sign_logout_responses,
+        saml_encrypt_nameid,
+        saml_encrypt_assertions,
+        saml_case_sensitive,
+        passwd_min_length,
+        passwd_check_rules,
+        ldap_jit_status,
+        saml_jit_status,
+        jit_provision_interval,
+        disabled_usrgroup,
+    ):
         try:
             params = {}
 
             if authentication_type:
-                params['authentication_type'] = str(zabbix_utils.helper_to_numeric_value(
-                    ['internal', 'ldap'],
-                    authentication_type
-                ))
+                params["authentication_type"] = str(
+                    zabbix_utils.helper_to_numeric_value(
+                        ["internal", "ldap"], authentication_type
+                    )
+                )
 
             if isinstance(http_auth_enabled, bool):
-                params['http_auth_enabled'] = str(int(http_auth_enabled))
+                params["http_auth_enabled"] = str(int(http_auth_enabled))
 
             if http_login_form:
-                params['http_login_form'] = str(zabbix_utils.helper_to_numeric_value(
-                    ['zabbix_login_form', 'http_login_form'],
-                    http_login_form
-                ))
+                params["http_login_form"] = str(
+                    zabbix_utils.helper_to_numeric_value(
+                        ["zabbix_login_form", "http_login_form"], http_login_form
+                    )
+                )
 
             if http_strip_domains:
-                params['http_strip_domains'] = ','.join(http_strip_domains)
+                params["http_strip_domains"] = ",".join(http_strip_domains)
 
             if isinstance(http_case_sensitive, bool):
-                params['http_case_sensitive'] = str(int(http_case_sensitive))
+                params["http_case_sensitive"] = str(int(http_case_sensitive))
 
-            if LooseVersion(self._zbx_api_version) < LooseVersion('6.4'):
+            if LooseVersion(self._zbx_api_version) < LooseVersion("6.4"):
                 if isinstance(ldap_configured, bool):
-                    params['ldap_configured'] = str(int(ldap_configured))
+                    params["ldap_configured"] = str(int(ldap_configured))
             else:
                 if isinstance(ldap_auth_enabled, bool):
-                    params['ldap_auth_enabled'] = str(int(ldap_auth_enabled))
+                    params["ldap_auth_enabled"] = str(int(ldap_auth_enabled))
 
-            if LooseVersion(self._zbx_api_version) < LooseVersion('6.2.0'):
+            if LooseVersion(self._zbx_api_version) < LooseVersion("6.2"):
                 if ldap_host:
-                    params['ldap_host'] = ldap_host
+                    params["ldap_host"] = ldap_host
 
                 if ldap_port:
-                    params['ldap_port'] = str(ldap_port)
+                    params["ldap_port"] = str(ldap_port)
 
                 if ldap_base_dn:
-                    params['ldap_base_dn'] = ldap_base_dn
+                    params["ldap_base_dn"] = ldap_base_dn
 
                 if ldap_search_attribute:
-                    params['ldap_search_attribute'] = ldap_search_attribute
+                    params["ldap_search_attribute"] = ldap_search_attribute
 
                 if ldap_bind_dn:
-                    params['ldap_bind_dn'] = ldap_bind_dn
+                    params["ldap_bind_dn"] = ldap_bind_dn
 
                 if ldap_bind_password:
-                    params['ldap_bind_password'] = ldap_bind_password
+                    params["ldap_bind_password"] = ldap_bind_password
             else:
                 if ldap_userdirectory:
-                    directory = self._zapi.userdirectory.get({'search': {'name': ldap_userdirectory}})
+                    directory = self._zapi.userdirectory.get(
+                        {"search": {"name": ldap_userdirectory}}
+                    )
                     if not directory:
-                        self._module.fail_json(msg="Canot find user directory with name: %s" % ldap_userdirectory)
-                    params['ldap_userdirectoryid'] = directory[0]['userdirectoryid']
+                        self._module.fail_json(
+                            msg="Canot find user directory with name: %s"
+                            % ldap_userdirectory
+                        )
+                    params["ldap_userdirectoryid"] = directory[0]["userdirectoryid"]
 
             if isinstance(ldap_case_sensitive, bool):
-                params['ldap_case_sensitive'] = str(int(ldap_case_sensitive))
+                params["ldap_case_sensitive"] = str(int(ldap_case_sensitive))
 
             if isinstance(saml_auth_enabled, bool):
-                params['saml_auth_enabled'] = str(int(saml_auth_enabled))
+                params["saml_auth_enabled"] = str(int(saml_auth_enabled))
 
-            if LooseVersion(self._zbx_api_version) < LooseVersion('6.4'):
+            if LooseVersion(self._zbx_api_version) < LooseVersion("6.4"):
                 if saml_idp_entityid:
-                    params['saml_idp_entityid'] = saml_idp_entityid
+                    params["saml_idp_entityid"] = saml_idp_entityid
 
                 if saml_sso_url:
-                    params['saml_sso_url'] = saml_sso_url
+                    params["saml_sso_url"] = saml_sso_url
 
                 if saml_slo_url:
-                    params['saml_slo_url'] = saml_slo_url
+                    params["saml_slo_url"] = saml_slo_url
 
                 if saml_username_attribute:
-                    params['saml_username_attribute'] = saml_username_attribute
+                    params["saml_username_attribute"] = saml_username_attribute
 
                 if saml_sp_entityid:
-                    params['saml_sp_entityid'] = saml_sp_entityid
+                    params["saml_sp_entityid"] = saml_sp_entityid
 
                 if saml_nameid_format:
-                    params['saml_nameid_format'] = saml_nameid_format
+                    params["saml_nameid_format"] = saml_nameid_format
 
                 if isinstance(saml_sign_messages, bool):
-                    params['saml_sign_messages'] = str(int(saml_sign_messages))
+                    params["saml_sign_messages"] = str(int(saml_sign_messages))
 
                 if isinstance(saml_sign_assertions, bool):
-                    params['saml_sign_assertions'] = str(int(saml_sign_assertions))
+                    params["saml_sign_assertions"] = str(int(saml_sign_assertions))
 
                 if isinstance(saml_sign_authn_requests, bool):
-                    params['saml_sign_authn_requests'] = str(int(saml_sign_authn_requests))
+                    params["saml_sign_authn_requests"] = str(
+                        int(saml_sign_authn_requests)
+                    )
 
                 if isinstance(saml_sign_logout_requests, bool):
-                    params['saml_sign_logout_requests'] = str(int(saml_sign_logout_requests))
+                    params["saml_sign_logout_requests"] = str(
+                        int(saml_sign_logout_requests)
+                    )
 
                 if isinstance(saml_sign_logout_responses, bool):
-                    params['saml_sign_logout_responses'] = str(int(saml_sign_logout_responses))
+                    params["saml_sign_logout_responses"] = str(
+                        int(saml_sign_logout_responses)
+                    )
 
                 if isinstance(saml_encrypt_nameid, bool):
-                    params['saml_encrypt_nameid'] = str(int(saml_encrypt_nameid))
+                    params["saml_encrypt_nameid"] = str(int(saml_encrypt_nameid))
 
                 if isinstance(saml_encrypt_assertions, bool):
-                    params['saml_encrypt_assertions'] = str(int(saml_encrypt_assertions))
+                    params["saml_encrypt_assertions"] = str(
+                        int(saml_encrypt_assertions)
+                    )
 
                 if isinstance(saml_case_sensitive, bool):
-                    params['saml_case_sensitive'] = str(int(saml_case_sensitive))
+                    params["saml_case_sensitive"] = str(int(saml_case_sensitive))
             else:
                 if isinstance(ldap_jit_status, bool):
-                    params['ldap_jit_status'] = str(int(ldap_jit_status))
+                    params["ldap_jit_status"] = str(int(ldap_jit_status))
 
                 if isinstance(saml_jit_status, bool):
-                    params['saml_jit_status'] = str(int(saml_jit_status))
+                    params["saml_jit_status"] = str(int(saml_jit_status))
 
                 if isinstance(jit_provision_interval, str):
-                    params['jit_provision_interval'] = jit_provision_interval
+                    params["jit_provision_interval"] = jit_provision_interval
 
                 if isinstance(disabled_usrgroup, str):
-                    usrgrpids = self._zapi.usergroup.get({'filter': {'name': disabled_usrgroup}})
+                    usrgrpids = self._zapi.usergroup.get(
+                        {"filter": {"name": disabled_usrgroup}}
+                    )
                     if not usrgrpids:
-                        self._module.fail_json('User group "%s" cannot be found' % disabled_usrgroup)
-                    params['disabled_usrgrpid'] = str(int(usrgrpids[0]['usrgrpid']))
+                        self._module.fail_json(
+                            "User group '%s' cannot be found" % disabled_usrgroup
+                        )
+                    params["disabled_usrgrpid"] = str(int(usrgrpids[0]["usrgrpid"]))
 
                 if (ldap_jit_status or saml_jit_status) and not disabled_usrgroup:
-                    self._module.fail_json('"disabled_usrgroup" must be provided if "ldap_jit_status" or "saml_jit_status" enabled')
+                    self._module.fail_json(
+                        "'disabled_usrgroup' must be provided if 'ldap_jit_status' or 'saml_jit_status' enabled"
+                    )
 
             if passwd_min_length:
-                if LooseVersion(self._zbx_api_version) < LooseVersion('6.0'):
-                    self._module.warn('passwd_min_length is ignored with Zabbix 5.4.')
-                elif passwd_min_length < 1 or passwd_min_length > 70:
+                if passwd_min_length < 1 or passwd_min_length > 70:
                     self._module.fail_json(msg="Please set 0-70 to passwd_min_length.")
                 else:
-                    params['passwd_min_length'] = str(passwd_min_length)
+                    params["passwd_min_length"] = str(passwd_min_length)
 
             if passwd_check_rules:
-                if LooseVersion(self._zbx_api_version) < LooseVersion('6.0'):
-                    self._module.warn('passwd_check_rules is ignored with Zabbix 5.4.')
-                else:
-                    passwd_check_rules_values = [
-                        'contain_uppercase_and_lowercase_letters',
-                        'contain_digits',
-                        'contain_special_characters',
-                        'avoid_easy_to_guess'
-                    ]
-                    params['passwd_check_rules'] = 0
-                    if isinstance(passwd_check_rules, str):
-                        if passwd_check_rules not in passwd_check_rules_values:
-                            self._module.fail_json(msg="%s is invalid value for passwd_check_rules." % passwd_check_rules)
-                        params['passwd_check_rules'] += 2 ** zabbix_utils.helper_to_numeric_value(
-                            passwd_check_rules_values, passwd_check_rules
+                passwd_check_rules_values = [
+                    "contain_uppercase_and_lowercase_letters",
+                    "contain_digits",
+                    "contain_special_characters",
+                    "avoid_easy_to_guess",
+                ]
+                params["passwd_check_rules"] = 0
+                if isinstance(passwd_check_rules, str):
+                    if passwd_check_rules not in passwd_check_rules_values:
+                        self._module.fail_json(
+                            msg="%s is invalid value for passwd_check_rules."
+                            % passwd_check_rules
                         )
-                    elif isinstance(passwd_check_rules, list):
-                        for _passwd_check_rules_value in passwd_check_rules:
-                            if _passwd_check_rules_value not in passwd_check_rules_values:
-                                self._module.fail_json(msg="%s is invalid value for passwd_check_rules." % _passwd_check_rules_value)
-                            params['passwd_check_rules'] += 2 ** zabbix_utils.helper_to_numeric_value(
+                    params[
+                        "passwd_check_rules"
+                    ] += 2 ** zabbix_utils.helper_to_numeric_value(
+                        passwd_check_rules_values, passwd_check_rules
+                    )
+                elif isinstance(passwd_check_rules, list):
+                    for _passwd_check_rules_value in passwd_check_rules:
+                        if (
+                            _passwd_check_rules_value
+                            not in passwd_check_rules_values
+                        ):
+                            self._module.fail_json(
+                                msg="%s is invalid value for passwd_check_rules."
+                                % _passwd_check_rules_value
+                            )
+                            params[
+                                "passwd_check_rules"
+                            ] += 2 ** zabbix_utils.helper_to_numeric_value(
                                 passwd_check_rules_values, _passwd_check_rules_value
                             )
 
-                    params['passwd_check_rules'] = str(params['passwd_check_rules'])
+                params["passwd_check_rules"] = str(params["passwd_check_rules"])
 
             future_authentication = current_authentication.copy()
             future_authentication.update(params)
 
-            if LooseVersion(self._zbx_api_version) < LooseVersion('6.4'):
-                if (current_authentication['ldap_configured'] == '0'
-                        and future_authentication['ldap_configured'] == '1'):
-                    if LooseVersion(self._zbx_api_version) < LooseVersion('6.2.0'):
-                        if (not ldap_host
-                                or not ldap_port
-                                or not ldap_search_attribute
-                                or not ldap_base_dn):
+            if LooseVersion(self._zbx_api_version) < LooseVersion("6.4"):
+                if (
+                    current_authentication["ldap_configured"] == "0"
+                    and future_authentication["ldap_configured"] == "1"
+                ):
+                    if LooseVersion(self._zbx_api_version) < LooseVersion("6.2"):
+                        if (
+                            not ldap_host
+                            or not ldap_port
+                            or not ldap_search_attribute
+                            or not ldap_base_dn
+                        ):
                             self._module.fail_json(
                                 msg="Please set ldap_host, ldap_search_attribute and ldap_base_dn when you change a value of ldap_configured to true."
                             )
                     else:
                         if not ldap_userdirectory:
-                            self._module.fail_json(msg="Please set ldap_userdirectory when you change a value of ldap_configured to true.")
+                            self._module.fail_json(
+                                msg="Please set ldap_userdirectory when you change a value of ldap_configured to true."
+                            )
             else:
-                if (current_authentication['ldap_auth_enabled'] == "0"
-                        and future_authentication['ldap_auth_enabled'] == "1"):
+                if (
+                    current_authentication["ldap_auth_enabled"] == "0"
+                    and future_authentication["ldap_auth_enabled"] == "1"
+                ):
                     if not ldap_userdirectory:
-                        self._module.fail_json(msg="Please set ldap_userdirectory when you change a value of ldap_auth_enabled to true.")
+                        self._module.fail_json(
+                            msg="Please set ldap_userdirectory when you change a value of ldap_auth_enabled to true."
+                        )
 
-            if LooseVersion(self._zbx_api_version) < LooseVersion('6.4'):
-                if (current_authentication['saml_auth_enabled'] == '0'
-                        and future_authentication['saml_auth_enabled'] == '1'
-                        and not saml_idp_entityid
-                        and not saml_sso_url
-                        and not saml_username_attribute
-                        and not saml_sp_entityid):
+            if LooseVersion(self._zbx_api_version) < LooseVersion("6.4"):
+                if (
+                    current_authentication["saml_auth_enabled"] == "0"
+                    and future_authentication["saml_auth_enabled"] == "1"
+                    and not saml_idp_entityid
+                    and not saml_sso_url
+                    and not saml_username_attribute
+                    and not saml_sp_entityid
+                ):
                     self._module.fail_json(
-                        msg=' '.join([
-                            "Please set saml_idp_entityid, saml_sso_url, saml_username_attribute and saml_sp_entityid",
-                            "when you change a value of saml_auth_enabled to true."
-                        ])
+                        msg=" ".join(
+                            [
+                                "Please set saml_idp_entityid, saml_sso_url, saml_username_attribute and saml_sp_entityid",
+                                "when you change a value of saml_auth_enabled to true.",
+                            ]
+                        )
                     )
 
             if future_authentication != current_authentication:
@@ -669,100 +707,101 @@ class Authentication(ZabbixBase):
                     self._module.exit_json(changed=True)
 
                 self._zapi.authentication.update(params)
-                self._module.exit_json(changed=True, result="Successfully update authentication setting")
+                self._module.exit_json(
+                    changed=True, result="Successfully update authentication setting"
+                )
             else:
-                self._module.exit_json(changed=False, result="Authentication setting is already up to date")
+                self._module.exit_json(
+                    changed=False, result="Authentication setting is already up to date"
+                )
         except Exception as e:
-            self._module.fail_json(msg="Failed to update authentication setting, Exception: %s" % e)
+            self._module.fail_json(
+                msg="Failed to update authentication setting, Exception: %s" % e
+            )
 
 
 def main():
     argument_spec = zabbix_utils.zabbix_common_argument_spec()
-    argument_spec.update(dict(
-        authentication_type=dict(type='str', choices=['internal', 'ldap']),
-        http_auth_enabled=dict(type='bool'),
-        http_login_form=dict(type='str', choices=['zabbix_login_form', 'http_login_form']),
-        http_strip_domains=dict(type='list', elements='str'),
-        http_case_sensitive=dict(type='bool'),
-        ldap_configured=dict(type='bool'),
-        ldap_auth_enabled=dict(type='bool'),
-        ldap_host=dict(type='str'),
-        ldap_port=dict(type='int'),
-        ldap_base_dn=dict(type='str'),
-        ldap_search_attribute=dict(type='str'),
-        ldap_bind_dn=dict(type='str'),
-        ldap_case_sensitive=dict(type='bool'),
-        ldap_bind_password=dict(type='str', no_log=True),
-        ldap_userdirectory=dict(type='str'),
-        ldap_jit_status=dict(type='bool'),
-        saml_auth_enabled=dict(type='bool'),
-        saml_idp_entityid=dict(type='str'),
-        saml_sso_url=dict(type='str'),
-        saml_slo_url=dict(type='str'),
-        saml_username_attribute=dict(type='str'),
-        saml_sp_entityid=dict(type='str'),
-        saml_nameid_format=dict(type='str'),
-        saml_sign_messages=dict(type='bool'),
-        saml_sign_assertions=dict(type='bool'),
-        saml_sign_authn_requests=dict(type='bool'),
-        saml_sign_logout_requests=dict(type='bool'),
-        saml_sign_logout_responses=dict(type='bool'),
-        saml_encrypt_nameid=dict(type='bool'),
-        saml_encrypt_assertions=dict(type='bool'),
-        saml_case_sensitive=dict(type='bool'),
-        saml_jit_status=dict(type='bool'),
-        jit_provision_interval=dict(type='str', default='1h'),
-        disabled_usrgroup=dict(type='str'),
-        passwd_min_length=dict(type='int', no_log=False),
-        passwd_check_rules=dict(type='list', elements='str', no_log=False)
-    ))
-    module = AnsibleModule(
-        argument_spec=argument_spec,
-        supports_check_mode=True
+    argument_spec.update(
+        dict(
+            authentication_type=dict(type="str", choices=["internal", "ldap"]),
+            http_auth_enabled=dict(type="bool"),
+            http_login_form=dict(
+                type="str", choices=["zabbix_login_form", "http_login_form"]
+            ),
+            http_strip_domains=dict(type="list", elements="str"),
+            http_case_sensitive=dict(type="bool"),
+            ldap_configured=dict(type="bool"),
+            ldap_auth_enabled=dict(type="bool"),
+            ldap_host=dict(type="str"),
+            ldap_port=dict(type="int"),
+            ldap_base_dn=dict(type="str"),
+            ldap_search_attribute=dict(type="str"),
+            ldap_bind_dn=dict(type="str"),
+            ldap_case_sensitive=dict(type="bool"),
+            ldap_bind_password=dict(type="str", no_log=True),
+            ldap_userdirectory=dict(type="str"),
+            ldap_jit_status=dict(type="bool"),
+            saml_auth_enabled=dict(type="bool"),
+            saml_idp_entityid=dict(type="str"),
+            saml_sso_url=dict(type="str"),
+            saml_slo_url=dict(type="str"),
+            saml_username_attribute=dict(type="str"),
+            saml_sp_entityid=dict(type="str"),
+            saml_nameid_format=dict(type="str"),
+            saml_sign_messages=dict(type="bool"),
+            saml_sign_assertions=dict(type="bool"),
+            saml_sign_authn_requests=dict(type="bool"),
+            saml_sign_logout_requests=dict(type="bool"),
+            saml_sign_logout_responses=dict(type="bool"),
+            saml_encrypt_nameid=dict(type="bool"),
+            saml_encrypt_assertions=dict(type="bool"),
+            saml_case_sensitive=dict(type="bool"),
+            saml_jit_status=dict(type="bool"),
+            jit_provision_interval=dict(type="str", default="1h"),
+            disabled_usrgroup=dict(type="str"),
+            passwd_min_length=dict(type="int", no_log=False),
+            passwd_check_rules=dict(type="list", elements="str", no_log=False),
+        )
     )
+    module = AnsibleModule(argument_spec=argument_spec, supports_check_mode=True)
 
-    zabbix_utils.require_creds_params(module)
-
-    for p in ['server_url', 'login_user', 'login_password', 'timeout', 'validate_certs']:
-        if p in module.params and not module.params[p] is None:
-            module.warn('Option "%s" is deprecated with the move to httpapi connection and will be removed in the next release' % p)
-
-    authentication_type = module.params['authentication_type']
-    http_auth_enabled = module.params['http_auth_enabled']
-    http_login_form = module.params['http_login_form']
-    http_strip_domains = module.params['http_strip_domains']
-    http_case_sensitive = module.params['http_case_sensitive']
-    ldap_configured = module.params['ldap_configured']
-    ldap_auth_enabled = module.params['ldap_auth_enabled']
-    ldap_host = module.params['ldap_host']
-    ldap_port = module.params['ldap_port']
-    ldap_base_dn = module.params['ldap_base_dn']
-    ldap_search_attribute = module.params['ldap_search_attribute']
-    ldap_bind_dn = module.params['ldap_bind_dn']
-    ldap_case_sensitive = module.params['ldap_case_sensitive']
-    ldap_bind_password = module.params['ldap_bind_password']
-    ldap_userdirectory = module.params['ldap_userdirectory']
-    saml_auth_enabled = module.params['saml_auth_enabled']
-    saml_idp_entityid = module.params['saml_idp_entityid']
-    saml_sso_url = module.params['saml_sso_url']
-    saml_slo_url = module.params['saml_slo_url']
-    saml_username_attribute = module.params['saml_username_attribute']
-    saml_sp_entityid = module.params['saml_sp_entityid']
-    saml_nameid_format = module.params['saml_nameid_format']
-    saml_sign_messages = module.params['saml_sign_messages']
-    saml_sign_assertions = module.params['saml_sign_assertions']
-    saml_sign_authn_requests = module.params['saml_sign_authn_requests']
-    saml_sign_logout_requests = module.params['saml_sign_logout_requests']
-    saml_sign_logout_responses = module.params['saml_sign_logout_responses']
-    saml_encrypt_nameid = module.params['saml_encrypt_nameid']
-    saml_encrypt_assertions = module.params['saml_encrypt_assertions']
-    saml_case_sensitive = module.params['saml_case_sensitive']
-    passwd_min_length = module.params['passwd_min_length']
-    passwd_check_rules = module.params['passwd_check_rules']
-    ldap_jit_status = module.params['ldap_jit_status']
-    saml_jit_status = module.params['saml_jit_status']
-    jit_provision_interval = module.params['jit_provision_interval']
-    disabled_usrgroup = module.params['disabled_usrgroup']
+    authentication_type = module.params["authentication_type"]
+    http_auth_enabled = module.params["http_auth_enabled"]
+    http_login_form = module.params["http_login_form"]
+    http_strip_domains = module.params["http_strip_domains"]
+    http_case_sensitive = module.params["http_case_sensitive"]
+    ldap_configured = module.params["ldap_configured"]
+    ldap_auth_enabled = module.params["ldap_auth_enabled"]
+    ldap_host = module.params["ldap_host"]
+    ldap_port = module.params["ldap_port"]
+    ldap_base_dn = module.params["ldap_base_dn"]
+    ldap_search_attribute = module.params["ldap_search_attribute"]
+    ldap_bind_dn = module.params["ldap_bind_dn"]
+    ldap_case_sensitive = module.params["ldap_case_sensitive"]
+    ldap_bind_password = module.params["ldap_bind_password"]
+    ldap_userdirectory = module.params["ldap_userdirectory"]
+    saml_auth_enabled = module.params["saml_auth_enabled"]
+    saml_idp_entityid = module.params["saml_idp_entityid"]
+    saml_sso_url = module.params["saml_sso_url"]
+    saml_slo_url = module.params["saml_slo_url"]
+    saml_username_attribute = module.params["saml_username_attribute"]
+    saml_sp_entityid = module.params["saml_sp_entityid"]
+    saml_nameid_format = module.params["saml_nameid_format"]
+    saml_sign_messages = module.params["saml_sign_messages"]
+    saml_sign_assertions = module.params["saml_sign_assertions"]
+    saml_sign_authn_requests = module.params["saml_sign_authn_requests"]
+    saml_sign_logout_requests = module.params["saml_sign_logout_requests"]
+    saml_sign_logout_responses = module.params["saml_sign_logout_responses"]
+    saml_encrypt_nameid = module.params["saml_encrypt_nameid"]
+    saml_encrypt_assertions = module.params["saml_encrypt_assertions"]
+    saml_case_sensitive = module.params["saml_case_sensitive"]
+    passwd_min_length = module.params["passwd_min_length"]
+    passwd_check_rules = module.params["passwd_check_rules"]
+    ldap_jit_status = module.params["ldap_jit_status"]
+    saml_jit_status = module.params["saml_jit_status"]
+    jit_provision_interval = module.params["jit_provision_interval"]
+    disabled_usrgroup = module.params["disabled_usrgroup"]
 
     authentication = Authentication(module)
 
@@ -804,9 +843,9 @@ def main():
         ldap_jit_status,
         saml_jit_status,
         jit_provision_interval,
-        disabled_usrgroup
+        disabled_usrgroup,
     )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

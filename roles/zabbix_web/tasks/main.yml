@@ -1,6 +1,4 @@
 ---
-# tasks file for wdijkerman.zabbix-web
-
 - name: "Include OS-specific variables"
   include_vars: "{{ ansible_os_family }}.yml"
   tags:
@@ -8,96 +6,90 @@
 
 - name: Determine Latest Supported Zabbix Version
   set_fact:
-    zabbix_web_version: "{{ zabbix_valid_web_versions[ansible_distribution_major_version][0] | default(6.0) }}"
+    zabbix_web_version: "{{ zabbix_valid_web_versions[ansible_distribution_major_version][0] | default(6.4) }}"
   when: zabbix_web_version is not defined
-
-- name: "Include distribution and version-specific vars"
-  include_vars: "{{ item }}"
-  with_first_found:
-    - files:
-        - "{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml"
-        - "{{ ansible_os_family }}-{{ ansible_distribution_major_version }}.yml"
   tags:
     - always
 
-- name: "Set some versions"
+- name: Set More Variables
   set_fact:
-    zabbix_short_version: "{{ zabbix_version | regex_replace('\\.', '') }}"
-    zabbix_php_version: "{{ zabbix_php_version if zabbix_php_version is defined else _zabbix_php_version }}"
-    _zabbix_php_package_prefix: ""
+    zabbix_valid_version: "{{ zabbix_web_version|float in zabbix_valid_web_versions[ansible_distribution_major_version] }}"
+    zabbix_db_type_long: "{{ 'postgresql' if zabbix_server_database == 'pgsql' else 'mysql' }}"
   tags:
     - always
 
-- name: "Set default PHP-FPM variables"
+- name: Stopping Install of Invalid Version
+  fail:
+    msg: Zabbix version {{ zabbix_web_version }} is not supported on {{ ansible_distribution }} {{ ansible_distribution_major_version }}
+  when: not zabbix_valid_version
+  tags:
+    - always
+
+- name: Determine PHP Version
+  shell: php --version | head -1 | awk '{ print $2 }' | awk -F '.' '{print $1"."$2}'
+  register: _zabbix_web_php_installed_version
+  changed_when: false
+  tags:
+    - config
+    - install
+
+- name: Set PHP Version
   set_fact:
+    zabbix_web_php_installed_version: "{{ _zabbix_web_php_installed_version.stdout }}"
+  tags:
+    - config
+    - install
+
+- name: Set PHP Variables
+  set_fact:
+    zabbix_php_fpm_listen: "{{ zabbix_php_fpm_listen if zabbix_php_fpm_listen is defined else _zabbix_php_fpm_listen }}"
     zabbix_php_fpm_dir: "{{ zabbix_php_fpm_dir if zabbix_php_fpm_dir is defined else _php_fpm_dir }}"
     zabbix_php_fpm_session: "{{ zabbix_php_fpm_session if zabbix_php_fpm_session is defined else _php_fpm_session }}"
-    zabbix_php_fpm_listen: "{{ zabbix_php_fpm_listen if zabbix_php_fpm_listen is defined else _php_fpm_listen }}"
-  when:
-    - not zabbix_php_fpm
-
-- name: "Set default PHP-FPM variables specific RH provided"
-  set_fact:
-    zabbix_php_fpm_dir: "{{ zabbix_php_fpm_dir if zabbix_php_fpm_dir is defined else _php_fpm_dir }}"
-    zabbix_php_fpm_session: "{{ zabbix_php_fpm_session if zabbix_php_fpm_session is defined else _zabbix_php_fpm_session }}"
-    zabbix_php_fpm_listen: "{{ zabbix_php_fpm_listen if zabbix_php_fpm_listen is defined else _zabbix_php_fpm_listen }}"
-  when:
-    - zabbix_php_fpm
-    - ansible_os_family == "RedHat"
-
-- name: "Set websrv specific variables (Apache)"
-  set_fact:
-    zabbix_web_conf_web_user: "{{ zabbix_web_conf_web_user if zabbix_web_conf_web_user is defined else _apache_user }}"
-    zabbix_web_conf_web_group: "{{ zabbix_web_conf_web_group if zabbix_web_conf_web_group is defined else _apache_group }}"
-  when:
-    - zabbix_websrv == 'apache'
-
-- include_tasks: nginx.yml
-  when:
-    - zabbix_websrv == 'nginx'
-
-- name: "Install the correct repository"
-  include_tasks: "RedHat.yml"
-  when: ansible_os_family == "RedHat"
   tags:
-    - zabbix-web
+    - config
+    - install
 
-- name: "Install the correct repository"
-  include_tasks: "Debian.yml"
-  when: ansible_os_family == "Debian"
-  tags:
-    - zabbix-web
+- name: Include OS Specific Tasks
+  include_tasks: "{{ ansible_os_family }}.yml"
+
+- name: "Install the web server specific tasks"
+  include_tasks: "{{ zabbix_web_http_server }}.yml"
 
 - name: "Create zabbix-web directory"
   file:
     path: /etc/zabbix/web
-    owner: "{{ zabbix_web_conf_web_user }}"
-    group: "{{ zabbix_web_conf_web_group }}"
+    owner: "{{ zabbix_web_user }}"
+    group: "{{ zabbix_web_group }}"
     state: directory
     mode: 0755
   tags:
-    - zabbix-web
-    - init
+    - install
     - config
 
 - name: "Configure zabbix-web"
   template:
     src: zabbix.conf.php.j2
     dest: /etc/zabbix/web/zabbix.conf.php
-    owner: "{{ zabbix_web_conf_web_user }}"
-    group: "{{ zabbix_web_conf_web_group }}"
+    owner: "{{ zabbix_web_user }}"
+    group: "{{ zabbix_web_group }}"
     mode: "{{ zabbix_web_conf_mode }}"
   notify:
-    - restart apache
+    - "restart {{ zabbix_web_http_server }}"
   tags:
-    - zabbix-web
-    - init
     - config
 
-- include_tasks: access.yml
+- name: "Debian | Install PHP"
+  template:
+    src: php-fpm.conf.j2
+    dest: "{{ zabbix_php_fpm_dir }}/zabbix.conf"
+    owner: "{{ zabbix_web_user }}"
+    group: "{{ zabbix_web_group }}"
+    mode: 0644
+  become: true
   when:
-    - zabbix_web_htpasswd
+    - zabbix_web_create_vhost
+    - ansible_os_family == "Debian"
+  notify:
+    - restart php-fpm-version
   tags:
-    - zabbix-web
-    - init
     - config

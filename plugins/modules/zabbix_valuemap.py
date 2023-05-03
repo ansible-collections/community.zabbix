@@ -8,7 +8,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = r'''
+DOCUMENTATION = r"""
 ---
 module: zabbix_valuemap
 short_description: Create/update/delete Zabbix value maps
@@ -17,46 +17,46 @@ description:
 author:
     - "Ruben Tsirunyan (@rubentsirunyan)"
 requirements:
-    - "python >= 2.6"
+    - "python >= 3.9"
 options:
     name:
-        type: 'str'
+        type: "str"
         description:
             - Name of the value map.
         required: true
     state:
-        type: 'str'
+        type: "str"
         description:
             - State of the value map.
             - On C(present), it will create a value map if it does not exist or update the value map if the associated data is different.
             - On C(absent), it will remove the value map if it exists.
-        choices: ['present', 'absent']
-        default: 'present'
+        choices: ["present", "absent"]
+        default: "present"
     mappings:
-        type: 'list'
+        type: "list"
         elements: dict
         description:
             - List of value mappings for the value map.
             - Required when I(state=present).
         suboptions:
             value:
-                type: 'str'
+                type: "str"
                 description: Original value.
                 required: true
             map_to:
-                type: 'str'
+                type: "str"
                 description: Value to which the original value is mapped to.
                 required: true
 
 extends_documentation_fragment:
 - community.zabbix.zabbix
 
-'''
+"""
 
-RETURN = r'''
-'''
+RETURN = r"""
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 # If you want to use Username and Password to be authenticated by Zabbix Server
 - name: Set credentials to access Zabbix Server API
   set_fact:
@@ -77,7 +77,7 @@ EXAMPLES = r'''
     ansible_httpapi_port: 443
     ansible_httpapi_use_ssl: true
     ansible_httpapi_validate_certs: false
-    ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
+    ansible_zabbix_url_path: "zabbixeu"  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
     ansible_host: zabbix-example-fqdn.org
   community.zabbix.zabbix_valuemap:
     name: Numbers
@@ -87,7 +87,7 @@ EXAMPLES = r'''
       - value: 2
         map_to: two
     state: present
-'''
+"""
 
 from ansible.module_utils.basic import AnsibleModule
 
@@ -104,31 +104,31 @@ def construct_parameters(**kwargs):
     Returns:
         A dictionary of arguments in a format that is understandable by Zabbix API.
     """
-    if kwargs['mappings'] is None:
+    if kwargs["mappings"] is None:
         return dict(
-            name=kwargs['name']
+            name=kwargs["name"]
         )
 
     return dict(
-        name=kwargs['name'],
+        name=kwargs["name"],
         mappings=[
             dict(
-                value=mapping['value'],
-                newvalue=mapping['map_to']
-            ) for mapping in kwargs['mappings']
+                value=mapping["value"],
+                newvalue=mapping["map_to"]
+            ) for mapping in kwargs["mappings"]
         ]
     )
 
 
 def diff(existing, new):
-    """Constructs the diff for Ansible's --diff option.
+    """Constructs the diff for Ansible"s --diff option.
 
     Args:
         existing (dict): Existing valuemap data.
         new (dict): New valuemap data.
 
     Returns:
-        A dictionary like {'before': existing, 'after': new}
+        A dictionary like {"before": existing, "after": new}
         with filtered empty values.
     """
     before = {}
@@ -136,11 +136,11 @@ def diff(existing, new):
     for key in new:
         before[key] = existing[key]
         if new[key] is None:
-            after[key] = ''
+            after[key] = ""
         else:
             after[key] = new[key]
 
-    return {'before': before, 'after': after}
+    return {"before": before, "after": after}
 
 
 def get_update_params(existing_valuemap, **kwargs):
@@ -158,8 +158,8 @@ def get_update_params(existing_valuemap, **kwargs):
     """
 
     params_to_update = {}
-    if sorted(existing_valuemap['mappings'], key=lambda k: k['value']) != sorted(kwargs['mappings'], key=lambda k: k['value']):
-        params_to_update['mappings'] = kwargs['mappings']
+    if sorted(existing_valuemap["mappings"], key=lambda k: k["value"]) != sorted(kwargs["mappings"], key=lambda k: k["value"]):
+        params_to_update["mappings"] = kwargs["mappings"]
     return params_to_update, diff(existing_valuemap, kwargs)
 
 
@@ -176,9 +176,9 @@ class ValuemapModule(ZabbixBase):
         """
         try:
             valuemap_list = self._zapi.valuemap.get({
-                'output': 'extend',
-                'selectMappings': 'extend',
-                'filter': {'name': [name]}
+                "output": "extend",
+                "selectMappings": "extend",
+                "filter": {"name": [name]}
             })
             if len(valuemap_list) < 1:
                 return False, None
@@ -197,26 +197,26 @@ class ValuemapModule(ZabbixBase):
         try:
             self._zapi.valuemap.update(kwargs)
         except Exception as e:
-            self._module.fail_json(msg="Failed to update valuemap '{_id}': {e}".format(_id=kwargs['valuemapid'], e=e))
+            self._module.fail_json(msg="Failed to update valuemap '{_id}': {e}".format(_id=kwargs["valuemapid"], e=e))
 
     def create(self, **kwargs):
         try:
             self._zapi.valuemap.create(kwargs)
         except Exception as e:
-            self._module.fail_json(msg="Failed to create valuemap '{name}': {e}".format(name=kwargs['description'], e=e))
+            self._module.fail_json(msg="Failed to create valuemap '{name}': {e}".format(name=kwargs["description"], e=e))
 
 
 def main():
     argument_spec = zabbix_utils.zabbix_common_argument_spec()
     argument_spec.update(dict(
-        name=dict(type='str', required=True),
-        state=dict(type='str', default='present', choices=['present', 'absent']),
+        name=dict(type="str", required=True),
+        state=dict(type="str", default="present", choices=["present", "absent"]),
         mappings=dict(
-            type='list',
-            elements='dict',
+            type="list",
+            elements="dict",
             options=dict(
-                value=dict(type='str', required=True),
-                map_to=dict(type='str', required=True)
+                value=dict(type="str", required=True),
+                map_to=dict(type="str", required=True)
             )
         )
     ))
@@ -224,20 +224,15 @@ def main():
         argument_spec=argument_spec,
         supports_check_mode=True,
         required_if=[
-            ['state', 'present', ['mappings']],
+            ["state", "present", ["mappings"]],
         ]
     )
 
-    zabbix_utils.require_creds_params(module)
-
-    for p in ['server_url', 'login_user', 'login_password', 'timeout', 'validate_certs']:
-        if p in module.params and not module.params[p] is None:
-            module.warn('Option "%s" is deprecated with the move to httpapi connection and will be removed in the next release' % p)
     vm = ValuemapModule(module)
 
-    name = module.params['name']
-    state = module.params['state']
-    mappings = module.params['mappings']
+    name = module.params["name"]
+    state = module.params["state"]
+    mappings = module.params["mappings"]
 
     valuemap_exists, valuemap_object = vm.check_if_valuemap_exists(name)
 
@@ -247,8 +242,8 @@ def main():
     )
 
     if valuemap_exists:
-        valuemap_id = valuemap_object['valuemapid']
-        if state == 'absent':
+        valuemap_id = valuemap_object["valuemapid"]
+        if state == "absent":
             if module.check_mode:
                 module.exit_json(
                     changed=True,
@@ -313,5 +308,5 @@ def main():
             )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

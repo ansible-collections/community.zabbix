@@ -94,17 +94,6 @@ EXAMPLES = r'''
 '''
 
 
-import traceback
-
-try:
-    from zabbix_api import Already_Exists
-
-    HAS_ZABBIX_API = True
-    ZBX_IMP_ERR = Exception()
-except ImportError:
-    ZBX_IMP_ERR = traceback.format_exc()
-    HAS_ZABBIX_API = False
-
 from ansible.module_utils.basic import AnsibleModule
 
 from ansible_collections.community.zabbix.plugins.module_utils.base import ZabbixBase
@@ -119,13 +108,10 @@ class HostGroup(ZabbixBase):
             for group_name in group_names:
                 result = self._zapi.hostgroup.get({'filter': {'name': group_name}})
                 if not result:
-                    try:
-                        if self._module.check_mode:
-                            self._module.exit_json(changed=True)
-                        self._zapi.hostgroup.create({'name': group_name})
-                        group_add_list.append(group_name)
-                    except Already_Exists:
-                        return group_add_list
+                    if self._module.check_mode:
+                        self._module.exit_json(changed=True)
+                    self._zapi.hostgroup.create({'name': group_name})
+                    group_add_list.append(group_name)
             return group_add_list
         except Exception as e:
             self._module.fail_json(msg="Failed to create host group(s): %s" % e)
@@ -160,12 +146,6 @@ def main():
         argument_spec=argument_spec,
         supports_check_mode=True
     )
-
-    zabbix_utils.require_creds_params(module)
-
-    for p in ['server_url', 'login_user', 'login_password']:
-        if p in module.params and module.params[p] and module.params[p]:
-            module.warn('Option "%s" is deprecated with the move to httpapi connection and will be removed in the next release' % p)
 
     host_groups = module.params['host_groups']
     state = module.params['state']

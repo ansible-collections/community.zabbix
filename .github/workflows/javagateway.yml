@@ -3,29 +3,39 @@ name: "community.zabbix.zabbix_javagateway"
 on:
   push:
     paths:
-      - 'roles/zabbix_javagateway/**'
-      - 'molecule/zabbix_javagateway/**'
-      - 'molecule/requirements.txt'
-      - '.github/workflows/javagateway.yml'
+      - "roles/zabbix_javagateway/**"
+      - "molecule/zabbix_javagateway/**"
+      - "molecule/requirements.txt"
+      - ".github/workflows/javagateway.yml"
   pull_request:
     paths:
-      - 'roles/zabbix_javagateway/**'
-      - 'molecule/zabbix_javagateway/**'
-      - 'molecule/requirements.txt'
-      - '.github/workflows/javagateway.yml'
+      - "roles/zabbix_javagateway/**"
+      - "molecule/zabbix_javagateway/**"
+      - "molecule/requirements.txt"
+      - ".github/workflows/javagateway.yml"
 jobs:
   molecule:
     runs-on: ubuntu-20.04
     strategy:
       fail-fast: false
       matrix:
-        molecule_distro:
-          - container: centos
-            image: geerlingguy/docker-centos8-ansible:latest
-          - container: ubuntu
-            image: geerlingguy/docker-ubuntu2004-ansible
-          - container: debian
-            image: geerlingguy/docker-debian10-ansible
+        container:
+          - rockylinux9
+          - rockylinux8
+          - centos7
+          - ubuntu2204
+          - ubuntu2004
+          - ubuntu1804
+          - debian11
+          - debian10
+        version:
+          - v64
+          - v62
+          - v60
+        include:
+          - interpreter: python3
+          - interpreter: python
+            container: centos7
         collection_role:
           - zabbix_javagateway
     steps:
@@ -50,10 +60,11 @@ jobs:
       - name: Install the collection
         run: ansible-galaxy collection install $COLLECTION_FILE
 
-      - name: Run role tests
+      - name: Run server role tests
         run: >-
-          MY_MOLECULE_CONTAINER=${{ matrix.molecule_distro.container }}
-          MY_MOLECULE_IMAGE=${{ matrix.molecule_distro.image }}
-          MY_MOLECULE_GROUP=${{ matrix.molecule_distro.group }}
-          MY_MOLECULE_DOCKER_COMMAND=${{ matrix.molecule_distro.command }}
+          MY_MOLECULE_CONTAINER=${{ matrix.container }}
+          MY_MOLECULE_IMAGE=${{ matrix.container }}
+          MY_MOLECULE_VERSION=${{ matrix.version }}
+          MY_MOLECULE_DOCKER_COMMAND=${{ matrix.command }}
+          MY_MOLECULE_INTERPRETER=${{ matrix.interpreter }}
           molecule test -s ${{ matrix.collection_role }}

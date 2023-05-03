@@ -1,5 +1,4 @@
 ---
-
 - name: "SELinux | Debian | Install policycoreutils-python"
   apt:
     pkg: policycoreutils-python-utils
@@ -15,7 +14,9 @@
   until: zabbix_agent_package_installed is succeeded
   become: true
   when:
-    - zabbix_agent_os_family == "Debian"
+    - ansible_os_family == "Debian"
+  tags:
+    - install
 
 - name: "SELinux | RedHat | Install policycoreutils-python"
   package:
@@ -27,12 +28,11 @@
   register: zabbix_agent_policycoreutils_installed
   until: zabbix_agent_policycoreutils_installed is succeeded
   when:
-    - zabbix_agent_os_family == "RedHat"
+    - ansible_os_family == "RedHat"
     - (zabbix_agent_distribution_major_version == "6" or zabbix_agent_distribution_major_version == "7")
   become: true
   tags:
-    - init
-    - zabbix-agent
+    - install
 
 - name: "SELinux | RedHat | Install python3-policycoreutils on RHEL8"
   package:
@@ -44,12 +44,11 @@
   register: zabbix_agent_policycoreutils_installed
   until: zabbix_agent_policycoreutils_installed is succeeded
   when:
-    - zabbix_agent_os_family == "RedHat"
+    - ansible_os_family == "RedHat"
     - ansible_distribution_major_version == "8"
   become: true
   tags:
-    - init
-    - zabbix-agent
+    - install
 
 - name: "SELinux | RedHat | Install selinux-policy-targeted"
   package:
@@ -58,11 +57,10 @@
   register: zabbix_agent_selinuxpolicytargeted_installed
   until: zabbix_agent_selinuxpolicytargeted_installed is succeeded
   when:
-    - zabbix_agent_os_family == "RedHat"
+    - ansible_os_family == "RedHat"
   become: true
   tags:
-    - init
-    - zabbix-agent
+    - install
 
 # straight to getenforce binary , workaround for missing python_selinux library
 - name: "SELinux | Get getenforce binary"
@@ -70,26 +68,34 @@
     path: /usr/sbin/getenforce
   register: getenforce_bin
   become: true
+  tags:
+    - always
 
 - name: "SELinux | Collect getenforce output"
   command: /usr/sbin/getenforce
   register: sestatus
-  when: 'getenforce_bin.stat.exists'
+  when: "getenforce_bin.stat.exists"
   changed_when: false
   become: true
   check_mode: false
+  tags:
+    - always
 
 - name: "SELinux | Set zabbix_selinux to true if getenforce returns Enforcing or Permissive"
   set_fact:
     zabbix_selinux: "{{ true }}"
   when:
     - 'getenforce_bin.stat.exists and ("Enforcing" in sestatus.stdout or "Permissive" in sestatus.stdout)'
+  tags:
+    - always
 
 - name: "SELinux | Allow zabbix_agent to start (SELinux)"
   community.general.selinux_permissive:
     name: zabbix_agent_t
     permissive: true
   become: true
+  tags:
+    - config
 
 - name: "SELinux | Allow zabbix to run sudo commands (SELinux)"
   ansible.posix.seboolean:
@@ -99,4 +105,5 @@
   when:
     - ansible_selinux.status == "enabled"
     - selinux_allow_zabbix_run_sudo|bool
-  tags: selinux
+  tags:
+    - config

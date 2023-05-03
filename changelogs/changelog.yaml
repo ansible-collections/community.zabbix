@@ -876,3 +876,69 @@ releases:
     - zabbix_user_media_mailto.yml
     - zabbix_user_sendto.yaml
     release_date: '2023-04-03'
+  2.0.0:
+    changes:
+      breaking_changes:
+      - agent role - removed support for Darwin, Amazon, Fedora, XCP-ng, Suse, Mint,
+        and Sangoma operating systems
+      - agent role - removed support for zabbix_create_host and replaced it with zabbix_agent_host_state
+      - agent role - removed support for zabbix_create_hostgroup and replaced it with
+        zabbix_agent_hostgroups_state
+      - agent role - removed support for zabbix_http_password, zabbix_api_http_password,
+        zabbix_api_pass, and zabbix_api_login_pass and replaced it with zabbix_api_login_pass
+      - agent role - removed support for zabbix_http_user, zabbix_api_http_user, zabbix_api_user,
+        and zabbix_api_login_user and replaced it with zabbix_api_login_user
+      - agent role - removed support for zabbix_inventory_mode and replaced it with
+        zabbix_agent_inventory_mode
+      - agent role - removed support for zabbix_link_templates adn replaced it with
+        zabbix_agent_link_templates
+      - agent role - removed support for zabbix_macros and replaced it with zabbix_agent_macros
+      - agent role - removed support for zabbix_proxy and replaced it with zabbix_agent_proxy
+      - agent role - removed support for zabbix_update_host and replaced it with zabbix_agent_host_update
+      - all modules - dropped support of Zabbix versions < 6.0
+      - all roles  - removed support for the zabbix_version variable.
+      - all roles - removed support for all versions of Zabbix < 6.0.
+      - all roles - removed support for installation from epel and non-standard repositories
+      - dropped support of zabbix-api to make REST API calls to Zabbix
+      - proxy role - removed support for zabbix_database_creation  and replaced it
+        with zabbix_proxy_database_creation
+      - proxy role - removed support for zabbix_database_sqlload  and replaced it
+        with zabbix_proxy_database_sqlload
+      - proxy role - removed support for zabbix_selinux  and replaced it with zabbix_proxy_selinux
+      - server role - removed support for zabbix_server_mysql_login_password and replaced
+        with zabbix_server_dbpassword
+      - server role - removed support for zabbix_server_mysql_login_user and replaced
+        with zabbix_server_dbuser
+      - stopped supporting Ansible < 2.12
+      - stopped supporting Python < 3.9
+      - zabbix_action - message parameter renamed to op_message
+      - zabbix_group_facts module - removed in favour of zabbix_group_info
+      - zabbix_host_facts module - removed in favour of zabbix_host_info
+      minor_changes:
+      - Replaced usage of deprecated apt key management in Debian based distros -
+        See https://wiki.debian.org/DebianRepository/UseThirdParty
+      - Standardized tags across all roles.
+      - Updated all roles to default to version 6.4 for install.
+      - all roles - removed unused variables from defaults
+      - all roles - standardized testing matrix to check all supported versions and
+        operating systems.
+      - all roles - temporarily disable epel repo on zabbix installation tasks
+      - all roles - updated documentation.
+      - inventory plugin - switched from using zabbix-api to custom implementation
+        adding authentication with tokens
+      - inventory script - re-coded to stop using zabbix-api. API tokens support added.
+      - web role - removed support for htpasswd
+      removed_features:
+      - agent role - removed support to configure firewall
+      - web role - removed installation of apache, debian, and php
+    fragments:
+    - 2_0_update.yml
+    - 941_github_runner.yml
+    - 963-drop-zabbix-api.yml
+    - 964_tag_cleanup.yml
+    - 969_replace_apt_key.yml
+    - 976_old_zabbix_versions_removal.yml
+    - default_ver.yml
+    - inventory_script.yml
+    - python-ansible.yml
+    release_date: '2023-05-04'

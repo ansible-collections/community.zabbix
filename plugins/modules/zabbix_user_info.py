@@ -8,7 +8,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
+DOCUMENTATION = """
 module: zabbix_user_info
 short_description: Gather information about Zabbix user
 author:
@@ -16,22 +16,20 @@ author:
 description:
     - This module allows you to search for Zabbix user entries.
 requirements:
-    - "python >= 2.6"
+    - "python >= 3.9"
 options:
     username:
         description:
-            - Name of the user alias in Zabbix.
-            - username is the unique identifier used and cannot be updated using this module.
-            - alias should be replaced with username
-        aliases: [ alias ]
+            - User name.
+            - sername is the unique identifier used and cannot be updated using this module.
         required: true
         type: str
 extends_documentation_fragment:
 - community.zabbix.zabbix
 
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = """
 # If you want to use Username and Password to be authenticated by Zabbix Server
 - name: Set credentials to access Zabbix Server API
   set_fact:
@@ -52,13 +50,13 @@ EXAMPLES = '''
     ansible_httpapi_port: 443
     ansible_httpapi_use_ssl: true
     ansible_httpapi_validate_certs: false
-    ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
+    ansible_zabbix_url_path: "zabbixeu"  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
     ansible_host: zabbix-example-fqdn.org
   community.zabbix.zabbix_user_info:
     username: example
-'''
+"""
 
-RETURN = '''
+RETURN = """
 zabbix_user:
   description: example
   returned: always
@@ -103,11 +101,10 @@ zabbix_user:
       }
     ]
   }
-'''
+"""
 
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.compat.version import LooseVersion
 
 from ansible_collections.community.zabbix.plugins.module_utils.base import ZabbixBase
 import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabbix_utils
@@ -117,13 +114,10 @@ class User(ZabbixBase):
     def get_user_by_user_username(self, username):
         zabbix_user = ""
         try:
-            data = {'output': 'extend', 'filter': {},
-                    'getAccess': True, 'selectMedias': 'extend',
-                    'selectUsrgrps': 'extend'}
-            if LooseVersion(self._zbx_api_version) >= LooseVersion('5.4'):
-                data['filter']['username'] = username
-            else:
-                data['filter']['alias'] = username
+            data = {"output": "extend", "filter": {},
+                    "getAccess": True, "selectMedias": "extend",
+                    "selectUsrgrps": "extend"}
+            data["filter"]["username"] = username
 
             zabbix_user = self._zapi.user.get(data)
         except Exception as e:
@@ -141,20 +135,14 @@ class User(ZabbixBase):
 def main():
     argument_spec = zabbix_utils.zabbix_common_argument_spec()
     argument_spec.update(dict(
-        username=dict(type='str', required=True, aliases=['alias']),
+        username=dict(type="str", required=True),
     ))
     module = AnsibleModule(
         argument_spec=argument_spec,
         supports_check_mode=True
     )
 
-    zabbix_utils.require_creds_params(module)
-
-    for p in ['server_url', 'login_user', 'login_password', 'timeout', 'validate_certs']:
-        if p in module.params and not module.params[p] is None:
-            module.warn('Option "%s" is deprecated with the move to httpapi connection and will be removed in the next release' % p)
-
-    username = module.params['username']
+    username = module.params["username"]
 
     user = User(module)
     zabbix_user = user.get_user_by_user_username(username)

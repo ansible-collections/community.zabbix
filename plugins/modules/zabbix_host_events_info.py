@@ -9,7 +9,7 @@ from __future__ import (absolute_import, division, print_function)
 
 __metaclass__ = type
 
-RETURN = '''
+RETURN = """
 ---
 triggers_ok:
     description: Host Zabbix Triggers in OK state
@@ -134,20 +134,20 @@ triggers_problem:
           value:
             description: Whether the trigger is in OK or problem state
             type: int
-'''
+"""
 
-DOCUMENTATION = '''
+DOCUMENTATION = """
 ---
 module: zabbix_host_events_info
 short_description: Get all triggers about a Zabbix host
 description:
    - This module allows you to see if a Zabbix host have no active alert to make actions on it.
-     For this case use module Ansible 'fail' to exclude host in trouble.
+     For this case use module Ansible "fail" to exclude host in trouble.
    - Length of "triggers_ok" allow if template's triggers exist for Zabbix Host
 author:
     - "Stéphane Travassac (@stravassac)"
 requirements:
-    - "python >= 2.7"
+    - "python >= 3.9"
 options:
     host_identifier:
         description:
@@ -180,9 +180,9 @@ options:
 extends_documentation_fragment:
 - community.zabbix.zabbix
 
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = """
 # If you want to use Username and Password to be authenticated by Zabbix Server
 - name: Set credentials to access Zabbix Server API
   set_fact:
@@ -203,7 +203,7 @@ EXAMPLES = '''
       ansible_httpapi_port: 443
       ansible_httpapi_use_ssl: true
       ansible_httpapi_validate_certs: false
-      ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
+      ansible_zabbix_url_path: "zabbixeu"  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
       ansible_host: zabbix-example-fqdn.org
   community.zabbix.zabbix_host_events_info:
       host_identifier: "{{inventory_hostname}}"
@@ -213,8 +213,8 @@ EXAMPLES = '''
   delegate_to: localhost
 - fail:
     msg: "machine alert in zabbix"
-  when: zbx_host['triggers_problem']|length > 0
-'''
+  when: zbx_host["triggers_problem"]|length > 0
+"""
 
 
 from ansible.module_utils.basic import AnsibleModule
@@ -227,8 +227,8 @@ class Host(ZabbixBase):
     def get_host(self, host_identifier, host_inventory, search_key):
         """ Get host by hostname|visible_name|hostid """
         host = self._zapi.host.get(
-            {'output': 'extend', 'selectParentTemplates': ['name'], 'filter': {search_key: host_identifier},
-             'selectInventory': host_inventory})
+            {"output": "extend", "selectParentTemplates": ["name"], "filter": {search_key: host_identifier},
+             "selectInventory": host_inventory})
         if len(host) < 1:
             self._module.fail_json(msg="Host not found: %s" % host_identifier)
         else:
@@ -236,18 +236,17 @@ class Host(ZabbixBase):
 
     def get_triggers_by_host_id_in_problem_state(self, host_id, trigger_severity):
         """ Get triggers in problem state from a hostid"""
-        # https://www.zabbix.com/documentation/3.4/manual/api/reference/trigger/get
-        output = 'extend'
-        triggers_list = self._zapi.trigger.get({'output': output, 'hostids': host_id,
-                                                'min_severity': trigger_severity})
+        output = "extend"
+        triggers_list = self._zapi.trigger.get({"output": output, "hostids": host_id,
+                                                "min_severity": trigger_severity})
         return triggers_list
 
     def get_last_event_by_trigger_id(self, triggers_id):
         """ Get the last event from triggerid"""
-        output = ['eventid', 'clock', 'acknowledged', 'value']
-        select_acknowledges = ['clock', 'alias', 'message']
-        event = self._zapi.event.get({'output': output, 'objectids': triggers_id,
-                                      'select_acknowledges': select_acknowledges, "limit": 1, "sortfield": "clock",
+        output = ["eventid", "clock", "acknowledged", "value"]
+        select_acknowledges = ["clock", "alias", "message"]
+        event = self._zapi.event.get({"output": output, "objectids": triggers_id,
+                                      "select_acknowledges": select_acknowledges, "limit": 1, "sortfield": "clock",
                                       "sortorder": "DESC"})
         return event[0]
 
@@ -255,48 +254,42 @@ class Host(ZabbixBase):
 def main():
     argument_spec = zabbix_utils.zabbix_common_argument_spec()
     argument_spec.update(dict(
-        host_identifier=dict(type='str', required=True),
+        host_identifier=dict(type="str", required=True),
         host_id_type=dict(
-            default='hostname',
-            type='str',
-            choices=['hostname', 'visible_name', 'hostid']),
+            default="hostname",
+            type="str",
+            choices=["hostname", "visible_name", "hostid"]),
         trigger_severity=dict(
-            type='str',
+            type="str",
             required=False,
-            default='average',
-            choices=['not_classified', 'information', 'warning', 'average', 'high', 'disaster']),
+            default="average",
+            choices=["not_classified", "information", "warning", "average", "high", "disaster"]),
     ))
     module = AnsibleModule(
         argument_spec=argument_spec,
         supports_check_mode=True
     )
 
-    zabbix_utils.require_creds_params(module)
+    trigger_severity_map = {"not_classified": 0, "information": 1, "warning": 2, "average": 3, "high": 4, "disaster": 5}
+    host_id = module.params["host_identifier"]
+    host_id_type = module.params["host_id_type"]
+    trigger_severity = trigger_severity_map[module.params["trigger_severity"]]
 
-    for p in ['server_url', 'login_user', 'login_password', 'timeout', 'validate_certs']:
-        if p in module.params and not module.params[p] is None:
-            module.warn('Option "%s" is deprecated with the move to httpapi connection and will be removed in the next release' % p)
-
-    trigger_severity_map = {'not_classified': 0, 'information': 1, 'warning': 2, 'average': 3, 'high': 4, 'disaster': 5}
-    host_id = module.params['host_identifier']
-    host_id_type = module.params['host_id_type']
-    trigger_severity = trigger_severity_map[module.params['trigger_severity']]
-
-    host_inventory = 'hostid'
+    host_inventory = "hostid"
 
     host = Host(module)
 
-    if host_id_type == 'hostname':
-        zabbix_host = host.get_host(host_id, host_inventory, 'host')
-        host_id = zabbix_host['hostid']
+    if host_id_type == "hostname":
+        zabbix_host = host.get_host(host_id, host_inventory, "host")
+        host_id = zabbix_host["hostid"]
 
-    elif host_id_type == 'visible_name':
-        zabbix_host = host.get_host(host_id, host_inventory, 'name')
-        host_id = zabbix_host['hostid']
+    elif host_id_type == "visible_name":
+        zabbix_host = host.get_host(host_id, host_inventory, "name")
+        host_id = zabbix_host["hostid"]
 
-    elif host_id_type == 'hostid':
-        ''' check hostid exist'''
-        zabbix_host = host.get_host(host_id, host_inventory, 'hostid')
+    elif host_id_type == "hostid":
+        # check hostid exist
+        zabbix_host = host.get_host(host_id, host_inventory, "hostid")
 
     triggers = host.get_triggers_by_host_id_in_problem_state(host_id, trigger_severity)
 
@@ -305,9 +298,9 @@ def main():
     for trigger in triggers:
         # tGet last event for trigger with problem value = 1
         # https://www.zabbix.com/documentation/3.4/manual/api/reference/trigger/object
-        if int(trigger['value']) == 1:
-            event = host.get_last_event_by_trigger_id(trigger['triggerid'])
-            trigger['last_event'] = event
+        if int(trigger["value"]) == 1:
+            event = host.get_last_event_by_trigger_id(trigger["triggerid"])
+            trigger["last_event"] = event
             triggers_problem.append(trigger)
         else:
             triggers_ok.append(trigger)
@@ -315,5 +308,5 @@ def main():
     module.exit_json(ok=True, triggers_ok=triggers_ok, triggers_problem=triggers_problem)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

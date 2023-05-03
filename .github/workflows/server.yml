@@ -19,28 +19,34 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        molecule_distro:
-          - container: mysql-centos
-            image: geerlingguy/docker-rockylinux8-ansible:latest
-            group: mysql
-          - container: pgsql-centos
-            image: geerlingguy/docker-rockylinux8-ansible:latest
-            group: postgresql
-          - container: mysql-ubuntu
-            image: geerlingguy/docker-ubuntu2004-ansible
-            group: mysql
-          - container: pgsql-ubuntu
-            image: geerlingguy/docker-ubuntu2004-ansible
-            group: postgresql
-            command: /sbin/init
-          - container: mysql-debian
-            image: geerlingguy/docker-debian11-ansible
-            group: mysql
-          - container: pgsql-debian
-            image: geerlingguy/docker-debian11-ansible
-            group: postgresql
+        container:
+          - rockylinux9
+          - rockylinux8
+          - ubuntu2204
+          - ubuntu2004
+          - ubuntu1804
+          - debian11
+          - debian10
         collection_role:
           - zabbix_server
+        database:
+          - mysql
+          - pgsql
+        version:
+          - v64
+          - v62
+          - v60
+        include:
+          - interpreter: python3
+        exclude:
+          - container: debian10
+            version: v62
+          - container: ubuntu1804
+            version: v62
+          - container: ubuntu1804
+            version: v64
+          - container: debian10
+            version: v64
     steps:
       - name: Check out code
         uses: actions/checkout@v1
@@ -63,10 +69,12 @@ jobs:
       - name: Install the collection
         run: ansible-galaxy collection install $COLLECTION_FILE
 
-      - name: Run role tests
+      - name: Run server role tests
         run: >-
-          MY_MOLECULE_CONTAINER=${{ matrix.molecule_distro.container }}
-          MY_MOLECULE_IMAGE=${{ matrix.molecule_distro.image }}
-          MY_MOLECULE_GROUP=${{ matrix.molecule_distro.group }}
-          MY_MOLECULE_DOCKER_COMMAND=${{ matrix.molecule_distro.command }}
+          MY_MOLECULE_CONTAINER=${{ matrix.container }}
+          MY_MOLECULE_IMAGE=${{ matrix.container }}
+          MY_MOLECULE_VERSION=${{ matrix.version }}
+          MY_MOLECULE_DATABASE=${{ matrix.database }}
+          MY_MOLECULE_INTERPRETER=${{ matrix.interpreter }}
+          MY_MOLECULE_DOCKER_COMMAND=${{ matrix.command }}
           molecule test -s ${{ matrix.collection_role }}

@@ -80,9 +80,6 @@ This is especially important for some of the Zabbix roles that require you to **
 
 For the majority of modules, however, you can get away with just:
 
-```bash
-pip install zabbix-api
-```
 #### Ansible 2.10 and higher
 
 With the release of Ansible 2.10, modules have been moved into collections.  With the exception of ansible.builtin modules, this means additonal collections must be installed in order to use modules such as seboolean (now ansible.posix.seboolean).  The following collections are now frequently required: `ansible.posix` and `community.general`.  Installing the collections:
@@ -106,7 +103,7 @@ You can also include it in a `requirements.yml` file along with other required c
 ---
 collections:
   - name: community.zabbix
-    version: 1.9.3
+    version: 2.0.0
   - name: ansible.posix
     version: 1.3.0
   - name: community.general
@@ -219,8 +216,6 @@ zabbix_api_http_password: "password"
 ## Supported Zabbix versions
 
 Main priority is to support Zabbix releases which have official full support from Zabbix LLC. Please checkout the versions at [Zabbix Life Cycle & Release Policy](https://www.zabbix.com/life_cycle_and_release_policy) page.
-
-> We aim to cover at least two LTS releases. For example, currently we support LTS 4.0 + 5.0 and with LTS 6.0 we will drop 4.0. But we do our best to also include the latest point releases - for example currently this is 5.4 which should be supperseeded by 6.2 then.
 
 Support for Zabbix LTS versions will be dropped with Major releases of the collection and mostly affect modules. Each role is following its unique support matrix. You should always consult documentation of roles in *docs/* directory.
 

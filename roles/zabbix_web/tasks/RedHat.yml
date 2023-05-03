@@ -1,126 +1,35 @@
----
-# Tasks specific for RedHat systems
+- name: "RedHat | Setting Short PHP Version"
+  set_fact:
+    zabbix_web_php_installed_version: "{{ zabbix_web_php_installed_version | regex_replace('\\.', '') }}"
+  tags:
+    - always
 
 - name: "RedHat | Install basic repo file"
   yum_repository:
     name: "{{ item.name }}"
-    description: "{{ item.description }}"
+    description: "{{ item.description | default(omit) }}"
     baseurl: "{{ item.baseurl }}"
-    gpgcheck: "{{ item.gpgcheck }}"
-    gpgkey: "{{ item.gpgkey }}"
+    gpgcheck: "{{ item.gpgcheck | default(omit) }}"
+    gpgkey: "{{ item.gpgkey | default(omit) }}"
     mode: "{{ item.mode | default('0644') }}"
-    priority: "{{ item.priority | default('98') }}"
+    priority: "{{ item.priority | default('99') }}"
     state: "{{ item.state | default('present') }}"
     proxy: "{{ zabbix_http_proxy | default(omit) }}"
   with_items: "{{ zabbix_repo_yum }}"
   register: yum_repo_installed
   become: true
-  when:
-    zabbix_repo == "zabbix"
   notify:
     - "clean repo files from proxy creds"
   tags:
-    - zabbix-web
-
-- name: "RedHat | Install basic repo file (Zabbix 5.x)"
-  yum_repository:
-    name: "{{ item.name }}"
-    description: "{{ item.description }}"
-    baseurl: "{{ item.baseurl }}"
-    gpgcheck: "{{ item.gpgcheck }}"
-    gpgkey: "{{ item.gpgkey }}"
-    mode: "{{ item.mode | default('0644') }}"
-    priority: "{{ item.priority | default('98') }}"
-    state: "{{ item.state | default('present') }}"
-    proxy: "{{ zabbix_http_proxy | default(omit) }}"
-  with_items: "{{ zabbix_5_repo_yum }}"
-  become: true
-  when:
-    - zabbix_repo == "zabbix"
-    - zabbix_version is version('5.0', '>=')
-    - ansible_distribution_major_version != '8'
-    - ansible_distribution_major_version != '9'
-  notify:
-    - "clean repo files from proxy creds"
-  tags:
-    - zabbix-web
-
-- name: "RedHat | Install zabbix-web dependency (Zabbix 5.x) (CentOS)"
-  yum:
-    pkg:
-      - centos-release-scl
-    state: "{{ zabbix_web_package_state }}"
-    update_cache: true
-    disablerepo: "{{ '*' if (zabbix_repo_yum_enabled | length>0) else omit }}"
-    enablerepo: "{{ zabbix_repo_yum_enabled if zabbix_repo_yum_enabled is iterable and (zabbix_repo_yum_enabled | length>0) else omit }}"
-  environment:
-    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
-    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
-  register: zabbix_web_dependency_package_install
-  until: zabbix_web_dependency_package_install is succeeded
-  become: true
-  when:
-    - zabbix_version is version('5.0', '>=')
-    - zabbix_web_centos_release
-    - ansible_distribution_major_version != '9'
-    - ansible_distribution_major_version != '8'
-    - ansible_distribution == "CentOS"
-  tags:
-    - zabbix-web
-
-- name: "RedHat | Install zabbix-web dependency (Zabbix 5.x) (RHEL)"
-  yum:
-    pkg:
-      - scl-utils
-      - scl-utils-build
-    state: "{{ zabbix_web_package_state }}"
-    update_cache: true
-    disablerepo: "{{ '*' if (zabbix_repo_yum_enabled | length>0) else omit }}"
-    enablerepo: "{{ zabbix_repo_yum_enabled if zabbix_repo_yum_enabled is iterable and (zabbix_repo_yum_enabled | length>0) else omit }}"
-  environment:
-    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
-    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
-  register: zabbix_web_dependency_package_install
-  until: zabbix_web_dependency_package_install is succeeded
-  become: true
-  when:
-    - zabbix_version is version('5.0', '>=')
-    - zabbix_web_centos_release
-    - ansible_distribution_major_version != '9'
-    - ansible_distribution_major_version != '8'
-    - ansible_distribution == "RedHat"
-  tags:
-    - zabbix-web
-
-- name: "RedHat | Install zabbix-web (Zabbix 5.x)"
-  yum:
-    pkg:
-      - zabbix-apache-conf-scl-{{ zabbix_web_version }}.{{ zabbix_web_version_minor }}
-    state: "{{ zabbix_web_package_state }}"
-    update_cache: true
-    disablerepo: "{{ '*' if (zabbix_repo_yum_enabled | length>0) else omit }}"
-    enablerepo: "{{ zabbix_repo_yum_enabled if zabbix_repo_yum_enabled is iterable and (zabbix_repo_yum_enabled | length>0) else omit }}"
-  environment:
-    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
-    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
-  register: zabbix_web_package_install
-  until: zabbix_web_package_install is succeeded
-  become: true
-  when:
-    - zabbix_version is version('5.0', '>=')
-    - ansible_distribution_major_version != '9'
-    - ansible_distribution_major_version != '8'
-    - zabbix_websrv == 'apache'
-  tags:
-    - zabbix-web
+    - install
 
 - name: "RedHat | Install zabbix-web-{{ zabbix_server_database }}"
   yum:
-    pkg: zabbix-web-{{ zabbix_server_database }}{{ '-scl' if zabbix_version is version('5.0', '>=') and ansible_distribution_major_version|int < 8 else '' }}-{{ zabbix_web_version }}.{{ zabbix_web_version_minor }}
+    name:
+      - "zabbix-web-{{ zabbix_server_database }}"
     state: "{{ zabbix_web_package_state }}"
     update_cache: true
-    disablerepo: "{{ '*' if (zabbix_repo_yum_enabled | length>0) else omit }}"
-    enablerepo: "{{ zabbix_repo_yum_enabled if zabbix_repo_yum_enabled is iterable and (zabbix_repo_yum_enabled | length>0) else omit }}"
+    disablerepo: "epel"
   environment:
     http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
     https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
@@ -128,56 +37,23 @@
   until: zabbix_web_package_install is succeeded
   become: true
   tags:
-    - zabbix-web
+    - install
 
-- name: RedHat 9 | Install PHP"
-  package:
-    name: php
-    state: "{{ zabbix_php_install_state }}"
+- name: "RedHat | Install zabbix-web-configuration"
+  yum:
+    name:
+      - "zabbix-{{ zabbix_web_http_server }}-conf"
+    state: "{{ zabbix_web_package_state }}"
+    update_cache: true
+    disablerepo: "epel"
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
+  register: zabbix_web_package_install
+  until: zabbix_web_package_install is succeeded
+  become: true
   when:
-    - zabbix_version is version('6.0', '>=')
+    - zabbix_web_version is version('6.0', '!=')
     - ansible_distribution_major_version == '9'
-    - zabbix_vhost
-
-- name: "RedHat | Install PHP"
-  template:
-    src: php-fpm.conf.j2
-    dest: "{{ zabbix_php_fpm_dir }}/zabbix.conf"
-    owner: "{{ zabbix_web_conf_web_user }}"
-    group: "{{ zabbix_web_conf_web_group }}"
-    mode: 0644
-  become: true
-  when:
-    - zabbix_vhost
-  notify:
-    - restart redhat-php-fpm
-
-- include_tasks: apache_RedHat.yml
-  vars:
-    zabbix_apache_servername: "{{ zabbix_websrv_servername }}"
-  when:
-    - zabbix_websrv == 'apache'
-
-- name: "RedHat | Install Nginx vhost"
-  template:
-    src: nginx_vhost.conf.j2
-    dest: /etc/nginx/conf.d/zabbix.conf
-    owner: root
-    group: root
-    mode: 0644
-  when:
-    - zabbix_vhost
-    - zabbix_websrv == 'nginx'
-  become: true
-  notify:
-    - restart nginx
   tags:
-    - zabbix-web
-    - init
-    - config
-    - nginx
-
-- name: "Configure SELinux when enabled"
-  include_tasks: selinux.yml
-  when:
-    - zabbix_selinux | bool
+    - install

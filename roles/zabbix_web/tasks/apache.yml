@@ -1,4 +1,46 @@
 ---
+- name: Setting Web Server Facts
+  set_fact:
+    zabbix_web_user: "{{ zabbix_web_user if zabbix_web_user is defined else _apache_user }}"
+    zabbix_web_group: "{{ zabbix_web_group if zabbix_web_group is defined else _apache_group }}"
+    zabbix_web_vhost_location: "{{ zabbix_web_vhost_location if zabbix_web_vhost_location is defined else _apache_vhost_location }}"
+  tags:
+    - always
+
+- name: "Apache | Installing Zabbix Apache Conf"
+  block:
+    - name: "Debian | Install zabbix-apache-conf"
+      apt:
+        pkg: "zabbix-apache-conf"
+        state: "{{ zabbix_web_package_state }}"
+        update_cache: true
+        cache_valid_time: 0
+      environment:
+        http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+        https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
+      register: zabbix_apache_conf_install
+      until: zabbix_apache_conf_install is succeeded
+      become: true
+      when: ansible_os_family == "Debian"
+
+    - name: "RedHat | Install zabbix-apache-conf"
+      yum:
+        name:
+          - "zabbix-apache-conf-{{ zabbix_web_version }}.{{ zabbix_web_version_minor }}"
+        state: "{{ zabbix_web_package_state }}"
+        update_cache: true
+        disablerepo: "{{ '*' if (zabbix_repo_yum_enabled | length>0) else omit }}"
+        enablerepo: "{{ zabbix_repo_yum_enabled if zabbix_repo_yum_enabled is iterable and (zabbix_repo_yum_enabled | length>0) else omit }}"
+      environment:
+        http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+        https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
+      register: zabbix_apache_conf_install
+      until: zabbix_apache_conf_install is succeeded
+      become: true
+      when: ansible_os_family == "RedHat"
+  tags:
+    - install
+
 - name: "Apache | Get Apache version"
   shell: |
     PATH=/usr/sbin:$PATH
@@ -10,26 +52,36 @@
   args:
     executable: /bin/bash
   tags:
-    - zabbix-web
+    - config
 
 - name: "Apache | Set correct apache_version"
   set_fact:
     apache_version: "{{ apachectl_version.stdout }}"
   tags:
-    - zabbix-web
+    - config
 
-- name: "Set some"
-  set_fact:
-    _zabbix_web_apache_php_addition: true
-  when:
-    - zabbix_version is version('4.4', '<=')
+- name: "Apache | Install apache vhost"
+  template:
+    src: apache_vhost.conf.j2
+    dest: "{{ zabbix_web_vhost_location }}"
+    owner: "{{ zabbix_web_user }}"
+    group: "{{ zabbix_web_group }}"
+    mode: 0644
+  when: zabbix_web_create_vhost
+  become: true
+  notify:
+    - restart apache
   tags:
-    - zabbix-web
+    - config
 
-- name: "Set some"
-  set_fact:
-    _zabbix_web_apache_php_addition: true
-  when:
-    - ansible_os_family == "Debian"
+- name: "Apache | Enable Site (Debian Only)"
+  file:
+    src: "{{ zabbix_web_vhost_location }}"
+    dest: /etc/apache2/sites-enabled/zabbix.conf
+    state: link
+    owner: "{{ zabbix_web_user }}"
+    group: "{{ zabbix_web_group }}"
+    mode: 0644
+  when: ansible_os_family == "Debian"
   tags:
-    - zabbix-web
+    - config

@@ -1,5 +1,4 @@
 ---
-
 - name: restart apache
   service:
     name: "{{ _apache_service }}"
@@ -7,7 +6,7 @@
     enabled: true
   become: true
   when:
-    - zabbix_websrv == 'apache'
+    - zabbix_web_http_server == 'apache'
 
 - name: test nginx config
   listen: restart nginx
@@ -16,7 +15,7 @@
   notify: restart nginx tested
   become: true
   when:
-    - zabbix_websrv == 'nginx'
+    - zabbix_web_http_server == 'nginx'
 
 - name: restart nginx tested
   service:
@@ -25,26 +24,17 @@
     enabled: true
   become: true
   when:
-    - zabbix_websrv == 'nginx'
+    - zabbix_web_http_server == 'nginx'
     - zabbix_nginx_cfg_check.rc == 0
-
-- name: restart redhat-php-fpm
-  service:
-    name: "{{ 'rh-php72-php-fpm' if zabbix_php_fpm else 'php-fpm' }}"
-    state: restarted
-    enabled: true
-  become: true
-  when:
-    - zabbix_version is version('5.0', '>=')
 
 - name: restart php-fpm-version
   service:
-    name: php{{ zabbix_php_version }}-fpm
+    name: php{{ zabbix_web_php_installed_version }}-fpm
     state: restarted
     enabled: true
   become: true
   when:
-    - zabbix_version is version('5.0', '>=')
+    - zabbix_web_version is version('5.0', '>=')
 
 - name: "clean repo files from proxy creds"
   shell: ls /etc/yum.repos.d/zabbix* && sed -i 's/^proxy =.*//' /etc/yum.repos.d/zabbix* || true

@@ -2,17 +2,37 @@
 # tasks file for zabbix_proxy
 - name: "Include OS-specific variables"
   include_vars: "{{ ansible_os_family }}.yml"
+  tags:
+    - always
 
 - name: Determine Latest Supported Zabbix Version
   set_fact:
-    zabbix_proxy_version: "{{ zabbix_valid_proxy_versions[ansible_distribution_major_version][0] | default(6.0) }}"
-  when: zabbix_proxy_version is not defined
+    zabbix_proxy_version: "{{ zabbix_valid_proxy_versions[ansible_distribution_major_version][0] | default(6.4) }}"
+  when: zabbix_proxy_version is not defined or zabbix_proxy_version is none
+  tags:
+    - always
 
-- name: "Replace Sangoma with RedHat task"
+- name: Set More Variables
   set_fact:
-    ansible_os_family: "RedHat"
-  when:
-    - ansible_os_family == 'Sangoma'
+    zabbix_proxy_db_long: "{{ 'postgresql' if zabbix_proxy_database == 'pgsql' else zabbix_proxy_database }}"
+    zabbix_valid_version: "{{ zabbix_proxy_version in zabbix_valid_proxy_versions[ansible_distribution_major_version] }}"
+    zabbix_short_version: "{{ zabbix_proxy_version | regex_replace('\\.', '') }}"
+  tags:
+    - always
+
+- name: Stopping Install of Invalid Version
+  fail:
+    msg: Zabbix version {{ zabbix_proxy_version }} is not supported on {{ ansible_distribution }} {{ ansible_distribution_major_version }}
+  when: not zabbix_valid_version
+  tags:
+    - always
+
+- name: Set Path to SQL File
+  set_fact:
+    datafile_path: "{{ db_file_path[zabbix_short_version] }}"
+  tags:
+    - install
+    - config
 
 - name: "Set default ip address for zabbix_proxy_ip"
   set_fact:
@@ -20,36 +40,49 @@
   when:
     - zabbix_proxy_ip is not defined
     - "'ansible_default_ipv4' in hostvars[inventory_hostname]"
+  tags:
+    - install
+    - config
+    - api
 
-- name: "Set OS dependent variables"
-  include_vars: "{{ item }}"
-  with_first_found:
-    - "../vars/{{ ansible_distribution }}.yml"
-    - "../vars/main.yml"
+- name: "Complete OS Specific Tasks"
+  include: "{{ ansible_os_family }}.yml"
 
-- name: "Install the correct repository"
-  include_tasks: "{{ ansible_os_family }}.yml"
+- name: "Get the file for database schema"
+  shell: ls -1 {{ db_file_path[zabbix_short_version] }}
+  changed_when: false
+  when:
+    - zabbix_proxy_database_sqlload
+  register: ls_output_schema
+  tags:
+    - database
 
-- name: "Installing the {{ zabbix_proxy_database_long }} database"
-  include_tasks: "{{ zabbix_proxy_database_long }}.yml"
+- name: "Installing the database"
+  include: "{{ zabbix_proxy_db_long }}.yml"
 
 - name: "Create include dir zabbix-proxy"
   file:
     path: "{{ zabbix_proxy_include }}"
-    owner: zabbix
-    group: zabbix
+    owner: "{{ zabbix_os_user }}"
+    group: "{{ zabbix_os_user }}"
     mode: "{{ zabbix_proxy_include_mode }}"
     state: directory
   become: true
+  tags:
+    - install
+    - config
 
 - name: "Create module dir zabbix-proxy"
   file:
     path: "{{ zabbix_proxy_loadmodulepath }}"
-    owner: zabbix
-    group: zabbix
+    owner: "{{ zabbix_os_user }}"
+    group: "{{ zabbix_os_user }}"
     state: directory
     mode: "0755"
   become: true
+  tags:
+    - install
+    - config
 
 - name: "Create directory for PSK file if not exist."
   file:
@@ -59,13 +92,15 @@
   become: true
   when:
     - zabbix_proxy_tlspskfile is defined
+  tags:
+    - config
 
 - name: "Place TLS PSK File"
   copy:
     dest: "{{ zabbix_proxy_tlspskfile }}"
     content: "{{ zabbix_proxy_tlspsk_secret }}"
-    owner: zabbix
-    group: zabbix
+    owner: "{{ zabbix_os_user }}"
+    group: "{{ zabbix_os_user }}"
     mode: 0400
   become: true
   when:
@@ -73,34 +108,20 @@
     - zabbix_proxy_tlspsk_secret is defined
   notify:
     - restart zabbix-proxy
-
-- name: "Allow zabbix-proxy to open connections (SELinux)"
-  ansible.posix.seboolean:
-    name: zabbix_can_network
-    persistent: true
-    state: true
-  become: true
-  when: ansible_selinux.status == "enabled"
-  tags: selinux
-
-- name: "Allow zabbix-proxy to connect to zabbix_proxy_preprocessing.sock (SELinux)"
-  ansible.posix.seboolean:
-    name: daemons_enable_cluster_mode
-    persistent: true
-    state: true
-  become: true
-  when: ansible_selinux.status == "enabled"
-  tags: selinux
+  tags:
+    - config
 
 - name: "Configure zabbix-proxy"
   template:
     src: zabbix_proxy.conf.j2
-    dest: /etc/zabbix/zabbix_proxy.conf
-    owner: zabbix
-    group: zabbix
+    dest: "{{ zabbix_proxy_config }}"
+    owner: "{{ zabbix_os_user }}"
+    group: "{{ zabbix_os_user }}"
     mode: "{{ zabbix_proxy_conf_mode }}"
   notify: restart zabbix-proxy
   become: true
+  tags:
+    - config
 
 - name: Ensure proxy definition is up-to-date (added/updated/removed)
   vars:
@@ -108,9 +129,8 @@
     ansible_user: "{{ zabbix_api_login_user }}"
     ansible_network_os: community.zabbix.zabbix
     ansible_connection: httpapi
-    # Can't think of a way to make http_login_* vars be undefined -(
-    http_login_user: "{{ zabbix_api_http_user | default(zabbix_http_user | default(-42)) }}"
-    http_login_password: "{{ zabbix_api_http_password | default(zabbix_http_password | default(-42)) }}"
+    http_login_user: "{{ zabbix_api_http_user | default(-42) }}"
+    http_login_password: "{{ zabbix_api_http_password | default(-42) }}"
   community.zabbix.zabbix_proxy:
     state: "{{ zabbix_proxy_state }}"
     status: "{{ zabbix_proxy_status }}"
@@ -136,3 +156,5 @@
     enabled: true
   become: true
   when: zabbix_proxy_manage_service | bool
+  tags:
+    - service

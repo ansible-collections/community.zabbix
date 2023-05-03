@@ -1,7 +1,6 @@
 ---
 - name: "test: create host with many options set"
   zabbix_host:
-    timeout: 30     # slower with py2.7
     host_name: ExampleHost
     visible_name: ExampleName
     description: My ExampleHost Description
@@ -9,8 +8,8 @@
       - Linux servers
       - Zabbix servers
     link_templates:
-      - "{{ 'IMAP Service' if zabbix_version | float >= 5.2 else 'Template App IMAP Service' }}"
-      - "{{ 'NTP Service' if zabbix_version | float >= 5.2 else 'Template App NTP Service' }}"
+      - 'IMAP Service'
+      - 'NTP Service'
     status: enabled
     state: present
     inventory_mode: manual
@@ -60,7 +59,6 @@
 
 - name: "test: try to create the same host with the same settings"
   zabbix_host:
-    timeout: 30     # slower with py2.7
     host_name: ExampleHost
     visible_name: ExampleName
     description: My ExampleHost Description
@@ -68,8 +66,8 @@
       - Linux servers
       - Zabbix servers
     link_templates:
-      - "{{ 'IMAP Service' if zabbix_version | float >= 5.2 else 'Template App IMAP Service' }}"
-      - "{{ 'NTP Service' if zabbix_version | float >= 5.2 else 'Template App NTP Service' }}"
+      - 'IMAP Service'
+      - 'NTP Service'
     status: enabled
     state: present
     inventory_mode: manual
@@ -120,7 +118,6 @@
 - name: "test: try to create the same host with the same settings and force false"
   zabbix_host:
     force: false
-    timeout: 30     # slower with py2.7
     host_name: ExampleHost
     visible_name: ExampleName
     description: My ExampleHost Description
@@ -128,8 +125,8 @@
       - Linux servers
       - Zabbix servers
     link_templates:
-      - "{{ 'IMAP Service' if zabbix_version | float >= 5.2 else 'Template App IMAP Service' }}"
-      - "{{ 'NTP Service' if zabbix_version | float >= 5.2 else 'Template App NTP Service' }}"
+      - 'IMAP Service'
+      - 'NTP Service'
     status: enabled
     state: present
     inventory_mode: manual
@@ -171,7 +168,6 @@
 - name: "test: try to create the same host changing one parameter in the inventory with force false"
   zabbix_host:
     force: false
-    timeout: 30     # slower with py2.7
     host_name: ExampleHost
     visible_name: ExampleName
     description: My ExampleHost Description
@@ -179,8 +175,8 @@
       - Linux servers
       - Zabbix servers
     link_templates:
-      - "{{ 'IMAP Service' if zabbix_version | float >= 5.2 else 'Template App IMAP Service' }}"
-      - "{{ 'NTP Service' if zabbix_version | float >= 5.2 else 'Template App NTP Service' }}"
+      - 'IMAP Service'
+      - 'NTP Service'
     status: enabled
     state: present
     inventory_mode: manual
@@ -303,7 +299,6 @@
     that:
       - "zabbix_host1 is changed"
 
-
 - name: "test: change host groups (check whether we are at three groups)"
   zabbix_host:
     host_name: ExampleHost
@@ -336,8 +331,8 @@
   zabbix_host:
     host_name: ExampleHost
     link_templates:
-      - "{{ 'IMAP Service' if zabbix_version | float >= 5.2 else 'Template App IMAP Service' }}"
-      - "{{ 'NTP Service' if zabbix_version | float >= 5.2 else 'Template App NTP Service' }}"
+      - 'IMAP Service'
+      - 'NTP Service'
   register: zabbix_host1
 
 - name: expect to succeed and that things have not changed
@@ -349,9 +344,9 @@
   zabbix_host:
     host_name: ExampleHost
     link_templates:
-      - "{{ 'IMAP Service' if zabbix_version | float >= 5.2 else 'Template App IMAP Service' }}"
-      - "{{ 'NTP Service' if zabbix_version | float >= 5.2 else 'Template App NTP Service' }}"
-      - "{{ 'HTTP Service' if zabbix_version | float >= 5.2 else 'Template App HTTP Service' }}"
+      - 'IMAP Service'
+      - 'NTP Service'
+      - 'HTTP Service'
   register: zabbix_host1
 
 - name: expect to succeed and that things have changed
@@ -363,7 +358,7 @@
   zabbix_host:
     host_name: ExampleHost
     link_templates:
-      - "{{ 'LDAP Service' if zabbix_version | float >= 5.2 else 'Template App LDAP Service' }}"
+      - 'LDAP Service'
     force: false
   register: zabbix_host1
 
@@ -376,10 +371,10 @@
   zabbix_host:
     host_name: ExampleHost
     link_templates:
-      - "{{ 'IMAP Service' if zabbix_version | float >= 5.2 else 'Template App IMAP Service' }}"
-      - "{{ 'NTP Service' if zabbix_version | float >= 5.2 else 'Template App NTP Service' }}"
-      - "{{ 'HTTP Service' if zabbix_version | float >= 5.2 else 'Template App HTTP Service' }}"
-      - "{{ 'LDAP Service' if zabbix_version | float >= 5.2 else 'Template App LDAP Service' }}"
+      - 'IMAP Service'
+      - 'NTP Service'
+      - 'HTTP Service'
+      - 'LDAP Service'
   register: zabbix_host1
 
 - name: expect to succeed and that things have not changed
@@ -389,7 +384,6 @@
 
 - name: "test: change host linked templates (remove all templates)"
   zabbix_host:
-    timeout: 60     # slower with py2.7
     host_name: ExampleHost
     link_templates: []
   register: zabbix_host1
@@ -576,12 +570,6 @@
 - name: expect to succeed and that things have changed (tls_psk makes module non-idempotent)
   assert:
     that: zabbix_host1 is changed
-  when: zabbix_version is version('5.4', '>=')
-
-- name: expect to succeed and that things have not changed
-  assert:
-    that: zabbix_host1 is not changed
-  when: zabbix_version is version('5.4', '<')
 
 - name: "test: change interface settings (remove one)"
   zabbix_host:
@@ -701,211 +689,208 @@
     that:
       - "zabbix_host1 is failed"
 
-- when: zabbix_version is version("5.0", ">=")
-  block:
-    - name: "test: configure SNMPv2 interface without details (fail)"
-      zabbix_host:
-        host_name: ExampleHost
-        interfaces:
-          - type: 1
-            main: 1
-            useip: 1
-            ip: 10.1.1.1
-            port: "10050"
-          - type: 2
-            main: 1
-            useip: 1
-            ip: 10.1.1.1
-            port: "161"
-      register: zabbix_host1
-      ignore_errors: true
+- name: "test: configure SNMPv2 interface without details (fail)"
+  zabbix_host:
+    host_name: ExampleHost
+    interfaces:
+      - type: 1
+        main: 1
+        useip: 1
+        ip: 10.1.1.1
+        port: "10050"
+      - type: 2
+        main: 1
+        useip: 1
+        ip: 10.1.1.1
+        port: "161"
+  register: zabbix_host1
+  ignore_errors: true
 
-    - name: expect to fail
-      assert:
-        that:
-          - "zabbix_host1 is failed"
+- name: expect to fail
+  assert:
+    that:
+      - "zabbix_host1 is failed"
 
-    - name: "test: configure details for SNMPv2 interface"
-      zabbix_host:
-        host_name: ExampleHost
-        interfaces:
-          - type: 1
-            main: 1
-            useip: 1
-            ip: 10.1.1.1
-            port: "10050"
-          - type: 2
-            main: 1
-            useip: 1
-            ip: 10.1.1.1
-            port: "161"
-            details:
-              version: 2
-              community: Community String
-      register: zabbix_host1
+- name: "test: configure details for SNMPv2 interface"
+  zabbix_host:
+    host_name: ExampleHost
+    interfaces:
+      - type: 1
+        main: 1
+        useip: 1
+        ip: 10.1.1.1
+        port: "10050"
+      - type: 2
+        main: 1
+        useip: 1
+        ip: 10.1.1.1
+        port: "161"
+        details:
+          version: 2
+          community: Community String
+  register: zabbix_host1
 
-    - name: expect to succeed and that things have changed
-      assert:
-        that:
-          - "zabbix_host1 is changed"
+- name: expect to succeed and that things have changed
+  assert:
+    that:
+      - "zabbix_host1 is changed"
 
-    - name: "test: configure details for SNMPv2 interface (again)"
-      zabbix_host:
-        host_name: ExampleHost
-        interfaces:
-          - type: 1
-            main: 1
-            useip: 1
-            ip: 10.1.1.1
-            port: "10050"
-          - type: 2
-            main: 1
-            useip: 1
-            ip: 10.1.1.1
-            port: "161"
-            details:
-              version: 2
-              community: Community String
-      register: zabbix_host1
+- name: "test: configure details for SNMPv2 interface (again)"
+  zabbix_host:
+    host_name: ExampleHost
+    interfaces:
+      - type: 1
+        main: 1
+        useip: 1
+        ip: 10.1.1.1
+        port: "10050"
+      - type: 2
+        main: 1
+        useip: 1
+        ip: 10.1.1.1
+        port: "161"
+        details:
+          version: 2
+          community: Community String
+  register: zabbix_host1
 
-    - name: expect to succeed and that things have not changed
-      assert:
-        that:
-          - "zabbix_host1 is not changed"
+- name: expect to succeed and that things have not changed
+  assert:
+    that:
+      - "zabbix_host1 is not changed"
 
-    - name: "test: configure SNMPv2 interface with the same options and force=False "
-      zabbix_host:
-        host_name: ExampleHost
-        force: False
-        interfaces:
-          - type: 1
-            main: 1
-            useip: 1
-            ip: 10.1.1.1
-            port: "10050"
-          - type: 2
-            main: 1
-            useip: 1
-            ip: 10.1.1.1
-            port: "161"
-            details:
-              version: 2
-              community: Community String
-      register: zabbix_host1
+- name: "test: configure SNMPv2 interface with the same options and force=False "
+  zabbix_host:
+    host_name: ExampleHost
+    force: False
+    interfaces:
+      - type: 1
+        main: 1
+        useip: 1
+        ip: 10.1.1.1
+        port: "10050"
+      - type: 2
+        main: 1
+        useip: 1
+        ip: 10.1.1.1
+        port: "161"
+        details:
+          version: 2
+          community: Community String
+  register: zabbix_host1
 
-    - name: expect to succeed and that things have not changed
-      assert:
-        that:
-          - "zabbix_host1 is not changed"
+- name: expect to succeed and that things have not changed
+  assert:
+    that:
+      - "zabbix_host1 is not changed"
 
-    - name: "test: update details for SNMPv2 interface with bulk sub option"
-      zabbix_host:
-        host_name: ExampleHost
-        interfaces:
-          - type: 1
-            main: 1
-            useip: 1
-            ip: 10.1.1.1
-            port: "10050"
-          - type: 2
-            main: 1
-            useip: 1
-            ip: 10.1.1.1
-            port: "161"
-            details:
-              version: 2
-              community: Community String
-              bulk: 0
-      register: zabbix_host1
+- name: "test: update details for SNMPv2 interface with bulk sub option"
+  zabbix_host:
+    host_name: ExampleHost
+    interfaces:
+      - type: 1
+        main: 1
+        useip: 1
+        ip: 10.1.1.1
+        port: "10050"
+      - type: 2
+        main: 1
+        useip: 1
+        ip: 10.1.1.1
+        port: "161"
+        details:
+          version: 2
+          community: Community String
+          bulk: 0
+  register: zabbix_host1
 
-    - name: expect to succeed and that things have changed
-      assert:
-        that:
-          - "zabbix_host1 is changed"
+- name: expect to succeed and that things have changed
+  assert:
+    that:
+      - "zabbix_host1 is changed"
 
-    - name: "test: configure details for SNMPv3 interface"
-      zabbix_host:
-        host_name: ExampleHost
-        interfaces:
-          - type: 1
-            main: 1
-            useip: 1
-            ip: 10.1.1.1
-            port: "10050"
-          - type: 2
-            main: 1
-            useip: 1
-            ip: 10.1.1.1
-            port: "161"
-            details:
-              version: 3
-              contextname: snmp_context
-              securityname: SNMP3 sec name
-              securitylevel: 0
-      register: zabbix_host1
+- name: "test: configure details for SNMPv3 interface"
+  zabbix_host:
+    host_name: ExampleHost
+    interfaces:
+      - type: 1
+        main: 1
+        useip: 1
+        ip: 10.1.1.1
+        port: "10050"
+      - type: 2
+        main: 1
+        useip: 1
+        ip: 10.1.1.1
+        port: "161"
+        details:
+          version: 3
+          contextname: snmp_context
+          securityname: SNMP3 sec name
+          securitylevel: 0
+  register: zabbix_host1
 
-    - name: expect to succeed and that things have changed
-      assert:
-        that:
-          - "zabbix_host1 is changed"
+- name: expect to succeed and that things have changed
+  assert:
+    that:
+      - "zabbix_host1 is changed"
 
-    - name: "test: configure details for SNMPv3 interface (again)"
-      zabbix_host:
-        host_name: ExampleHost
-        interfaces:
-          - type: 1
-            main: 1
-            useip: 1
-            ip: 10.1.1.1
-            port: "10050"
-          - type: 2
-            main: 1
-            useip: 1
-            ip: 10.1.1.1
-            port: "161"
-            details:
-              version: 3
-              contextname: snmp_context
-              securityname: SNMP3 sec name
-              securitylevel: 0
-      register: zabbix_host1
+- name: "test: configure details for SNMPv3 interface (again)"
+  zabbix_host:
+    host_name: ExampleHost
+    interfaces:
+      - type: 1
+        main: 1
+        useip: 1
+        ip: 10.1.1.1
+        port: "10050"
+      - type: 2
+        main: 1
+        useip: 1
+        ip: 10.1.1.1
+        port: "161"
+        details:
+          version: 3
+          contextname: snmp_context
+          securityname: SNMP3 sec name
+          securitylevel: 0
+  register: zabbix_host1
 
-    - name: expect to succeed and that things have not changed
-      assert:
-        that:
-          - "zabbix_host1 is not changed"
+- name: expect to succeed and that things have not changed
+  assert:
+    that:
+      - "zabbix_host1 is not changed"
 
-    - name: "test: update details for SNMPv3 interface"
-      zabbix_host:
-        host_name: ExampleHost
-        interfaces:
-          - type: 1
-            main: 1
-            useip: 1
-            ip: 10.1.1.1
-            port: "10050"
-          - type: 2
-            main: 1
-            useip: 1
-            ip: 10.1.1.1
-            port: "161"
-            details:
-              version: 3
-              contextname: snmp_context
-              securityname: SNMP3 sec name
-              securitylevel: 2
-              authprotocol: "{{ 2 if zabbix_version | float >= 5.4 else 0 }}"
-              authpassphrase: secret_auth_passphrase
-              privprotocol: "{{ 2 if zabbix_version | float >= 5.4 else 0 }}"
-              privpassphrase: secret_priv_passphrase
-      register: zabbix_host1
+- name: "test: update details for SNMPv3 interface"
+  zabbix_host:
+    host_name: ExampleHost
+    interfaces:
+      - type: 1
+        main: 1
+        useip: 1
+        ip: 10.1.1.1
+        port: "10050"
+      - type: 2
+        main: 1
+        useip: 1
+        ip: 10.1.1.1
+        port: "161"
+        details:
+          version: 3
+          contextname: snmp_context
+          securityname: SNMP3 sec name
+          securitylevel: 2
+          authprotocol: "{{ 2 if zabbix_version | float >= 5.4 else 0 }}"
+          authpassphrase: secret_auth_passphrase
+          privprotocol: "{{ 2 if zabbix_version | float >= 5.4 else 0 }}"
+          privpassphrase: secret_priv_passphrase
+  register: zabbix_host1
 
-    - name: expect to succeed and that things have changed
-      assert:
-        that:
-          - "zabbix_host1 is changed"
+- name: expect to succeed and that things have changed
+  assert:
+    that:
+      - "zabbix_host1 is changed"
 
-# https://github.com/ansible-collections/community.zabbix/pull/391
 - name: "reset interfaces to two of the same type"
   zabbix_host:
     host_name: ExampleHost
@@ -1028,7 +1013,7 @@
 - name: expect to succeed and that things have changed
   assert:
     that:
-      - "zabbix_host1 is changed"
+       - "zabbix_host1 is changed"
 
 - name: "test: add new set of user macros to the host"
   zabbix_host:
@@ -1075,55 +1060,52 @@
     that:
       - "zabbix_host1 is changed"
 
-# The description of tag is available since  Zabbix version 4.4
-- when: zabbix_version is version("4.4", ">=")
-  block:
-    - name: "test: update one of the user macros with description"
-      zabbix_host:
-        host_name: ExampleHost
-        macros:
-          - macro: '{$NEWMACRO1}'
-            value: test1234
-            description: Example Description
-          - macro: NEWMACRO2
-            value: abc
-      register: zabbix_host1
+- name: "test: update one of the user macros with description"
+  zabbix_host:
+    host_name: ExampleHost
+    macros:
+      - macro: '{$NEWMACRO1}'
+        value: test1234
+        description: Example Description
+      - macro: NEWMACRO2
+        value: abc
+  register: zabbix_host1
 
-    - name: expect to succeed and that things have changed
-      assert:
-        that:
-          - "zabbix_host1 is changed"
+- name: expect to succeed and that things have changed
+  assert:
+    that:
+      - "zabbix_host1 is changed"
 
-    - name: "test: update one of the user macros with description (again)"
-      zabbix_host:
-        host_name: ExampleHost
-        macros:
-          - macro: '{$NEWMACRO1}'
-            value: test1234
-            description: Example Description
-          - macro: NEWMACRO2
-            value: abc
-      register: zabbix_host1
+- name: "test: update one of the user macros with description (again)"
+  zabbix_host:
+    host_name: ExampleHost
+    macros:
+      - macro: '{$NEWMACRO1}'
+        value: test1234
+        description: Example Description
+      - macro: NEWMACRO2
+        value: abc
+  register: zabbix_host1
 
-    - name: expect to succeed and that things have not changed
-      assert:
-        that:
-          - "zabbix_host1 is not changed"
+- name: expect to succeed and that things have not changed
+  assert:
+    that:
+      - "zabbix_host1 is not changed"
 
-    - name: "test: update one of the user macros by removing description"
-      zabbix_host:
-        host_name: ExampleHost
-        macros:
-          - macro: '{$NEWMACRO1}'
-            value: test1234
-          - macro: NEWMACRO2
-            value: abc
-      register: zabbix_host1
+- name: "test: update one of the user macros by removing description"
+  zabbix_host:
+    host_name: ExampleHost
+    macros:
+      - macro: '{$NEWMACRO1}'
+        value: test1234
+      - macro: NEWMACRO2
+        value: abc
+  register: zabbix_host1
 
-    - name: expect to succeed and that things have changed
-      assert:
-        that:
-          - "zabbix_host1 is changed"
+- name: expect to succeed and that things have changed
+  assert:
+    that:
+      - "zabbix_host1 is changed"
 
 - name: "test: add user macro while keeping previous ones with force=no"
   zabbix_host:
@@ -1170,36 +1152,33 @@
     that:
       - "zabbix_host1 is not changed"
 
-# type for macros added in 5.0
-- when: zabbix_version is version("5.0", ">=")
-  block:
-    - name: "test: add new user macro with type secret"
-      zabbix_host:
-        host_name: ExampleHost
-        macros:
-          - macro: '{$NEWMACROSECRET}'
-            value: secretvalue
-            type: secret
-      register: zabbix_host1
+- name: "test: add new user macro with type secret"
+  zabbix_host:
+    host_name: ExampleHost
+    macros:
+      - macro: '{$NEWMACROSECRET}'
+        value: secretvalue
+        type: secret
+  register: zabbix_host1
 
-    - name: expect to succeed and that things have changed
-      assert:
-        that:
-          - "zabbix_host1 is changed"
+- name: expect to succeed and that things have changed
+  assert:
+    that:
+      - "zabbix_host1 is changed"
 
-    - name: "test: add new user macro with type secret (again)"
-      zabbix_host:
-        host_name: ExampleHost
-        macros:
-          - macro: '{$NEWMACROSECRET}'
-            value: secretvalue
-            type: secret
-      register: zabbix_host1
+- name: "test: add new user macro with type secret (again)"
+  zabbix_host:
+    host_name: ExampleHost
+    macros:
+      - macro: '{$NEWMACROSECRET}'
+        value: secretvalue
+        type: secret
+  register: zabbix_host1
 
-    - name: expect to succeed and that things have changed as it has secret value
-      assert:
-        that:
-          - "zabbix_host1 is changed"
+- name: expect to succeed and that things have changed as it has secret value
+  assert:
+    that:
+      - "zabbix_host1 is changed"
 
 - name: "test: wipe out all of the user macros"
   zabbix_host:
@@ -1223,91 +1202,88 @@
     that:
       - "zabbix_host1 is not changed"
 
-# The tag function is available since  Zabbix version 4.4
-- when: zabbix_version is version("4.4", ">=")
-  block:
-    - name: "test: add new set of tags to the host"
-      zabbix_host:
-        host_name: ExampleHost
-        tags:
-          - tag: NEWTAG1
-          - tag: NewTag2
-            value: abc
-      register: zabbix_host1
+- name: "test: add new set of tags to the host"
+  zabbix_host:
+    host_name: ExampleHost
+    tags:
+      - tag: NEWTAG1
+      - tag: NewTag2
+        value: abc
+  register: zabbix_host1
 
-    - name: expect to succeed and that things have changed
-      assert:
-        that:
-          - "zabbix_host1 is changed"
+- name: expect to succeed and that things have changed
+  assert:
+    that:
+      - "zabbix_host1 is changed"
 
-    - name: "test: add new set of tags to the host (again)"
-      zabbix_host:
-        host_name: ExampleHost
-        tags:
-          - tag: NEWTAG1
-          - tag: NewTag2
-            value: abc
-      register: zabbix_host1
+- name: "test: add new set of tags to the host (again)"
+  zabbix_host:
+    host_name: ExampleHost
+    tags:
+      - tag: NEWTAG1
+      - tag: NewTag2
+        value: abc
+  register: zabbix_host1
 
-    - name: expect to succeed and that things have not changed
-      assert:
-        that:
-          - "zabbix_host1 is not changed"
+- name: expect to succeed and that things have not changed
+  assert:
+    that:
+      - "zabbix_host1 is not changed"
 
-    - name: "test: update one of the tags present on the host"
-      zabbix_host:
-        host_name: ExampleHost
-        tags:
-          - tag: NEWTAG1
-          - tag: NewTag2
-            value: abcd
-      register: zabbix_host1
+- name: "test: update one of the tags present on the host"
+  zabbix_host:
+    host_name: ExampleHost
+    tags:
+      - tag: NEWTAG1
+      - tag: NewTag2
+        value: abcd
+  register: zabbix_host1
 
-    - name: expect to succeed and that things have changed
-      assert:
-        that:
-          - "zabbix_host1 is changed"
+- name: expect to succeed and that things have changed
+  assert:
+    that:
+      - "zabbix_host1 is changed"
 
-    - name: "test: add tag while keeping previous ones with force=no"
-      zabbix_host:
-        host_name: ExampleHost
-        force: false
-        tags:
-          - tag: newtag3
-            value: testing
-      register: zabbix_host1
+- name: "test: add tag while keeping previous ones with force=no"
+  zabbix_host:
+    host_name: ExampleHost
+    force: false
+    tags:
+      - tag: newtag3
+        value: testing
+  register: zabbix_host1
 
-    - name: expect to succeed and that things have changed
-      assert:
-        that:
-          - "zabbix_host1 is changed"
+- name: expect to succeed and that things have changed
+  assert:
+    that:
+      - "zabbix_host1 is changed"
 
-    - name: "test: add the same tags (again)"
-      zabbix_host:
-        host_name: ExampleHost
-        tags:
-          - tag: NEWTAG1
-          - tag: NewTag2
-            value: abcd
-          - tag: newtag3
-            value: testing
-      register: zabbix_host1
+- name: "test: add the same tags (again)"
+  zabbix_host:
+    host_name: ExampleHost
+    tags:
+      - tag: NEWTAG1
+      - tag: NewTag2
+        value: abcd
+      - tag: newtag3
+        value: testing
+  register: zabbix_host1
 
-    - name: expect to succeed and that things have not changed
-      assert:
-        that:
-          - "zabbix_host1 is not changed"
+- name: expect to succeed and that things have not changed
+  assert:
+    that:
+      - "zabbix_host1 is not changed"
 
-    - name: "test: wipe out all of the tags"
-      zabbix_host:
-        host_name: ExampleHost
-        tags: []
-      register: zabbix_host1
+- name: "test: wipe out all of the tags"
+  zabbix_host:
+    host_name: ExampleHost
+    tags: []
+  register: zabbix_host1
 
-    - name: expect to succeed and that things have changed
-      assert:
-        that:
-          - "zabbix_host1 is changed"
+- name: expect to succeed and that things have changed
+  assert:
+    that:
+      - "zabbix_host1 is changed"
 
 - name: "test: wipe out all of the tags (again)"
   zabbix_host:
@@ -1342,42 +1318,37 @@
     that:
       - "not zabbix_host1 is changed"
 
-- when: zabbix_version is version('5.2', '>=')
-  block:
-  - name: "test: create host without host interfaces"
-    zabbix_host:
-      host_name: ExampleHost
-      visible_name: ExampleName
-      description: My ExampleHost Description
-      host_groups:
-        - Linux servers
-      status: disabled
-      state: present
-    register: zbx_host_create_interfaceless
+- name: "test: create host without host interfaces"
+  zabbix_host:
+    host_name: ExampleHost
+    visible_name: ExampleName
+    description: My ExampleHost Description
+    host_groups:
+      - Linux servers
+    status: disabled
+    state: present
+  register: zbx_host_create_interfaceless
 
-  - name: verify host was created without interfaces
-    assert:
-      that: zbx_host_create_interfaceless is changed
-  
-  - name: "test: create host without host interfaces (again)"
-    zabbix_host:
-      server_url: "{{ zabbix_api_server_url }}"
-      login_user: "{{ zabbix_api_login_user }}"
-      login_password: "{{ zabbix_api_login_pass }}"
-      host_name: ExampleHost
-      visible_name: ExampleName
-      description: My ExampleHost Description
-      host_groups:
-        - Linux servers
-      status: disabled
-      state: present
-    register: zbx_host_create_interfaceless
+- name: verify host was created without interfaces
+  assert:
+    that: zbx_host_create_interfaceless is changed
 
-  - name: expect to succeed and that things have not changed
-    assert:
-      that: zbx_host_create_interfaceless is not changed
+- name: "test: create host without host interfaces (again)"
+  zabbix_host:
+    host_name: ExampleHost
+    visible_name: ExampleName
+    description: My ExampleHost Description
+    host_groups:
+      - Linux servers
+    status: disabled
+    state: present
+  register: zbx_host_create_interfaceless
 
-  - name: "cleanup"
-    zabbix_host:
-      host_name: ExampleHost
-      state: absent
+- name: expect to succeed and that things have not changed
+  assert:
+    that: zbx_host_create_interfaceless is not changed
+
+- name: "cleanup"
+  zabbix_host:
+    host_name: ExampleHost
+    state: absent
