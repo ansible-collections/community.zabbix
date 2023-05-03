@@ -1,4 +1,5 @@
 breaking_changes:
+  - all roles - removed support for installation from epel and non-standard repositories
   - all roles - removed support for all versions of Zabbix < 6.0.
   - all roles  - removed support for the zabbix_version variable.
   - server role - removed support for zabbix_server_mysql_login_user and replaced with zabbix_server_dbuser
@@ -16,9 +17,6 @@ breaking_changes:
   - proxy role - removed support for zabbix_database_creation  and replaced it with zabbix_proxy_database_creation
   - proxy role - removed support for zabbix_database_sqlload  and replaced it with zabbix_proxy_database_sqlload
   - proxy role - removed support for zabbix_selinux  and replaced it with zabbix_proxy_selinux
-
-major_changes:
-  - all roles - removed support for installation from epel and non-standard repositories
 
 minor_changes:
   - all roles - standardized testing matrix to check all supported versions and operating systems.
