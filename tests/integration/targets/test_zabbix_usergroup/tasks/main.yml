@@ -1,8 +1,4 @@
 ---
-- name: test - do not run tests for Zabbix 3.0
-  meta: end_play
-  when: zabbix_version is version('3.0', '=')
-
 - name: test - Zabbix user group
   module_defaults:
     community.zabbix.zabbix_usergroup:

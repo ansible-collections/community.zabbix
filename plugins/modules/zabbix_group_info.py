@@ -8,16 +8,16 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-RETURN = r'''
+RETURN = r"""
 ---
 host_groups:
   description: List of Zabbix groups.
   returned: success
   type: dict
   sample: [ { "flags": "0", "groupid": "33", "internal": "0", "name": "Hostgruup A" } ]
-'''
+"""
 
-DOCUMENTATION = r'''
+DOCUMENTATION = r"""
 ---
 module: zabbix_group_info
 short_description: Gather information about Zabbix hostgroup
@@ -27,7 +27,7 @@ description:
 author:
     - "Michael Miko (@RedWhiteMiko)"
 requirements:
-    - "python >= 2.6"
+    - "python >= 3.9"
 options:
     hostgroup_name:
         description:
@@ -39,9 +39,9 @@ options:
 
 extends_documentation_fragment:
 - community.zabbix.zabbix
-'''
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 # If you want to use Username and Password to be authenticated by Zabbix Server
 - name: Set credentials to access Zabbix Server API
   set_fact:
@@ -62,13 +62,13 @@ EXAMPLES = r'''
     ansible_httpapi_port: 443
     ansible_httpapi_use_ssl: true
     ansible_httpapi_validate_certs: false
-    ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
+    ansible_zabbix_url_path: "zabbixeu"  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
     ansible_host: zabbix-example-fqdn.org
   community.zabbix.zabbix_group_info:
     hostgroup_name:
       - ExampleHostgroup
     timeout: 10
-'''
+"""
 
 from ansible.module_utils.basic import AnsibleModule
 
@@ -78,7 +78,7 @@ import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabb
 
 class Host(ZabbixBase):
     def get_group_ids_by_group_names(self, group_names):
-        group_list = self._zapi.hostgroup.get({'output': 'extend', 'filter': {'name': group_names}})
+        group_list = self._zapi.hostgroup.get({"output": "extend", "filter": {"name": group_names}})
         if len(group_list) < 1:
             self._module.fail_json(msg="Hostgroup not found: %s" % group_names)
         return group_list
@@ -87,29 +87,19 @@ class Host(ZabbixBase):
 def main():
     argument_spec = zabbix_utils.zabbix_common_argument_spec()
     argument_spec.update(dict(
-        hostgroup_name=dict(type='list', required=True, elements='str'),
+        hostgroup_name=dict(type="list", required=True, elements="str"),
     ))
     module = AnsibleModule(
         argument_spec=argument_spec,
         supports_check_mode=True
     )
 
-    zabbix_utils.require_creds_params(module)
-
-    for p in ['server_url', 'login_user', 'login_password', 'timeout', 'validate_certs']:
-        if p in module.params and not module.params[p] is None:
-            module.warn('Option "%s" is deprecated with the move to httpapi connection and will be removed in the next release' % p)
-
-    if module._name == 'zabbix_group_facts':
-        module.deprecate("The 'zabbix_group_facts' module has been renamed to 'zabbix_group_info'",
-                         collection_name="community.zabbix", version='2.0.0')  # was 2.13
-
-    hostgroup_name = module.params['hostgroup_name']
+    hostgroup_name = module.params["hostgroup_name"]
 
     host = Host(module)
     host_groups = host.get_group_ids_by_group_names(hostgroup_name)
     module.exit_json(host_groups=host_groups)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

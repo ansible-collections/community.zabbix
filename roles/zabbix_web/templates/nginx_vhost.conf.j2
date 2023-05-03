@@ -1,61 +1,79 @@
 # Nginx configuration for Zabbix Web
 
 server {
-{% if not zabbix_nginx_tls %}
-    listen {{ zabbix_nginx_vhost_port }};
-{% else %}
-{% if zabbix_letsencrypt %}
-    listen 80;
+    listen {{ zabbix_web_vhost_port }};
     server_tokens off;
-    server_name     {{ zabbix_websrv_servername }} {% for alias in zabbix_url_aliases -%}{{ alias -}} {% endfor %};
-    location ^~ /.well-known/acme-challenge {
-        root {{ zabbix_letsencrypt_webroot_path | default('/var/www/letsencrypt') }};
-        # disables IP restrictions and HTTP auth
-        allow all;
-        default_type text/plain;
-        try_files $uri =404;
+    server_name {{ zabbix_api_server_url }} {% for alias in zabbix_url_aliases -%}{{ alias -}} {% endfor %};
+
+    {% if zabbix_web_redirect|default(false) and zabbix_web_tls|default(false) %}
+    return 301 https://{{ zabbix_api_server_url }}$request_uri;
+    {% else %}
+    root    /usr/share/zabbix;
+
+    index   index.php;
+
+    location = /favicon.ico {
+        log_not_found   off;
     }
-    location / { return 301 https://$host:{{ zabbix_nginx_vhost_tls_port }}$request_uri; }
+
+    location / {
+        try_files       $uri $uri/ =404;
+    }
+
+    location /assets {
+        access_log      off;
+        expires         10d;
+    }
+
+    location ~ /\.ht {
+        deny            all;
+    }
+
+    location ~ /(api\/|conf[^\.]|include|locale) {
+        deny            all;
+        return          404;
+    }
+
+    location ~ [^/]\.php(/|$) {
+        fastcgi_pass    unix:{{ zabbix_php_fpm_listen }};
+        fastcgi_split_path_info ^(.+\.php)(/.+)$;
+        fastcgi_index   index.php;
+
+        fastcgi_param   DOCUMENT_ROOT   /usr/share/zabbix;
+        fastcgi_param   SCRIPT_FILENAME /usr/share/zabbix$fastcgi_script_name;
+        fastcgi_param   PATH_TRANSLATED /usr/share/zabbix$fastcgi_script_name;
+
+        include fastcgi_params;
+        fastcgi_param   QUERY_STRING    $query_string;
+        fastcgi_param   REQUEST_METHOD  $request_method;
+        fastcgi_param   CONTENT_TYPE    $content_type;
+        fastcgi_param   CONTENT_LENGTH  $content_length;
+
+        fastcgi_intercept_errors        on;
+        fastcgi_ignore_client_abort     off;
+        fastcgi_connect_timeout         60;
+        fastcgi_send_timeout            180;
+        fastcgi_read_timeout            180;
+        fastcgi_buffer_size             128k;
+        fastcgi_buffers                 4 256k;
+        fastcgi_busy_buffers_size       256k;
+        fastcgi_temp_file_write_size    256k;
+    }
+    {% endif %}
 }
 
+{% if zabbix_web_tls|default(false) %}
 server {
-{% endif %}
-    listen {{ zabbix_nginx_vhost_tls_port }} ssl;
-{% if zabbix_letsencrypt and zabbix_letsencrypt_cert.stat.exists %}
-    ssl_certificate /etc/letsencrypt/live/{{ zabbix_websrv_servername }}/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/{{ zabbix_websrv_servername }}/privkey.pem;
-{% else %}
-    ssl_certificate {{ zabbix_nginx_tls_crt }};
-    ssl_certificate_key {{ zabbix_nginx_tls_key }};
-{% endif %}
-    ssl_session_timeout {{ zabbix_nginx_tls_session_timeout }};
-    ssl_session_cache {{ zabbix_nginx_tls_session_cache }};
-    ssl_session_tickets {{ zabbix_nginx_tls_session_tickets }};
-    ssl_dhparam {{ zabbix_nginx_tls_dhparam }};
-
-    ssl_protocols {{ zabbix_nginx_tls_protocols }};
-    ssl_ciphers {{ zabbix_nginx_tls_ciphers }};
-    ssl_prefer_server_ciphers off;
-
-{% endif %}
+    listen {{ zabbix_web_vhost_tls_port }} ssl;
     server_tokens off;
-    server_name     {{ zabbix_websrv_servername }} {% for alias in zabbix_url_aliases -%}{{ alias -}} {% endfor %};
+    server_name {{ zabbix_api_server_url }} {% for alias in zabbix_url_aliases -%}{{ alias -}} {% endfor %};
 
-{% if zabbix_web_allowlist_ips is defined and zabbix_web_allowlist_ips %}
-    # Allow list IPs via zabbix_web_allowlist_ips
-    satisfy any;
-{% for ip in zabbix_web_allowlist_ips | ansible.netcommon.ipaddr %}
-    allow {{ ip }};
-{% endfor %}
-    deny all;
-
-{% endif %}
-{% if zabbix_web_htpasswd is defined and zabbix_web_htpasswd %}
-    # HTTP authentication via zabbix_web_htpasswd
-    auth_basic "Restricted";
-    auth_basic_user_file {{ zabbix_web_htpasswd_file }};
-
-{% endif %}
+    ssl on;
+    ssl_certificate {{ zabbix_web_tls_crt }};
+    ssl_certificate_key {{ zabbix_web_tls_key }};
+    {{ (zabbix_web_ssl_cipher_suite is defined and zabbix_web_ssl_cipher_suite is not none) | ternary('', '# ') }}ssl_ciphers {{ zabbix_web_ssl_cipher_suite | default('') }}
+    {{ (zabbix_web_SSLSessionCache is defined and zabbix_web_SSLSessionCache is not none) | ternary('', '# ') }}ssl_session_cache  {{ zabbix_web_SSLSessionCache | default('') }}
+    {{ (zabbix_web_SSLSessionCacheTimeout is defined and zabbix_web_SSLSessionCacheTimeout is not none) | ternary('', '# ') }}ssl_session_timeout {{ zabbix_web_SSLSessionCacheTimeout | default('') }}
     root    /usr/share/zabbix;
 
     index   index.php;
@@ -108,3 +126,4 @@ server {
         fastcgi_temp_file_write_size    256k;
     }
 }
+{% endif %}

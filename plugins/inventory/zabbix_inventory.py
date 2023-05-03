@@ -10,7 +10,7 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = r'''
+DOCUMENTATION = r"""
 name: zabbix_inventory
 author:
     - Timothy Test (@ttestscripting)
@@ -20,8 +20,7 @@ description:
     - Zabbix Inventory plugin
     - All vars from zabbix are prefixed with zbx_
 requirements:
-    - "python >= 2.6"
-    - "zabbix-api >= 0.5.4"
+    - "python >= 3.9"
 options:
     server_url:
         description:
@@ -35,7 +34,7 @@ options:
     proxy:
         description: Proxy server to use for reaching zabbix API
         type: string
-        default: ''
+        default: ""
     host_zapi_query:
         description:
             - API query for hosts - see zabbix documentation for more details U(https://www.zabbix.com/documentation/current/manual/api/reference/host/get)
@@ -47,9 +46,9 @@ options:
                 description:
                     - query
                     - Return an applications property with host applications.
-                    - To return all values specify 'extend'
-                    - Can be limited to different fields for example setting the vaule to ['name'] will only return the name
-                    - Additional fields can be specified by comma seperated value ['name', 'field2']
+                    - To return all values specify "extend"
+                    - Can be limited to different fields for example setting the vaule to ["name"] will only return the name
+                    - Additional fields can be specified by comma seperated value ["name", "field2"]
                     - Please see U(https://www.zabbix.com/documentation/current/manual/api/reference/application/object) for more details on field names
             selectDiscoveries:
                 type: str
@@ -200,6 +199,12 @@ options:
         required: true
         env:
           - name: ZABBIX_PASSWORD
+    auth_token:
+        description:
+            - Zabbix authentication token (see https://www.zabbix.com/documentation/current/en/manual/web_interface/frontend_sections/users/api_tokens)
+            - If provided then C(login_user) and C(login_password) are ignored
+        type: str
+        required: false
     http_login_user:
         description:
             - Basic Auth login
@@ -228,9 +233,9 @@ options:
 extends_documentation_fragment:
     - constructed
     - inventory_cache
-'''
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 # Simple Inventory Plugin example
 # This will create an inventory with details from zabbix such as applications name, applicaitonids, Parent Template Name, and group membership name
 #It will also create 2 ansible inventory groups for enabled and disabled hosts in zabbix based on the status field.
@@ -286,27 +291,34 @@ validate_certs: false
 compose:
   zbx_testvar: zbx_status.replace("1", "Disabled")
 
+#Using auth token instead of username/password
+plugin: community.zabbix.zabbix_inventory
+server_url: https://zabbix.com
+auth_token: 3bc3dc85e13e2431812e7a32fa8341cbcf378e5101356c015fdf2e35fd511b06
+validate_certs: false
 
-'''
+"""
 
 from ansible.plugins.inventory import BaseInventoryPlugin, Constructable, Cacheable, to_safe_group_name
 import os
 import atexit
-import traceback
-
-try:
-    from zabbix_api import ZabbixAPI
-    HAS_ZABBIX_API = True
-except ImportError:
-    ZBX_IMP_ERR = traceback.format_exc()
-    HAS_ZABBIX_API = False
+import json
+from ansible.module_utils.urls import Request
+from ansible.module_utils.six.moves.urllib.error import URLError, HTTPError
+from ansible.module_utils.compat.version import LooseVersion
+from ansible.errors import AnsibleParserError
 
 
 class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
 
     NAME = 'community.zabbix.zabbix_inventory'
 
-    def login_zabbix(self):
+    def __init__(self):
+        super().__init__()
+        self.auth = ''
+        self.zabbix_verion = ''
+
+    def api_request(self, method, params=None):
         # set proxy information if required
         proxy = self.get_option('proxy')
         os.environ['http_proxy'] = proxy
@@ -315,24 +327,74 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         os.environ['HTTPS_PROXY'] = proxy
 
         server_url = self.get_option('server_url')
-        http_login_user = self.get_option('login_user')
-        http_login_password = self.get_option('login_password')
         validate_certs = self.get_option('validate_certs')
         timeout = self.get_option('timeout')
-        self._zapi = ZabbixAPI(server_url, timeout=timeout, user=http_login_user, passwd=http_login_password, validate_certs=validate_certs)
-        self.login()
-        self._zbx_api_version = self._zapi.api_version()[:5]
 
-    def login(self):
-        # check if api already logged in
-        if not self._zapi.auth != '':
-            try:
-                login_user = self.get_option('login_user')
-                login_password = self.get_option('login_password')
-                self._zapi.login(login_user, login_password)
-                atexit.register(self._zapi.logout)
-            except Exception as e:
-                self.display.vvv(msg="Failed to connect to Zabbix server: %s" % e)
+        headers = {'Content-Type': 'application/json-rpc'}
+        payload = {
+            'jsonrpc': '2.0',
+            'method': method,
+            'id': '1'
+        }
+        if params is None:
+            payload['params'] = {}
+        else:
+            payload['params'] = params
+
+        if self.auth != '':
+            if (LooseVersion(self.zabbix_version) >= LooseVersion('6.4')):
+                headers['Authorization'] = 'Bearer ' + self.auth
+            else:
+                payload['auth'] = self.auth
+
+        api_url = server_url + '/api_jsonrpc.php'
+        req = Request(
+            headers=headers,
+            timeout=timeout,
+            validate_certs=validate_certs
+        )
+        try:
+            self.display.vvv("Sending request to {0}".format(api_url))
+            response = req.post(api_url, data=json.dumps(payload))
+        except ValueError:
+            raise AnsibleParserError("something went wrong with JSON loading")
+        except (URLError, HTTPError) as error:
+            raise AnsibleParserError(error)
+
+        return response
+
+    def get_version(self):
+        response = self.api_request(
+            'apiinfo.version'
+        )
+        res = json.load(response)
+        self.zabbix_version = res['result']
+
+    def logout_zabbix(self):
+        self.api_request(
+            'user.logout',
+            []
+        )
+
+    def login_zabbix(self):
+        auth_token = self.get_option('auth_token')
+        if auth_token:
+            self.auth = auth_token
+            return
+
+        atexit.register(self.logout_zabbix)
+
+        login_user = self.get_option('login_user')
+        login_password = self.get_option('login_password')
+        response = self.api_request(
+            'user.login',
+            {
+                "username": login_user,
+                "password": login_password
+            }
+        )
+        res = json.load(response)
+        self.auth = res["result"]
 
     def verify_file(self, path):
         valid = False
@@ -354,9 +416,15 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         self.use_cache = self.get_option('cache') and cache
         self.update_cache = self.get_option('cache') and not cache
 
+        self.get_version()
         self.login_zabbix()
         zapi_query = self.get_option('host_zapi_query')
-        content = self._zapi.host.get(zapi_query)
+        response = self.api_request(
+            'host.get',
+            zapi_query
+        )
+        res = json.load(response)
+        content = res['result']
 
         strict = self.get_option('strict')
 

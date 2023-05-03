@@ -137,11 +137,6 @@
 
 - assert:
     that: zbxgmacro_secret.changed is sameas True
-  when: zabbix_version is version('5.0', '>=')
-
-- assert:
-    that: zbxgmacro_secret.changed is sameas False
-  when: zabbix_version is version('5.0', '<')
 
 - name: test - attempt to create vault global macro
   zabbix_globalmacro:

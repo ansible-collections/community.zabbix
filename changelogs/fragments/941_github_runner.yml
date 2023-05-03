@@ -1,3 +1,0 @@
----
-breaking_changes:
-  - zabbix_action - message parameter renamed to op_message

@@ -1,58 +1,6 @@
 ---
 # Tasks specific for RedHat systems
 
-- name: "RedHat | Use EPEL package name"
-  set_fact:
-    zabbix_agent_package: "zabbix{{ zabbix_version | regex_replace('\\.', '') }}-agent"
-    zabbix_sender_package: "zabbix{{ zabbix_version | regex_replace('\\.', '') }}-sender"
-    zabbix_get_package: "zabbix{{ zabbix_version | regex_replace('\\.', '') }}-get"
-  when:
-    - zabbix_repo == "epel"
-  tags:
-    - zabbix-agent
-    - init
-
-- name: "RedHat | Set zabbix_agent_distribution_major_version to 6 when Amazon"
-  set_fact:
-    zabbix_agent_distribution_major_version: 6
-  when:
-    - ansible_distribution == "Amazon"
-    - ansible_distribution_major_version == "NA"
-
-- name: "RedHat | Set zabbix_agent_distribution_major_version to 6 when Major Version is 2018.03"
-  set_fact:
-    zabbix_agent_distribution_major_version: 6
-  when:
-    - ansible_distribution == "Amazon"
-    - ansible_distribution_major_version == "2018"
-
-- name: "RedHat | Set zabbix_agent_distribution_major_version to 7 when Amazon 2"
-  set_fact:
-    zabbix_agent_distribution_major_version: 7
-  when:
-    - ansible_distribution == "Amazon"
-    - ansible_distribution_major_version == "2"
-
-- name: "Fedora | Override zabbix_agent_distribution_major_version for Fedora <= 27"
-  set_fact:
-    zabbix_agent_distribution_major_version: 7
-  when:
-    - ansible_distribution == "Fedora"
-    - ansible_distribution_major_version <= "27"
-
-- name: "Fedora | Override zabbix_agent_distribution_major_version for Fedora >= 27"
-  set_fact:
-    zabbix_agent_distribution_major_version: 8
-  when:
-    - ansible_distribution == "Fedora"
-    - ansible_distribution_major_version >= "27"
-
-- name: "XCP-ng | Override zabbix_agent_distribution_major_version for XCP-ng"
-  set_fact:
-    zabbix_agent_distribution_major_version: 7
-  when:
-    - ansible_distribution == "XCP-ng"
-
 - name: "RedHat | Install basic repo file"
   yum_repository:
     name: "{{ item.name }}"
@@ -67,67 +15,39 @@
   with_items: "{{ zabbix_repo_yum }}"
   register: yum_repo_installed
   become: true
-  when:
-    zabbix_repo == "zabbix"
   notify:
     - "clean repo files from proxy creds"
   tags:
-    - zabbix-agent
+    - install
 
 - name: Check if warn parameter can be used for shell module
   set_fact:
     produce_warn: False
   when: ansible_version.full is version("2.14", "<")
-
-- name: "Do a yum clean"
-  shell: yum clean all
-  args:
-    warn: "{{ produce_warn | default(omit) }}"
-  when: yum_repo_installed.changed
-  become: true
   tags:
-    - skip_ansible_lint
+    - always
 
 - name: "RedHat | Installing zabbix-agent"
   package:
     pkg:
       - "{{ zabbix_agent_package }}-{{ zabbix_agent_version }}.{{ zabbix_agent_version_minor }}"
-    disablerepo: "{{ '*' if (zabbix_repo_yum_enabled | length>0) else omit }}"
-    enablerepo: "{{ zabbix_repo_yum_enabled if zabbix_repo_yum_enabled is iterable and (zabbix_repo_yum_enabled | length>0) else omit }}"
+    disablerepo: epel
     state: "{{ zabbix_agent_package_state }}"
   environment:
     http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
     https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   register: zabbix_agent_package_installed
   until: zabbix_agent_package_installed is succeeded
-  when:
-    zabbix_repo != "other"
   become: true
   tags:
-    - init
-    - zabbix-agent
-
-- name: "RedHat | Installing zabbix-agent (When zabbix_repo == other)"
-  package:
-    pkg:
-      - "{{ zabbix_agent_package }}-{{ zabbix_agent_version }}.{{ zabbix_agent_version_minor }}"
-    state: "{{ zabbix_agent_package_state }}"
-  register: zabbix_agent_package_installed
-  until: zabbix_agent_package_installed is succeeded
-  when:
-    zabbix_repo == "other"
-  become: true
-  tags:
-    - init
-    - zabbix-agent
+    - install
 
 - name: "RedHat | Installing zabbix-{sender,get}"
   package:
     pkg:
       - "{{ zabbix_sender_package }}-{{ zabbix_agent_version }}.{{ zabbix_agent_version_minor }}"
       - "{{ zabbix_get_package }}-{{ zabbix_agent_version }}.{{ zabbix_agent_version_minor }}"
-    disablerepo: "{{ '*' if (zabbix_repo_yum_enabled | length>0) else omit }}"
-    enablerepo: "{{ zabbix_repo_yum_enabled if zabbix_repo_yum_enabled is iterable and (zabbix_repo_yum_enabled | length>0) else omit }}"
+    disablerepo: epel
     state: "{{ zabbix_agent_package_state }}"
   environment:
     http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
@@ -135,28 +55,10 @@
   register: zabbix_agent_package_installed
   until: zabbix_agent_package_installed is succeeded
   when:
-    - zabbix_repo not in ['epel', 'other']
     - not zabbix_agent_install_agent_only
   become: true
   tags:
-    - init
-    - zabbix-agent
-
-- name: "RedHat | Installing zabbix-{sender,get} (When zabbix_repo == other)"
-  package:
-    pkg:
-      - "{{ zabbix_sender_package }}-{{ zabbix_agent_version }}.{{ zabbix_agent_version_minor }}"
-      - "{{ zabbix_get_package }}-{{ zabbix_agent_version }}.{{ zabbix_agent_version_minor }}"
-    state: "{{ zabbix_agent_package_state }}"
-  register: zabbix_agent_package_installed
-  until: zabbix_agent_package_installed is succeeded
-  when:
-    - zabbix_repo == "other"
-    - not zabbix_agent_install_agent_only
-  become: true
-  tags:
-    - init
-    - zabbix-agent
+    - install
 
 - name: "RedHat | Enable the service"
   service:
@@ -165,6 +67,4 @@
     use: service
   become: true
   tags:
-    - zabbix-agent
-    - init
     - service

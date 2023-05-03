@@ -107,174 +107,170 @@
   - assert:
       that: zbxmediatype_verif.changed is sameas False
 
-  - when: zabbix_version is version('3.4', '>=')
-    block:
-    - name: test - reset email mediatype smtp information to default
-      zabbix_mediatype:
-      register: zbxmediatype_reset
+  - name: test - reset email mediatype smtp information to default
+    zabbix_mediatype:
+    register: zbxmediatype_reset
 
-    - assert:
-        that: zbxmediatype_reset.changed is sameas True
+  - assert:
+      that: zbxmediatype_reset.changed is sameas True
 
-    - name: test - update email mediatype concurrent settings
-      zabbix_mediatype:
-        max_sessions: 99
-        max_attempts: 10
-        attempt_interval: 30s
-      register: zbxmediatype_concur
+  - name: test - update email mediatype concurrent settings
+    zabbix_mediatype:
+      max_sessions: 99
+      max_attempts: 10
+      attempt_interval: 30s
+    register: zbxmediatype_concur
 
-    - assert:
-        that: zbxmediatype_concur.changed is sameas True
+  - assert:
+      that: zbxmediatype_concur.changed is sameas True
 
-    - name: test - update email mediatype concurrent settings (again)
-      zabbix_mediatype:
-        max_sessions: 99
-        max_attempts: 10
-        attempt_interval: 30s
-      register: zbxmediatype_concur
+  - name: test - update email mediatype concurrent settings (again)
+    zabbix_mediatype:
+      max_sessions: 99
+      max_attempts: 10
+      attempt_interval: 30s
+    register: zbxmediatype_concur
 
-    - assert:
-        that: zbxmediatype_concur.changed is sameas False
+  - assert:
+      that: zbxmediatype_concur.changed is sameas False
 
-    - name: test - update email mediatype concurrent settings above range (fail)
-      zabbix_mediatype:
-        max_sessions: 102
-        max_attempts: 101
-        attempt_interval: 61m
-      register: zbxmediatype_concur_fail
-      ignore_errors: true
+  - name: test - update email mediatype concurrent settings above range (fail)
+    zabbix_mediatype:
+      max_sessions: 102
+      max_attempts: 101
+      attempt_interval: 61m
+    register: zbxmediatype_concur_fail
+    ignore_errors: true
 
-    - assert:
-        that: zbxmediatype_concur_fail.failed is sameas True
+  - assert:
+      that: zbxmediatype_concur_fail.failed is sameas True
 
-  - when: zabbix_version is version('5.0', '>=')
-    block:
-    - name: test - reset email mediatype smtp information to default
-      zabbix_mediatype:
-      register: zbxmediatype_reset
+  - name: test - reset email mediatype smtp information to default
+    zabbix_mediatype:
+    register: zbxmediatype_reset
 
-    - assert:
-        that: zbxmediatype_reset.changed is sameas True
+  - assert:
+      that: zbxmediatype_reset.changed is sameas True
 
-    - name: test - update email mediatype with message templates
-      zabbix_mediatype:
-        message_templates:
-          - eventsource: triggers
-            recovery: operations
-            subject: "Problem: {EVENT.NAME}"
-            body: "Problem started at {EVENT.TIME} on {EVENT.DATE}\r\nProblem name: {EVENT.NAME}\r\n"
-          - eventsource: discovery
-            recovery: operations
-            subject: "Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}"
-            body: "Discovery rule: {DISCOVERY.RULE.NAME}\r\n\r\nDevice IP: {DISCOVERY.DEVICE.IPADDRESS}"
-          - eventsource: autoregistration
-            recovery: operations
-            subject: "Autoregistration: {HOST.HOST}"
-            body: "Host name: {HOST.HOST}\r\nHost IP: {HOST.IP}\r\nAgent port: {HOST.PORT}"
-          - eventsource: internal
-            recovery: operations
-            subject: "Internal: {EVENT.NAME}"
-            body: "Internal event started at {EVEN.TIME} on {EVENT.DATE}\r\nEvent name: {EVENT.NAME}\r\n"
-      register: zbxmediatype_msg_templates
+  - name: test - update email mediatype with message templates
+    zabbix_mediatype:
+      message_templates:
+        - eventsource: triggers
+          recovery: operations
+          subject: "Problem: {EVENT.NAME}"
+          body: "Problem started at {EVENT.TIME} on {EVENT.DATE}\r\nProblem name: {EVENT.NAME}\r\n"
+        - eventsource: discovery
+          recovery: operations
+          subject: "Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}"
+          body: "Discovery rule: {DISCOVERY.RULE.NAME}\r\n\r\nDevice IP: {DISCOVERY.DEVICE.IPADDRESS}"
+        - eventsource: autoregistration
+          recovery: operations
+          subject: "Autoregistration: {HOST.HOST}"
+          body: "Host name: {HOST.HOST}\r\nHost IP: {HOST.IP}\r\nAgent port: {HOST.PORT}"
+        - eventsource: internal
+          recovery: operations
+          subject: "Internal: {EVENT.NAME}"
+          body: "Internal event started at {EVEN.TIME} on {EVENT.DATE}\r\nEvent name: {EVENT.NAME}\r\n"
+    register: zbxmediatype_msg_templates
 
-    - assert:
-        that: zbxmediatype_msg_templates.changed is sameas True
+  - assert:
+      that: zbxmediatype_msg_templates.changed is sameas True
 
-    - name: test - update email mediatype with message templates (again)
-      zabbix_mediatype:
-        message_templates:
-          - eventsource: triggers
-            recovery: operations
-            subject: "Problem: {EVENT.NAME}"
-            body: "Problem started at {EVENT.TIME} on {EVENT.DATE}\r\nProblem name: {EVENT.NAME}\r\n"
-          - eventsource: discovery
-            recovery: operations
-            subject: "Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}"
-            body: "Discovery rule: {DISCOVERY.RULE.NAME}\r\n\r\nDevice IP: {DISCOVERY.DEVICE.IPADDRESS}"
-          - eventsource: autoregistration
-            recovery: operations
-            subject: "Autoregistration: {HOST.HOST}"
-            body: "Host name: {HOST.HOST}\r\nHost IP: {HOST.IP}\r\nAgent port: {HOST.PORT}"
-          - eventsource: internal
-            recovery: operations
-            subject: "Internal: {EVENT.NAME}"
-            body: "Internal event started at {EVEN.TIME} on {EVENT.DATE}\r\nEvent name: {EVENT.NAME}\r\n"
-      register: zbxmediatype_msg_templates
+  - name: test - update email mediatype with message templates (again)
+    zabbix_mediatype:
+      message_templates:
+        - eventsource: triggers
+          recovery: operations
+          subject: "Problem: {EVENT.NAME}"
+          body: "Problem started at {EVENT.TIME} on {EVENT.DATE}\r\nProblem name: {EVENT.NAME}\r\n"
+        - eventsource: discovery
+          recovery: operations
+          subject: "Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}"
+          body: "Discovery rule: {DISCOVERY.RULE.NAME}\r\n\r\nDevice IP: {DISCOVERY.DEVICE.IPADDRESS}"
+        - eventsource: autoregistration
+          recovery: operations
+          subject: "Autoregistration: {HOST.HOST}"
+          body: "Host name: {HOST.HOST}\r\nHost IP: {HOST.IP}\r\nAgent port: {HOST.PORT}"
+        - eventsource: internal
+          recovery: operations
+          subject: "Internal: {EVENT.NAME}"
+          body: "Internal event started at {EVEN.TIME} on {EVENT.DATE}\r\nEvent name: {EVENT.NAME}\r\n"
+    register: zbxmediatype_msg_templates
 
-    - assert:
-        that: zbxmediatype_msg_templates.changed is sameas False
+  - assert:
+      that: zbxmediatype_msg_templates.changed is sameas False
 
-    - name: test - update subject of message template in email mediatype
-      zabbix_mediatype:
-        message_templates:
-          - eventsource: triggers
-            recovery: operations
-            subject: "Problem: {EVENT.NAME} - test change"
-            body: "Problem started at {EVENT.TIME} on {EVENT.DATE}\r\nProblem name: {EVENT.NAME}\r\n"
-          - eventsource: discovery
-            recovery: operations
-            subject: "Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}"
-            body: "Discovery rule: {DISCOVERY.RULE.NAME}\r\n\r\nDevice IP: {DISCOVERY.DEVICE.IPADDRESS}"
-          - eventsource: autoregistration
-            recovery: operations
-            subject: "Autoregistration: {HOST.HOST}"
-            body: "Host name: {HOST.HOST}\r\nHost IP: {HOST.IP}\r\nAgent port: {HOST.PORT}"
-          - eventsource: internal
-            recovery: operations
-            subject: "Internal: {EVENT.NAME}"
-            body: "Internal event started at {EVEN.TIME} on {EVENT.DATE}\r\nEvent name: {EVENT.NAME}\r\n"
-      register: zbxmediatype_msg_templates
+  - name: test - update subject of message template in email mediatype
+    zabbix_mediatype:
+      message_templates:
+        - eventsource: triggers
+          recovery: operations
+          subject: "Problem: {EVENT.NAME} - test change"
+          body: "Problem started at {EVENT.TIME} on {EVENT.DATE}\r\nProblem name: {EVENT.NAME}\r\n"
+        - eventsource: discovery
+          recovery: operations
+          subject: "Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}"
+          body: "Discovery rule: {DISCOVERY.RULE.NAME}\r\n\r\nDevice IP: {DISCOVERY.DEVICE.IPADDRESS}"
+        - eventsource: autoregistration
+          recovery: operations
+          subject: "Autoregistration: {HOST.HOST}"
+          body: "Host name: {HOST.HOST}\r\nHost IP: {HOST.IP}\r\nAgent port: {HOST.PORT}"
+        - eventsource: internal
+          recovery: operations
+          subject: "Internal: {EVENT.NAME}"
+          body: "Internal event started at {EVEN.TIME} on {EVENT.DATE}\r\nEvent name: {EVENT.NAME}\r\n"
+    register: zbxmediatype_msg_templates
 
-    - assert:
-        that: zbxmediatype_msg_templates.changed is sameas True
+  - assert:
+      that: zbxmediatype_msg_templates.changed is sameas True
 
-    - name: test - update message of message template in email mediatype
-      zabbix_mediatype:
-        message_templates:
-          - eventsource: triggers
-            recovery: operations
-            subject: "Problem: {EVENT.NAME} - test change"
-            body: "Problem started at {EVENT.TIME} on {EVENT.DATE}\r\nProblem name: {EVENT.NAME}\r\n"
-          - eventsource: discovery
-            recovery: operations
-            subject: "Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}"
-            body: "Discovery rule: {DISCOVERY.RULE.NAME}\r\n\r\nDevice IP: {DISCOVERY.DEVICE.IPADDRESS} - test"
-          - eventsource: autoregistration
-            recovery: operations
-            subject: "Autoregistration: {HOST.HOST}"
-            body: "Host name: {HOST.HOST}\r\nHost IP: {HOST.IP}\r\nAgent port: {HOST.PORT}"
-          - eventsource: internal
-            recovery: operations
-            subject: "Internal: {EVENT.NAME}"
-            body: "Internal event started at {EVEN.TIME} on {EVENT.DATE}\r\nEvent name: {EVENT.NAME}\r\n"
-      register: zbxmediatype_msg_templates
+  - name: test - update message of message template in email mediatype
+    zabbix_mediatype:
+      message_templates:
+        - eventsource: triggers
+          recovery: operations
+          subject: "Problem: {EVENT.NAME} - test change"
+          body: "Problem started at {EVENT.TIME} on {EVENT.DATE}\r\nProblem name: {EVENT.NAME}\r\n"
+        - eventsource: discovery
+          recovery: operations
+          subject: "Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}"
+          body: "Discovery rule: {DISCOVERY.RULE.NAME}\r\n\r\nDevice IP: {DISCOVERY.DEVICE.IPADDRESS} - test"
+        - eventsource: autoregistration
+          recovery: operations
+          subject: "Autoregistration: {HOST.HOST}"
+          body: "Host name: {HOST.HOST}\r\nHost IP: {HOST.IP}\r\nAgent port: {HOST.PORT}"
+        - eventsource: internal
+          recovery: operations
+          subject: "Internal: {EVENT.NAME}"
+          body: "Internal event started at {EVEN.TIME} on {EVENT.DATE}\r\nEvent name: {EVENT.NAME}\r\n"
+    register: zbxmediatype_msg_templates
 
-    - assert:
-        that: zbxmediatype_msg_templates.changed is sameas True
+  - assert:
+      that: zbxmediatype_msg_templates.changed is sameas True
 
-    - name: test - update subject and message of message template in email mediatype (again)
-      zabbix_mediatype:
-        message_templates:
-          - eventsource: triggers
-            recovery: operations
-            subject: "Problem: {EVENT.NAME} - test change"
-            body: "Problem started at {EVENT.TIME} on {EVENT.DATE}\r\nProblem name: {EVENT.NAME}\r\n"
-          - eventsource: discovery
-            recovery: operations
-            subject: "Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}"
-            body: "Discovery rule: {DISCOVERY.RULE.NAME}\r\n\r\nDevice IP: {DISCOVERY.DEVICE.IPADDRESS} - test"
-          - eventsource: autoregistration
-            recovery: operations
-            subject: "Autoregistration: {HOST.HOST}"
-            body: "Host name: {HOST.HOST}\r\nHost IP: {HOST.IP}\r\nAgent port: {HOST.PORT}"
-          - eventsource: internal
-            recovery: operations
-            subject: "Internal: {EVENT.NAME}"
-            body: "Internal event started at {EVEN.TIME} on {EVENT.DATE}\r\nEvent name: {EVENT.NAME}\r\n"
-      register: zbxmediatype_msg_templates
+  - name: test - update subject and message of message template in email mediatype (again)
+    zabbix_mediatype:
+      message_templates:
+        - eventsource: triggers
+          recovery: operations
+          subject: "Problem: {EVENT.NAME} - test change"
+          body: "Problem started at {EVENT.TIME} on {EVENT.DATE}\r\nProblem name: {EVENT.NAME}\r\n"
+        - eventsource: discovery
+          recovery: operations
+          subject: "Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}"
+          body: "Discovery rule: {DISCOVERY.RULE.NAME}\r\n\r\nDevice IP: {DISCOVERY.DEVICE.IPADDRESS} - test"
+        - eventsource: autoregistration
+          recovery: operations
+          subject: "Autoregistration: {HOST.HOST}"
+          body: "Host name: {HOST.HOST}\r\nHost IP: {HOST.IP}\r\nAgent port: {HOST.PORT}"
+        - eventsource: internal
+          recovery: operations
+          subject: "Internal: {EVENT.NAME}"
+          body: "Internal event started at {EVEN.TIME} on {EVENT.DATE}\r\nEvent name: {EVENT.NAME}\r\n"
+    register: zbxmediatype_msg_templates
 
-    - assert:
-        that: zbxmediatype_msg_templates.changed is sameas False
+  - assert:
+      that: zbxmediatype_msg_templates.changed is sameas False
 
   - name: test - disable email mediatype
     zabbix_mediatype:
@@ -394,38 +390,36 @@
   - assert:
       that: zbxmediatype_sms_new.changed is sameas False
 
-  - when: zabbix_version is version('3.4', '>=')
-    block:
-    - name: test - update sms mediatype with concurrent settings
-      zabbix_mediatype:
-        gsm_modem: /dev/ttyS0
-        max_sessions: 1
-        max_attempts: 3
-        attempt_interval: 30
-      register: zbxmediatype_sms_concur
+  - name: test - update sms mediatype with concurrent settings
+    zabbix_mediatype:
+      gsm_modem: /dev/ttyS0
+      max_sessions: 1
+      max_attempts: 3
+      attempt_interval: 30
+    register: zbxmediatype_sms_concur
 
-    - assert:
-        that: zbxmediatype_sms_concur.changed is sameas True
+  - assert:
+      that: zbxmediatype_sms_concur.changed is sameas True
 
-    - name: test - update sms mediatype with concurrent settings (again)
-      zabbix_mediatype:
-        gsm_modem: /dev/ttyS0
-        max_sessions: 1
-        max_attempts: 3
-        attempt_interval: 30
-      register: zbxmediatype_sms_concur
+  - name: test - update sms mediatype with concurrent settings (again)
+    zabbix_mediatype:
+      gsm_modem: /dev/ttyS0
+      max_sessions: 1
+      max_attempts: 3
+      attempt_interval: 30
+    register: zbxmediatype_sms_concur
 
-    - assert:
-        that: zbxmediatype_sms_concur.changed is sameas False
+  - assert:
+      that: zbxmediatype_sms_concur.changed is sameas False
 
-    - name: test - update sms mediatype with invalid max sessions (fail)
-      zabbix_mediatype:
-        gsm_modem: /dev/ttyS0
-        max_sessions: 2
-      register: zbxmediatype_sms_fail
-      ignore_errors: true
+  - name: test - update sms mediatype with invalid max sessions (fail)
+    zabbix_mediatype:
+      gsm_modem: /dev/ttyS0
+      max_sessions: 2
+    register: zbxmediatype_sms_fail
+    ignore_errors: true
 
-    - assert:
+  - assert:
         that: zbxmediatype_sms_fail.failed is sameas True
 
   - name: test - delete sms mediatype
@@ -436,90 +430,7 @@
   - assert:
       that: zbxmediatype_delete.changed is sameas True
 
-- name: test - jabber mediatypes
-  when: zabbix_version is version('4.2', '<=')
-  module_defaults:
-    community.zabbix.zabbix_mediatype:
-      state: present
-      name: Example jabber
-      type: jabber
-
-  block:
-  - name: test - create new jabber mediatype
-    zabbix_mediatype:
-      username: zabbix
-      password: Ex4mP!3
-    register: zbxmediatype_jabber_new
-
-  - assert:
-      that: zbxmediatype_jabber_new.changed is sameas True
-
-  - name: test - create new jabber mediatype (again)
-    zabbix_mediatype:
-      username: zabbix
-      password: Ex4mP!3
-    register: zbxmediatype_jabber_new
-
-  - assert:
-      that: zbxmediatype_jabber_new.changed is sameas False
-
-  - name: test - delete jabber mediatype
-    zabbix_mediatype:
-      state: absent
-    register: zbxmediatype_delete
-
-  - assert:
-      that: zbxmediatype_delete.changed is sameas True
-
-- name: test - ez_texting mediatypes
-  when: zabbix_version is version('4.2', '<=')
-  module_defaults:
-    community.zabbix.zabbix_mediatype:
-      state: present
-      name: Example ez_texting
-      type: ez_texting
-
-  block:
-  - name: test - create new ez_texting mediatype
-    zabbix_mediatype:
-      username: zabbix
-      password: Ex4mP!3
-      message_text_limit: USA
-    register: zbxmediatype_ez_texting_new
-
-  - assert:
-      that: zbxmediatype_ez_texting_new.changed is sameas True
-
-  - name: test - create new ez_texting mediatype (again)
-    zabbix_mediatype:
-      username: zabbix
-      password: Ex4mP!3
-      message_text_limit: USA
-    register: zbxmediatype_ez_texting_new
-
-  - assert:
-      that: zbxmediatype_ez_texting_new.changed is sameas False
-
-  - name: test - update ez_texting mediatype with text limit
-    zabbix_mediatype:
-      username: zabbix
-      password: Ex4mP!3
-      message_text_limit: Canada
-    register: zbxmediatype_ez_texting_update
-
-  - assert:
-      that: zbxmediatype_ez_texting_update.changed is sameas True
-
-  - name: test - delete ez_texting mediatype
-    zabbix_mediatype:
-      state: absent
-    register: zbxmediatype_delete
-
-  - assert:
-      that: zbxmediatype_delete.changed is sameas True
-
 - name: test - email mediatypes
-  when: zabbix_version is version('4.4', '>=')
   module_defaults:
     community.zabbix.zabbix_mediatype:
       state: present
@@ -558,7 +469,6 @@
   - assert:
       that: zbxmediatype_webhook_tags.changed is sameas False
 
-  # supported since 4.4
   - name: test - update webhook mediatype with description
     zabbix_mediatype:
       process_tags: true

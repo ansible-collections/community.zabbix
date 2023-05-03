@@ -9,7 +9,7 @@
   become: true
   when:
     - not zabbix_agent_docker
-    - zabbix_agent_os_family != "Windows" and zabbix_agent_os_family != "Darwin"
+    - ansible_os_family != "Windows" and ansible_os_family != "Darwin"
 
 - name: firewalld-reload
   command: "firewall-cmd --reload"
@@ -23,14 +23,14 @@
     name: "{{ zabbix_win_svc_name }}"
     state: restarted
   when:
-    - zabbix_agent_os_family == "Windows"
+    - ansible_os_family == "Windows"
 
 - name: restart mac zabbix agent
   command: "launchctl kickstart -k system/{{ zabbix_agent_service }}"
   become: true
   when:
     - not zabbix_agent_docker
-    - zabbix_agent_os_family == "Darwin"
+    - ansible_os_family == "Darwin"
 
 - name: "clean repo files from proxy creds"
   shell: ls /etc/yum.repos.d/zabbix* && sed -i 's/^proxy =.*//' /etc/yum.repos.d/zabbix* || true

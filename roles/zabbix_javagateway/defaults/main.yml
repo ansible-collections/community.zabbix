@@ -1,17 +1,13 @@
 ---
 # defaults file for zabbix_javagateway
 
-zabbix_javagateway_version: 6.4
-zabbix_version: "{{ zabbix_javagateway_version }}"
+#zabbix_javagateway_version:6.4
 zabbix_javagateway_package_state: present
-zabbix_selinux: false
-zabbix_repo: zabbix
 zabbix_repo_yum_schema: https
 zabbix_java_gateway_conf_mode: "0644"
 
 zabbix_repo_yum_gpgcheck: 0
-zabbix_repo_yum_disabled: "*"
-zabbix_repo_yum_enabled: []
+
 zabbix_repo_yum:
   - name: zabbix
     description: Zabbix Official Repository - $basearch

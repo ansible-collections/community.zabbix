@@ -59,7 +59,6 @@ These rules are required for any contributions proposing a new Zabbix module or 
   * In `DOCUMENTATION` block via `extends_documentation_fragment` keyword.
   * In module `argument_spec` as a set of module parameters.
 * Implement proper logout mechanism as other modules do.
-* Use the same version of `zabbix-api` library as defined in collection requirements.
 * Comply with [Ansible module best practices](https://docs.ansible.com/ansible/devel/dev_guide/developing_modules_best_practices.html).
 
 ## Testing and Development

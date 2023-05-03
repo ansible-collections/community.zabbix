@@ -8,7 +8,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
+DOCUMENTATION = """
 module: zabbix_script
 short_description: Create/update/delete Zabbix scripts
 version_added: 1.7.0
@@ -17,7 +17,7 @@ author:
 description:
     - This module allows you to create, update and delete scripts.
 requirements:
-    - "python >= 2.6"
+    - "python >= 3.9"
 options:
     name:
         description:
@@ -27,10 +27,9 @@ options:
     script_type:
         description:
             - Script type.
-            - Types C(ssh), C(telnet) and C(webhook) works only with Zabbix >= 5.4.
         type: str
         required: true
-        choices: ['script', 'ipmi', 'ssh', 'telnet', 'webhook']
+        choices: ["script", "ipmi", "ssh", "telnet", "webhook"]
     command:
         description:
             - Command to run.
@@ -39,24 +38,22 @@ options:
     scope:
         description:
             - Script scope.
-            - Works only with Zabbix >= 5.4. For lower versions is silently ignored which is equivalent of C(manual_host_action).
         type: str
         required: false
-        choices: ['action_operation', 'manual_host_action', 'manual_event_action']
-        default: 'action_operation'
+        choices: ["action_operation", "manual_host_action", "manual_event_action"]
+        default: "action_operation"
     execute_on:
         description:
             - Where to run the script.
             - Used if type is C(script).
         type: str
         required: false
-        choices: ['zabbix_agent', 'zabbix_server', 'zabbix_server_proxy']
-        default: 'zabbix_server_proxy'
+        choices: ["zabbix_agent", "zabbix_server", "zabbix_server_proxy"]
+        default: "zabbix_server_proxy"
     menu_path:
         description:
             - Folders separated by slash that form a menu like navigation in frontend when clicked on host or event.
             - Used if scope is C(manual_host_action) or C(manual_event_action).
-            - Works only with Zabbix >= 5.4. For lower versions is silently ignored. Prepend menu path to name instead.
         type: str
         required: false
     authtype:
@@ -65,7 +62,7 @@ options:
             - Used if type is C(ssh).
         type: str
         required: false
-        choices: ['password', 'public_key']
+        choices: ["password", "public_key"]
     username:
         description:
             - User name used for authentication.
@@ -98,25 +95,25 @@ options:
         required: false
     host_group:
         description:
-            - host group name that the script can be run on. If set to 'all', the script will be available on all host groups.
+            - host group name that the script can be run on. If set to "all", the script will be available on all host groups.
         type: str
         required: false
-        default: 'all'
+        default: "all"
     user_group:
         description:
-            - user group name that will be allowed to run the script. If set to 'all', the script will be available for all user groups.
+            - user group name that will be allowed to run the script. If set to "all", the script will be available for all user groups.
             - Used if scope is C(manual_host_action) or C(manual_event_action).
         type: str
         required: false
-        default: 'all'
+        default: "all"
     host_access:
         description:
             - Host permissions needed to run the script.
             - Used if scope is C(manual_host_action) or C(manual_event_action).
         type: str
         required: false
-        choices: ['read', 'write']
-        default: 'read'
+        choices: ["read", "write"]
+        default: "read"
     confirmation:
         description:
             - Confirmation pop up text. The pop up will appear when trying to run the script from the Zabbix frontend.
@@ -127,9 +124,9 @@ options:
         description:
             - Webhook script execution timeout in seconds. Time suffixes are supported, e.g. 30s, 1m.
             - Required if type is C(webhook).
-            - 'Possible values: 1-60s.'
+            - "Possible values: 1-60s."
         type: str
-        default: '30s'
+        default: "30s"
         required: false
     parameters:
         description:
@@ -148,7 +145,7 @@ options:
                     - Parameter value. Supports macros.
                 type: str
                 required: false
-                default: ''
+                default: ""
     description:
         description:
             - Description of the script.
@@ -159,14 +156,14 @@ options:
             - State of the script.
         type: str
         required: false
-        choices: ['present', 'absent']
-        default: 'present'
+        choices: ["present", "absent"]
+        default: "present"
 extends_documentation_fragment:
 - community.zabbix.zabbix
 
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = """
 # If you want to use Username and Password to be authenticated by Zabbix Server
 - name: Set credentials to access Zabbix Server API
   set_fact:
@@ -187,34 +184,33 @@ EXAMPLES = '''
     ansible_httpapi_port: 443
     ansible_httpapi_use_ssl: true
     ansible_httpapi_validate_certs: false
-    ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
+    ansible_zabbix_url_path: "zabbixeu"  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
     ansible_host: zabbix-example-fqdn.org
   zabbix_script:
     name: Test action operation script
     scope: action_operation
     script_type: webhook
-    command: 'return 0'
+    command: "return 0"
     description: "Test action operation script"
     state: present
-'''
+"""
 
-RETURN = '''
-'''
+RETURN = """
+"""
 
 
 from ansible.module_utils.basic import AnsibleModule
 
 from ansible_collections.community.zabbix.plugins.module_utils.base import ZabbixBase
-from ansible.module_utils.compat.version import LooseVersion
 import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabbix_utils
 
 
 class Script(ZabbixBase):
     def get_script_ids(self, script_name):
         script_ids = []
-        scripts = self._zapi.script.get({'filter': {'name': script_name}})
+        scripts = self._zapi.script.get({"filter": {"name": script_name}})
         for script in scripts:
-            script_ids.append(script['scriptid'])
+            script_ids.append(script["scriptid"])
         return script_ids
 
     def create_script(self, name, script_type, command, scope, execute_on, menu_path, authtype, username, password,
@@ -233,103 +229,95 @@ class Script(ZabbixBase):
 
     def generate_script_config(self, name, script_type, command, scope, execute_on, menu_path, authtype, username, password,
                                publickey, privatekey, port, host_group, user_group, host_access, confirmation, script_timeout, parameters, description):
-        if host_group == 'all':
-            groupid = '0'
+        if host_group == "all":
+            groupid = "0"
         else:
-            groups = self._zapi.hostgroup.get({'filter': {'name': host_group}})
+            groups = self._zapi.hostgroup.get({"filter": {"name": host_group}})
             if not groups:
-                self._module.fail_json(changed=False, msg='Host group "%s" not found' % host_group)
-            groupid = groups[0]['groupid']
+                self._module.fail_json(changed=False, msg="Host group '%s' not found" % host_group)
+            groupid = groups[0]["groupid"]
 
-        if user_group == 'all':
-            usrgrpid = '0'
+        if user_group == "all":
+            usrgrpid = "0"
         else:
-            user_groups = self._zapi.usergroup.get({'filter': {'name': user_group}})
+            user_groups = self._zapi.usergroup.get({"filter": {"name": user_group}})
             if not user_groups:
-                self._module.fail_json(changed=False, msg='User group "%s" not found' % user_group)
-            usrgrpid = user_groups[0]['usrgrpid']
+                self._module.fail_json(changed=False, msg="User group '%s' not found" % user_group)
+            usrgrpid = user_groups[0]["usrgrpid"]
 
         request = {
-            'name': name,
-            'type': str(zabbix_utils.helper_to_numeric_value([
-                'script',
-                'ipmi',
-                'ssh',
-                'telnet',
-                '',
-                'webhook'], script_type)),
-            'command': command,
-            'scope': str(zabbix_utils.helper_to_numeric_value([
-                '',
-                'action_operation',
-                'manual_host_action',
-                '',
-                'manual_event_action'], scope)),
-            'groupid': groupid
+            "name": name,
+            "type": str(zabbix_utils.helper_to_numeric_value([
+                "script",
+                "ipmi",
+                "ssh",
+                "telnet",
+                "",
+                "webhook"], script_type)),
+            "command": command,
+            "scope": str(zabbix_utils.helper_to_numeric_value([
+                "",
+                "action_operation",
+                "manual_host_action",
+                "",
+                "manual_event_action"], scope)),
+            "groupid": groupid
         }
 
         if description is not None:
-            request['description'] = description
+            request["description"] = description
 
-        if script_type == 'script':
+        if script_type == "script":
             if execute_on is None:
-                execute_on = 'zabbix_server_proxy'
-            request['execute_on'] = str(zabbix_utils.helper_to_numeric_value([
-                'zabbix_agent',
-                'zabbix_server',
-                'zabbix_server_proxy'], execute_on))
+                execute_on = "zabbix_server_proxy"
+            request["execute_on"] = str(zabbix_utils.helper_to_numeric_value([
+                "zabbix_agent",
+                "zabbix_server",
+                "zabbix_server_proxy"], execute_on))
 
-        if scope in ['manual_host_action', 'manual_event_action']:
+        if scope in ["manual_host_action", "manual_event_action"]:
             if menu_path is None:
-                request['menu_path'] = ''
+                request["menu_path"] = ""
             else:
-                request['menu_path'] = menu_path
-            request['usrgrpid'] = usrgrpid
-            request['host_access'] = str(zabbix_utils.helper_to_numeric_value([
-                '',
-                '',
-                'read',
-                'write'], host_access))
+                request["menu_path"] = menu_path
+            request["usrgrpid"] = usrgrpid
+            request["host_access"] = str(zabbix_utils.helper_to_numeric_value([
+                "",
+                "",
+                "read",
+                "write"], host_access))
             if confirmation is None:
-                request['confirmation'] = ''
+                request["confirmation"] = ""
             else:
-                request['confirmation'] = confirmation
+                request["confirmation"] = confirmation
 
-        if script_type == 'ssh':
+        if script_type == "ssh":
             if authtype is None:
-                self._module.fail_json(changed=False, msg='authtype must be provided for ssh script type')
-            request['authtype'] = str(zabbix_utils.helper_to_numeric_value([
-                'password',
-                'public_key'], authtype))
-            if authtype == 'public_key':
+                self._module.fail_json(changed=False, msg="authtype must be provided for ssh script type")
+            request["authtype"] = str(zabbix_utils.helper_to_numeric_value([
+                "password",
+                "public_key"], authtype))
+            if authtype == "public_key":
                 if publickey is None or privatekey is None:
-                    self._module.fail_json(changed=False, msg='publickey and privatekey must be provided for ssh script type with publickey authtype')
-                request['publickey'] = publickey
-                request['privatekey'] = privatekey
+                    self._module.fail_json(changed=False, msg="publickey and privatekey must be provided for ssh script type with publickey authtype")
+                request["publickey"] = publickey
+                request["privatekey"] = privatekey
 
-        if script_type in ['ssh', 'telnet']:
+        if script_type in ["ssh", "telnet"]:
             if username is None:
-                self._module.fail_json(changed=False, msg='username must be provided for "ssh" and "telnet" script types')
-            request['username'] = username
-            if (script_type == 'ssh' and authtype == 'password') or script_type == 'telnet':
+                self._module.fail_json(changed=False, msg="username must be provided for 'ssh' and 'telnet' script types")
+            request["username"] = username
+            if (script_type == "ssh" and authtype == "password") or script_type == "telnet":
                 if password is None:
-                    self._module.fail_json(changed=False, msg='password must be provided for telnet script type or ssh script type with password autheype')
-                request['password'] = password
+                    self._module.fail_json(changed=False, msg="password must be provided for telnet script type or ssh script type with password autheype")
+                request["password"] = password
             if port is not None:
-                request['port'] = port
+                request["port"] = port
 
-        if script_type == 'webhook':
-            request['timeout'] = script_timeout
+        if script_type == "webhook":
+            request["timeout"] = script_timeout
             if parameters:
-                request['parameters'] = parameters
-
-        if LooseVersion(self._zbx_api_version) < LooseVersion('5.4'):
-            if script_type not in ['script', 'ipmi']:
-                self._module.fail_json(changed=False, msg='script_type must be script or ipmi in version <5.4')
-            if 'scope' in request:
-                del request['scope']
-            if 'menu_path' in request:
-                del request['menu_path']
+                request["parameters"] = parameters
 
         return request
 
@@ -338,7 +326,7 @@ class Script(ZabbixBase):
         generated_config = self.generate_script_config(name, script_type, command, scope, execute_on, menu_path, authtype, username,
                                                        password, publickey, privatekey, port, host_group, user_group, host_access,
                                                        confirmation, script_timeout, parameters, description)
-        live_config = self._zapi.script.get({'filter': {'name': name}})[0]
+        live_config = self._zapi.script.get({"filter": {"name": name}})[0]
 
         change_parameters = {}
         difference = zabbix_utils.helper_cleanup_data(zabbix_utils.helper_compare_dictionaries(generated_config, live_config, change_parameters))
@@ -348,7 +336,7 @@ class Script(ZabbixBase):
 
         if self._module.check_mode:
             self._module.exit_json(changed=True)
-        generated_config['scriptid'] = live_config['scriptid']
+        generated_config["scriptid"] = live_config["scriptid"]
         self._zapi.script.update(generated_config)
         self._module.exit_json(changed=True, msg="Script %s updated" % name)
 
@@ -356,55 +344,55 @@ class Script(ZabbixBase):
 def main():
     argument_spec = zabbix_utils.zabbix_common_argument_spec()
     argument_spec.update(dict(
-        name=dict(type='str', required=True),
+        name=dict(type="str", required=True),
         script_type=dict(
-            type='str',
+            type="str",
             required=True,
-            choices=['script', 'ipmi', 'ssh', 'telnet', 'webhook']),
-        command=dict(type='str', required=True),
+            choices=["script", "ipmi", "ssh", "telnet", "webhook"]),
+        command=dict(type="str", required=True),
         scope=dict(
-            type='str',
+            type="str",
             required=False,
-            choices=['action_operation', 'manual_host_action', 'manual_event_action'],
-            default='action_operation'),
+            choices=["action_operation", "manual_host_action", "manual_event_action"],
+            default="action_operation"),
         execute_on=dict(
-            type='str',
+            type="str",
             required=False,
-            choices=['zabbix_agent', 'zabbix_server', 'zabbix_server_proxy'],
-            default='zabbix_server_proxy'),
-        menu_path=dict(type='str', required=False),
+            choices=["zabbix_agent", "zabbix_server", "zabbix_server_proxy"],
+            default="zabbix_server_proxy"),
+        menu_path=dict(type="str", required=False),
         authtype=dict(
-            type='str',
+            type="str",
             required=False,
-            choices=['password', 'public_key']),
-        username=dict(type='str', required=False),
-        password=dict(type='str', required=False, no_log=True),
-        publickey=dict(type='str', required=False),
-        privatekey=dict(type='str', required=False, no_log=True),
-        port=dict(type='str', required=False),
-        host_group=dict(type='str', required=False, default='all'),
-        user_group=dict(type='str', required=False, default='all'),
+            choices=["password", "public_key"]),
+        username=dict(type="str", required=False),
+        password=dict(type="str", required=False, no_log=True),
+        publickey=dict(type="str", required=False),
+        privatekey=dict(type="str", required=False, no_log=True),
+        port=dict(type="str", required=False),
+        host_group=dict(type="str", required=False, default="all"),
+        user_group=dict(type="str", required=False, default="all"),
         host_access=dict(
-            type='str',
+            type="str",
             required=False,
-            choices=['read', 'write'],
-            default='read'),
-        confirmation=dict(type='str', required=False),
-        script_timeout=dict(type='str', default='30s', required=False),
+            choices=["read", "write"],
+            default="read"),
+        confirmation=dict(type="str", required=False),
+        script_timeout=dict(type="str", default="30s", required=False),
         parameters=dict(
-            type='list',
-            elements='dict',
+            type="list",
+            elements="dict",
             options=dict(
-                name=dict(type='str', required=True),
-                value=dict(type='str', required=False, default='')
+                name=dict(type="str", required=True),
+                value=dict(type="str", required=False, default="")
             )
         ),
-        description=dict(type='str', required=False),
+        description=dict(type="str", required=False),
         state=dict(
-            type='str',
+            type="str",
             required=False,
-            default='present',
-            choices=['present', 'absent'])
+            default="present",
+            choices=["present", "absent"])
     ))
 
     module = AnsibleModule(
@@ -412,32 +400,26 @@ def main():
         supports_check_mode=True
     )
 
-    zabbix_utils.require_creds_params(module)
-
-    for p in ['server_url', 'login_user', 'login_password', 'timeout', 'validate_certs']:
-        if p in module.params and not module.params[p] is None:
-            module.warn('Option "%s" is deprecated with the move to httpapi connection and will be removed in the next release' % p)
-
-    name = module.params['name']
-    script_type = module.params['script_type']
-    command = module.params['command']
-    scope = module.params['scope']
-    execute_on = module.params['execute_on']
-    menu_path = module.params['menu_path']
-    authtype = module.params['authtype']
-    username = module.params['username']
-    password = module.params['password']
-    publickey = module.params['publickey']
-    privatekey = module.params['privatekey']
-    port = module.params['port']
-    host_group = module.params['host_group']
-    user_group = module.params['user_group']
-    host_access = module.params['host_access']
-    confirmation = module.params['confirmation']
-    script_timeout = module.params['script_timeout']
-    parameters = module.params['parameters']
-    description = module.params['description']
-    state = module.params['state']
+    name = module.params["name"]
+    script_type = module.params["script_type"]
+    command = module.params["command"]
+    scope = module.params["scope"]
+    execute_on = module.params["execute_on"]
+    menu_path = module.params["menu_path"]
+    authtype = module.params["authtype"]
+    username = module.params["username"]
+    password = module.params["password"]
+    publickey = module.params["publickey"]
+    privatekey = module.params["privatekey"]
+    port = module.params["port"]
+    host_group = module.params["host_group"]
+    user_group = module.params["user_group"]
+    host_access = module.params["host_access"]
+    confirmation = module.params["confirmation"]
+    script_timeout = module.params["script_timeout"]
+    parameters = module.params["parameters"]
+    description = module.params["description"]
+    state = module.params["state"]
 
     script = Script(module)
     script_ids = script.get_script_ids(name)

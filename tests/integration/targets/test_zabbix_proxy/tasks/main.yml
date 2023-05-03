@@ -189,35 +189,31 @@
   assert:
     that: not zbxproxy_active_update_again is changed
 
-# proxy_address available on zabbix 4.0 and above
-- block:
-    - name: test - update Zabbix proxy server to be active and use proxy_address
-      zabbix_proxy:
-        proxy_name: zbxproxy_example01
-        description: Example Zabbix Proxy
-        state: present
-        status: active
-        proxy_address: 10.1.1.0/24,zabbix.example.com
-      register: zbxproxy_active_proxyaddress
+- name: test - update Zabbix proxy server to be active and use proxy_address
+  zabbix_proxy:
+    proxy_name: zbxproxy_example01
+    description: Example Zabbix Proxy
+    state: present
+    status: active
+    proxy_address: 10.1.1.0/24,zabbix.example.com
+  register: zbxproxy_active_proxyaddress
 
-    - name: assert that proxy was updated
-      assert:
-        that: zbxproxy_active_proxyaddress is changed
+- name: assert that proxy was updated
+  assert:
+    that: zbxproxy_active_proxyaddress is changed
 
-    - name: test - update Zabbix proxy server to be active use proxy_address (again)
-      zabbix_proxy:
-        proxy_name: zbxproxy_example01
-        description: Example Zabbix Proxy
-        state: present
-        status: active
-        proxy_address: 10.1.1.0/24,zabbix.example.com
-      register: zbxproxy_active_proxyaddress_again
+- name: test - update Zabbix proxy server to be active use proxy_address (again)
+  zabbix_proxy:
+    proxy_name: zbxproxy_example01
+    description: Example Zabbix Proxy
+    state: present
+    status: active
+    proxy_address: 10.1.1.0/24,zabbix.example.com
+  register: zbxproxy_active_proxyaddress_again
 
-    - name: assert that nothing has been changed
-      assert:
-        that: not zbxproxy_active_proxyaddress_again is changed
-
-  when: zabbix_version != "3.0"
+- name: assert that nothing has been changed
+  assert:
+    that: not zbxproxy_active_proxyaddress_again is changed
 
 - name: test - update Zabbix proxy server to use encryption
   zabbix_proxy:
@@ -249,15 +245,7 @@
 
 - name: assert that nothing has been changed
   assert:
-    that: not zbxproxy_encryption_again is changed
-  when: zabbix_version < "6.0"
-
-# With Zabbix >= 6.0 tls_psk and tls_psk_identity cannot be read
-# thus there is no way to check idempotency
-- name: assert that nothing has been changed
-  assert:
     that: zbxproxy_encryption_again is changed
-  when: zabbix_version >= "6.0"
 
 - name: test - update Zabbix proxy server encryption settings
   zabbix_proxy:

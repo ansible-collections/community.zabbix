@@ -1,17 +1,21 @@
 ---
 # task file for postgresql
 
-- name: "Set the correct delegated_dbhost (to support postgres db deployment on a remote dbhost)"
+- name: "PostgreSQL | Set the correct delegated_dbhost (to support postgres db deployment on a remote dbhost)"
   set_fact:
     delegated_dbhost: "{{ zabbix_proxy_dbhost if (zabbix_proxy_dbhost != 'localhost') else inventory_hostname }}"
   when:
     - zabbix_proxy_dbhost_run_install
+  tags:
+    - database
 
-- name: "Set the correct delegated_dbhost (to support postgres db deployment on a remote dbhost)"
+- name: "PostgreSQL | Set the correct delegated_dbhost (to support postgres db deployment on a remote dbhost)"
   set_fact:
     delegated_dbhost: "{{ inventory_hostname }}"
   when:
     - not zabbix_proxy_dbhost_run_install
+  tags:
+    - database
 
 - name: "PostgreSQL | Delegated"
   block:
@@ -20,11 +24,12 @@
         name: "{{ zabbix_proxy_dbname }}"
         port: "{{ zabbix_proxy_dbport }}"
         state: present
+
     - name: "PostgreSQL | Delegated | Create database user"
-      postgresql_user:
+      community.postgresql.postgresql_user:
         db: "{{ zabbix_proxy_dbname }}"
         name: "{{ zabbix_proxy_dbuser }}"
-        password: "{{ ('md5' + (zabbix_proxy_dbpassword + zabbix_proxy_dbuser)|hash('md5')) if zabbix_proxy_dbpassword_hash_method == 'md5' else zabbix_proxy_dbpassword }}"
+        password: "md5{{ (zabbix_proxy_dbpassword + zabbix_proxy_dbuser)|hash('md5') }}"
         port: "{{ zabbix_proxy_dbport }}"
         priv: ALL
         state: present
@@ -33,10 +38,9 @@
   become_user: postgres
   delegate_to: "{{ delegated_dbhost }}"
   when:
-    - zabbix_database_creation
+    - zabbix_proxy_database_creation
     - zabbix_proxy_pgsql_login_host is not defined
   tags:
-    - zabbix-proxy
     - database
 
 - name: "PostgreSQL | Remote"
@@ -51,42 +55,41 @@
         port: "{{ zabbix_proxy_dbport }}"
         state: present
     - name: "PostgreSQL | Remote | Create database user"
-      postgresql_user:
+      community.postgresql.postgresql_user:
         login_host: "{{ zabbix_proxy_pgsql_login_host | default(omit) }}"
         login_user: "{{ zabbix_proxy_pgsql_login_user | default(omit) }}"
         login_password: "{{ zabbix_proxy_pgsql_login_password | default(omit) }}"
         db: "{{ zabbix_proxy_dbname }}"
         name: "{{ zabbix_proxy_dbuser }}"
-        password: "{{ ('md5' + (zabbix_proxy_dbpassword + zabbix_proxy_dbuser)|hash('md5')) if zabbix_proxy_dbpassword_hash_method == 'md5' else zabbix_proxy_dbpassword }}"
+        password: "md5{{ (zabbix_proxy_dbpassword + zabbix_proxy_dbuser)|hash('md5') }}"
         port: "{{ zabbix_proxy_dbport }}"
         priv: ALL
         state: present
         encrypted: true
   when:
-    - zabbix_database_creation
+    - zabbix_proxy_database_creation
     - zabbix_proxy_pgsql_login_host is defined
   tags:
-    - zabbix-proxy
+    - database
+
+- name: "PostgreSQL | Handle Compressed Schema File"
+  set_fact:
+    zabbix_proxy_cat_cmd: zcat
+  when: "'.gz' in ls_output_schema.stdout"
+  tags:
     - database
 
 - name: "PostgreSQL | Importing schema file"
   shell: |
     set -euxo pipefail
-    FILE={{ 'schema.sql' if zabbix_version is version('6.0', '<') else 'proxy.sql' }}
-    cd {{ datafiles_path }}
-    if [ -f ${FILE}.gz ]
-      then zcat ${FILE}.gz > /tmp/schema.sql
-    else
-      cp ${FILE} /tmp/schema.sql
-    fi
-    cat /tmp/schema.sql | psql -h '{{ zabbix_proxy_dbhost }}' -U '{{ zabbix_proxy_dbuser }}' \
-    -d '{{ zabbix_proxy_dbname }}'
+    {{ zabbix_proxy_cat_cmd }} {{ ls_output_schema.stdout }} | psql -h '{{ zabbix_proxy_dbhost }}' -U '{{ zabbix_proxy_dbuser }}' -d '{{ zabbix_proxy_dbname }}'
     touch /etc/zabbix/schema.done
-    rm -f /tmp/schema.sql
   args:
     creates: /etc/zabbix/schema.done
     executable: /bin/bash
   environment:
-    PGPASSWORD: '{{ zabbix_proxy_dbpassword }}'
+    PGPASSWORD: "{{ zabbix_proxy_dbpassword }}"
   when:
-    - zabbix_database_creation
+    - zabbix_proxy_database_creation
+  tags:
+    - database

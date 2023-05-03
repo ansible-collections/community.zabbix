@@ -1,6 +1,14 @@
 ---
-apache_user: apache
-apache_group: apache
-apache_log: httpd
-
-mysql_create_dir: create/
+zabbix_valid_javagateway_versions:
+  "9":
+    - 6.4
+    - 6.2
+    - 6.0
+  "8":
+    - 6.4
+    - 6.2
+    - 6.0
+  "7":
+    - 6.4
+    - 6.2
+    - 6.0

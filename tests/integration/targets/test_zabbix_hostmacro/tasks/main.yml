@@ -126,10 +126,6 @@
   assert:
     that: not zbxhmacro_delete_missing is changed
 
-- name: test - do not run host macro secret tests for Zabbix < 5.0
-  meta: end_play
-  when: zabbix_version is version('5.0', '<')
-
 - name: test - attempt to create host macro with type secret
   zabbix_hostmacro:
     host_name: zbx_hmacro_host01

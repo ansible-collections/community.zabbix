@@ -1,5 +1,7 @@
 import os
 import pytest
+from pathlib import Path
+
 
 import testinfra.utils.ansible_runner
 
@@ -36,9 +38,19 @@ def test_zabbix_package(host, server):
 
 
 def test_zabbix_server_dot_conf(host):
-    zabbix_server_conf = host.file("/etc/zabbix/zabbix_server.conf")
-    assert zabbix_server_conf.user == "zabbix"
-    assert zabbix_server_conf.group == "zabbix"
+    found = False
+    for file_name in [
+        "/etc/zabbix/zabbix_server.conf",
+        "/etc/zabbix_server.conf",
+    ]:
+        if host.file(file_name).exists:
+            found = True
+            break
+
+    assert found
+    zabbix_server_conf = host.file(file_name)
+    assert zabbix_server_conf.user in ["zabbix", "zabbixsrv"]
+    assert zabbix_server_conf.group in ["zabbix", "zabbixsrv"]
     assert zabbix_server_conf.mode == 0o640
 
     assert zabbix_server_conf.contains("ListenPort=10051")
@@ -48,14 +60,24 @@ def test_zabbix_server_dot_conf(host):
 def test_zabbix_include_dir(host):
     zabbix_include_dir = host.file("/etc/zabbix/zabbix_server.conf.d")
     assert zabbix_include_dir.is_directory
-    assert zabbix_include_dir.user == "zabbix"
-    assert zabbix_include_dir.group == "zabbix"
+    assert zabbix_include_dir.user in ["zabbix", "zabbixsrv"]
+    assert zabbix_include_dir.group in ["zabbix", "zabbixsrv"]
     # assert zabbix_include_dir.mode == 0o644
 
 
 def test_zabbix_server_logfile(host):
-    zabbix_logfile = host.file("/var/log/zabbix/zabbix_server.log")
+    found = False
+    for file_name in [
+        "/var/log/zabbix/zabbix_server.log",
+        "/var/log/zabbixsrv/zabbix_server.log",
+    ]:
+        if host.file(file_name).exists:
+            found = True
+            break
 
+    assert found
+
+    zabbix_logfile = host.file(file_name)
     assert not zabbix_logfile.contains("Access denied for user")
     assert not zabbix_logfile.contains("database is down: reconnecting")
     assert zabbix_logfile.contains("current database version")

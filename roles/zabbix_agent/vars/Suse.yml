@@ -1,7 +1,0 @@
----
-# vars file for zabbix_agent (Suse)
-
-zabbix_agent: zabbix-agentd
-zabbix_agent_service: zabbix_agentd
-zabbix_agent_conf: zabbix_agentd.conf
-zabbix_agent2_conf: zabbix-agent2.conf

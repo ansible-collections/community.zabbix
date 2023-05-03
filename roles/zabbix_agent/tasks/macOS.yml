@@ -20,5 +20,3 @@
   command: installer -pkg "/tmp/{{ zabbix_mac_package }}" -target /
   become: true
   when: pkgutil_version.stdout != zabbix_version_long
-  tags:
-    - zabbix-agent

@@ -8,8 +8,6 @@
     status: active
     state: present
     interface:
-      type: 0
-      main: 1
       useip: 1
       ip: 10.5.6.7
       dns: ""

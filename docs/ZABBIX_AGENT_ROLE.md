@@ -44,15 +44,10 @@
 This role will work on the following operating systems:
 
  * Red Hat
- * Fedora
  * Debian
  * Ubuntu
- * opensuse
  * Windows (Best effort)
- * macOS
-
-So, you'll need one of those operating systems.. :-)
-Please send Pull Requests or suggestions when you want to use this role for other Operating systems.
+ * macOS (Best effort)
 
 ## Ansible 2.10 and higher
 
@@ -62,7 +57,7 @@ With the release of Ansible 2.10, modules have been moved into collections.  Wit
 ansible-galaxy collection install ansible.posix
 ansible-galaxy collection install community.general
 ```
-If you are willing to create host_groups and hosts in Zabbix via API as a part of this role execution then you need to install `ansible.netcommon` collection too:
+If you are wanting to create host_groups and hosts in Zabbix via API as a part of this role execution then you need to install `ansible.netcommon` collection too:
 
 ```
 ansible-galaxy collection install ansible.netcommon
@@ -95,24 +90,17 @@ To successfully complete the install the role requires `python-netaddr` on the c
 
 See the following list of supported Operating systems with the Zabbix releases:
 
-| Zabbix              | 6.4 | 6.2 | 6.0 | 5.4 | 5.2 | 5.0 (LTS)| 4.4 | 4.0 (LTS) | 3.0 (LTS) |
-|---------------------|-----|-----|-----|-----|-----|----------|-----|-----------|-----------|
-| Red Hat Fam 9       |  V  |  V  |  V  |     |     |          |     |           |           |
-| Red Hat Fam 8       |  V  |  V  |  V  |  V  |  V  |  V       | V   |           |           |
-| Red Hat Fam 7       |  V  |  V  |  V  |  V  |  V  |  V       | V   | V         | V         |
-| Red Hat Fam 6       |  V  |  V  |  V  |  V  |  V  |  V       |     |           | V         |
-| Red Hat Fam 5       |     |     |  V  |  V  |  V  |  V       |     |           | V         |
-| Fedora              |     |     |     |     |     |          | V   | V         |           |
-| Ubuntu 20.04 focal  |  V  |  V  |  V  |  V  |  V  |  V       |     | V         |           |
-| Ubuntu 18.04 bionic |  V  |  V  |  V  |  V  |  V  |  V       | V   | V         |           |
-| Ubuntu 16.04 xenial |  V  |  V  |  V  |  V  |  V  |  V       | V   | V         |           |
-| Ubuntu 14.04 trusty |  V  |  V  |  V  |  V  |  V  |  V       | V   | V         | V         |
-| Debian 10 buster    |  V  |  V  |  V  |  V  |  V  |  V       | V   |           |           |
-| Debian 9 stretch    |  V  |  V  |     |  V  |  V  |  V       | V   | V         |           |
-| Debian 8 jessie     |     |     |     |     |  V  |  V       | V   | V         | V         |
-| Debian 7 wheezy     |     |     |     |     |     |          |     | V         | V         |
-| macOS 10.15         |     |     |     |     |     |          | V   | V         |           |
-| macOS 10.14         |     |     |     |     |     |          | V   | V         |           |
+| Zabbix              | 6.4 | 6.2 | 6.0 |
+|---------------------|-----|-----|-----|
+| Red Hat Fam 9       |  V  |  V  |  V  |
+| Red Hat Fam 8       |  V  |  V  |  V  |
+| Red Hat Fam 7       |  V  |  V  |  V  |
+| Ubuntu 22.04 jammy  |  V  |  V  |  V  |
+| Ubuntu 20.04 focal  |  V  |  V  |  V  |
+| Ubuntu 18.04 bionic |  V  |  V  |  V  |
+| Debian 11 bullseye  |  V  |  V  |  V  |
+| Debian 10 buster    |  V  |  V  |  V  |
+
 
 # Getting started
 
@@ -124,7 +112,7 @@ In order to get the Zabbix Agent running, you'll have to define the following pr
 * `zabbix_agent(2)_server`
 * `zabbix_agent(2)_serveractive` (When using active checks)
 
-The `zabbix_agent_version` is optional. The latest available major.minor version of Zabbix will be installed on the host(s). If you want to use an older version, please specify this in the major.minor format. Example: `zabbix_agent_version: 4.0`, `zabbix_agent_version: 3.4` or `zabbix_agent_version: 2.2`.
+The `zabbix_agent_version` is optional. The latest available major.minor version of Zabbix will be installed on the host(s). If you want to use an older version, please specify this in the major.minor format. Example: `zabbix_agent_version: 6.0`.
 
 The `zabbix_agent(2)_server` (and `zabbix_agent(2)_serveractive`) should contain the ip or fqdn of the host running the Zabbix Server.
 
@@ -140,16 +128,10 @@ The following is an overview of all available configuration default for this rol
 
 ### Overall Zabbix
 
-* `zabbix_agent_version`: This is the version of zabbix. Default: The highest supported version for the operating system. Can be overridden to 6.2, 6.0, 5.4, 5.2 5.0, 4.4, 4.0, 3.4, 3.2, 3.0, 2.4, or 2.2. Previously the variable `zabbix_version` was used directly but it could cause [some inconvenience](https://github.com/dj-wasabi/ansible-zabbix-agent/pull/303). That variable is maintained by retrocompativility.
+* `zabbix_agent_version`: This is the version of zabbix. Default: The highest supported version for the operating system. Can be overridden to 6.4, 6.2, or 6.0
 * `zabbix_agent_version_minor`: When you want to specify a minor version to be installed. Is also used for `zabbix_sender` and `zabbix_get`. RedHat only. Default set to: `*` (latest available)
-* `zabbix_repo`: Default: `zabbix`
-  * `epel`: install agent from EPEL repo
-  * `zabbix`: (default) install agent from Zabbix repo
-  * `other`: install agent from pre-existing or other repo
 * `zabbix_repo_yum`: A list with Yum repository configuration.
 * `zabbix_repo_yum_schema`: Default: `https`. Option to change the web schema for the yum repository(http/https)
-* `zabbix_repo_yum_disabled`: A string with repository names that should be disabled when installing Zabbix component specific packages. Is only used when `zabbix_repo_yum_enabled` contains 1 or more repositories. Default `*`.
-* `zabbix_repo_yum_enabled`: A list with repository names that should be enabled when installing Zabbix component specific packages.
 
 ### SElinux
 
@@ -158,7 +140,7 @@ The following is an overview of all available configuration default for this rol
 ### Zabbix Agent
 
 * `zabbix_agent_ip`: The IP address of the host. When not provided, it will be determined via the `ansible_default_ipv4` fact.
-* `zabbix_agent2`: Default: `False`. When you want to install the `Zabbix Agent2` instead of the "old" `Zabbix Agent`.
+* `zabbix_agent2`: Default: `False`. When you want to install the `Zabbix Agent2` instead of the "old" `Zabbix Agent`.zabbix_agent_version
 * `zabbix_agent_listeninterface`: Interface zabbix-agent listens on. Leave blank for all.
 * `zabbix_agent_package_remove`: If `zabbix_agent2: True` and you want to remove the old installation. Default: `False`.
 * `zabbix_agent_package`: The name of the zabbix-agent package. Default: `zabbix-agent`. In case for EPEL, it is automatically renamed.
@@ -174,7 +156,6 @@ The following is an overview of all available configuration default for this rol
 * `zabbix_agent_userparameters_scripts_src`: indicates the relative path (from `files/`) where userparameter scripts are searched
 * `zabbix_agent_runas_user`: Drop privileges to a specific, existing user on the system. Only has effect if run as 'root' and AllowRoot is disabled.
 * `zabbix_agent_become_on_localhost`: Default: `True`. Set to `False` if you don't need to elevate privileges on localhost to install packages locally with pip.
-* `zabbix_install_pip_packages`: Default: `True`. Set to `False` if you don't want to install the required pip packages. Useful when you control your environment completely.
 * `zabbix_agent_apt_priority`: Add a weight (`Pin-Priority`) for the APT repository.
 * `zabbix_agent_conf_mode`: Default: `0644`. The "mode" for the Zabbix configuration file.
 * `zabbix_agent_dont_detect_ip`: Default `false`. When set to `true`, it won't detect available ip addresses on the host and no need for the Python module `netaddr` to be installed.
@@ -261,16 +242,17 @@ These variables need to be overridden when you want to make use of the Zabbix AP
 
 Host encryption configuration will be set to match agent configuration.
 
-* `zabbix_api_http_user`: The http user to access zabbix url with Basic Auth.
-* `zabbix_api_http_password`: The http password to access zabbix url with Basic Auth.
-* `zabbix_api_create_hosts`: Default: `False`. When you want to enable the Zabbix API to create/delete the host. This has to be set to `True` if you want to make use of `zabbix_agent_host_state`.
-* `zabbix_api_create_hostgroup`: When you want to enable the Zabbix API to create/delete the hostgroups. This has to be set to `True` if you want to make use of `zabbix_agent_hostgroups_state`.Default: `False`
 * `zabbix_api_server_host`: The IP or hostname/FQDN of Zabbix server. Example: zabbix.example.com
 * `zabbix_api_server_port`: TCP port to use to connect to Zabbix server. Example: 8080
-* `zabbix_api_use_ssl`: yes (Default) if we need to connect to Zabbix server over HTTPS
-* `zabbix_api_validate_certs` : yes (Default) if we need to validate tls certificates of the API. Use `no` in case self-signed certificates are used
 * `zabbix_api_login_user`: Username of user which has API access.
 * `zabbix_api_login_pass`: Password for the user which has API access.
+* `zabbix_api_http_user`: The http user to access zabbix url with Basic Auth (if your Zabbix is behind a proxy with HTTP Basic Auth).
+* `zabbix_api_http_password`: The http password to access zabbix url with Basic Auth (if your Zabbix is behind a proxy with HTTP Basic Auth).
+* `zabbix_api_validate_certs`: yes (Default) if we need to validate tls certificates of the API. Use `no` in case self-signed certificates are used.
+* `zabbix_api_timeout`: How many seconds to wait for API response (default 30s).
+* `zabbix_api_create_hosts`: Default: `False`. When you want to enable the Zabbix API to create/delete the host. This has to be set to `True` if you want to make use of `zabbix_agent_host_state`.
+* `zabbix_api_create_hostgroup`: When you want to enable the Zabbix API to create/delete the hostgroups. This has to be set to `True` if you want to make use of `zabbix_agent_hostgroups_state`.Default: `False`
+* `zabbix_api_use_ssl`: yes (Default) if we need to connect to Zabbix server over HTTPS
 * `ansible_zabbix_url_path`: URL path if Zabbix WebUI running on non-default (zabbix) path, e.g. if http://<FQDN>/zabbixeu then set to `zabbixeu`
 * `zabbix_agent_hostgroups_state`: present (Default) if the hostgroup needs to be created or absent if you want to delete it. This only works when `zabbix_api_create_hostgroup` is set to `True`.
 * `zabbix_host_status`: enabled (Default) when host in monitored, disabled when host is disabled for monitoring.
@@ -290,7 +272,7 @@ Host encryption configuration will be set to match agent configuration.
 
 **NOTE**
 
-_Supporting Windows is a best effort (I don't have the possibility to either test/verify changes on the various amount of available Windows instances). PRs specific to Windows will almost immediately be merged, unless someone is able to provide a Windows test mechanism via Travis for Pull Requests._
+_Supporting Windows is a best effort (We don't have the possibility to either test/verify changes on the various amount of available Windows instances). PRs specific to Windows will almost immediately be merged, unless someone is able to provide a Windows test mechanism via Travis for Pull Requests._
 When `(2)` is used in the name of the property, like `zabbix_agent(2)_win_logfile`, it will show that you can configure `zabbix_agent_win_logfile` for the Zabbix Agent configuration file and `zabbix_agent2_win_logfile` for the Zabbix Agent 2 configuration file.
 
 Otherwise it just for the Zabbix Agent or for the Zabbix Agent 2.
@@ -307,6 +289,10 @@ Otherwise it just for the Zabbix Agent or for the Zabbix Agent 2.
 * `zabbix_win_firewall_management`: Enable Windows firewall management (add service and port to allow rules). Default: `True`
 
 ## macOS Variables
+
+**NOTE**
+
+_Supporting Windows is a best effort (We don't have the possibility to either test/verify changes on the various amount of available Windows instances). PRs specific to Windows will almost immediately be merged, unless someone is able to provide a Windows test mechanism via Travis for Pull Requests._
 
 * `zabbix_version_long`: The long (major.minor.patch) version of the Zabbix Agent. This will be used to generate the `zabbix_mac_download_link` link.
 * `zabbix_mac_download_link`: The download url to the `pkg` file.
@@ -344,17 +330,6 @@ Keep in mind that using the Zabbix Agent in a Container requires changes to the 
 * `zabbix_agent_docker_volumes`: A list with all directories that needs to be available in the Container.
 * `zabbix_agent_docker_env`: A dict with all environment variables that needs to be set for the Container.
 
-## FirewallD/Iptables
-
-* `zabbix_agent_firewall_enable`: If IPtables needs to be updated by opening an TCP port for port configured in `zabbix_agent_listenport`.
-* `zabbix_agent_firewall_source`: When provided, IPtables will be configuring to only allow traffic from this IP address/range.
-* `zabbix_agent_firewalld_enable`: If firewalld needs to be updated by opening an TCP port for port configured in `zabbix_agent_listenport` and `zabbix_agent_jmx_listenport` if defined.
-* `zabbix_agent_firewalld_source`: When provided, firewalld will be configuring to only allow traffic for IP configured in `zabbix_agent_server`.
-* `zabbix_agent_firewalld_zone`: When provided, the firewalld rule will be attached to this zone (only if zabbix_agent_firewalld_enable is set to true). The default behavior is to use the default zone define by the remote host firewalld configuration.
-* `zabbix_agent_firewall_action`: Default: `insert`. When to `insert` the rule or to `append` to IPTables.
-* `zabbix_agent_firewall_chain`: Default `INPUT`. Which `chain` to add the rule to IPTables.
-
-
 ## IPMI variables
 
 * `zabbix_agent_ipmi_authtype`: IPMI authentication algorithm. Possible values are 1 (callback), 2 (user), 3 (operator), 4 (admin), 5 (OEM), with 2 being the API default.
@@ -368,6 +343,17 @@ When the target host does not have access to the internet, but you do have a pro
 
 * `zabbix_http_proxy`
 * `zabbix_https_proxy`
+
+## Tags
+
+The majority of tasks within this role are tagged as follows:
+
+* `install`:  Tasks associated with the installation of software.
+* `dependencies`:  Installation tasks related to dependencies that aren't part of the core zabbix installation.
+* `database`: Tasks associated with the installation or configuration of the database.
+* `api`:  Tasks associated with using the Zabbix API to connect and modify the Zabbix server.
+* `config`:  Tasks associated with the configuration of Zabbix or a supporting service.
+* `service`:  Tasks associated with managing a service.
 
 # Dependencies
 
@@ -440,10 +426,11 @@ Including an example of how to use your role (for instance, with variables passe
          - role: community.zabbix.zabbix_agent
            zabbix_agent_server: 192.168.33.30
            zabbix_agent_serveractive: 192.168.33.30
-           zabbix_api_server_url: http://zabbix.example.com
-           zabbix_api_use: true # use zabbix_api_create_hosts and/or zabbix_api_create_hostgroup from 0.8.0
+           zabbix_api_server_host: zabbix.example.com
            zabbix_api_login_user: Admin
            zabbix_api_login_pass: zabbix
+           zabbix_api_create_hostgroup: true
+           zabbix_api_create_hosts: true
            zabbix_agent_host_state: present
            zabbix_host_groups:
              - Linux Servers
@@ -465,10 +452,11 @@ You can also use the group_vars or the host_vars files for setting the variables
 ```yaml
     zabbix_agent_server: 192.168.33.30
     zabbix_agent_serveractive: 192.168.33.30
-    zabbix_api_server_url: http://zabbix.example.com
-    zabbix_api_use: true # use zabbix_api_create_hosts and/or zabbix_api_create_hostgroup from 0.8.0
+    zabbix_api_server_host: zabbix.example.com
     zabbix_api_login_user: Admin
     zabbix_api_login_pass: zabbix
+    zabbix_api_create_hostgroup: true
+    zabbix_api_create_hosts: true
     zabbix_agent_host_state: present
     zabbix_host_groups:
       - Linux Servers

@@ -35,7 +35,7 @@ def test_zabbix_package(host, server, redhat, debian):
 def test_zabbix_web(host):
     zabbix_web = host.file("/etc/zabbix/web/zabbix.conf.php")
     ansible_variables = host.ansible.get_variables()
-    zabbix_websrv = str(ansible_variables["zabbix_websrv"])
+    zabbix_websrv = str(ansible_variables["zabbix_web_http_server"])
 
     if host.system_info.distribution in ["debian", "ubuntu"]:
         assert zabbix_web.user == "www-data"
@@ -47,7 +47,7 @@ def test_zabbix_web(host):
         elif zabbix_websrv == "nginx":
             assert zabbix_web.user == "nginx"
             assert zabbix_web.group == "nginx"
-    assert zabbix_web.mode == 0o640
+    assert zabbix_web.mode == 0o644
 
 
 def test_zabbix_api(host):

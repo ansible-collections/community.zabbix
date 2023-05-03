@@ -1,8 +1,4 @@
 ---
-- name: test - do not run tests for Zabbix < 6.0
-  meta: end_play
-  when: zabbix_version is version('6.0', '<')
-
 - name: test - Test action operation script
   module_defaults:
     community.zabbix.zabbix_script:

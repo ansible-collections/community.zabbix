@@ -102,11 +102,6 @@ plugins:
       name: zabbix_proxy_info
       namespace: ''
       version_added: 1.5.0
-    zabbix_screen:
-      description: Create/update/delete Zabbix screens
-      name: zabbix_screen
-      namespace: ''
-      version_added: null
     zabbix_script:
       description: Create/update/delete Zabbix scripts
       name: zabbix_script
@@ -118,7 +113,7 @@ plugins:
       namespace: ''
       version_added: null
     zabbix_template:
-      description: Create/update/delete/dump Zabbix template
+      description: Create/update/delete Zabbix template
       name: zabbix_template
       namespace: ''
       version_added: null
@@ -161,4 +156,4 @@ plugins:
   shell: {}
   strategy: {}
   vars: {}
-version: 1.9.3
+version: 2.0.0
