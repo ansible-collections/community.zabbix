@@ -20,8 +20,7 @@ description:
     - Zabbix Inventory plugin
     - All vars from zabbix are prefixed with zbx_
 requirements:
-    - "python >= 2.6"
-    - "zabbix-api >= 0.5.4"
+    - "python >= 3.9"
 options:
     server_url:
         description:
