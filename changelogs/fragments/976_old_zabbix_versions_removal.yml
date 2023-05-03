@@ -1,5 +1,0 @@
----
-breaking_changes:
-  - all modules - dropped support of Zabbix versions < 6.0
-  - zabbix_group_facts module - removed in favour of zabbix_group_info
-  - zabbix_host_facts module - removed in favour of zabbix_host_info

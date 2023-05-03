@@ -1,3 +1,0 @@
----
-minor_changes:
-  - Replaced usage of deprecated apt key management in Debian based distros - See https://wiki.debian.org/DebianRepository/UseThirdParty

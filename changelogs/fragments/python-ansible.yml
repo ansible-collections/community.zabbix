@@ -1,4 +1,0 @@
----
-breaking_changes:
-  - stopped supporting Python < 3.9
-  - stopped supporting Ansible < 2.12

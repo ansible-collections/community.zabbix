@@ -1,4 +1,0 @@
-breaking_changes:
-- dropped support of zabbix-api to make REST API calls to Zabbix
-minor_changes:
-- inventory plugin - switched from using zabbix-api to custom implementation adding authentication with tokens

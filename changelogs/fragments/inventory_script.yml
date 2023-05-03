@@ -1,2 +1,0 @@
-minor_changes:
-  - inventory script - re-coded to stop using zabbix-api. API tokens support added.
