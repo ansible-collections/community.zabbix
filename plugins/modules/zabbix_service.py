@@ -550,8 +550,6 @@ def main():
         supports_check_mode=True
     )
 
-    zabbix_utils.require_creds_params(module)
-
     name = module.params["name"]
     algorithm = module.params["algorithm"]
     sortorder = module.params["sortorder"]

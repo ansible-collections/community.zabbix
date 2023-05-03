@@ -174,8 +174,6 @@ def main():
         supports_check_mode=False
     )
 
-    zabbix_utils.require_creds_params(module)
-
     state = module.params["state"]
     name = module.params["name"]
     type = zabbix_utils.helper_to_numeric_value(

@@ -351,8 +351,6 @@ def main():
         supports_check_mode=True
     )
 
-    zabbix_utils.require_creds_params(module)
-
     hk_events_mode = module.params["hk_events_mode"]
     hk_events_trigger = module.params["hk_events_trigger"]
     hk_events_service = module.params["hk_events_service"]

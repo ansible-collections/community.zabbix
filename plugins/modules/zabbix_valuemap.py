@@ -228,8 +228,6 @@ def main():
         ]
     )
 
-    zabbix_utils.require_creds_params(module)
-
     vm = ValuemapModule(module)
 
     name = module.params["name"]

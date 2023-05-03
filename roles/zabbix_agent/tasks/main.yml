@@ -73,8 +73,8 @@
     ansible_network_os: community.zabbix.zabbix
     ansible_connection: httpapi
     # Can't think of a way to make http_login_* vars be undefined -(
-    http_login_user: "{{ zabbix_api_login_user | default(-42)) }}"
-    http_login_password: "{{ zabbix_api_login_pass | default(-42)) }}"
+    http_login_user: "{{ zabbix_api_http_user | default(-42) }}"
+    http_login_password: "{{ zabbix_api_http_password | default(-42) }}"
   include_tasks: api.yml
   when:
     - (zabbix_api_create_hostgroup | bool) or (zabbix_api_create_hosts | bool)

@@ -147,8 +147,6 @@ def main():
         supports_check_mode=True
     )
 
-    zabbix_utils.require_creds_params(module)
-
     host_groups = module.params['host_groups']
     state = module.params['state']
 

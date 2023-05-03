@@ -400,8 +400,6 @@ def main():
         supports_check_mode=True
     )
 
-    zabbix_utils.require_creds_params(module)
-
     name = module.params["name"]
     script_type = module.params["script_type"]
     command = module.params["command"]

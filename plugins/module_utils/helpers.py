@@ -8,13 +8,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-def require_creds_params(module):
-    if module._socket_path is None:
-        # ansible_connection = local
-        if ((not module.params.get('server_url', None)) or (not module.params.get('login_user', None)) or (not module.params.get('login_password', None))):
-            module.fail_json(msg="server_url, login_user, login_password are mandatory parameters when httpapi connection is not used")
-
-
 def zabbix_common_argument_spec():
     """
     Return a dictionary with connection options.
