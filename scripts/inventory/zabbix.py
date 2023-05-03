@@ -127,7 +127,7 @@ class ZabbixInventory(object):
             print("Error: Something went wrong with JSON loading.", file=sys.stderr)
             sys.exit(1)
         except (URLError, HTTPError) as error:
-             print(error, file=sys.stderr)
+            print(error, file=sys.stderr)
 
         return response
 
