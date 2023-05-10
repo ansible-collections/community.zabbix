@@ -243,6 +243,7 @@ These variables need to be overridden when you want to make use of the Zabbix AP
 Host encryption configuration will be set to match agent configuration.
 
 * `zabbix_api_server_host`: The IP or hostname/FQDN of Zabbix server. Example: zabbix.example.com
+* `zabbix_api_use_ssl`: Is SSL required to connect to the Zabbix API server?  Default: `false`
 * `zabbix_api_server_port`: TCP port to use to connect to Zabbix server. Example: 8080
 * `zabbix_api_login_user`: Username of user which has API access.
 * `zabbix_api_login_pass`: Password for the user which has API access.
