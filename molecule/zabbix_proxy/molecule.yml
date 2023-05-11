@@ -62,5 +62,3 @@ provisioner:
         zabbix_proxy_dbname: /path/to/sqlite3.db
 verifier:
   name: testinfra
-  lint:
-    name: flake8
