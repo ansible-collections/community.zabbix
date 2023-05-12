@@ -27,8 +27,6 @@ platforms:
 
 provisioner:
   name: ansible
-  lint:
-    name: ansible-lint
   env:
     ANSIBLE_COLLECTIONS_PATHS: $HOME/.ansible/collections/ansible_collections/community/zabbix
     ANSIBLE_ROLES_PATH: $HOME/.ansible/collections/ansible_collections/community/zabbix/roles

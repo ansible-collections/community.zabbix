@@ -3,9 +3,6 @@ dependency:
   name: galaxy
 driver:
   name: docker
-lint:
-  name: yamllint
-
 platforms:
   - name: zabbix-server-centos
     image: milcom/centos7-systemd:latest
@@ -46,8 +43,6 @@ provisioner:
     docker:
       create: ../default/create.yml
       destroy: ../default/destroy.yml
-  lint:
-    name: ansible-lint
   inventory:
     group_vars:
       all:

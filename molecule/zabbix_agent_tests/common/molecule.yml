@@ -18,8 +18,6 @@ platforms:
 
 provisioner:
   name: ansible
-  lint:
-    name: ansible-lint
   playbooks:
     prepare: ../../common/playbooks/prepare.yml
     converge: ../../common/playbooks/converge.yml
@@ -46,7 +44,6 @@ provisioner:
 scenario:
   test_sequence:
     - dependency
-    - lint
     - cleanup
     - destroy
     - syntax
