@@ -29,7 +29,6 @@ jobs:
       - name: Run lint test for py3
         run: tox -elinters-py3 -vv
         working-directory: ./ansible_collections/community/zabbix
-        if: matrix.python != '2.7'
 
   sanity:
     name: Sanity (Ⓐ${{ matrix.ansible }}+py${{ matrix.python }})
