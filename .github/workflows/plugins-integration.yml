@@ -48,7 +48,7 @@ jobs:
         run: pip install https://github.com/ansible/ansible/archive/${{ matrix.ansible }}.tar.gz --disable-pip-version-check
 
       - name: Install dependencies
-        run: pip install docker-compose zabbix-api
+        run: pip install docker-compose
 
       - name: Install ansible.netcommon collection
         run: ansible-galaxy collection install ansible.netcommon -p $GITHUB_WORKSPACE
