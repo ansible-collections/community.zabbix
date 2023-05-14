@@ -129,6 +129,7 @@
     ansible_user: "{{ zabbix_api_login_user }}"
     ansible_network_os: community.zabbix.zabbix
     ansible_connection: httpapi
+    ansible_httpapi_use_ssl: "{{ zabbix_api_use_ssl }}"
     http_login_user: "{{ zabbix_api_http_user | default(-42) }}"
     http_login_password: "{{ zabbix_api_http_password | default(-42) }}"
   community.zabbix.zabbix_proxy:
