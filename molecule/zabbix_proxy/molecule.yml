@@ -17,8 +17,6 @@ platforms:
 
 provisioner:
   name: ansible
-  lint:
-    name: ansible-lint
   env:
     ANSIBLE_COLLECTIONS_PATHS: $HOME/.ansible/collections/ansible_collections/community/zabbix
     ANSIBLE_ROLES_PATH: $HOME/.ansible/collections/ansible_collections/community/zabbix/roles
@@ -62,5 +60,3 @@ provisioner:
         zabbix_proxy_dbname: /path/to/sqlite3.db
 verifier:
   name: testinfra
-  lint:
-    name: flake8
