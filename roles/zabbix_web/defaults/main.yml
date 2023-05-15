@@ -34,6 +34,7 @@ zabbix_php_fpm_conf_listen: true
 # zabbix_web_upload_max_filesize: 2M
 # zabbix_web_max_input_time: 300
 # zabbix_web_max_input_vars: 10000
+zabbix_apache_custom_includes: []
 
 # Database
 zabbix_server_database: pgsql
