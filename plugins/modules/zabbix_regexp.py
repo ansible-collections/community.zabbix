@@ -24,9 +24,9 @@ author:
     - ONODERA Masaru(@masa-orca)
 
 requirements:
-    - "python >= 2.7"
+    - "python >= 3.9"
 
-version_added: 1.8.0
+version_added: 2.1.0
 
 options:
     name:
@@ -86,7 +86,7 @@ notes:
     - Only Zabbix >= 6.0 is supported.
 
 extends_documentation_fragment:
-- community.zabbix.zabbix
+    - community.zabbix.zabbix
 
 """
 
@@ -114,9 +114,6 @@ EXAMPLES = """
     ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
     ansible_host: zabbix-example-fqdn.org
   community.zabbix.zabbix_regexp:
-    server_url: "{{ zabbix_api_server_url }}"
-    login_user: "{{ zabbix_api_login_user }}"
-    login_password: "{{ zabbix_api_login_pass }}"
     name: File systems for discovery
     test_string: ext2
     expressions:
@@ -323,12 +320,6 @@ def main():
         required_if=[["state", "present", ["expressions"]]],
         supports_check_mode=True,
     )
-
-    zabbix_utils.require_creds_params(module)
-
-    for p in ['server_url', 'login_user', 'login_password', 'timeout', 'validate_certs']:
-        if p in module.params and not module.params[p] is None:
-            module.warn('Option "%s" is deprecated with the move to httpapi connection and will be removed in the next release' % p)
 
     name = module.params["name"]
     test_string = module.params["test_string"]

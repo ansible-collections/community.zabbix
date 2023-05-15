@@ -8,9 +8,6 @@
   block:
     - name: test - fail to update regexp setting
       zabbix_regexp:
-        server_url: "{{ zabbix_api_server_url }}"
-        login_user: "{{ zabbix_api_login_user }}"
-        login_password: "{{ zabbix_api_login_pass }}"
         name: File systems for discovery
         test_string: ext3
         expressions:
@@ -25,11 +22,8 @@
 - when: zabbix_version is version('6.0', '>=')
   name: support Zabbix version (>=6.0)
   block:
-    - name: test - try to update regexp (present) 
+    - name: test - try to update regexp (present)
       zabbix_regexp:
-        server_url: "{{ zabbix_api_server_url }}"
-        login_user: "{{ zabbix_api_login_user }}"
-        login_password: "{{ zabbix_api_login_pass }}"
         name: File systems for discovery
         test_string: ext3
         expressions:
@@ -42,11 +36,8 @@
         that:
           - zbxregexp_update.changed is sameas False
 
-    - name: test - try to delete regexp 
+    - name: test - try to delete regexp
       zabbix_regexp:
-        server_url: "{{ zabbix_api_server_url }}"
-        login_user: "{{ zabbix_api_login_user }}"
-        login_password: "{{ zabbix_api_login_pass }}"
         name: File systems for discovery
         state: absent
       register: zbxregexp_update
@@ -58,11 +49,8 @@
           - zbxregexp_update.msg == "Successfully deleted regular expression setting."
 
 
-    - name: test - try to create regexp 
+    - name: test - try to create regexp
       zabbix_regexp:
-        server_url: "{{ zabbix_api_server_url }}"
-        login_user: "{{ zabbix_api_login_user }}"
-        login_password: "{{ zabbix_api_login_pass }}"
         name: File systems for discovery
         test_string: ext3
         expressions:
@@ -76,11 +64,8 @@
           - zbxregexp_update.changed is sameas True
           - zbxregexp_update.msg == "Successfully created regular expression setting."
 
-    - name: test - try to update regexp 
+    - name: test - try to update regexp
       zabbix_regexp:
-        server_url: "{{ zabbix_api_server_url }}"
-        login_user: "{{ zabbix_api_login_user }}"
-        login_password: "{{ zabbix_api_login_pass }}"
         name: File systems for discovery
         test_string: ext3
         expressions:
@@ -106,9 +91,6 @@
 
     - name: test - try to update regexp (will not update)
       zabbix_regexp:
-        server_url: "{{ zabbix_api_server_url }}"
-        login_user: "{{ zabbix_api_login_user }}"
-        login_password: "{{ zabbix_api_login_pass }}"
         name: File systems for discovery
         test_string: ext3
         expressions:
