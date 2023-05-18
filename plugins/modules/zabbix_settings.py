@@ -389,7 +389,7 @@ EXAMPLES = """
   set_fact:
     ansible_zabbix_auth_key: 8ec0d52432c15c91fcafe9888500cf9a607f44091ab554dbee860f6b44fac895
 
-- name: Update all setting setting (Zabbix <= 6.0)
+- name: Update settings
   # set task level variables as we change ansible_connection plugin here
   vars:
     ansible_network_os: community.zabbix.zabbix
@@ -399,98 +399,13 @@ EXAMPLES = """
     ansible_httpapi_validate_certs: false
     ansible_zabbix_url_path: "zabbixeu"  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
     ansible_host: zabbix-example-fqdn.org
-  zabbix_settings:
-    setting_type: internal
-    http_auth_enabled: true
-    http_login_form: zabbix_login_form
-    http_strip_domains:
-      - comp
-      - any
-    http_case_sensitive: true
-    ldap_configured: true
-    ldap_host: "ldap://localhost"
-    ldap_port: 389
-    ldap_base_dn: "ou=Users,ou=system"
-    ldap_search_attribute: "uid"
-    ldap_bind_dn: "uid=ldap_search,ou=system"
-    ldap_case_sensitive: true
-    ldap_bind_password: "password"
-    saml_auth_enabled: true
-    saml_idp_entityid: ""
-    saml_sso_url: "https://localhost/SAML2/SSO"
-    saml_slo_url: "https://localhost/SAML2/SLO"
-    saml_username_attribute: "uid"
-    saml_sp_entityid: "https://localhost"
-    saml_nameid_format: "urn:oasis:names:tc:SAML:2.0:nameid-format:entity"
-    saml_sign_messages: true
-    saml_sign_assertions: true
-    saml_sign_authn_requests: true
-    saml_sign_logout_requests: true
-    saml_sign_logout_responses: true
-    saml_encrypt_nameid: true
-    saml_encrypt_assertions: true
-    saml_case_sensitive: true
-    passwd_min_length: 70
-    passwd_check_rules:
-      - contain_uppercase_and_lowercase_letters
-      - contain_digits
-      - contain_special_characters
-      - avoid_easy_to_guess
-
-- name: Update all setting setting (Zabbix = 6.2)
-  # set task level variables as we change ansible_connection plugin here
-  vars:
-    ansible_network_os: community.zabbix.zabbix
-    ansible_connection: httpapi
-    ansible_httpapi_port: 443
-    ansible_httpapi_use_ssl: true
-    ansible_httpapi_validate_certs: false
-    ansible_zabbix_url_path: "zabbixeu"  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
-    ansible_host: zabbix-example-fqdn.org
-  zabbix_settings:
-    setting_type: internal
-    http_auth_enabled: true
-    http_login_form: zabbix_login_form
-    http_strip_domains:
-      - comp
-      - any
-    http_case_sensitive: true
-    ldap_configured: true
-    ldap_case_sensitive: true
-    saml_auth_enabled: true
-    saml_idp_entityid: ""
-    saml_sso_url: "https://localhost/SAML2/SSO"
-    saml_slo_url: "https://localhost/SAML2/SLO"
-    saml_username_attribute: "uid"
-    saml_sp_entityid: "https://localhost"
-    saml_nameid_format: "urn:oasis:names:tc:SAML:2.0:nameid-format:entity"
-    saml_sign_messages: true
-    saml_sign_assertions: true
-    saml_sign_authn_requests: true
-    saml_sign_logout_requests: true
-    saml_sign_logout_responses: true
-    saml_encrypt_nameid: true
-    saml_encrypt_assertions: true
-    saml_case_sensitive: true
-    passwd_min_length: 70
-    passwd_check_rules:
-      - contain_uppercase_and_lowercase_letters
-      - contain_digits
-      - contain_special_characters
-      - avoid_easy_to_guess
-
-- name: Update all setting setting (Zabbix >= 6.4)
-  # set task level variables as we change ansible_connection plugin here
-  vars:
-    ansible_network_os: community.zabbix.zabbix
-    ansible_connection: httpapi
-    ansible_httpapi_port: 443
-    ansible_httpapi_use_ssl: true
-    ansible_httpapi_validate_certs: false
-    ansible_zabbix_url_path: "zabbixeu"  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
-    ansible_host: zabbix-example-fqdn.org
-  zabbix_settings:
-
+  community.zabbix.zabbix_settings:
+    alert_usrgrp: "0"
+    auditlog_enabled: false
+    blink_period: "10m"
+    connect_timeout: "30s"
+    custom_color: false
+    default_inventory_mode: automatic
 """
 
 RETURN = """
