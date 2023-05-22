@@ -7,7 +7,7 @@
 
 - name: Default to Latest Version for Windows
   set_fact:
-    zabbix_agent_version: 6.4
+    zabbix_agent_version: "{{ zabbix_agent_windows_version }}"
   when:
     - zabbix_agent_version is not defined or zabbix_agent_version is none
     - ansible_os_family == "Windows"
