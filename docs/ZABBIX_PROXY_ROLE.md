@@ -126,6 +126,7 @@ The following is an overview of all available configuration default for this rol
 * `zabbix_repo_yum`: A list with Yum repository configuration.
 * `zabbix_repo_yum_schema`: Default: `https`. Option to change the web schema for the yum repository(http/https)
 * `zabbix_repo_yum_gpgcheck`: Default: `0`.  Should yum perform a GPG check on the repository
+* `zabbix_proxy_disable_repo`: A list of repos to disable during install.  Default `epel`.
 * `zabbix_proxy_apt_priority`: APT priority for the zabbix repository
 * `*zabbix_proxy_package_state`: Default: `present`. Can be overridden to `latest` to update packages
 ### SElinux

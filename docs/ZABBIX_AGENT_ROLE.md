@@ -132,6 +132,7 @@ The following is an overview of all available configuration default for this rol
 * `zabbix_agent_version_minor`: When you want to specify a minor version to be installed. Is also used for `zabbix_sender` and `zabbix_get`. RedHat only. Default set to: `*` (latest available)
 * `zabbix_repo_yum`: A list with Yum repository configuration.
 * `zabbix_repo_yum_schema`: Default: `https`. Option to change the web schema for the yum repository(http/https)
+* `zabbix_agent_disable_repo`: A list of repos to disable during install.  Default `epel`.
 
 ### SElinux
 

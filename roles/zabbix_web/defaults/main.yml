@@ -52,7 +52,8 @@ zabbix_web_apt_priority:
 zabbix_web_version_minor: "*"
 zabbix_repo_yum_gpgcheck: 0
 zabbix_repo_yum_schema: https
-zabbix_repo_yum_enabled: []
+zabbix_web_disable_repo:
+  - epel
 zabbix_repo_yum:
   - name: zabbix
     description: Zabbix Official Repository - $basearch
