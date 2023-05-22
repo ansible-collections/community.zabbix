@@ -33,7 +33,7 @@
           - "zabbix-nginx-conf"
         state: "{{ zabbix_web_package_state }}"
         update_cache: true
-        disablerepo: "{{ zabbix_agent_disable_repo | default omit }}"
+        disablerepo: "{{ zabbix_agent_disable_repo | default(omit) }}"
       environment:
         http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
         https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"

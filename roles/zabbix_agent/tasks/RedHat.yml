@@ -31,7 +31,7 @@
   package:
     pkg:
       - "{{ zabbix_agent_package }}-{{ zabbix_agent_version }}.{{ zabbix_agent_version_minor }}"
-    disablerepo: "{{ zabbix_agent_disable_repo | default omit }}"
+    disablerepo: "{{ zabbix_agent_disable_repo | default(omit) }}"
     state: "{{ zabbix_agent_package_state }}"
   environment:
     http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
@@ -47,7 +47,7 @@
     pkg:
       - "{{ zabbix_sender_package }}-{{ zabbix_agent_version }}.{{ zabbix_agent_version_minor }}"
       - "{{ zabbix_get_package }}-{{ zabbix_agent_version }}.{{ zabbix_agent_version_minor }}"
-    disablerepo: "{{ zabbix_agent_disable_repo | default omit }}"
+    disablerepo: "{{ zabbix_agent_disable_repo | default(omit) }}"
     state: "{{ zabbix_agent_package_state }}"
   environment:
     http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
