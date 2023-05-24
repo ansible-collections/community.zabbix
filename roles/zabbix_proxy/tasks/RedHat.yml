@@ -53,7 +53,7 @@
       yum:
         pkg: "{{ zabbix_proxy_package }}-{{ zabbix_proxy_version }}.{{ zabbix_proxy_version_minor }}"
         state: "{{ zabbix_proxy_package_state }}"
-        disablerepo: "{{ zabbix_agent_disable_repo | default(omit) }}"
+        disablerepo: "{{ zabbix_proxy_disable_repo | default(omit) }}"
       environment:
         http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
         https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
@@ -65,7 +65,7 @@
       yum:
         pkg: "zabbix-sql-scripts-{{ zabbix_proxy_version }}.{{ zabbix_proxy_version_minor }}"
         state: "{{ zabbix_proxy_package_state }}"
-        disablerepo: "{{ zabbix_agent_disable_repo | default(omit) }}"
+        disablerepo: "{{ zabbix_proxy_disable_repo | default(omit) }}"
       environment:
         http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
         https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
