@@ -5,13 +5,6 @@
   tags:
     - always
 
-- name: Default to Latest Version for Windows
-  set_fact:
-    zabbix_agent_version: "{{ zabbix_agent_windows_version }}"
-  when:
-    - zabbix_agent_version is not defined or zabbix_agent_version is none
-    - ansible_os_family == "Windows"
-
 - name: Determine Latest Supported Zabbix Version
   set_fact:
     zabbix_agent_version: "{{ zabbix_valid_agent_versions[ansible_distribution_major_version][0] | default(6.4) }}"
@@ -22,8 +15,6 @@
 - name: Set More Variables
   set_fact:
     zabbix_valid_version: "{{ zabbix_agent_version|float in zabbix_valid_agent_versions[ansible_distribution_major_version] }}"
-  when: ansible_os_family != "Windows"
-
   tags:
     - always
 
