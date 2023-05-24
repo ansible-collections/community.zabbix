@@ -21,8 +21,7 @@
 - name: Stopping Install of Invalid Version
   fail:
     msg: Zabbix version {{ zabbix_agent_version }} is not supported on {{ ansible_distribution }} {{ ansible_distribution_major_version }}
-  when:
-    - not zabbix_valid_version
+  when: not zabbix_valid_version
   tags:
     - always
 
