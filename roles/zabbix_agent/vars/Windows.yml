@@ -1,7 +1,6 @@
 ---
 # vars file for zabbix_agent (Windows)
 zabbix_valid_agent_versions:
-  # Debian
   "10":
     - 6.4
     - 6.2
