@@ -179,7 +179,8 @@ class HostMacro(ZabbixBase):
         host_macro_id = host_macro_obj["hostmacroid"]
         if host_macro_obj["macro"] == macro_name:
             # no change only when macro type == 0. when type = 1 or 2 zabbix will not output value of it.
-            if host_macro_obj["type"] == "0" and macro_type == "0" and host_macro_obj["value"] == macro_value and host_macro_obj["description"] == macro_description:
+            if (host_macro_obj["type"] == "0" and macro_type == "0" and host_macro_obj["value"] == macro_value
+                    and host_macro_obj["description"] == macro_description):
                 self._module.exit_json(changed=False, result="Host macro %s already up to date" % macro_name)
         try:
             if self._module.check_mode:
