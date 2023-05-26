@@ -39,7 +39,8 @@ zabbix_server_version_minor: "*"
 zabbix_server_package_state: present
 zabbix_repo_yum_gpgcheck: 0
 zabbix_repo_yum_schema: https
-zabbix_repo_yum_enabled: []
+zabbix_server_disable_repo:
+  - epel
 zabbix_repo_yum:
   - name: zabbix
     description: Zabbix Official Repository - $basearch
