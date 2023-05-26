@@ -24,7 +24,7 @@
   package:
     pkg: zabbix-java-gateway
     state: "{{ zabbix_javagateway_package_state }}"
-    disablerepo: "epel"
+    disablerepo: "{{ zabbix_agent_disable_repo | default(omit) }}"
   environment:
     http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
     https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"

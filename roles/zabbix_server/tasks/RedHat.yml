@@ -50,7 +50,7 @@
   package:
     pkg: "{{ zabbix_server_package }}-{{ zabbix_server_version }}.{{ zabbix_server_version_minor }}"
     state: "{{ zabbix_server_package_state }}"
-    disablerepo: "epel"
+    disablerepo: "{{ zabbix_server_disable_repo | default(omit) }}"
   environment:
     http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
     https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
@@ -64,7 +64,7 @@
   package:
     pkg: "zabbix-sql-scripts-{{ zabbix_server_version }}.{{ zabbix_server_version_minor }}"
     state: "{{ zabbix_server_package_state }}"
-    disablerepo: "epel"
+    disablerepo: "{{ zabbix_server_disable_repo | default(omit) }}"
   environment:
     http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
     https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"

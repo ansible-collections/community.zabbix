@@ -29,8 +29,7 @@
           - "zabbix-apache-conf-{{ zabbix_web_version }}.{{ zabbix_web_version_minor }}"
         state: "{{ zabbix_web_package_state }}"
         update_cache: true
-        disablerepo: "{{ '*' if (zabbix_repo_yum_enabled | length>0) else omit }}"
-        enablerepo: "{{ zabbix_repo_yum_enabled if zabbix_repo_yum_enabled is iterable and (zabbix_repo_yum_enabled | length>0) else omit }}"
+        disablerepo: "{{ zabbix_agent_disable_repo | default(omit) }}"
       environment:
         http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
         https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
