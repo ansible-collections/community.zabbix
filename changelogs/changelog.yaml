@@ -942,3 +942,17 @@ releases:
     - inventory_script.yml
     - python-ansible.yml
     release_date: '2023-05-04'
+  2.0.1:
+    changes:
+      bugfixes:
+      - Proxy and Agent Roles - Added `zabbix_api_use_ssl` variable to allow secure
+        API connections
+      - Web Role - Added defaults and documentation for `zabbix_apache_custom_includes`
+      - agent - Handled undefined variable error for Windows default versions
+      - all roles - Added option to selectively disable a repo on Redhat installs
+    fragments:
+    - 986.yml
+    - 990.yml
+    - api_ssl.yml
+    - disable_repo.yml
+    release_date: '2023-05-26'

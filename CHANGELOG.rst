@@ -5,6 +5,17 @@ community.zabbix Release Notes
 .. contents:: Topics
 
 
+v2.0.1
+======
+
+Bugfixes
+--------
+
+- Proxy and Agent Roles - Added `zabbix_api_use_ssl` variable to allow secure API connections
+- Web Role - Added defaults and documentation for `zabbix_apache_custom_includes`
+- agent - Handled undefined variable error for Windows default versions
+- all roles - Added option to selectively disable a repo on Redhat installs
+
 v2.0.0
 ======
 

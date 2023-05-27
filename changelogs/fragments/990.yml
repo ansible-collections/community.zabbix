@@ -1,2 +1,0 @@
-bugfixes:
-  - agent - Handled undefined variable error for Windows default versions
