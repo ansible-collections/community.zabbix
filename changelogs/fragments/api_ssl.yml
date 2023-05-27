@@ -1,2 +1,0 @@
-bugfixes:
-  - Proxy and Agent Roles - Added `zabbix_api_use_ssl` variable to allow secure API connections
