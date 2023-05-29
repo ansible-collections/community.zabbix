@@ -213,7 +213,7 @@ zabbix_agent2_tlspskidentity:
 zabbix_agent2_tlspsk_auto: false
 
 # Windows/macOS Related
-zabbix_version_long: 5.2.4
+zabbix_version_long: 6.4.2 #update for latest version
 
 # Windows Related
 zabbix_win_package: zabbix_agent-{{ zabbix_version_long }}-windows-amd64-openssl.zip
