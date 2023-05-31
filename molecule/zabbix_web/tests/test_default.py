@@ -11,9 +11,9 @@ testinfra_hosts = testinfra.utils.ansible_runner.AnsibleRunner(
 def test_zabbix_package(host):
     ansible_data = host.ansible.get_variables()
     version = ansible_data['zabbix_web_version']
-    database = ansible_data['zabbix_server_database']
+    webserver = ansible_data['zabbix_web_http_server']
 
-    zabbix_web = host.package(f'zabbix-web-%s' % database)
+    zabbix_web = host.package(f'zabbix-%s-conf' % webserver)
     assert str(version) in zabbix_web.version
 
 
