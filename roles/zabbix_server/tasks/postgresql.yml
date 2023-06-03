@@ -107,6 +107,7 @@
     warn: "{{ produce_warn | default(omit) }}"
   environment:
     PGPASSWORD: "{{ zabbix_server_dbpassword }}"
+  become: true
   when:
     - zabbix_server_database_sqlload
   tags:
@@ -129,6 +130,7 @@
     warn: "{{ produce_warn | default(omit) }}"
   environment:
     PGPASSWORD: "{{ zabbix_server_dbpassword }}"
+  become: true
   when:
     - zabbix_server_database_timescaledb
   tags:

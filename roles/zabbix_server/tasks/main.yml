@@ -38,6 +38,7 @@
     owner: "{{ zabbix_os_user }}"
     group: "{{ zabbix_os_user }}"
     mode: "{{ zabbix_server_conf_mode }}"
+  become: true
   notify:
     - zabbix-server restarted
   tags:
@@ -50,6 +51,7 @@
     group: "{{ zabbix_os_user }}"
     state: directory
     mode: "{{ zabbix_server_include_mode }}"
+  become: true
   tags:
     - install
     - config
@@ -64,6 +66,7 @@
     name: zabbix-server
     state: "{{ zabbix_service_state }}"
     enabled: "{{ zabbix_service_enabled }}"
+  become: true
   tags:
     - service
   when: zabbix_server_manage_service | bool
