@@ -81,6 +81,7 @@
     owner: "{{ zabbix_web_user }}"
     group: "{{ zabbix_web_group }}"
     mode: 0644
+  become: true
   when: ansible_os_family == "Debian"
   tags:
     - config
