@@ -89,6 +89,7 @@
     executable: /bin/bash
   environment:
     PGPASSWORD: "{{ zabbix_proxy_dbpassword }}"
+  become: true
   when:
     - zabbix_proxy_database_creation
   tags:
