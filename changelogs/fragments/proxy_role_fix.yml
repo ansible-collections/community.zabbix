@@ -1,0 +1,2 @@
+bugfixes:
+  - zabbix_proxy role - failed at version validation. Fix adds cast of zabbix_proxy_version to float, similarly to the other roles.
