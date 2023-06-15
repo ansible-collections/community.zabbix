@@ -52,6 +52,13 @@ options:
             - Password will not be updated on subsequent runs without setting this value to yes.
         default: no
         type: bool
+    current_passwd:
+        description:
+            - Current password for the user when overriding its password.
+            - Required when overriding the logged in user's password.
+            - https://www.zabbix.com/documentation/6.4/en/manual/api/reference/user/update
+        required: false
+        type: str
     lang:
         description:
             - Language code of the user's language.
@@ -605,6 +612,7 @@ class User(ZabbixBase):
         timezone,
         role_name,
         override_passwd,
+        current_passwd,
     ):
 
         user_ids = {}
@@ -626,6 +634,8 @@ class User(ZabbixBase):
 
         if override_passwd:
             request_data["passwd"] = passwd
+            if current_passwd:
+                request_data["current_passwd"] = current_passwd
 
         request_data["roleid"] = (
             self.get_roleid_by_name(role_name) if role_name else None
@@ -685,6 +695,7 @@ def main():
             override_passwd=dict(
                 type="bool", required=False, default=False, no_log=False
             ),
+            current_passwd=dict(type="str", required=False, no_log=True),
             lang=dict(
                 type="str",
                 choices=[
@@ -760,6 +771,7 @@ def main():
     usrgrps = module.params["usrgrps"]
     passwd = module.params["passwd"]
     override_passwd = module.params["override_passwd"]
+    current_passwd = module.params["current_passwd"]
     lang = module.params["lang"]
     theme = module.params["theme"]
     autologin = module.params["autologin"]
@@ -833,6 +845,7 @@ def main():
                     timezone,
                     role_name,
                     override_passwd,
+                    current_passwd,
                 )
         else:
             diff_check_result = True
