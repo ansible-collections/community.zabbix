@@ -63,6 +63,7 @@
 - name: "MySQL | Get the file for create.sql"
   shell: ls -1 {{ datafiles_path }}/{{ 'create' if zabbix_server_version is version('6.0', '<') else 'server' }}.sq*
   changed_when: false
+  become: true
   when:
     - zabbix_server_database_sqlload | bool
   register: ls_output_create
@@ -75,6 +76,7 @@
     -p'{{ zabbix_server_dbpassword }}' -D '{{ zabbix_server_dbname }}' \
     -e 'SELECT mandatory FROM dbversion;'
   register: mysql_db_version
+  become: true
   changed_when: false
   ignore_errors: true
   tags:
@@ -139,6 +141,7 @@
     src: "{{ ls_output_create.stdout }}"
     dest: /tmp/{{ role_name }}/
     flat: true
+  become: true
   when:
     - delegated_dbhost != inventory_hostname
     - zabbix_server_database_sqlload | bool
@@ -152,6 +155,7 @@
     dest: "{{ ls_output_create.stdout | dirname }}"
     mode: "0640"
   delegate_to: "{{ delegated_dbhost }}"
+  become: true
   when:
     - delegated_dbhost != inventory_hostname
     - zabbix_server_database_sqlload | bool
@@ -201,6 +205,7 @@
     path: /etc/zabbix/create.done
     state: touch
     mode: "0644"
+  become: true
   when:
     - zabbix_server_database_sqlload | bool
     - mysql_schema_empty

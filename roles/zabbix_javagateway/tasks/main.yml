@@ -36,6 +36,7 @@
     owner: zabbix
     group: zabbix
     mode: "{{ zabbix_java_gateway_conf_mode }}"
+  become: true
   notify:
     - zabbix-java-gateway restarted
   tags:
@@ -47,5 +48,6 @@
     state: started
     enabled: true
     daemon_reload: true
+  become: true
   tags:
     - service
