@@ -50,6 +50,8 @@ jobs:
             version: v64
           - container: ubuntu1804
             version: v64
+          - container: debian12
+            version: v62
     steps:
       - name: Check out code
         uses: actions/checkout@v1

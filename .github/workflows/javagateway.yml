@@ -37,6 +37,9 @@ jobs:
           - interpreter: python3
           - interpreter: python
             container: centos7
+        exclude:
+          - container: debian12
+            version: v62
         collection_role:
           - zabbix_javagateway
     steps:
