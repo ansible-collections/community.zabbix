@@ -8,28 +8,13 @@ testinfra_hosts = testinfra.utils.ansible_runner.AnsibleRunner(
 ).get_hosts("all")
 
 
-@pytest.mark.parametrize(
-    "server, redhat, debian",
-    [
-        ("zabbix-server-pgsql", "zabbix-web-pgsql", "zabbix-frontend-php"),
-        ("zabbix-server-mysql", "zabbix-web-mysql", "zabbix-frontend-php"),
-    ],
-)
-def test_zabbix_package(host, server, redhat, debian):
-    host = host.backend.get_hostname()
-    host = host.replace("-centos7", "")
-    host = host.replace("-centos8", "")
-    host = host.replace("-debian", "")
-    host = host.replace("-ubuntu", "")
+def test_zabbix_package(host):
+    ansible_data = host.ansible.get_variables()
+    version = ansible_data['zabbix_web_version']
+    webserver = ansible_data['zabbix_web_http_server']
 
-    if host == server:
-        if host.system_info.distribution in ["debian", "ubuntu"]:
-            zabbix_web = host.package(debian)
-            assert zabbix_web.version.startswith("1:6.4")
-        elif host.system_info.distribution == "centos":
-            zabbix_web = host.package(redhat)
-            assert zabbix_web.version.startswith("6.4")
-        assert zabbix_web.is_installed
+    zabbix_web = host.package(f'zabbix-%s-conf' % webserver)
+    assert str(version) in zabbix_web.version
 
 
 def test_zabbix_web(host):
