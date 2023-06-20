@@ -68,7 +68,6 @@ server {
     server_tokens off;
     server_name {{ zabbix_api_server_url }} {% for alias in zabbix_url_aliases -%}{{ alias -}} {% endfor %};
 
-    ssl on;
     ssl_certificate {{ zabbix_web_tls_crt }};
     ssl_certificate_key {{ zabbix_web_tls_key }};
     {{ (zabbix_web_ssl_cipher_suite is defined and zabbix_web_ssl_cipher_suite is not none) | ternary('', '# ') }}ssl_ciphers {{ zabbix_web_ssl_cipher_suite | default('') }}
