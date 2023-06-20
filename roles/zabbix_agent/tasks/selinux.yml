@@ -102,6 +102,7 @@
     name: zabbix_run_sudo
     persistent: true
     state: true
+  become: true
   when:
     - ansible_selinux.status == "enabled"
     - selinux_allow_zabbix_run_sudo|bool

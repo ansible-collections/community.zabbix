@@ -233,6 +233,7 @@
     path: /sys/firmware/dmi/tables/DMI
     owner: root
     group: zabbix
+  become: true
   when: zabbix_agent_chassis | bool
   tags:
     - config

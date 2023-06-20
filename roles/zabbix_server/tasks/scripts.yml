@@ -7,6 +7,7 @@
     group: "{{ zabbix_os_user }}"
     mode: 0755
   with_items: "{{ zabbix_server_alertscripts }}"
+  become: true
   when: zabbix_server_alertscripts is defined
   tags:
     - config
@@ -19,6 +20,7 @@
     group: "{{ zabbix_os_user }}"
     mode: 0755
   with_items: "{{ zabbix_server_externalscripts }}"
+  become: true
   when: zabbix_server_externalscripts is defined
   tags:
     - config

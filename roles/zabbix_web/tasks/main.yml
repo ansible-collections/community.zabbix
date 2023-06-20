@@ -62,6 +62,7 @@
     group: "{{ zabbix_web_group }}"
     state: directory
     mode: 0755
+  become: true
   tags:
     - install
     - config
@@ -73,6 +74,7 @@
     owner: "{{ zabbix_web_user }}"
     group: "{{ zabbix_web_group }}"
     mode: "{{ zabbix_web_conf_mode }}"
+  become: true
   notify:
     - "restart {{ zabbix_web_http_server }}"
   tags:

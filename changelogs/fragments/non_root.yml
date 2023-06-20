@@ -1,0 +1,2 @@
+minor_changes:
+  - all roles - Modified to allow a non-root user to run the role.
