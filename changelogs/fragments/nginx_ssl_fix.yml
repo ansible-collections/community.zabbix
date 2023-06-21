@@ -1,0 +1,2 @@
+bugfixes:
+  - zabbix_web role - removed 'ssl on;' nginx configuration, which is no longer supported since nginx version 1.25.1.

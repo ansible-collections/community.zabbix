@@ -17,40 +17,20 @@ def test_zabbixproxy_running_and_enabled(host):
         assert zabbix.is_running
 
 
-@pytest.mark.parametrize(
-    "proxy", [("zabbix-proxy-pgsql"), ("zabbix-proxy-mysql"), ("zabbix-proxy-sqlite3")]
-)
-def test_zabbix_package(host, proxy):
+def test_zabbix_package(host):
     ansible_data = host.ansible.get_variables()
-    zabbixhost = ansible_data["inventory_hostname"]
+    version = ansible_data['zabbix_proxy_version']
+    database = ansible_data['zabbix_proxy_database']
 
-    zabbixhost = zabbixhost.replace("-centos", "")
-    zabbixhost = zabbixhost.replace("-debian", "")
-    zabbixhost = zabbixhost.replace("-ubuntu", "")
-
-    if zabbixhost == proxy:
-        zabbix_proxy = host.package(proxy)
-        if host.system_info.distribution in ["debian", "ubuntu"]:
-            assert zabbix_proxy.version.startswith("1:6.4")
-        elif host.system_info.distribution == "centos":
-            assert zabbix_proxy.version.startswith("6.4")
-        assert zabbix_proxy.is_installed
+    zabbix_proxy = host.package(f'zabbix-proxy-%s' % database)
+    assert str(version) in zabbix_proxy.version
 
 
 def test_zabbix_proxy_dot_conf(host):
-    found = False
-    for file_name in [
-        "/etc/zabbix/zabbix_proxy.conf",
-        "/etc/zabbix_proxy.conf",
-    ]:
-        if host.file(file_name).exists:
-            found = True
-            break
-
-    assert found
-    zabbix_proxy_conf = host.file(file_name)
-    assert zabbix_proxy_conf.user in ["zabbix", "zabbixsrv"]
-    assert zabbix_proxy_conf.group in ["zabbix", "zabbixsrv"]
+    zabbix_proxy_conf = host.file("/etc/zabbix/zabbix_proxy.conf")
+    assert zabbix_proxy_conf.exists
+    assert zabbix_proxy_conf.user == "zabbix"
+    assert zabbix_proxy_conf.group == "zabbix"
     assert zabbix_proxy_conf.mode == 0o644
 
     assert zabbix_proxy_conf.contains("ListenPort=10051")
@@ -60,24 +40,13 @@ def test_zabbix_proxy_dot_conf(host):
 def test_zabbix_include_dir(host):
     zabbix_include_dir = host.file("/etc/zabbix/zabbix_proxy.conf.d")
     assert zabbix_include_dir.is_directory
-    assert zabbix_include_dir.user in ["zabbix", "zabbixsrv"]
-    assert zabbix_include_dir.group in ["zabbix", "zabbixsrv"]
-    # assert zabbix_include_dir.mode == 0o644
+    assert zabbix_include_dir.user == "zabbix"
+    assert zabbix_include_dir.group == "zabbix"
 
 
 def test_zabbix_proxy_logfile(host):
-    found = False
-    for file_name in [
-        "/var/log/zabbix/zabbix_proxy.log",
-        "/var/log/zabbixsrv/zabbix_proxy.log",
-    ]:
-        if host.file(file_name).exists:
-            found = True
-            break
-
-    assert found
-
-    zabbix_logfile = host.file(file_name)
+    zabbix_logfile = host.file("/var/log/zabbix/zabbix_proxy.log")
+    assert zabbix_logfile.exists
     assert not zabbix_logfile.contains("Access denied for user")
     assert not zabbix_logfile.contains("database is down: reconnecting")
     assert zabbix_logfile.contains("current database version")

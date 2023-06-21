@@ -62,6 +62,7 @@
   stat:
     path: /etc/zabbix/schema.done
   register: done_file
+  become: true
   when:
     - zabbix_proxy_database_sqlload
   tags:
@@ -154,6 +155,7 @@
     path: /etc/zabbix/schema.done
     state: touch
     mode: "0644"
+  become: true
   when:
     - zabbix_proxy_database_sqlload
     - not done_file.stat.exists

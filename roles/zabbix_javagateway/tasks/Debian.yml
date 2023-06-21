@@ -32,14 +32,15 @@
   tags:
     - install
 
-# In releases older than Debian 12 and Ubuntu 22.04, /etc/apt/keyrings does not exist by default. 
+# In releases older than Debian 12 and Ubuntu 22.04, /etc/apt/keyrings does not exist by default.
 # It SHOULD be created with permissions 0755 if it is needed and does not already exist.
 # See: https://wiki.debian.org/DebianRepository/UseThirdParty
 - name: "Debian | Create /etc/apt/keyrings/ on older versions"
   ansible.builtin.file:
     path: /etc/apt/keyrings/
     state: directory
-    mode: '0755'
+    mode: "0755"
+  become: true
   when:
     - (ansible_distribution == "Ubuntu" and ansible_distribution_major_version < "22") or
       (ansible_distribution == "Debian" and ansible_distribution_major_version < "12")
@@ -48,7 +49,7 @@
   ansible.builtin.get_url:
     url: http://repo.zabbix.com/zabbix-official-repo.key
     dest: "{{ zabbix_gpg_key }}"
-    mode: '0644'
+    mode: "0644"
     force: true
   become: true
   tags:
@@ -87,6 +88,7 @@
     state: stopped
     enabled: true
     daemon_reload: true
+  become: true
   when:
     - zabbix_java_gateway_install.changed
   tags:

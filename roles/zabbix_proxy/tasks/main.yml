@@ -15,7 +15,7 @@
 - name: Set More Variables
   set_fact:
     zabbix_proxy_db_long: "{{ 'postgresql' if zabbix_proxy_database == 'pgsql' else zabbix_proxy_database }}"
-    zabbix_valid_version: "{{ zabbix_proxy_version in zabbix_valid_proxy_versions[ansible_distribution_major_version] }}"
+    zabbix_valid_version: "{{ zabbix_proxy_version|float in zabbix_valid_proxy_versions[ansible_distribution_major_version] }}"
     zabbix_short_version: "{{ zabbix_proxy_version | regex_replace('\\.', '') }}"
   tags:
     - always
@@ -51,6 +51,7 @@
 - name: "Get the file for database schema"
   shell: ls -1 {{ db_file_path[zabbix_short_version] }}
   changed_when: false
+  become: true
   when:
     - zabbix_proxy_database_sqlload
   register: ls_output_schema
@@ -146,7 +147,6 @@
   when:
     - zabbix_api_create_proxy | bool
   delegate_to: "{{ zabbix_api_server_host }}"
-  become: false
   tags:
     - api
 
