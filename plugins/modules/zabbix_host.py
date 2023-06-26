@@ -513,43 +513,48 @@ class Host(ZabbixBase):
 
     def update_host(self, host_name, group_ids, status, host_id, interfaces, exist_interface_list, proxy_id,
                     visible_name, description, tls_connect, tls_accept, tls_psk_identity, tls_psk, tls_issuer,
-                    tls_subject, ipmi_authtype, ipmi_privilege, ipmi_username, ipmi_password, macros, tags):
+                    tls_subject, ipmi_authtype, ipmi_privilege, ipmi_username, ipmi_password, macros, tags, discovered_host):
         try:
             if self._module.check_mode:
                 self._module.exit_json(changed=True)
-            parameters = {"hostid": host_id, "groups": group_ids, "status": status}
-            if proxy_id >= 0:
-                parameters["proxy_hostid"] = proxy_id
-            if visible_name:
-                parameters["name"] = visible_name
-            if tls_connect:
-                parameters["tls_connect"] = tls_connect
-            if tls_accept:
-                parameters["tls_accept"] = tls_accept
-            if tls_psk_identity:
-                parameters["tls_psk_identity"] = tls_psk_identity
-            if tls_psk:
-                parameters["tls_psk"] = tls_psk
-            if tls_issuer:
-                parameters["tls_issuer"] = tls_issuer
-            if tls_subject:
-                parameters["tls_subject"] = tls_subject
-            if description:
-                parameters["description"] = description
-            if ipmi_authtype:
-                parameters["ipmi_authtype"] = ipmi_authtype
-            if ipmi_privilege:
-                parameters["ipmi_privilege"] = ipmi_privilege
-            if ipmi_username:
-                parameters["ipmi_username"] = ipmi_username
-            if ipmi_password:
-                parameters["ipmi_password"] = ipmi_password
+            if discovered_host:
+                # The host was discovered via Discovery Rule
+                parameters = {"hostid": host_id, "status": status}
+            else:
+                # A "plain" host
+                parameters = {"hostid": host_id, "groups": group_ids, "status": status}
+                if proxy_id >= 0:
+                    parameters["proxy_hostid"] = proxy_id
+                if visible_name:
+                    parameters["name"] = visible_name
+                if tls_connect:
+                    parameters["tls_connect"] = tls_connect
+                if tls_accept:
+                    parameters["tls_accept"] = tls_accept
+                if tls_psk_identity:
+                    parameters["tls_psk_identity"] = tls_psk_identity
+                if tls_psk:
+                    parameters["tls_psk"] = tls_psk
+                if tls_issuer:
+                    parameters["tls_issuer"] = tls_issuer
+                if tls_subject:
+                    parameters["tls_subject"] = tls_subject
+                if description:
+                    parameters["description"] = description
+                if ipmi_authtype:
+                    parameters["ipmi_authtype"] = ipmi_authtype
+                if ipmi_privilege:
+                    parameters["ipmi_privilege"] = ipmi_privilege
+                if ipmi_username:
+                    parameters["ipmi_username"] = ipmi_username
+                if ipmi_password:
+                    parameters["ipmi_password"] = ipmi_password
+                if interfaces:
+                    parameters["interfaces"] = interfaces
             if macros is not None:
                 parameters["macros"] = macros
             if tags is not None:
                 parameters["tags"] = tags
-            if interfaces:
-                parameters["interfaces"] = interfaces
 
             self._zapi.host.update(parameters)
         except Exception as e:
@@ -805,7 +810,7 @@ class Host(ZabbixBase):
 
     # link or clear template of the host
     def link_or_clear_template(self, host_id, template_id_list, tls_connect, tls_accept, tls_psk_identity, tls_psk,
-                               tls_issuer, tls_subject, ipmi_authtype, ipmi_privilege, ipmi_username, ipmi_password):
+                               tls_issuer, tls_subject, ipmi_authtype, ipmi_privilege, ipmi_username, ipmi_password, discovered_host):
         # get host's exist template ids
         exist_template_id_list = self.get_host_templates_by_host_id(host_id)
 
@@ -816,20 +821,25 @@ class Host(ZabbixBase):
         # get unlink and clear templates
         templates_clear = exist_template_ids.difference(template_ids)
         templates_clear_list = list(templates_clear)
-        request_str = {"hostid": host_id, "templates": template_id_list, "templates_clear": templates_clear_list,
-                       "ipmi_authtype": ipmi_authtype, "ipmi_privilege": ipmi_privilege, "ipmi_username": ipmi_username, "ipmi_password": ipmi_password}
-        if tls_connect:
-            request_str["tls_connect"] = tls_connect
-        if tls_accept:
-            request_str["tls_accept"] = tls_accept
-        if tls_psk_identity is not None:
-            request_str["tls_psk_identity"] = tls_psk_identity
-        if tls_psk is not None:
-            request_str["tls_psk"] = tls_psk
-        if tls_issuer is not None:
-            request_str["tls_issuer"] = tls_issuer
-        if tls_subject is not None:
-            request_str["tls_subject"] = tls_subject
+        if discovered_host:
+            # The host was discovered via Discovery Rule
+            request_str = {"hostid": host_id, "templates": template_id_list, "templates_clear": templates_clear_list}
+        else:
+            # A "plain" host
+            request_str = {"hostid": host_id, "templates": template_id_list, "templates_clear": templates_clear_list,
+                           "ipmi_authtype": ipmi_authtype, "ipmi_privilege": ipmi_privilege, "ipmi_username": ipmi_username, "ipmi_password": ipmi_password}
+            if tls_connect:
+                request_str["tls_connect"] = tls_connect
+            if tls_accept:
+                request_str["tls_accept"] = tls_accept
+            if tls_psk_identity is not None:
+                request_str["tls_psk_identity"] = tls_psk_identity
+            if tls_psk is not None:
+                request_str["tls_psk"] = tls_psk
+            if tls_issuer is not None:
+                request_str["tls_issuer"] = tls_issuer
+            if tls_subject is not None:
+                request_str["tls_subject"] = tls_subject
         try:
             if self._module.check_mode:
                 self._module.exit_json(changed=True)
@@ -1076,6 +1086,7 @@ def main():
         # get host id by host name
         zabbix_host_obj = host.get_host_by_host_name(host_name)
         host_id = zabbix_host_obj["hostid"]
+        discovered_host = zabbix_host_obj["flags"] == '4'
 
         # If proxy is not specified as a module parameter, use the existing setting
         if proxy is None:
@@ -1193,11 +1204,11 @@ def main():
                 host.update_host(
                     host_name, group_ids, status, host_id, interfaces, exist_interfaces, proxy_id, visible_name,
                     description, tls_connect, tls_accept, tls_psk_identity, tls_psk, tls_issuer, tls_subject,
-                    ipmi_authtype, ipmi_privilege, ipmi_username, ipmi_password, macros, tags)
+                    ipmi_authtype, ipmi_privilege, ipmi_username, ipmi_password, macros, tags, discovered_host)
 
                 host.link_or_clear_template(
                     host_id, template_ids, tls_connect, tls_accept, tls_psk_identity, tls_psk, tls_issuer,
-                    tls_subject, ipmi_authtype, ipmi_privilege, ipmi_username, ipmi_password)
+                    tls_subject, ipmi_authtype, ipmi_privilege, ipmi_username, ipmi_password, discovered_host)
 
                 host.update_inventory_mode(host_id, inventory_mode)
                 host.update_inventory_zabbix(host_id, inventory_zabbix)
@@ -1209,6 +1220,8 @@ def main():
                 module.exit_json(changed=False)
 
     else:
+        discovered_host = False
+
         if state == "absent":
             # the host is already deleted.
             module.exit_json(changed=False)
@@ -1224,7 +1237,7 @@ def main():
 
         host.link_or_clear_template(
             host_id, template_ids, tls_connect, tls_accept, tls_psk_identity, tls_psk, tls_issuer, tls_subject,
-            ipmi_authtype, ipmi_privilege, ipmi_username, ipmi_password)
+            ipmi_authtype, ipmi_privilege, ipmi_username, ipmi_password, discovered_host)
 
         host.update_inventory_mode(host_id, inventory_mode)
         host.update_inventory_zabbix(host_id, inventory_zabbix)
