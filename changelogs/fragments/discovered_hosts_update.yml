@@ -1,0 +1,3 @@
+---
+bugfixes:
+  - zabbix_host module - fix updating hosts that were discovered via LLD
