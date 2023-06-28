@@ -112,55 +112,47 @@
       when:
         - ansible_os_family != 'RedHat'
 
-    - name: PyMySQL
-      pip:
-        name: PyMySQL
-      register: installation_dependencies
-      until: installation_dependencies is succeeded
-      when:
-        - inventory_hostname in groups['mysql']
+    # - name: Install MariaDB (RHEL)
+    #   block:
+    #     - name: Add MariaDB Repo
+    #       ansible.builtin.yum_repository:
+    #         name: mariadb
+    #         description: MariaDB 10.8 CentOS repository list
+    #         file: mariadb
+    #         baseurl: "https://mirror.rackspace.com/mariadb/yum/10.8/centos{{ ansible_distribution_major_version }}-amd64"
+    #         gpgcheck: no
+    #       when: ansible_distribution_major_version <= '8'
 
-    - name: Install MariaDB (RHEL)
-      block:
-        - name: Add MariaDB Repo
-          ansible.builtin.yum_repository:
-            name: mariadb
-            description: MariaDB 10.8 CentOS repository list
-            file: mariadb
-            baseurl: "https://mirror.rackspace.com/mariadb/yum/10.8/centos{{ ansible_distribution_major_version }}-amd64"
-            gpgcheck: no
-          when: ansible_distribution_major_version <= '8'
+    #     - name: Install MariaDB Client
+    #       yum:
+    #         name:
+    #           - "{{ 'mariadb' if ansible_distribution_major_version >= '8' else 'MariaDB-client' }}"
+    #           - "{{ 'python3-PyMySQL' if ansible_distribution_major_version >= '8' else 'MySQL-python' }}"
+    #   when:
+    #     - ansible_os_family == 'RedHat'
+    #     - zabbix_proxy_database == 'mysql'
 
-        - name: Install MariaDB Client
-          yum:
-            name:
-              - "{{ 'mariadb' if ansible_distribution_major_version >= '8' else 'MariaDB-client' }}"
-              - "{{ 'python3-PyMySQL' if ansible_distribution_major_version >= '8' else 'MySQL-python' }}"
-      when:
-        - ansible_os_family == 'RedHat'
-        - zabbix_proxy_database == 'mysql'
+    # - name: Install MariaDB (Debian)
+    #   block:
+    #     - name: Add an Apt signing key, uses whichever key is at the URL
+    #       ansible.builtin.apt_key:
+    #         url: https://mariadb.org/mariadb_release_signing_key.asc
+    #         state: present
 
-    - name: Install MariaDB (Debian)
-      block:
-        - name: Add an Apt signing key, uses whichever key is at the URL
-          ansible.builtin.apt_key:
-            url: https://mariadb.org/mariadb_release_signing_key.asc
-            state: present
+    #     - name: Add specified repository into sources list
+    #       ansible.builtin.apt_repository:
+    #         repo: "deb https://mirror.rackspace.com/mariadb/repo/10.8/{{ ansible_distribution | lower }} {{ ansible_distribution_release }} main"
+    #         state: present
+    #         validate_certs: false
 
-        - name: Add specified repository into sources list
-          ansible.builtin.apt_repository:
-            repo: "deb https://mirror.rackspace.com/mariadb/repo/10.8/{{ ansible_distribution | lower }} {{ ansible_distribution_release }} main"
-            state: present
-            validate_certs: false
-
-        - name: Install MariaDB Client
-          ansible.builtin.apt:
-            name:
-              - mariadb-client
-              - "{{ zabbix_python_prefix }}-mysqldb"
-            state: present
-            update_cache: true
-            allow_unauthenticated: true
-      when:
-        - ansible_os_family == 'Debian'
-        - zabbix_proxy_database == 'mysql'
+    #     - name: Install MariaDB Client
+    #       ansible.builtin.apt:
+    #         name:
+    #           - mariadb-client
+    #           - "{{ zabbix_python_prefix }}-mysqldb"
+    #         state: present
+    #         update_cache: true
+    #         allow_unauthenticated: true
+    #   when:
+    #     - ansible_os_family == 'Debian'
+    #     - zabbix_proxy_database == 'mysql'

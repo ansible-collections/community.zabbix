@@ -26,21 +26,24 @@ zabbix_valid_proxy_versions:
 
 mysql_client_pkgs:
   # Debian
+  "12":
+    - default-mysql-client
+    - "{{ zabbix_python_prefix }}-mysqldb"
   "11":
-    - mycli
+    - default-mysql-client
     - "{{ zabbix_python_prefix }}-mysqldb"
   "10":
     - mariadb-client
     - "{{ zabbix_python_prefix }}-mysqldb"
   # Ubuntu
   "22":
-    - mycli
+    - default-mysql-client
     - "{{ zabbix_python_prefix }}-mysqldb"
   "20":
-    - mycli
+    - default-mysql-client
     - "{{ zabbix_python_prefix }}-mysqldb"
   "18":
-    - mycli
+    - default-mysql-client
     - "{{ zabbix_python_prefix }}-mysqldb"
 
 mysql_plugin:
