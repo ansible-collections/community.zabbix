@@ -1,0 +1,2 @@
+minor_changes:
+  - zabbix_hostmacro module - Add description property for Host macro creation/update. Allow to set/update description of Zabbix host macros.
