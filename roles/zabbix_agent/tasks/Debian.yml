@@ -1,9 +1,6 @@
 ---
 # Tasks specific for Debian/Ubuntu Systems
 
-- name: "Include Zabbix gpg ids"
-  include_vars: zabbix.yml
-
 - name: "Debian | Set some variables"
   set_fact:
     zabbix_short_version: "{{ zabbix_agent_version | regex_replace('\\.', '') }}"
@@ -46,7 +43,7 @@
   tags:
     - install
 
-# In releases older than Debian 12 and Ubuntu 22.04, /etc/apt/keyrings does not exist by default. 
+# In releases older than Debian 12 and Ubuntu 22.04, /etc/apt/keyrings does not exist by default.
 # It SHOULD be created with permissions 0755 if it is needed and does not already exist.
 # See: https://wiki.debian.org/DebianRepository/UseThirdParty
 - name: "Debian | Create /etc/apt/keyrings/ on older versions"
