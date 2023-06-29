@@ -1,2 +1,5 @@
 minor_changes:
   - all roles - Added support for Debian 12 (Bookworm)
+  - zabbix_proxy - Modified installation of Centos 7 MySQL client
+  - zabbix_proxy - Added installation of PyMySQL pip package
+  - zabbix_proxy - Standardized MySQL client installed on Debian and Ubuntu
