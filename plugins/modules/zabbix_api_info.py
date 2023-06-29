@@ -21,9 +21,9 @@ author:
     - ONODERA Masaru(@masa-orca)
 
 requirements:
-    - "python >= 2.6"
+    - "python >= 3.9"
 
-version_added: 1.8.0
+version_added: 2.1.0
 
 extends_documentation_fragment:
     - community.zabbix.zabbix
@@ -65,7 +65,7 @@ api:
         version:
             description: API version
             type: str
-            sample: 4.0.42
+            sample: 6.0.18
 '''
 
 from ansible.module_utils.basic import AnsibleModule
