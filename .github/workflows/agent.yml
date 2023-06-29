@@ -37,6 +37,9 @@ jobs:
           - autopsk
           - agent2
           - agent2autopsk
+        exclude:
+          - container: debian12
+            version: v62
 
     steps:
       - name: Check out code
