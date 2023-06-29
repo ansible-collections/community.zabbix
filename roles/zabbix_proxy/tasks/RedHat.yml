@@ -93,16 +93,27 @@
     - database
     - dependencies
 
-- name: "RedHat | Install Mysql Client package"
-  yum:
-    name: "{{ mysql_client_pkgs[ansible_distribution_major_version] }}"
-    state: installed
-  environment:
-    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
-    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
-  become: true
-  register: are_zabbix_proxy_mysql_packages_installed
-  until: are_zabbix_proxy_mysql_packages_installed is succeeded
+- name: "RedHat | Install Mysql Client Package"
+  block:
+    - name: "RedHat | Add Mysql Repo (Centos 7 Only)"
+      ansible.builtin.yum_repository:
+        name: mariadb
+        description: MariaDB 10.8 CentOS repository list
+        file: mariadb
+        baseurl: "https://mirror.rackspace.com/mariadb/yum/10.8/centos{{ ansible_distribution_major_version }}-amd64"
+        gpgcheck: no
+      when: ansible_distribution_major_version == '7'
+
+    - name: "RedHat | Install Mysql Client package"
+      yum:
+        name: "{{ mysql_client_pkgs[ansible_distribution_major_version] }}"
+        state: installed
+      environment:
+        http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+        https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
+      become: true
+      register: are_zabbix_proxy_mysql_packages_installed
+      until: are_zabbix_proxy_mysql_packages_installed is succeeded
   when:
     - zabbix_proxy_database_creation or zabbix_proxy_database_sqlload
     - zabbix_proxy_install_database_client
