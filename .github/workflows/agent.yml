@@ -24,7 +24,6 @@ jobs:
           - rockylinux8
           - ubuntu2204
           - ubuntu2004
-          - ubuntu1804
           - debian11
           - debian10
         version:

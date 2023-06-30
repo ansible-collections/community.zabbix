@@ -1,0 +1,2 @@
+minor_changes:
+  - all roles - Exclude ubuntu 18.04 from supported OS list.

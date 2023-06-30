@@ -81,7 +81,6 @@ See the following list of supported Operating systems with the Zabbix releases:
 | Red Hat Fam 8       |  V  |  V  |  V  |
 | Ubuntu 22.04 jammy  |  V  |  V  |  V  |
 | Ubuntu 20.04 focal  |  V  |  V  |  V  |
-| Ubuntu 18.04 bionic |     |     |  V  |
 | Debian 11 bullseye  |  V  |  V  |  V  |
 | Debian 10 buster    |     |     |  V  |
 
@@ -110,8 +109,8 @@ The following is an overview of all available configuration default for this rol
 ### SElinux
 
 * `zabbix_server_selinux`: Default: `False`. Enables an SELinux policy so that the server will run.
-* `selinux_allow_zabbix_can_network`: Default: `False`. 
-* `selinux_allow_zabbix_can_http`: Default: `False`. 
+* `selinux_allow_zabbix_can_network`: Default: `False`.
+* `selinux_allow_zabbix_can_http`: Default: `False`.
 
 ### Zabbix Server
 
@@ -415,7 +414,7 @@ Including an example of how to use your role (for instance, with variables passe
 
 # Molecule
 
-This role is configured to be tested with Molecule. You can find on this page some more information regarding Molecule: 
+This role is configured to be tested with Molecule. You can find on this page some more information regarding Molecule:
 
 * http://werner-dijkerman.nl/2016/07/10/testing-ansible-roles-with-molecule-testinfra-and-docker/
 * http://werner-dijkerman.nl/2016/07/27/extending-ansible-role-testing-with-molecule-by-adding-group_vars-dependencies-and-using-travis-ci/
