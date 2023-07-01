@@ -1,9 +1,4 @@
 ---
-- name: "Debian | Include Zabbix gpg ids"
-  include_vars: zabbix.yml
-  tags:
-    - always
-
 - name: "Debian | Set some variables"
   set_fact:
     zabbix_short_version: "{{ zabbix_server_version | regex_replace('\\.', '') }}"
