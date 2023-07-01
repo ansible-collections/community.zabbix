@@ -44,7 +44,6 @@ provisioner:
         zabbix_proxy_mysql_login_user: root
         zabbix_proxy_mysql_login_password: changeme
         zabbix_proxy_mysql_login_port: 3306
-        zabbix_proxy_install_database_client: false
       pgsql:
         zabbix_proxy_database: pgsql
         zabbix_proxy_dbport: 5432

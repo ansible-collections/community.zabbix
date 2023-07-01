@@ -23,6 +23,14 @@
   tags:
     - database
 
+- name: PyMySQL
+  pip:
+    name: PyMySQL
+  register: installation_dependencies
+  until: installation_dependencies is succeeded
+  when:
+    - inventory_hostname in groups['mysql']
+
 - name: "MySQL | Create database"
   community.mysql.mysql_db:
     name: "{{ zabbix_proxy_dbname }}"
@@ -52,6 +60,7 @@
     password: "{{ zabbix_proxy_dbpassword }}"
     priv: "{{ zabbix_proxy_dbname }}.*:ALL"
     host: "{{ zabbix_proxy_privileged_host }}"
+    plugin: "{{ 'mysql_native_password' if (ansible_os_family == 'RedHat' and ansible_distribution_major_version == '7') else omit }}"
     state: present
   when: zabbix_proxy_database_creation
   delegate_to: "{{ delegated_dbhost }}"

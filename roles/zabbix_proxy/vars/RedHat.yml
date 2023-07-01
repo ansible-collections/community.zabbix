@@ -31,7 +31,7 @@ mysql_client_pkgs:
     - mysql
     - python3-PyMySQL
   "7":
-    - mariadb
+    - MariaDB-client
     - MySQL-python
 
 selinux_pkgs:
