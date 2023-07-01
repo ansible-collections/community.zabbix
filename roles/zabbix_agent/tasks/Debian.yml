@@ -50,7 +50,8 @@
   ansible.builtin.file:
     path: /etc/apt/keyrings/
     state: directory
-    mode: '0755'
+    mode: "0755"
+  become: true
   when:
     - (ansible_distribution == "Ubuntu" and ansible_distribution_major_version < "22") or
       (ansible_distribution == "Debian" and ansible_distribution_major_version < "12")
@@ -59,7 +60,7 @@
   ansible.builtin.get_url:
     url: http://repo.zabbix.com/zabbix-official-repo.key
     dest: "{{ zabbix_gpg_key }}"
-    mode: '0644'
+    mode: "0644"
     force: true
   environment:
     http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"

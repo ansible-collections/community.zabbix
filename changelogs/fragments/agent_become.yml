@@ -1,0 +1,2 @@
+bugfixes:
+  - agent role - Added missing become statement to allow run to role as nonroot
