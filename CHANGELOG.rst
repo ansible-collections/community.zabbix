@@ -5,6 +5,42 @@ community.zabbix Release Notes
 .. contents:: Topics
 
 
+v2.1.0
+======
+
+Minor Changes
+-------------
+
+- Multiple Roles - Replaced depricated 'include' statements with 'include_tasks'
+- Update action_groups variable in runtime.yml
+- all roles - Added support for Debian 12 (Bookworm)
+- all roles - Delete gpg ids variable.
+- all roles - Modified to allow a non-root user to run the role.
+- all roles - Updated testing to account for the correct version of Zabbix
+- zabbix_hostmacro module - Add description property for Host macro creation/update. Allow to set/update description of Zabbix host macros.
+- zabbix_proxy - Added installation of PyMySQL pip package
+- zabbix_proxy - Modified installation of Centos 7 MySQL client
+- zabbix_proxy - Standardized MySQL client installed on Debian and Ubuntu
+- zabbix_regexp module added
+- zabbix_settings module added
+- zabbix_token module added
+
+Bugfixes
+--------
+
+- agent role - Added missing become statement to allow run to role as nonroot
+- zabbix_host module - fix updating hosts that were discovered via LLD
+- zabbix_proxy role - failed at version validation. Fix adds cast of zabbix_proxy_version to float, similarly to the other roles.
+- zabbix_proxy role - undefined vars at updating proxy definition. Fix adds null defaults for zabbix_proxy_tlsaccept and zabbix_proxy_tlsconnect.
+- zabbix_web role - removed 'ssl on;' nginx configuration, which is no longer supported since nginx version 1.25.1.
+
+New Modules
+-----------
+
+- community.zabbix.zabbix_regexp - Create/update/delete Zabbix regular expression
+- community.zabbix.zabbix_settings - Update Zabbix global settings.
+- community.zabbix.zabbix_token - Create/Update/Generate/Delete Zabbix token.
+
 v2.0.1
 ======
 
