@@ -1,2 +1,0 @@
-minor_changes:
-  - Multiple Roles - Replaced depricated 'include' statements with 'include_tasks'

@@ -1,5 +1,4 @@
-objects:
-  role: {}
+objects: {}
 plugins:
   become: {}
   cache: {}
@@ -103,6 +102,11 @@ plugins:
       name: zabbix_proxy_info
       namespace: ''
       version_added: 1.5.0
+    zabbix_regexp:
+      description: Create/update/delete Zabbix regular expression
+      name: zabbix_regexp
+      namespace: ''
+      version_added: 2.1.0
     zabbix_script:
       description: Create/update/delete Zabbix scripts
       name: zabbix_script
@@ -113,6 +117,11 @@ plugins:
       name: zabbix_service
       namespace: ''
       version_added: null
+    zabbix_settings:
+      description: Update Zabbix global settings.
+      name: zabbix_settings
+      namespace: ''
+      version_added: 2.1.0
     zabbix_template:
       description: Create/update/delete Zabbix template
       name: zabbix_template
@@ -123,6 +132,11 @@ plugins:
       name: zabbix_template_info
       namespace: ''
       version_added: null
+    zabbix_token:
+      description: Create/Update/Generate/Delete Zabbix token.
+      name: zabbix_token
+      namespace: ''
+      version_added: 2.1.0
     zabbix_user:
       description: Create/update/delete Zabbix users
       name: zabbix_user
@@ -157,4 +171,4 @@ plugins:
   shell: {}
   strategy: {}
   vars: {}
-version: 2.0.1
+version: 2.1.0

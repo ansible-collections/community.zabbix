@@ -956,3 +956,55 @@ releases:
     - api_ssl.yml
     - disable_repo.yml
     release_date: '2023-05-26'
+  2.1.0:
+    changes:
+      bugfixes:
+      - agent role - Added missing become statement to allow run to role as nonroot
+      - zabbix_host module - fix updating hosts that were discovered via LLD
+      - zabbix_proxy role - failed at version validation. Fix adds cast of zabbix_proxy_version
+        to float, similarly to the other roles.
+      - zabbix_proxy role - undefined vars at updating proxy definition. Fix adds
+        null defaults for zabbix_proxy_tlsaccept and zabbix_proxy_tlsconnect.
+      - zabbix_web role - removed 'ssl on;' nginx configuration, which is no longer
+        supported since nginx version 1.25.1.
+      minor_changes:
+      - Multiple Roles - Replaced depricated 'include' statements with 'include_tasks'
+      - Update action_groups variable in runtime.yml
+      - all roles - Added support for Debian 12 (Bookworm)
+      - all roles - Delete gpg ids variable.
+      - all roles - Modified to allow a non-root user to run the role.
+      - all roles - Updated testing to account for the correct version of Zabbix
+      - zabbix_hostmacro module - Add description property for Host macro creation/update.
+        Allow to set/update description of Zabbix host macros.
+      - zabbix_proxy - Added installation of PyMySQL pip package
+      - zabbix_proxy - Modified installation of Centos 7 MySQL client
+      - zabbix_proxy - Standardized MySQL client installed on Debian and Ubuntu
+      - zabbix_regexp module added
+      - zabbix_settings module added
+      - zabbix_token module added
+    fragments:
+    - 1025-delete_vars_zabbix.yml
+    - 1029-update_action_groups.yml
+    - 732-zabbix-regexp.yml
+    - 991-zabbix-token.yml
+    - 993-zabbix-settings.yml
+    - agent_become.yml
+    - debian12.yml
+    - discovered_hosts_update.yml
+    - hostmacro_modules.yml
+    - include_tasks.yml
+    - missing.yml
+    - nginx_ssl_fix.yml
+    - non_root.yml
+    - proxy_role_fix.yml
+    modules:
+    - description: Create/update/delete Zabbix regular expression
+      name: zabbix_regexp
+      namespace: ''
+    - description: Update Zabbix global settings.
+      name: zabbix_settings
+      namespace: ''
+    - description: Create/Update/Generate/Delete Zabbix token.
+      name: zabbix_token
+      namespace: ''
+    release_date: '2023-06-01'
