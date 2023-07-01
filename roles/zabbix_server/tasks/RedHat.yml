@@ -127,6 +127,6 @@
     - database
 
 - name: "RedHat | Configure SELinux when enabled"
-  include: selinux.yml
+  include_tasks: selinux.yml
   when:
     - zabbix_server_selinux | bool

@@ -59,7 +59,7 @@
     - database
 
 - name: "Installing the database"
-  include: "{{ zabbix_proxy_db_long }}.yml"
+  include_tasks: "{{ zabbix_proxy_db_long }}.yml"
 
 - name: "Create include dir zabbix-proxy"
   file:
