@@ -7,11 +7,9 @@ action_groups:
     - zabbix_autoregister
     - zabbix_discovery_rule
     - zabbix_globalmacro
-    - zabbix_group_facts
     - zabbix_group_info
     - zabbix_group
     - zabbix_host_events_info
-    - zabbix_host_facts
     - zabbix_host_info
     - zabbix_hostmacro
     - zabbix_host
@@ -21,11 +19,13 @@ action_groups:
     - zabbix_mediatype
     - zabbix_proxy_info
     - zabbix_proxy
-    - zabbix_screen
+    - zabbix_regexp
     - zabbix_script
     - zabbix_service
+    - zabbix_settings
     - zabbix_template_info
     - zabbix_template
+    - zabbix_token
     - zabbix_user_directory
     - zabbix_usergroup
     - zabbix_user_info
