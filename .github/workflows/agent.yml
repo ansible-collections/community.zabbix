@@ -25,6 +25,7 @@ jobs:
           - ubuntu2204
           - ubuntu2004
           - ubuntu1804
+          - debian12
           - debian11
           - debian10
         version:
@@ -36,6 +37,9 @@ jobs:
           - autopsk
           - agent2
           - agent2autopsk
+        exclude:
+          - container: debian12
+            version: v62
 
     steps:
       - name: Check out code
