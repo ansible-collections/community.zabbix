@@ -1,0 +1,2 @@
+minor_changes:
+  - all roles - Updated testing to account for the correct version of Zabbix
