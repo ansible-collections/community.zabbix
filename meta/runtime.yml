@@ -3,6 +3,7 @@ requires_ansible: '>=2.12'
 action_groups:
   zabbix:
     - zabbix_action
+    - zabbix_api_info
     - zabbix_authentication
     - zabbix_autoregister
     - zabbix_discovery_rule
