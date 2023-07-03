@@ -255,7 +255,6 @@ Host encryption configuration will be set to match agent configuration.
 * `zabbix_api_timeout`: How many seconds to wait for API response (default 30s).
 * `zabbix_api_create_hosts`: Default: `False`. When you want to enable the Zabbix API to create/delete the host. This has to be set to `True` if you want to make use of `zabbix_agent_host_state`.
 * `zabbix_api_create_hostgroup`: When you want to enable the Zabbix API to create/delete the hostgroups. This has to be set to `True` if you want to make use of `zabbix_agent_hostgroups_state`.Default: `False`
-* `zabbix_api_use_ssl`: yes (Default) if we need to connect to Zabbix server over HTTPS
 * `ansible_zabbix_url_path`: URL path if Zabbix WebUI running on non-default (zabbix) path, e.g. if http://<FQDN>/zabbixeu then set to `zabbixeu`
 * `zabbix_agent_hostgroups_state`: present (Default) if the hostgroup needs to be created or absent if you want to delete it. This only works when `zabbix_api_create_hostgroup` is set to `True`.
 * `zabbix_host_status`: enabled (Default) when host in monitored, disabled when host is disabled for monitoring.
