@@ -31,7 +31,7 @@ jobs:
           - stable-2.15
           - devel
         python:
-          - 3.9
+          - '3.10'
 
     steps:
       - name: Check out code
