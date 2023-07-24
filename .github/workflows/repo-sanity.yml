@@ -10,7 +10,7 @@ jobs:
     strategy:
       matrix:
         python:
-          - 3.10
+          - 3.9
     runs-on: ubuntu-latest
     steps:
       - name: Check out code
