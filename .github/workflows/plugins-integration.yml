@@ -50,6 +50,9 @@ jobs:
       - name: Download Docker-Compose
         run: curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
 
+      - name: Set Docker Compose Execution
+        run: chmod +x /usr/local/bin/docker-compose
+
       - name: Install ansible.netcommon collection
         run: ansible-galaxy collection install ansible.netcommon -p $GITHUB_WORKSPACE
         working-directory: ./ansible_collections/community/zabbix
@@ -57,11 +60,11 @@ jobs:
       # For Zabbix integration tests we need to test against different versions of
       # the Zabbix server. To do this we spin up a Docker container using the `matrix`
       # of version and ports specified earlier.
-      # - name: Zabbix container server provisioning
-      #   run: docker-compose up -d
-      #   working-directory: ./ansible_collections/community/zabbix
-      #   env:
-      #     zabbix_version: ${{ matrix.zabbix_container.version }}
+      - name: Zabbix container server provisioning
+        run: docker-compose up -d
+        working-directory: ./ansible_collections/community/zabbix
+        env:
+          zabbix_version: ${{ matrix.zabbix_container.version }}
 
       # Run the integration tests
       # As we need to connect to an existing docker container we can't use `--docker` here as the VMs would be on different
