@@ -63,7 +63,7 @@ jobs:
       - name: Zabbix container server provisioning
         uses: isbang/compose-action@v1.5.0
         with:
-          compose-file: "./docker-compose.yml"
+          compose-file: "./ansible_collections/community/zabbix/docker-compose.yml"
         env:
           zabbix_version: ${{ matrix.zabbix_container.version }}
 
