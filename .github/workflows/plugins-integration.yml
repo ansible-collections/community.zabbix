@@ -47,15 +47,9 @@ jobs:
       - name: Install ansible-base (${{ matrix.ansible }})
         run: pip install https://github.com/ansible/ansible/archive/${{ matrix.ansible }}.tar.gz --disable-pip-version-check
 
-      # - name: Download Docker-Compose
-      #   run: sudo curl -L "https://github.com/docker/compose/releases/download/2.20.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-
-      # - name: Set Docker Compose Execution
-      #   run: sudo chmod +x /usr/local/bin/docker-compose
-
-      # - name: Install ansible.netcommon collection
-      #   run: ansible-galaxy collection install ansible.netcommon -p $GITHUB_WORKSPACE
-      #   working-directory: ./ansible_collections/community/zabbix
+      - name: Install ansible.netcommon collection
+        run: ansible-galaxy collection install ansible.netcommon -p $GITHUB_WORKSPACE
+        working-directory: ./ansible_collections/community/zabbix
 
       # For Zabbix integration tests we need to test against different versions of
       # the Zabbix server. To do this we spin up a Docker container using the `matrix`
