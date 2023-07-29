@@ -75,7 +75,7 @@ zabbix_api_login_pass: !unsafe zabbix
 zabbix_api_validate_certs: false
 ansible_httpapi_pass: "{{ zabbix_api_login_pass }}"
 ansible_httpapi_port: "{{ zabbix_api_server_port }}"
-ensible_httpapi_validate_certs: "{{ zabbix_api_validate_certs }}"
+ansible_httpapi_validate_certs: "{{ zabbix_api_validate_certs }}"
 zabbix_api_timeout: 30
 zabbix_api_create_hostgroup: false
 zabbix_api_create_hosts: false
