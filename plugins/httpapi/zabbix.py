@@ -165,11 +165,15 @@ class HttpApi(HttpApiBase):
 
             try:
                 json_data = json.loads(value) if value else {}
-                if "result" in json_data:
-                    json_data = json_data["result"]
             # JSONDecodeError only available on Python 3.5+
             except ValueError:
                 raise ConnectionError("Invalid JSON response: %s" % value)
+
+            if "error" in json_data:
+                raise ConnectionError("REST API returned %s when sending %s" % (json_data["error"], data))
+
+            if "result" in json_data:
+                json_data = json_data["result"]
 
             try:
                 # Some methods return bool not a dict in "result"
@@ -177,9 +181,6 @@ class HttpApi(HttpApiBase):
             except TypeError:
                 # Do not try to find "error" if it is not a dict
                 return response.getcode(), json_data
-
-            if "error" in json_data:
-                raise ConnectionError("REST API returned %s when sending %s" % (json_data["error"], data))
 
             return response.getcode(), json_data
         except AnsibleConnectionFailure as e:
