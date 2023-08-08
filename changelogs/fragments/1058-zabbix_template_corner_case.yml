@@ -1,0 +1,3 @@
+---
+bugfixes:
+  - zabbix_template - fix template export when template's content has "error" word
