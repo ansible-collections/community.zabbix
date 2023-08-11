@@ -90,6 +90,11 @@ Include={{ zabbix_agent_win_include }}
 {% else %}
 Include={{ zabbix_agent_include }}/{{ zabbix_agent_include_pattern }}
 {% endif %}
+{% if zabbix_agent_additional_include is defined and zabbix_agent_additional_include is iterable and zabbix_agent_additional_include is not string %}
+{% for include in zabbix_agent_additional_include %}
+Include={{ include }}
+{% endfor %}
+{% endif %}
 UnsafeUserParameters={{ zabbix_agent_unsafeuserparameters }}
 {% if zabbix_agent_version is version_compare('2.2', '>=') %}
 {% if ansible_os_family != "Windows" %}
