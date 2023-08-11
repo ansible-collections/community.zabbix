@@ -4,7 +4,7 @@ driver:
 
 platforms:
   - name: zabbix-agent-${MY_MOLECULE_CONTAINER:-centos}
-    image: geerlingguy/docker-${MY_MOLECULE_IMAGE:-"centos8"}-ansible:latest
+    image: geerlingguy/docker-${MY_MOLECULE_IMAGE:-rockylinux8}-ansible:latest
     command: ${MOLECULE_DOCKER_COMMAND:-""}
     privileged: true
     pre_build_image: true
@@ -14,7 +14,7 @@ platforms:
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
     groups:
       - agent
-      - ${MY_MOLECULE_VERSION:-6.2}
+      - ${MY_MOLECULE_VERSION:-v64}
 
 provisioner:
   name: ansible
