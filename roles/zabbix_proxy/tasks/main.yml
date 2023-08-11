@@ -27,6 +27,11 @@
   tags:
     - always
 
+- name: Setting Zabbix API Server Port
+  ansible.builtin.set_fact:
+    zabbix_api_server_port: "{{ '443' if zabbix_api_use_ssl|bool else '80' }}"
+  when: zabbix_api_server_port is undefined
+
 - name: Set Path to SQL File
   set_fact:
     datafile_path: "{{ db_file_path[zabbix_short_version] }}"

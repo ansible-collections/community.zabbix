@@ -25,6 +25,11 @@
   tags:
     - always
 
+- name: Setting Zabbix API Server Port
+  ansible.builtin.set_fact:
+    zabbix_api_server_port: "{{ '443' if zabbix_api_use_ssl|bool else '80' }}"
+  when: zabbix_api_server_port is undefined
+
 - name: "Set variables specific for Zabbix Agent 2"
   set_fact:
     zabbix_agent_service: zabbix-agent2
