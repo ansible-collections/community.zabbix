@@ -2,7 +2,7 @@
 # task file for postgresql
 
 - name: "PostgreSQL | Set the correct delegated_dbhost (to support postgres db deployment on a remote dbhost)"
-  set_fact:
+  ansible.builtin.set_fact:
     delegated_dbhost: "{{ zabbix_server_dbhost if (zabbix_server_dbhost != 'localhost') else inventory_hostname }}"
   when:
     - zabbix_server_dbhost_run_install
@@ -10,7 +10,7 @@
     - database
 
 - name: "PostgreSQL | Set the correct delegated_dbhost (to support postgres db deployment on a remote dbhost)"
-  set_fact:
+  ansible.builtin.set_fact:
     delegated_dbhost: "{{ inventory_hostname }}"
   when:
     - not zabbix_server_dbhost_run_install
@@ -86,7 +86,7 @@
     - database
 
 - name: "PostgreSQL | Create schema"
-  shell: |
+  ansible.builtin.shell: |
     set -euxo pipefail
     FILE={{ 'create.sql' if zabbix_server_version is version('6.0', '<') else 'server.sql' }}
     cd {{ datafiles_path }}
@@ -114,7 +114,7 @@
     - database
 
 - name: "PostgreSQL | Create TimescaleDB hypertables"
-  shell: |
+  ansible.builtin.shell: |
     set -euxo pipefail
     cd {{ datafiles_path }} &&
     if [ -f timescaledb.sql.gz ]; then zcat timescaledb.sql.gz > /etc/timescaledb.sql ; else cp -p timescaledb.sql /etc/timescaledb.sql ; fi

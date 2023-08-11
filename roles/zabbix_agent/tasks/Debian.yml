@@ -2,7 +2,7 @@
 # Tasks specific for Debian/Ubuntu Systems
 
 - name: "Debian | Set some variables"
-  set_fact:
+  ansible.builtin.set_fact:
     zabbix_short_version: "{{ zabbix_agent_version | regex_replace('\\.', '') }}"
     zabbix_agent_apt_repository:
       - "http://repo.zabbix.com/zabbix/{{ zabbix_agent_version }}/{{ ansible_distribution.lower() }}/"
@@ -15,7 +15,7 @@
     - always
 
 - name: "Debian | Set some variables"
-  set_fact:
+  ansible.builtin.set_fact:
     zabbix_short_version: "{{ zabbix_agent_version | regex_replace('\\.', '') }}"
     zabbix_agent_apt_repository:
       - "http://repo.zabbix.com/zabbix/{{ zabbix_agent_version }}/{{ ansible_distribution.lower() }}-arm64/"
@@ -28,7 +28,7 @@
     - always
 
 - name: "Debian | Installing gnupg"
-  apt:
+  ansible.builtin.apt:
     pkg: gnupg
     update_cache: true
     cache_valid_time: 3600
@@ -70,7 +70,7 @@
     - install
 
 - name: "Debian | Installing repository {{ ansible_distribution }}"
-  apt_repository:
+  ansible.builtin.apt_repository:
     repo: "{{ item }} [signed-by={{ zabbix_gpg_key }}] {{ zabbix_agent_apt_repository | join(' ') }}"
     state: present
   become: true
@@ -81,7 +81,7 @@
     - install
 
 - name: "Debian | Create /etc/apt/preferences.d/"
-  file:
+  ansible.builtin.file:
     path: /etc/apt/preferences.d/
     state: directory
     mode: "0755"
@@ -92,10 +92,10 @@
     - install
 
 - name: "Debian | Configuring the weight for APT"
-  copy:
+  ansible.builtin.copy:
     dest: "/etc/apt/preferences.d/zabbix-agent-{{ zabbix_underscore_version }}"
     content: |
-      Package: {{ zabbix_agent_package }}
+      ansible.builtin.package: {{ zabbix_agent_package }}
       Pin: origin repo.zabbix.com
       Pin-Priority: {{ zabbix_agent_apt_priority | int }}
     owner: root
@@ -107,7 +107,7 @@
     - install
 
 - name: "Debian | apt-get clean"
-  shell: apt-get clean; apt-get update
+  ansible.builtin.shell: apt-get clean; apt-get update
   args:
     warn: "{{ produce_warn | default(omit) }}"
   changed_when: false
@@ -117,7 +117,7 @@
     - install
 
 - name: "Debian | Installing zabbix-agent"
-  apt:
+  ansible.builtin.apt:
     pkg: "{{ zabbix_agent_package }}"
     state: "{{ zabbix_agent_package_state }}"
     update_cache: true
@@ -134,7 +134,7 @@
     - install
 
 - name: "Debian | Installing zabbix-{sender,get}"
-  apt:
+  ansible.builtin.apt:
     pkg:
       - "{{ zabbix_sender_package }}"
       - "{{ zabbix_get_package }}"
@@ -156,7 +156,7 @@
     - install
 
 - name: "Debian | Enable the service"
-  service:
+  ansible.builtin.service:
     name: "{{ zabbix_agent_service }}"
     enabled: true
     use: service
