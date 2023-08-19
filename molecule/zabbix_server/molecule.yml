@@ -3,7 +3,7 @@ driver:
   name: docker
 platforms:
   - name: zabbix-server-${MY_MOLECULE_CONTAINER:-centos}
-    image: geerlingguy/docker-${MY_MOLECULE_IMAGE:-"centos8"}-ansible:latest
+    image: geerlingguy/docker-${MY_MOLECULE_IMAGE:-rockylinux8}-ansible:latest
     privileged: true
     pre_build_image: true
     command: ${MOLECULE_DOCKER_COMMAND:-""}
@@ -13,7 +13,7 @@ platforms:
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
     groups:
       - ${MY_MOLECULE_DATABASE:-mysql}
-      - ${MY_MOLECULE_VERSION:-6.2}
+      - ${MY_MOLECULE_VERSION:-v64}
       - ${MY_MOLECULE_INTERPRETER:-python3}
 
 provisioner:
