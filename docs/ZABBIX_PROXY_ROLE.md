@@ -269,7 +269,7 @@ These variables need to be overridden when you want to make use of the Zabbix AP
 
 * `zabbix_api_server_host`: The IP or hostname/FQDN of Zabbix server. Example: zabbix.example.com
 * `zabbix_api_use_ssl`: Is SSL required to connect to the Zabbix API server?  Default: `false`
-* `zabbix_api_server_port`: TCP port to use to connect to Zabbix server. Example: 8080
+* `zabbix_api_server_port`: 80 if `zabbix_api_use_ssl` is `false` and 443 if `true` (Default) TCP port to use to connect to Zabbix server. Example: 8080
 * `zabbix_api_login_user`: Username of user which has API access.
 * `zabbix_api_login_pass`: Password for the user which has API access.
 * `zabbix_api_http_user`: The http user to access zabbix url with Basic Auth (if your Zabbix is behind a proxy with HTTP Basic Auth).
