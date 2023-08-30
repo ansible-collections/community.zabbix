@@ -1,7 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# built by Martin Eiswirth (@meis4h) on top of the work by Stéphane Travassac (@stravassac) on zabbix_host_events_info.py and Michael Miko (@RedWhiteMiko) on zabbix_group_info.py
+# built by Martin Eiswirth (@meis4h) on top of the work by Stéphane Travassac (@stravassac) on zabbix_host_events_info.py
+# and Michael Miko (@RedWhiteMiko) on zabbix_group_info.py
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 
