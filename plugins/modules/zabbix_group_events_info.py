@@ -257,10 +257,12 @@ def main():
 
     host = Host(module)
     host_groups = host.get_group_ids_by_group_names(hostgroup_name)
-    host_group_ids = host_groups[0]["groupid"]
+    triggers = []
 
-    for host_group_id in host_group_ids:
-        triggers = host.get_triggers_by_group_id_in_problem_state(host_group_id, trigger_severity)
+    for host_group in host_groups:
+        host_group_id = host_group["groupid"]
+        host_group_triggers = host.get_triggers_by_group_id_in_problem_state(host_group_id, trigger_severity)
+        triggers = triggers + host_group_triggers
 
     triggers_ok = []
     triggers_problem = []
@@ -274,7 +276,7 @@ def main():
         else:
             triggers_ok.append(trigger)
 
-    module.exit_json(ok=True, triggers_ok=triggers_ok, triggers_problem=triggers_problem)
+    module.exit_json(ok=True, host_groups=host_groups, triggers_ok=triggers_ok, triggers_problem=triggers_problem)
 
 
 if __name__ == "__main__":
