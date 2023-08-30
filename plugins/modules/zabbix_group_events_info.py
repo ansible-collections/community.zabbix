@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# (c) stephane.travassac@fr.clara.net
+# built by Martin Eiswirth (@meis4h) on top of the work by Stéphane Travassac (@stravassac) on zabbix_host_events_info.py and Michael Miko (@RedWhiteMiko) on zabbix_group_info.py
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 
@@ -12,7 +12,7 @@ __metaclass__ = type
 RETURN = """
 ---
 triggers_ok:
-    description: Host Zabbix Triggers in OK state
+    description: Zabbix Triggers in OK state
     returned: On success
     type: complex
     contains:
@@ -59,7 +59,7 @@ triggers_ok:
             description: Whether the trigger is in OK or problem state
             type: int
 triggers_problem:
-    description: Host Zabbix Triggers in problem state. See trigger and event objects in API documentation of your zabbix version for more
+    description: Zabbix Triggers in problem state. See trigger and event objects in API documentation of your zabbix version for more
     returned: On success
     type: complex
     contains:
@@ -138,32 +138,21 @@ triggers_problem:
 
 DOCUMENTATION = """
 ---
-module: zabbix_host_events_info
-short_description: Get all triggers about a Zabbix host
+module: zabbix_group_events_info
+short_description: Get all triggers about a Zabbix group
 description:
-   - This module allows you to see if a Zabbix host have no active alert to make actions on it.
-     For this case use module Ansible "fail" to exclude host in trouble.
-   - Length of "triggers_ok" allow if template's triggers exist for Zabbix Host
+   - This module allows you to check the state of triggers of all hosts in a Zabbix hostgroup.
 author:
-    - "Stéphane Travassac (@stravassac)"
+    - "Martin Eiswirth (@meis4h)"
 requirements:
     - "python >= 3.9"
 options:
-    host_identifier:
+    hostgroup_name:
         description:
-            - Identifier of Zabbix Host
+            - Name of the hostgroup in Zabbix.
         required: true
-        type: str
-    host_id_type:
-        description:
-            - Type of host_identifier
-        choices:
-            - hostname
-            - visible_name
-            - hostid
-        required: false
-        default: hostname
-        type: str
+        type: list
+        elements: str
     trigger_severity:
         description:
             - Zabbix severity for search filter
@@ -195,7 +184,7 @@ EXAMPLES = """
   set_fact:
     ansible_zabbix_auth_key: 8ec0d52432c15c91fcafe9888500cf9a607f44091ab554dbee860f6b44fac895
 
-- name: exclude machine if alert active on it
+- name: Fail if alert active in hostgroup
   # set task level variables as we change ansible_connection plugin here
   vars:
       ansible_network_os: community.zabbix.zabbix
@@ -206,14 +195,12 @@ EXAMPLES = """
       ansible_zabbix_url_path: "zabbixeu"  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
       ansible_host: zabbix-example-fqdn.org
   community.zabbix.zabbix_host_events_info:
-      host_identifier: "{{inventory_hostname}}"
-      host_id_type: "hostname"
-      timeout: 120
-  register: zbx_host
+      hostgroup_name: "{{ inventory_hostname }}"
+  register: zbx_hostgroup
   delegate_to: localhost
 - fail:
-    msg: "machine alert in zabbix"
-  when: zbx_host["triggers_problem"]|length > 0
+    msg: "Active alert in zabbix"
+  when: zbx_hostgroup["triggers_problem"] | length > 0
 """
 
 
@@ -224,20 +211,16 @@ import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabb
 
 
 class Host(ZabbixBase):
-    def get_host(self, host_identifier, host_inventory, search_key):
-        """ Get host by hostname|visible_name|hostid """
-        host = self._zapi.host.get(
-            {"output": "extend", "selectParentTemplates": ["name"], "filter": {search_key: host_identifier},
-             "selectInventory": host_inventory})
-        if len(host) < 1:
-            self._module.fail_json(msg="Host not found: %s" % host_identifier)
-        else:
-            return host[0]
+    def get_group_ids_by_group_names(self, group_names):
+        group_list = self._zapi.hostgroup.get({"output": "extend", "filter": {"name": group_names}})
+        if len(group_list) < 1:
+            self._module.fail_json(msg="Hostgroup not found: %s" % group_names)
+        return group_list
 
-    def get_triggers_by_host_id_in_problem_state(self, host_id, trigger_severity):
-        """ Get triggers in problem state from a hostid"""
+    def get_triggers_by_group_id_in_problem_state(self, group_id, trigger_severity):
+        """ Get triggers in problem state from a groupid"""
         output = "extend"
-        triggers_list = self._zapi.trigger.get({"output": output, "hostids": host_id,
+        triggers_list = self._zapi.trigger.get({"output": output, "groupids": group_id,
                                                 "min_severity": trigger_severity})
         return triggers_list
 
@@ -254,11 +237,7 @@ class Host(ZabbixBase):
 def main():
     argument_spec = zabbix_utils.zabbix_common_argument_spec()
     argument_spec.update(dict(
-        host_identifier=dict(type="str", required=True),
-        host_id_type=dict(
-            default="hostname",
-            type="str",
-            choices=["hostname", "visible_name", "hostid"]),
+        hostgroup_name=dict(type="list", required=True, elements="str"),
         trigger_severity=dict(
             type="str",
             required=False,
@@ -271,27 +250,16 @@ def main():
     )
 
     trigger_severity_map = {"not_classified": 0, "information": 1, "warning": 2, "average": 3, "high": 4, "disaster": 5}
-    host_id = module.params["host_identifier"]
-    host_id_type = module.params["host_id_type"]
     trigger_severity = trigger_severity_map[module.params["trigger_severity"]]
 
-    host_inventory = "hostid"
+    hostgroup_name = module.params["hostgroup_name"]
 
     host = Host(module)
+    host_groups = host.get_group_ids_by_group_names(hostgroup_name)
+    host_group_ids = host_groups[0]["groupid"]
 
-    if host_id_type == "hostname":
-        zabbix_host = host.get_host(host_id, host_inventory, "host")
-        host_id = zabbix_host["hostid"]
-
-    elif host_id_type == "visible_name":
-        zabbix_host = host.get_host(host_id, host_inventory, "name")
-        host_id = zabbix_host["hostid"]
-
-    elif host_id_type == "hostid":
-        # check hostid exist
-        zabbix_host = host.get_host(host_id, host_inventory, "hostid")
-
-    triggers = host.get_triggers_by_host_id_in_problem_state(host_id, trigger_severity)
+    for host_group_id in host_group_ids:
+        triggers = host.get_triggers_by_group_id_in_problem_state(host_group_id, trigger_severity)
 
     triggers_ok = []
     triggers_problem = []
