@@ -51,7 +51,7 @@
     - api
 
 - name: "Complete OS Specific Tasks"
-  ansible.builtin.include_vars: "{{ ansible_os_family }}.yml"
+  ansible.builtin.include_tasks: "{{ ansible_os_family }}.yml"
 
 - name: "Get the file for database schema"
   ansible.builtin.shell: ls -1 {{ db_file_path[zabbix_short_version] }}
