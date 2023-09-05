@@ -1,6 +1,6 @@
 ---
 - name: test - prepare example template for zabbix_action module
-  zabbix_template:
+  community.zabbix.zabbix_template:
     template_name: ExampleTemplateForActionModule
     template_groups:
       - Templates
@@ -8,7 +8,7 @@
   register: zbxaction_prep_template
 
 - name: test - prepare example mediatype for zabbix_action module
-  zabbix_mediatype:
+  community.zabbix.zabbix_mediatype:
     name: ExampleMediaTypeForActionModule
     smtp_email: zabbix@example.com
     type: email
@@ -38,122 +38,122 @@
 
   block:
     - name: test - create new action
-      zabbix_action:
+      community.zabbix.zabbix_action:
       register: zbxaction_new
 
-    - assert:
+    - ansible.builtin.assert:
         that: zbxaction_new.changed is sameas True
 
     - name: test - create new action (again)
-      zabbix_action:
+      community.zabbix.zabbix_action:
       register: zbxaction_new
 
-    - assert:
+    - ansible.builtin.assert:
         that: zbxaction_new.changed is sameas False
 
     - name: test - update action with esc_period as string
-      zabbix_action:
+      community.zabbix.zabbix_action:
         esc_period: 2m
       register: zbxaction_escperiod_str
 
-    - assert:
+    - ansible.builtin.assert:
         that: zbxaction_escperiod_str.changed is sameas True
 
     - name: test - update action with esc_period as string (again)
-      zabbix_action:
+      community.zabbix.zabbix_action:
         esc_period: 2m
       register: zbxaction_escperiod_str
 
-    - assert:
+    - ansible.builtin.assert:
         that: zbxaction_escperiod_str.changed is sameas False
 
     - name: test - update action with esc_period as macro
-      zabbix_action:
+      community.zabbix.zabbix_action:
         esc_period: "{$MYMACRO}"
       register: zbxaction_escperiod_macro
 
-    - assert:
+    - ansible.builtin.assert:
         that: zbxaction_escperiod_macro.changed is sameas True
 
     - name: test - update action with esc_period as macro (again)
-      zabbix_action:
+      community.zabbix.zabbix_action:
         esc_period: "{$MYMACRO}"
       register: zbxaction_escperiod_macro
 
-    - assert:
+    - ansible.builtin.assert:
         that: zbxaction_escperiod_macro.changed is sameas False
 
     - name: test - update action with esc_period
-      zabbix_action:
+      community.zabbix.zabbix_action:
         esc_period: 120
       register: zbxaction_escperiod
 
-    - assert:
+    - ansible.builtin.assert:
         that: zbxaction_escperiod.changed is sameas True
 
     - name: test - update action with esc_period (again)
-      zabbix_action:
+      community.zabbix.zabbix_action:
         esc_period: 120
       register: zbxaction_escperiod
 
-    - assert:
+    - ansible.builtin.assert:
         that: zbxaction_escperiod.changed is sameas False
 
     - name: test - update action with pause_in_maintenance
-      zabbix_action:
+      community.zabbix.zabbix_action:
         esc_period: 120
         pause_in_maintenance: false
       register: zbxaction_maintpause
 
-    - assert:
+    - ansible.builtin.assert:
         that: zbxaction_maintpause.changed is sameas True
 
     - name: test - update action with pause_in_maintenance (again)
-      zabbix_action:
+      community.zabbix.zabbix_action:
         esc_period: 120
         pause_in_maintenance: false
       register: zbxaction_maintpause
 
-    - assert:
+    - ansible.builtin.assert:
         that: zbxaction_maintpause.changed is sameas False
 
     - name: test - reset action to default
-      zabbix_action:
+      community.zabbix.zabbix_action:
       register: zbxaction_reset
 
-    - assert:
+    - ansible.builtin.assert:
         that: zbxaction_reset.changed is sameas True
 
     - name: test - disable action
-      zabbix_action:
+      community.zabbix.zabbix_action:
         status: disabled
       register: zbxaction_disable
 
-    - assert:
+    - ansible.builtin.assert:
         that: zbxaction_disable.changed is sameas True
 
     - name: test - disable action (again)
-      zabbix_action:
+      community.zabbix.zabbix_action:
         status: disabled
       register: zbxaction_disable
 
-    - assert:
+    - ansible.builtin.assert:
         that: zbxaction_disable.changed is sameas False
 
     - name: test - delete action
-      zabbix_action:
+      community.zabbix.zabbix_action:
         state: absent
       register: zbxaction_delete
 
-    - assert:
+    - ansible.builtin.assert:
         that: zbxaction_delete.changed is sameas True
 
     - name: test - delete action (again)
-      zabbix_action:
+      community.zabbix.zabbix_action:
         state: absent
       register: zbxaction_delete
 
-    - assert:
+    - ansible.builtin.assert:
         that: zbxaction_delete.changed is sameas False
 
 - name: test - trigger actions with conditions
@@ -175,7 +175,7 @@
 
   block:
     - name: test - create new action with multiple conditions
-      zabbix_action:
+      community.zabbix.zabbix_action:
         conditions:
           - type: host_group
             operator: "="
@@ -192,11 +192,11 @@
             value: 6-7,00:00-24:00
       register: zbxaction_conditions
 
-    - assert:
+    - ansible.builtin.assert:
         that: zbxaction_conditions.changed is sameas True
 
     - name: test - create new action with multiple conditions (again)
-      zabbix_action:
+      community.zabbix.zabbix_action:
         conditions:
           - type: host_group
             operator: "="
@@ -213,11 +213,11 @@
             value: 6-7,00:00-24:00
       register: zbxaction_conditions
 
-    - assert:
+    - ansible.builtin.assert:
         that: zbxaction_conditions.changed is sameas False
 
     - name: test - create new action with multiple conditions (reorder)
-      zabbix_action:
+      community.zabbix.zabbix_action:
         conditions:
           - type: host_group
             operator: "="
@@ -234,11 +234,11 @@
             value: 6-7,00:00-24:00
       register: zbxaction_conditions_reorder
 
-    - assert:
+    - ansible.builtin.assert:
         that: zbxaction_conditions_reorder.changed is sameas False
 
     - name: test - update action with multiple conditions by removing one condition
-      zabbix_action:
+      community.zabbix.zabbix_action:
         conditions:
           - type: host_group
             operator: "="
@@ -252,11 +252,11 @@
             value: Average
       register: zbxaction_conditions_delone
 
-    - assert:
+    - ansible.builtin.assert:
         that: zbxaction_conditions_delone.changed is sameas True
 
     - name: test - update action with multiple conditions by changing operators
-      zabbix_action:
+      community.zabbix.zabbix_action:
         conditions:
           - type: host_group
             operator: "<>"
@@ -270,11 +270,11 @@
             value: Average
       register: zbxaction_conditions_operators
 
-    - assert:
+    - ansible.builtin.assert:
         that: zbxaction_conditions_operators.changed is sameas True
 
     - name: test - update action with multiple conditions with operator aliases
-      zabbix_action:
+      community.zabbix.zabbix_action:
         conditions:
           - type: host_group
             operator: does not equal
@@ -288,11 +288,11 @@
             value: Average
       register: zbxaction_conditions_operator_aliases
 
-    - assert:
+    - ansible.builtin.assert:
         that: zbxaction_conditions_operator_aliases.changed is sameas True
 
     - name: test - update action with multiple conditions and evaltype
-      zabbix_action:
+      community.zabbix.zabbix_action:
         conditions:
           - type: host_group
             operator: "<>"
@@ -307,11 +307,11 @@
         eval_type: and
       register: zbxaction_conditions_eval
 
-    - assert:
+    - ansible.builtin.assert:
         that: zbxaction_conditions_eval.changed is sameas True
 
     - name: test - update action with multiple conditions and evaltype (again)
-      zabbix_action:
+      community.zabbix.zabbix_action:
         conditions:
           - type: host_group
             operator: "<>"
@@ -326,11 +326,11 @@
         eval_type: and
       register: zbxaction_conditions_eval
 
-    - assert:
+    - ansible.builtin.assert:
         that: zbxaction_conditions_eval.changed is sameas False
 
     - name: test - update action with reduced conditions and formula
-      zabbix_action:
+      community.zabbix.zabbix_action:
         conditions:
           - type: host_group
             operator: "="
@@ -348,11 +348,11 @@
         formula: A and (B or C)
       register: zbxaction_conditions_formula
 
-    - assert:
+    - ansible.builtin.assert:
         that: zbxaction_conditions_formula.changed is sameas True
 
     - name: test - update formula used in action with reduced conditions
-      zabbix_action:
+      community.zabbix.zabbix_action:
         conditions:
           - type: host_group
             operator: "="
@@ -370,11 +370,11 @@
         formula: (A or B) or C
       register: zbxaction_conditions_formula
 
-    - assert:
+    - ansible.builtin.assert:
         that: zbxaction_conditions_formula.changed is sameas True
 
     - name: test - update formula used in action with reduced conditions (again)
-      zabbix_action:
+      community.zabbix.zabbix_action:
         conditions:
           - type: host_group
             operator: "="
@@ -392,15 +392,15 @@
         formula: (A or B) or C
       register: zbxaction_conditions_formula
 
-    - assert:
+    - ansible.builtin.assert:
         that: zbxaction_conditions_formula.changed is sameas False
 
     - name: test - delete action
-      zabbix_action:
+      community.zabbix.zabbix_action:
         state: absent
       register: zbxaction_delete
 
-    - assert:
+    - ansible.builtin.assert:
         that: zbxaction_delete.changed is sameas True
 
 - name: test - trigger actions with message operations
@@ -419,7 +419,7 @@
 
   block:
     - name: test - create new action with send_message operations
-      zabbix_action:
+      community.zabbix.zabbix_action:
         operations:
           - type: send_message
             send_to_users:
@@ -442,11 +442,11 @@
             esc_period: 300
       register: zbxaction_ops
 
-    - assert:
+    - ansible.builtin.assert:
         that: zbxaction_ops.changed is sameas True
 
     - name: test - create new action with send_message operations (again)
-      zabbix_action:
+      community.zabbix.zabbix_action:
         operations:
           - type: send_message
             send_to_users:
@@ -469,19 +469,19 @@
             esc_period: 300
       register: zbxaction_ops
 
-    - assert:
+    - ansible.builtin.assert:
         that: zbxaction_ops.changed is sameas False
 
     - name: test - delete action
-      zabbix_action:
+      community.zabbix.zabbix_action:
         state: absent
       register: zbxaction_delete
 
-    - assert:
+    - ansible.builtin.assert:
         that: zbxaction_delete.changed is sameas True
 
     - name: test - create new action with escalation steps 1-1
-      zabbix_action:
+      community.zabbix.zabbix_action:
         operations:
           - type: send_message
             send_to_users:
@@ -491,11 +491,11 @@
             esc_step_to: 1
       register: zbxaction_esc11
 
-    - assert:
+    - ansible.builtin.assert:
         that: zbxaction_esc11.changed is sameas True
 
     - name: test - create new action with escalation steps 1-1 (again)
-      zabbix_action:
+      community.zabbix.zabbix_action:
         operations:
           - type: send_message
             send_to_users:
@@ -505,11 +505,11 @@
             esc_step_to: 1
       register: zbxaction_esc11_again
 
-    - assert:
+    - ansible.builtin.assert:
         that: zbxaction_esc11_again.changed is sameas False
 
     - name: test - update action with escalation steps 2-2
-      zabbix_action:
+      community.zabbix.zabbix_action:
         operations:
           - type: send_message
             send_to_users:
@@ -519,11 +519,11 @@
             esc_step_to: 2
       register: zbxaction_esc22
 
-    - assert:
+    - ansible.builtin.assert:
         that: zbxaction_esc22.changed is sameas True
 
     - name: test - create new action with escalation steps 2-2 (again)
-      zabbix_action:
+      community.zabbix.zabbix_action:
         operations:
           - type: send_message
             send_to_users:
@@ -533,15 +533,15 @@
             esc_step_to: 2
       register: zbxaction_esc22_again
 
-    - assert:
+    - ansible.builtin.assert:
         that: zbxaction_esc11_again.changed is sameas False
 
     - name: test - delete action
-      zabbix_action:
+      community.zabbix.zabbix_action:
         state: absent
       register: zbxaction_delete
 
-    - assert:
+    - ansible.builtin.assert:
         that: zbxaction_delete.changed is sameas True
 
 - name: test - discovery actions
@@ -555,7 +555,7 @@
 
   block:
     - name: test - create new discovery action
-      zabbix_action:
+      community.zabbix.zabbix_action:
         conditions:
           - type: host_IP
             operator: "="
@@ -582,11 +582,11 @@
             inventory: automatic
       register: zbxaction_discovery
 
-    - assert:
+    - ansible.builtin.assert:
         that: zbxaction_discovery.changed is sameas True
 
     - name: test - create new discovery action (again)
-      zabbix_action:
+      community.zabbix.zabbix_action:
         conditions:
           - type: host_IP
             operator: "="
@@ -613,11 +613,11 @@
             inventory: automatic
       register: zbxaction_discovery
 
-    - assert:
+    - ansible.builtin.assert:
         that: zbxaction_discovery.changed is sameas False
 
     - name: test - update discovery action conditions and operations
-      zabbix_action:
+      community.zabbix.zabbix_action:
         conditions:
           - type: host_IP
             operator: "="
@@ -652,11 +652,11 @@
             esc_step_to: 2
       register: zbxaction_discovery_update
 
-    - assert:
+    - ansible.builtin.assert:
         that: zbxaction_discovery_update.changed is sameas True
 
     - name: test - update discovery action conditions and operations (again)
-      zabbix_action:
+      community.zabbix.zabbix_action:
         conditions:
           - type: host_IP
             operator: "="
@@ -691,15 +691,15 @@
             esc_step_to: 2
       register: zbxaction_discovery_update
 
-    - assert:
+    - ansible.builtin.assert:
         that: zbxaction_discovery_update.changed is sameas False
 
     - name: test - delete action
-      zabbix_action:
+      community.zabbix.zabbix_action:
         state: absent
       register: zbxaction_delete
 
-    - assert:
+    - ansible.builtin.assert:
         that: zbxaction_delete.changed is sameas True
 
 - name: test - auto registration actions
@@ -713,7 +713,7 @@
 
   block:
     - name: test - create new auto registration action
-      zabbix_action:
+      community.zabbix.zabbix_action:
         conditions:
           - type: host_name
             operator: like
@@ -725,11 +725,11 @@
           - type: add_host
       register: zbxaction_autoreg
 
-    - assert:
+    - ansible.builtin.assert:
         that: zbxaction_autoreg.changed is sameas True
 
     - name: test - create new auto registration action (again)
-      zabbix_action:
+      community.zabbix.zabbix_action:
         conditions:
           - type: host_name
             operator: like
@@ -741,11 +741,11 @@
           - type: add_host
       register: zbxaction_autoreg
 
-    - assert:
+    - ansible.builtin.assert:
         that: zbxaction_autoreg.changed is sameas False
 
     - name: test - update auto registration action
-      zabbix_action:
+      community.zabbix.zabbix_action:
         conditions:
           - type: host_name
             operator: like
@@ -760,11 +760,11 @@
           - type: add_host
       register: zbxaction_autoreg_update
 
-    - assert:
+    - ansible.builtin.assert:
         that: zbxaction_autoreg_update.changed is sameas True
 
     - name: test - update auto registration action (again)
-      zabbix_action:
+      community.zabbix.zabbix_action:
         conditions:
           - type: host_name
             operator: like
@@ -779,15 +779,15 @@
           - type: add_host
       register: zbxaction_autoreg_update
 
-    - assert:
+    - ansible.builtin.assert:
         that: zbxaction_autoreg_update.changed is sameas False
 
     - name: test - delete action
-      zabbix_action:
+      community.zabbix.zabbix_action:
         state: absent
       register: zbxaction_delete
 
-    - assert:
+    - ansible.builtin.assert:
         that: zbxaction_delete.changed is sameas True
 
 - name: test - internal actions
@@ -808,7 +808,7 @@
 
   block:
     - name: test - create new internal action
-      zabbix_action:
+      community.zabbix.zabbix_action:
         conditions:
           - type: host_template
             operator: "="
@@ -818,11 +818,11 @@
             value: item in not supported state
       register: zbxaction_internal
 
-    - assert:
+    - ansible.builtin.assert:
         that: zbxaction_internal.changed is sameas True
 
     - name: test - create new internal action (again)
-      zabbix_action:
+      community.zabbix.zabbix_action:
         conditions:
           - type: host_template
             operator: "="
@@ -832,11 +832,11 @@
             value: item in not supported state
       register: zbxaction_internal
 
-    - assert:
+    - ansible.builtin.assert:
         that: zbxaction_internal.changed is sameas False
 
     - name: test - update internal action conditions
-      zabbix_action:
+      community.zabbix.zabbix_action:
         conditions:
           - type: host_template
             operator: "="
@@ -849,11 +849,11 @@
             value: trigger in unknown state
       register: zbxaction_internal_update
 
-    - assert:
+    - ansible.builtin.assert:
         that: zbxaction_internal_update.changed is sameas True
 
     - name: test - update internal action conditions (again)
-      zabbix_action:
+      community.zabbix.zabbix_action:
         conditions:
           - type: host_template
             operator: "="
@@ -866,15 +866,15 @@
             value: trigger in unknown state
       register: zbxaction_internal_update
 
-    - assert:
+    - ansible.builtin.assert:
         that: zbxaction_internal_update.changed is sameas False
 
     - name: test - delete action
-      zabbix_action:
+      community.zabbix.zabbix_action:
         state: absent
       register: zbxaction_delete
 
-    - assert:
+    - ansible.builtin.assert:
         that: zbxaction_delete.changed is sameas True
 
 - module_defaults:
@@ -899,7 +899,7 @@
 
   block:
     - name: test - create new action with recovery and acknowledge operations
-      zabbix_action:
+      community.zabbix.zabbix_action:
         recovery_operations:
           - type: send_message
             subject: ExampleSubject
@@ -923,11 +923,11 @@
             media_type: ExampleMediaTypeForActionModule
       register: zbxaction_recack_new
 
-    - assert:
+    - ansible.builtin.assert:
         that: zbxaction_recack_new.changed is sameas True
 
     - name: test - create new action with recovery and acknowledge operations (again)
-      zabbix_action:
+      community.zabbix.zabbix_action:
         recovery_operations:
           - type: send_message
             subject: ExampleSubject
@@ -951,13 +951,13 @@
             media_type: ExampleMediaTypeForActionModule
       register: zbxaction_recack_new
 
-    - assert:
+    - ansible.builtin.assert:
         that: zbxaction_recack_new.changed is sameas False
 
     - when: zabbix_version is version('6.4', '>=')
       block:
         - name: test - update action with pause_symptoms off
-          zabbix_action:
+          community.zabbix.zabbix_action:
             recovery_operations:
               - type: send_message
                 subject: ExampleSubject
@@ -982,11 +982,11 @@
             pause_symptoms: False
           register: zbxaction_pause_symptoms
 
-        - assert:
+        - ansible.builtin.assert:
             that: zbxaction_pause_symptoms.changed is sameas True
 
         - name: test - update action with pause_symptoms off (again)
-          zabbix_action:
+          community.zabbix.zabbix_action:
             recovery_operations:
               - type: send_message
                 subject: ExampleSubject
@@ -1011,15 +1011,15 @@
             pause_symptoms: False
           register: zbxaction_pause_symptoms
 
-        - assert:
+        - ansible.builtin.assert:
             that: zbxaction_pause_symptoms.changed is sameas False
 
     - name: test - delete action
-      zabbix_action:
+      community.zabbix.zabbix_action:
         state: absent
       register: zbxaction_delete
 
-    - assert:
+    - ansible.builtin.assert:
         that: zbxaction_delete.changed is sameas True
 
 - name: delete ExampleApplicationAction action
@@ -1028,13 +1028,13 @@
     state: absent
 
 - name: test - cleanup example template for zabbix_action module
-  zabbix_template:
+  community.zabbix.zabbix_template:
     template_name: ExampleTemplateForActionModule
     state: absent
   register: zbxaction_prep_template
 
 - name: test - cleanup example mediatype for zabbix_action module
-  zabbix_mediatype:
+  community.zabbix.zabbix_mediatype:
     name: ExampleMediaTypeForActionModule
     type: email
     state: absent

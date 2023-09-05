@@ -1,6 +1,6 @@
 ---
 - name: get zabbix version
-  uri:
+  ansible.builtin.uri:
     url: "{{ zabbix_api_server_url }}/api_jsonrpc.php"
     method: POST
     body:
@@ -16,7 +16,7 @@
   register: zabbix_version_result
 
 - name: set zabbix_version variable
-  set_fact:
+  ansible.builtin.set_fact:
     zabbix_version: >-
       {{ [0,1]
         | map('extract', zabbix_version_result.json.result.split('.'))
@@ -27,7 +27,7 @@
     ansible_connection: httpapi
     # ansible_zabbix_auth_key: 8ec0d52432c15c91fcafe9888500cf9a607f44091ab554dbee860f6b44fac895
     ansible_host: 127.0.0.1
-    ansible_zabbix_url_path: ''
+    ansible_zabbix_url_path: ""
     ansible_httpapi_port: 8080
     ansible_httpapi_use_ssl: false
     ansible_httpapi_validate_certs: false
@@ -36,14 +36,14 @@
 
 - debug: var=zabbix_version
 - name: check login to zabbix for Zabbix < 6.4
-  uri:
+  ansible.builtin.uri:
     url: "{{ zabbix_api_server_url }}/api_jsonrpc.php"
     method: POST
     body:
       jsonrpc: "2.0"
       method: "user.login"
       params:
-        user: "{{ zabbix_api_login_user }}"
+        ansible.builtin.user: "{{ zabbix_api_login_user }}"
         password: "{{ zabbix_api_login_pass }}"
       id: "1"
     body_format: json
@@ -55,7 +55,7 @@
   when: zabbix_version is version('6.4', '<')
 
 - name: check login to zabbix for Zabbix >= 6.4
-  uri:
+  ansible.builtin.uri:
     url: "{{ zabbix_api_server_url }}/api_jsonrpc.php"
     method: POST
     body:

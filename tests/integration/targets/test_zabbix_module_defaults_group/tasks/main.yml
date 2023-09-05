@@ -7,11 +7,11 @@
       state: present
   block:
     - name: Create host group
-      zabbix_group:
+      community.zabbix.zabbix_group:
       register: _grp
 
     - name: Create host
-      zabbix_host:
+      community.zabbix.zabbix_host:
         host_name: Example Host
         interfaces:
           - type: agent
@@ -20,7 +20,7 @@
       register: _host
 
     - name: Assert that resources were correctly created
-      assert:
+      ansible.builtin.assert:
         that:
           - _grp is changed
           - _host is changed
@@ -33,16 +33,16 @@
       state: absent
   block:
     - name: Delete host
-      zabbix_host:
+      community.zabbix.zabbix_host:
         host_name: Example Host
       register: _host
 
     - name: Delete host group
-      zabbix_group:
+      community.zabbix.zabbix_group:
       register: _grp
 
     - name: Assert that resources were correctly deleted
-      assert:
+      ansible.builtin.assert:
         that:
           - _grp is changed
           - _host is changed
