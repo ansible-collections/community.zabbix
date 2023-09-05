@@ -99,7 +99,7 @@
       ansible.builtin.yum_repository:
         name: mariadb
         description: MariaDB 10.8 CentOS repository list
-        ansible.builtin.file: mariadb
+        file: mariadb
         baseurl: "https://mirror.rackspace.com/mariadb/yum/10.8/centos{{ ansible_distribution_major_version }}-amd64"
         gpgcheck: no
       when: ansible_distribution_major_version == '7'
