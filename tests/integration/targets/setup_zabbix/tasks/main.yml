@@ -43,7 +43,7 @@
       jsonrpc: "2.0"
       method: "user.login"
       params:
-        ansible.builtin.user: "{{ zabbix_api_login_user }}"
+        user: "{{ zabbix_api_login_user }}"
         password: "{{ zabbix_api_login_pass }}"
       id: "1"
     body_format: json
