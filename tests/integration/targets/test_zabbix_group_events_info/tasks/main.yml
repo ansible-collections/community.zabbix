@@ -39,3 +39,19 @@
       - hostgroup_events_results.triggers_problem[0].status == "0"
       - hostgroup_events_results.triggers_problem[0].last_event.acknowledged == "0"
       - hostgroup_events_results.triggers_problem[0].last_event.value == "1"
+
+- name: Clean up host
+  zabbix_host:
+    host_name: Example host
+    state: absent
+
+- name: Clean up host group
+  zabbix_group:
+    host_groups:
+      - Example group
+    state: absent
+
+- name: Clean up template
+  zabbix_template:
+    template_name: "Trigger testing"
+    state: absent
