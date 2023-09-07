@@ -11,72 +11,72 @@
 
   block:
     - name: test - Create new action operation script to execute webhook check mode
-      community.zabbix.zabbix_script:
+      zabbix_script:
       check_mode: true
       register: create_action_check_mode_result
 
-    - ansible.builtin.assert:
+    - assert:
         that:
           - create_action_check_mode_result.changed is sameas true
 
     - name: test - Create new action operation script to execute webhook
-      community.zabbix.zabbix_script:
+      zabbix_script:
       register: create_action_result
 
-    - ansible.builtin.assert:
+    - assert:
         that:
           - create_action_result.changed is sameas true
 
     - name: test - Create new action operation script to execute webhook again
-      community.zabbix.zabbix_script:
+      zabbix_script:
       register: create_action_again_result
 
-    - ansible.builtin.assert:
+    - assert:
         that:
           - create_action_again_result.changed is sameas false
 
     - name: test - Update action operation script to execute webhook with host group
-      community.zabbix.zabbix_script:
+      zabbix_script:
         host_group: "Discovered hosts"
       register: update_action_host_group_result
 
-    - ansible.builtin.assert:
+    - assert:
         that:
           - update_action_host_group_result.changed is sameas true
 
     - name: test - Update action operation script to execute webhook with host group again
-      community.zabbix.zabbix_script:
+      zabbix_script:
         host_group: "Discovered hosts"
       register: update_action_host_group_again_result
 
-    - ansible.builtin.assert:
+    - assert:
         that:
           - update_action_host_group_again_result.changed is sameas false
 
     - name: test - Update action operation script to execute webhook with parameters
-      community.zabbix.zabbix_script:
+      zabbix_script:
         host_group: "Discovered hosts"
         parameters:
           - name: param_name1
       register: update_action_param_result
 
-    - ansible.builtin.assert:
+    - assert:
         that:
           - update_action_param_result.changed is sameas true
 
     - name: test - Update action operation script to execute webhook with parameters again
-      community.zabbix.zabbix_script:
+      zabbix_script:
         host_group: "Discovered hosts"
         parameters:
           - name: param_name1
       register: update_action_param_again_result
 
-    - ansible.builtin.assert:
+    - assert:
         that:
           - update_action_param_again_result.changed is sameas false
 
     - name: test - Update action operation script to execute webhook with parameters and value
-      community.zabbix.zabbix_script:
+      zabbix_script:
         host_group: "Discovered hosts"
         parameters:
           - name: param_name1
@@ -84,12 +84,12 @@
             value: value2
       register: update_action_param_value_result
 
-    - ansible.builtin.assert:
+    - assert:
         that:
           - update_action_param_value_result.changed is sameas true
 
     - name: test - Update action operation script to execute webhook with parameters and value again
-      community.zabbix.zabbix_script:
+      zabbix_script:
         host_group: "Discovered hosts"
         parameters:
           - name: param_name1
@@ -97,102 +97,102 @@
             value: value2
       register: update_action_param_value_again_result
 
-    - ansible.builtin.assert:
+    - assert:
         that:
           - update_action_param_value_again_result.changed is sameas false
 
     - name: test - Update action operation script remove host group
-      community.zabbix.zabbix_script:
+      zabbix_script:
         parameters:
           - name: param_name1
           - name: param_name2
             value: value2
       register: update_action_no_host_group_result
 
-    - ansible.builtin.assert:
+    - assert:
         that:
           - update_action_no_host_group_result.changed is sameas true
 
     - name: test - Update action operation script remove host group again
-      community.zabbix.zabbix_script:
+      zabbix_script:
         parameters:
           - name: param_name1
           - name: param_name2
             value: value2
       register: update_action_no_host_group_again_result
 
-    - ansible.builtin.assert:
+    - assert:
         that:
           - update_action_no_host_group_again_result.changed is sameas false
 
     - name: test - Update action operation script to type Script
-      community.zabbix.zabbix_script:
+      zabbix_script:
         script_type: script
         execute_on: zabbix_agent
         command: echo 1
       register: update_action_script_result
 
-    - ansible.builtin.assert:
+    - assert:
         that:
           - update_action_script_result.changed is sameas true
 
     - name: test - Update action operation script to type Script again
-      community.zabbix.zabbix_script:
+      zabbix_script:
         script_type: script
         execute_on: zabbix_agent
         command: echo 1
       register: update_action_script_again_result
 
-    - ansible.builtin.assert:
+    - assert:
         that:
           - update_action_script_again_result.changed is sameas false
 
     - name: test - Update action operation script to execute on server
-      community.zabbix.zabbix_script:
+      zabbix_script:
         script_type: script
         execute_on: zabbix_server
         command: echo 1
       register: update_action_script_server_result
 
-    - ansible.builtin.assert:
+    - assert:
         that:
           - update_action_script_server_result.changed is sameas true
 
     - name: test - Update action operation script to execute on server again
-      community.zabbix.zabbix_script:
+      zabbix_script:
         script_type: script
         execute_on: zabbix_server
         command: echo 1
       register: update_action_script_server_again_result
 
-    - ansible.builtin.assert:
+    - assert:
         that:
           - update_action_script_server_again_result.changed is sameas false
 
     - name: test - Update action operation script to execute on server or proxy
-      community.zabbix.zabbix_script:
+      zabbix_script:
         script_type: script
         execute_on: zabbix_server_proxy
         command: echo 1
       register: update_action_script_server_proxy_result
 
-    - ansible.builtin.assert:
+    - assert:
         that:
           - update_action_script_server_proxy_result.changed is sameas true
 
     - name: test - Update action operation script to execute on server or proxy again
-      community.zabbix.zabbix_script:
+      zabbix_script:
         script_type: script
         execute_on: zabbix_server_proxy
         command: echo 1
       register: update_action_script_server_proxy_again_result
 
-    - ansible.builtin.assert:
+    - assert:
         that:
           - update_action_script_server_proxy_again_result.changed is sameas false
 
     - name: test - Update action operation script to type SSH
-      community.zabbix.zabbix_script:
+      zabbix_script:
         script_type: ssh
         authtype: password
         username: bla
@@ -200,12 +200,12 @@
         command: echo 2
       register: update_action_script_ssh_result
 
-    - ansible.builtin.assert:
+    - assert:
         that:
           - update_action_script_ssh_result.changed is sameas true
 
     - name: test - Update action operation script to type SSH again
-      community.zabbix.zabbix_script:
+      zabbix_script:
         script_type: ssh
         authtype: password
         username: bla
@@ -213,12 +213,12 @@
         command: echo 2
       register: update_action_script_ssh_again_result
 
-    - ansible.builtin.assert:
+    - assert:
         that:
           - update_action_script_ssh_again_result.changed is sameas false
 
     - name: test - Update action operation script type SSH key auth
-      community.zabbix.zabbix_script:
+      zabbix_script:
         script_type: ssh
         authtype: public_key
         username: bla
@@ -227,12 +227,12 @@
         command: echo 3
       register: update_action_script_ssh_authkey_result
 
-    - ansible.builtin.assert:
+    - assert:
         that:
           - update_action_script_ssh_authkey_result.changed is sameas true
 
     - name: test - Update action operation script type SSH key auth again
-      community.zabbix.zabbix_script:
+      zabbix_script:
         script_type: ssh
         authtype: public_key
         username: bla
@@ -241,12 +241,12 @@
         command: echo 3
       register: update_action_script_ssh_authkey_again_result
 
-    - ansible.builtin.assert:
+    - assert:
         that:
           - update_action_script_ssh_authkey_again_result.changed is sameas false
 
     - name: test - Update action operation script type SSH add port
-      community.zabbix.zabbix_script:
+      zabbix_script:
         script_type: ssh
         authtype: public_key
         username: bla
@@ -256,12 +256,12 @@
         port: 222
       register: update_action_script_ssh_port_result
 
-    - ansible.builtin.assert:
+    - assert:
         that:
           - update_action_script_ssh_port_result.changed is sameas true
 
     - name: test - Update action operation script type SSH add port again
-      community.zabbix.zabbix_script:
+      zabbix_script:
         script_type: ssh
         authtype: public_key
         username: bla
@@ -271,12 +271,12 @@
         port: 222
       register: update_action_script_ssh_port_again_result
 
-    - ansible.builtin.assert:
+    - assert:
         that:
           - update_action_script_ssh_port_again_result.changed is sameas false
 
     - name: test - Update action operation script to type Telnet
-      community.zabbix.zabbix_script:
+      zabbix_script:
         script_type: telnet
         username: bla1
         password: blabla1
@@ -284,12 +284,12 @@
         port: 223
       register: update_action_script_telnet_result
 
-    - ansible.builtin.assert:
+    - assert:
         that:
           - update_action_script_telnet_result.changed is sameas true
 
     - name: test - Update action operation script to type Telnet again
-      community.zabbix.zabbix_script:
+      zabbix_script:
         script_type: telnet
         username: bla1
         password: blabla1
@@ -297,45 +297,45 @@
         port: 223
       register: update_action_script_telnet_again_result
 
-    - ansible.builtin.assert:
+    - assert:
         that:
           - update_action_script_telnet_again_result.changed is sameas false
 
     - name: test - Update action operation script to type IPMI
-      community.zabbix.zabbix_script:
+      zabbix_script:
         script_type: ipmi
         command: echo 5
       register: update_action_script_ipmi_result
 
-    - ansible.builtin.assert:
+    - assert:
         that:
           - update_action_script_ipmi_result.changed is sameas true
 
     - name: test - Update action operation script to type IPMI again
-      community.zabbix.zabbix_script:
+      zabbix_script:
         script_type: ipmi
         command: echo 5
       register: update_action_script_ipmi_again_result
 
-    - ansible.builtin.assert:
+    - assert:
         that:
           - update_action_script_ipmi_again_result.changed is sameas false
 
     - name: test - Delete action operation script
-      community.zabbix.zabbix_script:
+      zabbix_script:
         state: absent
       register: delete_action_result
 
-    - ansible.builtin.assert:
+    - assert:
         that:
           - delete_action_result.changed is sameas true
 
     - name: test - Delete action operation script again
-      community.zabbix.zabbix_script:
+      zabbix_script:
         state: absent
       register: delete_action_again_result
 
-    - ansible.builtin.assert:
+    - assert:
         that:
           - delete_action_again_result.changed is sameas false
 
@@ -351,7 +351,7 @@
 
   block:
     - name: test - Create new manual host action script to execute webhook check mode
-      community.zabbix.zabbix_script:
+      zabbix_script:
         parameters:
           - name: param_name1
           - name: param_name2
@@ -359,110 +359,110 @@
       check_mode: true
       register: create_action_check_mode_result
 
-    - ansible.builtin.assert:
+    - assert:
         that:
           - create_action_check_mode_result.changed is sameas true
 
     - name: test - Create new manual host action script to execute webhook
-      community.zabbix.zabbix_script:
+      zabbix_script:
         parameters:
           - name: param_name1
           - name: param_name2
             value: value2
       register: create_action_result
 
-    - ansible.builtin.assert:
+    - assert:
         that:
           - create_action_result.changed is sameas true
 
     - name: test - Create new manual host action script to execute webhook again
-      community.zabbix.zabbix_script:
+      zabbix_script:
         parameters:
           - name: param_name1
           - name: param_name2
             value: value2
       register: create_action_again_result
 
-    - ansible.builtin.assert:
+    - assert:
         that:
           - create_action_again_result.changed is sameas false
 
     - name: test - Update manual host action script with menu path
-      community.zabbix.zabbix_script:
+      zabbix_script:
         menu_path: menu/submenu
       register: update_action_result
 
-    - ansible.builtin.assert:
+    - assert:
         that:
           - update_action_result.changed is sameas true
 
     - name: test - Update manual host action script with menu path again
-      community.zabbix.zabbix_script:
+      zabbix_script:
         menu_path: menu/submenu
       register: update_action_again_result
 
-    - ansible.builtin.assert:
+    - assert:
         that:
           - update_action_again_result.changed is sameas false
 
     - name: test - Update manual host action script with user group
-      community.zabbix.zabbix_script:
+      zabbix_script:
         menu_path: menu/submenu
         user_group: Guests
       register: update_action_usrgrp_result
 
-    - ansible.builtin.assert:
+    - assert:
         that:
           - update_action_usrgrp_result.changed is sameas true
 
     - name: test - Update manual host action script with user group again
-      community.zabbix.zabbix_script:
+      zabbix_script:
         menu_path: menu/submenu
         user_group: Guests
       register: update_action_usrgrp_again_result
 
-    - ansible.builtin.assert:
+    - assert:
         that:
           - update_action_usrgrp_again_result.changed is sameas false
 
     - name: test - Update manual host action script with Write permissions
-      community.zabbix.zabbix_script:
+      zabbix_script:
         host_access: write
       register: update_action_host_perms_result
 
-    - ansible.builtin.assert:
+    - assert:
         that:
           - update_action_host_perms_result.changed is sameas true
 
     - name: test - Update manual host action script with Write permissions again
-      community.zabbix.zabbix_script:
+      zabbix_script:
         host_access: write
       register: update_action_host_perms_again_result
 
-    - ansible.builtin.assert:
+    - assert:
         that:
           - update_action_host_perms_again_result.changed is sameas false
 
     - name: test - Update manual host action script with confirmation
-      community.zabbix.zabbix_script:
+      zabbix_script:
         confirmation: "Are you sure?"
       register: update_action_host_confirm_result
 
-    - ansible.builtin.assert:
+    - assert:
         that:
           - update_action_host_confirm_result.changed is sameas true
 
     - name: test - Update manual host action script with confirmation again
-      community.zabbix.zabbix_script:
+      zabbix_script:
         confirmation: "Are you sure?"
       register: update_action_host_confirm_again_result
 
-    - ansible.builtin.assert:
+    - assert:
         that:
           - update_action_host_confirm_again_result.changed is sameas false
 
     - name: test - Delete manual host action script
-      community.zabbix.zabbix_script:
+      zabbix_script:
         state: absent
 
 - name: test - Test manual event action script
@@ -477,7 +477,7 @@
 
   block:
     - name: test - Create new manual event action script to execute webhook check mode
-      community.zabbix.zabbix_script:
+      zabbix_script:
         parameters:
           - name: param_name1
           - name: param_name2
@@ -485,24 +485,24 @@
       check_mode: true
       register: create_action_check_mode_result
 
-    - ansible.builtin.assert:
+    - assert:
         that:
           - create_action_check_mode_result.changed is sameas true
 
     - name: test - Create new manual event action script to execute webhook
-      community.zabbix.zabbix_script:
+      zabbix_script:
         parameters:
           - name: param_name1
           - name: param_name2
             value: value2
       register: create_action_result
 
-    - ansible.builtin.assert:
+    - assert:
         that:
           - create_action_result.changed is sameas true
 
     - name: test - Create new manual event action script to execute webhook again
-      community.zabbix.zabbix_script:
+      zabbix_script:
         parameters:
           - name: param_name1
           - name: param_name2
@@ -510,10 +510,10 @@
       diff: true
       register: create_action_again_result
 
-    - ansible.builtin.assert:
+    - assert:
         that:
           - create_action_again_result.changed is sameas false
 
     - name: test - Delete manual host action script
-      community.zabbix.zabbix_script:
+      zabbix_script:
         state: absent
