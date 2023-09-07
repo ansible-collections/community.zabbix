@@ -5,7 +5,7 @@
       name: Test action operation script
       scope: action_operation
       script_type: webhook
-      ansible.builtin.command: "return 0"
+      command: "return 0"
       description: "Test action operation script"
       state: present
 
