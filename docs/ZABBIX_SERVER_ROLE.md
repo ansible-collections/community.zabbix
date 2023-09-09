@@ -107,6 +107,8 @@ The following is an overview of all available configuration default for this rol
 * `zabbix_server_disable_repo`: A list of repos to disable during install.  Default `epel`.
 * `zabbix_service_state`: Default: `started`. Can be overridden to stopped if needed
 * `zabbix_service_enabled`: Default: `True` Can be overridden to `False` if needed
+* `zabbix_repo_deb_url`: The URL to the Zabbix repository.  Default `http://repo.zabbix.com/zabbix/{{ zabbix_server_version }}/{{ ansible_distribution.lower() }}`
+* `zabbix_repo_deb_component`: The repository component for Debian installs. Default `main`.
 
 ### SElinux
 
