@@ -96,6 +96,7 @@ The following is an overview of all available configuration defaults for this ro
 ### Zabbix Web specific
 
 * `zabbix_api_server_url`: This is the url on which the zabbix web interface is available. Default is zabbix.example.com, you should override it. For example, see "Example Playbook"
+* `zabbix_web_http_server`: Which web server is in use.  Valid values are 'apache' and 'nginx'.  Default is `apache`
 * `zabbix_url_aliases`: A list with Aliases for the Apache Virtual Host configuration.
 * `zabbix_timezone`: Default: `Europe/Amsterdam`. This is the timezone. The Apache Virtual Host needs this parameter.
 * `zabbix_web_create_vhost`: Default: `true`. When you don't want to create an Apache Virtual Host configuration, you can set it to False.
