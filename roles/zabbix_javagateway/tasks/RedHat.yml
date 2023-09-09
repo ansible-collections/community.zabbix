@@ -2,7 +2,7 @@
 # Tasks specific for RedHat systems
 
 - name: "RedHat | Install basic repo file"
-  yum_repository:
+  ansible.builtin.yum_repository:
     name: "{{ item.name }}"
     description: "{{ item.description }}"
     baseurl: "{{ item.baseurl }}"
@@ -21,7 +21,7 @@
     - install
 
 - name: "RedHat | Installing zabbix-java-gateway"
-  package:
+  ansible.builtin.package:
     pkg: zabbix-java-gateway
     state: "{{ zabbix_javagateway_package_state }}"
     disablerepo: "{{ zabbix_agent_disable_repo | default(omit) }}"

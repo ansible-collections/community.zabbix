@@ -2,7 +2,7 @@
 # These two tests are close to documentation example
 
 - name: Create a new host or update an existing host's info
-  zabbix_host:
+  community.zabbix.zabbix_host:
     host_name: ExampleHost1
     visible_name: ExampleName
     description: My ExampleHost Description
@@ -10,8 +10,8 @@
       - Linux servers
       - Zabbix servers
     link_templates:
-      - 'IMAP Service'
-      - 'NTP Service'
+      - "IMAP Service"
+      - "NTP Service"
     status: enabled
     state: present
     inventory_mode: manual
@@ -41,7 +41,7 @@
         dns: ""
         port: "12345"
     macros:
-      - macro: '{$EXAMPLEMACRO}'
+      - macro: "{$EXAMPLEMACRO}"
         value: ExampleMacroValue
       - macro: EXAMPLEMACRO2
         value: ExampleMacroValue2
@@ -53,7 +53,7 @@
   register: zabbix_host1
 
 - name: Update an existing host's tls settings
-  zabbix_host:
+  community.zabbix.zabbix_host:
     host_name: ExampleHost2
     visible_name: ExampleName2
     interfaces:
@@ -71,7 +71,7 @@
   register: zabbix_host2
 
 - name: expect both to succeed
-  assert:
+  ansible.builtin.assert:
     that:
       - "zabbix_host1 is changed"
       - "zabbix_host2 is changed"

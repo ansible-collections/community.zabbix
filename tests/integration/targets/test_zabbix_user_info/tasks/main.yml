@@ -1,6 +1,6 @@
 ---
 - name: test - Create a new Zabbix user
-  zabbix_user:
+  community.zabbix.zabbix_user:
     username: example
     name: user name
     surname: user surname
@@ -11,10 +11,10 @@
     lang: en_US
     theme: blue-theme
     autologin: false
-    autologout: '0'
-    refresh: '30'
-    rows_per_page: '200'
-    after_login_url: ''
+    autologout: "0"
+    refresh: "30"
+    rows_per_page: "200"
+    after_login_url: ""
     user_medias:
       - mediatype: Email
         sendto: example@example.com
@@ -32,12 +32,12 @@
     state: present
   register: create_zabbix_user_result
 
-- assert:
+- ansible.builtin.assert:
     that:
       - create_zabbix_user_result.changed is sameas true
 
 - name: test - Set definition_of_results variable
-  set_fact:
+  ansible.builtin.set_fact:
     definition_of_results:
       - get_user_info_result[user_info_key].username == "example"
       - get_user_info_result[user_info_key].autologin is defined
@@ -72,23 +72,22 @@
       - get_user_info_result[user_info_key].usrgrps.1.usrgrpid is defined
 
 - name: "test - Get a zabbix user information"
-  zabbix_user_info:
+  community.zabbix.zabbix_user_info:
     username: example
   register: get_user_info_result
 
 - name: "test - Set key to user_info_key variable(This deals with the key being masked)"
-  set_fact:
+  ansible.builtin.set_fact:
     user_info_key: "{{ item }}"
   loop: "{{ get_user_info_result.keys() | list }}"
   when:
     - item | regex_search('_user')
 
-- assert:
+- ansible.builtin.assert:
     that: definition_of_results
 
-
 - name: test - Create a new Zabbix user
-  zabbix_user:
+  community.zabbix.zabbix_user:
     username: example2
     usrgrps:
       - Guests
@@ -97,22 +96,22 @@
     state: present
   register: create_zabbix_user_result2
 
-- assert:
+- ansible.builtin.assert:
     that:
       - create_zabbix_user_result2.changed is sameas true
 
 - name: "test - Get a zabbix user information"
-  zabbix_user_info:
+  community.zabbix.zabbix_user_info:
     username: example2
   register: get_user_info_result2
 
 - name: "test - Set key to user_info_key variable(This deals with the key being masked)"
-  set_fact:
+  ansible.builtin.set_fact:
     user_info_key: "{{ item }}"
   loop: "{{ get_user_info_result2.keys() | list }}"
   when:
     - item | regex_search('_user')
 
-- assert:
+- ansible.builtin.assert:
     that:
       - get_user_info_result2[user_info_key].username == "example2"

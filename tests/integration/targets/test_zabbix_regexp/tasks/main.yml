@@ -7,7 +7,7 @@
   name: Unsupport Zabbix version (<6.0)
   block:
     - name: test - fail to update regexp setting
-      zabbix_regexp:
+      community.zabbix.zabbix_regexp:
         name: File systems for discovery
         test_string: ext3
         expressions:
@@ -16,14 +16,14 @@
       ignore_errors: true
       register: zbxauth_update
 
-    - assert:
+    - ansible.builtin.assert:
         that: zbxauth_update.failed is sameas True
 
 - when: zabbix_version is version('6.0', '>=')
   name: support Zabbix version (>=6.0)
   block:
     - name: test - try to update regexp (present)
-      zabbix_regexp:
+      community.zabbix.zabbix_regexp:
         name: File systems for discovery
         test_string: ext3
         expressions:
@@ -32,25 +32,24 @@
       register: zbxregexp_update
 
     - name: assert that regexp was NOT updated
-      assert:
+      ansible.builtin.assert:
         that:
           - zbxregexp_update.changed is sameas False
 
     - name: test - try to delete regexp
-      zabbix_regexp:
+      community.zabbix.zabbix_regexp:
         name: File systems for discovery
         state: absent
       register: zbxregexp_update
 
     - name: assert that regexp was deleted
-      assert:
+      ansible.builtin.assert:
         that:
           - zbxregexp_update.changed is sameas True
           - zbxregexp_update.msg == "Successfully deleted regular expression setting."
 
-
     - name: test - try to create regexp
-      zabbix_regexp:
+      community.zabbix.zabbix_regexp:
         name: File systems for discovery
         test_string: ext3
         expressions:
@@ -59,13 +58,13 @@
       register: zbxregexp_update
 
     - name: assert that regexp was created
-      assert:
+      ansible.builtin.assert:
         that:
           - zbxregexp_update.changed is sameas True
           - zbxregexp_update.msg == "Successfully created regular expression setting."
 
     - name: test - try to update regexp
-      zabbix_regexp:
+      community.zabbix.zabbix_regexp:
         name: File systems for discovery
         test_string: ext3
         expressions:
@@ -74,7 +73,7 @@
           - expression: "update/delete"
             expression_type: any_character_string_included
             case_sensitive: true
-            exp_delimiter: '/'
+            exp_delimiter: "/"
           - expression: "failed"
             expression_type: character_string_not_included
           - expression: "^(btrfs|ext2|ext3|ext4|reiser|xfs|ffs|ufs|jfs|jfs2|vxfs|hfs|apfs|refs|ntfs|fat32|zfs)$"
@@ -84,20 +83,20 @@
       register: zbxregexp_update
 
     - name: assert that regexp was updated
-      assert:
+      ansible.builtin.assert:
         that:
           - zbxregexp_update.changed is sameas True
           - zbxregexp_update.msg == "Successfully updated regular expression setting."
 
     - name: test - try to update regexp (will not update)
-      zabbix_regexp:
+      community.zabbix.zabbix_regexp:
         name: File systems for discovery
         test_string: ext3
         expressions:
           - expression: "update/delete"
             expression_type: any_character_string_included
             case_sensitive: true
-            exp_delimiter: '/'
+            exp_delimiter: "/"
           - expression: "create"
             expression_type: character_string_included
           - expression: "failed"
@@ -109,6 +108,6 @@
       register: zbxregexp_update
 
     - name: assert that regexp was updated
-      assert:
+      ansible.builtin.assert:
         that:
           - zbxregexp_update.changed is sameas False

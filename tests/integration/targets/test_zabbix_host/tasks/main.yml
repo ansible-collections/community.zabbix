@@ -12,8 +12,8 @@
     # tear down stuff set up earlier
     - include_tasks: zabbix_host_teardown.yml
   always:
-  - name: "cleanup if tests failed"
-    zabbix_host:
-      host_name: ExampleHost
-      state: absent
-    ignore_errors: true
+    - name: "cleanup if tests failed"
+      community.zabbix.zabbix_host:
+        host_name: ExampleHost
+        state: absent
+      ignore_errors: true

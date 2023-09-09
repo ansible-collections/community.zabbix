@@ -131,7 +131,7 @@ To use a module or role from this collection, reference them with their Fully Qu
       ...
 
 - name: If Zabbix WebUI runs on non-default (zabbix) path, e.g. http://<FQDN>/zabbixeu
-  set_fact:
+  ansible.builtin.set_fact:
     ansible_zabbix_url_path: 'zabbixeu'
 
 - name: Using Zabbix collection to manage Zabbix Server's elements with username/password
@@ -204,7 +204,7 @@ Or you include collection name `community.zabbix` in the playbook's `collections
     ansible_zabbix_auth_key: 8ec0d52432c15c91fcafe9888500cf9a607f44091ab554dbee860f6b44fac895
   tasks:
     - name: Ensure host is monitored by Zabbix
-      zabbix_host:
+      community.zabbix.zabbix_host:
         ...
 ```
 
