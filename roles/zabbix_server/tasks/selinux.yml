@@ -1,7 +1,7 @@
 ---
 # straight to getenforce binary , workaround for missing python_selinux library
 - name: "SELinux | Get getenforce binary"
-  stat:
+  ansible.builtin.stat:
     path: /usr/sbin/getenforce
   register: getenforce_bin
   become: true
@@ -9,7 +9,7 @@
     - always
 
 - name: "SELinux | Collect getenforce output"
-  command: getenforce
+  ansible.builtin.command: getenforce
   register: sestatus
   when: "getenforce_bin.stat.exists"
   changed_when: false
@@ -19,14 +19,14 @@
     - always
 
 - name: "Set zabbix_server_selinux to true if getenforce returns Enforcing or Permissive"
-  set_fact:
+  ansible.builtin.set_fact:
     zabbix_server_selinux: "{{ true }}"
   when: 'getenforce_bin.stat.exists and ("Enforcing" in sestatus.stdout or "Permissive" in sestatus.stdout)'
   tags:
     - config
 
 - name: "SELinux | RedHat | Install related SELinux package"
-  yum:
+  ansible.builtin.yum:
     name:
       - libsemanage-python
       - policycoreutils
@@ -46,7 +46,7 @@
     - install
 
 - name: "SELinux | RedHat | Install related SELinux package on RHEL8"
-  yum:
+  ansible.builtin.yum:
     name:
       - python3-libsemanage
     state: present
@@ -86,7 +86,7 @@
     - config
 
 - name: "SELinux | RedHat | Install related SELinux package to fix issues"
-  yum:
+  ansible.builtin.yum:
     name:
       - policycoreutils-python
     state: present
@@ -103,7 +103,7 @@
     - install
 
 - name: "SELinux | RedHat | Install related SELinux package to fix issues on RHEL8"
-  yum:
+  ansible.builtin.yum:
     name:
       - policycoreutils
       - checkpolicy
@@ -122,7 +122,7 @@
     - install
 
 - name: "SELinux | RedHat | Add SEmodule to fix SELinux issue: zabbix_server_alerter.sock"
-  script:
+  ansible.builtin.script:
     cmd: files/install_semodule.bsx
   args:
     creates: /etc/selinux/targeted/active/modules/400/zabbix_server_add/cil

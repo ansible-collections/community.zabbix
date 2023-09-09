@@ -1,6 +1,6 @@
 ---
 - name: "Nginx | Set websrv specific variables"
-  set_fact:
+  ansible.builtin.set_fact:
     zabbix_web_user: "{{ zabbix_web_user if zabbix_web_user is defined else _nginx_user }}"
     zabbix_web_group: "{{ zabbix_web_group if zabbix_web_group is defined else _nginx_group }}"
     zabbix_web_vhost_location: "{{ zabbix_web_vhost_location if zabbix_web_vhost_location is defined else _nginx_vhost_location }}"
@@ -13,7 +13,7 @@
 - name: "Nginx | Installing Zabbix Nginx Conf"
   block:
     - name: "Debian | Install zabbix-nginx-conf"
-      apt:
+      ansible.builtin.apt:
         pkg: "zabbix-nginx-conf"
         state: "{{ zabbix_web_package_state }}"
         update_cache: true
@@ -27,7 +27,7 @@
       when: ansible_os_family == "Debian"
 
     - name: "RedHat | Install zabbix-nginx-conf"
-      yum:
+      ansible.builtin.yum:
         name:
           - "zabbix-nginx-conf"
         state: "{{ zabbix_web_package_state }}"
@@ -44,7 +44,7 @@
     - install
 
 - name: "Nginx | Install vhost in conf.d"
-  template:
+  ansible.builtin.template:
     src: nginx_vhost.conf.j2
     dest: "{{ zabbix_web_vhost_location }}"
     owner: "{{ zabbix_web_user }}"

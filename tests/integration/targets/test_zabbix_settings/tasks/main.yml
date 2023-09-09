@@ -1,6 +1,6 @@
 ---
 - name: test - Update zabbix settings (same as default)
-  zabbix_settings:
+  community.zabbix.zabbix_settings:
     alert_usrgrp: "Zabbix administrators"
     auditlog_enabled: true
     blink_period: "2m"
@@ -69,36 +69,35 @@
   register: zbx_settings
 
 - name: assert that settings was NOT updated
-  assert:
+  ansible.builtin.assert:
     that:
       - zbx_settings.changed is sameas False
-
 
 - when: zabbix_version is version('6.2', '>=')
   name: support Zabbix version (>=6.2)
   block:
     - name: test - Zabbix settings (same as default)
-      zabbix_settings:
+      community.zabbix.zabbix_settings:
         vault_provider: HashiCorp_Vault
       register: zbx_settings
 
     - name: assert that settings was NOT updated
-      assert:
+      ansible.builtin.assert:
         that:
           - zbx_settings.changed is sameas False
 
     - name: test - Update zabbix settings
-      zabbix_settings:
+      community.zabbix.zabbix_settings:
         vault_provider: CyberArk_Vault
       register: zbx_settings
 
     - name: assert that settings was updated
-      assert:
+      ansible.builtin.assert:
         that:
           - zbx_settings.changed is sameas True
 
 - name: test - Update zabbix settings
-  zabbix_settings:
+  community.zabbix.zabbix_settings:
     alert_usrgrp: "0"
     auditlog_enabled: false
     blink_period: "10m"
@@ -166,12 +165,12 @@
   register: zbx_settings
 
 - name: assert that settings was updated
-  assert:
+  ansible.builtin.assert:
     that:
       - zbx_settings.changed is sameas True
 
 - name: test - Update zabbix settings (same setting)
-  zabbix_settings:
+  community.zabbix.zabbix_settings:
     alert_usrgrp: "0"
     auditlog_enabled: false
     blink_period: "10m"
@@ -239,32 +238,32 @@
   register: zbx_settings
 
 - name: assert that settings was NOT updated
-  assert:
+  ansible.builtin.assert:
     that:
       - zbx_settings.changed is sameas False
 
 - name: test - Update zabbix alert_usrgrp setting
-  zabbix_settings:
+  community.zabbix.zabbix_settings:
     alert_usrgrp: "No access to the frontend"
   register: zbx_settings
 
 - name: assert that setting was updated
-  assert:
+  ansible.builtin.assert:
     that:
       - zbx_settings.changed is sameas True
 
 - name: test - Update zabbix alert_usrgrp setting (same parameter)
-  zabbix_settings:
+  community.zabbix.zabbix_settings:
     alert_usrgrp: "No access to the frontend"
   register: zbx_settings
 
 - name: assert that settings was NOT updated
-  assert:
+  ansible.builtin.assert:
     that:
       - zbx_settings.changed is sameas False
 
 - name: test - Update zabbix settings (same as default)
-  zabbix_settings:
+  community.zabbix.zabbix_settings:
     alert_usrgrp: "Zabbix administrators"
     auditlog_enabled: true
     blink_period: "2m"

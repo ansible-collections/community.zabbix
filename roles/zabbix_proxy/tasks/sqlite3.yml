@@ -2,7 +2,7 @@
 # task file for sqlite3
 
 - name: "Sqlite3 | Default Database Path"
-  set_fact:
+  ansible.builtin.set_fact:
     zabbix_proxy_dbname: /var/lib/zabbix/zabbix_proxy.db
   when:
     - zabbix_proxy_dbname == "zabbix_proxy"
@@ -10,7 +10,7 @@
     - database
 
 - name: "Sqlite3 | Create database"
-  file:
+  ansible.builtin.file:
     name: "{{ zabbix_proxy_dbname | dirname }}"
     mode: 0744
     owner: "{{ zabbix_os_user }}"
@@ -26,7 +26,7 @@
     - database
 
 - name: "Sqlite3 | Handle Compressed Schema File"
-  set_fact:
+  ansible.builtin.set_fact:
     zabbix_proxy_cat_cmd: zcat
   when: "'.gz' in ls_output_schema.stdout"
   tags:
@@ -35,7 +35,7 @@
 - name: "Sqlite3 | Importing schema file"
   become: true
   become_user: "{{ zabbix_os_user }}"
-  shell: |
+  ansible.builtin.shell: |
     set -euxo pipefail
     {{ zabbix_proxy_cat_cmd }} {{ ls_output_schema.stdout }} | sqlite3 {{ zabbix_proxy_dbname }}
   args:
@@ -49,7 +49,7 @@
     - database
 
 - name: "Sqlite3 | Fix zabbix db file permission (SELinux)"
-  file:
+  ansible.builtin.file:
     path: "{{ zabbix_proxy_dbname }}"
     state: file
     seuser: system_u

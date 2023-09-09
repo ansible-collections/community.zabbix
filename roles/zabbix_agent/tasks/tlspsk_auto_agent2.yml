@@ -6,7 +6,7 @@
   when: ansible_os_family == "Windows"
 
 - name: AutoPSK | Default tlsaccept and tlsconnect to enforce PSK
-  set_fact:
+  ansible.builtin.set_fact:
     zabbix_agent2_tlsaccept: psk
     zabbix_agent2_tlsconnect: psk
   when: zabbix_api_create_hosts

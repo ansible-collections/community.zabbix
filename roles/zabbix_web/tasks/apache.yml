@@ -1,6 +1,6 @@
 ---
 - name: Setting Web Server Facts
-  set_fact:
+  ansible.builtin.set_fact:
     zabbix_web_user: "{{ zabbix_web_user if zabbix_web_user is defined else _apache_user }}"
     zabbix_web_group: "{{ zabbix_web_group if zabbix_web_group is defined else _apache_group }}"
     zabbix_web_vhost_location: "{{ zabbix_web_vhost_location if zabbix_web_vhost_location is defined else _apache_vhost_location }}"
@@ -10,7 +10,7 @@
 - name: "Apache | Installing Zabbix Apache Conf"
   block:
     - name: "Debian | Install zabbix-apache-conf"
-      apt:
+      ansible.builtin.apt:
         pkg: "zabbix-apache-conf"
         state: "{{ zabbix_web_package_state }}"
         update_cache: true
@@ -24,7 +24,7 @@
       when: ansible_os_family == "Debian"
 
     - name: "RedHat | Install zabbix-apache-conf"
-      yum:
+      ansible.builtin.yum:
         name:
           - "zabbix-apache-conf-{{ zabbix_web_version }}.{{ zabbix_web_version_minor }}"
         state: "{{ zabbix_web_package_state }}"
@@ -41,7 +41,7 @@
     - install
 
 - name: "Apache | Get Apache version"
-  shell: |
+  ansible.builtin.shell: |
     PATH=/usr/sbin:$PATH
     set -o pipefail
     apachectl -v | grep 'version' | awk -F '/' '{ print $2 }'| awk '{ print $1 }' | cut -c 1-3
@@ -54,13 +54,13 @@
     - config
 
 - name: "Apache | Set correct apache_version"
-  set_fact:
+  ansible.builtin.set_fact:
     apache_version: "{{ apachectl_version.stdout }}"
   tags:
     - config
 
 - name: "Apache | Install apache vhost"
-  template:
+  ansible.builtin.template:
     src: apache_vhost.conf.j2
     dest: "{{ zabbix_web_vhost_location }}"
     owner: "{{ zabbix_web_user }}"
@@ -74,7 +74,7 @@
     - config
 
 - name: "Apache | Enable Site (Debian Only)"
-  file:
+  ansible.builtin.file:
     src: "{{ zabbix_web_vhost_location }}"
     dest: /etc/apache2/sites-enabled/zabbix.conf
     state: link

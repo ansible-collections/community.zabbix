@@ -1,6 +1,6 @@
 ---
 - name: "test: create host with many options set"
-  zabbix_host:
+  community.zabbix.zabbix_host:
     host_name: ExampleHost
     visible_name: ExampleName
     description: My ExampleHost Description
@@ -8,8 +8,8 @@
       - Linux servers
       - Zabbix servers
     link_templates:
-      - 'IMAP Service'
-      - 'NTP Service'
+      - "IMAP Service"
+      - "NTP Service"
     status: enabled
     state: present
     inventory_mode: manual
@@ -44,7 +44,7 @@
     macros:
       - macro: MACRO1
         value: test1
-      - macro: '{$MACRO2}'
+      - macro: "{$MACRO2}"
         value: test2
     tags:
       - tag: Tag1
@@ -53,12 +53,12 @@
   register: zabbix_host1
 
 - name: expect to succeed and that things changed
-  assert:
+  ansible.builtin.assert:
     that:
       - "zabbix_host1 is changed"
 
 - name: "test: try to create the same host with the same settings"
-  zabbix_host:
+  community.zabbix.zabbix_host:
     host_name: ExampleHost
     visible_name: ExampleName
     description: My ExampleHost Description
@@ -66,8 +66,8 @@
       - Linux servers
       - Zabbix servers
     link_templates:
-      - 'IMAP Service'
-      - 'NTP Service'
+      - "IMAP Service"
+      - "NTP Service"
     status: enabled
     state: present
     inventory_mode: manual
@@ -102,7 +102,7 @@
     macros:
       - macro: MACRO1
         value: test1
-      - macro: '{$MACRO2}'
+      - macro: "{$MACRO2}"
         value: test2
     tags:
       - tag: Tag1
@@ -111,12 +111,12 @@
   register: zabbix_host1
 
 - name: updating with same values should be idempotent
-  assert:
+  ansible.builtin.assert:
     that:
       - "not zabbix_host1 is changed"
 
 - name: "test: try to create the same host with the same settings and force false"
-  zabbix_host:
+  community.zabbix.zabbix_host:
     force: false
     host_name: ExampleHost
     visible_name: ExampleName
@@ -125,8 +125,8 @@
       - Linux servers
       - Zabbix servers
     link_templates:
-      - 'IMAP Service'
-      - 'NTP Service'
+      - "IMAP Service"
+      - "NTP Service"
     status: enabled
     state: present
     inventory_mode: manual
@@ -161,12 +161,12 @@
   register: zabbix_host1
 
 - name: updating with same values and force false should be idempotent
-  assert:
+  ansible.builtin.assert:
     that:
       - "not zabbix_host1 is changed"
 
 - name: "test: try to create the same host changing one parameter in the inventory with force false"
-  zabbix_host:
+  community.zabbix.zabbix_host:
     force: false
     host_name: ExampleHost
     visible_name: ExampleName
@@ -175,8 +175,8 @@
       - Linux servers
       - Zabbix servers
     link_templates:
-      - 'IMAP Service'
-      - 'NTP Service'
+      - "IMAP Service"
+      - "NTP Service"
     status: enabled
     state: present
     inventory_mode: manual
@@ -211,56 +211,56 @@
   register: zabbix_host1
 
 - name: changing the value of an already defined inventory should work and mark task as changed
-  assert:
+  ansible.builtin.assert:
     that:
       - "zabbix_host1 is changed"
 
 - name: "test: change visible_name"
-  zabbix_host:
+  community.zabbix.zabbix_host:
     host_name: ExampleHost
     visible_name: "ExampleName Changed"
   register: zabbix_host1
 
 - name: expect to succeed and that things changed
-  assert:
+  ansible.builtin.assert:
     that:
       - "zabbix_host1 is changed"
 
 - name: "test: change visible_name (again)"
-  zabbix_host:
+  community.zabbix.zabbix_host:
     host_name: ExampleHost
     visible_name: "ExampleName Changed"
   register: zabbix_host1
 
 - name: updating with same values should be idempotent
-  assert:
+  ansible.builtin.assert:
     that:
       - "not zabbix_host1 is changed"
 
 - name: "test: change description"
-  zabbix_host:
+  community.zabbix.zabbix_host:
     host_name: ExampleHost
     description: "My ExampleHost Description Changed"
   register: zabbix_host1
 
 - name: expect to succeed and that things changed
-  assert:
+  ansible.builtin.assert:
     that:
       - "zabbix_host1 is changed"
 
 - name: "test: change description (again)"
-  zabbix_host:
+  community.zabbix.zabbix_host:
     host_name: ExampleHost
     description: "My ExampleHost Description Changed"
   register: zabbix_host1
 
 - name: updating with same values should be idempotent
-  assert:
+  ansible.builtin.assert:
     that:
       - "not zabbix_host1 is changed"
 
 - name: "test: change host groups (adding one group)"
-  zabbix_host:
+  community.zabbix.zabbix_host:
     host_name: ExampleHost
     host_groups:
       - Linux servers
@@ -269,12 +269,12 @@
   register: zabbix_host1
 
 - name: expect to succeed and that things changed
-  assert:
+  ansible.builtin.assert:
     that:
       - "zabbix_host1 is changed"
 
 - name: "test: change host groups (remove one group)"
-  zabbix_host:
+  community.zabbix.zabbix_host:
     host_name: ExampleHost
     host_groups:
       - Linux servers
@@ -282,12 +282,12 @@
   register: zabbix_host1
 
 - name: expect to succeed and that things changed
-  assert:
+  ansible.builtin.assert:
     that:
       - "zabbix_host1 is changed"
 
 - name: "test: change host groups (add one group using force=no)"
-  zabbix_host:
+  community.zabbix.zabbix_host:
     host_name: ExampleHost
     host_groups:
       - Virtual machines
@@ -295,12 +295,12 @@
   register: zabbix_host1
 
 - name: expect to succeed and that things changed
-  assert:
+  ansible.builtin.assert:
     that:
       - "zabbix_host1 is changed"
 
 - name: "test: change host groups (check whether we are at three groups)"
-  zabbix_host:
+  community.zabbix.zabbix_host:
     host_name: ExampleHost
     host_groups:
       - Linux servers
@@ -309,12 +309,12 @@
   register: zabbix_host1
 
 - name: expect to succeed and that things have not changed
-  assert:
+  ansible.builtin.assert:
     that:
       - "not zabbix_host1 is changed"
 
 - name: "test: change host groups (attempt to remove all host groups)"
-  zabbix_host:
+  community.zabbix.zabbix_host:
     host_name: ExampleHost
     # list with empty value, expected:
     host_groups:
@@ -323,133 +323,133 @@
   ignore_errors: true
 
 - name: expect to fail
-  assert:
+  ansible.builtin.assert:
     that:
       - "zabbix_host1 is failed"
 
 - name: "test: change host linked templates (same as before)"
-  zabbix_host:
+  community.zabbix.zabbix_host:
     host_name: ExampleHost
     link_templates:
-      - 'IMAP Service'
-      - 'NTP Service'
+      - "IMAP Service"
+      - "NTP Service"
   register: zabbix_host1
 
 - name: expect to succeed and that things have not changed
-  assert:
+  ansible.builtin.assert:
     that:
       - "not zabbix_host1 is changed"
 
 - name: "test: change host linked templates (add one template)"
-  zabbix_host:
+  community.zabbix.zabbix_host:
     host_name: ExampleHost
     link_templates:
-      - 'IMAP Service'
-      - 'NTP Service'
-      - 'HTTP Service'
+      - "IMAP Service"
+      - "NTP Service"
+      - "HTTP Service"
   register: zabbix_host1
 
 - name: expect to succeed and that things have changed
-  assert:
+  ansible.builtin.assert:
     that:
       - "zabbix_host1 is changed"
 
 - name: "test: change host linked templates (add one template, using force=no)"
-  zabbix_host:
+  community.zabbix.zabbix_host:
     host_name: ExampleHost
     link_templates:
-      - 'LDAP Service'
+      - "LDAP Service"
     force: false
   register: zabbix_host1
 
 - name: expect to succeed and that things have changed
-  assert:
+  ansible.builtin.assert:
     that:
       - "zabbix_host1 is changed"
 
 - name: "test: change host linked templates (make sure we are at 4 templates)"
-  zabbix_host:
+  community.zabbix.zabbix_host:
     host_name: ExampleHost
     link_templates:
-      - 'IMAP Service'
-      - 'NTP Service'
-      - 'HTTP Service'
-      - 'LDAP Service'
+      - "IMAP Service"
+      - "NTP Service"
+      - "HTTP Service"
+      - "LDAP Service"
   register: zabbix_host1
 
 - name: expect to succeed and that things have not changed
-  assert:
+  ansible.builtin.assert:
     that:
       - "not zabbix_host1 is changed"
 
 - name: "test: change host linked templates (remove all templates)"
-  zabbix_host:
+  community.zabbix.zabbix_host:
     host_name: ExampleHost
     link_templates: []
   register: zabbix_host1
 
 - name: expect to succeed and that things have changed
-  assert:
+  ansible.builtin.assert:
     that:
       - "zabbix_host1 is changed"
 
 - name: "test: change host linked templates (check we have no templates left)"
-  zabbix_host:
+  community.zabbix.zabbix_host:
     host_name: ExampleHost
     link_templates: []
   register: zabbix_host1
 
 - name: expect to succeed and that things have not changed
-  assert:
+  ansible.builtin.assert:
     that:
       - "not zabbix_host1 is changed"
 
 - name: "test: change host status"
-  zabbix_host:
+  community.zabbix.zabbix_host:
     host_name: ExampleHost
     status: disabled
   register: zabbix_host1
 
 - name: expect to succeed and that things have changed
-  assert:
+  ansible.builtin.assert:
     that:
       - "zabbix_host1 is changed"
 
 - name: "test: change host status (again)"
-  zabbix_host:
+  community.zabbix.zabbix_host:
     host_name: ExampleHost
     status: disabled
   register: zabbix_host1
 
 - name: expect to succeed and that things have not changed
-  assert:
+  ansible.builtin.assert:
     that:
       - "not zabbix_host1 is changed"
 
 - name: "test: change host inventory mode"
-  zabbix_host:
+  community.zabbix.zabbix_host:
     host_name: ExampleHost
     inventory_mode: automatic
   register: zabbix_host1
 
 - name: expect to succeed and that things have changed
-  assert:
+  ansible.builtin.assert:
     that:
       - "zabbix_host1 is changed"
 
 - name: "test: change host inventory mode"
-  zabbix_host:
+  community.zabbix.zabbix_host:
     host_name: ExampleHost
     inventory_mode: automatic
   register: zabbix_host1
 
 - name: expect to succeed and that things have not changed
-  assert:
+  ansible.builtin.assert:
     that:
       - "not zabbix_host1 is changed"
 
 - name: "test: change host inventory data (one field)"
-  zabbix_host:
+  community.zabbix.zabbix_host:
     host_name: ExampleHost
     inventory_zabbix:
       tag: test-tag-two
@@ -462,12 +462,12 @@
   register: zabbix_host1
 
 - name: expect to succeed and that things have changed
-  assert:
+  ansible.builtin.assert:
     that:
       - "zabbix_host1 is changed"
 
 - name: "test: change host inventory data (again)"
-  zabbix_host:
+  community.zabbix.zabbix_host:
     host_name: ExampleHost
     inventory_zabbix:
       tag: test-tag-two
@@ -480,45 +480,45 @@
   register: zabbix_host1
 
 - name: expect to succeed and that things have not changed
-  assert:
+  ansible.builtin.assert:
     that:
       - "not zabbix_host1 is changed"
 
 - name: "test: remove host proxy"
-  zabbix_host:
+  community.zabbix.zabbix_host:
     host_name: ExampleHost
-    proxy: ''
+    proxy: ""
   register: zabbix_host1
 
 - name: expect to succeed and that things have changed
-  assert:
+  ansible.builtin.assert:
     that:
       - "zabbix_host1 is changed"
 
 - name: "test: add host proxy"
-  zabbix_host:
+  community.zabbix.zabbix_host:
     host_name: ExampleHost
     proxy: ExampleProxy
   register: zabbix_host1
 
 - name: expect to succeed and that things have changed
-  assert:
+  ansible.builtin.assert:
     that:
       - "zabbix_host1 is changed"
 
 - name: "test: add host proxy (again)"
-  zabbix_host:
+  community.zabbix.zabbix_host:
     host_name: ExampleHost
     proxy: ExampleProxy
   register: zabbix_host1
 
 - name: expect to succeed and that things have not changed
-  assert:
+  ansible.builtin.assert:
     that:
       - "not zabbix_host1 is changed"
 
 - name: "test: change tls certificate settings"
-  zabbix_host:
+  community.zabbix.zabbix_host:
     host_name: ExampleHost
     tls_connect: 4
     tls_accept: 4
@@ -527,12 +527,12 @@
   register: zabbix_host1
 
 - name: expect to succeed and that things have changed
-  assert:
+  ansible.builtin.assert:
     that:
       - "zabbix_host1 is changed"
 
 - name: "test: change tls certificate settings (again)"
-  zabbix_host:
+  community.zabbix.zabbix_host:
     host_name: ExampleHost
     tls_connect: 4
     tls_accept: 4
@@ -541,12 +541,12 @@
   register: zabbix_host1
 
 - name: expect to succeed and that things have not changed
-  assert:
+  ansible.builtin.assert:
     that:
       - "not zabbix_host1 is changed"
 
 - name: "test: change tls psk (write-only) settings"
-  zabbix_host:
+  community.zabbix.zabbix_host:
     host_name: ExampleHost
     tls_connect: 2
     tls_accept: 2
@@ -555,11 +555,11 @@
   register: zabbix_host1
 
 - name: expect to succeed and that things have changed
-  assert:
+  ansible.builtin.assert:
     that: zabbix_host1 is changed
 
 - name: "test: change tls psk (write-only) settings (again)"
-  zabbix_host:
+  community.zabbix.zabbix_host:
     host_name: ExampleHost
     tls_connect: 2
     tls_accept: 2
@@ -568,11 +568,11 @@
   register: zabbix_host1
 
 - name: expect to succeed and that things have changed (tls_psk makes module non-idempotent)
-  assert:
+  ansible.builtin.assert:
     that: zabbix_host1 is changed
 
 - name: "test: change interface settings (remove one)"
-  zabbix_host:
+  community.zabbix.zabbix_host:
     host_name: ExampleHost
     interfaces:
       - type: 1
@@ -584,12 +584,12 @@
   register: zabbix_host1
 
 - name: expect to succeed and that things have changed
-  assert:
+  ansible.builtin.assert:
     that:
       - "zabbix_host1 is changed"
 
 - name: "test: change interface settings (again)"
-  zabbix_host:
+  community.zabbix.zabbix_host:
     host_name: ExampleHost
     interfaces:
       - type: 1
@@ -601,12 +601,12 @@
   register: zabbix_host1
 
 - name: expect to succeed and that things have not changed
-  assert:
+  ansible.builtin.assert:
     that:
       - "not zabbix_host1 is changed"
 
 - name: "test: change interface settings (add one interface using force=no)"
-  zabbix_host:
+  community.zabbix.zabbix_host:
     host_name: ExampleHost
     interfaces:
       - type: 4
@@ -619,12 +619,12 @@
   register: zabbix_host1
 
 - name: expect to succeed and that things have changed
-  assert:
+  ansible.builtin.assert:
     that:
       - "zabbix_host1 is changed"
 
 - name: "test: change interface settings (verify that we are at two interfaces)"
-  zabbix_host:
+  community.zabbix.zabbix_host:
     host_name: ExampleHost
     interfaces:
       - type: 1
@@ -642,12 +642,12 @@
   register: zabbix_host1
 
 - name: expect to succeed and that things have not changed
-  assert:
+  ansible.builtin.assert:
     that:
       - "not zabbix_host1 is changed"
 
 - name: "test: configure interface to useip=1 but provide no ip"
-  zabbix_host:
+  community.zabbix.zabbix_host:
     host_name: ExampleHost
     interfaces:
       - type: 1
@@ -663,12 +663,12 @@
   ignore_errors: true
 
 - name: expect to fail
-  assert:
+  ansible.builtin.assert:
     that:
       - "zabbix_host1 is failed"
 
 - name: "test: configure interface to useip=0 but provide no dns"
-  zabbix_host:
+  community.zabbix.zabbix_host:
     host_name: ExampleHost
     interfaces:
       - type: 1
@@ -685,12 +685,12 @@
   ignore_errors: true
 
 - name: expect to fail
-  assert:
+  ansible.builtin.assert:
     that:
       - "zabbix_host1 is failed"
 
 - name: "test: configure SNMPv2 interface without details (fail)"
-  zabbix_host:
+  community.zabbix.zabbix_host:
     host_name: ExampleHost
     interfaces:
       - type: 1
@@ -707,12 +707,12 @@
   ignore_errors: true
 
 - name: expect to fail
-  assert:
+  ansible.builtin.assert:
     that:
       - "zabbix_host1 is failed"
 
 - name: "test: configure details for SNMPv2 interface"
-  zabbix_host:
+  community.zabbix.zabbix_host:
     host_name: ExampleHost
     interfaces:
       - type: 1
@@ -731,12 +731,12 @@
   register: zabbix_host1
 
 - name: expect to succeed and that things have changed
-  assert:
+  ansible.builtin.assert:
     that:
       - "zabbix_host1 is changed"
 
 - name: "test: configure details for SNMPv2 interface (again)"
-  zabbix_host:
+  community.zabbix.zabbix_host:
     host_name: ExampleHost
     interfaces:
       - type: 1
@@ -755,12 +755,12 @@
   register: zabbix_host1
 
 - name: expect to succeed and that things have not changed
-  assert:
+  ansible.builtin.assert:
     that:
       - "zabbix_host1 is not changed"
 
 - name: "test: configure SNMPv2 interface with the same options and force=False "
-  zabbix_host:
+  community.zabbix.zabbix_host:
     host_name: ExampleHost
     force: False
     interfaces:
@@ -780,12 +780,12 @@
   register: zabbix_host1
 
 - name: expect to succeed and that things have not changed
-  assert:
+  ansible.builtin.assert:
     that:
       - "zabbix_host1 is not changed"
 
 - name: "test: update details for SNMPv2 interface with bulk sub option"
-  zabbix_host:
+  community.zabbix.zabbix_host:
     host_name: ExampleHost
     interfaces:
       - type: 1
@@ -805,12 +805,12 @@
   register: zabbix_host1
 
 - name: expect to succeed and that things have changed
-  assert:
+  ansible.builtin.assert:
     that:
       - "zabbix_host1 is changed"
 
 - name: "test: configure details for SNMPv3 interface"
-  zabbix_host:
+  community.zabbix.zabbix_host:
     host_name: ExampleHost
     interfaces:
       - type: 1
@@ -831,12 +831,12 @@
   register: zabbix_host1
 
 - name: expect to succeed and that things have changed
-  assert:
+  ansible.builtin.assert:
     that:
       - "zabbix_host1 is changed"
 
 - name: "test: configure details for SNMPv3 interface (again)"
-  zabbix_host:
+  community.zabbix.zabbix_host:
     host_name: ExampleHost
     interfaces:
       - type: 1
@@ -857,12 +857,12 @@
   register: zabbix_host1
 
 - name: expect to succeed and that things have not changed
-  assert:
+  ansible.builtin.assert:
     that:
       - "zabbix_host1 is not changed"
 
 - name: "test: update details for SNMPv3 interface"
-  zabbix_host:
+  community.zabbix.zabbix_host:
     host_name: ExampleHost
     interfaces:
       - type: 1
@@ -887,12 +887,12 @@
   register: zabbix_host1
 
 - name: expect to succeed and that things have changed
-  assert:
+  ansible.builtin.assert:
     that:
       - "zabbix_host1 is changed"
 
 - name: "reset interfaces to two of the same type"
-  zabbix_host:
+  community.zabbix.zabbix_host:
     host_name: ExampleHost
     interfaces:
       - type: "1"
@@ -905,12 +905,12 @@
   register: zabbix_host1
 
 - name: expect to succeed and that things have changed
-  assert:
+  ansible.builtin.assert:
     that:
       - "zabbix_host1 is changed"
 
 - name: "reset interfaces to two of the same type (again)"
-  zabbix_host:
+  community.zabbix.zabbix_host:
     host_name: ExampleHost
     interfaces:
       - type: "1"
@@ -923,12 +923,12 @@
   register: zabbix_host1
 
 - name: expect to succeed and that things have not changed
-  assert:
+  ansible.builtin.assert:
     that:
       - "zabbix_host1 is not changed"
 
 - name: "test: add IPMI settings"
-  zabbix_host:
+  community.zabbix.zabbix_host:
     host_name: ExampleHost
     ipmi_authtype: 2
     ipmi_privilege: 4
@@ -937,12 +937,12 @@
   register: zabbix_host1
 
 - name: expect to succeed and that things have changed
-  assert:
+  ansible.builtin.assert:
     that:
       - "zabbix_host1 is changed"
 
 - name: "test: add IPMI settings again"
-  zabbix_host:
+  community.zabbix.zabbix_host:
     host_name: ExampleHost
     ipmi_authtype: 2
     ipmi_privilege: 4
@@ -951,22 +951,22 @@
   register: zabbix_host1
 
 - name: expect to succeed and that things have not changed
-  assert:
+  ansible.builtin.assert:
     that:
       - "zabbix_host1 is not changed"
 
 - name: "test: verify that an empty change is idempotent"
-  zabbix_host:
+  community.zabbix.zabbix_host:
     host_name: ExampleHost
   register: zabbix_host1
 
 - name: expect to succeed and that things have not changed
-  assert:
+  ansible.builtin.assert:
     that:
       - "zabbix_host1 is not changed"
 
 - name: "test: IPMI set default values"
-  zabbix_host:
+  community.zabbix.zabbix_host:
     host_name: ExampleHost
     ipmi_authtype: -1
     ipmi_privilege: 2
@@ -975,12 +975,12 @@
   register: zabbix_host1
 
 - name: expect to succeed and that things have changed
-  assert:
+  ansible.builtin.assert:
     that:
       - "zabbix_host1 is changed"
 
 - name: "test: IPMI set default values (again)"
-  zabbix_host:
+  community.zabbix.zabbix_host:
     host_name: ExampleHost
     ipmi_authtype: -1
     ipmi_privilege: 2
@@ -989,82 +989,82 @@
   register: zabbix_host1
 
 - name: expect to succeed and that things have not changed
-  assert:
+  ansible.builtin.assert:
     that:
       - "zabbix_host1 is not changed"
 
 - name: "test: change host inventory mode to disabled"
-  zabbix_host:
+  community.zabbix.zabbix_host:
     host_name: ExampleHost
     inventory_mode: disabled
   register: zabbix_host1
 
 - name: expect to succeed and that things have changed
-  assert:
+  ansible.builtin.assert:
     that:
       - "zabbix_host1 is changed"
 
 - name: "test: change host inventory mode to manual"
-  zabbix_host:
+  community.zabbix.zabbix_host:
     host_name: ExampleHost
     inventory_mode: manual
   register: zabbix_host1
 
 - name: expect to succeed and that things have changed
-  assert:
+  ansible.builtin.assert:
     that:
-       - "zabbix_host1 is changed"
+      - "zabbix_host1 is changed"
 
 - name: "test: add new set of user macros to the host"
-  zabbix_host:
+  community.zabbix.zabbix_host:
     host_name: ExampleHost
     macros:
-      - macro: '{$NEWMACRO1}'
+      - macro: "{$NEWMACRO1}"
         value: test123
       - macro: NEWMACRO2
         value: abc
   register: zabbix_host1
 
 - name: expect to succeed and that things have changed
-  assert:
+  ansible.builtin.assert:
     that:
       - "zabbix_host1 is changed"
 
 - name: "test: add new set of user macros to the host (again - lowercase)"
-  zabbix_host:
+  community.zabbix.zabbix_host:
     host_name: ExampleHost
     macros:
-      - macro: '{$newmacro1}'
+      - macro: "{$newmacro1}"
         value: test123
       - macro: newmacro2
         value: abc
   register: zabbix_host1
 
 - name: expect to succeed and that things have not changed
-  assert:
+  ansible.builtin.assert:
     that:
       - "zabbix_host1 is not changed"
 
 - name: "test: update one of the user macros present on the host"
-  zabbix_host:
+  community.zabbix.zabbix_host:
     host_name: ExampleHost
     macros:
-      - macro: '{$NEWMACRO1}'
+      - macro: "{$NEWMACRO1}"
         value: test1234
       - macro: NEWMACRO2
         value: abc
   register: zabbix_host1
 
 - name: expect to succeed and that things have changed
-  assert:
+  ansible.builtin.assert:
     that:
       - "zabbix_host1 is changed"
 
 - name: "test: update one of the user macros with description"
-  zabbix_host:
+  community.zabbix.zabbix_host:
     host_name: ExampleHost
     macros:
-      - macro: '{$NEWMACRO1}'
+      - macro: "{$NEWMACRO1}"
         value: test1234
         description: Example Description
       - macro: NEWMACRO2
@@ -1072,15 +1072,15 @@
   register: zabbix_host1
 
 - name: expect to succeed and that things have changed
-  assert:
+  ansible.builtin.assert:
     that:
       - "zabbix_host1 is changed"
 
 - name: "test: update one of the user macros with description (again)"
-  zabbix_host:
+  community.zabbix.zabbix_host:
     host_name: ExampleHost
     macros:
-      - macro: '{$NEWMACRO1}'
+      - macro: "{$NEWMACRO1}"
         value: test1234
         description: Example Description
       - macro: NEWMACRO2
@@ -1088,122 +1088,122 @@
   register: zabbix_host1
 
 - name: expect to succeed and that things have not changed
-  assert:
+  ansible.builtin.assert:
     that:
       - "zabbix_host1 is not changed"
 
 - name: "test: update one of the user macros by removing description"
-  zabbix_host:
+  community.zabbix.zabbix_host:
     host_name: ExampleHost
     macros:
-      - macro: '{$NEWMACRO1}'
+      - macro: "{$NEWMACRO1}"
         value: test1234
       - macro: NEWMACRO2
         value: abc
   register: zabbix_host1
 
 - name: expect to succeed and that things have changed
-  assert:
+  ansible.builtin.assert:
     that:
       - "zabbix_host1 is changed"
 
 - name: "test: add user macro while keeping previous ones with force=no"
-  zabbix_host:
+  community.zabbix.zabbix_host:
     host_name: ExampleHost
     force: false
     macros:
-      - macro: '{$NEWMACRO3}'
+      - macro: "{$NEWMACRO3}"
         value: testing
   register: zabbix_host1
 
 - name: expect to succeed and that things have changed
-  assert:
+  ansible.builtin.assert:
     that:
       - "zabbix_host1 is changed"
 
 - name: "test: add user macro while keeping previous ones with force=no (again)"
-  zabbix_host:
+  community.zabbix.zabbix_host:
     host_name: ExampleHost
     force: false
     macros:
-      - macro: '{$NEWMACRO3}'
+      - macro: "{$NEWMACRO3}"
         value: testing
   register: zabbix_host1
 
 - name: expect to succeed and that things have not changed
-  assert:
+  ansible.builtin.assert:
     that:
       - "zabbix_host1 is not changed"
 
 - name: "test: add the same user macros (again)"
-  zabbix_host:
+  community.zabbix.zabbix_host:
     host_name: ExampleHost
     macros:
-      - macro: '{$NEWMACRO1}'
+      - macro: "{$NEWMACRO1}"
         value: test1234
       - macro: NEWMACRO2
         value: abc
-      - macro: '{$NEWMACRO3}'
+      - macro: "{$NEWMACRO3}"
         value: testing
   register: zabbix_host1
 
 - name: expect to succeed and that things have not changed
-  assert:
+  ansible.builtin.assert:
     that:
       - "zabbix_host1 is not changed"
 
 - name: "test: add new user macro with type secret"
-  zabbix_host:
+  community.zabbix.zabbix_host:
     host_name: ExampleHost
     macros:
-      - macro: '{$NEWMACROSECRET}'
+      - macro: "{$NEWMACROSECRET}"
         value: secretvalue
         type: secret
   register: zabbix_host1
 
 - name: expect to succeed and that things have changed
-  assert:
+  ansible.builtin.assert:
     that:
       - "zabbix_host1 is changed"
 
 - name: "test: add new user macro with type secret (again)"
-  zabbix_host:
+  community.zabbix.zabbix_host:
     host_name: ExampleHost
     macros:
-      - macro: '{$NEWMACROSECRET}'
+      - macro: "{$NEWMACROSECRET}"
         value: secretvalue
         type: secret
   register: zabbix_host1
 
 - name: expect to succeed and that things have changed as it has secret value
-  assert:
+  ansible.builtin.assert:
     that:
       - "zabbix_host1 is changed"
 
 - name: "test: wipe out all of the user macros"
-  zabbix_host:
+  community.zabbix.zabbix_host:
     host_name: ExampleHost
     macros: []
   register: zabbix_host1
 
 - name: expect to succeed and that things have changed
-  assert:
+  ansible.builtin.assert:
     that:
       - "zabbix_host1 is changed"
 
 - name: "test: wipe out all of the user macros (again)"
-  zabbix_host:
+  community.zabbix.zabbix_host:
     host_name: ExampleHost
     macros: []
   register: zabbix_host1
 
 - name: expect to succeed and that things have not changed
-  assert:
+  ansible.builtin.assert:
     that:
       - "zabbix_host1 is not changed"
 
 - name: "test: add new set of tags to the host"
-  zabbix_host:
+  community.zabbix.zabbix_host:
     host_name: ExampleHost
     tags:
       - tag: NEWTAG1
@@ -1212,12 +1212,12 @@
   register: zabbix_host1
 
 - name: expect to succeed and that things have changed
-  assert:
+  ansible.builtin.assert:
     that:
       - "zabbix_host1 is changed"
 
 - name: "test: add new set of tags to the host (again)"
-  zabbix_host:
+  community.zabbix.zabbix_host:
     host_name: ExampleHost
     tags:
       - tag: NEWTAG1
@@ -1226,12 +1226,12 @@
   register: zabbix_host1
 
 - name: expect to succeed and that things have not changed
-  assert:
+  ansible.builtin.assert:
     that:
       - "zabbix_host1 is not changed"
 
 - name: "test: update one of the tags present on the host"
-  zabbix_host:
+  community.zabbix.zabbix_host:
     host_name: ExampleHost
     tags:
       - tag: NEWTAG1
@@ -1240,12 +1240,12 @@
   register: zabbix_host1
 
 - name: expect to succeed and that things have changed
-  assert:
+  ansible.builtin.assert:
     that:
       - "zabbix_host1 is changed"
 
 - name: "test: add tag while keeping previous ones with force=no"
-  zabbix_host:
+  community.zabbix.zabbix_host:
     host_name: ExampleHost
     force: false
     tags:
@@ -1254,12 +1254,12 @@
   register: zabbix_host1
 
 - name: expect to succeed and that things have changed
-  assert:
+  ansible.builtin.assert:
     that:
       - "zabbix_host1 is changed"
 
 - name: "test: add the same tags (again)"
-  zabbix_host:
+  community.zabbix.zabbix_host:
     host_name: ExampleHost
     tags:
       - tag: NEWTAG1
@@ -1270,56 +1270,56 @@
   register: zabbix_host1
 
 - name: expect to succeed and that things have not changed
-  assert:
+  ansible.builtin.assert:
     that:
       - "zabbix_host1 is not changed"
 
 - name: "test: wipe out all of the tags"
-  zabbix_host:
+  community.zabbix.zabbix_host:
     host_name: ExampleHost
     tags: []
   register: zabbix_host1
 
 - name: expect to succeed and that things have changed
-  assert:
+  ansible.builtin.assert:
     that:
       - "zabbix_host1 is changed"
 
 - name: "test: wipe out all of the tags (again)"
-  zabbix_host:
+  community.zabbix.zabbix_host:
     host_name: ExampleHost
     tags: []
   register: zabbix_host1
 
 - name: expect to succeed and that things have not changed
-  assert:
+  ansible.builtin.assert:
     that:
       - "zabbix_host1 is not changed"
 
 - name: "test: attempt to delete host created earlier"
-  zabbix_host:
+  community.zabbix.zabbix_host:
     host_name: ExampleHost
     state: absent
   register: zabbix_host1
 
 - name: deleting a host is a change, right?
-  assert:
+  ansible.builtin.assert:
     that:
       - "zabbix_host1 is changed"
 
 - name: "test: attempt deleting a non-existant host"
-  zabbix_host:
+  community.zabbix.zabbix_host:
     host_name: ExampleHost
     state: absent
   register: zabbix_host1
 
 - name: deleting a non-existant host is not a change, right?
-  assert:
+  ansible.builtin.assert:
     that:
       - "not zabbix_host1 is changed"
 
 - name: "test: create host without host interfaces"
-  zabbix_host:
+  community.zabbix.zabbix_host:
     host_name: ExampleHost
     visible_name: ExampleName
     description: My ExampleHost Description
@@ -1330,11 +1330,11 @@
   register: zbx_host_create_interfaceless
 
 - name: verify host was created without interfaces
-  assert:
+  ansible.builtin.assert:
     that: zbx_host_create_interfaceless is changed
 
 - name: "test: create host without host interfaces (again)"
-  zabbix_host:
+  community.zabbix.zabbix_host:
     host_name: ExampleHost
     visible_name: ExampleName
     description: My ExampleHost Description
@@ -1345,10 +1345,10 @@
   register: zbx_host_create_interfaceless
 
 - name: expect to succeed and that things have not changed
-  assert:
+  ansible.builtin.assert:
     that: zbx_host_create_interfaceless is not changed
 
 - name: "cleanup"
-  zabbix_host:
+  community.zabbix.zabbix_host:
     host_name: ExampleHost
     state: absent

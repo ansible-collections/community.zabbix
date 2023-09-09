@@ -45,7 +45,7 @@
       changed_when: false
 
     - name: "Installing packages on CentOS"
-      yum:
+      ansible.builtin.yum:
         name:
           - net-tools
           - which
@@ -57,7 +57,7 @@
         - ansible_os_family == 'RedHat'
 
     - name: "Installing packages (CentOS7)"
-      yum:
+      ansible.builtin.yum:
         name:
           - centos-release-scl
         state: present
@@ -67,7 +67,7 @@
         - ansible_distribution_major_version == '7'
 
     - name: "Installing MySQL on CentOS"
-      yum:
+      ansible.builtin.yum:
         name:
           - mysql
         state: present
@@ -78,12 +78,12 @@
         - inventory_hostname in groups['mysql']
 
     - name: Check if warn parameter can be used for shell module
-      set_fact:
+      ansible.builtin.set_fact:
         produce_warn: false
       when: ansible_version.full is version("2.14", "<")
 
     - name: "Apt update"
-      shell: "apt-get update && echo exit 0 > /usr/sbin/policy-rc.d"
+      ansible.builtin.shell: "apt-get update && echo exit 0 > /usr/sbin/policy-rc.d"
       args:
         warn: "{{ produce_warn | default(omit) }}"
       register: installation_dependencies
@@ -92,7 +92,7 @@
         - ansible_os_family != 'RedHat'
 
     - name: "Installing packages on NON-CentOS"
-      apt:
+      ansible.builtin.apt:
         name:
           - net-tools
           - apt-utils
@@ -108,13 +108,13 @@
         - ansible_os_family != 'RedHat'
 
     - name: "Configure SUDO."
-      lineinfile:
+      ansible.builtin.lineinfile:
         dest: /etc/sudoers
         line: "Defaults    !requiretty"
         state: present
 
     - name: "Make sure the docs are installed."
-      lineinfile:
+      ansible.builtin.lineinfile:
         dest: /etc/yum.conf
         line: "tsflags=nodocs"
         state: absent
@@ -122,7 +122,7 @@
         - ansible_os_family == 'RedHat'
 
     - name: PyMySQL
-      pip:
+      ansible.builtin.pip:
         name: PyMySQL
       register: installation_dependencies
       until: installation_dependencies is succeeded
@@ -130,13 +130,13 @@
         - inventory_hostname in groups['mysql']
 
     - name: Enabeling PHP 7.4
-      command: dnf module enable php:7.4 -y
+      ansible.builtin.command: dnf module enable php:7.4 -y
       when:
         - ansible_os_family == 'RedHat'
         - ansible_distribution_major_version == "8"
 
     - name: Set PHP packages (Centos 8+)
-      set_fact:
+      ansible.builtin.set_fact:
         php_packages:
           - php
           - php-cli
@@ -156,14 +156,14 @@
         - ansible_os_family == "RedHat"
 
     - name: Set PHP Version (Ubuntu 2204)
-      set_fact:
+      ansible.builtin.set_fact:
         __php_default_version_debian: "8.1"
       when:
         - ansible_distribution_major_version >= '22'
         - ansible_os_family == "Debian"
 
     - name: Set PHP packages (Ubuntu 2204)
-      set_fact:
+      ansible.builtin.set_fact:
         __php_packages:
           - php{{ __php_default_version_debian }}-common
           - php{{ __php_default_version_debian }}-cli
@@ -195,7 +195,7 @@
 
   post_tasks:
     - name: "Remove file"
-      file:
+      ansible.builtin.file:
         path: "{{ item }}"
         state: absent
       with_items:

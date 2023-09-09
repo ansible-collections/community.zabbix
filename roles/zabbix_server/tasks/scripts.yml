@@ -1,6 +1,6 @@
 ---
 - name: "Configure zabbix-server alertscripts"
-  template:
+  ansible.builtin.template:
     src: "{{ item.path }}"
     dest: "{{ zabbix_server_alertscriptspath }}/{{ item.name }}"
     owner: "{{ zabbix_os_user }}"
@@ -13,7 +13,7 @@
     - config
 
 - name: "Configure zabbix-server externalscripts"
-  template:
+  ansible.builtin.template:
     src: "{{ item.path }}"
     dest: "{{ zabbix_server_externalscriptspath }}/{{ item.name }}"
     owner: "{{ zabbix_os_user }}"

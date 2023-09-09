@@ -1,6 +1,6 @@
 ---
 - name: test - create new passive Zabbix proxy server
-  zabbix_proxy:
+  community.zabbix.zabbix_proxy:
     proxy_name: zbxproxy_example01
     description: Example Zabbix Proxy
     state: present
@@ -13,11 +13,11 @@
   register: zbxproxy_new
 
 - name: assert that proxy was created
-  assert:
+  ansible.builtin.assert:
     that: zbxproxy_new is changed
 
 - name: test - create same passive Zabbix proxy server
-  zabbix_proxy:
+  community.zabbix.zabbix_proxy:
     proxy_name: zbxproxy_example01
     description: Example Zabbix Proxy
     state: present
@@ -30,11 +30,11 @@
   register: zbxproxy_existing
 
 - name: assert that nothing has been changed
-  assert:
+  ansible.builtin.assert:
     that: not zbxproxy_existing is changed
 
 - name: test - update Zabbix proxy server description
-  zabbix_proxy:
+  community.zabbix.zabbix_proxy:
     proxy_name: zbxproxy_example01
     description: Example Zabbix Proxy desc
     state: present
@@ -47,11 +47,11 @@
   register: zbxproxy_desc_update
 
 - name: assert that description has been updated
-  assert:
+  ansible.builtin.assert:
     that: zbxproxy_desc_update is changed
 
 - name: test - update Zabbix proxy server interface
-  zabbix_proxy:
+  community.zabbix.zabbix_proxy:
     proxy_name: zbxproxy_example01
     description: Example Zabbix Proxy desc
     state: present
@@ -64,11 +64,11 @@
   register: zbxproxy_interface_update
 
 - name: assert that interface has been updated
-  assert:
+  ansible.builtin.assert:
     that: zbxproxy_interface_update is changed
 
 - name: test - update Zabbix proxy server description & interface (again)
-  zabbix_proxy:
+  community.zabbix.zabbix_proxy:
     proxy_name: zbxproxy_example01
     description: Example Zabbix Proxy desc
     state: present
@@ -81,11 +81,11 @@
   register: zbxproxy_desc_interface_update
 
 - name: assert that nothing has been changed
-  assert:
+  ansible.builtin.assert:
     that: not zbxproxy_desc_interface_update is changed
 
 - name: test - update Zabbix proxy server interface to use only ip
-  zabbix_proxy:
+  community.zabbix.zabbix_proxy:
     proxy_name: zbxproxy_example01
     description: Example Zabbix Proxy desc
     state: present
@@ -97,11 +97,11 @@
   register: zbxproxy_interface_onlyip
 
 - name: assert that interface has been updated
-  assert:
+  ansible.builtin.assert:
     that: zbxproxy_interface_onlyip is changed
 
 - name: test - update Zabbix proxy server interface to use only ip again
-  zabbix_proxy:
+  community.zabbix.zabbix_proxy:
     proxy_name: zbxproxy_example01
     description: Example Zabbix Proxy desc
     state: present
@@ -113,11 +113,11 @@
   register: zbxproxy_interface_onlyip_again
 
 - name: assert that nothing has been changed
-  assert:
+  ansible.builtin.assert:
     that: not zbxproxy_interface_onlyip_again is changed
 
 - name: test - update Zabbix proxy server interface to use only dns
-  zabbix_proxy:
+  community.zabbix.zabbix_proxy:
     proxy_name: zbxproxy_example01
     description: Example Zabbix Proxy desc
     state: present
@@ -129,11 +129,11 @@
   register: zbxproxy_interface_onlydns
 
 - name: assert that interface has been updated
-  assert:
+  ansible.builtin.assert:
     that: zbxproxy_interface_onlydns is changed
 
 - name: test - update Zabbix proxy server interface to use only dns again
-  zabbix_proxy:
+  community.zabbix.zabbix_proxy:
     proxy_name: zbxproxy_example01
     description: Example Zabbix Proxy desc
     state: present
@@ -145,11 +145,11 @@
   register: zbxproxy_interface_onlydns_again
 
 - name: assert that nothing has been changed
-  assert:
+  ansible.builtin.assert:
     that: not zbxproxy_interface_onlydns_again is changed
 
 - name: test - update Zabbix proxy server interface to fail
-  zabbix_proxy:
+  community.zabbix.zabbix_proxy:
     proxy_name: zbxproxy_example01
     description: Example Zabbix Proxy desc
     state: present
@@ -162,11 +162,11 @@
   ignore_errors: true
 
 - name: assert that module has failed
-  assert:
+  ansible.builtin.assert:
     that: zbxproxy_interface_fail is failed
 
 - name: test - update Zabbix proxy server to be active
-  zabbix_proxy:
+  community.zabbix.zabbix_proxy:
     proxy_name: zbxproxy_example01
     description: Example Zabbix Proxy
     state: present
@@ -174,11 +174,11 @@
   register: zbxproxy_active_update
 
 - name: assert that proxy was updated
-  assert:
+  ansible.builtin.assert:
     that: zbxproxy_active_update is changed
 
 - name: test - update Zabbix proxy server to be active (again)
-  zabbix_proxy:
+  community.zabbix.zabbix_proxy:
     proxy_name: zbxproxy_example01
     description: Example Zabbix Proxy
     state: present
@@ -186,11 +186,11 @@
   register: zbxproxy_active_update_again
 
 - name: assert that nothing has been changed
-  assert:
+  ansible.builtin.assert:
     that: not zbxproxy_active_update_again is changed
 
 - name: test - update Zabbix proxy server to be active and use proxy_address
-  zabbix_proxy:
+  community.zabbix.zabbix_proxy:
     proxy_name: zbxproxy_example01
     description: Example Zabbix Proxy
     state: present
@@ -199,11 +199,11 @@
   register: zbxproxy_active_proxyaddress
 
 - name: assert that proxy was updated
-  assert:
+  ansible.builtin.assert:
     that: zbxproxy_active_proxyaddress is changed
 
 - name: test - update Zabbix proxy server to be active use proxy_address (again)
-  zabbix_proxy:
+  community.zabbix.zabbix_proxy:
     proxy_name: zbxproxy_example01
     description: Example Zabbix Proxy
     state: present
@@ -212,11 +212,11 @@
   register: zbxproxy_active_proxyaddress_again
 
 - name: assert that nothing has been changed
-  assert:
+  ansible.builtin.assert:
     that: not zbxproxy_active_proxyaddress_again is changed
 
 - name: test - update Zabbix proxy server to use encryption
-  zabbix_proxy:
+  community.zabbix.zabbix_proxy:
     proxy_name: zbxproxy_example01
     description: Example Zabbix Proxy
     state: present
@@ -228,11 +228,11 @@
   register: zbxproxy_encryption
 
 - name: assert that encryption has been enabled
-  assert:
+  ansible.builtin.assert:
     that: zbxproxy_encryption is changed
 
 - name: test - update Zabbix proxy server to use encryption (again)
-  zabbix_proxy:
+  community.zabbix.zabbix_proxy:
     proxy_name: zbxproxy_example01
     description: Example Zabbix Proxy
     state: present
@@ -244,11 +244,11 @@
   register: zbxproxy_encryption_again
 
 - name: assert that nothing has been changed
-  assert:
+  ansible.builtin.assert:
     that: zbxproxy_encryption_again is changed
 
 - name: test - update Zabbix proxy server encryption settings
-  zabbix_proxy:
+  community.zabbix.zabbix_proxy:
     proxy_name: zbxproxy_example01
     description: Example Zabbix Proxy
     state: present
@@ -260,11 +260,11 @@
   register: zbxproxy_encryption_update
 
 - name: assert that encryption has been updated
-  assert:
+  ansible.builtin.assert:
     that: zbxproxy_encryption_update is changed
 
 - name: test - update Zabbix proxy server back to being passive
-  zabbix_proxy:
+  community.zabbix.zabbix_proxy:
     proxy_name: zbxproxy_example01
     description: Example Zabbix Proxy
     state: present
@@ -277,25 +277,25 @@
   register: zbxproxy_passive_update
 
 - name: assert that proxy was updated
-  assert:
+  ansible.builtin.assert:
     that: zbxproxy_passive_update is changed
 
 - name: test - delete Zabbix proxy server
-  zabbix_proxy:
+  community.zabbix.zabbix_proxy:
     proxy_name: zbxproxy_example01
     state: absent
   register: zbxproxy_delete
 
 - name: assert that proxy has been deleted
-  assert:
+  ansible.builtin.assert:
     that: zbxproxy_delete is changed
 
 - name: test - delete Zabbix proxy server (again)
-  zabbix_proxy:
+  community.zabbix.zabbix_proxy:
     proxy_name: zbxproxy_example01
     state: absent
   register: zbxproxy_delete_again
 
 - name: assert that nothing has been changed
-  assert:
+  ansible.builtin.assert:
     that: not zbxproxy_delete_again is changed

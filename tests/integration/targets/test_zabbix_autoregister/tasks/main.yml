@@ -4,7 +4,7 @@
   register: zbxautoregister_update_result
   ignore_errors: true
 
-- assert:
+- ansible.builtin.assert:
     that: zbxautoregister_update_result.failed is sameas True
 
 - name: test update autoregistration with all parameters
@@ -12,11 +12,11 @@
     tls_accept:
       - unsecure
       - tls_with_psk
-    tls_psk_identity: 'PSK 001'
+    tls_psk_identity: "PSK 001"
     tls_psk: "11111595725ac58dd977beef14b97461a7c1045b9a1c923453302c5473193478"
   register: zbxautoregister_update_result
 
-- assert:
+- ansible.builtin.assert:
     that: zbxautoregister_update_result.changed is sameas True
 
 - name: test update autoregistration with all parameters (again)
@@ -24,11 +24,11 @@
     tls_accept:
       - unsecure
       - tls_with_psk
-    tls_psk_identity: 'PSK 001'
+    tls_psk_identity: "PSK 001"
     tls_psk: "11111595725ac58dd977beef14b97461a7c1045b9a1c923453302c5473193478"
   register: zbxautoregister_update_result
 
-- assert:
+- ansible.builtin.assert:
     that: zbxautoregister_update_result.changed is sameas True
 
 - name: test update autoregistration with only tls_accept
@@ -36,7 +36,7 @@
     tls_accept: "tls_with_psk"
   register: zbxautoregister_update_result
 
-- assert:
+- ansible.builtin.assert:
     that: zbxautoregister_update_result.changed is sameas True
 
 - name: test update autoregistration with only tls_accept (again)
@@ -45,7 +45,7 @@
       - tls_with_psk
   register: zbxautoregister_update_result
 
-- assert:
+- ansible.builtin.assert:
     that: zbxautoregister_update_result.changed is sameas False
 
 - name: test update autoregistration with only tls_accept (unsecure)
@@ -54,7 +54,7 @@
       - unsecure
   register: zbxautoregister_update_result
 
-- assert:
+- ansible.builtin.assert:
     that: zbxautoregister_update_result.changed is sameas True
 
 - name: test fail to update autoregistration with only tls_accept (tls_with_psk)
@@ -63,17 +63,17 @@
   register: zbxautoregister_update_result
   ignore_errors: true
 
-- assert:
+- ansible.builtin.assert:
     that: zbxautoregister_update_result.failed is sameas True
 
 - name: test fail to update autoregistration with only tls_accept and tls_psk_identity (tls_with_psk)
   community.zabbix.zabbix_autoregister:
     tls_accept: "tls_with_psk"
-    tls_psk_identity: 'PSK 001'
+    tls_psk_identity: "PSK 001"
   register: zbxautoregister_update_result
   ignore_errors: true
 
-- assert:
+- ansible.builtin.assert:
     that: zbxautoregister_update_result.failed is sameas True
 
 - name: test fail to update autoregistration with only tls_accept and tls_psk (tls_with_psk)
@@ -83,5 +83,5 @@
   register: zbxautoregister_update_result
   ignore_errors: true
 
-- assert:
+- ansible.builtin.assert:
     that: zbxautoregister_update_result.failed is sameas True

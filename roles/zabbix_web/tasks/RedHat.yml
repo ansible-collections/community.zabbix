@@ -1,11 +1,11 @@
 - name: "RedHat | Setting Short PHP Version"
-  set_fact:
+  ansible.builtin.set_fact:
     zabbix_web_php_installed_version: "{{ zabbix_web_php_installed_version | regex_replace('\\.', '') }}"
   tags:
     - always
 
 - name: "RedHat | Install basic repo file"
-  yum_repository:
+  ansible.builtin.yum_repository:
     name: "{{ item.name }}"
     description: "{{ item.description | default(omit) }}"
     baseurl: "{{ item.baseurl }}"
@@ -24,7 +24,7 @@
     - install
 
 - name: "RedHat | Install zabbix-web-{{ zabbix_server_database }}"
-  yum:
+  ansible.builtin.yum:
     name:
       - "zabbix-web-{{ zabbix_server_database }}"
     state: "{{ zabbix_web_package_state }}"
@@ -40,7 +40,7 @@
     - install
 
 - name: "RedHat | Install zabbix-web-configuration"
-  yum:
+  ansible.builtin.yum:
     name:
       - "zabbix-{{ zabbix_web_http_server }}-conf"
     state: "{{ zabbix_web_package_state }}"

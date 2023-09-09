@@ -1,7 +1,6 @@
 ---
-
 - name: "Create volume mount string"
-  set_fact:
+  ansible.builtin.set_fact:
     volume_mount: "{{ zabbix_agent_tlspskfile }}:/var/lib/zabbix/enc/tlspskfile"
     tls_key:
       ZBX_TLSPSKFILE: tlspskfile
@@ -9,7 +8,7 @@
     - zabbix_agent_tlspskfile is defined
 
 - name: "Add zabbix_agent_tlspskfile to volume mount"
-  set_fact:
+  ansible.builtin.set_fact:
     zabbix_agent_docker_volumes: "{{ zabbix_agent_docker_volumes + [ volume_mount ] }}"
     zabbix_agent_docker_env: "{{ zabbix_agent_docker_env | combine(tls_key) }}"
   when:

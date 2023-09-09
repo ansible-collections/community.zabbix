@@ -2,26 +2,26 @@
 # Tasks specific for RedHat systems
 
 - name: "RedHat | Set short version name"
-  set_fact:
+  ansible.builtin.set_fact:
     zabbix_short_version: "{{ zabbix_proxy_version | regex_replace('\\.', '') }}"
   tags:
     - always
 
 - name: "RedHat | Define package without version"
-  set_fact:
+  ansible.builtin.set_fact:
     zabbix_proxy_package: "zabbix-proxy-{{ zabbix_proxy_database }}"
     cacheable: true
   tags:
     - always
 
 - name: "RedHat | Set facts for Zabbix"
-  set_fact:
+  ansible.builtin.set_fact:
     datafiles_path: "/usr/share/doc/zabbix-sql-scripts/{{ zabbix_proxy_db_long }}"
   tags:
     - always
 
 - name: "RedHat | Make sure old file is absent"
-  file:
+  ansible.builtin.file:
     path: /etc/yum.repos.d/zabbix-supported.repo
     state: absent
   become: true
@@ -29,7 +29,7 @@
     - install
 
 - name: "RedHat | Install basic repo file"
-  yum_repository:
+  ansible.builtin.yum_repository:
     name: "{{ item.name }}"
     description: "{{ item.description }}"
     baseurl: "{{ item.baseurl }}"
@@ -50,7 +50,7 @@
 - name: Install packages for Zabbix Repository
   block:
     - name: "RedHat | Installing zabbix-proxy-{{ zabbix_proxy_database }}"
-      yum:
+      ansible.builtin.yum:
         pkg: "{{ zabbix_proxy_package }}-{{ zabbix_proxy_version }}.{{ zabbix_proxy_version_minor }}"
         state: "{{ zabbix_proxy_package_state }}"
         disablerepo: "{{ zabbix_proxy_disable_repo | default(omit) }}"
@@ -62,7 +62,7 @@
       until: is_zabbix_proxy_package_installed is succeeded
 
     - name: "RedHat | Installing zabbix-sql-scripts"
-      yum:
+      ansible.builtin.yum:
         pkg: "zabbix-sql-scripts-{{ zabbix_proxy_version }}.{{ zabbix_proxy_version_minor }}"
         state: "{{ zabbix_proxy_package_state }}"
         disablerepo: "{{ zabbix_proxy_disable_repo | default(omit) }}"
@@ -76,7 +76,7 @@
     - install
 
 - name: "RedHat | Install Ansible PostgreSQL Client package"
-  yum:
+  ansible.builtin.yum:
     name: "{{ pgsql_depenencies[ansible_distribution_major_version] }}"
     state: present
   environment:
@@ -105,7 +105,7 @@
       when: ansible_distribution_major_version == '7'
 
     - name: "RedHat | Install Mysql Client package"
-      yum:
+      ansible.builtin.yum:
         name: "{{ mysql_client_pkgs[ansible_distribution_major_version] }}"
         state: installed
       environment:
@@ -124,7 +124,7 @@
     - dependencies
 
 - name: "RedHat | Install sqlite3"
-  yum:
+  ansible.builtin.yum:
     name:
       - sqlite
     state: present
@@ -142,6 +142,6 @@
     - dependencies
 
 - name: "Configure SELinux when enabled"
-  include_tasks: selinux.yml
+  ansible.builtin.include_tasks: selinux.yml
   when:
     - zabbix_proxy_selinux | bool

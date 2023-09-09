@@ -1,12 +1,12 @@
 ---
 - name: "Debian | Set some variables"
-  set_fact:
+  ansible.builtin.set_fact:
     zabbix_short_version: "{{ zabbix_javagateway_version | regex_replace('\\.', '') }}"
   tags:
     - always
 
 - name: "Debian | Set some variables"
-  set_fact:
+  ansible.builtin.set_fact:
     zabbix_javagateway_apt_repository:
       - "http://repo.zabbix.com/zabbix/{{ zabbix_javagateway_version }}/{{ ansible_distribution.lower() }}/"
       - "{{ ansible_distribution_release }}"
@@ -17,7 +17,7 @@
     - install
 
 - name: "Debian | Set some variables"
-  set_fact:
+  ansible.builtin.set_fact:
     zabbix_javagateway_apt_repository:
       - "http://repo.zabbix.com/zabbix/{{ zabbix_javagateway_version }}/{{ ansible_distribution.lower() }}-arm64/"
       - "{{ ansible_distribution_release }}"
@@ -51,7 +51,7 @@
     - install
 
 - name: "Debian | Installing repository Debian"
-  apt_repository:
+  ansible.builtin.apt_repository:
     repo: "{{ item }} [signed-by={{ zabbix_gpg_key }}] {{ zabbix_javagateway_apt_repository | join(' ') }}"
     state: present
   become: true
@@ -62,7 +62,7 @@
     - install
 
 - name: "Debian | Installing zabbix-java-gateway"
-  apt:
+  ansible.builtin.apt:
     pkg: zabbix-java-gateway
     state: "{{ zabbix_javagateway_package_state }}"
     update_cache: true
@@ -78,7 +78,7 @@
     - install
 
 - name: "Debian | Make sure Zabbix Java Gateway is not yet running"
-  systemd:
+  ansible.builtin.systemd:
     name: zabbix-java-gateway
     state: stopped
     enabled: true

@@ -1,6 +1,6 @@
 ---
 - name: "SELinux | RedHat | Install related SELinux package to fix issues"
-  yum:
+  ansible.builtin.yum:
     name: "{{ selinux_pkgs[ansible_distribution_major_version] }}"
     state: present
   environment:
@@ -13,7 +13,7 @@
     - zabbix-proxy
 
 - name: "SELinux | RedHat | Add SEmodule to fix SELinux issue: zabbix_proxy_alerter.sock"
-  script:
+  ansible.builtin.script:
     cmd: files/install_semodule.bsx
   args:
     creates: /etc/selinux/targeted/active/modules/400/zabbix_proxy_add/cil

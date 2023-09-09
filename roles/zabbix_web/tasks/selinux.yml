@@ -1,6 +1,6 @@
 ---
 - name: "SELinux | RedHat | Install related SELinux package"
-  yum:
+  ansible.builtin.yum:
     name:
       - libsemanage-python
     state: present
@@ -18,7 +18,7 @@
     - install
 
 - name: "SELinux | RedHat | Install related SELinux package on RHEL9 and RHEL8"
-  yum:
+  ansible.builtin.yum:
     name:
       - python3-libsemanage
     state: present

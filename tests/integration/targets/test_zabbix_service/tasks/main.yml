@@ -10,59 +10,59 @@
 
   block:
     - name: "test - Create a new service with check_mode"
-      zabbix_service:
+      community.zabbix.zabbix_service:
         name: ExampleServiceForServiceModule
       check_mode: true
       register: create_service_check_mode_result
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - create_service_check_mode_result.changed is sameas true
 
     - name: "test - Create a new service"
-      zabbix_service:
+      community.zabbix.zabbix_service:
         name: ExampleServiceForServiceModule
       register: create_service_result
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - create_service_result.changed is sameas true
 
     - name: "test - Create a new service (idempotency check)"
-      zabbix_service:
+      community.zabbix.zabbix_service:
         name: ExampleServiceForServiceModule
       register: create_service_idempotency_check_result
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - create_service_idempotency_check_result.changed is sameas false
 
     - name: "test - Update service add service tags"
-      zabbix_service:
+      community.zabbix.zabbix_service:
         name: ExampleServiceForServiceModule
         tags:
           - tag: TagName1
             value: TagValue1
       register: update_service_stags_result
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - update_service_stags_result.changed is sameas true
 
     - name: "test - Update service with service tags (idempotency check)"
-      zabbix_service:
+      community.zabbix.zabbix_service:
         name: ExampleServiceForServiceModule
         tags:
           - tag: TagName1
             value: TagValue1
       register: update_service_stags_idempotency_check_result
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - update_service_stags_idempotency_check_result.changed is sameas false
 
     - name: "test - Update service add more service tags"
-      zabbix_service:
+      community.zabbix.zabbix_service:
         name: ExampleServiceForServiceModule
         tags:
           - tag: TagName1
@@ -71,12 +71,12 @@
             value: TagValue2
       register: update_service_more_stags_result
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - update_service_more_stags_result.changed is sameas true
 
     - name: "test - Update service add more service tags (idempotency check)"
-      zabbix_service:
+      community.zabbix.zabbix_service:
         name: ExampleServiceForServiceModule
         tags:
           - tag: TagName1
@@ -85,41 +85,41 @@
             value: TagValue2
       register: update_service_more_stags_idempotency_check_result
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - update_service_more_stags_idempotency_check_result.changed is sameas false
 
     - name: "test - Update service remove service tags"
-      zabbix_service:
+      community.zabbix.zabbix_service:
         name: ExampleServiceForServiceModule
         tags:
           - tag: TagName2
             value: TagValue2
       register: update_service_less_stags_result
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - update_service_less_stags_result.changed is sameas true
 
     - name: "test - Update service remove service tags (idempotency check)"
-      zabbix_service:
+      community.zabbix.zabbix_service:
         name: ExampleServiceForServiceModule
         tags:
           - tag: TagName2
             value: TagValue2
       register: update_service_less_stags_idempotency_check_result
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - update_service_less_stags_idempotency_check_result.changed is sameas false
 
     - name: "test - Delete service"
-      zabbix_service:
+      community.zabbix.zabbix_service:
         name: ExampleServiceForServiceModule
         state: absent
 
     - name: "test - Create service with one problem tag"
-      zabbix_service:
+      community.zabbix.zabbix_service:
         name: ExampleServiceForServiceModule
         problem_tags:
           - tag: TagName1
@@ -127,12 +127,12 @@
             value: TagValue1
       register: create_service_with_ptag_result
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - create_service_with_ptag_result.changed is sameas true
 
     - name: "test - Create service with one problem tag (idempotency check)"
-      zabbix_service:
+      community.zabbix.zabbix_service:
         name: ExampleServiceForServiceModule
         problem_tags:
           - tag: TagName1
@@ -141,7 +141,7 @@
       register: create_service_with_ptag_idempotency_check_result
 
     - name: "test - Update service with problem tag without operator"
-      zabbix_service:
+      community.zabbix.zabbix_service:
         name: ExampleServiceForServiceModule
         problem_tags:
           - tag: TagName1
@@ -151,12 +151,12 @@
             value: TagValue2
       register: update_service_with_ptag_woop_result
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - update_service_with_ptag_woop_result.changed is sameas true
 
     - name: "test - Update service with problem tag without operator (idempotency check)"
-      zabbix_service:
+      community.zabbix.zabbix_service:
         name: ExampleServiceForServiceModule
         problem_tags:
           - tag: TagName1
@@ -166,12 +166,12 @@
             value: TagValue2
       register: update_service_with_ptag_woop_idempotency_check_result
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - update_service_with_ptag_woop_idempotency_check_result.changed is sameas false
 
     - name: "test - Update service with problem tag with like operator"
-      zabbix_service:
+      community.zabbix.zabbix_service:
         name: ExampleServiceForServiceModule
         problem_tags:
           - tag: TagName1
@@ -184,12 +184,12 @@
             value: TagValue3
       register: update_service_with_ptag_wlikeop_result
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - update_service_with_ptag_wlikeop_result.changed is sameas true
 
     - name: "test - Update service with problem tag with like operator (idempotency check)"
-      zabbix_service:
+      community.zabbix.zabbix_service:
         name: ExampleServiceForServiceModule
         problem_tags:
           - tag: TagName1
@@ -202,12 +202,12 @@
             value: TagValue3
       register: update_service_with_ptag_wlikeop_idempotency_check_result
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - update_service_with_ptag_wlikeop_idempotency_check_result.changed is sameas false
 
     - name: "test - Update service with problem tag without operator and without value"
-      zabbix_service:
+      community.zabbix.zabbix_service:
         name: ExampleServiceForServiceModule
         problem_tags:
           - tag: TagName1
@@ -221,12 +221,12 @@
           - tag: TagName4
       register: update_service_with_ptag_woov_result
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - update_service_with_ptag_woov_result.changed is sameas true
 
     - name: "test - Update service with problem tag without operator and without value (idempotency check)"
-      zabbix_service:
+      community.zabbix.zabbix_service:
         name: ExampleServiceForServiceModule
         problem_tags:
           - tag: TagName1
@@ -240,12 +240,12 @@
           - tag: TagName4
       register: update_service_with_ptag_woov_idempotency_check_result
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - update_service_with_ptag_woov_idempotency_check_result.changed is sameas false
 
     - name: "test - Update service remove problem tags"
-      zabbix_service:
+      community.zabbix.zabbix_service:
         name: ExampleServiceForServiceModule
         problem_tags:
           - tag: TagName1
@@ -256,12 +256,12 @@
             value: TagValue3
       register: update_service_remove_tags_result
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - update_service_remove_tags_result.changed is sameas true
 
     - name: "test - Update service remove problem tags (idempotency check)"
-      zabbix_service:
+      community.zabbix.zabbix_service:
         name: ExampleServiceForServiceModule
         problem_tags:
           - tag: TagName1
@@ -272,237 +272,237 @@
             value: TagValue3
       register: update_service_remove_tags_idempotency_check_result
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - update_service_remove_tags_idempotency_check_result.changed is sameas false
 
     - name: "test - Update service remove all problem tags"
-      zabbix_service:
+      community.zabbix.zabbix_service:
         name: ExampleServiceForServiceModule
       register: update_service_remove_all_tags_result
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - update_service_remove_all_tags_result.changed is sameas true
 
     - name: "test - Update service remove all problem tags (idempotency check)"
-      zabbix_service:
+      community.zabbix.zabbix_service:
         name: ExampleServiceForServiceModule
       register: update_service_remove_all_tags_idempotency_check_result
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - update_service_remove_all_tags_idempotency_check_result.changed is sameas false
 
     - name: "test - Create a new child service"
-      zabbix_service:
+      community.zabbix.zabbix_service:
         name: ExampleChildServiceForServiceModule
         sortorder: 10
         parents:
           - ExampleServiceForServiceModule
       register: create_child_service_result
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - create_child_service_result.changed is sameas true
 
     - name: "test - Create a new child service (idempotency check)"
-      zabbix_service:
+      community.zabbix.zabbix_service:
         name: ExampleChildServiceForServiceModule
         sortorder: 10
         parents:
           - ExampleServiceForServiceModule
       register: create_child_service_idempotency_check_result
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - create_child_service_idempotency_check_result.changed is sameas false
 
     - name: "test - Update child service to remove parent"
-      zabbix_service:
+      community.zabbix.zabbix_service:
         name: ExampleChildServiceForServiceModule
         parents: []
       register: update_child_service_delete_parent_result
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - update_child_service_delete_parent_result.changed is sameas true
 
     - name: "test - Create a new parent service"
-      zabbix_service:
+      community.zabbix.zabbix_service:
         name: ExampleParentServiceForServiceModule
 
     - name: "test - Delete child service"
-      zabbix_service:
+      community.zabbix.zabbix_service:
         name: ExampleChildServiceForServiceModule
         state: absent
 
     - name: "test - Create a new child service with two parents"
-      zabbix_service:
+      community.zabbix.zabbix_service:
         name: ExampleChildServiceForServiceModule
         parents:
           - ExampleServiceForServiceModule
           - ExampleParentServiceForServiceModule
       register: create_child_service_two_parents_result
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - create_child_service_two_parents_result.changed is sameas true
 
     - name: "test - Create a new child service with two parents (idempotency check)"
-      zabbix_service:
+      community.zabbix.zabbix_service:
         name: ExampleChildServiceForServiceModule
         parents:
           - ExampleServiceForServiceModule
           - ExampleParentServiceForServiceModule
       register: create_child_service_two_parents_idempotency_check_result
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - create_child_service_two_parents_idempotency_check_result.changed is sameas false
 
     - name: "test - Remove one parent from new child service"
-      zabbix_service:
+      community.zabbix.zabbix_service:
         name: ExampleChildServiceForServiceModule
         parents:
           - ExampleParentServiceForServiceModule
       register: update_child_service_remove_parent_result
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - update_child_service_remove_parent_result.changed is sameas true
 
     - name: "test - Remove one parent from new child service (idempotency check)"
-      zabbix_service:
+      community.zabbix.zabbix_service:
         name: ExampleChildServiceForServiceModule
         parents:
           - ExampleParentServiceForServiceModule
       register: update_child_service_remove_parent_idempotency_check_result
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - update_child_service_remove_parent_idempotency_check_result.changed is sameas false
 
     - name: "test - Delete parent service 2"
-      zabbix_service:
+      community.zabbix.zabbix_service:
         name: ExampleParentServiceForServiceModule
         state: absent
 
     - name: "test - Create parent service with child service"
-      zabbix_service:
+      community.zabbix.zabbix_service:
         name: ExampleParentServiceForServiceModule
         children:
           - ExampleChildServiceForServiceModule
       register: create_parent_service_with_child_result
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - create_parent_service_with_child_result.changed is sameas true
 
     - name: "test - Create parent service with child service (idempotency check)"
-      zabbix_service:
+      community.zabbix.zabbix_service:
         name: ExampleParentServiceForServiceModule
         children:
           - ExampleChildServiceForServiceModule
       register: create_parent_service_with_child_result_idempotency_check_result
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - create_parent_service_with_child_result_idempotency_check_result.changed is sameas false
 
     - name: "test - Create second chile service"
-      zabbix_service:
+      community.zabbix.zabbix_service:
         name: ExampleChildServiceForServiceModule2
 
     - name: "test - Update parent service with the second child service"
-      zabbix_service:
+      community.zabbix.zabbix_service:
         name: ExampleParentServiceForServiceModule
         children:
           - ExampleChildServiceForServiceModule
           - ExampleChildServiceForServiceModule2
       register: update_parent_service_with_second_child_result
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - update_parent_service_with_second_child_result.changed is sameas true
 
     - name: "test - Update parent service with the second child service (idempotency check)"
-      zabbix_service:
+      community.zabbix.zabbix_service:
         name: ExampleParentServiceForServiceModule
         children:
           - ExampleChildServiceForServiceModule
           - ExampleChildServiceForServiceModule2
       register: update_parent_service_with_second_child_result_idempotency_check_result
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - update_parent_service_with_second_child_result_idempotency_check_result.changed is sameas false
 
     - name: "test - Delete parent service"
-      zabbix_service:
+      community.zabbix.zabbix_service:
         name: ExampleParentServiceForServiceModule
         state: absent
 
     - name: "test - Create parent service with two child services"
-      zabbix_service:
+      community.zabbix.zabbix_service:
         name: ExampleParentServiceForServiceModule
         children:
           - ExampleChildServiceForServiceModule
           - ExampleChildServiceForServiceModule2
       register: create_parent_service_with_two_children_result
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - create_parent_service_with_two_children_result.changed is sameas true
 
     - name: "test - Create parent service with child services (idempotency check)"
-      zabbix_service:
+      community.zabbix.zabbix_service:
         name: ExampleParentServiceForServiceModule
         children:
           - ExampleChildServiceForServiceModule
           - ExampleChildServiceForServiceModule2
       register: create_parent_service_with_two_children_idempotency_check_result
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - create_parent_service_with_two_children_idempotency_check_result.changed is sameas false
 
     - name: "test - Delete parent service"
-      zabbix_service:
+      community.zabbix.zabbix_service:
         name: ExampleParentServiceForServiceModule
         state: absent
 
     - name: "test - Delete child service"
-      zabbix_service:
+      community.zabbix.zabbix_service:
         name: ExampleChildServiceForServiceModule
         state: absent
     - name: "test - Delete child servicei 2"
-      zabbix_service:
+      community.zabbix.zabbix_service:
         name: ExampleChildServiceForServiceModule2
         state: absent
 
     - name: "test - Delete new service"
-      zabbix_service:
+      community.zabbix.zabbix_service:
         name: ExampleServiceForServiceModule
         state: absent
       register: delete_service_result
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - delete_service_result.changed is sameas true
 
     - name: "test - Delete new service (idempotency check)"
-      zabbix_service:
+      community.zabbix.zabbix_service:
         name: ExampleServiceForServiceModule
         state: absent
       register: delete_service_idempotency_check_result
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - delete_service_idempotency_check_result.changed is sameas false
 
     - name: "test - Create a new service with status rule"
-      zabbix_service:
+      community.zabbix.zabbix_service:
         name: ExampleServiceForServiceModule
         status_rules:
           - type: at_least_n_child_services_have_status_or_above
@@ -511,12 +511,12 @@
             new_status: not_classified
       register: create_service_sr_result
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - create_service_sr_result.changed is sameas true
 
     - name: "test - Create a new service with status rule (idempotency check)"
-      zabbix_service:
+      community.zabbix.zabbix_service:
         name: ExampleServiceForServiceModule
         status_rules:
           - type: at_least_n_child_services_have_status_or_above
@@ -525,12 +525,12 @@
             new_status: not_classified
       register: create_service_sr_idempotency_check_result
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - create_service_sr_idempotency_check_result.changed is sameas false
 
     - name: "test - Update service with the second status rule"
-      zabbix_service:
+      community.zabbix.zabbix_service:
         name: ExampleServiceForServiceModule
         status_rules:
           - type: at_least_n_child_services_have_status_or_above
@@ -543,12 +543,12 @@
             new_status: warning
       register: update_service_add_sr_result
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - update_service_add_sr_result.changed is sameas true
 
     - name: "test - Update service with the second status rule (idempotency check)"
-      zabbix_service:
+      community.zabbix.zabbix_service:
         name: ExampleServiceForServiceModule
         status_rules:
           - type: at_least_n_child_services_have_status_or_above
@@ -561,12 +561,12 @@
             new_status: warning
       register: update_service_add_sr_idempotency_check_result
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - update_service_add_sr_idempotency_check_result.changed is sameas false
 
     - name: "test - Update service remove status rule"
-      zabbix_service:
+      community.zabbix.zabbix_service:
         name: ExampleServiceForServiceModule
         status_rules:
           - type: at_least_npct_child_services_have_status_or_above
@@ -575,12 +575,12 @@
             new_status: warning
       register: update_service_remove_sr_result
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - update_service_remove_sr_result.changed is sameas true
 
     - name: "test - Update service remove status rule (idempotency check)"
-      zabbix_service:
+      community.zabbix.zabbix_service:
         name: ExampleServiceForServiceModule
         status_rules:
           - type: at_least_npct_child_services_have_status_or_above
@@ -589,12 +589,12 @@
             new_status: warning
       register: update_service_remove_sr_idempotency_check_result
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - update_service_remove_sr_idempotency_check_result.changed is sameas false
 
     - name: "test - Delete new service"
-      zabbix_service:
+      community.zabbix.zabbix_service:
         name: ExampleServiceForServiceModule
         state: absent
       register: delete_service_result

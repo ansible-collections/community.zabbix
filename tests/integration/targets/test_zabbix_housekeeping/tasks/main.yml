@@ -23,7 +23,7 @@
     compress_older: 7d
   register: zbxhk_update_result
 
-- assert:
+- ansible.builtin.assert:
     that: zbxhk_update_result.changed is sameas True
 
 - name: test update housekeeping parameters (again).
@@ -50,7 +50,7 @@
     compress_older: 7d
   register: zbxhk_update_result
 
-- assert:
+- ansible.builtin.assert:
     that: zbxhk_update_result.changed is sameas False
 
 - name: initialize housekeeping setting.

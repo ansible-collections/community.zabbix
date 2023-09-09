@@ -2,7 +2,7 @@
 # task file for postgresql
 
 - name: "PostgreSQL | Set the correct delegated_dbhost (to support postgres db deployment on a remote dbhost)"
-  set_fact:
+  ansible.builtin.set_fact:
     delegated_dbhost: "{{ zabbix_proxy_dbhost if (zabbix_proxy_dbhost != 'localhost') else inventory_hostname }}"
   when:
     - zabbix_proxy_dbhost_run_install
@@ -10,7 +10,7 @@
     - database
 
 - name: "PostgreSQL | Set the correct delegated_dbhost (to support postgres db deployment on a remote dbhost)"
-  set_fact:
+  ansible.builtin.set_fact:
     delegated_dbhost: "{{ inventory_hostname }}"
   when:
     - not zabbix_proxy_dbhost_run_install
@@ -73,14 +73,14 @@
     - database
 
 - name: "PostgreSQL | Handle Compressed Schema File"
-  set_fact:
+  ansible.builtin.set_fact:
     zabbix_proxy_cat_cmd: zcat
   when: "'.gz' in ls_output_schema.stdout"
   tags:
     - database
 
 - name: "PostgreSQL | Importing schema file"
-  shell: |
+  ansible.builtin.shell: |
     set -euxo pipefail
     {{ zabbix_proxy_cat_cmd }} {{ ls_output_schema.stdout }} | psql -h '{{ zabbix_proxy_dbhost }}' -U '{{ zabbix_proxy_dbuser }}' -d '{{ zabbix_proxy_dbname }}'
     touch /etc/zabbix/schema.done
