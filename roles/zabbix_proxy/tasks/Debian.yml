@@ -111,7 +111,7 @@
   ansible.builtin.apt:
     pkg: "zabbix-proxy-{{ zabbix_proxy_database }}"
     update_cache: true
-    cache_valid_time: 3600
+    cache_valid_time: 0
     force: true
     state: "{{ zabbix_proxy_package_state }}"
     default_release: "{{ ansible_distribution_release }}"
