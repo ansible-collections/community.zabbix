@@ -70,7 +70,7 @@
       URIs: {{ zabbix_repo_deb_url }}
       Suites: {{ ansible_distribution_release }}
       Components: {{ zabbix_repo_deb_component }}
-      Architecutres: {{ 'amd64' if ansible_machine != 'aarch64' else 'arm64'}}
+      Architectures: {{ 'amd64' if ansible_machine != 'aarch64' else 'arm64'}}
       Signed-By: {{ zabbix_gpg_key }}
   become: true
   tags:
