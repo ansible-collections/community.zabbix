@@ -66,6 +66,8 @@ zabbix_repo_yum:
     gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-ZABBIX
     state: present
 
+zabbix_repo_deb_component: main
+
 # Zabbix API stuff
 zabbix_api_server_host: localhost
 # zabbix_api_server_port: 80

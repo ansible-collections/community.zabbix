@@ -130,6 +130,8 @@ The following is an overview of all available configuration default for this rol
 * `zabbix_proxy_disable_repo`: A list of repos to disable during install.  Default `epel`.
 * `zabbix_proxy_apt_priority`: APT priority for the zabbix repository
 * `*zabbix_proxy_package_state`: Default: `present`. Can be overridden to `latest` to update packages
+* `zabbix_repo_deb_url`: The URL to the Zabbix repository.  Default `http://repo.zabbix.com/zabbix/{{ zabbix_proxy_version }}/{{ ansible_distribution.lower() }}`
+* `zabbix_repo_deb_component`: The repository component for Debian installs. Default `main`.
 ### SElinux
 
 * `zabbix_proxy_selinux`: Default: `False`. Enables an SELinux policy so that the Proxy will run.

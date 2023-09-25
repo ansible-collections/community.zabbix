@@ -60,6 +60,8 @@ The `zabbix_javagateway_version` is optional. The latest available major.minor v
 * `zabbix_javagateway_disable_repo`: A list of repos to disable during install.  Default `epel`.
 * `zabbix_javagateway_package_state`: Default: `present`. Can be overridden to `latest` to update packages when needed.
 * `zabbix_javagateway_conf_mode`: Default: `0644`. The "mode" for the Zabbix configuration file.
+* `zabbix_repo_deb_url`: The URL to the Zabbix repository.  Default `http://repo.zabbix.com/zabbix/{{ zabbix_agent_version }}/{{ ansible_distribution.lower() }}`
+* `zabbix_repo_deb_component`: The repository component for Debian installs. Default `main`.
 
 ### Java Gatewaty
 
