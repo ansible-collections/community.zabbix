@@ -7,6 +7,14 @@
   tags:
     - always
 
+- name: "Debian | Repo URL"
+  ansible.builtin.set_fact:
+    zabbix_repo_deb_url: "{{ _zabbix_repo_deb_url }}{{ '-arm64' if ansible_machine == 'aarch64' else ''}}"
+  when:
+    - zabbix_repo_deb_url is undefined
+  tags:
+    - always
+
 - name: "Debian | Set some facts for Zabbix"
   ansible.builtin.set_fact:
     datafiles_path: /usr/share/doc/zabbix-sql-scripts/{{ zabbix_proxy_db_long }}
@@ -56,13 +64,20 @@
     - install
 
 - name: "Debian | Installing repository {{ ansible_distribution }}"
-  ansible.builtin.apt_repository:
-    repo: "{{ item }} [signed-by={{ zabbix_gpg_key }}] http://repo.zabbix.com/zabbix/{{ zabbix_proxy_version }}/{{ ansible_distribution.lower() }}/ {{ ansible_distribution_release }} main"
-    state: present
+  ansible.builtin.copy:
+    dest: /etc/apt/sources.list.d/zabbix.sources
+    owner: root
+    group: root
+    mode: 0644
+    content: |
+      Types: deb deb-src
+      Enabled: yes
+      URIs: {{ zabbix_repo_deb_url }}
+      Suites: {{ ansible_distribution_release }}
+      Components: {{ zabbix_repo_deb_component }}
+      Architectures: {{ 'amd64' if ansible_machine != 'aarch64' else 'arm64'}}
+      Signed-By: {{ zabbix_gpg_key }}
   become: true
-  with_items:
-    - deb-src
-    - deb
   tags:
     - install
 
@@ -96,7 +111,7 @@
   ansible.builtin.apt:
     pkg: "zabbix-proxy-{{ zabbix_proxy_database }}"
     update_cache: true
-    cache_valid_time: 3600
+    cache_valid_time: 0
     force: true
     state: "{{ zabbix_proxy_package_state }}"
     default_release: "{{ ansible_distribution_release }}"

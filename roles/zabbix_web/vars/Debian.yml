@@ -48,3 +48,4 @@ zabbix_valid_web_versions:
 
 debian_keyring_path: /etc/apt/keyrings/
 zabbix_gpg_key: "{{ debian_keyring_path }}/zabbix-official-repo.asc"
+_zabbix_repo_deb_url: "http://repo.zabbix.com/zabbix/{{ zabbix_web_version }}/{{ ansible_distribution.lower() }}"

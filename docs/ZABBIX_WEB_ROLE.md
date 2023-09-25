@@ -92,6 +92,8 @@ The following is an overview of all available configuration defaults for this ro
 * `zabbix_web_package_state`: Default: `present`. Can be overridden to `latest` to update packages when needed.
 * `zabbix_web_doubleprecision`: Default: `False`. For upgraded installations, please read database [upgrade notes](https://www.zabbix.com/documentation/current/manual/installation/upgrade_notes_500) (Paragraph "Enabling extended range of numeric (float) values") before enabling this option.
 * `zabbix_web_conf_mode`: Default: `0644`. The "mode" for the Zabbix configuration file.
+* `zabbix_repo_deb_url`: The URL to the Zabbix repository.  Default `http://repo.zabbix.com/zabbix/{{ zabbix_web_version }}/{{ ansible_distribution.lower() }}`
+* `zabbix_repo_deb_component`: The repository component for Debian installs. Default `main`.
 
 ### Zabbix Web specific
 

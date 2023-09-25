@@ -5,27 +5,13 @@
   tags:
     - always
 
-- name: "Debian | Set some variables"
+- name: "Debian | Repo URL"
   ansible.builtin.set_fact:
-    zabbix_javagateway_apt_repository:
-      - "http://repo.zabbix.com/zabbix/{{ zabbix_javagateway_version }}/{{ ansible_distribution.lower() }}/"
-      - "{{ ansible_distribution_release }}"
-      - "main"
+    zabbix_repo_deb_url: "{{ _zabbix_repo_deb_url }}{{ '-arm64' if ansible_machine == 'aarch64' else ''}}"
   when:
-    - ansible_machine != "aarch64"
+    - zabbix_repo_deb_url is undefined
   tags:
-    - install
-
-- name: "Debian | Set some variables"
-  ansible.builtin.set_fact:
-    zabbix_javagateway_apt_repository:
-      - "http://repo.zabbix.com/zabbix/{{ zabbix_javagateway_version }}/{{ ansible_distribution.lower() }}-arm64/"
-      - "{{ ansible_distribution_release }}"
-      - "main"
-  when:
-    - ansible_machine == "aarch64"
-  tags:
-    - install
+    - always
 
 # In releases older than Debian 12 and Ubuntu 22.04, /etc/apt/keyrings does not exist by default.
 # It SHOULD be created with permissions 0755 if it is needed and does not already exist.
@@ -50,14 +36,21 @@
   tags:
     - install
 
-- name: "Debian | Installing repository Debian"
-  ansible.builtin.apt_repository:
-    repo: "{{ item }} [signed-by={{ zabbix_gpg_key }}] {{ zabbix_javagateway_apt_repository | join(' ') }}"
-    state: present
+- name: "Debian | Installing repository {{ ansible_distribution }}"
+  ansible.builtin.copy:
+    dest: /etc/apt/sources.list.d/zabbix.sources
+    owner: root
+    group: root
+    mode: 0644
+    content: |
+      Types: deb deb-src
+      Enabled: yes
+      URIs: {{ zabbix_repo_deb_url }}
+      Suites: {{ ansible_distribution_release }}
+      Components: {{ zabbix_repo_deb_component }}
+      Architectures: {{ 'amd64' if ansible_machine != 'aarch64' else 'arm64'}}
+      Signed-By: {{ zabbix_gpg_key }}
   become: true
-  with_items:
-    - deb-src
-    - deb
   tags:
     - install
 
