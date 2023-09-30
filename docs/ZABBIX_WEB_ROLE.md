@@ -261,7 +261,7 @@ zabbix.conf.php, for example to add LDAP CA certificates. To do this add a `zabb
       php_packages:
         - php
         - php-fpm
-        - php-acpu
+        - php-apcu
     - role: geerlingguy.apache-php-fpm
     - role: community.zabbix.zabbix_web
       zabbix_api_server_url: zabbix.mydomain.com
