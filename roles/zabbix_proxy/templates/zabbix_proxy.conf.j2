@@ -7,9 +7,7 @@
 # https://www.zabbix.com/documentation/{{ zabbix_proxy_version }}/en/manual/appendix/config/zabbix_proxy
 
 {{ (zabbix_proxy_allowroot is defined and zabbix_proxy_allowroot is not none) | ternary('','# ') }}AllowRoot={{ zabbix_proxy_allowroot | default('') }}
-{% if zabbix_proxy_version is version('6.0', '>=') %}
 {{ (zabbix_proxy_allowunsupporteddbversions is defined and zabbix_proxy_allowunsupporteddbversions is not none) | ternary('','# ') }}AllowUnsupportedDBVersions={{ zabbix_proxy_allowunsupporteddbversions | default('') }}
-{% endif %}
 {{ (zabbix_proxy_cachesize is defined and zabbix_proxy_cachesize is not none) | ternary('','# ') }}CacheSize={{ zabbix_proxy_cachesize | default('') }}
 {{ (zabbix_proxy_configfrequency is defined and zabbix_proxy_configfrequency is not none) | ternary('','# ') }}ConfigFrequency={{ zabbix_proxy_configfrequency | default('') }}
 {{ (zabbix_proxy_datasenderfrequency is defined and zabbix_proxy_datasenderfrequency is not none) | ternary('','# ') }}DataSenderFrequency={{ zabbix_proxy_datasenderfrequency | default('') }}
@@ -30,7 +28,7 @@
 {{ (zabbix_proxy_externalscripts is defined and zabbix_proxy_externalscripts is not none) | ternary('','# ') }}ExternalScripts={{ zabbix_proxy_externalscripts | default('') }}
 {{ (zabbix_proxy_fping6location is defined and zabbix_proxy_fping6location is not none) | ternary('','# ') }}Fping6Location={{ zabbix_proxy_fping6location | default('') }}
 {{ (zabbix_proxy_fpinglocation is defined and zabbix_proxy_fpinglocation is not none) | ternary('','# ') }}FpingLocation={{ zabbix_proxy_fpinglocation | default('') }}
-{% if zabbix_proxy_version is version('6.4', '<') %}
+{% if zabbix_proxy_version is version('6.0', '==') %}
 {{ (zabbix_proxy_heartbeatfrequency is defined and zabbix_proxy_heartbeatfrequency is not none) | ternary('','# ') }}HeartbeatFrequency={{ zabbix_proxy_heartbeatfrequency | default('') }}
 {% endif %}
 {{ (zabbix_proxy_historycachesize is defined and zabbix_proxy_historycachesize is not none) | ternary('','# ') }}HistoryCacheSize={{ zabbix_proxy_historycachesize | default('') }}
@@ -103,11 +101,11 @@
 {{ (zabbix_proxy_unreachabledelay is defined and zabbix_proxy_unreachabledelay is not none) | ternary('','# ') }}UnreachableDelay={{ zabbix_proxy_unreachabledelay | default('') }}
 {{ (zabbix_proxy_unreachableperiod is defined and zabbix_proxy_unreachableperiod is not none) | ternary('','# ') }}UnreachablePeriod={{ zabbix_proxy_unreachableperiod | default('') }}
 {{ (zabbix_proxy_user is defined and zabbix_proxy_user is not none) | ternary('','# ') }}User={{ zabbix_proxy_user | default('') }}
-{% if zabbix_proxy_version is version('6.2', '>=') %}
+{% if zabbix_proxy_version is version('6.0', '>') %}
 {{ (zabbix_proxy_vault is defined and zabbix_proxy_vault is not none) | ternary('','# ') }}Vault={{ zabbix_proxy_vault | default('') }}
 {% endif %}
 {{ (zabbix_proxy_vaultdbpath is defined and zabbix_proxy_vaultdbpath is not none) | ternary('','# ') }}VaultDBPath={{ zabbix_proxy_vaultdbpath | default('') }}
-{% if zabbix_proxy_version is version('6.2', '>=') %}
+{% if zabbix_proxy_version is version('6.0', '>') %}
 {{ (zabbix_proxy_vaulttlscertfile is defined and zabbix_proxy_vaulttlscertfile is not none) | ternary('','# ') }}VaultTLSCertFile={{ zabbix_proxy_vaulttlscertfile | default('') }}
 {{ (zabbix_proxy_vaulttlskeyfile is defined and zabbix_proxy_vaulttlskeyfile is not none) | ternary('','# ') }}VaultTLSKeyFile={{ zabbix_proxy_vaulttlskeyfile | default('') }}
 {% endif %}

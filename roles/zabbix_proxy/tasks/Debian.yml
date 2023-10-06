@@ -136,8 +136,6 @@
     https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   register: zabbix_proxy_package_sql_installed
   until: zabbix_proxy_package_sql_installed is succeeded
-  when:
-    - zabbix_proxy_version is version('6.0', '>=')
   become: true
   tags:
     - install
