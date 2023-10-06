@@ -29,6 +29,7 @@ Bugfixes
 
 - zabbix_template - fix template export when template's content has "error" word
 - zabbix_web role - fix variable naming issues (undefined) to zabbix_web_version and zabbix_web_apt_repository
+- zabbix_inventory - fixed handeling of add_zabbix_groups option
 
 v2.1.0
 ======
