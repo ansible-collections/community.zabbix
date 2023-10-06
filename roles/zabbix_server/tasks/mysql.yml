@@ -60,16 +60,6 @@
   tags:
     - database
 
-- name: "MySQL | Get the file for create.sql"
-  ansible.builtin.shell: ls -1 {{ datafiles_path }}/{{ 'create' if zabbix_server_version is version('6.0', '<') else 'server' }}.sq*
-  changed_when: false
-  become: true
-  when:
-    - zabbix_server_database_sqlload | bool
-  register: ls_output_create
-  tags:
-    - database
-
 - name: MySQL | Get current database version
   ansible.builtin.shell: |
     mysql -h {{ zabbix_server_dbhost }} -u{{ zabbix_server_dbuser }} \
@@ -175,7 +165,7 @@
     collation: "{{ zabbix_server_dbcollation }}"
     state: import
     target: "{{ ls_output_create.stdout }}"
-    use_shell: "{{ true if zabbix_server_version is version('5.0', '==') else false }}"
+    use_shell: false
   when:
     - zabbix_server_database_sqlload | bool
     - mysql_schema_empty
