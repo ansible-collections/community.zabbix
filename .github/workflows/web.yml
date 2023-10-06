@@ -24,7 +24,6 @@ jobs:
           - rockylinux8
           - ubuntu2204
           - ubuntu2004
-          - ubuntu1804
           - debian12
           - debian11
           - debian10
@@ -44,11 +43,7 @@ jobs:
         exclude:
           - container: debian10
             version: v62
-          - container: ubuntu1804
-            version: v62
           - container: debian10
-            version: v64
-          - container: ubuntu1804
             version: v64
           - container: debian12
             version: v62

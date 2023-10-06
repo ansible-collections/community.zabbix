@@ -97,7 +97,6 @@ See the following list of supported Operating systems with the Zabbix releases:
 | Red Hat Fam 7       |  V  |  V  |  V  |
 | Ubuntu 22.04 jammy  |  V  |  V  |  V  |
 | Ubuntu 20.04 focal  |  V  |  V  |  V  |
-| Ubuntu 18.04 bionic |  V  |  V  |  V  |
 | Debian 12 bookworm  |  V  |  V  |  V  |
 | Debian 11 bullseye  |  V  |  V  |  V  |
 | Debian 10 buster    |  V  |  V  |  V  |
