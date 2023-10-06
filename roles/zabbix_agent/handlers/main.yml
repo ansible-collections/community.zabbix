@@ -2,7 +2,7 @@
 # handlers file for zabbix-agent
 
 - name: restart zabbix-agent
-  service:
+  ansible.builtin.service:
     name: "{{ zabbix_agent_service }}"
     state: restarted
     enabled: true
@@ -12,7 +12,7 @@
     - ansible_os_family != "Windows" and ansible_os_family != "Darwin"
 
 - name: firewalld-reload
-  command: "firewall-cmd --reload"
+  ansible.builtin.command: "firewall-cmd --reload"
   become: true
   when:
     - ansible_facts.services["firewalld"] is defined
@@ -26,14 +26,14 @@
     - ansible_os_family == "Windows"
 
 - name: restart mac zabbix agent
-  command: "launchctl kickstart -k system/{{ zabbix_agent_service }}"
+  ansible.builtin.command: "launchctl kickstart -k system/{{ zabbix_agent_service }}"
   become: true
   when:
     - not zabbix_agent_docker
     - ansible_os_family == "Darwin"
 
 - name: "clean repo files from proxy creds"
-  shell: ls /etc/yum.repos.d/zabbix* && sed -i 's/^proxy =.*//' /etc/yum.repos.d/zabbix* || true
+  ansible.builtin.shell: ls /etc/yum.repos.d/zabbix* && sed -i 's/^proxy =.*//' /etc/yum.repos.d/zabbix* || true
   become: true
   when:
     - ansible_os_family == 'RedHat'

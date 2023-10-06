@@ -1,38 +1,38 @@
 ---
 - name: Include OS-specific variables
-  include_vars: "{{ ansible_os_family }}.yml"
+  ansible.builtin.include_vars: "{{ ansible_os_family }}.yml"
   tags:
     - always
 
 - name: Determine Latest Supported Zabbix Version
-  set_fact:
+  ansible.builtin.set_fact:
     zabbix_server_version: "{{ zabbix_valid_server_versions[ansible_distribution_major_version][0] | default(6.4) }}"
   when: zabbix_server_version is not defined
   tags:
     - always
 
 - name: Set More Variables
-  set_fact:
+  ansible.builtin.set_fact:
     zabbix_db_type_long: "{{ 'postgresql' if zabbix_server_database == 'pgsql' else 'mysql' }}"
     zabbix_valid_version: "{{ zabbix_server_version|float in zabbix_valid_server_versions[ansible_distribution_major_version] }}"
   tags:
     - always
 
 - name: Stopping Install of Invalid Version
-  fail:
+  ansible.builtin.fail:
     msg: Zabbix version {{ zabbix_server_version }} is not supported on {{ ansible_distribution }} {{ ansible_distribution_major_version }}
   when: not zabbix_valid_version
   tags:
     - always
 
 - name: Install the correct repository
-  include_tasks: "{{ ansible_os_family }}.yml"
+  ansible.builtin.include_tasks: "{{ ansible_os_family }}.yml"
 
 - name: Installing the {{ zabbix_db_type_long }} database
-  include_tasks: "{{ zabbix_db_type_long }}.yml"
+  ansible.builtin.include_tasks: "{{ zabbix_db_type_long }}.yml"
 
 - name: "Configure zabbix-server"
-  template:
+  ansible.builtin.template:
     src: zabbix_server.conf.j2
     dest: "{{ zabbix_server_config }}"
     owner: "{{ zabbix_os_user }}"
@@ -45,7 +45,7 @@
     - config
 
 - name: "Create include dir zabbix-server"
-  file:
+  ansible.builtin.file:
     path: "{{ zabbix_server_include }}"
     owner: "{{ zabbix_os_user }}"
     group: "{{ zabbix_os_user }}"
@@ -57,12 +57,12 @@
     - config
 
 - name: "Add zabbix-server scripts"
-  include: "scripts.yml"
+  ansible.builtin.include_tasks: "scripts.yml"
   when: ( zabbix_server_alertscripts is defined ) or
     ( zabbix_server_externalscripts is defined )
 
 - name: "Zabbix-server started"
-  service:
+  ansible.builtin.service:
     name: zabbix-server
     state: "{{ zabbix_service_state }}"
     enabled: "{{ zabbix_service_enabled }}"

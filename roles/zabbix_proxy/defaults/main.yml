@@ -40,6 +40,7 @@ zabbix_proxy_version_minor: "*"
 # Yum/APT Variables
 zabbix_repo_yum_schema: https
 zabbix_repo_yum_gpgcheck: 0
+zabbix_repo_deb_component: main
 zabbix_proxy_disable_repo:
   - epel
 zabbix_repo_yum:
@@ -112,13 +113,13 @@ zabbix_proxy_vmwarefrequency: 60
 # Zabbix API stuff
 zabbix_api_server_host: localhost
 zabbix_api_use_ssl: false
-zabbix_api_server_port: 80
+# zabbix_api_server_port: 80
 zabbix_api_login_user: Admin
 zabbix_api_login_pass: !unsafe zabbix
 zabbix_api_validate_certs: false
 ansible_httpapi_pass: "{{ zabbix_api_login_pass }}"
 ansible_httpapi_port: "{{ zabbix_api_server_port }}"
-ensible_httpapi_validate_certs: "{{ zabbix_api_validate_certs }}"
+ansible_httpapi_validate_certs: "{{ zabbix_api_validate_certs }}"
 zabbix_api_timeout: 30
 zabbix_api_create_proxy: false
 zabbix_proxy_state: present

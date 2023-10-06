@@ -9,267 +9,267 @@
         - type: ICMP
 
   block:
-  - name: test - create new Zabbix discovery rule (checkmode)
-    zabbix_discovery_rule:
-    check_mode: true
-    register: drule_new_checkmode
+    - name: test - create new Zabbix discovery rule (checkmode)
+      community.zabbix.zabbix_discovery_rule:
+      check_mode: true
+      register: drule_new_checkmode
 
-  - name: assert that drule will be created (checkmode)
-    assert:
-      that: drule_new_checkmode is changed
+    - name: assert that drule will be created (checkmode)
+      ansible.builtin.assert:
+        that: drule_new_checkmode is changed
 
-  - name: test - create new Zabbix discovery rule
-    zabbix_discovery_rule:
-    register: drule_new
+    - name: test - create new Zabbix discovery rule
+      community.zabbix.zabbix_discovery_rule:
+      register: drule_new
 
-  - name: assert that drule was created
-    assert:
-      that: drule_new is changed
+    - name: assert that drule was created
+      ansible.builtin.assert:
+        that: drule_new is changed
 
-  - name: test - create same Zabbix discovery rule
-    zabbix_discovery_rule:
-    register: drule_exists
+    - name: test - create same Zabbix discovery rule
+      community.zabbix.zabbix_discovery_rule:
+      register: drule_exists
 
-  - name: assert that nothing has been changed
-    assert:
-      that: not drule_exists is changed
+    - name: assert that nothing has been changed
+      ansible.builtin.assert:
+        that: not drule_exists is changed
 
-  - name: test - update Zabbix discovery rule iprange (checkmode)
-    zabbix_discovery_rule:
-      iprange:
-        - 192.168.1.1-255
-        - 10.0.0.1-255
-    check_mode: true
-    register: drule_iprange_update_checkmode
+    - name: test - update Zabbix discovery rule iprange (checkmode)
+      community.zabbix.zabbix_discovery_rule:
+        iprange:
+          - 192.168.1.1-255
+          - 10.0.0.1-255
+      check_mode: true
+      register: drule_iprange_update_checkmode
 
-  - name: assert that iprange will be changed
-    assert:
-      that: drule_iprange_update_checkmode is changed
+    - name: assert that iprange will be changed
+      ansible.builtin.assert:
+        that: drule_iprange_update_checkmode is changed
 
-  - name: test - update Zabbix discovery rule iprange
-    zabbix_discovery_rule:
-      iprange:
-        - 192.168.1.1-255
-        - 10.0.0.1-255
-    register: drule_iprange_update
+    - name: test - update Zabbix discovery rule iprange
+      community.zabbix.zabbix_discovery_rule:
+        iprange:
+          - 192.168.1.1-255
+          - 10.0.0.1-255
+      register: drule_iprange_update
 
-  - name: assert that iprange has been changed
-    assert:
-      that: drule_iprange_update is changed
+    - name: assert that iprange has been changed
+      ansible.builtin.assert:
+        that: drule_iprange_update is changed
 
-  - name: test - reset Zabbix discovery rule to default
-    zabbix_discovery_rule:
-    register: drule_reset
+    - name: test - reset Zabbix discovery rule to default
+      community.zabbix.zabbix_discovery_rule:
+      register: drule_reset
 
-  - name: assert that iprange has been changed
-    assert:
-      that: drule_reset is changed
+    - name: assert that iprange has been changed
+      ansible.builtin.assert:
+        that: drule_reset is changed
 
-  - name: test - update Zabbix discovery rule status
-    zabbix_discovery_rule:
-      status: disabled
-    register: drule_status_update
+    - name: test - update Zabbix discovery rule status
+      community.zabbix.zabbix_discovery_rule:
+        status: disabled
+      register: drule_status_update
 
-  - name: assert that iprange has been changed
-    assert:
-      that: drule_status_update is changed
+    - name: assert that iprange has been changed
+      ansible.builtin.assert:
+        that: drule_status_update is changed
 
-  - name: test - reset Zabbix discovery rule to default
-    zabbix_discovery_rule:
-    register: drule_reset
+    - name: test - reset Zabbix discovery rule to default
+      community.zabbix.zabbix_discovery_rule:
+      register: drule_reset
 
-  - name: assert that iprange has been changed
-    assert:
-      that: drule_reset is changed
+    - name: assert that iprange has been changed
+      ansible.builtin.assert:
+        that: drule_reset is changed
 
-  - name: test - update Zabbix discovery rule dchecks
-    zabbix_discovery_rule:
-      dchecks:
-        - type: ICMP
-        - type: Zabbix
-          key: "system.hostname"
-          ports: "10050"
-          uniq: true
-          host_source: discovery
-    register: drule_dchecks_update
+    - name: test - update Zabbix discovery rule dchecks
+      community.zabbix.zabbix_discovery_rule:
+        dchecks:
+          - type: ICMP
+          - type: Zabbix
+            key: "system.hostname"
+            ports: "10050"
+            uniq: true
+            host_source: discovery
+      register: drule_dchecks_update
 
-  - name: assert that dcheck has been changed
-    assert:
-      that: drule_dchecks_update is changed
+    - name: assert that dcheck has been changed
+      ansible.builtin.assert:
+        that: drule_dchecks_update is changed
 
-  - name: test - update Zabbix discovery rule dchecks ssh
-    zabbix_discovery_rule:
-      dchecks:
-        - type: ICMP
-        - type: SSH
-          ports: "22"
-    register: drule_dchecks_ssh_update
+    - name: test - update Zabbix discovery rule dchecks ssh
+      community.zabbix.zabbix_discovery_rule:
+        dchecks:
+          - type: ICMP
+          - type: SSH
+            ports: "22"
+      register: drule_dchecks_ssh_update
 
-  - name: assert that dcheck has been changed
-    assert:
-      that: drule_dchecks_ssh_update is changed
+    - name: assert that dcheck has been changed
+      ansible.builtin.assert:
+        that: drule_dchecks_ssh_update is changed
 
-  - name: test - update Zabbix discovery rule dchecks ldap
-    zabbix_discovery_rule:
-      dchecks:
-        - type: ICMP
-        - type: SSH
-          ports: "22"
-        - type: LDAP
-          ports: "389"
-    register: drule_dchecks_ldap_update
+    - name: test - update Zabbix discovery rule dchecks ldap
+      community.zabbix.zabbix_discovery_rule:
+        dchecks:
+          - type: ICMP
+          - type: SSH
+            ports: "22"
+          - type: LDAP
+            ports: "389"
+      register: drule_dchecks_ldap_update
 
-  - name: assert that dcheck has been changed
-    assert:
-      that: drule_dchecks_ldap_update is changed
+    - name: assert that dcheck has been changed
+      ansible.builtin.assert:
+        that: drule_dchecks_ldap_update is changed
 
-  - name: test - update Zabbix discovery rule dchecks smtp
-    zabbix_discovery_rule:
-      dchecks:
-        - type: ICMP
-        - type: SSH
-          ports: "22"
-        - type: LDAP
-          ports: "389"
-        - type: SMTP
-          ports: 25,465,587
-    register: drule_dchecks_smtp_update
+    - name: test - update Zabbix discovery rule dchecks smtp
+      community.zabbix.zabbix_discovery_rule:
+        dchecks:
+          - type: ICMP
+          - type: SSH
+            ports: "22"
+          - type: LDAP
+            ports: "389"
+          - type: SMTP
+            ports: 25,465,587
+      register: drule_dchecks_smtp_update
 
-  - name: assert that dcheck has been changed
-    assert:
-      that: drule_dchecks_smtp_update is changed
+    - name: assert that dcheck has been changed
+      ansible.builtin.assert:
+        that: drule_dchecks_smtp_update is changed
 
-  - name: test - update Zabbix discovery rule dchecks http
-    zabbix_discovery_rule:
-      dchecks:
-        - type: ICMP
-        - type: SSH
-          ports: "22"
-        - type: LDAP
-          ports: "389"
-        - type: SMTP
-          ports: 25,465,587
-        - type: HTTP
-          ports: 80,8080
-    register: drule_dchecks_http_update
+    - name: test - update Zabbix discovery rule dchecks http
+      community.zabbix.zabbix_discovery_rule:
+        dchecks:
+          - type: ICMP
+          - type: SSH
+            ports: "22"
+          - type: LDAP
+            ports: "389"
+          - type: SMTP
+            ports: 25,465,587
+          - type: HTTP
+            ports: 80,8080
+      register: drule_dchecks_http_update
 
-  - name: assert that dcheck has been changed
-    assert:
-      that: drule_dchecks_http_update is changed
+    - name: assert that dcheck has been changed
+      ansible.builtin.assert:
+        that: drule_dchecks_http_update is changed
 
-  - name: test - remove Zabbix discovery rule dchecks
-    zabbix_discovery_rule:
-      dchecks:
-        - type: ICMP
-    register: drule_dchecks_remove_update
+    - name: test - remove Zabbix discovery rule dchecks
+      community.zabbix.zabbix_discovery_rule:
+        dchecks:
+          - type: ICMP
+      register: drule_dchecks_remove_update
 
-  - name: assert that dcheck has been changed
-    assert:
-      that: drule_dchecks_remove_update is changed
+    - name: assert that dcheck has been changed
+      ansible.builtin.assert:
+        that: drule_dchecks_remove_update is changed
 
-  - name: test - update Zabbix discovery rule snmp dcheck
-    zabbix_discovery_rule:
-      dchecks:
-        - type: SNMPv2
-          snmp_community: CUSTOMER@snmp-readonly
-          ports: "161"
-          key: iso.3.6.1.2.1.1.1.0
-          uniq: false
-          host_source: discovery
-          name_source: discovery
-    register: drule_snmp_update
+    - name: test - update Zabbix discovery rule snmp dcheck
+      community.zabbix.zabbix_discovery_rule:
+        dchecks:
+          - type: SNMPv2
+            snmp_community: CUSTOMER@snmp-readonly
+            ports: "161"
+            key: iso.3.6.1.2.1.1.1.0
+            uniq: false
+            host_source: discovery
+            name_source: discovery
+      register: drule_snmp_update
 
-  - name: assert that snmp dcheck has been changed
-    assert:
-      that: drule_snmp_update is changed
+    - name: assert that snmp dcheck has been changed
+      ansible.builtin.assert:
+        that: drule_snmp_update is changed
 
-  - name: test - update Zabbix discovery rule snmp3 dcheck
-    zabbix_discovery_rule:
-      dchecks:
-        - type: SNMPv3
-          snmp_community: CUSTOMER@snmp3-readonly
-          ports: "161"
-          key: iso.3.6.1.2.1.1.1.0
-          snmpv3_contextname: "ContextName"
-          snmpv3_securityname: "SecurityName"
-          snmpv3_securitylevel: authPriv
-          snmpv3_authprotocol: SHA
-          snmpv3_authpassphrase: "SeCrEt"
-          snmpv3_privprotocol: AES
-          snmpv3_privpassphrase: "TopSecret"
-          uniq: false
-          host_source: DNS
-          name_source: None
-    register: drule_snmp3_update
+    - name: test - update Zabbix discovery rule snmp3 dcheck
+      community.zabbix.zabbix_discovery_rule:
+        dchecks:
+          - type: SNMPv3
+            snmp_community: CUSTOMER@snmp3-readonly
+            ports: "161"
+            key: iso.3.6.1.2.1.1.1.0
+            snmpv3_contextname: "ContextName"
+            snmpv3_securityname: "SecurityName"
+            snmpv3_securitylevel: authPriv
+            snmpv3_authprotocol: SHA
+            snmpv3_authpassphrase: "SeCrEt"
+            snmpv3_privprotocol: AES
+            snmpv3_privpassphrase: "TopSecret"
+            uniq: false
+            host_source: DNS
+            name_source: None
+      register: drule_snmp3_update
 
-  - name: assert that snmp3 dcheck has been changed
-    assert:
-      that: drule_snmp3_update is changed
+    - name: assert that snmp3 dcheck has been changed
+      ansible.builtin.assert:
+        that: drule_snmp3_update is changed
 
-  - name: test - reset Zabbix discovery rule to default
-    zabbix_discovery_rule:
-    register: drule_reset
+    - name: test - reset Zabbix discovery rule to default
+      community.zabbix.zabbix_discovery_rule:
+      register: drule_reset
 
-  - name: assert that iprange has been changed
-    assert:
-      that: drule_reset is changed
+    - name: assert that iprange has been changed
+      ansible.builtin.assert:
+        that: drule_reset is changed
 
-  - name: test - create new active Zabbix proxy server
-    zabbix_proxy:
-      proxy_name: ACME_proxy
-      status: active
-      state: present
-    register: zbxproxy_active
+    - name: test - create new active Zabbix proxy server
+      community.zabbix.zabbix_proxy:
+        proxy_name: ACME_proxy
+        status: active
+        state: present
+      register: zbxproxy_active
 
-  - name: assert that proxy was created
-    assert:
-      that: zbxproxy_active is changed
+    - name: assert that proxy was created
+      ansible.builtin.assert:
+        that: zbxproxy_active is changed
 
-  - name: test - update Zabbix discovery rule proxy
-    zabbix_discovery_rule:
-      proxy: ACME_proxy
-    register: drule_proxy_update
+    - name: test - update Zabbix discovery rule proxy
+      community.zabbix.zabbix_discovery_rule:
+        proxy: ACME_proxy
+      register: drule_proxy_update
 
-  - name: assert that proxy has been changed
-    assert:
-      that: drule_proxy_update is changed
+    - name: assert that proxy has been changed
+      ansible.builtin.assert:
+        that: drule_proxy_update is changed
 
-  - name: test - update Zabbix discovery rule proxy (again)
-    zabbix_discovery_rule:
-      proxy: ACME_proxy
-    register: drule_proxy_update_again
+    - name: test - update Zabbix discovery rule proxy (again)
+      community.zabbix.zabbix_discovery_rule:
+        proxy: ACME_proxy
+      register: drule_proxy_update_again
 
-  - name: assert that nothing has been changed
-    assert:
-      that: not drule_proxy_update_again is changed
+    - name: assert that nothing has been changed
+      ansible.builtin.assert:
+        that: not drule_proxy_update_again is changed
 
 - name: test - delete Zabbix discovery rule
-  zabbix_discovery_rule:
+  community.zabbix.zabbix_discovery_rule:
     name: ACME
     state: absent
   register: drule_delete
 
 - name: assert that proxy has been deleted
-  assert:
+  ansible.builtin.assert:
     that: drule_delete is changed
 
 - name: test - delete Zabbix discovery rule (again)
-  zabbix_discovery_rule:
+  community.zabbix.zabbix_discovery_rule:
     name: ACME
     state: absent
   register: drule_delete_again
 
 - name: assert that nothing has been changed
-  assert:
+  ansible.builtin.assert:
     that: not drule_delete_again is changed
 
 # Cleanup
 - name: delete active Zabbix proxy server
-  zabbix_proxy:
+  community.zabbix.zabbix_proxy:
     proxy_name: ACME_proxy
     state: absent
   register: zbxproxy_delete
 
 - name: assert that proxy has been deleted
-  assert:
+  ansible.builtin.assert:
     that: zbxproxy_delete is changed

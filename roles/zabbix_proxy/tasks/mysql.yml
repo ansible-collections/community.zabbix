@@ -1,7 +1,7 @@
 ---
 # task file for mysql
 - name: "MySQL | Set the correct delegated_dbhost (to support MySQL db deployment on a remote dbhost)"
-  set_fact:
+  ansible.builtin.set_fact:
     delegated_dbhost: "{{ zabbix_proxy_dbhost if (zabbix_proxy_dbhost != 'localhost') else inventory_hostname }}"
   when:
     - zabbix_proxy_dbhost_run_install
@@ -9,7 +9,7 @@
     - database
 
 - name: "MySQL | Set the correct delegated_dbhost (to support MySQL db deployment on a remote dbhost)"
-  set_fact:
+  ansible.builtin.set_fact:
     delegated_dbhost: "{{ inventory_hostname }}"
   when:
     - not zabbix_proxy_dbhost_run_install
@@ -17,11 +17,19 @@
     - database
 
 - name: "MySQL | Override delegated_dbhost with real dbhost when dbhost is behind loadbalancer"
-  set_fact:
+  ansible.builtin.set_fact:
     delegated_dbhost: "{{ zabbix_proxy_real_dbhost }}"
   when: zabbix_proxy_real_dbhost | default(false)
   tags:
     - database
+
+- name: PyMySQL
+  ansible.builtin.pip:
+    name: PyMySQL
+  register: installation_dependencies
+  until: installation_dependencies is succeeded
+  when:
+    - inventory_hostname in groups['mysql']
 
 - name: "MySQL | Create database"
   community.mysql.mysql_db:
@@ -52,6 +60,7 @@
     password: "{{ zabbix_proxy_dbpassword }}"
     priv: "{{ zabbix_proxy_dbname }}.*:ALL"
     host: "{{ zabbix_proxy_privileged_host }}"
+    plugin: "{{ 'mysql_native_password' if (ansible_os_family == 'RedHat' and ansible_distribution_major_version == '7') else omit }}"
     state: present
   when: zabbix_proxy_database_creation
   delegate_to: "{{ delegated_dbhost }}"
@@ -59,7 +68,7 @@
     - database
 
 - name: "MySQL | Check if we have done files"
-  stat:
+  ansible.builtin.stat:
     path: /etc/zabbix/schema.done
   register: done_file
   become: true
@@ -151,7 +160,7 @@
     - database
 
 - name: "MySQL | Create done file"
-  file:
+  ansible.builtin.file:
     path: /etc/zabbix/schema.done
     state: touch
     mode: "0644"

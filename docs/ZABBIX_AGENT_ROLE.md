@@ -97,6 +97,7 @@ See the following list of supported Operating systems with the Zabbix releases:
 | Red Hat Fam 7       |  V  |  V  |  V  |
 | Ubuntu 22.04 jammy  |  V  |  V  |  V  |
 | Ubuntu 20.04 focal  |  V  |  V  |  V  |
+| Debian 12 bookworm  |  V  |  V  |  V  |
 | Debian 11 bullseye  |  V  |  V  |  V  |
 | Debian 10 buster    |  V  |  V  |  V  |
 
@@ -132,6 +133,8 @@ The following is an overview of all available configuration default for this rol
 * `zabbix_repo_yum`: A list with Yum repository configuration.
 * `zabbix_repo_yum_schema`: Default: `https`. Option to change the web schema for the yum repository(http/https)
 * `zabbix_agent_disable_repo`: A list of repos to disable during install.  Default `epel`.
+* `zabbix_repo_deb_url`: The URL to the Zabbix repository.  Default `http://repo.zabbix.com/zabbix/{{ zabbix_agent_version }}/{{ ansible_distribution.lower() }}`
+* `zabbix_repo_deb_component`: The repository component for Debian installs. Default `main`.
 
 ### SElinux
 
@@ -174,6 +177,7 @@ Otherwise it just for the Zabbix Agent or for the Zabbix Agent 2.
 * `zabbix_agent(2)_pidfile`: name of pid file.
 * `zabbix_agent(2)_logfile`: name of log file.
 * `zabbix_agent(2)_logfilesize`: maximum size of log file in mb.
+* `zabbix_agent(2)_additional_include`: A list of additional complete paths to include in configuration
 * `zabbix_agent(2)_logtype`: Specifies where log messages are written to
 * `zabbix_agent(2)_debuglevel`: specifies debug level
 * `zabbix_agent(2)_sourceip`: source ip address for outgoing connections.
@@ -244,7 +248,7 @@ Host encryption configuration will be set to match agent configuration.
 
 * `zabbix_api_server_host`: The IP or hostname/FQDN of Zabbix server. Example: zabbix.example.com
 * `zabbix_api_use_ssl`: Is SSL required to connect to the Zabbix API server?  Default: `false`
-* `zabbix_api_server_port`: TCP port to use to connect to Zabbix server. Example: 8080
+* `zabbix_api_server_port`: 80 if `zabbix_api_use_ssl` is `false` and 443 if `true` (Default) TCP port to use to connect to Zabbix server. Example: 8080
 * `zabbix_api_login_user`: Username of user which has API access.
 * `zabbix_api_login_pass`: Password for the user which has API access.
 * `zabbix_api_http_user`: The http user to access zabbix url with Basic Auth (if your Zabbix is behind a proxy with HTTP Basic Auth).
@@ -253,7 +257,6 @@ Host encryption configuration will be set to match agent configuration.
 * `zabbix_api_timeout`: How many seconds to wait for API response (default 30s).
 * `zabbix_api_create_hosts`: Default: `False`. When you want to enable the Zabbix API to create/delete the host. This has to be set to `True` if you want to make use of `zabbix_agent_host_state`.
 * `zabbix_api_create_hostgroup`: When you want to enable the Zabbix API to create/delete the hostgroups. This has to be set to `True` if you want to make use of `zabbix_agent_hostgroups_state`.Default: `False`
-* `zabbix_api_use_ssl`: yes (Default) if we need to connect to Zabbix server over HTTPS
 * `ansible_zabbix_url_path`: URL path if Zabbix WebUI running on non-default (zabbix) path, e.g. if http://<FQDN>/zabbixeu then set to `zabbixeu`
 * `zabbix_agent_hostgroups_state`: present (Default) if the hostgroup needs to be created or absent if you want to delete it. This only works when `zabbix_api_create_hostgroup` is set to `True`.
 * `zabbix_host_status`: enabled (Default) when host in monitored, disabled when host is disabled for monitoring.

@@ -2,25 +2,25 @@
 # Tasks specific for RedHat systems
 
 - name: "RedHat | Set short version name"
-  set_fact:
+  ansible.builtin.set_fact:
     zabbix_short_version: "{{ zabbix_server_version | regex_replace('\\.', '') }}"
   tags:
     - always
 
 - name: "RedHat | Use Zabbix package name"
-  set_fact:
+  ansible.builtin.set_fact:
     zabbix_server_package: "zabbix-server-{{ zabbix_server_database }}"
   tags:
     - always
 
 - name: "RedHat | Set facts for Zabbix"
-  set_fact:
+  ansible.builtin.set_fact:
     datafiles_path: "/usr/share/zabbix-sql-scripts/{{ 'postgresql' if zabbix_server_database == 'pgsql' else 'mysql' }}"
   tags:
     - always
 
 - name: "RedHat | Make sure old file is absent"
-  file:
+  ansible.builtin.file:
     path: /etc/yum.repos.d/zabbix-supported.repo
     state: absent
   become: true
@@ -28,7 +28,7 @@
     - install
 
 - name: "RedHat | Install basic repo file"
-  yum_repository:
+  ansible.builtin.yum_repository:
     name: "{{ item.name }}"
     description: "{{ item.description }}"
     baseurl: "{{ item.baseurl }}"
@@ -47,7 +47,7 @@
     - install
 
 - name: "RedHat | Installing zabbix-server-{{ zabbix_server_database }}"
-  package:
+  ansible.builtin.package:
     pkg: "{{ zabbix_server_package }}-{{ zabbix_server_version }}.{{ zabbix_server_version_minor }}"
     state: "{{ zabbix_server_package_state }}"
     disablerepo: "{{ zabbix_server_disable_repo | default(omit) }}"
@@ -61,7 +61,7 @@
     - install
 
 - name: "RedHat | Installing zabbix-sql-scripts"
-  package:
+  ansible.builtin.package:
     pkg: "zabbix-sql-scripts-{{ zabbix_server_version }}.{{ zabbix_server_version_minor }}"
     state: "{{ zabbix_server_package_state }}"
     disablerepo: "{{ zabbix_server_disable_repo | default(omit) }}"
@@ -77,7 +77,7 @@
     - install
 
 - name: "RedHat | Install Ansible module dependencies"
-  yum:
+  ansible.builtin.yum:
     name: "{{ pgsql_depenencies[ansible_distribution_major_version] }}"
     state: present
   environment:
@@ -96,7 +96,7 @@
 - name: RedHat | Install Database Client Package
   block:
     - name: "RedHat | Install Mysql Client packages"
-      yum:
+      ansible.builtin.yum:
         name: "{{ mysql_client_pkgs[ansible_distribution_major_version] }}"
         state: present
       environment:
@@ -109,7 +109,7 @@
         - zabbix_server_database == 'mysql'
 
     - name: "RedHat | Install PostgreSQL client package"
-      yum:
+      ansible.builtin.yum:
         name: postgresql
         state: present
       environment:
@@ -127,6 +127,6 @@
     - database
 
 - name: "RedHat | Configure SELinux when enabled"
-  include: selinux.yml
+  ansible.builtin.include_tasks: selinux.yml
   when:
     - zabbix_server_selinux | bool

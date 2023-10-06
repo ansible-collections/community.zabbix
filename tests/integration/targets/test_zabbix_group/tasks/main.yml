@@ -1,17 +1,17 @@
 ---
 - name: test - create new Zabbix group
-  zabbix_group:
+  community.zabbix.zabbix_group:
     host_groups:
       - zbxgrp_example_group01
     state: present
   register: zbxgrp_new
 
 - name: assert that group was created
-  assert:
+  ansible.builtin.assert:
     that: zbxgrp_new is changed
 
 - name: test - create simple zabbix host to assign to group
-  zabbix_host:
+  community.zabbix.zabbix_host:
     host_name: zbxgrp_example_host01
     host_groups:
       - zbxgrp_example_group01
@@ -23,33 +23,33 @@
   register: zbxgrp_host_assignement
 
 - name: assert that host was assigned successfully
-  assert:
+  ansible.builtin.assert:
     that: zbxgrp_host_assignement is changed
 
 - name: test - create same Zabbix group once again
-  zabbix_group:
+  community.zabbix.zabbix_group:
     host_groups:
       - zbxgrp_example_group01
     state: present
   register: zbxgrp_existing
 
 - name: assert that nothing has been changed
-  assert:
+  ansible.builtin.assert:
     that: not zbxgrp_existing is changed
 
 - name: test - attempt to create new Zabbix group matching name of default Zabbix group
-  zabbix_group:
+  community.zabbix.zabbix_group:
     host_groups:
       - Linux servers
     state: present
   register: zbxgrp_default_existing
 
 - name: assert that nothing has been changed
-  assert:
+  ansible.builtin.assert:
     that: not zbxgrp_default_existing is changed
 
 - name: test - attempt to delete host group while its only group host has assigned
-  zabbix_group:
+  community.zabbix.zabbix_group:
     host_groups:
       - zbxgrp_example_group01
     state: absent
@@ -57,32 +57,32 @@
   ignore_errors: true
 
 - name: assert that group deletion failed
-  assert:
+  ansible.builtin.assert:
     that: zbxgrp_existing_delete_failed is failed
 
 - name: delete helper zabbix host
-  zabbix_host:
+  community.zabbix.zabbix_host:
     host_name: zbxgrp_example_host01
     state: absent
 
 - name: test - attempt to delete previously created zabbix group
-  zabbix_group:
+  community.zabbix.zabbix_group:
     host_groups:
       - zbxgrp_example_group01
     state: absent
   register: zbxgrp_existing_delete
 
 - name: assert that group was deleted
-  assert:
+  ansible.builtin.assert:
     that: zbxgrp_existing_delete is changed
 
 - name: test - attempt to delete non-existing zabbix group
-  zabbix_group:
+  community.zabbix.zabbix_group:
     host_groups:
       - zbxgrp_example_group01
     state: absent
   register: zbxgrp_missing_delete
 
 - name: assert that nothing has been changed
-  assert:
+  ansible.builtin.assert:
     that: not zbxgrp_missing_delete is changed

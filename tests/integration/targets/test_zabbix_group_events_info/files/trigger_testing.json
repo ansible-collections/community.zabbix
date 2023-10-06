@@ -1,0 +1,48 @@
+{
+    "zabbix_export": {
+        "version": "6.0",
+        "date": "2023-09-05T13:58:23Z",
+        "groups": [
+            {
+                "uuid": "6932cc6c283949ee8d4c316e2f30af5f",
+                "name": "Templates"
+            }
+        ],
+        "templates": [
+            {
+                "uuid": "641c10c5445245edb59050c3518e76a0",
+                "template": "Trigger testing",
+                "name": "Trigger testing",
+                "groups": [
+                    {
+                        "name": "Templates"
+                    }
+                ],
+                "items": [
+                    {
+                        "uuid": "0dce402f6f0c44cfb7796c1ea6c4bb86",
+                        "name": "Test Item",
+                        "type": "CALCULATED",
+                        "key": "test",
+                        "delay": "10s",
+                        "params": "1",
+                        "triggers": [
+                            {
+                                "uuid": "11b2645a369946dcaa00b6edc578089f",
+                                "expression": "last(/Trigger testing/test)=0",
+                                "name": "Ok Trigger",
+                                "priority": "AVERAGE"
+                            },
+                            {
+                                "uuid": "f17f4b4f7fe444dfb856bc9d6366d0fe",
+                                "expression": "last(/Trigger testing/test)=1",
+                                "name": "Problem Trigger",
+                                "priority": "AVERAGE"
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+}

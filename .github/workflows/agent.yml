@@ -24,6 +24,7 @@ jobs:
           - rockylinux8
           - ubuntu2204
           - ubuntu2004
+          - debian12
           - debian11
           - debian10
         version:
@@ -35,13 +36,16 @@ jobs:
           - autopsk
           - agent2
           - agent2autopsk
+        exclude:
+          - container: debian12
+            version: v62
 
     steps:
       - name: Check out code
-        uses: actions/checkout@v1
+        uses: actions/checkout@v4
 
       - name: Set up Python 3.9
-        uses: actions/setup-python@v1
+        uses: actions/setup-python@v4
         with:
           python-version: 3.9
 

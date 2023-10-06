@@ -60,6 +60,7 @@ See the following list of supported Operating Systems with the Zabbix releases.
 | Red Hat Fam 8       |  V  |  V  |  V  |
 | Ubuntu 22.04 jammy  |  V  |  V  |  V  |
 | Ubuntu 20.04 focal  |  V  |  V  |  V  |
+| Debian 12 bookworm  |  V  |     |  V  |
 | Debian 11 bullseye  |  V  |  V  |  V  |
 | Debian 10 buster    |     |     |  V  |
 
@@ -90,10 +91,13 @@ The following is an overview of all available configuration defaults for this ro
 * `zabbix_web_package_state`: Default: `present`. Can be overridden to `latest` to update packages when needed.
 * `zabbix_web_doubleprecision`: Default: `False`. For upgraded installations, please read database [upgrade notes](https://www.zabbix.com/documentation/current/manual/installation/upgrade_notes_500) (Paragraph "Enabling extended range of numeric (float) values") before enabling this option.
 * `zabbix_web_conf_mode`: Default: `0644`. The "mode" for the Zabbix configuration file.
+* `zabbix_repo_deb_url`: The URL to the Zabbix repository.  Default `http://repo.zabbix.com/zabbix/{{ zabbix_web_version }}/{{ ansible_distribution.lower() }}`
+* `zabbix_repo_deb_component`: The repository component for Debian installs. Default `main`.
 
 ### Zabbix Web specific
 
 * `zabbix_api_server_url`: This is the url on which the zabbix web interface is available. Default is zabbix.example.com, you should override it. For example, see "Example Playbook"
+* `zabbix_web_http_server`: Which web server is in use.  Valid values are 'apache' and 'nginx'.  Default is `apache`
 * `zabbix_url_aliases`: A list with Aliases for the Apache Virtual Host configuration.
 * `zabbix_timezone`: Default: `Europe/Amsterdam`. This is the timezone. The Apache Virtual Host needs this parameter.
 * `zabbix_web_create_vhost`: Default: `true`. When you don't want to create an Apache Virtual Host configuration, you can set it to False.
@@ -256,7 +260,7 @@ zabbix.conf.php, for example to add LDAP CA certificates. To do this add a `zabb
       php_packages:
         - php
         - php-fpm
-        - php-acpu
+        - php-apcu
     - role: geerlingguy.apache-php-fpm
     - role: community.zabbix.zabbix_web
       zabbix_api_server_url: zabbix.mydomain.com

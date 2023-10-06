@@ -43,6 +43,7 @@ Click on the name of a plugin or module to view that content's documentation:
     - [zabbix_discovery_rule](https://docs.ansible.com/ansible/latest/collections/community/zabbix/zabbix_discovery_rule_module.html)
     - [zabbix_globalmacro](https://docs.ansible.com/ansible/latest/collections/community/zabbix/zabbix_globalmacro_module.html)
     - [zabbix_group_info](https://docs.ansible.com/ansible/latest/collections/community/zabbix/zabbix_group_info_module.html)
+    - [zabbix_group_events_info](https://docs.ansible.com/ansible/latest/collections/community/zabbix/zabbix_group_events_info_module.html)
     - [zabbix_group](https://docs.ansible.com/ansible/latest/collections/community/zabbix/zabbix_group_module.html)
     - [zabbix_host_events_info](https://docs.ansible.com/ansible/latest/collections/community/zabbix/zabbix_host_events_info_module.html)
     - [zabbix_host_info](https://docs.ansible.com/ansible/latest/collections/community/zabbix/zabbix_host_info_module.html)
@@ -103,7 +104,7 @@ You can also include it in a `requirements.yml` file along with other required c
 ---
 collections:
   - name: community.zabbix
-    version: 2.0.0
+    version: 2.1.0
   - name: ansible.posix
     version: 1.3.0
   - name: community.general
@@ -130,7 +131,7 @@ To use a module or role from this collection, reference them with their Fully Qu
       ...
 
 - name: If Zabbix WebUI runs on non-default (zabbix) path, e.g. http://<FQDN>/zabbixeu
-  set_fact:
+  ansible.builtin.set_fact:
     ansible_zabbix_url_path: 'zabbixeu'
 
 - name: Using Zabbix collection to manage Zabbix Server's elements with username/password
@@ -203,7 +204,7 @@ Or you include collection name `community.zabbix` in the playbook's `collections
     ansible_zabbix_auth_key: 8ec0d52432c15c91fcafe9888500cf9a607f44091ab554dbee860f6b44fac895
   tasks:
     - name: Ensure host is monitored by Zabbix
-      zabbix_host:
+      community.zabbix.zabbix_host:
         ...
 ```
 

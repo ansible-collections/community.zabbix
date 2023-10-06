@@ -1,0 +1,9 @@
+---
+- name: Retrieve API information
+  community.zabbix.zabbix_api_info:
+  register: zbxapiinfo_get
+
+- ansible.builtin.assert:
+    that:
+      - zbxapiinfo_get.failed is sameas False
+      - zbxapiinfo_get.api.version is version(zabbix_version, '>=')

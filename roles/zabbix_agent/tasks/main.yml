@@ -1,32 +1,37 @@
 ---
 # tasks file for zabbix_agent
 - name: "Include OS-specific variables"
-  include_vars: "{{ ansible_os_family }}.yml"
+  ansible.builtin.include_vars: "{{ ansible_os_family }}.yml"
   tags:
     - always
 
 - name: Determine Latest Supported Zabbix Version
-  set_fact:
+  ansible.builtin.set_fact:
     zabbix_agent_version: "{{ zabbix_valid_agent_versions[ansible_distribution_major_version][0] | default(6.4) }}"
   when: zabbix_agent_version is not defined or zabbix_agent_version is none
   tags:
     - always
 
 - name: Set More Variables
-  set_fact:
+  ansible.builtin.set_fact:
     zabbix_valid_version: "{{ zabbix_agent_version|float in zabbix_valid_agent_versions[ansible_distribution_major_version] }}"
   tags:
     - always
 
 - name: Stopping Install of Invalid Version
-  fail:
+  ansible.builtin.fail:
     msg: Zabbix version {{ zabbix_agent_version }} is not supported on {{ ansible_distribution }} {{ ansible_distribution_major_version }}
   when: not zabbix_valid_version
   tags:
     - always
 
+- name: Setting Zabbix API Server Port
+  ansible.builtin.set_fact:
+    zabbix_api_server_port: "{{ '443' if zabbix_api_use_ssl|bool else '80' }}"
+  when: zabbix_api_server_port is undefined
+
 - name: "Set variables specific for Zabbix Agent 2"
-  set_fact:
+  ansible.builtin.set_fact:
     zabbix_agent_service: zabbix-agent2
     zabbix_agent_package: zabbix-agent2
   when:
@@ -36,12 +41,12 @@
     - always
 
 - name: "Install the correct repository"
-  include_tasks: "{{ ansible_os_family }}.yml"
+  ansible.builtin.include_tasks: "{{ ansible_os_family }}.yml"
   when:
     - not (zabbix_agent_docker | bool)
 
 - name: "Encrypt with TLS PSK auto management"
-  include_tasks: tlspsk_auto.yml
+  ansible.builtin.include_tasks: tlspsk_auto.yml
   when:
     - not zabbix_agent2
     - zabbix_agent_tlspsk_auto | bool
@@ -49,7 +54,7 @@
     - (zabbix_agent_tlspsk_secret is undefined) or (zabbix_agent_tlspsk_secret | length == '0')
 
 - name: "Encrypt with TLS PSK auto management"
-  include_tasks: tlspsk_auto_agent2.yml
+  ansible.builtin.include_tasks: tlspsk_auto_agent2.yml
   when:
     - zabbix_agent2 | bool
     - zabbix_agent2_tlspsk_auto | bool
@@ -57,12 +62,12 @@
     - (zabbix_agent2_tlspsk_secret is undefined) or (zabbix_agent2_tlspsk_secret | length == '0')
 
 - name: "Configure Agent"
-  include_tasks: Windows_conf.yml
+  ansible.builtin.include_tasks: Windows_conf.yml
   when:
     - ansible_os_family == "Windows"
 
 - name: "Configure Agent"
-  include_tasks: Linux.yml
+  ansible.builtin.include_tasks: Linux.yml
   when:
     - (ansible_os_family != "Windows" and ansible_os_family != "Darwin") or (zabbix_agent_docker | bool)
 
@@ -76,14 +81,14 @@
     # Can't think of a way to make http_login_* vars be undefined -(
     http_login_user: "{{ zabbix_api_http_user | default(-42) }}"
     http_login_password: "{{ zabbix_api_http_password | default(-42) }}"
-  include_tasks: api.yml
+  ansible.builtin.include_tasks: api.yml
   when:
     - (zabbix_api_create_hostgroup | bool) or (zabbix_api_create_hosts | bool)
   tags:
     - api
 
 - name: "Including userparameters"
-  include_tasks: "userparameter.yml"
+  ansible.builtin.include_tasks: "userparameter.yml"
   when: zabbix_agent_userparameters|length > 0
   tags:
     - config

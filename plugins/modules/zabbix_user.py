@@ -52,6 +52,13 @@ options:
             - Password will not be updated on subsequent runs without setting this value to yes.
         default: no
         type: bool
+    current_passwd:
+        description:
+            - Current password for the user when overriding its password.
+            - Required when overriding the logged in user's password.
+            - https://www.zabbix.com/documentation/6.4/en/manual/api/reference/user/update
+        required: false
+        type: str
     lang:
         description:
             - Language code of the user's language.
@@ -206,14 +213,14 @@ extends_documentation_fragment:
 EXAMPLES = r"""
 # If you want to use Username and Password to be authenticated by Zabbix Server
 - name: Set credentials to access Zabbix Server API
-  set_fact:
+  ansible.builtin.set_fact:
     ansible_user: Admin
     ansible_httpapi_pass: zabbix
 
 # If you want to use API token to be authenticated by Zabbix Server
 # https://www.zabbix.com/documentation/current/en/manual/web_interface/frontend_sections/administration/general#api-tokens
 - name: Set API token
-  set_fact:
+  ansible.builtin.set_fact:
     ansible_zabbix_auth_key: 8ec0d52432c15c91fcafe9888500cf9a607f44091ab554dbee860f6b44fac895
 
 - name: create a new zabbix user.
@@ -605,6 +612,7 @@ class User(ZabbixBase):
         timezone,
         role_name,
         override_passwd,
+        current_passwd,
     ):
 
         user_ids = {}
@@ -626,6 +634,8 @@ class User(ZabbixBase):
 
         if override_passwd:
             request_data["passwd"] = passwd
+            if current_passwd:
+                request_data["current_passwd"] = current_passwd
 
         request_data["roleid"] = (
             self.get_roleid_by_name(role_name) if role_name else None
@@ -685,6 +695,7 @@ def main():
             override_passwd=dict(
                 type="bool", required=False, default=False, no_log=False
             ),
+            current_passwd=dict(type="str", required=False, no_log=True),
             lang=dict(
                 type="str",
                 choices=[
@@ -760,6 +771,7 @@ def main():
     usrgrps = module.params["usrgrps"]
     passwd = module.params["passwd"]
     override_passwd = module.params["override_passwd"]
+    current_passwd = module.params["current_passwd"]
     lang = module.params["lang"]
     theme = module.params["theme"]
     autologin = module.params["autologin"]
@@ -833,6 +845,7 @@ def main():
                     timezone,
                     role_name,
                     override_passwd,
+                    current_passwd,
                 )
         else:
             diff_check_result = True

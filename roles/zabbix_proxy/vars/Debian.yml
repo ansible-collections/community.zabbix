@@ -1,5 +1,8 @@
 zabbix_valid_proxy_versions:
   # Debian
+  "12":
+    - 6.4
+    - 6.0
   "11":
     - 6.4
     - 6.2
@@ -23,21 +26,24 @@ zabbix_valid_proxy_versions:
 
 mysql_client_pkgs:
   # Debian
+  "12":
+    - default-mysql-client
+    - "{{ zabbix_python_prefix }}-mysqldb"
   "11":
-    - mycli
+    - default-mysql-client
     - "{{ zabbix_python_prefix }}-mysqldb"
   "10":
     - mariadb-client
     - "{{ zabbix_python_prefix }}-mysqldb"
   # Ubuntu
   "22":
-    - mycli
+    - default-mysql-client
     - "{{ zabbix_python_prefix }}-mysqldb"
   "20":
-    - mycli
+    - default-mysql-client
     - "{{ zabbix_python_prefix }}-mysqldb"
   "18":
-    - mycli
+    - default-mysql-client
     - "{{ zabbix_python_prefix }}-mysqldb"
 
 mysql_plugin:
@@ -46,3 +52,4 @@ mysql_plugin:
 
 debian_keyring_path: /etc/apt/keyrings/
 zabbix_gpg_key: "{{ debian_keyring_path }}/zabbix-official-repo.asc"
+_zabbix_repo_deb_url: "http://repo.zabbix.com/zabbix/{{ zabbix_proxy_version }}/{{ ansible_distribution.lower() }}"

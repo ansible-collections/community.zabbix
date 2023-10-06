@@ -2,7 +2,7 @@
 # handlers file for wdijkerman.zabbix
 
 - name: zabbix-server restarted
-  service:
+  ansible.builtin.service:
     name: zabbix-server
     state: restarted
     enabled: true
@@ -12,7 +12,7 @@
     - zabbix_server_manage_service | bool
 
 - name: "clean repo files from proxy creds"
-  shell: ls /etc/yum.repos.d/zabbix* && sed -i 's/^proxy =.*//' /etc/yum.repos.d/zabbix* || true
+  ansible.builtin.shell: ls /etc/yum.repos.d/zabbix* && sed -i 's/^proxy =.*//' /etc/yum.repos.d/zabbix* || true
   become: true
   when:
     - ansible_os_family == 'RedHat'

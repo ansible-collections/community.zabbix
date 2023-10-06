@@ -1,45 +1,28 @@
 ---
-- name: "Debian | Include Zabbix gpg ids"
-  include_vars: zabbix.yml
+- name: "Debian | Set some variables"
+  ansible.builtin.set_fact:
+    zabbix_short_version: "{{ zabbix_server_version | regex_replace('\\.', '') }}"
+    zabbix_underscore_version: "{{ zabbix_server_version | regex_replace('\\.', '_') }}"
+    zabbix_python_prefix: "python{% if ansible_python_version is version('3', '>=') %}3{% endif %}"
   tags:
     - always
 
-- name: "Debian | Set some variables"
-  set_fact:
-    zabbix_short_version: "{{ zabbix_server_version | regex_replace('\\.', '') }}"
-    zabbix_server_apt_repository:
-      - "http://repo.zabbix.com/zabbix/{{ zabbix_server_version }}/{{ ansible_distribution.lower() }}/"
-      - "{{ ansible_distribution_release }}"
-      - "main"
-    zabbix_underscore_version: "{{ zabbix_server_version | regex_replace('\\.', '_') }}"
-    zabbix_python_prefix: "python{% if ansible_python_version is version('3', '>=') %}3{% endif %}"
+- name: "Debian | Repo URL"
+  ansible.builtin.set_fact:
+    zabbix_repo_deb_url: "{{ _zabbix_repo_deb_url }}{{ '-arm64' if ansible_machine == 'aarch64' else ''}}"
   when:
-    - ansible_machine != "aarch64"
-  tags:
-    - always
-
-- name: "Debian | Set some variables"
-  set_fact:
-    zabbix_short_version: "{{ zabbix_server_version | regex_replace('\\.', '') }}"
-    zabbix_server_apt_repository:
-      - "http://repo.zabbix.com/zabbix/{{ zabbix_server_version }}/{{ ansible_distribution.lower() }}-arm64/"
-      - "{{ ansible_distribution_release }}"
-      - "main"
-    zabbix_underscore_version: "{{ zabbix_server_version | regex_replace('\\.', '_') }}"
-    zabbix_python_prefix: "python{% if ansible_python_version is version('3', '>=') %}3{% endif %}"
-  when:
-    - ansible_machine == "aarch64"
+    - zabbix_repo_deb_url is undefined
   tags:
     - always
 
 - name: "Debian | Set some facts for Zabbix"
-  set_fact:
+  ansible.builtin.set_fact:
     datafiles_path: /usr/share/zabbix-sql-scripts/{{ 'postgresql' if zabbix_server_database == 'pgsql' else 'mysql' }}
   tags:
     - always
 
 - name: "Debian | Installing gnupg"
-  apt:
+  ansible.builtin.apt:
     pkg: gnupg
     update_cache: true
     cache_valid_time: 3600
@@ -80,18 +63,25 @@
     - install
 
 - name: "Debian | Installing repository {{ ansible_distribution }}"
-  apt_repository:
-    repo: "{{ item }} [signed-by={{ zabbix_gpg_key }}] {{ zabbix_server_apt_repository | join(' ') }}"
-    state: present
+  ansible.builtin.copy:
+    dest: /etc/apt/sources.list.d/zabbix.sources
+    owner: root
+    group: root
+    mode: 0644
+    content: |
+      Types: deb deb-src
+      Enabled: yes
+      URIs: {{ zabbix_repo_deb_url }}
+      Suites: {{ ansible_distribution_release }}
+      Components: {{ zabbix_repo_deb_component }}
+      Architectures: {{ 'amd64' if ansible_machine != 'aarch64' else 'arm64'}}
+      Signed-By: {{ zabbix_gpg_key }}
   become: true
-  with_items:
-    - deb-src
-    - deb
   tags:
     - install
 
 - name: "Debian | Create /etc/apt/preferences.d/"
-  file:
+  ansible.builtin.file:
     path: /etc/apt/preferences.d/
     state: directory
     mode: "0755"
@@ -102,7 +92,7 @@
     - install
 
 - name: "Debian | Configuring the weight for APT"
-  copy:
+  ansible.builtin.copy:
     dest: "/etc/apt/preferences.d/zabbix_server-{{ zabbix_proxy_database }}"
     content: |
       Package: zabbix_server-{{ zabbix_proxy_database }}
@@ -117,7 +107,7 @@
     - install
 
 - name: "Debian | apt-get clean"
-  shell: apt-get clean; apt-get update
+  ansible.builtin.shell: apt-get clean; apt-get update
   args:
     warn: "{{ produce_warn | default(omit) }}"
   changed_when: false
@@ -131,7 +121,7 @@
 # Since this is where Zabbix installs its database schemas, we need to allow
 # files to be installed to /usr/share/doc/zabbix*
 - name: "Debian | Check for the dpkg exclude line"
-  command: grep -F 'path-exclude=/usr/share/doc/*' /etc/dpkg/dpkg.cfg.d/excludes
+  ansible.builtin.command: grep -F 'path-exclude=/usr/share/doc/*' /etc/dpkg/dpkg.cfg.d/excludes
   register: dpkg_exclude_line
   failed_when: false
   changed_when: false
@@ -141,7 +131,7 @@
     - install
 
 - name: "Debian | Allow Zabbix dpkg installs to /usr/share/doc/zabbix*"
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: /etc/dpkg/dpkg.cfg.d/excludes
     line: "path-include=/usr/share/doc/zabbix*"
   become: true
@@ -151,7 +141,7 @@
     - install
 
 - name: "Debian | Installing zabbix-server-{{ zabbix_server_database }}"
-  apt:
+  ansible.builtin.apt:
     pkg: zabbix-server-{{ zabbix_server_database }}
     state: "{{ zabbix_server_package_state }}"
     update_cache: true
@@ -168,7 +158,7 @@
     - install
 
 - name: "Debian | Installing zabbix-sql-scripts"
-  apt:
+  ansible.builtin.apt:
     pkg: zabbix-sql-scripts
     state: "{{ zabbix_server_package_state }}"
     update_cache: true
@@ -189,7 +179,7 @@
 - name: "Debian | Install Database Client Package"
   block:
     - name: "Debian | Install Mysql Client package"
-      apt:
+      ansible.builtin.apt:
         name:
           - default-mysql-client
           - "{{ zabbix_python_prefix }}-mysqldb"
@@ -205,7 +195,7 @@
         - ansible_distribution_release != "buster"
 
     - name: "Debian 10 | Install Mysql Client package"
-      apt:
+      ansible.builtin.apt:
         name:
           - mariadb-client
           - "{{ zabbix_python_prefix }}-mysqldb"
@@ -221,7 +211,7 @@
         - ansible_distribution_release == "buster"
 
     - name: "Debian | Install PostgreSQL Client package"
-      apt:
+      ansible.builtin.apt:
         name:
           - postgresql-client
           - "{{ zabbix_python_prefix }}-psycopg2"

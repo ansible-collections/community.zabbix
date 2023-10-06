@@ -1,26 +1,29 @@
 ---
-- name: "Debian | Include Zabbix gpg ids"
-  include_vars: zabbix.yml
-  tags:
-    - always
-
 - name: "Debian | Set short version name"
-  set_fact:
+  ansible.builtin.set_fact:
     zabbix_short_version: "{{ zabbix_proxy_version | regex_replace('\\.', '') }}"
     zabbix_python_prefix: "python{% if ansible_python_version is version('3', '>=') %}3{% endif %}"
     zabbix_underscore_version: "{{ zabbix_proxy_version | regex_replace('\\.', '_') }}"
   tags:
     - always
 
+- name: "Debian | Repo URL"
+  ansible.builtin.set_fact:
+    zabbix_repo_deb_url: "{{ _zabbix_repo_deb_url }}{{ '-arm64' if ansible_machine == 'aarch64' else ''}}"
+  when:
+    - zabbix_repo_deb_url is undefined
+  tags:
+    - always
+
 - name: "Debian | Set some facts for Zabbix"
-  set_fact:
+  ansible.builtin.set_fact:
     datafiles_path: /usr/share/doc/zabbix-sql-scripts/{{ zabbix_proxy_db_long }}
   tags:
     - install
     - config
 
 - name: "Debian | Installing gnupg"
-  apt:
+  ansible.builtin.apt:
     pkg: gnupg
     update_cache: true
     cache_valid_time: 3600
@@ -61,18 +64,25 @@
     - install
 
 - name: "Debian | Installing repository {{ ansible_distribution }}"
-  apt_repository:
-    repo: "{{ item }} [signed-by={{ zabbix_gpg_key }}] http://repo.zabbix.com/zabbix/{{ zabbix_proxy_version }}/{{ ansible_distribution.lower() }}/ {{ ansible_distribution_release }} main"
-    state: present
+  ansible.builtin.copy:
+    dest: /etc/apt/sources.list.d/zabbix.sources
+    owner: root
+    group: root
+    mode: 0644
+    content: |
+      Types: deb deb-src
+      Enabled: yes
+      URIs: {{ zabbix_repo_deb_url }}
+      Suites: {{ ansible_distribution_release }}
+      Components: {{ zabbix_repo_deb_component }}
+      Architectures: {{ 'amd64' if ansible_machine != 'aarch64' else 'arm64'}}
+      Signed-By: {{ zabbix_gpg_key }}
   become: true
-  with_items:
-    - deb-src
-    - deb
   tags:
     - install
 
 - name: "Debian | Create /etc/apt/preferences.d/"
-  file:
+  ansible.builtin.file:
     path: /etc/apt/preferences.d/
     state: directory
     mode: "0755"
@@ -83,7 +93,7 @@
     - install
 
 - name: "Debian | Configuring the weight for APT"
-  copy:
+  ansible.builtin.copy:
     dest: "/etc/apt/preferences.d/zabbix-proxy-{{ zabbix_proxy_database }}"
     content: |
       Package: zabbix-proxy-{{ zabbix_proxy_database }}
@@ -98,10 +108,10 @@
     - install
 
 - name: "Debian | Installing zabbix-proxy-{{ zabbix_proxy_database }}"
-  apt:
+  ansible.builtin.apt:
     pkg: "zabbix-proxy-{{ zabbix_proxy_database }}"
     update_cache: true
-    cache_valid_time: 3600
+    cache_valid_time: 0
     force: true
     state: "{{ zabbix_proxy_package_state }}"
     default_release: "{{ ansible_distribution_release }}"
@@ -115,7 +125,7 @@
     - install
 
 - name: "Debian | Installing zabbix-sql-scripts"
-  apt:
+  ansible.builtin.apt:
     pkg: zabbix-sql-scripts
     state: "{{ zabbix_proxy_package_state }}"
     update_cache: true
@@ -133,7 +143,7 @@
     - install
 
 - name: "Debian | Install Ansible module dependencies"
-  apt:
+  ansible.builtin.apt:
     name: "{{ zabbix_python_prefix }}-psycopg2"
     state: present
   environment:
@@ -149,7 +159,7 @@
     - dependencies
 
 - name: "Debian | Install Mysql Client package"
-  apt:
+  ansible.builtin.apt:
     name: "{{ mysql_client_pkgs[ansible_distribution_major_version] }}"
     state: present
   environment:
@@ -167,7 +177,7 @@
     - database
 
 - name: "Debian | Install PostgreSQL Client package"
-  apt:
+  ansible.builtin.apt:
     name: postgresql-client
     state: present
   environment:
@@ -186,7 +196,7 @@
     - database
 
 - name: "Debian | Install sqlite3"
-  apt:
+  ansible.builtin.apt:
     name: sqlite3
     state: present
   environment:

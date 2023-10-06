@@ -5,270 +5,269 @@
       name: ACME
 
   block:
-  - name: test - create new Zabbix user group
-    zabbix_usergroup:
-      state: present
-    register: usergroup_new
+    - name: test - create new Zabbix user group
+      community.zabbix.zabbix_usergroup:
+        state: present
+      register: usergroup_new
 
-  - name: assert that user group was created
-    assert:
-      that: usergroup_new is changed
+    - name: assert that user group was created
+      ansible.builtin.assert:
+        that: usergroup_new is changed
 
-  - name: test - create new Zabbix user group (again)
-    zabbix_usergroup:
-      state: present
-    register: usergroup_again
+    - name: test - create new Zabbix user group (again)
+      community.zabbix.zabbix_usergroup:
+        state: present
+      register: usergroup_again
 
-  - name: assert that user group was created
-    assert:
-      that: not usergroup_again is changed
+    - name: assert that user group was created
+      ansible.builtin.assert:
+        that: not usergroup_again is changed
 
-  - name: test - update Zabbix user group with disabled gui_access
-    zabbix_usergroup:
-      gui_access: disable
-    register: usergroup_updated
-
-  - name: assert that user group was updated
-    assert:
-      that: usergroup_updated is changed
-
-  - name: test - update Zabbix user group with disabled gui_access (again)
-    zabbix_usergroup:
-      gui_access: disable
-    register: usergroup_updated_again
-
-  - name: assert that user group was updated
-    assert:
-      that: not usergroup_updated_again is changed
-
-  - name: test - reset Zabbix user group to default
-    zabbix_usergroup:
-    register: usergroup_reset
-
-  - name: assert that user group was created
-    assert:
-      that: usergroup_reset is changed
-
-  - when: zabbix_version is version('6.2', '<')
-    block:
-    - name: test - update Zabbix user group with one right
-      zabbix_usergroup:
-        rights:
-          - host_group: Discovered hosts
-            permission: read-only
-      register: usergroup_updated_right
+    - name: test - update Zabbix user group with disabled gui_access
+      community.zabbix.zabbix_usergroup:
+        gui_access: disable
+      register: usergroup_updated
 
     - name: assert that user group was updated
-      assert:
-        that: usergroup_updated_right is changed
+      ansible.builtin.assert:
+        that: usergroup_updated is changed
 
-    - name: test - update Zabbix user group with multiple rights
-      zabbix_usergroup:
-        rights:
-          - host_group: Discovered hosts
-            permission: read-only
-          - host_group: Zabbix servers
-            permission: read-write
-      register: usergroup_updated_rights
+    - name: test - update Zabbix user group with disabled gui_access (again)
+      community.zabbix.zabbix_usergroup:
+        gui_access: disable
+      register: usergroup_updated_again
 
     - name: assert that user group was updated
-      assert:
-        that: usergroup_updated_rights is changed
+      ansible.builtin.assert:
+        that: not usergroup_updated_again is changed
 
-    - name: test - update Zabbix user group with multiple rights (again)
-      zabbix_usergroup:
-        rights:
+    - name: test - reset Zabbix user group to default
+      community.zabbix.zabbix_usergroup:
+      register: usergroup_reset
+
+    - name: assert that user group was created
+      ansible.builtin.assert:
+        that: usergroup_reset is changed
+
+    - when: zabbix_version is version('6.2', '<')
+      block:
+        - name: test - update Zabbix user group with one right
+          community.zabbix.zabbix_usergroup:
+            rights:
+              - host_group: Discovered hosts
+                permission: read-only
+          register: usergroup_updated_right
+
+        - name: assert that user group was updated
+          ansible.builtin.assert:
+            that: usergroup_updated_right is changed
+
+        - name: test - update Zabbix user group with multiple rights
+          community.zabbix.zabbix_usergroup:
+            rights:
+              - host_group: Discovered hosts
+                permission: read-only
+              - host_group: Zabbix servers
+                permission: read-write
+          register: usergroup_updated_rights
+
+        - name: assert that user group was updated
+          ansible.builtin.assert:
+            that: usergroup_updated_rights is changed
+
+        - name: test - update Zabbix user group with multiple rights (again)
+          community.zabbix.zabbix_usergroup:
+            rights:
+              - host_group: Discovered hosts
+                permission: read-only
+              - host_group: Zabbix servers
+                permission: read-write
+          register: usergroup_updated_rights_again
+
+        - name: assert that user group was not updated
+          ansible.builtin.assert:
+            that: not usergroup_updated_rights_again is changed
+
+    - when: zabbix_version is version('6.2', '>=')
+      block:
+        - name: test - update Zabbix user group with one hostgroup right
+          community.zabbix.zabbix_usergroup:
+            hostgroup_rights:
+              - host_group: Discovered hosts
+                permission: read-only
+          register: usergroup_updated_hostgroup_right
+
+        - name: assert that user group was updated
+          ansible.builtin.assert:
+            that: usergroup_updated_hostgroup_right is changed
+
+        - name: test - update Zabbix user group with multiple hostgroup rights
+          community.zabbix.zabbix_usergroup:
+            hostgroup_rights:
+              - host_group: Discovered hosts
+                permission: read-only
+              - host_group: Zabbix servers
+                permission: read-write
+          register: usergroup_updated_hostgroup_rights
+
+        - name: assert that user group was updated
+          ansible.builtin.assert:
+            that: usergroup_updated_hostgroup_rights is changed
+
+        - name: test - update Zabbix user group with multiple hostgroup rights (again)
+          community.zabbix.zabbix_usergroup:
+            hostgroup_rights:
+              - host_group: Discovered hosts
+                permission: read-only
+              - host_group: Zabbix servers
+                permission: read-write
+          register: usergroup_updated_hostgroup_rights_again
+
+        - name: assert that user group was not updated
+          ansible.builtin.assert:
+            that: not usergroup_updated_hostgroup_rights_again is changed
+
+        - name: test - update Zabbix user group with one template group right
+          community.zabbix.zabbix_usergroup:
+            hostgroup_rights:
+              - host_group: Discovered hosts
+                permission: read-only
+              - host_group: Zabbix servers
+                permission: read-write
+            templategroup_rights:
+              - template_group: Templates
+                permission: read-only
+          register: usergroup_updated_templategroup_right
+
+        - name: assert that user group was updated
+          ansible.builtin.assert:
+            that: usergroup_updated_templategroup_right is changed
+
+        - name: test - update Zabbix user group with multiple template group rights
+          community.zabbix.zabbix_usergroup:
+            hostgroup_rights:
+              - host_group: Discovered hosts
+                permission: read-only
+              - host_group: Zabbix servers
+                permission: read-write
+            templategroup_rights:
+              - template_group: Templates
+                permission: read-only
+              - template_group: Templates/Applications
+                permission: read-write
+          register: usergroup_updated_templategroup_rights
+
+        - name: assert that user group was updated
+          ansible.builtin.assert:
+            that: usergroup_updated_templategroup_right is changed
+
+        - name: test - update Zabbix user group with multiple template group rights (again)
+          community.zabbix.zabbix_usergroup:
+            hostgroup_rights:
+              - host_group: Discovered hosts
+                permission: read-only
+              - host_group: Zabbix servers
+                permission: read-write
+            templategroup_rights:
+              - template_group: Templates
+                permission: read-only
+              - template_group: Templates/Applications
+                permission: read-write
+          register: usergroup_updated_templategroup_rights_again
+
+        - name: assert that user group was not updated
+          ansible.builtin.assert:
+            that: not usergroup_updated_templategroup_rights_again is changed
+
+    - name: test - reset Zabbix user group to default
+      community.zabbix.zabbix_usergroup:
+      register: usergroup_reset
+
+    - name: assert that user group was created
+      ansible.builtin.assert:
+        that: usergroup_reset is changed
+
+    - name: test - update Zabbix user group with one tag_filter
+      community.zabbix.zabbix_usergroup:
+        tag_filters:
           - host_group: Discovered hosts
-            permission: read-only
-          - host_group: Zabbix servers
-            permission: read-write
-      register: usergroup_updated_rights_again
-
-    - name: assert that user group was not updated
-      assert:
-        that: not usergroup_updated_rights_again is changed
-
-  - when: zabbix_version is version('6.2', '>=')
-    block:
-    - name: test - update Zabbix user group with one hostgroup right
-      zabbix_usergroup:
-        hostgroup_rights:
-          - host_group: Discovered hosts
-            permission: read-only
-      register: usergroup_updated_hostgroup_right
+            tag: Service
+            value: JIRA
+      register: usergroup_updated_tag_filter
 
     - name: assert that user group was updated
-      assert:
-        that: usergroup_updated_hostgroup_right is changed
+      ansible.builtin.assert:
+        that: usergroup_updated_tag_filter is changed
 
-    - name: test - update Zabbix user group with multiple hostgroup rights
-      zabbix_usergroup:
-        hostgroup_rights:
+    - name: test - update Zabbix user group with multiple tag_filters
+      community.zabbix.zabbix_usergroup:
+        tag_filters:
           - host_group: Discovered hosts
-            permission: read-only
-          - host_group: Zabbix servers
-            permission: read-write
-      register: usergroup_updated_hostgroup_rights
+            tag: Service
+            value: JIRA
+          - host_group: Discovered hosts
+            tag: Service
+            value: Zabbix
+      register: usergroup_updated_tag_filters
 
     - name: assert that user group was updated
-      assert:
-        that: usergroup_updated_hostgroup_rights is changed
+      ansible.builtin.assert:
+        that: usergroup_updated_tag_filters is changed
 
-    - name: test - update Zabbix user group with multiple hostgroup rights (again)
-      zabbix_usergroup:
-        hostgroup_rights:
-          - host_group: Discovered hosts
-            permission: read-only
-          - host_group: Zabbix servers
-            permission: read-write
-      register: usergroup_updated_hostgroup_rights_again
+    - name: test - reset Zabbix user group to default
+      community.zabbix.zabbix_usergroup:
 
-    - name: assert that user group was not updated
-      assert:
-        that: not usergroup_updated_hostgroup_rights_again is changed
+    - when: zabbix_version is version('6.2', '>=')
+      block:
+        - name: test - create new user directory
+          community.zabbix.zabbix_user_directory:
+            name: LDAP infra 1
+            host: "test.com"
+            port: 389
+            base_dn: "ou=Users,dc=example,dc=org"
+            search_attribute: "uid"
+          when: zabbix_version is version('6.4', '<')
 
-    - name: test - update Zabbix user group with one template group right
-      zabbix_usergroup:
-        hostgroup_rights:
-          - host_group: Discovered hosts
-            permission: read-only
-          - host_group: Zabbix servers
-            permission: read-write
-        templategroup_rights:
-          - template_group: Templates
-            permission: read-only
-      register: usergroup_updated_templategroup_right
+        - name: test - create new user directory
+          community.zabbix.zabbix_user_directory:
+            name: LDAP infra 1
+            idp_type: ldap
+            host: "test.com"
+            port: 389
+            base_dn: "ou=Users,dc=example,dc=org"
+            search_attribute: "uid"
+          when: zabbix_version is version('6.4', '>=')
 
-    - name: assert that user group was updated
-      assert:
-        that: usergroup_updated_templategroup_right is changed
+        - name: test - update Zabbix user group with user directory
+          community.zabbix.zabbix_usergroup:
+            userdirectory: LDAP infra 1
+          register: usergroup_create_userdir
 
-    - name: test - update Zabbix user group with multiple template group rights
-      zabbix_usergroup:
-        hostgroup_rights:
-          - host_group: Discovered hosts
-            permission: read-only
-          - host_group: Zabbix servers
-            permission: read-write
-        templategroup_rights:
-          - template_group: Templates
-            permission: read-only
-          - template_group: Templates/Applications
-            permission: read-write
-      register: usergroup_updated_templategroup_rights
+        - name: assert that user group was updated
+          ansible.builtin.assert:
+            that: usergroup_create_userdir is changed
 
-    - name: assert that user group was updated
-      assert:
-        that: usergroup_updated_templategroup_right is changed
+        - name: test - update Zabbix user group with user directory (again)
+          community.zabbix.zabbix_usergroup:
+            userdirectory: LDAP infra 1
+          register: usergroup_create_userdir_again
 
-    - name: test - update Zabbix user group with multiple template group rights (again)
-      zabbix_usergroup:
-        hostgroup_rights:
-          - host_group: Discovered hosts
-            permission: read-only
-          - host_group: Zabbix servers
-            permission: read-write
-        templategroup_rights:
-          - template_group: Templates
-            permission: read-only
-          - template_group: Templates/Applications
-            permission: read-write
-      register: usergroup_updated_templategroup_rights_again
+        - name: assert that user group was not updated
+          ansible.builtin.assert:
+            that: not usergroup_create_userdir_again is changed
 
-    - name: assert that user group was not updated
-      assert:
-        that: not usergroup_updated_templategroup_rights_again is changed
+    - name: test - delete Zabbix user group
+      community.zabbix.zabbix_usergroup:
+        state: absent
+      register: usergroup_delete
 
-  - name: test - reset Zabbix user group to default
-    zabbix_usergroup:
-    register: usergroup_reset
+    - name: assert that Zabbix user group has been deleted
+      ansible.builtin.assert:
+        that: usergroup_delete is changed
 
-  - name: assert that user group was created
-    assert:
-      that: usergroup_reset is changed
-
-  - name: test - update Zabbix user group with one tag_filter
-    zabbix_usergroup:
-      tag_filters:
-        - host_group: Discovered hosts
-          tag: Service
-          value: JIRA
-    register: usergroup_updated_tag_filter
-
-  - name: assert that user group was updated
-    assert:
-      that: usergroup_updated_tag_filter is changed
-
-  - name: test - update Zabbix user group with multiple tag_filters
-    zabbix_usergroup:
-      tag_filters:
-        - host_group: Discovered hosts
-          tag: Service
-          value: JIRA
-        - host_group: Discovered hosts
-          tag: Service
-          value: Zabbix
-    register: usergroup_updated_tag_filters
-
-  - name: assert that user group was updated
-    assert:
-      that: usergroup_updated_tag_filters is changed
-
-  - name: test - reset Zabbix user group to default
-    zabbix_usergroup:
-
-  - when: zabbix_version is version('6.2', '>=')
-    block:
-    - name: test - create new user directory
-      zabbix_user_directory:
+    - name: test - delete user directory
+      community.zabbix.zabbix_user_directory:
         name: LDAP infra 1
-        host: 'test.com'
-        port: 389
-        base_dn: 'ou=Users,dc=example,dc=org'
-        search_attribute: 'uid'
-      when: zabbix_version is version('6.4', '<')
-
-    - name: test - create new user directory
-      zabbix_user_directory:
-        name: LDAP infra 1
-        idp_type: ldap
-        host: 'test.com'
-        port: 389
-        base_dn: 'ou=Users,dc=example,dc=org'
-        search_attribute: 'uid'
-      when: zabbix_version is version('6.4', '>=')
-
-    - name: test - update Zabbix user group with user directory
-      zabbix_usergroup:
-        userdirectory: LDAP infra 1
-      register: usergroup_create_userdir
-
-    - name: assert that user group was updated
-      assert:
-        that: usergroup_create_userdir is changed
-
-    - name: test - update Zabbix user group with user directory (again)
-      zabbix_usergroup:
-        userdirectory: LDAP infra 1
-      register: usergroup_create_userdir_again
-
-    - name: assert that user group was not updated
-      assert:
-        that: not usergroup_create_userdir_again is changed
-
-  - name: test - delete Zabbix user group
-    zabbix_usergroup:
-      state: absent
-    register: usergroup_delete
-
-  - name: assert that Zabbix user group has been deleted
-    assert:
-      that: usergroup_delete is changed
-
-
-  - name: test - delete user directory
-    zabbix_user_directory:
-      name: LDAP infra 1
-      host: 'test.com'
-      state: absent
-    when: zabbix_version is version('6.2', '>=')
+        host: "test.com"
+        state: absent
+      when: zabbix_version is version('6.2', '>=')
