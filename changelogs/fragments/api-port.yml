@@ -1,2 +1,0 @@
-minor_changes:
-  - agent and proxy roles - Set default `zabbix_api_server_port` to 80 or 443 based on `zabbix_api_use_ssl`
