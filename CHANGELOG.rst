@@ -5,6 +5,32 @@ community.zabbix Release Notes
 .. contents:: Topics
 
 
+v2.2.0
+======
+
+Minor Changes
+-------------
+
+- Added zabbix_group_events_info module
+- action module - Added notify_if_canceled property
+- agent and proxy roles - Set default `zabbix_api_server_port` to 80 or 443 based on `zabbix_api_use_ssl`
+- agent role - Removed duplicative Windows agent task
+- agent role - Standardized default yum priority to 99
+- all roles - Re-added ability to override Debian repo source
+- all roles - Updated Debian repository format to 822 standard
+- various - updated testing modules
+- various - updated to fully qualified module names
+- zabbix agent - Added capability to add additional configuration includes
+- zabbix_api_info module added
+- zabbix_user module - add current_passwd optional parameter to enable password updating of the currently logged in user (https://www.zabbix.com/documentation/6.4/en/manual/api/reference/user/update)
+
+Bugfixes
+--------
+
+- zabbix_template - fix template export when template's content has "error" word
+- zabbix_web role - fix variable naming issues (undefined) to zabbix_web_version and zabbix_web_apt_repository
+- zabbix_inventory - fixed handeling of add_zabbix_groups option
+
 v2.1.0
 ======
 

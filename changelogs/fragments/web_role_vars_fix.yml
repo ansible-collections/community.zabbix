@@ -1,2 +1,0 @@
-bugfixes:
-  - zabbix_web role - fix variable naming issues (undefined) to zabbix_web_version and zabbix_web_apt_repository

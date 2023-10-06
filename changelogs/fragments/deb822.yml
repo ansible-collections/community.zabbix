@@ -1,3 +1,0 @@
-minor_changes:
-  - all roles - Updated Debian repository format to 822 standard
-  - all roles - Re-added ability to override Debian repo source

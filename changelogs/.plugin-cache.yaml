@@ -22,6 +22,11 @@ plugins:
       name: zabbix_action
       namespace: ''
       version_added: null
+    zabbix_api_info:
+      description: Retrieve Zabbix API info
+      name: zabbix_api_info
+      namespace: ''
+      version_added: 2.1.0
     zabbix_authentication:
       description: Update Zabbix authentication
       name: zabbix_authentication
@@ -45,6 +50,11 @@ plugins:
     zabbix_group:
       description: Create/delete Zabbix host groups
       name: zabbix_group
+      namespace: ''
+      version_added: null
+    zabbix_group_events_info:
+      description: Get all triggers about a Zabbix group
+      name: zabbix_group_events_info
       namespace: ''
       version_added: null
     zabbix_group_info:
@@ -171,4 +181,4 @@ plugins:
   shell: {}
   strategy: {}
   vars: {}
-version: 2.1.0
+version: 2.2.0
