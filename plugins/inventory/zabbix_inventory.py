@@ -1,8 +1,9 @@
 #
 # Copyright: (c), Ansible Project
 #
-# (c) 2013, Greg Buehler
+# (c) 2023, Alexandre Georges
 # (c) 2018, Filippo Ferrazini
+# (c) 2013, Greg Buehler
 # (c) 2021, Timothy Test
 # Modified from ServiceNow Inventory Plugin and Zabbix inventory Script
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
@@ -445,7 +446,16 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
 
         # organize inventory by zabbix groups
         if self.get_option('add_zabbix_groups'):
-            content = self._zapi.host.get({'selectGroups': ['name']})
+
+            response = self.api_request(
+                'host.get',
+                {
+                    'selectGroups': ['name']
+                }
+            )
+            res = json.load(response)
+            content = res['result']
+
             for record in content:
                 host_name = record['host']
                 if len(record['groups']) >= 1:
