@@ -103,14 +103,14 @@
 {{ (zabbix_server_unreachableperiod is defined and zabbix_server_unreachableperiod is not none) | ternary('', '# ') }}UnreachablePeriod={{ zabbix_server_unreachableperiod | default('') }}
 {{ (zabbix_server_user is defined and zabbix_server_user is not none) | ternary('', '# ') }}User={{ zabbix_server_user | default('') }}
 {{ (zabbix_server_valuecachesize is defined and zabbix_server_valuecachesize is not none) | ternary('', '# ') }}ValueCacheSize={{ zabbix_server_valuecachesize | default('') }}
-{% if zabbix_server_version is version('6.2', '>=') %}
+{% if zabbix_server_version is version('6.0', '>') %}
 {{ (zabbix_server_vault is defined and zabbix_server_vault is not none) | ternary('', '# ') }}Vault={{ zabbix_server_vault | default('') }}
 {% endif %}
-{% if zabbix_server_version is version('6.4', '>=') %}
+{% if zabbix_server_version is version('6.0', '>') %}
 {{ (zabbix_server_connectors is defined and zabbix_server_connectors is not none) | ternary('', '# ') }}StartConnectors={{ zabbix_server_connectors | default('') }}
 {% endif %}
 {{ (zabbix_server_vaultdbpath is defined and zabbix_server_vaultdbpath is not none) | ternary('', '# ') }}VaultDBPath={{ zabbix_server_vaultdbpath | default('') }}
-{% if zabbix_server_version is version('6.2', '>=') %}
+{% if zabbix_server_version is version('6.0', '>') %}
 {{ (zabbix_server_vaulttlskeyfile is defined and zabbix_server_vaulttlskeyfile is not none) | ternary('', '# ') }}VaultTLSKeyFile={{ zabbix_server_vaulttlskeyfile | default('') }}
 {{ (zabbix_server_vaulttlscertfile is defined and zabbix_server_vaulttlscertfile is not none) | ternary('', '# ') }}VaultTLSCertFile={{ zabbix_server_vaulttlscertfile | default('') }}
 {% endif %}

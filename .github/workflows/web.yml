@@ -35,18 +35,9 @@ jobs:
         web_server:
           - nginx
         version:
-          - v64
-          - v62
           - v60
         include:
           - interpreter: python3
-        exclude:
-          - container: debian10
-            version: v62
-          - container: debian10
-            version: v64
-          - container: debian12
-            version: v62
     steps:
       - name: Check out code
         uses: actions/checkout@v4

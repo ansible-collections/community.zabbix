@@ -8,22 +8,15 @@ mysql_create_dir: ""
 zabbix_valid_server_versions:
   # Debian
   "12":
-    - 6.4
     - 6.0
   "11":
-    - 6.4
-    - 6.2
     - 6.0
   "10":
     - 6.0
   # Ubuntu
   "22":
-    - 6.4
-    - 6.2
     - 6.0
   "20":
-    - 6.4
-    - 6.2
     - 6.0
 
 debian_keyring_path: /etc/apt/keyrings/

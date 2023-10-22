@@ -22,23 +22,19 @@ jobs:
         container:
           - rockylinux9
           - rockylinux8
+          - centos7
           - ubuntu2204
           - ubuntu2004
           - debian12
           - debian11
           - debian10
         version:
-            - v64
-            - v62
             - v60
         scenario_name:
           - default
           - autopsk
           - agent2
           - agent2autopsk
-        exclude:
-          - container: debian12
-            version: v62
 
     steps:
       - name: Check out code

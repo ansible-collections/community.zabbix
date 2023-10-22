@@ -33,18 +33,9 @@ jobs:
           - mysql
           - pgsql
         version:
-          - v64
-          - v62
           - v60
         include:
           - interpreter: python3
-        exclude:
-          - container: debian12
-            version: v62
-          - container: debian10
-            version: v62
-          - container: debian10
-            version: v64
     steps:
       - name: Check out code
         uses: actions/checkout@v4
