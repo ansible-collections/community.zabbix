@@ -81,9 +81,9 @@ This is especially important for some of the Zabbix roles that require you to **
 
 For the majority of modules, however, you can get away with just:
 
-#### Ansible 2.10 and higher
+#### Ansible 2.14 and higher
 
-With the release of Ansible 2.10, modules have been moved into collections.  With the exception of ansible.builtin modules, this means additonal collections must be installed in order to use modules such as seboolean (now ansible.posix.seboolean).  The following collections are now frequently required: `ansible.posix` and `community.general`.  Installing the collections:
+With the release of Ansible 2.14, modules have been moved into collections.  With the exception of ansible.builtin modules, this means additonal collections must be installed in order to use modules such as seboolean (now ansible.posix.seboolean).  The following collections are now frequently required: `ansible.posix` and `community.general`.  Installing the collections:
 
 ```bash
 ansible-galaxy collection install ansible.posix
