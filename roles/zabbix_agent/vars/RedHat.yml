@@ -8,8 +8,11 @@ zabbix_agent2_conf: zabbix_agent2.conf
 
 zabbix_valid_agent_versions:
   "9":
+    - 6.5
     - 6.0
   "8":
+    - 6.5
     - 6.0
   "7":
+    - 6.5
     - 6.0

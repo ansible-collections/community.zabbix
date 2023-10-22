@@ -1,15 +1,19 @@
 zabbix_valid_javagateway_versions:
   # Debian
   "12":
+    - 6.5
     - 6.0
   "11":
+    - 6.5
     - 6.0
   "10":
     - 6.0
   # Ubuntu
   "22":
+    - 6.5
     - 6.0
   "20":
+    - 6.5
     - 6.0
 
 debian_keyring_path: /etc/apt/keyrings/

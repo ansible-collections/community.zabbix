@@ -30,6 +30,7 @@ jobs:
           - debian10
         version:
             - v60
+            - v65
         scenario_name:
           - default
           - autopsk

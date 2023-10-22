@@ -41,6 +41,9 @@ provisioner:
       v60:
         zabbix_server_version: 6.0
         zabbix_web_version: 6.0
+      v65:
+        zabbix_server_version: 6.5
+        zabbix_web_version: 6.5
       mysql:
         zabbix_server_database: mysql
         zabbix_server_dbport: 3306

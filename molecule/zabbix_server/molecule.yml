@@ -29,6 +29,8 @@ provisioner:
         ansible_python_interpreter: /usr/bin/python
       v60:
         zabbix_server_version: 6.0
+      v65:
+        zabbix_server_version: 6.5
       mysql:
         zabbix_server_dbname: zabbix
         zabbix_server_dbuser: zabbix-dbuser

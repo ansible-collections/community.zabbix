@@ -10,8 +10,10 @@ __epel_repo:
 
 zabbix_valid_server_versions:
   "9":
+    - 6.5
     - 6.0
   "8":
+    - 6.5
     - 6.0
 
 pgsql_depenencies:

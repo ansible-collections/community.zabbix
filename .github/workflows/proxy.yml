@@ -36,6 +36,7 @@ jobs:
           - sqlite3
         version:
           - v60
+          - v65
         include:
           - interpreter: python3
           - interpreter: python

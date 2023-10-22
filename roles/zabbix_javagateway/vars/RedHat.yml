@@ -1,8 +1,10 @@
 ---
 zabbix_valid_javagateway_versions:
   "9":
+    - 6.5
     - 6.0
   "8":
+    - 6.5
     - 6.0
   "7":
     - 6.0

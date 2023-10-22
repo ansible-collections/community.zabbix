@@ -37,6 +37,8 @@ provisioner:
         zabbix_agent_tlsaccept: psk
       v60:
         zabbix_agent_version: 6.0
+      v65:
+        zabbix_agent_version: 6.5
 scenario:
   test_sequence:
     - dependency
