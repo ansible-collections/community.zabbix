@@ -9,9 +9,7 @@
 {% if ansible_os_family != "Windows" %}
 PidFile={{ zabbix_agent_pidfile }}
 {% endif %}
-{% if zabbix_agent_version is version('3.0', '>=') %}
 LogType={{ zabbix_agent_logtype }}
-{% endif %}
 {% if ansible_os_family == "Windows" %}
 LogFile={{ zabbix_agent_win_logfile }}
 {% else %}
@@ -66,7 +64,7 @@ RefreshActiveChecks={{ zabbix_agent_refreshactivechecks }}
 BufferSend={{ zabbix_agent_buffersend }}
 BufferSize={{ zabbix_agent_buffersize }}
 MaxLinesPerSecond={{ zabbix_agent_maxlinespersecond }}
-{% if zabbix_agent_version is version_compare('6.2', '>=') %}
+{% if zabbix_agent_version is version_compare('6.0', '>') %}
 HeartbeatFrequency={{ zabbix_agent_heartbeatfrequency }}
 {% endif %}
 {% if zabbix_agent_zabbix_alias is defined and zabbix_agent_zabbix_alias %}
@@ -96,10 +94,8 @@ Include={{ include }}
 {% endfor %}
 {% endif %}
 UnsafeUserParameters={{ zabbix_agent_unsafeuserparameters }}
-{% if zabbix_agent_version is version_compare('2.2', '>=') %}
 {% if ansible_os_family != "Windows" %}
 LoadModulePath={{ zabbix_agent_loadmodulepath }}
-{% endif %}
 {% endif %}
 {% if zabbix_agent_loadmodule is defined and zabbix_agent_loadmodule %}
 {% if zabbix_agent_loadmodule is string %}
@@ -142,8 +138,6 @@ TLSPSKIdentity={{ zabbix_agent_tlspskidentity }}
 TLSPSKFile={{ zabbix_agent_tlspskfile }}
 {% endif %}
 {% endif %}
-{% if zabbix_agent_version is version('6.0', '>=') %}
 {% if zabbix_agent_listenbacklog is defined and zabbix_agent_listenbacklog %}
 ListenBacklog={{ zabbix_agent_listenbacklog }}
-{% endif %}
 {% endif %}
