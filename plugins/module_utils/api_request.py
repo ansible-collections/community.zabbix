@@ -12,10 +12,14 @@ __metaclass__ = type
 
 from uuid import uuid4
 
-from ansible.module_utils.urls import CertificateError
 from ansible.module_utils.connection import ConnectionError
 from ansible.module_utils.connection import Connection
 from ansible.module_utils._text import to_text
+try:
+    from ansible.module_utils.urls import CertificateError
+    HAS_CERT_ERROR = True
+except ImportError:
+    HAS_CERT_ERROR = False
 
 
 class ZabbixApiRequest(object):
@@ -25,14 +29,22 @@ class ZabbixApiRequest(object):
         self.connection = Connection(self.module._socket_path)
 
     def _httpapi_error_handle(self, payload=None):
-        try:
-            code, response = self.connection.send_request(data=payload)
-        except ConnectionError as e:
-            self.module.fail_json(msg="connection error occurred: {0}".format(e))
-        except CertificateError as e:
-            self.module.fail_json(msg="certificate error occurred: {0}".format(e))
-        except ValueError as e:
-            self.module.fail_json(msg="certificate not found: {0}".format(e))
+        if HAS_CERT_ERROR:
+            try:
+                code, response = self.connection.send_request(data=payload)
+            except ConnectionError as e:
+                self.module.fail_json(msg="connection error occurred: {0}".format(e))
+            except CertificateError as e:
+                self.module.fail_json(msg="certificate error occurred: {0}".format(e))
+            except ValueError as e:
+                self.module.fail_json(msg="certificate not found: {0}".format(e))
+        else:
+            try:
+                code, response = self.connection.send_request(data=payload)
+            except ConnectionError as e:
+                self.module.fail_json(msg="connection error occurred: {0}".format(e))
+            except ValueError as e:
+                self.module.fail_json(msg="certificate not found: {0}".format(e))
 
         if code == 404:
             if to_text(u"Object not found") in to_text(response) or to_text(
