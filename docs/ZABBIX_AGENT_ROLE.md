@@ -49,9 +49,9 @@ This role will work on the following operating systems:
  * Windows (Best effort)
  * macOS (Best effort)
 
-## Ansible 2.10 and higher
+## Ansible 2.14 and higher
 
-With the release of Ansible 2.10, modules have been moved into collections.  With the exception of ansible.builtin modules, this means additonal collections must be installed in order to use modules such as seboolean (now ansible.posix.seboolean).  The following collections are now required: `ansible.posix`and `community.general`.  Installing the collections:
+With the release of Ansible 2.14, modules have been moved into collections.  With the exception of ansible.builtin modules, this means additonal collections must be installed in order to use modules such as seboolean (now ansible.posix.seboolean).  The following collections are now required: `ansible.posix`and `community.general`.  Installing the collections:
 
 ```sh
 ansible-galaxy collection install ansible.posix
@@ -65,7 +65,7 @@ ansible-galaxy collection install ansible.netcommon
 
 ### Docker
 
-When you are a Docker user and using Ansible 2.10 or newer, then there is a dependency on the collection named `community.docker`. This collection is needed as the `docker_` modules are now part of collections and not standard in Ansible anymmore. Installing the collection:
+When you are a Docker user and using Ansible 2.14 or newer, then there is a dependency on the collection named `community.docker`. This collection is needed as the `docker_` modules are now part of collections and not standard in Ansible anymmore. Installing the collection:
 
 ```sh
 ansible-galaxy collection install community.docker
@@ -73,7 +73,7 @@ ansible-galaxy collection install community.docker
 
 ### Windows
 
-When you are a Windows user and using Ansible 2.10 or newer, then there are dependencies on collections named `ansible.windows` and `community.windows`. These collections are needed as the `win_` modules are now part of collections and not standard in Ansible anymmore. Installing the collections:
+When you are a Windows user and using Ansible 2.14 or newer, then there are dependencies on collections named `ansible.windows` and `community.windows`. These collections are needed as the `win_` modules are now part of collections and not standard in Ansible anymmore. Installing the collections:
 
 ```sh
 ansible-galaxy collection install ansible.windows

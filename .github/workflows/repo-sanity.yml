@@ -39,8 +39,6 @@ jobs:
           # Testing against `devel` may fail as new tests are added.
 
           # https://docs.ansible.com/ansible/latest/reference_appendices/release_and_maintenance.html#ansible-core-changelogs
-          - stable-2.12
-          - stable-2.13
           - stable-2.14
           - stable-2.15
           - stable-2.16
