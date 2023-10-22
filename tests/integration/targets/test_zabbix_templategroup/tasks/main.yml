@@ -1,4 +1,8 @@
 ---
+- name: test - do not run tests for Zabbix < 6.2
+  meta: end_play
+  when: zabbix_version is version('6.2', '<')
+
 - name: test - create new Zabbix template group
   community.zabbix.zabbix_templategroup:
     template_groups:
