@@ -46,6 +46,11 @@
   tags:
     - install
 
+- name: TEMP Update Version Number
+  ansible.builtin.set_fact:
+    zabbix_server_version: 7.0
+  when: zabbix_server_version == 6.5
+
 - name: "RedHat | Installing zabbix-server-{{ zabbix_server_database }}"
   ansible.builtin.package:
     pkg: "{{ zabbix_server_package }}-{{ zabbix_server_version }}.{{ zabbix_server_version_minor }}"
