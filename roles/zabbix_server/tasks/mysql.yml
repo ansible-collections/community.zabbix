@@ -60,6 +60,16 @@
   tags:
     - database
 
+- name: "MySQL | Get the file for create.sql"
+  ansible.builtin.shell: ls -1 {{ datafiles_path }}/server.sq*
+  changed_when: false
+  become: true
+  when:
+    - zabbix_server_database_sqlload | bool
+  register: ls_output_create
+  tags:
+    - database
+
 - name: MySQL | Get current database version
   ansible.builtin.shell: |
     mysql -h {{ zabbix_server_dbhost }} -u{{ zabbix_server_dbuser }} \
@@ -122,6 +132,53 @@
     - zabbix_server_database_sqlload | bool
     - mysql_schema_empty
     - ansible_distribution_release == "buster"
+  delegate_to: "{{ delegated_dbhost }}"
+  tags:
+    - database
+
+- name: "MySQL | Fetch sql create file"
+  fetch:
+    src: "{{ ls_output_create.stdout }}"
+    dest: /tmp/{{ role_name }}/
+    flat: true
+  become: true
+  when:
+    - delegated_dbhost != inventory_hostname
+    - zabbix_server_database_sqlload | bool
+    - mysql_schema_empty
+  tags:
+    - database
+
+- name: "MySQL | Copy sql create file"
+  ansible.builtin.copy:
+    src: /tmp/{{ role_name }}/
+    dest: "{{ ls_output_create.stdout | dirname }}"
+    mode: "0640"
+  delegate_to: "{{ delegated_dbhost }}"
+  become: true
+  when:
+    - delegated_dbhost != inventory_hostname
+    - zabbix_server_database_sqlload | bool
+    - mysql_schema_empty
+  tags:
+    - database
+
+- name: "MySQL | Create database and import file"
+  community.mysql.mysql_db:
+    login_host: "{{ zabbix_server_mysql_login_host | default(omit) }}"
+    login_user: "{{ zabbix_server_mysql_login_user }}"
+    login_password: "{{ zabbix_server_mysql_login_password }}"
+    login_port: "{{ zabbix_server_mysql_login_port | default(omit) }}"
+    login_unix_socket: "{{ zabbix_server_mysql_login_unix_socket | default(omit) }}"
+    name: "{{ zabbix_server_dbname }}"
+    encoding: "{{ zabbix_server_dbencoding }}"
+    collation: "{{ zabbix_server_dbcollation }}"
+    state: import
+    target: "{{ ls_output_create.stdout }}"
+    use_shell: false
+  when:
+    - zabbix_server_database_sqlload | bool
+    - mysql_schema_empty
   delegate_to: "{{ delegated_dbhost }}"
   tags:
     - database
