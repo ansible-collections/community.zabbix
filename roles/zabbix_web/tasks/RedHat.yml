@@ -23,6 +23,12 @@
   tags:
     - install
 
+- name: TEMP Update Version Number
+  ansible.builtin.set_fact:
+    zabbix_web_version: 7.0
+    zabbix_server_version: 7.0
+  when: zabbix_web_version == 6.5
+
 - name: "RedHat | Install zabbix-web-{{ zabbix_server_database }}"
   ansible.builtin.yum:
     name:

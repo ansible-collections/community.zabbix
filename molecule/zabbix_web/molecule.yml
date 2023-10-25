@@ -21,7 +21,7 @@ platforms:
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
     groups:
       - ${MY_MOLECULE_DATABASE:-mysql}
-      - ${MY_MOLECULE_VERSION:-v64}
+      - ${MY_MOLECULE_VERSION:-v65}
       - ${MY_MOLECULE_INTERPRETER:-python3}
       - ${MY_MOLECULE_WEB_SERVER:-apache}
 
