@@ -37,6 +37,9 @@ jobs:
           - v65
         include:
           - interpreter: python3
+        exclude:
+          - container: debian10
+            version: v65
     steps:
       - name: Check out code
         uses: actions/checkout@v4

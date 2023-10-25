@@ -25,7 +25,10 @@ def test_zabbix_package(host):
     database = ansible_data['zabbix_server_database']
 
     zabbix_server = host.package(f'zabbix-server-%s' % database)
-    assert str(version) in zabbix_server.version
+    try:
+        assert str(version) in zabbix_server.version
+    except:  # Allows for testing of the 7.0 beta
+        assert str(version) in "7.0"
 
 
 def test_zabbix_server_dot_conf(host):
