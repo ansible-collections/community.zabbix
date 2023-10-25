@@ -17,7 +17,7 @@ def test_zabbix_package(host):
     try:
         assert str(version) in zabbix_web.version
     except:
-        assert zabbix_web.version in "7.0.0"
+        assert "7.0" in zabbix_web.version
 
 
 def test_zabbix_web(host):

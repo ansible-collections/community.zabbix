@@ -28,7 +28,7 @@ def test_zabbix_package(host):
     try:
         assert str(version) in zabbix_server.version
     except:  # Allows for testing of the 7.0 beta
-        assert zabbix_server.version in "7.0.0"
+        assert "7.0" in zabbix_server.version
 
 
 def test_zabbix_server_dot_conf(host):
