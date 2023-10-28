@@ -337,6 +337,7 @@ The following table lists all variables that are exposed to modify the configura
 |SSHKeyLocation | zabbix_server_sshkeylocation | |  |
 |SSLCALocation | zabbix_server_sslcalocation | |  |
 |SSLCertLocation | zabbix_server_sslcertlocation | ${datadir}/zabbix/ssl/certs |  |
+|StartAgentPollers | zabbix_server_startagentpollers | | |
 |SSLKeyLocation | zabbix_server_sslkeylocation | ${datadir}/zabbix/ssl/keys |  |
 |StartAlerters | zabbix_server_startalerters | |  |
 |StartConnectors | zabbix_server_connectors | | Version 6.4 or later |
@@ -344,7 +345,9 @@ The following table lists all variables that are exposed to modify the configura
 |StartDiscoverers | zabbix_server_startdiscoverers | 1 |  |
 |StartEscalators | zabbix_server_startescalators | 1 |  |
 |StartHistoryPollers | zabbix_server_starthistorypollers | |  |
+|StartHTTPAgentPollers | zabbix_server_starthttpagentpollers | | |
 |StartHTTPPollers | zabbix_server_starthttppollers | 1 |  |
+|StartHTTPAgentPollers | zabbix_server_starthttpagentpollers | | |
 |StartIPMIPollers | zabbix_server_startipmipollers | 0 |  |
 |StartJavaPollers | zabbix_server_startjavapollers | 0 |  |
 |StartLLDProcessors | zabbix_server_startlldprocessors | |  |
@@ -355,6 +358,7 @@ The following table lists all variables that are exposed to modify the configura
 |StartPreprocessors | zabbix_server_startpreprocessors | |  |
 |StartProxyPollers | zabbix_server_startproxypollers | |  |
 |StartReportWriters | zabbix_server_startreportwriters | 0 |  |
+|StartSNMMPAgentPollers | zabbix_server_startsnmpagentpollers | | |
 |StartSNMPTrapper | zabbix_server_startsnmptrapper | 0 |  |
 |StartTimers | zabbix_server_starttimers | 1 |  |
 |StartTrappers | zabbix_server_starttrappers | 5 |  |

@@ -332,8 +332,12 @@ The following table lists all variables that are exposed to modify the configura
 | LogRemoteCommands | zabbix_proxy_logremotecommands || |
 | LogSlowQueries | zabbix_proxy_logslowqueries || |
 | LogType | zabbix_proxy_logtype | file| |
+| MaxConcurrentChecksPerPoller | zabbix_proxy_maxconcurrentchecksperpoller || |
 | PidFile | zabbix_proxy_pidfile | /var/run/zabbix/zabbix_proxy.pid| |
+| ProxyBufferMode | zabbix_proxy_proxybuffermode || |
 | ProxyLocalBuffer | zabbix_proxy_proxylocalbuffer |0| |
+| ProxyMemoryBufferAge | zabbix_proxy_proxymemorybufferage || |
+| ProxyMemoryBufferSize | zabbix_proxy_proxymemorybuffersize || |
 | ProxyMode | zabbix_proxy_proxymode || |
 | ProxyOfflineBuffer | zabbix_proxy_proxyofflinebuffer |1| |
 | Server | zabbix_proxy_server | 192.168.1.1| |
@@ -342,10 +346,12 @@ The following table lists all variables that are exposed to modify the configura
 | SourceIP | zabbix_proxy_sourceip || |
 | SSHKeyLocation | zabbix_proxy_sshkeylocation || |
 | SSLCALocation | zabbix_proxy_sslcalocation || |
+| StartAgentPollers | zabbix_proxy_startagentpollers || |
 | SSLCertLocation | zabbix_proxy_sslcertlocation || |
 | SSLKeyLocation | zabbix_proxy_sslkeylocation || |
 | StartDBSyncers | zabbix_proxy_startdbsyncers |4| |
 | StartDiscoverers | zabbix_proxy_startdiscoverers |1| |
+| StartHTTPAgentPollers | zabbix_proxy_starthttpagentpollers || |
 | StartHTTPPollers | zabbix_proxy_starthttppollers |1| |
 | StartIPMIPollers | zabbix_proxy_startipmipollers |0| |
 | StartJavaPollers | zabbix_proxy_startjavapollers || |
@@ -354,6 +360,7 @@ The following table lists all variables that are exposed to modify the configura
 | StartPollers | zabbix_proxy_startpollers |5| |
 | StartPollersUnreachable | zabbix_proxy_startpollersunreachable |1| |
 | StartPreprocessors | zabbix_proxy_startpreprocessors |3| |
+| StartSNMPPollers | zabbix_proxy_startsnmppollers || |
 | StartSNMPTrapper | zabbix_proxy_startsnmptrapper || |
 | StartTrappers | zabbix_proxy_starttrappers |5| |
 | StartVMwareCollectors | zabbix_proxy_startvmwarecollectors || |

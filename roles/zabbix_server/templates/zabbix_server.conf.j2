@@ -60,6 +60,9 @@
 {{ (zabbix_server_sourceip is defined and zabbix_server_sourceip is not none) | ternary('', '# ') }}SourceIP={{ zabbix_server_sourceip | default('') }}
 {{ (zabbix_server_sshkeylocation is defined and zabbix_server_sshkeylocation is not none) | ternary('', '# ') }}SSHKeyLocation={{ zabbix_server_sshkeylocation | default('') }}
 {{ (zabbix_server_sslcalocation is defined and zabbix_server_sslcalocation is not none) | ternary('', '# ') }}SSLCALocation={{ zabbix_server_sslcalocation | default('') }}
+{% if zabbix_server_version is version('6.4', '>') %}
+{{ (zabbix_server_startagentpollers is defined and zabbix_server_startagentpollers is not none) | ternary('', '# ') }}StartAgentPollers={{ zabbix_server_startagentpollers | default('') }}
+{% endif %}
 {{ (zabbix_server_sslcertlocation is defined and zabbix_server_sslcertlocation is not none) | ternary('', '# ') }}SSLCertLocation={{ zabbix_server_sslcertlocation | default('') }}
 {{ (zabbix_server_sslkeylocation is defined and zabbix_server_sslkeylocation is not none) | ternary('', '# ') }}SSLKeyLocation={{ zabbix_server_sslkeylocation | default('') }}
 {{ (zabbix_server_startalerters is defined and zabbix_server_startalerters is not none) | ternary('', '# ') }}StartAlerters={{ zabbix_server_startalerters | default('') }}
@@ -67,6 +70,9 @@
 {{ (zabbix_server_startdiscoverers is defined and zabbix_server_startdiscoverers is not none) | ternary('', '# ') }}StartDiscoverers={{ zabbix_server_startdiscoverers | default('') }}
 {{ (zabbix_server_startescalators is defined and zabbix_server_startescalators is not none) | ternary('', '# ') }}StartEscalators={{ zabbix_server_startescalators | default('') }}
 {{ (zabbix_server_starthistorypollers is defined and zabbix_server_starthistorypollers is not none) | ternary('', '# ') }}StartHistoryPollers={{ zabbix_server_starthistorypollers | default('') }}
+{% if zabbix_server_version is version('6.4', '>') %}
+{{ (zabbix_server_starthttpagentpollers is defined and zabbix_server_starthttpagentpollers is not none) | ternary('', '# ') }}StartHTTPAgentPollers={{ zabbix_server_starthttpagentpollers | default('') }}
+{% endif %}
 {{ (zabbix_server_starthttppollers is defined and zabbix_server_starthttppollers is not none) | ternary('', '# ') }}StartHTTPPollers={{ zabbix_server_starthttppollers | default('') }}
 {{ (zabbix_server_startipmipollers is defined and zabbix_server_startipmipollers is not none) | ternary('', '# ') }}StartIPMIPollers={{ zabbix_server_startipmipollers | default('') }}
 {{ (zabbix_server_startjavapollers is defined and zabbix_server_startjavapollers is not none) | ternary('', '# ') }}StartJavaPollers={{ zabbix_server_startjavapollers | default('') }}
@@ -78,6 +84,9 @@
 {{ (zabbix_server_startpreprocessors is defined and zabbix_server_startpreprocessors is not none) | ternary('', '# ') }}StartPreprocessors={{ zabbix_server_startpreprocessors | default('') }}
 {{ (zabbix_server_startproxypollers is defined and zabbix_server_startproxypollers is not none) | ternary('', '# ') }}StartProxyPollers={{ zabbix_server_startproxypollers | default('') }}
 {{ (zabbix_server_startreportwriters is defined and zabbix_server_startreportwriters is not none) | ternary('', '# ') }}StartReportWriters={{ zabbix_server_startreportwriters | default('') }}
+{% if zabbix_server_version is version('6.4', '>') %}
+{{ (zabbix_server_startsnmpagentpollers is defined and zabbix_server_startsnmpagentpollers is not none) | ternary('', '# ') }}StartSNMMPAgentPollers={{ zabbix_server_startsnmpagentpollers | default('') }}
+{% endif %}
 {{ (zabbix_server_startsnmptrapper is defined and zabbix_server_startsnmptrapper is not none) | ternary('', '# ') }}StartSNMPTrapper={{ zabbix_server_startsnmptrapper | default('') }}
 {{ (zabbix_server_starttimers is defined and zabbix_server_starttimers is not none) | ternary('', '# ') }}StartTimers={{ zabbix_server_starttimers | default('') }}
 {{ (zabbix_server_starttrappers is defined and zabbix_server_starttrappers is not none) | ternary('', '# ') }}StartTrappers={{ zabbix_server_starttrappers | default('') }}

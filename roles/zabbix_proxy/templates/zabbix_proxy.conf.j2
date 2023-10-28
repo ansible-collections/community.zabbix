@@ -49,8 +49,18 @@
 {{ (zabbix_proxy_logremotecommands is defined and zabbix_proxy_logremotecommands is not none) | ternary('','# ') }}LogRemoteCommands={{ zabbix_proxy_logremotecommands | default('') }}
 {{ (zabbix_proxy_logslowqueries is defined and zabbix_proxy_logslowqueries is not none) | ternary('','# ') }}LogSlowQueries={{ zabbix_proxy_logslowqueries | default('') }}
 {{ (zabbix_proxy_logtype is defined and zabbix_proxy_logtype is not none) | ternary('','# ') }}LogType={{ zabbix_proxy_logtype | default('') }}
+{% if zabbix_proxy_version is version('6.4', '>') %}
+{{ (zabbix_proxy_maxconcurrentchecksperpoller is defined and zabbix_proxy_maxconcurrentchecksperpoller is not none) | ternary('','# ') }}MaxConcurrentChecksPerPoller={{ zabbix_proxy_maxconcurrentchecksperpoller | default('') }}
+{% endif %}
 {{ (zabbix_proxy_pidfile is defined and zabbix_proxy_pidfile is not none) | ternary('','# ') }}PidFile={{ zabbix_proxy_pidfile | default('') }}
+{% if zabbix_proxy_version is version('6.4', '>') %}
+{{ (zabbix_proxy_proxybuffermode is defined and zabbix_proxy_proxybuffermode is not none) | ternary('','# ') }}ProxyBufferMode={{ zabbix_proxy_proxybuffermode | default('') }}
+{% endif %}
 {{ (zabbix_proxy_proxylocalbuffer is defined and zabbix_proxy_proxylocalbuffer is not none) | ternary('','# ') }}ProxyLocalBuffer={{ zabbix_proxy_proxylocalbuffer | default('') }}
+{% if zabbix_proxy_version is version('6.4', '>') %}
+{{ (zabbix_proxy_proxymemorybufferage is defined and zabbix_proxy_proxymemorybufferage is not none) | ternary('','# ') }}ProxyMemoryBufferAge={{ zabbix_proxy_proxymemorybufferage | default('') }}
+{{ (zabbix_proxy_proxymemorybuffersize is defined and zabbix_proxy_proxymemorybuffersize is not none) | ternary('','# ') }}ProxyMemoryBufferSize={{ zabbix_proxy_proxymemorybuffersize | default('') }}
+{% endif %}
 {{ (zabbix_proxy_proxymode is defined and zabbix_proxy_proxymode is not none) | ternary('','# ') }}ProxyMode={{ zabbix_proxy_proxymode | default('') }}
 {{ (zabbix_proxy_proxyofflinebuffer is defined and zabbix_proxy_proxyofflinebuffer is not none) | ternary('','# ') }}ProxyOfflineBuffer={{ zabbix_proxy_proxyofflinebuffer | default('') }}
 {{ (zabbix_proxy_server is defined and zabbix_proxy_server is not none) | ternary('','# ') }}Server={{ zabbix_proxy_server | default('') }}
@@ -59,10 +69,16 @@
 {{ (zabbix_proxy_sourceip is defined and zabbix_proxy_sourceip is not none) | ternary('','# ') }}SourceIP={{ zabbix_proxy_sourceip | default('') }}
 {{ (zabbix_proxy_sshkeylocation is defined and zabbix_proxy_sshkeylocation is not none) | ternary('','# ') }}SSHKeyLocation={{ zabbix_proxy_sshkeylocation | default('') }}
 {{ (zabbix_proxy_sslcalocation is defined and zabbix_proxy_sslcalocation is not none) | ternary('','# ') }}SSLCALocation={{ zabbix_proxy_sslcalocation | default('') }}
+{% if zabbix_proxy_version is version('6.4', '>') %}
+{{ (zabbix_proxy_startagentpollers is defined and zabbix_proxy_startagentpollers is not none) | ternary('','# ') }}StartAgentPollers={{ zabbix_proxy_startagentpollers | default('') }}
+{% endif %}
 {{ (zabbix_proxy_sslcertlocation is defined and zabbix_proxy_sslcertlocation is not none) | ternary('','# ') }}SSLCertLocation={{ zabbix_proxy_sslcertlocation | default('') }}
 {{ (zabbix_proxy_sslkeylocation is defined and zabbix_proxy_sslkeylocation is not none) | ternary('','# ') }}SSLKeyLocation={{ zabbix_proxy_sslkeylocation | default('') }}
 {{ (zabbix_proxy_startdbsyncers is defined and zabbix_proxy_startdbsyncers is not none) | ternary('','# ') }}StartDBSyncers={{ zabbix_proxy_startdbsyncers | default('') }}
 {{ (zabbix_proxy_startdiscoverers is defined and zabbix_proxy_startdiscoverers is not none) | ternary('','# ') }}StartDiscoverers={{ zabbix_proxy_startdiscoverers | default('') }}
+{% if zabbix_proxy_version is version('6.4', '>') %}
+{{ (zabbix_proxy_starthttpagentpollers is defined and zabbix_proxy_starthttpagentpollers is not none) | ternary('','# ') }}StartHTTPAgentPollers={{ zabbix_proxy_starthttpagentpollers | default('') }}
+{% endif %}
 {% if zabbix_proxy_version is version('6.0', '==') %}
 {{ (zabbix_proxy_starthistorypollers is defined and zabbix_proxy_starthistorypollers is not none) | ternary('','# ') }}={{ zabbix_proxy_starthistorypollers | default('') }}
 {% endif %}
@@ -74,6 +90,9 @@
 {{ (zabbix_proxy_startpollers is defined and zabbix_proxy_startpollers is not none) | ternary('','# ') }}StartPollers={{ zabbix_proxy_startpollers | default('') }}
 {{ (zabbix_proxy_startpollersunreachable is defined and zabbix_proxy_startpollersunreachable is not none) | ternary('','# ') }}StartPollersUnreachable={{ zabbix_proxy_startpollersunreachable | default('') }}
 {{ (zabbix_proxy_startpreprocessors is defined and zabbix_proxy_startpreprocessors is not none) | ternary('','# ') }}StartPreprocessors={{ zabbix_proxy_startpreprocessors | default('') }}
+{% if zabbix_proxy_version is version('6.4', '>') %}
+{{ (zabbix_proxy_startsnmppollers is defined and zabbix_proxy_startsnmppollers is not none) | ternary('','# ') }}StartSNMPPollers={{ zabbix_proxy_startsnmppollers | default('') }}
+{% endif %}
 {{ (zabbix_proxy_startsnmptrapper is defined and zabbix_proxy_startsnmptrapper is not none) | ternary('','# ') }}StartSNMPTrapper={{ zabbix_proxy_startsnmptrapper | default('') }}
 {{ (zabbix_proxy_starttrappers is defined and zabbix_proxy_starttrappers is not none) | ternary('','# ') }}StartTrappers={{ zabbix_proxy_starttrappers | default('') }}
 {{ (zabbix_proxy_startvmwarecollectors is defined and zabbix_proxy_startvmwarecollectors is not none) | ternary('','# ') }}StartVMwareCollectors={{ zabbix_proxy_startvmwarecollectors | default('') }}
