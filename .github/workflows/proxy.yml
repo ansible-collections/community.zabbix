@@ -44,6 +44,8 @@ jobs:
         exclude:
           - container: debian12
             version: v62
+          - container: centos7
+            version: v65
     steps:
       - name: Check out code
         uses: actions/checkout@v4
