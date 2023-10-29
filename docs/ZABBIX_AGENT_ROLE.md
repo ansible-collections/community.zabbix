@@ -90,16 +90,16 @@ To successfully complete the install the role requires `python-netaddr` on the c
 
 See the following list of supported Operating systems with the Zabbix releases:
 
-| Zabbix              | 6.0 |
-|---------------------|-----|
-| Red Hat Fam 9       | V  |
-| Red Hat Fam 8       | V  |
-| Red Hat Fam 7       | V  |
-| Ubuntu 22.04 jammy  | V  |
-| Ubuntu 20.04 focal  | V  |
-| Debian 12 bookworm  | V  |
-| Debian 11 bullseye  | V  |
-| Debian 10 buster    | V  |
+| Zabbix              | 6.0 | 7.0 |
+|---------------------|-----|-----|
+| Red Hat Fam 9       |  V  |  V  |
+| Red Hat Fam 8       |  V  |  V  |
+| Red Hat Fam 7       |  V  |  V  |
+| Ubuntu 22.04 jammy  |  V  |  V  |
+| Ubuntu 20.04 focal  |  V  |  V  |
+| Debian 12 bookworm  |  V  |  V  |
+| Debian 11 bullseye  |  V  |  V  |
+| Debian 10 buster    |  V  |  V  |
 
 
 # Getting started
