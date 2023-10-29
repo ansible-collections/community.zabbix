@@ -51,7 +51,7 @@ jobs:
 
       # For Zabbix integration tests we need to test against different versions of
       # the Zabbix server. To do this we spin up a Docker container using the `matrix`
-      # of version and ports specified earlier.
+      # of version and ports specified earlier. 
       - name: Zabbix container server provisioning
         uses: isbang/compose-action@v1.5.0
         with:
