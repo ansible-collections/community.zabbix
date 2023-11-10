@@ -177,6 +177,8 @@ zabbix_agent2_logtype: file
 zabbix_agent2_statusport: 9999
 zabbix_agent2_include: /etc/zabbix/zabbix_agent2.d
 zabbix_agent2_include_pattern:
+zabbix_agent2_plugins_include: /etc/zabbix/zabbix_agent2.d/plugins.d
+zabbix_agent2_plugins_include_pattern: 
 zabbix_agent2_logfilesize: 100
 zabbix_agent2_debuglevel: 3
 zabbix_agent2_sourceip:
@@ -199,6 +201,7 @@ zabbix_agent2_timeout: 3
 zabbix_agent2_include_mode: "0750"
 zabbix_agent2_unsafeuserparameters: 0
 zabbix_agent2_controlsocket: /tmp/agent.sock
+zabbix_agent2_pluginsocket: /tmp/agent.plugin.sock
 zabbix_agent2_plugins: []
 
 # Zabbix Agent2 TLS settings
@@ -226,6 +229,7 @@ zabbix2_win_download_link: "{{ zabbix_win_download_url }}/{{ zabbix_version_long
 zabbix_win_install_dir: 'C:\Zabbix'
 zabbix_win_install_dir_conf: '{{ zabbix_win_install_dir }}\\conf'
 zabbix_win_install_dir_bin: '{{ zabbix_win_install_dir }}\\bin'
+zabbix_win_install_dir_logs: '{{ zabbix_win_install_dir }}\\logs'
 zabbix_agent_win_logfile: "{{ zabbix_win_install_dir }}\\zabbix_agentd.log"
 zabbix_agent_win_include: "{{ zabbix_win_install_dir }}\\zabbix_agent.d\\"
 zabbix_agent2_win_logfile: "{{ zabbix_win_install_dir }}\\zabbix_agent2.log"

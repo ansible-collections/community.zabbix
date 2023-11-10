@@ -83,16 +83,11 @@ Timeout={{ zabbix_agent2_timeout }}
 Include={{ zabbix_agent_win_include }}
 {% else %}
 Include={{ zabbix_agent2_include }}/{{ zabbix_agent2_include_pattern }}
-{% endif %}
-{% if zabbix_agent2_additional_include is defined and zabbix_agent2_additional_include is iterable and zabbix_agent2_additional_include is not string %}
-{% for include in zabbix_agent2_additional_include %}
-Include={{ include }}
-{% endfor %}
+Include={{ zabbix_agent2_plugins_include }}/{{ zabbix_agent2_plugins_include_pattern }}
 {% endif %}
 UnsafeUserParameters={{ zabbix_agent2_unsafeuserparameters }}
-{% if ansible_os_family != "Windows" %}
 ControlSocket={{ zabbix_agent2_controlsocket }}
-{% endif %}
+PluginSocket={{ zabbix_agent2_pluginsocket }}
 {% if zabbix_agent2_tlsconnect is defined and zabbix_agent2_tlsconnect %}
 TLSConnect={{ zabbix_agent2_tlsconnect }}
 {% endif %}
