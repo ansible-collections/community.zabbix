@@ -67,7 +67,6 @@ EXAMPLES = r"""
   community.zabbix.zabbix_group_info:
     hostgroup_name:
       - ExampleHostgroup
-    timeout: 10
 """
 
 from ansible.module_utils.basic import AnsibleModule
