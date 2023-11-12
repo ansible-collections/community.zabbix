@@ -95,7 +95,6 @@ EXAMPLES = r"""
   community.zabbix.zabbix_host_info:
     host_name: ExampleHost
     host_ip: 127.0.0.1
-    timeout: 10
     exact_match: no
     remove_duplicate: yes
 
@@ -115,7 +114,6 @@ EXAMPLES = r"""
       - os
       - tag
     host_ip: 127.0.0.1
-    timeout: 10
     exact_match: no
     remove_duplicate: yes
 """

@@ -208,7 +208,6 @@ EXAMPLES = """
   community.zabbix.zabbix_host_events_info:
       host_identifier: "{{inventory_hostname}}"
       host_id_type: "hostname"
-      timeout: 120
   register: zbx_host
   delegate_to: localhost
 - fail:
