@@ -29,7 +29,7 @@
 2. Create new Release pointing to new X.Y.Z tag https://github.com/ansible-collections/community.zabbix/releases
 
 Additional manual steps are required when automatic publish to Ansible Galaxy is not enabled in the repository. This
-requires a user who has access to the `community.zabbix` namespace on Ansible Galaxy to publish the build artifact.
+requires a user who has access to the `community` namespace on Ansible Galaxy to publish the build artifact.
 
 3. Run the following commands to build and release the new version on Galaxy:
 
@@ -37,5 +37,7 @@ requires a user who has access to the `community.zabbix` namespace on Ansible Ga
    ansible-galaxy collection build
    ansible-galaxy collection publish ./community-zabbix-$VERSION_HERE.tar.gz
    ```
+
+4. If 3. is not feasible for any reason then create a post in "Get Help" section of Ansible forum https://forum.ansible.com/c/help/6/none so somebody from admins can take a look and see/fix why new version has not been published to Galaxy (e.g. https://forum.ansible.com/t/access-to-collection/2295/4).
 
 After the version is published, verify it exists on the [Zabbix Collection Galaxy page](https://galaxy.ansible.com/community/zabbix).
