@@ -28,8 +28,8 @@
     name: PyMySQL
   register: installation_dependencies
   until: installation_dependencies is succeeded
-  when:
-    - inventory_hostname in groups['mysql']
+  tags:
+    - database
 
 - name: "MySQL | Create database"
   community.mysql.mysql_db:
