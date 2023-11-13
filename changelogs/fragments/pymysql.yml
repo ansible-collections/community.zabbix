@@ -1,0 +1,2 @@
+bugfixes:
+  - proxy role - Removed requirement for mysql group definition.
