@@ -102,6 +102,7 @@ The following is an overview of all available configuration defaults for this ro
 * `zabbix_url_aliases`: A list with Aliases for the Apache Virtual Host configuration.
 * `zabbix_timezone`: Default: `Europe/Amsterdam`. This is the timezone. The Apache Virtual Host needs this parameter.
 * `zabbix_web_create_vhost`: Default: `true`. When you don't want to create an Apache Virtual Host configuration, you can set it to False.
+* `zabbix_web_create_php_fpm`: Configure php-fpm (Debian hosts only).  Default is to use the same value as `zabbix_web_create_vhost`.
 * `zabbix_web_env`: (Optional) A Dictionary of PHP Environments settings.
 * `zabbix_web_user`: When provided, the user (which should already exist on the host) will be used for ownership for web/php related processes. (Default set to either `apache` (`www-data` for Debian) or `nginx`).
 * `zabbix_web_group`: When provided, the group (which should already exist on the host) will be used for ownership for web/php related processes. (Default set to either `apache` (`www-data` for Debian) or `nginx`).
