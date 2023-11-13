@@ -306,8 +306,8 @@ The following table lists all variables that are exposed to modify the configura
 |ExportFileSize | zabbix_server_exportfilesize | 1G |  |
 |ExportType | zabbix_server_exporttype | |  |
 |ExternalScripts | zabbix_server_externalscriptspath | /usr/lib/zabbix/externalscripts |  |
-|Fping6Location | zabbix_server_fping6location | /usr/sbin/fping6 |  |
-|FpingLocation | zabbix_server_fpinglocation | /usr/sbin/fping |  |
+|Fping6Location | zabbix_server_fping6location | OS Specific Value |  |
+|FpingLocation | zabbix_server_fpinglocation | OS Specific Value |  |
 |HANodeName | zabbix_server_hanodename | |  |
 |HistoryCacheSize | zabbix_server_historycachesize | |  |
 |HistoryIndexCacheSize | zabbix_server_historyindexcachesize | |  |
