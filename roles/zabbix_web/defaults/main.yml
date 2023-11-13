@@ -10,6 +10,7 @@ zabbix_api_server_url: zabbix.example.com
 zabbix_web_http_server: apache
 zabbix_url_aliases: []
 zabbix_web_create_vhost: true
+zabbix_web_create_php_fpm: "{{ zabbix_web_create_vhost }}"
 
 zabbix_server_name: "{{ inventory_hostname }}"
 zabbix_server_hostname: "{{ inventory_hostname }}"

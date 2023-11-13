@@ -89,7 +89,7 @@
     mode: 0644
   become: true
   when:
-    - zabbix_web_create_vhost
+    - zabbix_web_create_php_fpm
     - ansible_os_family == "Debian"
   notify:
     - restart php-fpm-version
