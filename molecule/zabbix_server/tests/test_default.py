@@ -51,5 +51,6 @@ def test_zabbix_server_logfile(host):
     assert zabbix_logfile.exists
     assert not zabbix_logfile.contains("Access denied for user")
     assert not zabbix_logfile.contains("database is down: reconnecting")
+    assert not zabbix_logfile.contains("Both are missing in the system.")  # Missing fping
     assert zabbix_logfile.contains("current database version")
     assert zabbix_logfile.contains(r"server #0 started \[main process\]")

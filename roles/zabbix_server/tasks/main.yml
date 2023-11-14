@@ -15,6 +15,8 @@
   ansible.builtin.set_fact:
     zabbix_db_type_long: "{{ 'postgresql' if zabbix_server_database == 'pgsql' else 'mysql' }}"
     zabbix_valid_version: "{{ zabbix_server_version|float in zabbix_valid_server_versions[ansible_distribution_major_version] }}"
+    zabbix_server_fpinglocation: "{{ zabbix_server_fpinglocation if zabbix_server_fpinglocation is defined else _zabbix_server_fpinglocation}}"
+    zabbix_server_fping6location: "{{ zabbix_server_fping6location if zabbix_server_fping6location is defined else _zabbix_server_fping6location}}"
   tags:
     - always
 

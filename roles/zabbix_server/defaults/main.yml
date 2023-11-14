@@ -68,8 +68,6 @@ zabbix_server_allowunsupporteddbversions: 0
 zabbix_server_debuglevel: 3
 zabbix_server_exportfilesize: 1G
 zabbix_server_externalscriptspath: /usr/lib/zabbix/externalscripts
-zabbix_server_fping6location: /usr/sbin/fping6
-zabbix_server_fpinglocation: /usr/sbin/fping
 zabbix_server_historystoragedateindex: 0
 zabbix_server_historystoragetypes: uint,dbl,str,log,text
 zabbix_server_housekeepingfrequency: 1

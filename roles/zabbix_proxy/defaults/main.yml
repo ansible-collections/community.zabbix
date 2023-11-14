@@ -71,8 +71,6 @@ zabbix_proxy_dbport: 5432
 zabbix_proxy_debuglevel: 3
 zabbix_proxy_enableremotecommands: 0
 zabbix_proxy_externalscripts: /usr/lib/zabbix/externalscripts
-zabbix_proxy_fping6location: /usr/sbin/fping6
-zabbix_proxy_fpinglocation: /usr/sbin/fping
 zabbix_proxy_heartbeatfrequency: 60
 zabbix_proxy_historycachesize: 8M
 zabbix_proxy_historyindexcachesize: 4M

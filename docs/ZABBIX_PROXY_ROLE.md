@@ -312,8 +312,8 @@ The following table lists all variables that are exposed to modify the configura
 | DebugLevel | zabbix_proxy_debuglevel |3| |
 | EnableRemoteCommands | zabbix_proxy_enableremotecommands |0| |
 | ExternalScripts | zabbix_proxy_externalscripts | /usr/lib/zabbix/externalscripts| |
-| Fping6Location | zabbix_proxy_fping6location | /usr/sbin/fping6| |
-| FpingLocation | zabbix_proxy_fpinglocation | /usr/sbin/fping| |
+| Fping6Location | zabbix_proxy_fping6location | OS Specific Value | |
+| FpingLocation | zabbix_proxy_fpinglocation | OS Specific Value | |
 | HeartbeatFrequency | zabbix_proxy_heartbeatfrequency |60| Version 6.2 or Lower|
 | HistoryCacheSize | zabbix_proxy_historycachesize | 8M| |
 | HistoryIndexCacheSize | zabbix_proxy_historyindexcachesize | 4M| |
