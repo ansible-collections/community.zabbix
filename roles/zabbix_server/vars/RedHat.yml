@@ -31,3 +31,6 @@ mysql_client_pkgs:
   "8":
     - mysql
     - python3-PyMySQL
+
+_zabbix_server_fping6location: /usr/sbin/fping6
+_zabbix_server_fpinglocation: /usr/sbin/fping
