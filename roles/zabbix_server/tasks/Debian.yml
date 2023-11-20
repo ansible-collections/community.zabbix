@@ -106,16 +106,6 @@
   tags:
     - install
 
-- name: "Debian | apt-get clean"
-  ansible.builtin.shell: apt-get clean; apt-get update
-  args:
-    warn: "{{ produce_warn | default(omit) }}"
-  changed_when: false
-  become: true
-  tags:
-    - skip_ansible_lint
-    - install
-
 # On certain 18.04 images, such as docker or lxc, dpkg is configured not to
 # install files into paths /usr/share/doc/*
 # Since this is where Zabbix installs its database schemas, we need to allow
