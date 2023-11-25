@@ -262,7 +262,6 @@ EXAMPLES = r"""
           high: yes
           disaster: yes
         active: no
-    type: Zabbix super admin
     state: present
 
 - name: delete existing zabbix user.

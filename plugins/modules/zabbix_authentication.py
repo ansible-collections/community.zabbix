@@ -384,6 +384,7 @@ EXAMPLES = """
       - any
     http_case_sensitive: true
     ldap_auth_enabled: true
+    ldap_userdirectory: TestUserDirectory
     ldap_case_sensitive: true
     saml_auth_enabled: true
     saml_case_sensitive: true
