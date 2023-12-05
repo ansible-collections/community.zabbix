@@ -82,7 +82,7 @@
 {{ (zabbix_server_starttimers is defined and zabbix_server_starttimers is not none) | ternary('', '# ') }}StartTimers={{ zabbix_server_starttimers | default('') }}
 {{ (zabbix_server_starttrappers is defined and zabbix_server_starttrappers is not none) | ternary('', '# ') }}StartTrappers={{ zabbix_server_starttrappers | default('') }}
 {{ (zabbix_server_startvmwarecollectors is defined and zabbix_server_startvmwarecollectors is not none) | ternary('', '# ') }}StartVMwareCollectors={{ zabbix_server_startvmwarecollectors | default('') }}
-{{ (zabbix_server_statsallowedip is defined and zabbix_server_statsallowedip is not none) | ternary('', '# ') }}StasAllowedIP={{ zabbix_server_statsallowedip | default('') }}
+{{ (zabbix_server_statsallowedip is defined and zabbix_server_statsallowedip is not none) | ternary('', '# ') }}StatsAllowedIP={{ zabbix_server_statsallowedip | default('') }}
 {{ (zabbix_server_timeout is defined and zabbix_server_timeout is not none) | ternary('', '# ') }}Timeout={{ zabbix_server_timeout | default('') }}
 {{ (zabbix_server_tlscafile is defined and zabbix_server_tlscafile is not none) | ternary('', '# ') }}TLSCAFile={{ zabbix_server_tlscafile | default('') }}
 {{ (zabbix_server_tlscertfile is defined and zabbix_server_tlscertfile is not none) | ternary('', '# ') }}TLSCertFile={{ zabbix_server_tlscertfile | default('') }}
