@@ -15,7 +15,7 @@
 
 - name: "Debian | Repo URL"
   ansible.builtin.set_fact:
-    zabbix_repo_deb_url: "{{ _zabbix_repo_deb_url }}{{ '-arm64' if ansible_machine == 'aarch64' else ''}}"
+    zabbix_repo_deb_url: "{{ _zabbix_repo_deb_url }}/{{ ansible_lsb.id.lower() }}{{ '-arm64' if ansible_machine == 'aarch64' and ansible_lsb.id == 'debian' else ''}}"
   when:
     - zabbix_repo_deb_url is undefined
   tags:
