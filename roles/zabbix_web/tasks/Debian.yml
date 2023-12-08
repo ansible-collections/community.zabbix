@@ -13,6 +13,11 @@
   tags:
     - always
 
+- name: "Debian | Update ansible_lsb fact"
+  ansible.builtin.setup:
+    gather_subset:
+      - lsb
+
 - name: "Debian | Installing lsb-release"
   ansible.builtin.apt:
     pkg: lsb-release
