@@ -7,6 +7,20 @@
   tags:
     - always
 
+- name: "Debian | Installing lsb-release"
+  ansible.builtin.apt:
+    pkg: lsb-release
+    update_cache: true
+    cache_valid_time: 3600
+    force: true
+    state: present
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
+  become: true
+  tags:
+    - install
+
 - name: "Debian | Repo URL"
   ansible.builtin.set_fact:
     zabbix_repo_deb_url: "{{ _zabbix_repo_deb_url }}/{{ ansible_lsb.id.lower() }}{{ '-arm64' if ansible_machine == 'aarch64' and ansible_lsb.id == 'debian' else ''}}"
