@@ -52,10 +52,13 @@
 
 - name: "Debian | Download gpg key"
   ansible.builtin.get_url:
-    url: http://repo.zabbix.com/zabbix-official-repo.key
+    url: "{{ zabbix_server_gpg_key_url }}"
     dest: "{{ zabbix_gpg_key }}"
     mode: "0644"
     force: true
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   register: zabbix_server_repo_files_installed
   until: zabbix_server_repo_files_installed is succeeded
   become: true
