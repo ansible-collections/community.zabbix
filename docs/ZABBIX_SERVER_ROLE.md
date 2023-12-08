@@ -133,6 +133,7 @@ The following is an overview of all available configuration default for this rol
 * `zabbix_server_dbname`: The database name which is used by the Zabbix Server.
 * `zabbix_server_dbuser`: The database username which is used by the Zabbix Server.
 * `zabbix_server_dbpassword`: The database user password which is used by the Zabbix Server.
+* `zabbix_server_dbpassword_hash_method`: Default: `md5`. Allow switching postgresql user password creation to `scram-sha-256`, when anything other than `md5` is used then ansible won't hash the password with `md5`.
 * `zabbix_server_dbport`: The database port which is used by the Zabbix Server.
 * `zabbix_server_dbpassword_hash_method`: Default: `md5`. Allow switching postgresql user password creation to `scram-sha-256`, when anything other than `md5` is used then ansible won't hash the password with `md5`.
 * `zabbix_server_database_creation`: Default: `True`. When you don't want to create the database including user, you can set it to False.

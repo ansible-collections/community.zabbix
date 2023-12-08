@@ -115,6 +115,7 @@ The following is an overview of all available configuration default for this rol
 * `zabbix_proxy_dbname`: Default: zabbix_proxy. The database name which is used by the Zabbix Proxy.
 * `zabbix_proxy_dbuser`: Default: zabbix_proxy. The database username which is used by the Zabbix Proxy. Will be ignored when `sqlite3` is used as database.
 * `zabbix_proxy_dbpassword`: Default: zabbix_proxy. The database user password which is used by the Zabbix Proxy. Will be ignored when `sqlite3` is used as database.
+* `zabbix_proxy_dbpassword_hash_method`: Default: `md5`. Allow switching postgresql user password creation to `scram-sha-256`, when anything other than `md5` is used then ansible won't hash the password with `md5`.
 * `zabbix_proxy_dbport`: The database port which is used by the Zabbix Proxy. Will be ignored when `sqlite3` is used as database.
 * `zabbix_proxy_database_creation`: Default: `True`. When you don't want to create the database including user, you can set it to False.
 * `zabbix_proxy_install_database_client`: Default: `True`. False does not install database client. Default true

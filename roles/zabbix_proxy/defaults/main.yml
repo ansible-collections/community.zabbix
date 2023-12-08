@@ -20,6 +20,7 @@ zabbix_proxy_dbencoding: utf8
 zabbix_proxy_dbhost: localhost
 zabbix_proxy_dbname: zabbix_proxy
 zabbix_proxy_dbpassword: zabbix_proxy
+zabbix_proxy_dbpassword_hash_method: md5
 zabbix_proxy_dbuser: zabbix_proxy
 zabbix_proxy_install_database_client: true
 

@@ -29,7 +29,7 @@
       community.postgresql.postgresql_user:
         db: "{{ zabbix_server_dbname }}"
         name: "{{ zabbix_server_dbuser }}"
-        password: "md5{{ (zabbix_server_dbpassword + zabbix_server_dbuser)|hash('md5') }}"
+        password: "{{ ('md5' + (zabbix_server_dbpassword + zabbix_server_dbuser)|hash('md5')) if zabbix_server_dbpassword_hash_method == 'md5' else zabbix_server_dbpassword }}"
         port: "{{ zabbix_server_dbport }}"
         priv: ALL
         state: present
@@ -68,7 +68,7 @@
         login_password: "{{ zabbix_server_pgsql_login_password | default(omit) }}"
         db: "{{ zabbix_server_dbname }}"
         name: "{{ zabbix_server_dbuser }}"
-        password: "md5{{ (zabbix_server_dbpassword + zabbix_server_dbuser)|hash('md5') }}"
+        password: "{{ ('md5' + (zabbix_server_dbpassword + zabbix_server_dbuser)|hash('md5')) if zabbix_server_dbpassword_hash_method == 'md5' else zabbix_server_dbpassword }}"
         port: "{{ zabbix_server_dbport }}"
         priv: ALL
         state: present
