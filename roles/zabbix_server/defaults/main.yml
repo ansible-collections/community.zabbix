@@ -17,6 +17,7 @@ zabbix_server_dbcollation: utf8_bin
 zabbix_server_dbschema:
 zabbix_server_dbuser: zabbix-server
 zabbix_server_dbpassword: zabbix-server
+zabbix_server_dbpassword_hash_method: md5
 zabbix_server_dbsocket:
 zabbix_server_dbport: 5432
 zabbix_server_dbhost_run_install: true

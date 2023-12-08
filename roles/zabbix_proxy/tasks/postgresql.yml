@@ -29,7 +29,7 @@
       community.postgresql.postgresql_user:
         db: "{{ zabbix_proxy_dbname }}"
         name: "{{ zabbix_proxy_dbuser }}"
-        password: "md5{{ (zabbix_proxy_dbpassword + zabbix_proxy_dbuser)|hash('md5') }}"
+        password: "{{ ('md5' + (zabbix_proxy_dbpassword + zabbix_proxy_dbuser)|hash('md5')) if zabbix_proxy_dbpassword_hash_method == 'md5' else zabbix_proxy_dbpassword }}"
         port: "{{ zabbix_proxy_dbport }}"
         priv: ALL
         state: present
@@ -61,7 +61,7 @@
         login_password: "{{ zabbix_proxy_pgsql_login_password | default(omit) }}"
         db: "{{ zabbix_proxy_dbname }}"
         name: "{{ zabbix_proxy_dbuser }}"
-        password: "md5{{ (zabbix_proxy_dbpassword + zabbix_proxy_dbuser)|hash('md5') }}"
+        password: "{{ ('md5' + (zabbix_proxy_dbpassword + zabbix_proxy_dbuser)|hash('md5')) if zabbix_proxy_dbpassword_hash_method == 'md5' else zabbix_proxy_dbpassword }}"
         port: "{{ zabbix_proxy_dbport }}"
         priv: ALL
         state: present
