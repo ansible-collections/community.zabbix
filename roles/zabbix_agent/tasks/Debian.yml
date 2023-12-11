@@ -47,7 +47,7 @@
 
 - name: "Debian | Download gpg key"
   ansible.builtin.get_url:
-    url: http://repo.zabbix.com/zabbix-official-repo.key
+    url: "{{ zabbix_agent_gpg_key_url }}"
     dest: "{{ zabbix_gpg_key }}"
     mode: "0644"
     force: true

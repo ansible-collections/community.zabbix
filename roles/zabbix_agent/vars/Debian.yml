@@ -44,5 +44,5 @@ zabbix_valid_agent_versions:
     - 6.0
 
 debian_keyring_path: /etc/apt/keyrings/
-zabbix_gpg_key: "{{ debian_keyring_path }}/zabbix-official-repo.asc"
+zabbix_gpg_key: "{{ debian_keyring_path }}zabbix-repo.gpg"
 _zabbix_repo_deb_url: "http://repo.zabbix.com/zabbix/{{ zabbix_agent_version }}/{{ ansible_distribution.lower() }}"
