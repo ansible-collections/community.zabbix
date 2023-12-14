@@ -73,7 +73,7 @@
     group: root
     mode: 0644
     content: |
-      Types: deb deb-src
+      Types: deb
       Enabled: yes
       URIs: {{ zabbix_repo_deb_url }}
       Suites: {{ ansible_distribution_release }}
