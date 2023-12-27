@@ -1,0 +1,2 @@
+bugfixes:
+  - zabbix-{agent, javagateway, proxy, server, web} - support raspberry pi without repository url specification
