@@ -133,3 +133,16 @@
     - ansible.builtin.assert:
         that:
           - exact_match_host_not_found_result.failed is sameas true
+
+- name: Get all hosts
+  community.zabbix.zabbix_host_info:
+  register: get_all_hosts_result
+
+- ansible.builtin.assert:
+    that:
+      - get_all_hosts_result.hosts | length == 2
+
+- name: Clean up test host
+  community.zabbix.zabbix_host:
+    host_name: ExampleHostForHostInfoModule
+    state: absent
