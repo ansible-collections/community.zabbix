@@ -14,6 +14,10 @@
   always:
     - name: "cleanup if tests failed"
       community.zabbix.zabbix_host:
-        host_name: ExampleHost
+        host_name: "{{ item }}"
         state: absent
       ignore_errors: true
+      with_items:
+        - ExampleHost
+        - ExampleHost1
+        - ExampleHost2
