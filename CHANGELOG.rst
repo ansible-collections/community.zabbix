@@ -5,6 +5,30 @@ community.zabbix Release Notes
 .. contents:: Topics
 
 
+v2.3.0
+======
+
+Minor Changes
+-------------
+
+- api_requests - Handled error from depricated CertificateError class
+- multiple roles - Removed unneeded Apt Clean commands.
+- proxy role - Updated MariaDB version for Centos 7 to 10.11
+- zabbix web - Allowed the independent configuration of php-fpm without creating vhost.
+- zabbix_host_info - added ability to get all the hosts configured in Zabbix
+- zabbix_proxy role - Add variable zabbix_proxy_dbpassword_hash_method to control whether you want postgresql user password to be hashed with md5 or want to use db default. When zabbix_proxy_dbpassword_hash_method is set to anything other than md5 then do not hash the password with md5 so you could use postgresql scram-sha-256 hashing method.
+- zabbix_server role - Add variable zabbix_server_dbpassword_hash_method to control whether you want postgresql user password to be hashed with md5 or want to use db default. When zabbix_server_dbpassword_hash_method is set to anything other than md5 then do not hash the password with md5 so you could use postgresql scram-sha-256 hashing method.
+- zabbix_templategroup module added
+
+Bugfixes
+--------
+
+- api module - Fixed certificiate errors
+- proxy and server roles - Defaulted location of fping and fping6 based on OS.
+- proxy role - Removed requirement for mysql group definition.
+- server role - typo in configuration var StasAllowedIP to StatsAllowedIP
+- zabbix-{agent, javagateway, proxy, server, web} - support raspberry pi without repository url specification
+
 v2.2.0
 ======
 
@@ -27,9 +51,9 @@ Minor Changes
 Bugfixes
 --------
 
+- zabbix_inventory - fixed handeling of add_zabbix_groups option
 - zabbix_template - fix template export when template's content has "error" word
 - zabbix_web role - fix variable naming issues (undefined) to zabbix_web_version and zabbix_web_apt_repository
-- zabbix_inventory - fixed handeling of add_zabbix_groups option
 
 v2.1.0
 ======
