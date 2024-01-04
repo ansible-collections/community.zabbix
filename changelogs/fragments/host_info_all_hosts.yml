@@ -1,2 +1,0 @@
-minor_changes:
-  - zabbix_host_info - added ability to get all the hosts configured in Zabbix

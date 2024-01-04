@@ -1,10 +1,12 @@
-objects: {}
+objects:
+  role: {}
 plugins:
   become: {}
   cache: {}
   callback: {}
   cliconf: {}
   connection: {}
+  filter: {}
   httpapi:
     zabbix:
       description: HttpApi Plugin for Zabbix
@@ -142,6 +144,11 @@ plugins:
       name: zabbix_template_info
       namespace: ''
       version_added: null
+    zabbix_templategroup:
+      description: Create/delete Zabbix template groups
+      name: zabbix_templategroup
+      namespace: ''
+      version_added: null
     zabbix_token:
       description: Create/Update/Generate/Delete Zabbix token.
       name: zabbix_token
@@ -180,5 +187,6 @@ plugins:
   netconf: {}
   shell: {}
   strategy: {}
+  test: {}
   vars: {}
-version: 2.2.0
+version: 2.3.0

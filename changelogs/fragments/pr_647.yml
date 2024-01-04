@@ -1,2 +1,0 @@
-minor_changes:
-  - api_requests - Handled error from depricated CertificateError class
