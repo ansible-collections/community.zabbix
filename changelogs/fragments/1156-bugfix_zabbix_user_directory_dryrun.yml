@@ -1,0 +1,2 @@
+bugfixes:
+  - Avoid to update user-directory configuration in dry run.
