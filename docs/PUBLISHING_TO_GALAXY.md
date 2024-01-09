@@ -26,7 +26,7 @@
     git push origin X.Y.Z
     ```
 
-2. All community.* collections are usually published by Zuul, which works by you having to push a tag, and Zuul will build the collection from that tag (with the version in galaxy.yml set to the tag’s version) and publish it. It’s usually a good idea to take a look at [Zuul](https://ansible.softwarefactory-project.io/zuul/status) when pushing a tag and watch the release process to see whether it succeeds or not (and afterwards check on [Galaxy](https://galaxy.ansible.com/community/zabbix) whether the newest version shows up - note that it can make a few seconds after publishing finished until it actually shows up; that’s new with the new Galaxy).
+2. All community.* collections are usually published by Zuul, which works by you having to push a tag, and Zuul will build the collection from that tag (with the version in galaxy.yml set to the tag's version) and publish it. It's usually a good idea to take a look at [Zuul](https://ansible.softwarefactory-project.io/zuul/status) when pushing a tag and watch the release process to see whether it succeeds or not (and afterwards check on [Galaxy](https://galaxy.ansible.com/community/zabbix) whether the newest version shows up - note that it can make a few seconds after publishing finished until it actually shows up; that's new with the new Galaxy).
 
    If there is an error in building and it seems to be on Zuul side, the best thing is to re-push the tag to trigger the publish step another time. For that, assuming the remote for github.com/ansible-collections/community.zabbix is called upstream, you can do
 
