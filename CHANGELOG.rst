@@ -5,6 +5,14 @@ community.zabbix Release Notes
 .. contents:: Topics
 
 
+v2.3.1
+======
+
+Bugfixes
+--------
+
+- Avoid to update user-directory configuration in dry run.
+
 v2.3.0
 ======
 
