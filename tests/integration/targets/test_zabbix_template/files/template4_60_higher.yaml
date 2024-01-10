@@ -1,0 +1,23 @@
+zabbix_export:
+  version: '6.0'
+  date: '2024-01-04T18:26:17Z'
+  groups:
+    - uuid: 7df96b18c230490a9a0a9e2307226338
+      name: Templates
+    - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
+      name: Templates/Applications
+  templates:
+    - uuid: cd837ef0edb14e4e875f409bc90af546
+      template: ExampleTemplate
+      name: ExampleTemplate
+      templates:
+        - name: 'FTP Service'
+        - name: 'Zabbix proxy health'
+      groups:
+        - name: Templates
+        - name: Templates/Applications
+      macros:
+        - macro: '{$EXAMPLE_MACRO1}'
+          value: '1000'
+        - macro: '{$EXAMPLE_MACRO2}'
+          value: text
