@@ -1,0 +1,2 @@
+bugfixes:
+  - zabbix_host - Don't reset IPMI setting when update inventory
