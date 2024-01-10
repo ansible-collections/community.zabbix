@@ -1085,3 +1085,10 @@ releases:
     - pymysql.yml
     - raspberrypi.yml
     release_date: '2024-01-02'
+  2.3.1:
+    changes:
+      bugfixes:
+      - Avoid to update user-directory configuration in dry run.
+    fragments:
+    - 1156-bugfix_zabbix_user_directory_dryrun.yml
+    release_date: '2024-01-10'
