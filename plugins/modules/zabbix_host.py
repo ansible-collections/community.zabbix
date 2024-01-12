@@ -523,13 +523,13 @@ class Host(ZabbixBase):
             else:
                 # A "plain" host
                 parameters = {"hostid": host_id, "groups": group_ids, "status": status}
-                if proxy_id >= 0:
+                if (proxy_id >= 0 and proxy_id != zabbix_host_obj["proxy_hostid"]):
                     parameters["proxy_hostid"] = proxy_id
                 if (visible_name is not None and visible_name != zabbix_host_obj["name"]):
                     parameters["name"] = visible_name
-                if tls_connect:
+                if (tls_connect is not None and tls_connect != zabbix_host_obj["tls_connect"]):
                     parameters["tls_connect"] = tls_connect
-                if tls_accept:
+                if (tls_accept is not None and tls_accept != zabbix_host_obj["tls_accept"]):
                     parameters["tls_accept"] = tls_accept
                 if tls_psk_identity:
                     parameters["tls_psk_identity"] = tls_psk_identity
@@ -541,9 +541,9 @@ class Host(ZabbixBase):
                     parameters["tls_subject"] = tls_subject
                 if (description is not None and description != zabbix_host_obj["description"]):
                     parameters["description"] = description
-                if ipmi_authtype:
+                if (ipmi_authtype is not None and ipmi_authtype != zabbix_host_obj["ipmi_authtype"]):
                     parameters["ipmi_authtype"] = ipmi_authtype
-                if ipmi_privilege:
+                if (ipmi_privilege is not None and ipmi_privilege != zabbix_host_obj["ipmi_privilege"]):
                     parameters["ipmi_privilege"] = ipmi_privilege
                 if (ipmi_username is not None and ipmi_username != zabbix_host_obj["ipmi_username"]):
                     parameters["ipmi_username"] = ipmi_username
