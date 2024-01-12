@@ -1348,6 +1348,61 @@
   ansible.builtin.assert:
     that: zbx_host_create_interfaceless is not changed
 
+- name: "test: attempt to delete host created earlier"
+  community.zabbix.zabbix_host:
+    host_name: ExampleHost
+    state: absent
+  register: zabbix_host1
+
+- name: deleting a host is a change, right?
+  ansible.builtin.assert:
+    that:
+      - "zabbix_host1 is changed"
+
+- name: "test: create host with IPMI values"
+  community.zabbix.zabbix_host:
+    host_name: ExampleHost
+    host_groups:
+      - Linux servers
+      - Zabbix servers
+    ipmi_authtype: 1
+    ipmi_privilege: 1
+    ipmi_username: "test"
+    ipmi_password: "test"
+  register: zabbix_ipmi_host
+
+- name: expect to succeed and that things have changed
+  ansible.builtin.assert:
+    that:
+      - "zabbix_ipmi_host is changed"
+
+- name: "test: update inventory of the created host"
+  community.zabbix.zabbix_host:
+    host_name: ExampleHost
+    inventory_mode: manual
+    inventory_zabbix:
+      notes: "Update inventory"
+  register: zabbix_ipmi_host
+
+- name: expect to succeed and that things have changed
+  ansible.builtin.assert:
+    that:
+      - "zabbix_ipmi_host is changed"
+
+- name: "test: create host with IPMI values without changes"
+  community.zabbix.zabbix_host:
+    host_name: ExampleHost
+    ipmi_authtype: 1
+    ipmi_privilege: 1
+    ipmi_username: "test"
+    ipmi_password: "test"
+  register: zabbix_ipmi_host
+
+- name: expect to succeed and that things have not changed
+  ansible.builtin.assert:
+    that:
+      - "zabbix_ipmi_host is not changed"
+
 - name: "cleanup"
   community.zabbix.zabbix_host:
     host_name: ExampleHost
