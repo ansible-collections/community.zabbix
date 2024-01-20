@@ -67,7 +67,7 @@ EXAMPLES = r'''
     ansible_httpapi_validate_certs: false
     ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
     ansible_host: zabbix-example-fqdn.org
-  community.zabbix.zabbix_group:
+  community.zabbix.zabbix_templategroup:
     state: present
     template_groups:
       - Example group1
@@ -84,7 +84,7 @@ EXAMPLES = r'''
       ansible_httpapi_validate_certs: false
       ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
       ansible_host: zabbix-example-fqdn.org
-  community.zabbix.zabbix_group:
+  community.zabbix.zabbix_templategroup:
     state: present
     template_groups:
       - Example group1
