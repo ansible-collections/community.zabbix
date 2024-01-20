@@ -1,0 +1,2 @@
+bugfixes:
+  - zabbix_host - Finish task with failed if host_group parameter is empty list
