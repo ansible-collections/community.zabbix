@@ -1038,8 +1038,11 @@ def main():
 
     group_ids = []
 
-    if host_groups:
-        group_ids = host.get_group_ids_by_group_names(host_groups)
+    if host_groups is not None:
+        if len(host_groups) >= 1:
+            group_ids = host.get_group_ids_by_group_names(host_groups)
+        else:
+            module.fail_json(msg="host_groups must be not empty list.")
 
     interfaces, ip = host.construct_host_interfaces(interfaces)
 

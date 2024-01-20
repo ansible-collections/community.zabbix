@@ -1403,6 +1403,23 @@
     that:
       - "zabbix_ipmi_host is not changed"
 
+- name: "test: create host with host group(empty list)"
+  community.zabbix.zabbix_host:
+    host_name: ExampleHost
+    visible_name: ExampleName
+    description: My ExampleHost Description
+    host_groups: []
+    status: disabled
+    state: present
+  ignore_errors: true
+  register: zbx_host_create_hostgroup_empty_list
+
+- name: expect to fail updating
+  ansible.builtin.assert:
+    that:
+      - zbx_host_create_hostgroup_empty_list is failed
+      - zbx_host_create_hostgroup_empty_list.msg == "host_groups must be not empty list."
+
 - name: "cleanup"
   community.zabbix.zabbix_host:
     host_name: ExampleHost
