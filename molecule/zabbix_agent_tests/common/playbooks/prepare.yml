@@ -47,6 +47,7 @@
   hosts: docker
   tasks:
     - name: "Download Docker CE repo file"
+      when: not ansible_check_mode  # Because get_url always has changed status in check_mode.
       ansible.builtin.get_url:
         url: https://download.docker.com/linux/centos/docker-ce.repo
         dest: /etc/yum.repos.d/docker-ce.repo
