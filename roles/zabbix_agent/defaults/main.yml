@@ -10,18 +10,10 @@ zabbix_agent_package: zabbix-agent
 zabbix_sender_package: zabbix-sender
 zabbix_get_package: zabbix-get
 zabbix_agent_package_state: present
-zabbix_agent_server:
-zabbix_agent_serveractive:
-zabbix_agent2_server: "{{ zabbix_agent_server }}"
-zabbix_agent2_serveractive: "{{ zabbix_agent_serveractive }}"
 zabbix_selinux: false
 zabbix_agent_apt_priority:
 zabbix_agent_conf_mode: "0644"
 zabbix_agent_dont_detect_ip: false
-zabbix_agent_allow_key: []
-zabbix_agent_deny_key: []
-zabbix_agent2_allow_key: "{{ zabbix_agent_allow_key }}"
-zabbix_agent2_deny_key: "{{ zabbix_agent_deny_key }}"
 
 # Selinux related vars
 selinux_allow_zabbix_run_sudo: false
@@ -102,36 +94,17 @@ zabbix_agent_interfaces:
     port: "{{ (zabbix_agent2 == True) | ternary(zabbix_agent2_listenport, zabbix_agent_listenport) }}"
 
 # Zabbix configuration variables
-zabbix_agent_pidfile: /var/run/zabbix/zabbix_agentd.pid
-zabbix_agent_logtype: file
-zabbix_agent_logfile: /var/log/zabbix/zabbix_agentd.log
-zabbix_agent_logfilesize: 100
-zabbix_agent_debuglevel: 3
-zabbix_agent_sourceip:
 zabbix_agent_enableremotecommands: 0
 zabbix_agent_allowkeys:
 zabbix_agent_denykeys:
 zabbix_agent_logremotecommands: 0
-zabbix_agent_listenport: 10050
 zabbix_agent_jmx_listenport:
 zabbix_agent_listeninterface:
-zabbix_agent_listenip:
 zabbix_agent_startagents: 3
-zabbix_agent_hostname: "{{ inventory_hostname }}"
-zabbix_agent_hostnameitem:
-zabbix_agent_hostmetadata:
-zabbix_agent_hostmetadataitem:
-zabbix_agent_refreshactivechecks: 120
-zabbix_agent_buffersend: 5
-zabbix_agent_buffersize: 100
 zabbix_agent_maxlinespersecond: 100
 zabbix_agent_allowroot: 0
 zabbix_agent_zabbix_alias:
 zabbix_agent_timeout: 3
-zabbix_agent_include: /etc/zabbix/zabbix_agentd.d
-zabbix_agent_include_pattern:
-zabbix_agent_include_mode: "0750"
-zabbix_agent_unsafeuserparameters: 0
 zabbix_agent_userparameters: []
 zabbix_agent_userparameters_templates_src: "userparameters"
 zabbix_agent_userparameters_scripts_src: "scripts"
@@ -146,19 +119,6 @@ zabbix_agent_macros: []
 zabbix_agent_tags: []
 zabbix_agent_chassis: false
 
-# TLS settings
-zabbix_agent_tlsconnect:
-zabbix_agent_tlsaccept:
-zabbix_agent_tlscafile:
-zabbix_agent_tlscrlfile:
-zabbix_agent_tlsservercertissuer:
-zabbix_agent_tlsservercertsubject:
-zabbix_agent_tls_subject: "{{ zabbix_agent_tlsservercertsubject }}" # FIXME this is not correct and should be removed with 2.0.0, here only to prevent regression
-zabbix_agent_tlscertfile:
-zabbix_agent_tlskeyfile:
-zabbix_agent_tlspskidentity:
-zabbix_agent_tlspsk_auto: false
-
 zabbix_agent_tls_config:
   unencrypted: "1"
   psk: "2"
@@ -171,64 +131,26 @@ zabbix_agent_ipmi_privilege: 2
 zabbix_agent_ipmi_username:
 
 # Zabbix Agent2
-zabbix_agent2_pidfile: /var/run/zabbix/zabbix_agent2.pid
-zabbix_agent2_logfile: /var/log/zabbix/zabbix_agent2.log
-zabbix_agent2_logtype: file
 zabbix_agent2_statusport: 9999
-zabbix_agent2_include: /etc/zabbix/zabbix_agent2.d
-zabbix_agent2_include_pattern:
-zabbix_agent2_logfilesize: 100
-zabbix_agent2_debuglevel: 3
-zabbix_agent2_sourceip:
-zabbix_agent2_listenport: 10050
-zabbix_agent2_listenip:
-zabbix_agent2_hostname: "{{ inventory_hostname }}"
-zabbix_agent2_hostnameitem:
-zabbix_agent2_hostmetadata:
-zabbix_agent2_hostmetadataitem:
 zabbix_agent2_hostinterface:
 zabbix_agent2_hostinterfaceitem:
 zabbix_agent2_enablepersistentbuffer: 0
 zabbix_agent2_persistentbufferperiod: 1h
 zabbix_agent2_persistentbufferfile:
-zabbix_agent2_refreshactivechecks: 120
-zabbix_agent2_buffersend: 5
-zabbix_agent2_buffersize: 100
 zabbix_agent2_zabbix_alias:
 zabbix_agent2_timeout: 3
-zabbix_agent2_include_mode: "0750"
-zabbix_agent2_unsafeuserparameters: 0
 zabbix_agent2_controlsocket: /tmp/agent.sock
 zabbix_agent2_plugins: []
-
-# Zabbix Agent2 TLS settings
-zabbix_agent2_tlsconnect:
-zabbix_agent2_tlsaccept:
-zabbix_agent2_tlscafile:
-zabbix_agent2_tlscrlfile:
-zabbix_agent2_tlsservercertissuer:
-zabbix_agent2_tlsservercertsubject:
-zabbix_agent2_tls_subject: "{{ zabbix_agent2_tlsservercertsubject }}" # FIXME this is not correct and should be removed with 2.0.0, here only to prevent regression
-zabbix_agent2_tlscertfile:
-zabbix_agent2_tlskeyfile:
-zabbix_agent2_tlspskidentity:
-zabbix_agent2_tlspsk_auto: false
 
 # Windows/macOS Related
 zabbix_version_long: 5.2.4
 
 # Windows Related
-zabbix_win_package: zabbix_agent-{{ zabbix_version_long }}-windows-amd64-openssl.zip
-zabbix2_win_package: zabbix_agent2-{{ zabbix_version_long }}-windows-amd64-openssl-static.zip
 zabbix_win_download_url: https://cdn.zabbix.com/zabbix/binaries/stable
-zabbix_win_download_link: "{{ zabbix_win_download_url }}/{{ zabbix_version_long | regex_search('^\\d+\\.\\d+') }}/{{ zabbix_version_long }}/{{ zabbix_win_package }}"
-zabbix2_win_download_link: "{{ zabbix_win_download_url }}/{{ zabbix_version_long | regex_search('^\\d+\\.\\d+') }}/{{ zabbix_version_long }}/{{ zabbix2_win_package }}"
 zabbix_win_install_dir: 'C:\Zabbix'
 zabbix_win_install_dir_conf: '{{ zabbix_win_install_dir }}\\conf'
 zabbix_win_install_dir_bin: '{{ zabbix_win_install_dir }}\\bin'
-zabbix_agent_win_logfile: "{{ zabbix_win_install_dir }}\\zabbix_agentd.log"
 zabbix_agent_win_include: "{{ zabbix_win_install_dir }}\\zabbix_agent.d\\"
-zabbix_agent2_win_logfile: "{{ zabbix_win_install_dir }}\\zabbix_agent2.log"
 zabbix_agent_win_svc_recovery: true
 zabbix_win_firewall_management: true
 
