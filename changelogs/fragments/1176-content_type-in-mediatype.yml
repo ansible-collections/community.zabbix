@@ -1,0 +1,2 @@
+minor_changes:
+  - Added content_type for email in zabbix_mediatypes

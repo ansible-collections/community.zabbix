@@ -114,6 +114,29 @@
     - ansible.builtin.assert:
         that: zbxmediatype_reset.changed is sameas True
 
+    - name: test - check email mediatype content_type for html default
+      community.zabbix.zabbix_mediatype:
+        content_type: "html"
+      register: zbxmediatype_verif
+
+    - ansible.builtin.assert:
+        that: zbxmediatype_verif.changed is sameas False
+
+    - name: test - update email mediatype content_type to plaintext
+      community.zabbix.zabbix_mediatype:
+        content_type: "plaintext"
+      register: zbxmediatype_verif
+
+    - ansible.builtin.assert:
+        that: zbxmediatype_verif.changed is sameas True
+
+    - name: test - reset email mediatype content_type to default
+      community.zabbix.zabbix_mediatype:
+      register: zbxmediatype_reset
+
+    - ansible.builtin.assert:
+        that: zbxmediatype_reset.changed is sameas True
+
     - name: test - update email mediatype concurrent settings
       community.zabbix.zabbix_mediatype:
         max_sessions: 99
