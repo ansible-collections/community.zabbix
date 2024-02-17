@@ -64,6 +64,20 @@ options:
             - I(visible_name=yes) to search by visible name,  I(visible_name=no) to search by technical name.
         type: bool
         default: "yes"
+    active_since:
+        description:
+            - Time when the maintenance becomes active.
+            - The given value will be rounded down to minutes.
+            - Uses `datetime.datetime.now(`) if not specified.
+        type: "str"
+        default: ""
+    active_till:
+        description:
+            - Time when the maintenance stops being active.
+            - The given value will be rounded down to minutes.
+            - Gets calculated from I(minutes) if not specified.
+        type: "str"
+        default: ""
     tags:
         description:
             - List of tags to assign to the hosts in maintenance.
@@ -187,6 +201,24 @@ EXAMPLES = r"""
   community.zabbix.zabbix_maintenance:
     name: Test1
     state: absent
+
+- name: Create maintenance window by date
+  # set task level variables as we change ansible_connection plugin here
+  vars:
+    ansible_network_os: community.zabbix.zabbix
+    ansible_connection: httpapi
+    ansible_httpapi_port: 443
+    ansible_httpapi_use_ssl: true
+    ansible_httpapi_validate_certs: false
+    ansible_zabbix_url_path: "zabbixeu"  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
+    ansible_host: zabbix-example-fqdn.org
+  community.zabbix.zabbix_maintenance:
+    name: TestDate
+    state: present
+    host_names:
+      - host.example.org
+    active_since: "1979-09-19 09:00"
+    active_till: "1979-09-19 17:00"
 """
 
 import datetime
@@ -342,6 +374,8 @@ def main():
         desc=dict(type="str", required=False, default="Created by Ansible"),
         collect_data=dict(type="bool", required=False, default=True),
         visible_name=dict(type="bool", required=False, default=True),
+        active_since=dict(type="str", required=False, default=""),
+        active_till=dict(type="str", required=False, default=""),
         tags=dict(
             type="list",
             elements="dict",
@@ -368,6 +402,8 @@ def main():
     desc = module.params["desc"]
     collect_data = module.params["collect_data"]
     visible_name = module.params["visible_name"]
+    active_since = module.params["active_since"]
+    active_till = module.params["active_till"]
     tags = module.params["tags"]
 
     if collect_data:
@@ -389,9 +425,9 @@ def main():
             module.fail_json(
                 msg="At least one host_name or host_group must be defined for each created maintenance.")
 
-        now = datetime.datetime.now().replace(second=0)
+        now = datetime.datetime.fromisoformat(active_since) if active_since != "" else datetime.datetime.now().replace(second=0)
         start_time = int(time.mktime(now.timetuple()))
-        period = 60 * int(minutes)  # N * 60 seconds
+        period = int((datetime.datetime.fromisoformat(active_till) - now).total_seconds()) if active_till != "" else 60 * int(minutes)  # N * 60 seconds
 
         if host_groups:
             (rc, group_ids, error) = maint.get_group_ids(host_groups)

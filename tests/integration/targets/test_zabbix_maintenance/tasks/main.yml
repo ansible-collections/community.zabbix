@@ -273,6 +273,56 @@
 #    that:
 #      - update_maintenance_host_tags.changed is sameas false
 
+- name: "test - Create maintenance with an active_since param"
+  community.zabbix.zabbix_maintenance:
+    name: maintenance
+    host_name: example
+    active_since: "1979-09-19"
+    state: present
+  register: create_maintenance_active_since_result
+
+- ansible.builtin.assert:
+    that:
+      - create_maintenance_active_since_result.changed is sameas true
+
+- name: "test - Create maintenance with a active_since param(again - expectations: false change will occur)"
+  community.zabbix.zabbix_maintenance:
+    name: maintenance
+    host_name: example
+    active_since: "1979-09-19"
+    state: present
+  register: create_maintenance_active_since_again_result
+
+- ansible.builtin.assert:
+    that:
+      - create_maintenance_active_since_again_result.changed is sameas false
+
+- name: "test - Create maintenance with an active_till param"
+  community.zabbix.zabbix_maintenance:
+    name: maintenance
+    host_name: example
+    active_since: "1979-09-19 00:00"
+    active_till: "1979-09-19 23:59"
+    state: present
+  register: create_maintenance_active_till_result
+
+- ansible.builtin.assert:
+    that:
+      - create_maintenance_active_till_result.changed is sameas true
+
+- name: "test - Create maintenance with a active_till param(again - expectations: false change will occur)"
+  community.zabbix.zabbix_maintenance:
+    name: maintenance
+    host_name: example
+    active_since: "1979-09-19 00:00"
+    active_till: "1979-09-19 23:59"
+    state: present
+  register: create_maintenance_active_till_again_result
+
+- ansible.builtin.assert:
+    that:
+      - create_maintenance_active_till_again_result.changed is sameas false
+
 - name: "test - Delete maintenance"
   community.zabbix.zabbix_maintenance:
     name: maintenance

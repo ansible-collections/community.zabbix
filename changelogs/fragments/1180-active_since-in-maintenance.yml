@@ -1,0 +1,2 @@
+minor_changes:
+  - Added active_since and active_till in zabbix_maintenance
