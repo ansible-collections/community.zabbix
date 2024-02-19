@@ -30,11 +30,9 @@
 
 - name: Set Variables
   ansible.builtin.set_fact:
-    zabbix_agent_allow_key: "{{ zabbix_agent_allow_key is defined | ternary(zabbix_agent_allow_key, zabbix_agent2_allow_key) | default(_allow_key) }}"
     zabbix_agent_buffersend: "{{ zabbix_agent_buffersend is defined | ternary(zabbix_agent_buffersend, zabbix_agent2_buffersend) | default(_buffersend) }}"
     zabbix_agent_buffersize: "{{ zabbix_agent_buffersize is defined | ternary(zabbix_agent_buffersize, zabbix_agent2_buffersize) | default(_buffersize) }}"
     zabbix_agent_debuglevel: "{{ zabbix_agent_debuglevel is defined | ternary(zabbix_agent_debuglevel, zabbix_agent2_debuglevel) | default(_debuglevel) }}"
-    zabbix_agent_deny_key: "{{ zabbix_agent_deny_key is defined | ternary(zabbix_agent_deny_key, zabbix_agent2_deny_key) | default(_deny_key) }}"
     zabbix_agent_hostname: "{{ zabbix_agent_hostname is defined | ternary(zabbix_agent_hostname, zabbix_agent2_hostname) | default(_hostname) }}"
     zabbix_agent_include: "{{ zabbix_agent_include is defined | ternary(zabbix_agent_include, zabbix_agent2_include) | default(_include) }}"
     zabbix_agent_include_mode: "{{ zabbix_agent_include_mode is defined | ternary(zabbix_agent_include_mode, zabbix_agent2_include_mode) | default(_include_mode) }}"
