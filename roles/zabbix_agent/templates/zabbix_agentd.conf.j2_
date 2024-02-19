@@ -1,0 +1,44 @@
+{{ ansible_managed | comment }}
+# This is a configuration file for Zabbix Agent
+# To get more information about Zabbix, visit http://www.zabbix.com
+
+# This configuration file is "minimalized", which means all the original comments 
+# are removed. The full documentation for your Zabbix Agent can be found here:
+# https://www.zabbix.com/documentation/{{ zabbix_agent_version }}/en/manual/appendix/config/zabbix_agentd{{ "_win" if ansible_os_family == "Windows" else "" }}
+
+
+
+{% if ansible_os_family == "Windows" %}
+LogFile={{ zabbix_agent_win_logfile }}
+{% else %}
+LogFile={{ zabbix_agent_logfile }}
+{% endif %}
+
+{% if zabbix_agent_version is version('6.0', '<=') %}
+{% else %}
+
+
+
+
+
+
+
+{% if ansible_os_family == "Windows" %}
+Include={{ zabbix_agent_win_include }}
+{% else %}
+Include={{ zabbix_agent_include }}/{{ zabbix_agent_include_pattern }}
+{% endif %}
+{% if zabbix_agent_additional_include is defined and zabbix_agent_additional_include is iterable and zabbix_agent_additional_include is not string %}
+{% for include in zabbix_agent_additional_include %}
+Include={{ include }}
+{% endfor %}
+{% endif %}
+{% if zabbix_agent_version is version_compare('2.2', '>=') %}
+
+{% endif %}
+
+{% if zabbix_agent_version is version_compare('3.0', '>=') %}
+
+
+{% endif %}
+

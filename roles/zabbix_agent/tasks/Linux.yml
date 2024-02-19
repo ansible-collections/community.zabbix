@@ -1,4 +1,9 @@
 ---
+- name: "Set Log File Info"
+  ansible.builtin.set_fact:
+    zabbix_agent_logfile: "{{ zabbix_agent_logfile is defined | ternary(zabbix_agent_logfile, zabbix_agent2_logfile) | default(_logfile) }}"
+  when: zabbix_agent_logfile is undefined
+
 - name: "Set default ip address for zabbix_agent_ip"
   ansible.builtin.set_fact:
     zabbix_agent_ip: "{{ hostvars[inventory_hostname]['ansible_default_ipv4'].address }}"
@@ -22,8 +27,6 @@
     zabbix_agent_ip: "{{ ansible_all_ipv4_addresses | ansible.netcommon.ipaddr('public') | first }}"
     zabbix_agent_server: "{{ zabbix_agent_server_public_ip | default(zabbix_agent_server) }}"
     zabbix_agent_serveractive: "{{ zabbix_agent_serveractive_public_ip | default(zabbix_agent_serveractive) }}"
-    zabbix_agent2_server: "{{ zabbix_agent_server_public_ip | default(zabbix_agent2_server) }}"
-    zabbix_agent2_serveractive: "{{ zabbix_agent_serveractive_public_ip | default(zabbix_agent2_serveractive) }}"
   when:
     - zabbix_agent_ip is not defined
     - total_private_ip_addresses is defined
@@ -120,8 +123,8 @@
 
 - name: "Configure zabbix-agent"
   ansible.builtin.template:
-    src: "{{ 'zabbix_agentd.conf.j2' if not zabbix_agent2 else 'zabbix_agent2.conf.j2' }}"
-    dest: "/etc/zabbix/{{ zabbix_agent_conf if not zabbix_agent2 else zabbix_agent2_conf }}"
+    src: zabbix_agent.conf.j2
+    dest: "/etc/zabbix/zabbix_agent{{ '2' if zabbix_agent2 }.conf"
     owner: root
     group: root
     mode: "{{ zabbix_agent_conf_mode }}"

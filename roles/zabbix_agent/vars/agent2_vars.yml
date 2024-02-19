@@ -1,29 +1,13 @@
-test: 2
 _pidfile: /var/run/zabbix/zabbix_agent2.pid
 _logtype: file
 _logfile: /var/log/zabbix/zabbix_agent2.log
 _logfilesize: 100
 _debuglevel: 3
 _include: /etc/zabbix/zabbix_agent2.d
-_include_pattern:
-_sourceip:
-_listenip:
 _listenport: 10050
-_hostmetadataitem:
-_tlsconnect:
-_tlsaccept:
-_tlscafile:
-_tlscrlfile:
-_tlsservercertissuer:
-_tlsservercertsubject:
 _tls_subject: "{{ zabbix_agent_tlsservercertsubject }}" # FIXME this is not correct and should be removed with 2.0.0, here only to prevent regression
-_tlscertfile:
-_tlskeyfile:
-_tlspskidentity:
 _tlspsk_auto: false
 _hostname: "{{ inventory_hostname }}"
-_hostnameitem:
-_hostmetadata:
 _include_mode: "0750"
 _unsafeuserparameters: 0
 _buffersend: 5
@@ -32,8 +16,4 @@ _refreshactivechecks: 120
 _win_package: zabbix_agent2-{{ zabbix_version_long }}-windows-amd64-openssl-static.zip
 _win_download_link: "{{ zabbix_win_download_url }}/{{ zabbix_version_long | regex_search('^\\d+\\.\\d+') }}/{{ zabbix_version_long }}/{{ zabbix2_win_package }}"
 _win_logfile: "{{ zabbix_win_install_dir }}\\zabbix_agent2.log"
-_allow_key: []
-_deny_key: []
-_server:
-_serveractive:
 _zabbix_agent_service: zabbix_agent2
