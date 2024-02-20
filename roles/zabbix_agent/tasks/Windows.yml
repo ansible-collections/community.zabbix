@@ -1,4 +1,10 @@
 ---
+- name: "Windows | Set some variables"
+  ansible.builtin.set_fact:
+    zabbix_agent_win_download_link: "{{ zabbix_agent_win_download_link is defined | ternary(zabbix_agent_win_download_link, zabbix_agent2_win_download_link) | default(_win_download_link) }}"
+    zabbix_agent_win_logfile: "{{ zabbix_agent_win_logfile is defined | ternary(zabbix_agent_win_logfile, zabbix_agent2_win_logfile) | default(_win_logfile) }}"
+    zabbix_agent_win_package: "{{ zabbix_agent_win_package is defined | ternary(zabbix_agent_win_package, zabbix_agent2_win_package) | default(_win_package) }}"
+
 - name: "Windows | Set default architecture"
   ansible.builtin.set_fact:
     windows_arch: 32
@@ -23,6 +29,7 @@
   ansible.builtin.set_fact:
     zabbix_win_svc_name: Zabbix Agent
     zabbix_win_exe_path: '{{ zabbix_win_install_dir }}\bin\zabbix_agentd.exe'
+    zabbix_win_config_name: "zabbix_agentd.conf"
     zabbix2_win_svc_name: Zabbix Agent 2
     zabbix2_win_exe_path: '{{ zabbix_win_install_dir }}\bin\zabbix_agent2.exe'
     zabbix2_win_config_name: "zabbix_agent2.conf"

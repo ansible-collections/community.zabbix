@@ -16,4 +16,5 @@ _refreshactivechecks: 120
 _win_package: zabbix_agent2-{{ zabbix_version_long }}-windows-amd64-openssl-static.zip
 _win_download_link: "{{ zabbix_win_download_url }}/{{ zabbix_version_long | regex_search('^\\d+\\.\\d+') }}/{{ zabbix_version_long }}/{{ zabbix2_win_package }}"
 _win_logfile: "{{ zabbix_win_install_dir }}\\zabbix_agent2.log"
-_zabbix_agent_service: zabbix_agent2
+_agent_service: zabbix-agent2
+_agent_package: zabbix-agent2
