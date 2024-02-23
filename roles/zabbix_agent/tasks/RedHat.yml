@@ -18,7 +18,6 @@
   with_items: "{{ zabbix_repo_yum }}"
   register: yum_repo_installed
   become: true
-  no_log: true
   notify:
     - "clean repo files from proxy creds"
   tags:
