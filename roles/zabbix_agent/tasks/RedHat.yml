@@ -7,14 +7,18 @@
     description: "{{ item.description }}"
     baseurl: "{{ item.baseurl }}"
     gpgcheck: "{{ item.gpgcheck }}"
-    gpgkey: "{{ item.gpgkey }}"
+    gpgkey: "{{ item.gpgkey | default(omit) }}"
     mode: "{{ item.mode | default('0644') }}"
     priority: "{{ item.priority | default('99') }}"
     state: "{{ item.state | default('present') }}"
     proxy: "{{ zabbix_http_proxy | default(omit) }}"
+    username: "{{ item.username | default(omit) }}"
+    password: "{{ item.password | default(omit) }}"
+    sslverify: "{{ item.sslverify  | default('true') }}"
   with_items: "{{ zabbix_repo_yum }}"
   register: yum_repo_installed
   become: true
+  no_log: true
   notify:
     - "clean repo files from proxy creds"
   tags:
