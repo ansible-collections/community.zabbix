@@ -370,6 +370,83 @@
       - delete_zabbix_template_result.changed is sameas false
 
 #
+# template_file_context parameter
+#
+
+- name: Import Zabbix template from a file using configuration.importcompare api
+  block:
+    - name: Import Zabbix template from YAML file.
+      community.zabbix.zabbix_template:
+        template_yaml: "{{ lookup('file', 'template4_60_higher.yaml') }}"
+        state: present
+      register: import_template_yaml
+
+    - ansible.builtin.assert:
+        that:
+          - import_template_xml.changed is sameas true
+
+    - name: Import Zabbix same template from XML file.
+      community.zabbix.zabbix_template:
+        template_xml: "{{ lookup('file', 'template4_60_higher.xml') }}"
+        state: present
+      register: import_same_template_xml
+
+    - ansible.builtin.assert:
+        that:
+          - import_same_template_xml.changed is sameas false
+
+    - name: Delete Zabbix template.
+      community.zabbix.zabbix_template:
+        template_name: ExampleTemplate
+        state: absent
+      register: delete_zabbix_template_result
+
+    - ansible.builtin.assert:
+        that:
+          - delete_zabbix_template_result.changed is sameas true
+
+    - name: Import Zabbix same template from XML file (after deleting template).
+      community.zabbix.zabbix_template:
+        template_xml: "{{ lookup('file', 'template4_60_higher.xml') }}"
+        state: present
+      register: import_same_template_xml
+
+    - ansible.builtin.assert:
+        that:
+          - import_same_template_xml.changed is sameas true
+
+    - name: Import Zabbix same template from JSON file.
+      community.zabbix.zabbix_template:
+        template_json: "{{ lookup('file', 'template4_60_higher.json') }}"
+        state: present
+      register: import_same_template_json
+
+    - ansible.builtin.assert:
+        that:
+          - import_same_template_json.changed is sameas false
+
+    - name: Delete Zabbix template.
+      community.zabbix.zabbix_template:
+        template_name: ExampleTemplate
+        state: absent
+      register: delete_zabbix_template_result
+
+    - ansible.builtin.assert:
+        that:
+          - delete_zabbix_template_result.changed is sameas true
+
+    - name: Delete Zabbix template (idempotency check).
+      community.zabbix.zabbix_template:
+        template_name: ExampleTemplate
+        state: absent
+      register: delete_zabbix_template_result
+
+    - ansible.builtin.assert:
+        that:
+          - delete_zabbix_template_result.changed is sameas false
+
+
+#
 # Unicode stuff
 #
 

@@ -35,6 +35,7 @@ options:
             - Name of the host in Zabbix.
             - host_name is the unique identifier used and cannot be updated using this module.
             - Required when I(host_ip) is not used.
+            - If neither host_name nor host_ip specified then all the hosts configured in Zabbix returned.
         required: false
         type: str
         default: ""
@@ -207,7 +208,7 @@ def main():
 
     host = Host(module)
 
-    if host_name:
+    if host_name != "" or (host_name == "" and len(host_ips) == 0):
         hosts = host.get_hosts_by_host_name(host_name, exact_match, host_inventory)
         if is_remove_duplicate:
             hosts = host.delete_duplicate_hosts(hosts)

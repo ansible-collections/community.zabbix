@@ -100,7 +100,7 @@
         name: mariadb
         description: MariaDB 10.8 CentOS repository list
         file: mariadb
-        baseurl: "https://mirror.rackspace.com/mariadb/yum/10.8/centos{{ ansible_distribution_major_version }}-amd64"
+        baseurl: "https://mirror.rackspace.com/mariadb/yum/10.11/centos{{ ansible_distribution_major_version }}-amd64"
         gpgcheck: no
       when: ansible_distribution_major_version == '7'
 

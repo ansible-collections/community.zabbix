@@ -1,2 +1,0 @@
-minor_changes:
-  - zabbix web - Allowed the independent configuration of php-fpm without creating vhost.

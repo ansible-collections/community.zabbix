@@ -126,6 +126,6 @@
     cmd: files/install_semodule.bsx
   args:
     creates: /etc/selinux/targeted/active/modules/400/zabbix_server_add/cil
-    become: true
+  become: true
   tags:
     - config

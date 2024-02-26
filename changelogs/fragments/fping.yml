@@ -1,2 +1,0 @@
-bugfixes:
-  - proxy and server roles - Defaulted location of fping and fping6 based on OS.

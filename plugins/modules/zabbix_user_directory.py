@@ -691,6 +691,8 @@ def main():
     else:
         # User Directory with given name exists
         if state == "absent":
+            if module.check_mode:
+                module.exit_json(changed=True)
             user_directory._zapi.userdirectory.delete([directory[0]["userdirectoryid"]])
             module.exit_json(
                 changed=True,
@@ -705,6 +707,8 @@ def main():
                 parameters, directory[0], diff_dict
             ):
                 parameters["userdirectoryid"] = directory[0]["userdirectoryid"]
+                if module.check_mode:
+                    module.exit_json(changed=True)
                 user_directory._zapi.userdirectory.update(parameters)
                 module.exit_json(
                     changed=True,
