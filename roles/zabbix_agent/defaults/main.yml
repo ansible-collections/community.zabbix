@@ -27,6 +27,7 @@ zabbix_agent2_deny_key: "{{ zabbix_agent_deny_key }}"
 selinux_allow_zabbix_run_sudo: false
 
 zabbix_agent_gpg_key_url: http://repo.zabbix.com/zabbix-official-repo.key
+zabbix_agent_include_deb_src: true
 
 zabbix_agent_install_agent_only: false
 zabbix_agent_packages:

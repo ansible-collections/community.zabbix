@@ -38,7 +38,6 @@ zabbix_proxy_tls_config:
   cert: "certificate"
 zabbix_proxy_version_minor: "*"
 
-zabbix_proxy_gpg_key_url: http://repo.zabbix.com/zabbix-official-repo.key
 
 # Yum/APT Variables
 zabbix_repo_yum_schema: https
@@ -63,6 +62,8 @@ zabbix_repo_yum:
     state: present
 zabbix_proxy_apt_priority:
 zabbix_proxy_package_state: present
+zabbix_proxy_gpg_key_url: http://repo.zabbix.com/zabbix-official-repo.key
+zabbix_proxy_include_deb_src: true
 
 # Proxy Configuration Variables (Only ones with role provided defaults)
 zabbix_proxy_allowroot: 0

@@ -62,6 +62,7 @@ zabbix_server_apt_priority:
 zabbix_server_install_recommends: true
 zabbix_server_conf_mode: 0640
 zabbix_server_gpg_key_url: http://repo.zabbix.com/zabbix-official-repo.key
+zabbix_server_include_deb_src: true
 
 # Server Configuration Variables (Only ones with role provided defaults)
 zabbix_server_alertscriptspath: /usr/lib/zabbix/alertscripts
