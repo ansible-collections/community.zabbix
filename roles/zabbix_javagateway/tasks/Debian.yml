@@ -48,7 +48,7 @@
 - name: "Debian | Download gpg key"
   when: not ansible_check_mode  # Because get_url always has changed status in check_mode.
   ansible.builtin.get_url:
-    url: "{{ zabbix_javagateway_gpg_key_url }}"
+    url: "{{ zabbix_repo_deb_gpg_key_url }}"
     dest: "{{ zabbix_gpg_key }}"
     mode: "0644"
     force: true
@@ -66,7 +66,7 @@
     group: root
     mode: 0644
     content: |
-      Types: deb{{ ' deb-src' if zabbix_javagateway_include_deb_src }}
+      Types: deb{{ ' deb-src' if zabbix_repo_deb_include_deb_src }}
       Enabled: yes
       URIs: {{ zabbix_repo_deb_url }}
       Suites: {{ ansible_distribution_release }}

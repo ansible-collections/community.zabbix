@@ -32,5 +32,5 @@ zabbix_javagateway_listenip: 0.0.0.0
 zabbix_javagateway_listenport: 10052
 zabbix_javagateway_startpollers: 5
 
-zabbix_javagateway_gpg_key_url: http://repo.zabbix.com/zabbix-official-repo.key
-zabbix_javagateway_include_deb_src: true
+zabbix_repo_deb_gpg_key_url: http://repo.zabbix.com/zabbix-official-repo.key
+zabbix_repo_deb_include_deb_src: true

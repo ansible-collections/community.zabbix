@@ -62,6 +62,8 @@ The `zabbix_javagateway_version` is optional. The latest available major.minor v
 * `zabbix_javagateway_conf_mode`: Default: `0644`. The "mode" for the Zabbix configuration file.
 * `zabbix_repo_deb_url`: The URL to the Zabbix repository.  Default `http://repo.zabbix.com/zabbix/{{ zabbix_agent_version }}/{{ ansible_distribution.lower() }}`
 * `zabbix_repo_deb_component`: The repository component for Debian installs. Default `main`.
+* `zabbix_repo_deb_gpg_key_url`: The URL to download the Zabbix GPG key from. Default `http://repo.zabbix.com/zabbix-official-repo.key`.
+* `zabbix_repo_deb_include_deb_src`: True, if deb-src should be included in the zabbix.sources entry. Default 'true'.
 
 ### Java Gatewaty
 

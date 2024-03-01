@@ -94,6 +94,8 @@ The following is an overview of all available configuration defaults for this ro
 * `zabbix_web_conf_mode`: Default: `0644`. The "mode" for the Zabbix configuration file.
 * `zabbix_repo_deb_url`: The URL to the Zabbix repository.  Default `http://repo.zabbix.com/zabbix/{{ zabbix_web_version }}/{{ ansible_distribution.lower() }}`
 * `zabbix_repo_deb_component`: The repository component for Debian installs. Default `main`.
+* `zabbix_repo_deb_gpg_key_url`: The URL to download the Zabbix GPG key from. Default `http://repo.zabbix.com/zabbix-official-repo.key`.
+* `zabbix_repo_deb_include_deb_src`: True, if deb-src should be included in the zabbix.sources entry. Default 'true'.
 
 ### Zabbix Web specific
 

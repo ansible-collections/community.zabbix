@@ -88,8 +88,8 @@ zabbix_server_history_types:
 
 zabbix_selinux: false
 
-zabbix_web_gpg_key_url: http://repo.zabbix.com/zabbix-official-repo.key
-zabbix_web_include_deb_src: true
+zabbix_repo_deb_gpg_key_url: http://repo.zabbix.com/zabbix-official-repo.key
+zabbix_repo_deb_include_deb_src: true
 # selinux_allow_zabbix_can_network: false
 # zabbix_apache_can_connect_ldap: false
 
