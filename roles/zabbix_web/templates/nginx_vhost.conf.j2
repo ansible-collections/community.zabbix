@@ -20,7 +20,7 @@ server {
         try_files       $uri $uri/ =404;
     }
 
-    location /assets {
+    location /assets/ {
         access_log      off;
         expires         10d;
     }
@@ -85,7 +85,7 @@ server {
         try_files       $uri $uri/ =404;
     }
 
-    location /assets {
+    location /assets/ {
         access_log      off;
         expires         10d;
     }
