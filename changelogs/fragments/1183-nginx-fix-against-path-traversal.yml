@@ -1,0 +1,2 @@
+minor_changes:
+  - Add slash at the end of the location directives, to prevent path traversal attacks.
