@@ -1,0 +1,2 @@
+bugfixes:
+  - zabbix_agent - Fixed IPMI authentication algorithm default setting

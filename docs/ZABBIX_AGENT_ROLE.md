@@ -337,7 +337,7 @@ Keep in mind that using the Zabbix Agent in a Container requires changes to the 
 
 ## IPMI variables
 
-* `zabbix_agent_ipmi_authtype`: IPMI authentication algorithm. Possible values are 1 (callback), 2 (user), 3 (operator), 4 (admin), 5 (OEM), with 2 being the API default.
+* `zabbix_agent_ipmi_authtype`: IPMI authentication algorithm. Possible values are -1 (default), 0 (none), 1 (MD2), 2 (MD5), 4 (straight), 5 (OEM), 6 (RMCP+), with -1 being the API default.
 * `zabbix_agent_ipmi_password`: IPMI password.
 * `zabbix_agent_ipmi_privilege`: IPMI privilege level. Possible values are 1 (callback), 2 (user), 3 (operator), 4 (admin), 5 (OEM), with 2 being the API default.
 * `zabbix_agent_ipmi_username`: IPMI username.
