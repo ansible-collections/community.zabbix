@@ -29,7 +29,8 @@ options:
   zabbix_url_path:
     type: str
     description:
-      - Specifies path portion in Zabbix WebUI URL, e.g. for https://myzabbixfarm.com/zabbixeu zabbix_url_path=zabbixeu
+      - Specifies path portion in Zabbix WebUI URL, e.g. for https://myzabbixfarm.com/zabbixeu zabbix_url_path=zabbixeu.
+      - "If Zabbix WebUI is running at the root, i.e. https://myzabbixfarm.com/, then assign empty string to this variable C(zabbix_url_path: '')."
     default: zabbix
     env:
       - name: ANSIBLE_ZABBIX_URL_PATH
