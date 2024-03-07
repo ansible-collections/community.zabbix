@@ -5,4 +5,3 @@ minor_changes:
   - agent, javagateway, proxy, server, and web role - introduced default variable zabbix_repo_deb_include_deb_src with value true
   - agent, javagateway, proxy, server, and web role - used variable zabbix_repo_deb_include_deb_src in "Debian | Installing repository" to determine whether deb-src should be added to /etc/apt/sources.list.d/zabbix.sources
   - agent, javagateway, proxy, server, and web role - removed superfluous slash in zabbix_gpg_key of the Debian vars and renamed key to zabbix-repo instead of zabbix-official-repo
-  - agent, javagateway, proxy, server, and web role - updated readme with the two new variables "zabbix_repo_deb_gpg_key_url" and "zabbix_repo_deb_include_deb_src"
