@@ -38,7 +38,6 @@ zabbix_proxy_tls_config:
   cert: "certificate"
 zabbix_proxy_version_minor: "*"
 
-
 # Yum/APT Variables
 zabbix_repo_yum_schema: https
 zabbix_repo_yum_gpgcheck: 0
