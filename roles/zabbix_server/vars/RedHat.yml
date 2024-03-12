@@ -19,18 +19,11 @@ zabbix_valid_server_versions:
     - 6.0
 
 pgsql_depenencies:
-  "9":
-    - python3-psycopg2
-  "8":
-    - python3-psycopg2
+  - python3-psycopg2
 
 mysql_client_pkgs:
-  "9":
-    - mysql
-    - python3-PyMySQL
-  "8":
-    - mysql
-    - python3-PyMySQL
+  - mysql
+  - python3-PyMySQL
 
 _zabbix_server_fping6location: /usr/sbin/fping6
 _zabbix_server_fpinglocation: /usr/sbin/fping
