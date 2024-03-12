@@ -13,16 +13,12 @@
   tags:
     - always
 
-- name: Set More Variables
-  ansible.builtin.set_fact:
-    zabbix_valid_version: "{{ zabbix_javagateway_version|float in zabbix_valid_javagateway_versions[ansible_distribution_major_version] }}"
-  tags:
-    - always
-
-- name: Stopping Install of Invalid Version
-  ansible.builtin.fail:
-    msg: Zabbix version {{ zabbix_javagateway_version }} is not supported on {{ ansible_distribution }} {{ ansible_distribution_major_version }}
-  when: not zabbix_valid_version
+- name: Check that version is supported
+  when: enable_version_check | default(true) | bool
+  ansible.builtin.assert:
+    that:
+      - "{{ zabbix_javagateway_version|float in zabbix_valid_javagateway_versions[ansible_distribution_major_version] }}"
+    fail_msg: Zabbix version {{ zabbix_javagateway_version }} is not supported on {{ ansible_distribution }} {{ ansible_distribution_major_version }}
   tags:
     - always
 
