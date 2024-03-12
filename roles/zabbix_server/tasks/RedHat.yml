@@ -78,7 +78,7 @@
 
 - name: "RedHat | Install Ansible module dependencies"
   ansible.builtin.yum:
-    name: "{{ pgsql_depenencies[ansible_distribution_major_version] }}"
+    name: "{{ pgsql_depenencies }}"
     state: present
   environment:
     http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
@@ -97,7 +97,7 @@
   block:
     - name: "RedHat | Install Mysql Client packages"
       ansible.builtin.yum:
-        name: "{{ mysql_client_pkgs[ansible_distribution_major_version] }}"
+        name: "{{ mysql_client_pkgs }}"
         state: present
       environment:
         http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
