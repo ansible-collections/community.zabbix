@@ -93,7 +93,7 @@
   ansible.builtin.shell: |
     set -euxo pipefail
     FILE={{ 'create.sql' if zabbix_server_version is version('6.0', '<') else 'server.sql' }}
-    cd {{ datafiles_path }}
+    cd /usr/share/zabbix-sql-scripts/postgresql
     if [ -f ${FILE}.gz ]
       then zcat ${FILE}.gz > /tmp/create.sql
     else
@@ -120,7 +120,7 @@
 - name: "PostgreSQL | Create TimescaleDB hypertables"
   ansible.builtin.shell: |
     set -euxo pipefail
-    cd {{ datafiles_path }} &&
+    cd /usr/share/zabbix-sql-scripts/postgresql &&
     if [ -f timescaledb.sql.gz ]; then zcat timescaledb.sql.gz > /etc/timescaledb.sql ; else cp -p timescaledb.sql /etc/timescaledb.sql ; fi
     cat /etc/timescaledb.sql | psql -h '{{ zabbix_server_dbhost }}' \
     -U '{{ zabbix_server_dbuser }}' \
