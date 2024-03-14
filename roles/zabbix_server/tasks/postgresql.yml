@@ -92,8 +92,8 @@
 - name: "PostgreSQL | Create schema"
   ansible.builtin.shell: |
     set -euxo pipefail
-    FILE={{ 'create.sql' if zabbix_server_version is version('6.0', '<') else 'server.sql' }}
-    cd /usr/share/zabbix-sql-scripts/postgresql
+    FILE={{ is_legacy_version | ternary('create', 'server') }}.sql
+    cd {{ is_legacy_version | ternary(legacy_path, modern_path) }}
     if [ -f ${FILE}.gz ]
       then zcat ${FILE}.gz > /tmp/create.sql
     else
@@ -112,6 +112,10 @@
   environment:
     PGPASSWORD: "{{ zabbix_server_dbpassword }}"
   become: true
+  vars:
+    is_legacy_version: "{{ zabbix_server_version is version('6.0', '<') }}"
+    legacy_path: /usr/share/doc/zabbix-server-pgsql
+    modern_path: /usr/share/zabbix-sql-scripts/postgresql
   when:
     - zabbix_server_database_sqlload
   tags:
