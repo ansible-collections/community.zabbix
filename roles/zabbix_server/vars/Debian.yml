@@ -30,6 +30,5 @@ zabbix_valid_server_versions:
 
 debian_keyring_path: /etc/apt/keyrings/
 zabbix_gpg_key: "{{ debian_keyring_path }}zabbix-repo.asc"
-_zabbix_repo_deb_url: "http://repo.zabbix.com/zabbix/{{ zabbix_server_version }}"
 _zabbix_server_fping6location: /usr/bin/fping6
 _zabbix_server_fpinglocation: /usr/bin/fping
