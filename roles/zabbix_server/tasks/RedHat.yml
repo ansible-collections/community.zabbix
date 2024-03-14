@@ -13,12 +13,6 @@
   tags:
     - always
 
-- name: "RedHat | Set facts for Zabbix"
-  ansible.builtin.set_fact:
-    datafiles_path: "/usr/share/zabbix-sql-scripts/{{ 'postgresql' if zabbix_server_database == 'pgsql' else 'mysql' }}"
-  tags:
-    - always
-
 - name: "RedHat | Make sure old file is absent"
   ansible.builtin.file:
     path: /etc/yum.repos.d/zabbix-supported.repo

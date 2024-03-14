@@ -7,12 +7,6 @@
   tags:
     - always
 
-- name: "Debian | Set some facts for Zabbix"
-  ansible.builtin.set_fact:
-    datafiles_path: /usr/share/zabbix-sql-scripts/{{ 'postgresql' if zabbix_server_database == 'pgsql' else 'mysql' }}
-  tags:
-    - always
-
 - name: "Debian | Installing gnupg"
   ansible.builtin.apt:
     pkg: gnupg
