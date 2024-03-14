@@ -61,7 +61,7 @@
     - database
 
 - name: "MySQL | Get the file for create.sql"
-  ansible.builtin.shell: ls -1 {{ datafiles_path }}/{{ 'create' if zabbix_server_version is version('6.0', '<') else 'server' }}.sq*
+  ansible.builtin.shell: ls -1 /usr/share/zabbix-sql-scripts/mysql/{{ 'create' if zabbix_server_version is version('6.0', '<') else 'server' }}.sq*
   changed_when: false
   become: true
   when:
