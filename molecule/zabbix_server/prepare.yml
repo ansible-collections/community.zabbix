@@ -117,3 +117,17 @@
       until: installation_dependencies is succeeded
       when:
         - inventory_hostname in groups['mysql']
+
+    # On certain Ubuntu container images, dpkg is configured not to
+    # install files into paths /usr/share/doc/*
+    # Since this is where Zabbix 5.0 installs its database schemas, we need to allow
+    # files to be installed to /usr/share/doc/zabbix-server-*
+    - name: "Ubuntu | Allow Zabbix dpkg installs to /usr/share/doc/zabbix-server-*"
+      ansible.builtin.lineinfile:
+        path: /etc/dpkg/dpkg.cfg.d/excludes
+        create: true
+        line: 'path-include=/usr/share/doc/zabbix\-server\-*'
+      become: true
+      when:
+        - zabbix_server_version is version('6.0', '<')
+        - ansible_facts['distribution'] == 'Ubuntu'
