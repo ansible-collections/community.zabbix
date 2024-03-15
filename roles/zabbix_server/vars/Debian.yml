@@ -34,4 +34,5 @@ _zabbix_server_fping6location: /usr/bin/fping6
 _zabbix_server_fpinglocation: /usr/bin/fping
 
 _zabbix_server_package: "zabbix-server-{{ zabbix_server_database }}"
+_zabbix_server_sql_scripts_package: "zabbix-sql-scripts"
 _zabbix_server_install_recommends: true

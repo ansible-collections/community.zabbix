@@ -29,5 +29,6 @@ _zabbix_server_fping6location: /usr/sbin/fping6
 _zabbix_server_fpinglocation: /usr/sbin/fping
 
 _zabbix_server_package: "zabbix-server-{{ zabbix_server_database }}-{{ zabbix_server_version }}.{{ zabbix_server_version_minor }}"
+_zabbix_server_sql_scripts_package: "zabbix-sql-scripts-{{ zabbix_server_version }}.{{ zabbix_server_version_minor }}"
 _zabbix_server_disable_repo:
   - epel
