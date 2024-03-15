@@ -34,22 +34,6 @@
   tags:
     - install
 
-- name: "RedHat | Installing zabbix-sql-scripts"
-  ansible.builtin.package:
-    pkg: "zabbix-sql-scripts-{{ zabbix_server_version }}.{{ zabbix_server_version_minor }}"
-    state: "{{ zabbix_server_package_state }}"
-    disablerepo: "{{ zabbix_server_disable_repo | default(omit) }}"
-  environment:
-    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
-    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
-  register: zabbix_server_sql_package_installed
-  until: zabbix_server_sql_package_installed is succeeded
-  when:
-    - zabbix_server_version is version('6.0', '>=')
-  become: true
-  tags:
-    - install
-
 - name: "RedHat | Install Ansible module dependencies"
   ansible.builtin.yum:
     name: "{{ pgsql_depenencies }}"
