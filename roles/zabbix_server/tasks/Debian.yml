@@ -96,30 +96,6 @@
   tags:
     - install
 
-# On certain 18.04 images, such as docker or lxc, dpkg is configured not to
-# install files into paths /usr/share/doc/*
-# Since this is where Zabbix installs its database schemas, we need to allow
-# files to be installed to /usr/share/doc/zabbix*
-- name: "Debian | Check for the dpkg exclude line"
-  ansible.builtin.command: grep -F 'path-exclude=/usr/share/doc/*' /etc/dpkg/dpkg.cfg.d/excludes
-  register: dpkg_exclude_line
-  failed_when: false
-  changed_when: false
-  check_mode: false
-  become: true
-  tags:
-    - install
-
-- name: "Debian | Allow Zabbix dpkg installs to /usr/share/doc/zabbix*"
-  ansible.builtin.lineinfile:
-    path: /etc/dpkg/dpkg.cfg.d/excludes
-    line: "path-include=/usr/share/doc/zabbix*"
-  become: true
-  when:
-    - dpkg_exclude_line.rc == 0
-  tags:
-    - install
-
 - name: "Debian | Installing zabbix-server-{{ zabbix_server_database }}"
   ansible.builtin.apt:
     pkg: zabbix-server-{{ zabbix_server_database }}
