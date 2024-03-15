@@ -31,6 +31,22 @@
 - name: Install the correct repository
   ansible.builtin.include_tasks: "{{ ansible_os_family }}.yml"
 
+- name: Install zabbix-server package
+  ansible.builtin.package:
+    name: "{{ zabbix_server_package | default(_zabbix_server_package) }}"
+    state: "{{ zabbix_server_package_state }}"
+    update_cache: true
+    disablerepo: "{{ zabbix_server_disable_repo | default(_zabbix_server_disable_repo | default(omit)) }}"
+    install_recommends: "{{ zabbix_server_install_recommends | default(_zabbix_server_install_recommends | default(omit)) }}"
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
+  register: _zabbix_server_package_installed
+  until: _zabbix_server_package_installed is succeeded
+  become: true
+  tags:
+    - install
+
 - name: Installing the {{ zabbix_db_type_long }} database
   ansible.builtin.include_tasks: "{{ zabbix_db_type_long }}.yml"
 
