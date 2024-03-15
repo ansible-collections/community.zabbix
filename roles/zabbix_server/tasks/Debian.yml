@@ -96,27 +96,20 @@
   tags:
     - install
 
-# On certain 18.04 images, such as docker or lxc, dpkg is configured not to
+# On certain Ubuntu container images, dpkg is configured not to
 # install files into paths /usr/share/doc/*
-# Since this is where Zabbix installs its database schemas, we need to allow
-# files to be installed to /usr/share/doc/zabbix*
-- name: "Debian | Check for the dpkg exclude line"
-  ansible.builtin.command: grep -F 'path-exclude=/usr/share/doc/*' /etc/dpkg/dpkg.cfg.d/excludes
-  register: dpkg_exclude_line
-  failed_when: false
-  changed_when: false
-  check_mode: false
-  become: true
-  tags:
-    - install
-
-- name: "Debian | Allow Zabbix dpkg installs to /usr/share/doc/zabbix*"
+# Since this is where Zabbix 5.0 installs its database schemas, we need to allow
+# files to be installed to /usr/share/doc/zabbix-server-*
+- name: "Debian | Allow Zabbix dpkg installs to /usr/share/doc/zabbix-server-*"
   ansible.builtin.lineinfile:
     path: /etc/dpkg/dpkg.cfg.d/excludes
-    line: "path-include=/usr/share/doc/zabbix*"
+    create: true
+    line: 'path-include=/usr/share/doc/zabbix\-server\-*'
   become: true
   when:
-    - dpkg_exclude_line.rc == 0
+    - zabbix_server_version is version('6.0', '<')
+    - ansible_facts['distribution'] == 'Ubuntu'
+    - "'container' in ansible_facts['virtualization_tech_guest']"  # requires ansible-4, ansible-core-2.11.x
   tags:
     - install
 
