@@ -96,23 +96,6 @@
   tags:
     - install
 
-- name: "Debian | Installing zabbix-server-{{ zabbix_server_database }}"
-  ansible.builtin.apt:
-    pkg: zabbix-server-{{ zabbix_server_database }}
-    state: "{{ zabbix_server_package_state }}"
-    update_cache: true
-    cache_valid_time: 0
-    install_recommends: "{{ zabbix_server_install_recommends }}"
-    default_release: "{{ ansible_distribution_release }}"
-  environment:
-    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
-    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
-  register: zabbix_server_package_installed
-  until: zabbix_server_package_installed is succeeded
-  become: true
-  tags:
-    - install
-
 - name: "Debian | Installing zabbix-sql-scripts"
   ansible.builtin.apt:
     pkg: zabbix-sql-scripts

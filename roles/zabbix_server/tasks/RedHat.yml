@@ -7,12 +7,6 @@
   tags:
     - always
 
-- name: "RedHat | Use Zabbix package name"
-  ansible.builtin.set_fact:
-    zabbix_server_package: "zabbix-server-{{ zabbix_server_database }}"
-  tags:
-    - always
-
 - name: "RedHat | Make sure old file is absent"
   ansible.builtin.file:
     path: /etc/yum.repos.d/zabbix-supported.repo
@@ -37,20 +31,6 @@
   become: true
   notify:
     - "clean repo files from proxy creds"
-  tags:
-    - install
-
-- name: "RedHat | Installing zabbix-server-{{ zabbix_server_database }}"
-  ansible.builtin.package:
-    pkg: "{{ zabbix_server_package }}-{{ zabbix_server_version }}.{{ zabbix_server_version_minor }}"
-    state: "{{ zabbix_server_package_state }}"
-    disablerepo: "{{ zabbix_server_disable_repo | default(omit) }}"
-  environment:
-    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
-    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
-  register: zabbix_server_package_installed
-  until: zabbix_server_package_installed is succeeded
-  become: true
   tags:
     - install
 
