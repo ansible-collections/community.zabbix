@@ -1,5 +1,18 @@
 ---
 # task file for postgresql
+- name: "Install PostgreSQL dependencies"
+  ansible.builtin.package:
+    name: "{{ _zabbix_server_pgsql_dependencies | select | list }}"
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
+  register: _zabbix_server_dependencies_installed
+  until: _zabbix_server_dependencies_installed is succeeded
+  become: true
+  tags:
+    - install
+    - database
+    - dependencies
 
 - name: "PostgreSQL | Set the correct delegated_dbhost (to support postgres db deployment on a remote dbhost)"
   ansible.builtin.set_fact:
