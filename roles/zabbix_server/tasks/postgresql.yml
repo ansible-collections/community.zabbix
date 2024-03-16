@@ -14,22 +14,6 @@
     - database
     - dependencies
 
-- name: "PostgreSQL | Set the correct delegated_dbhost (to support postgres db deployment on a remote dbhost)"
-  ansible.builtin.set_fact:
-    delegated_dbhost: "{{ zabbix_server_dbhost if (zabbix_server_dbhost != 'localhost') else inventory_hostname }}"
-  when:
-    - zabbix_server_dbhost_run_install
-  tags:
-    - database
-
-- name: "PostgreSQL | Set the correct delegated_dbhost (to support postgres db deployment on a remote dbhost)"
-  ansible.builtin.set_fact:
-    delegated_dbhost: "{{ inventory_hostname }}"
-  when:
-    - not zabbix_server_dbhost_run_install
-  tags:
-    - database
-
 - name: "PostgreSQL | Delegated"
   block:
     - name: "PostgreSQL | Delegated | Create database"
@@ -55,7 +39,9 @@
       when: zabbix_server_database_timescaledb
   become: true
   become_user: postgres
-  delegate_to: "{{ delegated_dbhost }}"
+  delegate_to: "{{ zabbix_server_dbhost_run_install | ternary(delegated_dbhost, inventory_hostname) }}"
+  vars:
+    delegated_dbhost: "{{ (zabbix_server_dbhost == 'localhost') | ternary(inventory_hostname, zabbix_server_dbhost) }}"
   when:
     - zabbix_server_database_creation
     - zabbix_server_pgsql_login_host is not defined
