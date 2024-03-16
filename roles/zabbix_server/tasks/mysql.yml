@@ -2,13 +2,17 @@
 # task file for mysql
 - name: "Install MySQL dependencies"
   ansible.builtin.package:
-    name: "{{ _zabbix_server_mysql_dependencies }}"
+    name: "{{ _zabbix_server_mysql_dependencies | select | list }}"
   environment:
     http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
     https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   register: _zabbix_server_dependencies_installed
   until: _zabbix_server_dependencies_installed is succeeded
   become: true
+  tags:
+    - install
+    - database
+    - dependencies
 
 # NOTE: Upgrading system-packages with pip is generally a bad idea, but
 # ubuntu-18.04 comes with pymysql==0.8.0, which seems to have a problem with

@@ -34,43 +34,6 @@
   tags:
     - install
 
-- name: "RedHat | Install Ansible module dependencies"
-  ansible.builtin.yum:
-    name: "{{ pgsql_depenencies }}"
-    state: present
-  environment:
-    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
-    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
-  register: zabbix_server_dependencies_installed
-  until: zabbix_server_dependencies_installed is succeeded
-  become: true
-  when:
-    - zabbix_server_database_creation
-    - zabbix_server_database == 'pgsql'
-  tags:
-    - install
-    - dependencies
-
-- name: RedHat | Install Database Client Package
-  block:
-    - name: "RedHat | Install PostgreSQL client package"
-      ansible.builtin.yum:
-        name: postgresql
-        state: present
-      environment:
-        http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
-        https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
-      register: zabbix_server_dependencies_installed
-      until: zabbix_server_dependencies_installed is succeeded
-      become: true
-      when:
-        - zabbix_server_database == 'pgsql'
-  when: zabbix_server_install_database_client
-  tags:
-    - install
-    - dependencies
-    - database
-
 - name: "RedHat | Configure SELinux when enabled"
   ansible.builtin.include_tasks: selinux.yml
   when:
