@@ -3,7 +3,6 @@
   ansible.builtin.set_fact:
     zabbix_short_version: "{{ zabbix_server_version | regex_replace('\\.', '') }}"
     zabbix_underscore_version: "{{ zabbix_server_version | regex_replace('\\.', '_') }}"
-    zabbix_python_prefix: "python{% if ansible_python_version is version('3', '>=') %}3{% endif %}"
   tags:
     - always
 
@@ -95,25 +94,3 @@
   become: true
   tags:
     - install
-
-- name: "Debian | Install Database Client Package"
-  block:
-    - name: "Debian | Install PostgreSQL Client package"
-      ansible.builtin.apt:
-        name:
-          - postgresql-client
-          - "{{ zabbix_python_prefix }}-psycopg2"
-        state: present
-      environment:
-        http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
-        https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
-      register: zabbix_server_dependencies_installed
-      until: zabbix_server_dependencies_installed is succeeded
-      become: true
-      when:
-        - zabbix_server_database == 'pgsql'
-  when: zabbix_server_install_database_client
-  tags:
-    - install
-    - database
-    - dependencies
