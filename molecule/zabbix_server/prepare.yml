@@ -110,14 +110,6 @@
       when:
         - ansible_os_family == 'RedHat'
 
-    - name: PyMySQL
-      ansible.builtin.pip:
-        name: PyMySQL
-      register: installation_dependencies
-      until: installation_dependencies is succeeded
-      when:
-        - inventory_hostname in groups['mysql']
-
     # On certain Ubuntu container images, dpkg is configured not to
     # install files into paths /usr/share/doc/*
     # Since this is where Zabbix 5.0 installs its database schemas, we need to allow

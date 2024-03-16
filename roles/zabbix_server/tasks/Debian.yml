@@ -98,38 +98,6 @@
 
 - name: "Debian | Install Database Client Package"
   block:
-    - name: "Debian | Install Mysql Client package"
-      ansible.builtin.apt:
-        name:
-          - default-mysql-client
-          - "{{ zabbix_python_prefix }}-mysqldb"
-        state: present
-      environment:
-        http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
-        https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
-      register: zabbix_server_dependencies_installed
-      until: zabbix_server_dependencies_installed is succeeded
-      become: true
-      when:
-        - zabbix_server_database == 'mysql'
-        - ansible_distribution_release != "buster"
-
-    - name: "Debian 10 | Install Mysql Client package"
-      ansible.builtin.apt:
-        name:
-          - mariadb-client
-          - "{{ zabbix_python_prefix }}-mysqldb"
-        state: present
-      environment:
-        http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
-        https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
-      register: zabbix_server_dependencies_installed
-      until: zabbix_server_dependencies_installed is succeeded
-      become: true
-      when:
-        - zabbix_server_database == 'mysql'
-        - ansible_distribution_release == "buster"
-
     - name: "Debian | Install PostgreSQL Client package"
       ansible.builtin.apt:
         name:

@@ -30,6 +30,11 @@ zabbix_valid_server_versions:
 
 debian_keyring_path: /etc/apt/keyrings/
 zabbix_gpg_key: "{{ debian_keyring_path }}zabbix-repo.asc"
+
+_zabbix_server_mysql_dependencies:
+  - default-mysql-client
+  - python3-pymysql
+
 _zabbix_server_fping6location: /usr/bin/fping6
 _zabbix_server_fpinglocation: /usr/bin/fping
 

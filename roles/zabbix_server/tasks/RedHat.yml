@@ -53,19 +53,6 @@
 
 - name: RedHat | Install Database Client Package
   block:
-    - name: "RedHat | Install Mysql Client packages"
-      ansible.builtin.yum:
-        name: "{{ mysql_client_pkgs }}"
-        state: present
-      environment:
-        http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
-        https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
-      register: zabbix_server_dependencies_installed
-      until: zabbix_server_dependencies_installed is succeeded
-      become: true
-      when:
-        - zabbix_server_database == 'mysql'
-
     - name: "RedHat | Install PostgreSQL client package"
       ansible.builtin.yum:
         name: postgresql
