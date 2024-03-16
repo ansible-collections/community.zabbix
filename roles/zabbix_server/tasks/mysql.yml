@@ -1,5 +1,25 @@
 ---
 # task file for mysql
+- name: "Install MySQL dependencies"
+  ansible.builtin.package:
+    name: "{{ _zabbix_server_mysql_dependencies }}"
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
+  register: _zabbix_server_dependencies_installed
+  until: _zabbix_server_dependencies_installed is succeeded
+  become: true
+
+# NOTE: Upgrading system-packages with pip is generally a bad idea, but
+# ubuntu-18.04 comes with pymysql==0.8.0, which seems to have a problem with
+# versions 8 and above of mysql.
+- name: Upgrade pymysql
+  when:
+    - ansible_facts['distribution'] == 'Ubuntu'
+    - ansible_facts['distribution_release'] == 'bionic'
+  ansible.builtin.pip:
+    name: "pymysql>=0.10.0,<0.11.0"
+    state: latest
 
 - name: "MySQL | Set the correct delegated_dbhost (to support MySQL db deployment on a remote dbhost)"
   ansible.builtin.set_fact:
