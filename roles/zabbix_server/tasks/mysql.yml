@@ -25,64 +25,40 @@
     name: "pymysql>=0.10.0,<0.11.0"
     state: latest
 
-- name: "MySQL | Set the correct delegated_dbhost (to support MySQL db deployment on a remote dbhost)"
-  ansible.builtin.set_fact:
-    delegated_dbhost: "{{ zabbix_server_dbhost if (zabbix_server_dbhost != 'localhost') else inventory_hostname }}"
-  when:
-    - zabbix_server_dbhost_run_install
-  tags:
-    - database
-
-- name: "MySQL | Set the correct delegated_dbhost (to support MySQL db deployment on a remote dbhost)"
-  ansible.builtin.set_fact:
-    delegated_dbhost: "{{ inventory_hostname }}"
-  when:
-    - not zabbix_server_dbhost_run_install
-  tags:
-    - database
-
-- name: "MySQL | Override delegated_dbhost with real dbhost when dbhost is behind loadbalancer"
-  ansible.builtin.set_fact:
-    delegated_dbhost: "{{ zabbix_server_real_dbhost }}"
-  when: zabbix_server_real_dbhost | default(false)
-  tags:
-    - database
-
-- name: "MySQL | Create database"
-  community.mysql.mysql_db:
-    name: "{{ zabbix_server_dbname }}"
-    encoding: "{{ zabbix_server_dbencoding }}"
-    collation: "{{ zabbix_server_dbcollation }}"
-    login_host: "{{ zabbix_server_mysql_login_host | default(omit) }}"
-    login_user: "{{ zabbix_server_mysql_login_user | default(omit) }}"
-    login_password: "{{ zabbix_server_mysql_login_password | default(omit) }}"
-    login_port: "{{ zabbix_server_mysql_login_port | default(omit) }}"
-    login_unix_socket: "{{ zabbix_server_mysql_login_unix_socket | default(omit) }}"
-    state: present
+- name: "MySQL Database prep"
   when: zabbix_server_database_creation
-  register: zabbix_database_created
-  delegate_to: "{{ delegated_dbhost }}"
+  delegate_to: "{{ zabbix_server_real_dbhost | default(zabbix_server_dbhost_run_install | ternary(delegated_dbhost, inventory_hostname)) }}"
+  vars:
+    delegated_dbhost: "{{ (zabbix_server_dbhost == 'localhost') | ternary(inventory_hostname, zabbix_server_dbhost) }}"
   tags:
     - database
-    - skip_ansible_lint
+  block:
+    - name: "MySQL | Create database"
+      community.mysql.mysql_db:
+        login_user: "{{ zabbix_server_mysql_login_user | default(omit) }}"
+        login_password: "{{ zabbix_server_mysql_login_password | default(omit) }}"
+        login_host: "{{ zabbix_server_mysql_login_host | default(omit) }}"
+        login_port: "{{ zabbix_server_mysql_login_port | default(omit) }}"
+        login_unix_socket: "{{ zabbix_server_mysql_login_unix_socket | default(omit) }}"
+        name: "{{ zabbix_server_dbname }}"
+        encoding: "{{ zabbix_server_dbencoding }}"
+        collation: "{{ zabbix_server_dbcollation }}"
+        state: present
+      register: zabbix_database_created
 
-- name: "MySQL | Create database user"
-  community.mysql.mysql_user:
-    login_host: "{{ zabbix_server_mysql_login_host | default(omit) }}"
-    login_user: "{{ zabbix_server_mysql_login_user | default(omit) }}"
-    login_password: "{{ zabbix_server_mysql_login_password | default(omit) }}"
-    login_port: "{{ zabbix_server_mysql_login_port | default(omit) }}"
-    login_unix_socket: "{{ zabbix_server_mysql_login_unix_socket | default(omit) }}"
-    name: "{{ zabbix_server_dbuser }}"
-    password: "{{ zabbix_server_dbpassword }}"
-    plugin: "{{ 'mysql_native_password' if (ansible_os_family == 'RedHat' and ansible_distribution_major_version == '7') else omit }}"
-    priv: "{{ zabbix_server_dbname }}.*:ALL"
-    host: "{{ zabbix_server_privileged_host }}"
-    state: present
-  when: zabbix_server_database_creation
-  delegate_to: "{{ delegated_dbhost }}"
-  tags:
-    - database
+    - name: "MySQL | Create database user"
+      community.mysql.mysql_user:
+        login_user: "{{ zabbix_server_mysql_login_user | default(omit) }}"
+        login_password: "{{ zabbix_server_mysql_login_password | default(omit) }}"
+        login_host: "{{ zabbix_server_mysql_login_host | default(omit) }}"
+        login_port: "{{ zabbix_server_mysql_login_port | default(omit) }}"
+        login_unix_socket: "{{ zabbix_server_mysql_login_unix_socket | default(omit) }}"
+        name: "{{ zabbix_server_dbuser }}"
+        password: "{{ zabbix_server_dbpassword }}"
+        host: "{{ zabbix_server_privileged_host }}"
+        plugin: "{{ 'mysql_native_password' if (ansible_os_family == 'RedHat' and ansible_distribution_major_version == '7') else omit }}"
+        priv: "{{ zabbix_server_dbname }}.*:ALL"
+        state: present
 
 - name: "MySQL | Get the file for create.sql"
   ansible.builtin.shell: ls -1 {{ is_legacy_version | ternary(legacy_path, modern_path) }}/{{ is_legacy_version | ternary('create', 'server') }}.sq*
@@ -125,7 +101,9 @@
     login_password: "{{ zabbix_server_mysql_login_password | default(omit) }}"
     login_port: "{{ zabbix_server_mysql_login_port | default(omit) }}"
     login_unix_socket: "{{ zabbix_server_mysql_login_unix_socket | default(omit) }}"
-  delegate_to: "{{ delegated_dbhost }}"
+  delegate_to: "{{ zabbix_server_real_dbhost | default(zabbix_server_dbhost_run_install | ternary(delegated_dbhost, inventory_hostname)) }}"
+  vars:
+    delegated_dbhost: "{{ (zabbix_server_dbhost == 'localhost') | ternary(inventory_hostname, zabbix_server_dbhost) }}"
   register: mysql_innodb_default_row_format
   tags:
     - database
@@ -143,7 +121,9 @@
     - zabbix_server_database_sqlload | bool
     - mysql_schema_empty
     - mysql_innodb_default_row_format.msg != 'dynamic'
-  delegate_to: "{{ delegated_dbhost }}"
+  delegate_to: "{{ zabbix_server_real_dbhost | default(zabbix_server_dbhost_run_install | ternary(delegated_dbhost, inventory_hostname)) }}"
+  vars:
+    delegated_dbhost: "{{ (zabbix_server_dbhost == 'localhost') | ternary(inventory_hostname, zabbix_server_dbhost) }}"
   tags:
     - database
 
@@ -160,7 +140,9 @@
     - zabbix_server_database_sqlload | bool
     - mysql_schema_empty
     - ansible_distribution_release == "buster"
-  delegate_to: "{{ delegated_dbhost }}"
+  delegate_to: "{{ zabbix_server_real_dbhost | default(zabbix_server_dbhost_run_install | ternary(delegated_dbhost, inventory_hostname)) }}"
+  vars:
+    delegated_dbhost: "{{ (zabbix_server_dbhost == 'localhost') | ternary(inventory_hostname, zabbix_server_dbhost) }}"
   tags:
     - database
 
@@ -182,7 +164,9 @@
     src: /tmp/{{ role_name }}/
     dest: "{{ ls_output_create.stdout | dirname }}"
     mode: "0640"
-  delegate_to: "{{ delegated_dbhost }}"
+  delegate_to: "{{ zabbix_server_real_dbhost | default(zabbix_server_dbhost_run_install | ternary(delegated_dbhost, inventory_hostname)) }}"
+  vars:
+    delegated_dbhost: "{{ (zabbix_server_dbhost == 'localhost') | ternary(inventory_hostname, zabbix_server_dbhost) }}"
   become: true
   when:
     - delegated_dbhost != inventory_hostname
@@ -207,7 +191,9 @@
   when:
     - zabbix_server_database_sqlload | bool
     - mysql_schema_empty
-  delegate_to: "{{ delegated_dbhost }}"
+  delegate_to: "{{ zabbix_server_real_dbhost | default(zabbix_server_dbhost_run_install | ternary(delegated_dbhost, inventory_hostname)) }}"
+  vars:
+    delegated_dbhost: "{{ (zabbix_server_dbhost == 'localhost') | ternary(inventory_hostname, zabbix_server_dbhost) }}"
   tags:
     - database
 
@@ -224,7 +210,9 @@
     - zabbix_server_database_sqlload | bool
     - mysql_schema_empty
     - mysql_innodb_default_row_format.msg != 'dynamic'
-  delegate_to: "{{ delegated_dbhost }}"
+  delegate_to: "{{ zabbix_server_real_dbhost | default(zabbix_server_dbhost_run_install | ternary(delegated_dbhost, inventory_hostname)) }}"
+  vars:
+    delegated_dbhost: "{{ (zabbix_server_dbhost == 'localhost') | ternary(inventory_hostname, zabbix_server_dbhost) }}"
   tags:
     - database
 
