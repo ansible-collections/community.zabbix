@@ -99,7 +99,7 @@ zabbix_agent_interfaces:
 # zabbix_agent_denykeys:
 # zabbix_agent_logremotecommands: 0
 # zabbix_agent_jmx_listenport:
-# zabbix_agent_listeninterface:
+zabbix_agent_listeninterface:
 # zabbix_agent_startagents: 3
 # zabbix_agent_maxlinespersecond: 100
 # zabbix_agent_allowroot: 0

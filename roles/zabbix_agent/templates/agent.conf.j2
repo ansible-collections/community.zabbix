@@ -13,6 +13,7 @@ Alias={{ zabbix_agent_aliases }}
 {% for item in zabbix_agent_aliases %}
 Alias={{ item }}
 {% endfor %}
+{% endif %}
 {% else %}
 # Alias=
 {% endif %}
@@ -23,6 +24,7 @@ AllowKey={{ zabbix_agent_allowkeys }}
 {% for item in zabbix_agent_allowkeys %}
 AllowKey={{ item }}
 {% endfor %}
+{% endif %}
 {% else %}
 # AllowKey=
 {% endif %}
@@ -42,6 +44,7 @@ DenyKey={{ zabbix_agent_denykeys }}
 {% for item in zabbix_agent_denykeys %}
 DenyKey={{ item }}
 {% endfor %}
+{% endif %}
 {% else %}
 # DenyKey=
 {% endif %}
