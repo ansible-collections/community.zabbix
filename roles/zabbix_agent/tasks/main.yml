@@ -152,6 +152,6 @@
 
 - name: "Including userparameters"
   ansible.builtin.include_tasks: "userparameter.yml"
-  when: zabbix_agent_userparameters|length > 0
+  when: zabbix_agent_userparameters|length > 0 | default []
   tags:
     - config
