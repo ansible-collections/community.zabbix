@@ -33,6 +33,7 @@ jobs:
           - ubuntu2004
           - debian12
           - debian11
+          - opensuseleap15
         collection_role:
           - zabbix_proxy
         database:
@@ -43,6 +44,9 @@ jobs:
           - v70
           - v64
           - v60
+        exclude:
+          - container: opensuseleap15
+            database: mysql
 
     steps:
       - name: Check out code

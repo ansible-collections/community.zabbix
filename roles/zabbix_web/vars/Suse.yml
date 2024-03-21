@@ -1,0 +1,28 @@
+---
+_apache_user: wwwrun
+_apache_group: wwwrun
+_apache_log: apache2
+_apache_service: apache2
+_apache_vhost_location: /etc/apache2/conf.d/zabbix.conf
+
+_php_fpm_dir: "/etc/php8/fpm/php-fpm.d"
+_php_fpm_session: /var/lib/php8/sessions
+_zabbix_php_fpm_listen: /run/php-fpm/zabbix.sock
+
+_nginx_user: nginx
+_nginx_group: nginx
+_nginx_vhost_location: /etc/nginx/conf.d/zabbix.conf
+_nginx_log_path: /var/log/nginx
+_nginx_service: nginx
+
+zabbix_valid_web_versions:
+  "15":
+    - 7.0
+    - 6.4
+    - 6.0
+
+_zabbix_web_package: "zabbix-web-{{ zabbix_server_database }}"
+_zabbix_web_apache_packages:
+  - zabbix-apache-conf
+_zabbix_web_nginx_packages:
+  - zabbix-nginx-conf
