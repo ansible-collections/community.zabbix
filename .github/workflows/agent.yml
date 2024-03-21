@@ -28,10 +28,11 @@ jobs:
           - debian12
           - debian11
           - debian10
+          - opensuseleap15
         version:
-            - v64
-            - v62
-            - v60
+          - v64
+          - v62
+          - v60
         scenario_name:
           - default
           - autopsk

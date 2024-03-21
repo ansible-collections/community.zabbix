@@ -80,6 +80,7 @@
       until: installation_dependencies is succeeded
       when:
         - ansible_os_family != 'RedHat'
+        - ansible_os_family != 'Suse'
 
     - name: "Installing packages on NON-CentOS"
       ansible.builtin.apt:
@@ -95,6 +96,7 @@
       until: installation_dependencies is succeeded
       when:
         - ansible_os_family != 'RedHat'
+        - ansible_os_family != 'Suse'
 
     - name: "Configure SUDO."
       ansible.builtin.lineinfile:
