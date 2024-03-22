@@ -24,26 +24,30 @@ zabbix_valid_proxy_versions:
     - 6.2
     - 6.0
 
+_zabbix_proxy_pgsql_dependencies:
+  - "{{ zabbix_proxy_install_database_client | ternary('postgresql-client', '') }}"
+  - python3-psycopg2
+
 _zabbix_proxy_mysql_dependencies:
   # Debian
   "12":
-    - default-mysql-client
+    - "{{ zabbix_proxy_install_database_client | ternary('default-mysql-client', '') }}"
     - "{{ zabbix_python_prefix }}-mysqldb"
   "11":
-    - default-mysql-client
+    - "{{ zabbix_proxy_install_database_client | ternary('default-mysql-client', '') }}"
     - "{{ zabbix_python_prefix }}-mysqldb"
   "10":
-    - mariadb-client
+    - "{{ zabbix_proxy_install_database_client | ternary('default-mysql-client', '') }}"
     - "{{ zabbix_python_prefix }}-mysqldb"
   # Ubuntu
   "22":
-    - default-mysql-client
+    - "{{ zabbix_proxy_install_database_client | ternary('default-mysql-client', '') }}"
     - "{{ zabbix_python_prefix }}-mysqldb"
   "20":
-    - default-mysql-client
+    - "{{ zabbix_proxy_install_database_client | ternary('default-mysql-client', '') }}"
     - "{{ zabbix_python_prefix }}-mysqldb"
   "18":
-    - default-mysql-client
+    - "{{ zabbix_proxy_install_database_client | ternary('default-mysql-client', '') }}"
     - "{{ zabbix_python_prefix }}-mysqldb"
 
 mysql_plugin:
