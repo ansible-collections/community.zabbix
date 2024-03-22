@@ -56,3 +56,4 @@ _zabbix_proxy_fping6location: /usr/bin/fping6
 _zabbix_proxy_fpinglocation: /usr/bin/fping
 
 _zabbix_proxy_package: "zabbix-proxy-{{ zabbix_proxy_database }}"
+_zabbix_proxy_sql_scripts_package: "zabbix-sql-scripts"

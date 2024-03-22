@@ -40,22 +40,6 @@
   tags:
     - install
 
-- name: Install packages for Zabbix Repository
-  block:
-    - name: "RedHat | Installing zabbix-sql-scripts"
-      ansible.builtin.yum:
-        pkg: "zabbix-sql-scripts-{{ zabbix_proxy_version }}.{{ zabbix_proxy_version_minor }}"
-        state: "{{ zabbix_proxy_package_state }}"
-        disablerepo: "{{ zabbix_proxy_disable_repo | default(omit) }}"
-      environment:
-        http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
-        https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
-      register: zabbix_proxy_sql_package_installed
-      until: zabbix_proxy_sql_package_installed is succeeded
-      become: true
-  tags:
-    - install
-
 - name: "RedHat | Install Ansible PostgreSQL Client package"
   ansible.builtin.yum:
     name: "{{ pgsql_depenencies[ansible_distribution_major_version] }}"

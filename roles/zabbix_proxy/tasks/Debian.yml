@@ -103,24 +103,6 @@
   tags:
     - install
 
-- name: "Debian | Installing zabbix-sql-scripts"
-  ansible.builtin.apt:
-    pkg: zabbix-sql-scripts
-    state: "{{ zabbix_proxy_package_state }}"
-    update_cache: true
-    cache_valid_time: 0
-    default_release: "{{ ansible_distribution_release }}"
-  environment:
-    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
-    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
-  register: zabbix_proxy_package_sql_installed
-  until: zabbix_proxy_package_sql_installed is succeeded
-  when:
-    - zabbix_proxy_version is version('6.0', '>=')
-  become: true
-  tags:
-    - install
-
 - name: "Debian | Install Ansible module dependencies"
   ansible.builtin.apt:
     name: "{{ zabbix_python_prefix }}-psycopg2"
