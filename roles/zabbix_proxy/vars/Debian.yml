@@ -24,6 +24,10 @@ zabbix_valid_proxy_versions:
     - 6.2
     - 6.0
 
+_zabbix_proxy_pgsql_dependencies:
+  - "{{ zabbix_proxy_install_database_client | ternary('postgresql-client', '') }}"
+  - python3-psycopg2
+
 _zabbix_proxy_mysql_dependencies:
   # Debian
   "12":

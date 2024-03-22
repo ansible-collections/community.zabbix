@@ -12,26 +12,19 @@ zabbix_valid_proxy_versions:
     - 6.2
     - 6.0
 
-pgsql_depenencies:
-  "9":
-    - python3-psycopg2
-    - postgresql
-  "8":
-    - python3-psycopg2
-    - postgresql
-  "7":
-    - python-psycopg2
-    - postgresql
+_zabbix_proxy_pgsql_dependencies:
+  - "{{ zabbix_proxy_install_database_client | ternary('postgresql', '') }}"
+  - python3-psycopg2
 
 _zabbix_proxy_mysql_dependencies:
   "9":
-    - mysql
+    - "{{ zabbix_proxy_install_database_client | ternary('mysql', '') }}"
     - python3-PyMySQL
   "8":
-    - mysql
+    - "{{ zabbix_proxy_install_database_client | ternary('mysql', '') }}"
     - python3-PyMySQL
   "7":
-    - mariadb
+    - "{{ zabbix_proxy_install_database_client | ternary('mariadb', '') }}"
     - python3-PyMySQL
     - python36-cryptography
 

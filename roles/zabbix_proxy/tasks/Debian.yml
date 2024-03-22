@@ -2,7 +2,6 @@
 - name: "Debian | Set short version name"
   ansible.builtin.set_fact:
     zabbix_short_version: "{{ zabbix_proxy_version | regex_replace('\\.', '') }}"
-    zabbix_python_prefix: "python{% if ansible_python_version is version('3', '>=') %}3{% endif %}"
     zabbix_underscore_version: "{{ zabbix_proxy_version | regex_replace('\\.', '_') }}"
   tags:
     - always
@@ -102,41 +101,6 @@
   become: true
   tags:
     - install
-
-- name: "Debian | Install Ansible module dependencies"
-  ansible.builtin.apt:
-    name: "{{ zabbix_python_prefix }}-psycopg2"
-    state: present
-  environment:
-    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
-    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
-  register: zabbix_proxy_dependencies_installed
-  until: zabbix_proxy_dependencies_installed is succeeded
-  become: true
-  when:
-    - zabbix_proxy_database_creation
-  tags:
-    - install
-    - dependencies
-
-- name: "Debian | Install PostgreSQL Client package"
-  ansible.builtin.apt:
-    name: postgresql-client
-    state: present
-  environment:
-    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
-    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
-  register: are_zabbix_proxy_dependency_packages_installed
-  until: are_zabbix_proxy_dependency_packages_installed is succeeded
-  become: true
-  when:
-    - zabbix_proxy_database_creation or zabbix_proxy_database_sqlload
-    - zabbix_proxy_database == 'pgsql'
-    - zabbix_proxy_install_database_client
-  tags:
-    - install
-    - dependencies
-    - database
 
 - name: "Debian | Install sqlite3"
   ansible.builtin.apt:
