@@ -29,6 +29,7 @@ jobs:
           - debian12
           - debian11
           - debian10
+          - opensuseleap15
         collection_role:
           - zabbix_proxy
         database:
@@ -46,6 +47,11 @@ jobs:
         exclude:
           - container: debian12
             version: v62
+          - container: opensuseleap15
+            version: v62
+          - container: opensuseleap15
+            database: mysql
+
     steps:
       - name: Check out code
         uses: actions/checkout@v4

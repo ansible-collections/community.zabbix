@@ -1,0 +1,114 @@
+---
+# Tasks specific for Suse systems
+
+- name: "Suse | Abort if database is not supported"
+  fail:
+    msg: "Database '{{ zabbix_proxy_database }}' is not supported on Suse"
+  when: zabbix_proxy_database == 'mysql'
+  tags:
+    - always
+
+- name: "Suse | Define package without version"
+  ansible.builtin.set_fact:
+    zabbix_proxy_package: "zabbix-proxy-{{ zabbix_proxy_database }}"
+    cacheable: true
+  tags:
+    - always
+
+- name: "Suse | Install repos"
+  community.general.zypper_repository:
+    name: "{{ item.name }}"
+    description: "{{ item.description }}"
+    repo: "{{ item.repo }}"
+    disable_gpg_check: "{{ item.disable_gpg_check | default(false) }}"
+    auto_import_keys: "{{ item.auto_import_keys | default('true') }}"
+    priority: "{{ item.priority | default('99') }}"
+    runrefresh: "{{ item.runrefresh | default(false) }}"
+    state: "{{ item.state | default('present') }}"
+  with_items: "{{ zabbix_repo_zypper }}"
+  become: true
+  tags:
+    - install
+
+- name: Install packages for Zabbix Repository
+  tags:
+    - install
+  block:
+    - name: "Suse | Installing zabbix-proxy-{{ zabbix_proxy_database }}"
+      ansible.builtin.package:
+        pkg: "{{ zabbix_proxy_package }}"
+        state: "{{ zabbix_proxy_package_state }}"
+      environment:
+        http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+        https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
+      become: true
+      register: is_zabbix_proxy_package_installed
+      until: is_zabbix_proxy_package_installed is succeeded
+
+    - name: "Suse | Installing zabbix-sql-scripts"
+      ansible.builtin.package:
+        pkg: zabbix-sql-scripts
+        state: "{{ zabbix_proxy_package_state }}"
+      environment:
+        http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+        https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
+      register: zabbix_proxy_sql_package_installed
+      until: zabbix_proxy_sql_package_installed is succeeded
+      become: true
+
+- name: "Suse | Install Ansible PostgreSQL Client package"
+  ansible.builtin.package:
+    pkg: "{{ pgsql_depenencies[ansible_distribution_major_version] }}"
+    state: present
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
+  become: true
+  register: are_zabbix_proxy_pgsql_packages_installed
+  until: are_zabbix_proxy_pgsql_packages_installed is succeeded
+  when:
+    - zabbix_proxy_database_creation or zabbix_proxy_database_sqlload
+    - zabbix_proxy_database == 'pgsql'
+  tags:
+    - install
+    - database
+    - dependencies
+
+- name: "Suse | Handle Mysql"
+  when:
+    - zabbix_proxy_database_creation or zabbix_proxy_database_sqlload
+    - zabbix_proxy_install_database_client
+    - zabbix_proxy_database == 'mysql'
+  tags:
+    - install
+    - database
+    - dependencies
+  block:
+    - name: "Suse | Install Mysql Client package"
+      ansible.builtin.package:
+        pkg: "{{ mysql_client_pkgs[ansible_distribution_major_version] }}"
+        state: present
+      environment:
+        http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+        https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
+      become: true
+      register: are_zabbix_proxy_mysql_packages_installed
+      until: are_zabbix_proxy_mysql_packages_installed is succeeded
+
+
+- name: "Suse | Install sqlite3"
+  ansible.builtin.package:
+    pkg: sqlite3
+    state: present
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
+  register: zabbix_proxy_sqlite_packages_installed
+  until: zabbix_proxy_sqlite_packages_installed is succeeded
+  become: true
+  when:
+    - zabbix_proxy_database == 'sqlite3'
+  tags:
+    - install
+    - database
+    - dependencies

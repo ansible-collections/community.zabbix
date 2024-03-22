@@ -1,0 +1,18 @@
+---
+zabbix_valid_proxy_versions:
+  "15":
+    - 6.4
+    - 6.0
+
+pgsql_depenencies:
+  "15":
+    - python3-psycopg2
+    - postgresql
+
+mysql_client_pkgs:
+  "15":
+    - mysql
+    - python3-PyMySQL
+
+_zabbix_proxy_fping6location: null
+_zabbix_proxy_fpinglocation: /usr/sbin/fping
