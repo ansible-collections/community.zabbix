@@ -27,6 +27,19 @@ zabbix_repo_yum:
 
 zabbix_repo_deb_component: main
 
+zabbix_repo_zypper_auto_import_keys: true
+zabbix_repo_zypper_disable_gpg_check: false
+zabbix_repo_zypper_schema: https
+zabbix_repo_zypper:
+  - name: zabbix
+    description: Zabbix Official Repository
+    repo: "{{ zabbix_repo_zypper_schema }}://repo.zabbix.com/zabbix/{{ zabbix_javagateway_version }}/sles/{{ ansible_distribution_major_version }}/$basearch/"
+    disable_gpg_check: "{{ zabbix_repo_zypper_disable_gpg_check }}"
+    auto_import_keys: "{{ zabbix_repo_zypper_auto_import_keys }}"
+    state: present
+
+zabbix_javagateway_openjdk_version: 17
+
 zabbix_javagateway_pidfile: /run/zabbix/zabbix_java_gateway.pid
 zabbix_javagateway_listenip: 0.0.0.0
 zabbix_javagateway_listenport: 10052

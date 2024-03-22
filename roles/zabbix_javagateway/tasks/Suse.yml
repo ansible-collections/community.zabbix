@@ -1,0 +1,47 @@
+---
+# Tasks specific for Suse systems
+
+- name: "Suse | Install repos"
+  community.general.zypper_repository:
+    name: "{{ item.name }}"
+    description: "{{ item.description }}"
+    repo: "{{ item.repo }}"
+    disable_gpg_check: "{{ item.disable_gpg_check | default(false) }}"
+    auto_import_keys: "{{ item.auto_import_keys | default('true') }}"
+    priority: "{{ item.priority | default('99') }}"
+    runrefresh: "{{ item.runrefresh | default(false) }}"
+    state: "{{ item.state | default('present') }}"
+  with_items: "{{ zabbix_repo_zypper }}"
+  become: true
+  tags:
+    - install
+
+# SLES 15 comes with openjdk-11 by default.
+# In order for the zabbix-java-gateway to work, we need to install openjdk-17.
+- name: "Suse | Install openjdk-{{ zabbix_javagateway_openjdk_version }}"
+  ansible.builtin.package:
+    pkg:
+      - java-{{ zabbix_javagateway_openjdk_version }}-openjdk-headless
+      - java-{{ zabbix_javagateway_openjdk_version }}-openjdk
+    state: "{{ zabbix_javagateway_package_state }}"
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
+  register: zabbix_java_gateway_install
+  until: zabbix_java_gateway_install is succeeded
+  become: true
+  tags:
+    - install
+
+- name: "Suse | Installing zabbix-java-gateway"
+  ansible.builtin.package:
+    pkg: zabbix-java-gateway
+    state: "{{ zabbix_javagateway_package_state }}"
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
+  register: zabbix_java_gateway_install
+  until: zabbix_java_gateway_install is succeeded
+  become: true
+  tags:
+    - install
