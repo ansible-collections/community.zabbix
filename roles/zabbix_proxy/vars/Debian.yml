@@ -54,3 +54,5 @@ debian_keyring_path: /etc/apt/keyrings/
 zabbix_gpg_key: "{{ debian_keyring_path }}zabbix-repo.asc"
 _zabbix_proxy_fping6location: /usr/bin/fping6
 _zabbix_proxy_fpinglocation: /usr/bin/fping
+
+_zabbix_proxy_package: "zabbix-proxy-{{ zabbix_proxy_database }}"

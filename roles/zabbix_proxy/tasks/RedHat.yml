@@ -7,13 +7,6 @@
   tags:
     - always
 
-- name: "RedHat | Define package without version"
-  ansible.builtin.set_fact:
-    zabbix_proxy_package: "zabbix-proxy-{{ zabbix_proxy_database }}"
-    cacheable: true
-  tags:
-    - always
-
 - name: "RedHat | Set facts for Zabbix"
   ansible.builtin.set_fact:
     datafiles_path: "/usr/share/doc/zabbix-sql-scripts/{{ zabbix_proxy_db_long }}"
@@ -49,18 +42,6 @@
 
 - name: Install packages for Zabbix Repository
   block:
-    - name: "RedHat | Installing zabbix-proxy-{{ zabbix_proxy_database }}"
-      ansible.builtin.yum:
-        pkg: "{{ zabbix_proxy_package }}-{{ zabbix_proxy_version }}.{{ zabbix_proxy_version_minor }}"
-        state: "{{ zabbix_proxy_package_state }}"
-        disablerepo: "{{ zabbix_proxy_disable_repo | default(omit) }}"
-      environment:
-        http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
-        https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
-      become: true
-      register: is_zabbix_proxy_package_installed
-      until: is_zabbix_proxy_package_installed is succeeded
-
     - name: "RedHat | Installing zabbix-sql-scripts"
       ansible.builtin.yum:
         pkg: "zabbix-sql-scripts-{{ zabbix_proxy_version }}.{{ zabbix_proxy_version_minor }}"

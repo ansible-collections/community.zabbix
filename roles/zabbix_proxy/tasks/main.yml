@@ -56,6 +56,21 @@
 - name: "Complete OS Specific Tasks"
   ansible.builtin.include_tasks: "{{ ansible_os_family }}.yml"
 
+- name: "Install zabbix-proxy package"
+  ansible.builtin.package:
+    name: "{{ _zabbix_proxy_package }}"
+    state: "{{ zabbix_proxy_package_state }}"
+    update_cache: true
+    disablerepo: "{{ zabbix_proxy_disable_repo | default(_zabbix_proxy_disable_repo | default(omit)) }}"
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
+  register: _zabbix_proxy_package_installed
+  until: _zabbix_proxy_package_installed is succeeded
+  become: true
+  tags:
+    - install
+
 - name: "Get the file for database schema"
   ansible.builtin.shell: ls -1 {{ db_file_path[zabbix_short_version] }}
   changed_when: false

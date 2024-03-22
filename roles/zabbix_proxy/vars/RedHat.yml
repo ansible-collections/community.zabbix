@@ -53,3 +53,7 @@ mysql_plugin:
 
 _zabbix_proxy_fping6location: /usr/sbin/fping6
 _zabbix_proxy_fpinglocation: /usr/sbin/fping
+
+_zabbix_proxy_package: "zabbix-proxy-{{ zabbix_proxy_database }}-{{ zabbix_proxy_version }}.{{ zabbix_proxy_version_minor }}"
+_zabbix_proxy_disable_repo:
+  - epel
