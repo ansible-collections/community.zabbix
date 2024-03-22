@@ -1,5 +1,32 @@
 ---
 # task file for mysql
+- name: "Install MySQL dependencies"
+  when:
+    - zabbix_proxy_database_creation or zabbix_proxy_database_sqlload
+    - zabbix_proxy_install_database_client
+  ansible.builtin.package:
+    name: "{{ _zabbix_proxy_mysql_dependencies[ ansible_facts['distribution_major_version'] ] }}"
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
+  become: true
+  register: _zabbix_proxy_dependencies_installed
+  until: _zabbix_proxy_dependencies_installed is succeeded
+  tags:
+    - install
+    - database
+    - dependencies
+
+# NOTE: Upgrading system-packages with pip is generally a bad idea, but
+# these packaged older versions seems to have a problem with mysql 8 and above
+- name: Upgrade pymysql
+  when:
+    - ansible_facts['distribution'] in ['CentOS', 'Debian', 'Ubuntu']
+    - ansible_facts['distribution_release'] in ['Core', 'buster', 'bullseye', 'bionic', 'focal']
+  ansible.builtin.pip:
+    name: "pymysql>=0.10.0,<0.11.0"
+    state: latest
+
 - name: "MySQL | Set the correct delegated_dbhost (to support MySQL db deployment on a remote dbhost)"
   ansible.builtin.set_fact:
     delegated_dbhost: "{{ zabbix_proxy_dbhost if (zabbix_proxy_dbhost != 'localhost') else inventory_hostname }}"
@@ -20,14 +47,6 @@
   ansible.builtin.set_fact:
     delegated_dbhost: "{{ zabbix_proxy_real_dbhost }}"
   when: zabbix_proxy_real_dbhost | default(false)
-  tags:
-    - database
-
-- name: PyMySQL
-  ansible.builtin.pip:
-    name: PyMySQL
-  register: installation_dependencies
-  until: installation_dependencies is succeeded
   tags:
     - database
 

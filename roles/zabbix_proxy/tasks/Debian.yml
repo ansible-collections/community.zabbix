@@ -119,24 +119,6 @@
     - install
     - dependencies
 
-- name: "Debian | Install Mysql Client package"
-  ansible.builtin.apt:
-    name: "{{ mysql_client_pkgs[ansible_distribution_major_version] }}"
-    state: present
-  environment:
-    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
-    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
-  register: zabbix_proxy_dependencies_installed
-  until: zabbix_proxy_dependencies_installed is succeeded
-  become: true
-  when:
-    - zabbix_proxy_database == 'mysql'
-    - zabbix_proxy_install_database_client
-  tags:
-    - install
-    - dependencies
-    - database
-
 - name: "Debian | Install PostgreSQL Client package"
   ansible.builtin.apt:
     name: postgresql-client

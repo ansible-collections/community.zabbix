@@ -23,7 +23,7 @@ pgsql_depenencies:
     - python-psycopg2
     - postgresql
 
-mysql_client_pkgs:
+_zabbix_proxy_mysql_dependencies:
   "9":
     - mysql
     - python3-PyMySQL
@@ -31,8 +31,9 @@ mysql_client_pkgs:
     - mysql
     - python3-PyMySQL
   "7":
-    - MariaDB-client
-    - MySQL-python
+    - mariadb
+    - python3-PyMySQL
+    - python36-cryptography
 
 selinux_pkgs:
   "9":
