@@ -1,0 +1,101 @@
+---
+# Tasks specific for Suse systems
+
+- name: "Suse | Abort if database is not supported"
+  fail:
+    msg: "Database '{{ zabbix_server_database }}' is not supported on Suse using ansible"
+  when: zabbix_server_database == 'mysql'
+  tags:
+    - always
+
+- name: "Suse | Use Zabbix package name"
+  ansible.builtin.set_fact:
+    zabbix_server_package: "zabbix-server-{{ zabbix_server_database }}"
+  tags:
+    - always
+
+- name: "Suse | Set facts for Zabbix"
+  ansible.builtin.set_fact:
+    datafiles_path: "/usr/share/zabbix-sql-scripts/{{ 'postgresql' if zabbix_server_database == 'pgsql' else 'mysql' }}"
+  tags:
+    - always
+
+- name: "Suse | Install repos"
+  community.general.zypper_repository:
+    name: "{{ item.name }}"
+    description: "{{ item.description }}"
+    repo: "{{ item.repo }}"
+    disable_gpg_check: "{{ item.disable_gpg_check | default(false) }}"
+    auto_import_keys: "{{ item.auto_import_keys | default('true') }}"
+    priority: "{{ item.priority | default('99') }}"
+    runrefresh: "{{ item.runrefresh | default(false) }}"
+    state: "{{ item.state | default('present') }}"
+  with_items: "{{ zabbix_repo_zypper }}"
+  become: true
+  tags:
+    - install
+
+- name: "Suse | Installing zabbix-server-{{ zabbix_server_database }}"
+  ansible.builtin.package:
+    pkg: "{{ zabbix_server_package }}"
+    state: "{{ zabbix_server_package_state }}"
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
+  register: zabbix_server_package_installed
+  until: zabbix_server_package_installed is succeeded
+  become: true
+  tags:
+    - install
+
+- name: "Suse | Installing zabbix-sql-scripts"
+  ansible.builtin.package:
+    pkg: "zabbix-sql-scripts"
+    state: "{{ zabbix_server_package_state }}"
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
+  register: zabbix_server_sql_package_installed
+  until: zabbix_server_sql_package_installed is succeeded
+  when:
+    - zabbix_server_version is version('6.0', '>=')
+  become: true
+  tags:
+    - install
+
+- name: "Suse | Install Ansible module dependencies"
+  ansible.builtin.package:
+    name: "{{ pgsql_depenencies[ansible_distribution_major_version] }}"
+    state: present
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
+  register: zabbix_server_dependencies_installed
+  until: zabbix_server_dependencies_installed is succeeded
+  become: true
+  when:
+    - zabbix_server_database_creation
+    - zabbix_server_database == 'pgsql'
+  tags:
+    - install
+    - dependencies
+
+- name: Suse | Install Database Client Package
+  when: zabbix_server_install_database_client
+  tags:
+    - install
+    - dependencies
+    - database
+  block:
+    - name: "Suse | Install PostgreSQL client package"
+      ansible.builtin.package:
+        name: postgresql
+        state: present
+      environment:
+        http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+        https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
+      register: zabbix_server_dependencies_installed
+      until: zabbix_server_dependencies_installed is succeeded
+      become: true
+      when:
+        - zabbix_server_database == 'pgsql'

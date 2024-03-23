@@ -98,6 +98,18 @@
         - ansible_os_family != 'RedHat'
         - ansible_os_family != 'Suse'
 
+    - name: "Installing packages on Suse"
+      community.general.zypper:
+        name:
+          - iproute2
+          - sudo
+        state: present
+        update_cache: true
+      register: installation_dependencies
+      until: installation_dependencies is succeeded
+      when:
+        - ansible_os_family == 'Suse'
+
     - name: "Configure SUDO."
       ansible.builtin.lineinfile:
         dest: /etc/sudoers
