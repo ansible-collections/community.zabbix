@@ -51,8 +51,8 @@ jobs:
             version: v64
           - container: debian10
             version: v64
-          #- container: opensuseleap15
-          #  version: v62
+          - container: opensuseleap15
+            version: v62
           - container: opensuseleap15
             database: mysql
     steps:
