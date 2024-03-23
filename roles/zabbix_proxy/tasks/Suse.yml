@@ -3,7 +3,7 @@
 
 - name: "Suse | Abort if database is not supported"
   fail:
-    msg: "Database '{{ zabbix_proxy_database }}' is not supported on Suse"
+    msg: "Database '{{ zabbix_proxy_database }}' is not supported on Suse using ansible"
   when: zabbix_proxy_database == 'mysql'
   tags:
     - always
@@ -73,28 +73,6 @@
     - install
     - database
     - dependencies
-
-- name: "Suse | Handle Mysql"
-  when:
-    - zabbix_proxy_database_creation or zabbix_proxy_database_sqlload
-    - zabbix_proxy_install_database_client
-    - zabbix_proxy_database == 'mysql'
-  tags:
-    - install
-    - database
-    - dependencies
-  block:
-    - name: "Suse | Install Mysql Client package"
-      ansible.builtin.package:
-        pkg: "{{ mysql_client_pkgs[ansible_distribution_major_version] }}"
-        state: present
-      environment:
-        http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
-        https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
-      become: true
-      register: are_zabbix_proxy_mysql_packages_installed
-      until: are_zabbix_proxy_mysql_packages_installed is succeeded
-
 
 - name: "Suse | Install sqlite3"
   ansible.builtin.package:
