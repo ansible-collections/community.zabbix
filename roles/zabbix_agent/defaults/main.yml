@@ -71,6 +71,17 @@ zabbix_repo_yum:
 
 zabbix_repo_deb_component: main
 
+zabbix_repo_zypper_auto_import_keys: true
+zabbix_repo_zypper_disable_gpg_check: false
+zabbix_repo_zypper_schema: https
+zabbix_repo_zypper:
+  - name: zabbix
+    description: Zabbix Official Repository
+    repo: "{{ zabbix_repo_zypper_schema }}://repo.zabbix.com/zabbix/{{ zabbix_agent_version }}/sles/{{ zabbix_agent_distribution_major_version }}/$basearch/"
+    disable_gpg_check: "{{ zabbix_repo_zypper_disable_gpg_check }}"
+    auto_import_keys: "{{ zabbix_repo_zypper_auto_import_keys }}"
+    state: present
+
 # Zabbix API stuff
 zabbix_api_server_host: localhost
 # zabbix_api_server_port: 80

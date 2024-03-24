@@ -25,10 +25,11 @@
         regexp: "path-exclude=/usr/share/doc/*"
       when:
         - ansible_os_family != 'RedHat'
+        - ansible_os_family != 'Suse'
 
     - name: Check if warn parameter can be used for shell module
       ansible.builtin.set_fact:
-        produce_warn: False
+        produce_warn: false
       when: ansible_version.full is version("2.14", "<")
 
     # https://github.com/geerlingguy/ansible-role-java/issues/64
@@ -40,6 +41,7 @@
       until: installation_dependencies is succeeded
       when:
         - ansible_os_family != 'RedHat'
+        - ansible_os_family != 'Suse'
 
     - name: "Installing packages on NON-CentOS"
       ansible.builtin.apt:
@@ -58,3 +60,15 @@
       until: installation_dependencies is succeeded
       when:
         - ansible_os_family != 'RedHat'
+        - ansible_os_family != 'Suse'
+
+    - name: "Installing packages on Suse"
+      community.general.zypper:
+        name:
+          - iproute2
+          - which
+        state: present
+      register: installation_dependencies
+      until: installation_dependencies is succeeded
+      when:
+        - ansible_os_family == 'Suse'

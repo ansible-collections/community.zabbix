@@ -1,0 +1,35 @@
+---
+- name: "Suse | Setting Short PHP Version"
+  ansible.builtin.set_fact:
+    zabbix_web_php_installed_version: "{{ zabbix_web_php_installed_version | regex_replace('\\.', '') }}"
+  tags:
+    - always
+
+- name: "Suse | Install repos"
+  community.general.zypper_repository:
+    name: "{{ item.name }}"
+    description: "{{ item.description }}"
+    repo: "{{ item.repo }}"
+    disable_gpg_check: "{{ item.disable_gpg_check | default(false) }}"
+    auto_import_keys: "{{ item.auto_import_keys | default('true') }}"
+    priority: "{{ item.priority | default('99') }}"
+    runrefresh: "{{ item.runrefresh | default(false) }}"
+    state: "{{ item.state | default('present') }}"
+  with_items: "{{ zabbix_repo_zypper }}"
+  become: true
+  tags:
+    - install
+
+- name: "Suse | Install zabbix-web-{{ zabbix_server_database }}"
+  ansible.builtin.package:
+    pkg:
+      - "zabbix-web-{{ zabbix_server_database }}"
+    state: "{{ zabbix_web_package_state }}"
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
+  register: zabbix_web_package_install
+  until: zabbix_web_package_install is succeeded
+  become: true
+  tags:
+    - install
