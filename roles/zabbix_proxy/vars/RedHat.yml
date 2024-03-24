@@ -28,6 +28,9 @@ _zabbix_proxy_mysql_dependencies:
     - python3-PyMySQL
     - python36-cryptography
 
+_zabbix_proxy_sqlite3_dependencies:
+  - sqlite
+
 selinux_pkgs:
   "9":
     - policycoreutils

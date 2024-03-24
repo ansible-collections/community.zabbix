@@ -101,20 +101,3 @@
   become: true
   tags:
     - install
-
-- name: "Debian | Install sqlite3"
-  ansible.builtin.apt:
-    name: sqlite3
-    state: present
-  environment:
-    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
-    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
-  register: are_zabbix_proxy_dependency_packages_installed
-  until: are_zabbix_proxy_dependency_packages_installed is succeeded
-  become: true
-  when:
-    - zabbix_proxy_database == 'sqlite3'
-  tags:
-    - install
-    - dependencies
-    - database

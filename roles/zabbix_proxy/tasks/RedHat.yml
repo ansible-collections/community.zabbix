@@ -45,24 +45,6 @@
   ansible.builtin.yum:
     name: epel-release
 
-- name: "RedHat | Install sqlite3"
-  ansible.builtin.yum:
-    name:
-      - sqlite
-    state: present
-  environment:
-    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
-    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
-  register: zabbix_proxy_sqlite_packages_installed
-  until: zabbix_proxy_sqlite_packages_installed is succeeded
-  become: true
-  when:
-    - zabbix_proxy_database == 'sqlite3'
-  tags:
-    - install
-    - database
-    - dependencies
-
 - name: "Configure SELinux when enabled"
   ansible.builtin.include_tasks: selinux.yml
   when:

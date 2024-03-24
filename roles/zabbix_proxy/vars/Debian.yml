@@ -50,6 +50,9 @@ _zabbix_proxy_mysql_dependencies:
     - default-mysql-client
     - python3-pymysql
 
+_zabbix_proxy_sqlite3_dependencies:
+  - sqlite3
+
 mysql_plugin:
   "18": mysql_native_password
   "10": mysql_native_password
