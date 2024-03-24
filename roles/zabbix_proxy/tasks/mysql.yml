@@ -26,7 +26,7 @@
     state: latest
 
 - name: "MySQL Database prep"
-  when: zabbix_proxy_database_creation
+  when: zabbix_proxy_database_creation | bool
   delegate_to: "{{ zabbix_proxy_real_dbhost | default(zabbix_proxy_dbhost_run_install | ternary(delegated_dbhost, inventory_hostname)) }}"
   vars:
     delegated_dbhost: "{{ (zabbix_proxy_dbhost == 'localhost') | ternary(inventory_hostname, zabbix_proxy_dbhost) }}"
@@ -61,116 +61,88 @@
         plugin: "{{ 'mysql_native_password' if (ansible_os_family == 'RedHat' and ansible_distribution_major_version == '7') else omit }}"
         state: present
 
-- name: "MySQL | Check if we have done files"
-  ansible.builtin.stat:
-    path: /etc/zabbix/schema.done
-  register: done_file
-  become: true
-  when:
-    - zabbix_proxy_database_sqlload
+- name: "MySQL verify or create schema"
+  when: zabbix_proxy_database_sqlload | bool
   tags:
     - database
+  block:
+    - name: "MySQL | Get current database version"
+      community.mysql.mysql_query:
+        login_user: "{{ zabbix_proxy_dbuser }}"
+        login_password: "{{ zabbix_proxy_dbpassword }}"
+        login_host: "{{ zabbix_proxy_dbhost }}"
+        login_port: "{{ zabbix_proxy_dbport }}"
+        login_db: "{{ zabbix_proxy_dbname }}"
+        query: 'SELECT mandatory FROM dbversion'
+  rescue:
+    - name: "MySQL | Get and set schema import overrides"
+      delegate_to: "{{ zabbix_proxy_real_dbhost | default(zabbix_proxy_dbhost_run_install | ternary(delegated_dbhost, inventory_hostname)) }}"
+      vars:
+        delegated_dbhost: "{{ (zabbix_proxy_dbhost == 'localhost') | ternary(inventory_hostname, zabbix_proxy_dbhost) }}"
+      block:
+        - name: "MySQL | Get current value for variables"
+          community.mysql.mysql_variables:
+            variable: "{{ name }}"
+            login_user: "{{ zabbix_proxy_mysql_login_user | default(omit) }}"
+            login_password: "{{ zabbix_proxy_mysql_login_password | default(omit) }}"
+            login_host: "{{ zabbix_proxy_mysql_login_host | default(omit) }}"
+            login_port: "{{ zabbix_proxy_mysql_login_port | default(omit) }}"
+            login_unix_socket: "{{ zabbix_proxy_mysql_login_unix_socket | default(omit) }}"
+          loop:
+            - innodb_default_row_format
+            - log_bin_trust_function_creators
+          loop_control:
+            loop_var: name
+          register: _mysql_variable_defaults
 
-- name: "MySQL | Get version_comment"
-  community.mysql.mysql_variables:
-    variable: version
-    login_host: "{{ zabbix_proxy_mysql_login_host | default(omit) }}"
-    login_user: "{{ zabbix_proxy_mysql_login_user | default(omit) }}"
-    login_password: "{{ zabbix_proxy_mysql_login_password | default(omit) }}"
-    login_port: "{{ zabbix_proxy_mysql_login_port | default(omit) }}"
-    login_unix_socket: "{{ zabbix_proxy_mysql_login_unix_socket | default(omit) }}"
-  delegate_to: "{{ zabbix_proxy_real_dbhost | default(zabbix_proxy_dbhost_run_install | ternary(delegated_dbhost, inventory_hostname)) }}"
-  vars:
-    delegated_dbhost: "{{ (zabbix_proxy_dbhost == 'localhost') | ternary(inventory_hostname, zabbix_proxy_dbhost) }}"
-  register: install_mysql_version
-  tags:
-    - database
+        - name: "MySQL | Set variable overrides for schema import"
+          when: item.msg != _mysql_schema_import_overrides[item.name]
+          community.mysql.mysql_variables:
+            variable: "{{ item.name }}"
+            value: "{{ _mysql_schema_import_overrides[item.name] }}"
+            login_host: "{{ zabbix_proxy_mysql_login_host | default(omit) }}"
+            login_user: "{{ zabbix_proxy_mysql_login_user | default(omit) }}"
+            login_password: "{{ zabbix_proxy_mysql_login_password | default(omit) }}"
+            login_port: "{{ zabbix_proxy_mysql_login_port | default(omit) }}"
+            login_unix_socket: "{{ zabbix_proxy_mysql_login_unix_socket | default(omit) }}"
+          loop: "{{ _mysql_variable_defaults.results }}"
+          loop_control:
+            label: "{{ item.name }}: {{ _mysql_schema_import_overrides[item.name] }}"
+          vars:
+            _mysql_schema_import_overrides:
+              innodb_default_row_format: "dynamic"
+              log_bin_trust_function_creators: "ON"
 
-- name: "MySQL | Get current value for innodb_default_row_format"
-  community.mysql.mysql_variables:
-    variable: innodb_default_row_format
-    login_host: "{{ zabbix_proxy_mysql_login_host | default(omit) }}"
-    login_user: "{{ zabbix_proxy_mysql_login_user | default(omit) }}"
-    login_password: "{{ zabbix_proxy_mysql_login_password | default(omit) }}"
-    login_port: "{{ zabbix_proxy_mysql_login_port | default(omit) }}"
-    login_unix_socket: "{{ zabbix_proxy_mysql_login_unix_socket | default(omit) }}"
-  delegate_to: "{{ zabbix_proxy_real_dbhost | default(zabbix_proxy_dbhost_run_install | ternary(delegated_dbhost, inventory_hostname)) }}"
-  vars:
-    delegated_dbhost: "{{ (zabbix_proxy_dbhost == 'localhost') | ternary(inventory_hostname, zabbix_proxy_dbhost) }}"
-  register: mysql_innodb_default_row_format
-  when:
-    - install_mysql_version.msg is version('5.6', '>=')
-  tags:
-    - database
+    - name: "MySQL | Import schema"
+      community.mysql.mysql_db:
+        login_user: "{{ zabbix_proxy_dbuser }}"
+        login_password: "{{ zabbix_proxy_dbpassword }}"
+        login_host: "{{ zabbix_proxy_dbhost }}"
+        login_port: "{{ zabbix_proxy_dbport }}"
+        name: "{{ zabbix_proxy_dbname }}"
+        encoding: "{{ zabbix_proxy_dbencoding }}"
+        collation: "{{ zabbix_proxy_dbcollation }}"
+        state: import
+        target: "{{ is_legacy_version | ternary(legacy_path, modern_path) }}"
+      vars:
+        is_legacy_version: "{{ zabbix_proxy_version is version('6.0', '<') }}"
+        legacy_path: "{{ ls_output_schema.stdout }}"
+        modern_path: /usr/share/zabbix-sql-scripts/mysql/proxy.sql
 
-- name: "MySQL | Set innodb_default_row_format to dynamic"
-  community.mysql.mysql_variables:
-    variable: innodb_default_row_format
-    value: dynamic
-    login_host: "{{ zabbix_proxy_mysql_login_host | default(omit) }}"
-    login_user: "{{ zabbix_proxy_mysql_login_user | default(omit) }}"
-    login_password: "{{ zabbix_proxy_mysql_login_password | default(omit) }}"
-    login_port: "{{ zabbix_proxy_mysql_login_port | default(omit) }}"
-    login_unix_socket: "{{ zabbix_proxy_mysql_login_unix_socket | default(omit) }}"
-  when:
-    - zabbix_proxy_database_sqlload | bool
-    - not done_file.stat.exists
-    - install_mysql_version.msg is version('5.6', '>=')
-    - mysql_innodb_default_row_format.msg != 'dynamic'
-  delegate_to: "{{ zabbix_proxy_real_dbhost | default(zabbix_proxy_dbhost_run_install | ternary(delegated_dbhost, inventory_hostname)) }}"
-  vars:
-    delegated_dbhost: "{{ (zabbix_proxy_dbhost == 'localhost') | ternary(inventory_hostname, zabbix_proxy_dbhost) }}"
-  tags:
-    - database
-
-- name: "MySQL | Create database and import file"
-  community.mysql.mysql_db:
-    login_host: "{{ zabbix_proxy_mysql_login_host | default(omit) }}"
-    login_user: "{{ zabbix_proxy_mysql_login_user | default(omit) }}"
-    login_password: "{{ zabbix_proxy_mysql_login_password | default(omit) }}"
-    login_port: "{{ zabbix_proxy_mysql_login_port | default(omit) }}"
-    login_unix_socket: "{{ zabbix_proxy_mysql_login_unix_socket | default(omit) }}"
-    name: "{{ zabbix_proxy_dbname }}"
-    encoding: "{{ zabbix_proxy_dbencoding }}"
-    collation: "{{ zabbix_proxy_dbcollation }}"
-    state: import
-    target: "{{ ls_output_schema.stdout }}"
-  when:
-    - zabbix_proxy_database_sqlload
-    - not done_file.stat.exists
-  delegate_to: "{{ zabbix_proxy_real_dbhost | default(zabbix_proxy_dbhost_run_install | ternary(delegated_dbhost, inventory_hostname)) }}"
-  vars:
-    delegated_dbhost: "{{ (zabbix_proxy_dbhost == 'localhost') | ternary(inventory_hostname, zabbix_proxy_dbhost) }}"
-  tags:
-    - database
-
-- name: "MySQL | Revert innodb_default_row_format to previous value"
-  community.mysql.mysql_variables:
-    variable: innodb_default_row_format
-    value: "{{ mysql_innodb_default_row_format.msg }}"
-    login_host: "{{ zabbix_proxy_mysql_login_host | default(omit) }}"
-    login_user: "{{ zabbix_proxy_mysql_login_user | default(omit) }}"
-    login_password: "{{ zabbix_proxy_mysql_login_password | default(omit) }}"
-    login_port: "{{ zabbix_proxy_mysql_login_port | default(omit) }}"
-    login_unix_socket: "{{ zabbix_proxy_mysql_login_unix_socket | default(omit) }}"
-  when:
-    - zabbix_proxy_database_sqlload | bool
-    - not done_file.stat.exists
-    - mysql_innodb_default_row_format.msg != 'dynamic'
-  delegate_to: "{{ zabbix_proxy_real_dbhost | default(zabbix_proxy_dbhost_run_install | ternary(delegated_dbhost, inventory_hostname)) }}"
-  vars:
-    delegated_dbhost: "{{ (zabbix_proxy_dbhost == 'localhost') | ternary(inventory_hostname, zabbix_proxy_dbhost) }}"
-  tags:
-    - database
-
-- name: "MySQL | Create done file"
-  ansible.builtin.file:
-    path: /etc/zabbix/schema.done
-    state: touch
-    mode: "0644"
-  become: true
-  when:
-    - zabbix_proxy_database_sqlload
-    - not done_file.stat.exists
-  tags:
-    - database
+  always:
+    - name: "MySQL | Revert variable overrides for schema import"
+      when: _mysql_variable_defaults is defined
+      delegate_to: "{{ zabbix_proxy_real_dbhost | default(zabbix_proxy_dbhost_run_install | ternary(delegated_dbhost, inventory_hostname)) }}"
+      vars:
+        delegated_dbhost: "{{ (zabbix_proxy_dbhost == 'localhost') | ternary(inventory_hostname, zabbix_proxy_dbhost) }}"
+      community.mysql.mysql_variables:
+        variable: "{{ item.name }}"
+        value: "{{ item.msg }}"
+        login_user: "{{ zabbix_proxy_mysql_login_user | default(omit) }}"
+        login_password: "{{ zabbix_proxy_mysql_login_password | default(omit) }}"
+        login_host: "{{ zabbix_proxy_mysql_login_host | default(omit) }}"
+        login_port: "{{ zabbix_proxy_mysql_login_port | default(omit) }}"
+        login_unix_socket: "{{ zabbix_proxy_mysql_login_unix_socket | default(omit) }}"
+      loop: "{{ _mysql_variable_defaults.results | default([]) }}"
+      loop_control:
+        label: "{{ item.name }}: {{ item.msg }}"
