@@ -16,7 +16,7 @@
     - dependencies
 
 - name: "PostgreSQL Database prep"
-  when: zabbix_proxy_database_creation
+  when: zabbix_proxy_database_creation | bool
   become: "{{ zabbix_proxy_dbhost_run_install }}"
   become_user: postgres
   delegate_to: "{{ zabbix_proxy_dbhost_run_install | ternary(delegated_dbhost, inventory_hostname) }}"
@@ -48,25 +48,30 @@
         state: present
         encrypted: true
 
-- name: "PostgreSQL | Handle Compressed Schema File"
-  ansible.builtin.set_fact:
-    zabbix_proxy_cat_cmd: zcat
-  when: "'.gz' in ls_output_schema.stdout"
+- name: "PostgreSQL verify or create schema"
+  when: zabbix_proxy_database_sqlload | bool
   tags:
     - database
-
-- name: "PostgreSQL | Importing schema file"
-  ansible.builtin.shell: |
-    set -euxo pipefail
-    {{ zabbix_proxy_cat_cmd }} {{ ls_output_schema.stdout }} | psql -h '{{ zabbix_proxy_dbhost }}' -U '{{ zabbix_proxy_dbuser }}' -d '{{ zabbix_proxy_dbname }}'
-    touch /etc/zabbix/schema.done
-  args:
-    creates: /etc/zabbix/schema.done
-    executable: /bin/bash
-  environment:
-    PGPASSWORD: "{{ zabbix_proxy_dbpassword }}"
-  become: true
-  when:
-    - zabbix_proxy_database_creation
-  tags:
-    - database
+  block:
+    - name: "PostgreSQL | Get current database version"
+      community.postgresql.postgresql_query:
+        login_user: "{{ zabbix_proxy_dbuser }}"
+        login_password: "{{ zabbix_proxy_dbpassword }}"
+        login_host: "{{ zabbix_proxy_dbhost }}"
+        port: "{{ zabbix_proxy_dbport }}"
+        db: "{{ zabbix_proxy_dbname }}"
+        query: 'SELECT mandatory FROM dbversion'
+  rescue:
+    - name: "PostgreSQL | Import schema"
+      community.postgresql.postgresql_db:
+        login_user: "{{ zabbix_proxy_dbuser }}"
+        login_password: "{{ zabbix_proxy_dbpassword }}"
+        login_host: "{{ zabbix_proxy_dbhost }}"
+        port: "{{ zabbix_proxy_dbport }}"
+        db: "{{ zabbix_proxy_dbname }}"
+        state: restore
+        target: "{{ is_legacy_version | ternary(legacy_path, modern_path) }}"
+      vars:
+        is_legacy_version: "{{ zabbix_proxy_version is version('6.0', '<') }}"
+        legacy_path: "{{ ls_output_schema.stdout }}"
+        modern_path: /usr/share/zabbix-sql-scripts/postgresql/proxy.sql
