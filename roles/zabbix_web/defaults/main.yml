@@ -72,6 +72,17 @@ zabbix_repo_yum:
     gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-ZABBIX
     state: present
 
+zabbix_repo_zypper_auto_import_keys: true
+zabbix_repo_zypper_disable_gpg_check: false
+zabbix_repo_zypper_schema: https
+zabbix_repo_zypper:
+  - name: zabbix
+    description: Zabbix Official Repository
+    repo: "{{ zabbix_repo_zypper_schema }}://repo.zabbix.com/zabbix/{{ zabbix_web_version | regex_search('^[0-9]+.[0-9]+') }}/sles/{{ ansible_distribution_major_version }}/$basearch/"
+    disable_gpg_check: "{{ zabbix_repo_zypper_disable_gpg_check }}"
+    auto_import_keys: "{{ zabbix_repo_zypper_auto_import_keys }}"
+    state: present
+
 # Elasticsearch
 # zabbix_server_history_url:
 #  - "'uint' => 'http://localhost:9200'"

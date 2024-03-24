@@ -28,12 +28,14 @@ jobs:
           - debian12
           - debian11
           - debian10
+          # - opensuseleap15
         collection_role:
           - zabbix_web
         database:
           - mysql
           - pgsql
         web_server:
+          # maybe add apache?
           - nginx
         version:
           - v64
