@@ -27,6 +27,9 @@ _zabbix_proxy_mysql_dependencies:
     - "{{ zabbix_proxy_install_database_client | ternary('mariadb', '') }}"
     - python3-PyMySQL
 
+_zabbix_proxy_sqlite3_dependencies:
+  - sqlite
+
 selinux_pkgs:
   "9":
     - policycoreutils
