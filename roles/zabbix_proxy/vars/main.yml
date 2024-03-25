@@ -1,7 +1,0 @@
----
-# vars file for zabbix_proxy
-db_file_path:
-  "62": "/usr/share/zabbix-sql-scripts/{{ zabbix_proxy_db_long }}/proxy.sql"
-  "64": "/usr/share/zabbix-sql-scripts/{{ zabbix_proxy_db_long }}/proxy.sql"
-  "60": "/usr/share/zabbix-sql-scripts/{{ zabbix_proxy_db_long }}/proxy.sql"
-  "50": "/usr/share/doc/zabbix-proxy-{{ zabbix_proxy_database }}*/schema.sql.gz"

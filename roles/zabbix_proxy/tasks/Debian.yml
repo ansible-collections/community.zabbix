@@ -6,13 +6,6 @@
   tags:
     - always
 
-- name: "Debian | Set some facts for Zabbix"
-  ansible.builtin.set_fact:
-    datafiles_path: /usr/share/doc/zabbix-sql-scripts/{{ zabbix_proxy_db_long }}
-  tags:
-    - install
-    - config
-
 - name: "Debian | Installing gnupg"
   ansible.builtin.apt:
     pkg: gnupg

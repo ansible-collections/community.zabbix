@@ -35,13 +35,6 @@
     zabbix_api_server_port: "{{ '443' if zabbix_api_use_ssl|bool else '80' }}"
   when: zabbix_api_server_port is undefined
 
-- name: Set Path to SQL File
-  ansible.builtin.set_fact:
-    datafile_path: "{{ db_file_path[zabbix_short_version] }}"
-  tags:
-    - install
-    - config
-
 - name: "Set default ip address for zabbix_proxy_ip"
   ansible.builtin.set_fact:
     zabbix_proxy_ip: "{{ hostvars[inventory_hostname]['ansible_default_ipv4'].address }}"
@@ -76,12 +69,12 @@
   tags:
     - install
 
-- name: "Get the file for database schema"
-  ansible.builtin.shell: ls -1 {{ db_file_path[zabbix_short_version] }}
-  changed_when: false
-  become: true
+- name: "Get legacy file-path for database schema"
   when:
     - zabbix_proxy_database_sqlload
+    - zabbix_proxy_version is version('6.0', '<')
+  ansible.builtin.shell: "ls -1 /usr/share/doc/zabbix-proxy-{{ zabbix_proxy_database }}*/schema.sql.gz"
+  changed_when: false
   register: ls_output_schema
   tags:
     - database
