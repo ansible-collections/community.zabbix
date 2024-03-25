@@ -30,6 +30,18 @@ zabbix_valid_server_versions:
 
 debian_keyring_path: /etc/apt/keyrings/
 zabbix_gpg_key: "{{ debian_keyring_path }}zabbix-repo.asc"
-_zabbix_repo_deb_url: "http://repo.zabbix.com/zabbix/{{ zabbix_server_version }}"
+
+_zabbix_server_pgsql_dependencies:
+  - "{{ zabbix_server_install_database_client | ternary('postgresql-client', '') }}"
+  - python3-psycopg2
+
+_zabbix_server_mysql_dependencies:
+  - "{{ zabbix_server_install_database_client | ternary('default-mysql-client', '') }}"
+  - python3-mysqldb
+
 _zabbix_server_fping6location: /usr/bin/fping6
 _zabbix_server_fpinglocation: /usr/bin/fping
+
+_zabbix_server_package: "zabbix-server-{{ zabbix_server_database }}"
+_zabbix_server_sql_scripts_package: "zabbix-sql-scripts"
+_zabbix_server_install_recommends: true
