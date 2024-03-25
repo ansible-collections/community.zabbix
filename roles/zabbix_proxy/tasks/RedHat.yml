@@ -7,12 +7,6 @@
   tags:
     - always
 
-- name: "RedHat | Set facts for Zabbix"
-  ansible.builtin.set_fact:
-    datafiles_path: "/usr/share/doc/zabbix-sql-scripts/{{ zabbix_proxy_db_long }}"
-  tags:
-    - always
-
 - name: "RedHat | Make sure old file is absent"
   ansible.builtin.file:
     path: /etc/yum.repos.d/zabbix-supported.repo
