@@ -81,39 +81,25 @@
 - name: "Initialize the database"
   ansible.builtin.include_tasks: "initialize-{{ zabbix_proxy_database }}.yml"
 
-- name: "Create include dir zabbix-proxy"
+- name: "Create directories"
   ansible.builtin.file:
-    path: "{{ zabbix_proxy_include }}"
+    state: directory
+    path: "{{ item.path }}"
     owner: "{{ zabbix_os_user }}"
     group: "{{ zabbix_os_user }}"
-    mode: "{{ zabbix_proxy_include_mode }}"
-    state: directory
+    mode: "{{ item.mode | default('0755') }}"
   become: true
+  loop:
+    - path: "{{ zabbix_proxy_include }}"
+      mode: "{{ zabbix_proxy_include_mode }}"
+    - path: "{{ zabbix_proxy_loadmodulepath }}"
+    - required: "{{ zabbix_proxy_tlspskfile is defined }}"
+      path: "{{ zabbix_proxy_tlspskfile | default('/path/to/zabbix_proxy_tlspskfile/zabbix_proxy.psk') | dirname }}"
+  loop_control:
+    label: "{{ item.path }}"
+  when: item.required | default(true)
   tags:
     - install
-    - config
-
-- name: "Create module dir zabbix-proxy"
-  ansible.builtin.file:
-    path: "{{ zabbix_proxy_loadmodulepath }}"
-    owner: "{{ zabbix_os_user }}"
-    group: "{{ zabbix_os_user }}"
-    state: directory
-    mode: "0755"
-  become: true
-  tags:
-    - install
-    - config
-
-- name: "Create directory for PSK file if not exist."
-  ansible.builtin.file:
-    path: "{{ zabbix_proxy_tlspskfile | dirname }}"
-    mode: 0755
-    state: directory
-  become: true
-  when:
-    - zabbix_proxy_tlspskfile is defined
-  tags:
     - config
 
 - name: "Place TLS PSK File"
