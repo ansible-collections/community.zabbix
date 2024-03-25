@@ -14,7 +14,6 @@
 
 - name: Set More Variables
   ansible.builtin.set_fact:
-    zabbix_proxy_db_long: "{{ 'postgresql' if zabbix_proxy_database == 'pgsql' else zabbix_proxy_database }}"
     zabbix_short_version: "{{ zabbix_proxy_version | regex_replace('\\.', '') }}"
     zabbix_proxy_fpinglocation: "{{ zabbix_proxy_fpinglocation if zabbix_proxy_fpinglocation is defined else _zabbix_proxy_fpinglocation}}"
     zabbix_proxy_fping6location: "{{ zabbix_proxy_fping6location if zabbix_proxy_fping6location is defined else _zabbix_proxy_fping6location}}"
@@ -79,8 +78,8 @@
   tags:
     - database
 
-- name: "Installing the database"
-  ansible.builtin.include_tasks: "{{ zabbix_proxy_db_long }}.yml"
+- name: "Initialize the database"
+  ansible.builtin.include_tasks: "initialize-{{ zabbix_proxy_database }}.yml"
 
 - name: "Create include dir zabbix-proxy"
   ansible.builtin.file:
