@@ -41,8 +41,6 @@ jobs:
           - v60
         include:
           - interpreter: python3
-          - interpreter: python
-            container: centos7
         exclude:
           - container: debian12
             version: v62

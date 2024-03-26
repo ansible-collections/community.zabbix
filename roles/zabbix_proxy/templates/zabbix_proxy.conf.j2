@@ -71,7 +71,9 @@
 {{ (zabbix_proxy_starthttppollers is defined and zabbix_proxy_starthttppollers is not none) | ternary('','# ') }}StartHTTPPollers={{ zabbix_proxy_starthttppollers | default('') }}
 {{ (zabbix_proxy_startipmipollers is defined and zabbix_proxy_startipmipollers is not none) | ternary('','# ') }}StartIPMIPollers={{ zabbix_proxy_startipmipollers | default('') }}
 {{ (zabbix_proxy_startjavapollers is defined and zabbix_proxy_startjavapollers is not none) | ternary('','# ') }}StartJavaPollers={{ zabbix_proxy_startjavapollers | default('') }}
+{% if zabbix_proxy_version is version('6.0', '>=') %}
 {{ (zabbix_proxy_startodbcpollers is defined and zabbix_proxy_startodbcpollers is not none) | ternary('','# ') }}StartODBCPollers={{ zabbix_proxy_startodbcpollers | default('') }}
+{% endif %}
 {{ (zabbix_proxy_startpingers is defined and zabbix_proxy_startpingers is not none) | ternary('','# ') }}StartPingers={{ zabbix_proxy_startpingers | default('') }}
 {{ (zabbix_proxy_startpollers is defined and zabbix_proxy_startpollers is not none) | ternary('','# ') }}StartPollers={{ zabbix_proxy_startpollers | default('') }}
 {{ (zabbix_proxy_startpollersunreachable is defined and zabbix_proxy_startpollersunreachable is not none) | ternary('','# ') }}StartPollersUnreachable={{ zabbix_proxy_startpollersunreachable | default('') }}
@@ -112,7 +114,9 @@
 {{ (zabbix_proxy_vaulttlskeyfile is defined and zabbix_proxy_vaulttlskeyfile is not none) | ternary('','# ') }}VaultTLSKeyFile={{ zabbix_proxy_vaulttlskeyfile | default('') }}
 {% endif %}
 {{ (zabbix_proxy_vaulttoken is defined and zabbix_proxy_vaulttoken is not none) | ternary('','# ') }}VaultToken={{ zabbix_proxy_vaulttoken | default('') }}
+{% if zabbix_proxy_version is version('6.0', '>=') %}
 {{ (zabbix_proxy_vaulturl is defined and zabbix_proxy_vaulturl is not none) | ternary('','# ') }}VaultURL={{ zabbix_proxy_vaulturl | default('') }}
+{% endif %}
 {{ (zabbix_proxy_vmwarecachesize is defined and zabbix_proxy_vmwarecachesize is not none) | ternary('','# ') }}VMwareCacheSize={{ zabbix_proxy_vmwarecachesize | default('') }}
 {{ (zabbix_proxy_vmwarefrequency is defined and zabbix_proxy_vmwarefrequency is not none) | ternary('','# ') }}VMwareFrequency={{ zabbix_proxy_vmwarefrequency | default('') }}
 {{ (zabbix_proxy_vmwareperffrequency is defined and zabbix_proxy_vmwareperffrequency is not none) | ternary('','# ') }}VMwarePerfFrequency={{ zabbix_proxy_vmwareperffrequency | default('') }}

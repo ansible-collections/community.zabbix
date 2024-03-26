@@ -22,10 +22,8 @@ provisioner:
     ANSIBLE_ROLES_PATH: $HOME/.ansible/collections/ansible_collections/community/zabbix/roles
   inventory:
     group_vars:
-      python3:
+      all:
         ansible_python_interpreter: /usr/bin/python3
-      python:
-        ansible_python_interpreter: /usr/bin/python
       v64:
         zabbix_proxy_version: 6.4
       v62:
