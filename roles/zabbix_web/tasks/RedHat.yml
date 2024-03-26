@@ -4,22 +4,6 @@
   tags:
     - always
 
-- name: "RedHat | Install zabbix-web-{{ zabbix_server_database }}"
-  ansible.builtin.yum:
-    name:
-      - "zabbix-web-{{ zabbix_server_database }}"
-    state: "{{ zabbix_web_package_state }}"
-    update_cache: true
-    disablerepo: "{{ zabbix_web_disable_repo | default(omit) }}"
-  environment:
-    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
-    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
-  register: zabbix_web_package_install
-  until: zabbix_web_package_install is succeeded
-  become: true
-  tags:
-    - install
-
 - name: "RedHat | Install zabbix-web-configuration"
   ansible.builtin.yum:
     name:

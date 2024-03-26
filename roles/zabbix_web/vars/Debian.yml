@@ -44,3 +44,5 @@ zabbix_valid_web_versions:
   "20":
     - 6.4
     - 6.0
+
+_zabbix_web_package: zabbix-frontend-php

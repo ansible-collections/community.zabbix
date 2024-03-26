@@ -50,8 +50,6 @@ zabbix_server_dbschema:
 
 # Yum/APT Variables
 zabbix_web_version_minor: "*"
-zabbix_web_disable_repo:
-  - epel
 
 # Elasticsearch
 # zabbix_server_history_url:
