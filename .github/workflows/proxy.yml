@@ -20,15 +20,33 @@ jobs:
       fail-fast: false
       matrix:
         container:
-          - rockylinux9
-          - rockylinux8
-          - centos7
-          - ubuntu2204
-          - ubuntu2004
-          - ubuntu1804
-          - debian12
-          - debian11
-          - debian10
+          - name: rockylinux9
+            base_image: rockylinux/rockylinux:9-ubi-init
+            os_family: redhat
+          - name: rockylinux8
+            base_image: rockylinux/rockylinux:8-ubi-init
+            os_family: redhat
+          - name: centos7
+            base_image: centos/systemd:latest
+            os_family: redhat
+          - name: ubuntu2204
+            base_image: ubuntu:22.04
+            os_family: debian
+          - name: ubuntu2004
+            base_image: ubuntu:20.04
+            os_family: debian
+          - name: ubuntu1804
+            base_image: ubuntu:18.04
+            os_family: debian
+          - name: debian12
+            base_image: debian:12
+            os_family: debian
+          - name: debian11
+            base_image: debian:11
+            os_family: debian
+          - name: debian10
+            base_image: debian:10
+            os_family: debian
         collection_role:
           - zabbix_proxy
         database:
@@ -39,12 +57,11 @@ jobs:
           - v64
           - v62
           - v60
-        include:
-          - interpreter: python3
-          - interpreter: python
-            container: centos7
         exclude:
-          - container: debian12
+          - container:
+              name: debian12
+              base_image: debian:12
+              os_family: debian
             version: v62
     steps:
       - name: Check out code
@@ -78,10 +95,9 @@ jobs:
 
       - name: Run role tests
         run: >-
-          MY_MOLECULE_CONTAINER=${{ matrix.container }}
-          MY_MOLECULE_IMAGE=${{ matrix.container }}
+          MY_MOLECULE_CONTAINER=${{ matrix.container.name }}
+          MY_MOLECULE_IMAGE=${{ matrix.container.base_image }}
+          MY_MOLECULE_OS_FAMILY=${{ matrix.container.os_family }}
           MY_MOLECULE_VERSION=${{ matrix.version }}
           MY_MOLECULE_DATABASE=${{ matrix.database }}
-          MY_MOLECULE_INTERPRETER=${{ matrix.interpreter }}
-          MY_MOLECULE_DOCKER_COMMAND=${{ matrix.command }}
           molecule test -s ${{ matrix.collection_role }}
