@@ -5,7 +5,7 @@ _logfilesize: 100
 _debuglevel: 3
 _include: /etc/zabbix/zabbix_agentd.d
 _listenport: 10050
-_tls_subject: "{{ zabbix_agent_tlsservercertsubject }}" # FIXME this is not correct and should be removed with 2.0.0, here only to prevent regression
+_tls_subject: "{{ zabbix_agent_tlsservercertsubject | default(omit) }}" # FIXME this is not correct and should be removed with 2.0.0, here only to prevent regression
 _tlspsk_auto: false
 _hostname: "{{ inventory_hostname }}"
 _include_mode: "0750"

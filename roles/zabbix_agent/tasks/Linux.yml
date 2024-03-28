@@ -121,7 +121,7 @@
 - name: "Configure zabbix-agent"
   ansible.builtin.template:
     src: agent.conf.j2
-    dest: "/etc/zabbix/zabbix_agent{{ '2' if zabbix_agent2 | bool }}.conf"
+    dest: "/etc/zabbix/zabbix_agentd{{ '2' if zabbix_agent2 | bool }}.conf"
     owner: root
     group: root
     mode: "{{ zabbix_agent_conf_mode }}"

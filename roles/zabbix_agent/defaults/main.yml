@@ -59,7 +59,7 @@ zabbix_repo_yum:
     state: present
 
 zabbix_repo_deb_component: main
-zabbix_agent_tlsservercertsubject:
+# zabbix_agent_tlsservercertsubject:
 # Zabbix API stuff
 zabbix_api_server_host: localhost
 # zabbix_api_server_port: 80
