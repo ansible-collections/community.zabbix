@@ -122,8 +122,8 @@
         - config
   when:
     - zabbix_agent_tlspsk_auto | bool
-    - (zabbix_agent_tlspskfile is undefined) or (zabbix_agent_tlspskfile | length == '0')
-    - (zabbix_agent_tlspsk_secret is undefined) or (zabbix_agent_tlspsk_secret | length == '0')
+    # - (zabbix_agent_tlspskfile is undefined) or (zabbix_agent_tlspskfile | length == '0')
+    # - (zabbix_agent_tlspsk_secret is undefined) or (zabbix_agent_tlspsk_secret | length == '0')
 
 - name: "Configure Agent"
   ansible.builtin.include_tasks: Windows_conf.yml

@@ -1,11 +1,4 @@
 ---
-- name: AutoPSK | Set default path variables (Linux)
-  ansible.builtin.set_fact:
-    zabbix_agent_tlspskfile: "/etc/zabbix/tls_psk_auto.secret"
-    zabbix_agent_tlspskidentity_file: "/etc/zabbix/tls_psk_auto.identity"
-  tags:
-    - config
-
 - name: AutoPSK | Check for existing TLS PSK file (Linux)
   ansible.builtin.stat:
     path: "{{ zabbix_agent_tlspskfile }}"
