@@ -1,5 +1,6 @@
 ---
 - name: "API | Create host groups"
+  become: false
   community.zabbix.zabbix_group:
     host_group: "{{ zabbix_host_groups }}"
     state: "{{ zabbix_agent_hostgroups_state }}"
@@ -12,6 +13,7 @@
     - api
 
 - name: "API | Create a new host or update an existing host's info"
+  become: false
   community.zabbix.zabbix_host:
     host_name: "{{ zabbix_agent_hostname }}"
     host_groups: "{{ zabbix_host_groups }}"
@@ -46,6 +48,7 @@
     - api
 
 - name: "API | Create a new host using agent2 or update an existing host's info"
+  become: false
   community.zabbix.zabbix_host:
     host_name: "{{ zabbix_agent2_hostname }}"
     host_groups: "{{ zabbix_host_groups }}"
@@ -80,6 +83,7 @@
     - api
 
 - name: "API | Updating host configuration with macros"
+  become: false
   community.zabbix.zabbix_hostmacro:
     host_name: "{{ (zabbix_agent2 | bool) | ternary(zabbix_agent2_hostname, zabbix_agent_hostname) }}"
     macro_name: "{{ item.macro_key }}"
