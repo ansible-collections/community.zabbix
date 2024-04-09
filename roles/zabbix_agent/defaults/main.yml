@@ -10,6 +10,7 @@ zabbix_agent_package: zabbix-agent
 zabbix_sender_package: zabbix-sender
 zabbix_get_package: zabbix-get
 zabbix_agent_package_state: present
+zabbix_agent_managed: false
 zabbix_agent_server:
 zabbix_agent_serveractive:
 zabbix_agent2_server: "{{ zabbix_agent_server }}"

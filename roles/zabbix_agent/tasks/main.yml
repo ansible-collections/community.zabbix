@@ -43,7 +43,7 @@
 - name: "Install the correct repository"
   ansible.builtin.include_tasks: "{{ ansible_os_family }}.yml"
   when:
-    - not (zabbix_agent_docker | bool)
+    - not (zabbix_agent_docker | bool) or (zabbix_agent_managed | bool)
 
 - name: "Encrypt with TLS PSK auto management"
   ansible.builtin.include_tasks: tlspsk_auto.yml
