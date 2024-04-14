@@ -32,7 +32,7 @@
     zabbix_win_config_name: "zabbix_agentd.conf"
     zabbix2_win_svc_name: Zabbix Agent 2
     zabbix2_win_exe_path: '{{ zabbix_win_install_dir }}\bin\zabbix_agent2.exe'
-    zabbix2_win_config_name: "zabbix_agent2.conf"
+    zabbix2_win_config_name: "zabbix_agent2d.conf"
   tags:
     - always
 
