@@ -1,0 +1,2 @@
+bugfixes:
+  - zabbix_web - Added missing semicolon to nginx vhost template.
