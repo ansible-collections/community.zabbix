@@ -1,0 +1,10 @@
+---
+- name: "test: create item on host ExampleHostForHostInfoModule"
+  community.zabbix.zabbix_item:
+    item_name: ExampleItem
+    host_name: ExampleHostForHostInfoModule
+    key: ExampleItem
+    type: simple_check
+    state: present
+    value_type: text
+    delay: 1m
