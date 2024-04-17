@@ -548,6 +548,21 @@ def main():
 
     preprocessing = item.construct_preprocessing(preprocessing)
 
+    type_types = {"zabbix_agent": 0, "zabbix_trapper": 2, "simple_check": 3, "zabbix_internal": 5, "zabbix_agent_active": 7, "web_item": 9, "external_check": 10, "database_monitor": 11, "ipmi": 12, "ssh": 13, "telnet": 14, "calculated": 15, "jmx": 16, "snmp_trap": 17, "dependent": 18, "http": 19, "snmp_agent": 20, "script": 21}
+    value_type_types = {"float": 0, "character": 1, "log": 2, "unsigned": 3, "text": 4}
+    
+    if state == "present":
+        if type in list(type_types.keys()):
+            type = type_types[type]
+        else:
+            type = int(type)
+
+        if value_type in list(value_type_types.keys()):
+            value_type = value_type_types[value_type]
+        else:
+            value_type = int(value_type)    
+
+
     # find host id
     host_id = ""
     if host_name is not None:
@@ -600,10 +615,12 @@ def main():
         verify_host = 1 if verify_host == True else 0
     if verify_peer:
         verify_peer = 1 if verify_peer == True else 0
+
     # convert list to comma-seperated string
     if status_codes:
         status_codes = ",".join(status_codes)
-
+    
+    # convert to compatible object types
     if url_query:
         array = []
         for q in url_query:
@@ -615,22 +632,12 @@ def main():
             array.append({"name": p, "value": parameters[p]})
         parameters = array
      
+    # conditional parameter filtering
+    if type in list(2, 17, 18):
+        update_interval = "0"
 
     if master_item:
         master_item = item.get_itemid_by_item_and_hostid(master_item, host_id)[0]["itemid"]
-    type_types = {"zabbix_agent": 0, "zabbix_trapper": 2, "simple_check": 3, "zabbix_internal": 5, "zabbix_agent_active": 7, "web_item": 9, "external_check": 10, "database_monitor": 11, "ipmi": 12, "ssh": 13, "telnet": 14, "calculated": 15, "jmx": 16, "snmp_trap": 17, "dependent": 18, "http": 19, "snmp_agent": 20, "script": 21}
-    value_type_types = {"float": 0, "character": 1, "log": 2, "unsigned": 3, "text": 4}
-    
-    if state == "present":
-        if type in list(type_types.keys()):
-            type = type_types[type]
-        else:
-            type = int(type)
-
-        if value_type in list(value_type_types.keys()):
-            value_type = value_type_types[value_type]
-        else:
-            value_type = int(value_type)    
 
     # check if item exist
     is_item_exist = item.is_item_exist(item_name, host_name)
