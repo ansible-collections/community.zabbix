@@ -34,15 +34,19 @@ class Item(ZabbixBase):
             self._module.fail_json(msg="Host not found %s" % host_name)
         return True
     
-    def get_host_interfaceid_by_host(self, interface, host_id):
+    def get_host_interfaceid_by_host(self, interface, host_id, host_name):
         if interface:
             ip, port = interface.split(":")
             parameters = {"output": "extend", "hostid": host_id, "filter": {"port": port}}
-            if re.search(r"\w", ip):
+            if re.search(r"[a-zA-Z]", ip):
                 parameters["filter"]["dns"] = ip
             else:
                 parameters["filter"]["ip"] = ip
-            return self._zapi.hostinterface.get(parameters)[0]["interfaceid"]
+            result = self._zapi.hostinterface.get(parameters)
+            if len(result) > 0:
+                return result[0]["interfaceid"]
+            else:
+                self._module.fail_json(msg="Host interface %s not found on host %s" % (interface, host_name))
         return "0"
 
     def construct_preprocessing(self, preprocessing):
@@ -393,7 +397,7 @@ def main():
         authtype=dict(type="str", choices=["password", "0", "publickey", "1", "none", "0", "basic", "1", "ntlm", "2", "kerberos", "3"], default="none"),
         description=dict(type="str"),
         follow_redirects=dict(type="bool"),
-        headers=dict(type="dict", elements="dict"),
+        headers=dict(type="dict"),
         history=dict(type="str"),
         http_proxy=dict(type="str"),
         inventory_link=dict(type="str"),
@@ -413,7 +417,7 @@ def main():
             ["type", 15, ["calculated"]],
             ["type", 21, ["script"]]
         ]),
-        parameters=dict(type="str"),
+        parameters=dict(type="dict"),
         password=dict(type="str", no_log=True),
         body_type=dict(type="str", choices=["raw", "0", "json", "2", "xml", "3"]),
         body=dict(type="str", required_if=[
@@ -555,7 +559,7 @@ def main():
     
     # get interface id
     if interface:
-        interface = item.get_host_interfaceid_by_host(interface, host_id)
+        interface = item.get_host_interfaceid_by_host(interface, host_id, host_name)
 
     # convert bools/choices to integers
     if allow_traps:
@@ -600,8 +604,20 @@ def main():
     if status_codes:
         status_codes = ",".join(status_codes)
 
+    if url_query:
+        array = []
+        for q in url_query:
+            array.append({q: url_query[q]})
+        url_query = array
+    if parameters:
+        array = []
+        for p in parameters:
+            array.append({"name": p, "value": parameters[p]})
+        parameters = array
+     
+
     if master_item:
-        master_item = item.get_itemid_by_item_and_hostid(master_item, host_id)
+        master_item = item.get_itemid_by_item_and_hostid(master_item, host_id)[0]["itemid"]
     type_types = {"zabbix_agent": 0, "zabbix_trapper": 2, "simple_check": 3, "zabbix_internal": 5, "zabbix_agent_active": 7, "web_item": 9, "external_check": 10, "database_monitor": 11, "ipmi": 12, "ssh": 13, "telnet": 14, "calculated": 15, "jmx": 16, "snmp_trap": 17, "dependent": 18, "http": 19, "snmp_agent": 20, "script": 21}
     value_type_types = {"float": 0, "character": 1, "log": 2, "unsigned": 3, "text": 4}
     
