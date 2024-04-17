@@ -70,7 +70,7 @@ class Item(ZabbixBase):
 
         return preprocessing
 
-    def add_item(self, item_name, key, host_id, type, value_type, update_interval, interfaceid, url, allow_traps, authtype, description, follow_redirects, headers, history, http_proxy, inventory_link, ipmi_sensor, jmx_endpoint, logtimefmt, master_itemid, params, item_parameters, password, body_type, body, privatekey, url_query, http_method, retrieve_mode, snmp_oid, ssl_cert_file, ssl_key_file, ssl_key_password, status_codes, timeout, trapper_hosts, trends, units, username, verify_host, verify_peer, tags, preprocessing):
+    def add_item(self, item_name, key, host_id, type, value_type, update_interval, interfaceid, url, allow_traps, authtype, description, follow_redirects, headers, history, http_proxy, inventory_link, ipmi_sensor, jmx_endpoint, logtimefmt, master_itemid, params, item_parameters, password, body_type, body, privatekey, publickey, url_query, http_method, retrieve_mode, snmp_oid, ssl_cert_file, ssl_key_file, ssl_key_password, status_codes, timeout, allowed_hosts, trends, units, username, verify_host, verify_peer, tags, preprocessing):
         try:
             if self._module.check_mode:
                 self._module.exit_json(changed=True)
@@ -117,6 +117,8 @@ class Item(ZabbixBase):
                     parameters["posts"] = body
                 if privatekey is not None:
                     parameters["privatekey"] = privatekey
+                if publickey is not None:
+                    parameters["publickey"] = publickey
                 if url_query is not None:
                     parameters["query_fields"] = url_query
                 if http_method is not None:
@@ -135,8 +137,8 @@ class Item(ZabbixBase):
                     parameters["status_codes"] = status_codes
                 if timeout is not None:
                     parameters["timeout"] = timeout
-                if trapper_hosts is not None:
-                    parameters["trapper_hosts"] = trapper_hosts
+                if allowed_hosts is not None:
+                    parameters["trapper_hosts"] = allowed_hosts
                 if trends is not None:
                     parameters["trends"] = trends
                 if units is not None:
@@ -158,7 +160,7 @@ class Item(ZabbixBase):
         except Exception as e:
             self._module.fail_json(msg="Failed to create item %s: %s" % (item_name, e))
     
-    def update_item(self, item_name, item_id, key, update_interval, interfaceid, url, allow_traps, authtype, description, follow_redirects, headers, history, http_proxy, inventory_link, ipmi_sensor, jmx_endpoint, logtimefmt, master_itemid, params, item_parameters, password, body_type, body, privatekey, url_query, http_method, retrieve_mode, snmp_oid, ssl_cert_file, ssl_key_file, ssl_key_password, status_codes, timeout, trapper_hosts, trends, units, username, verify_host, verify_peer, tags, preprocessing):  
+    def update_item(self, item_name, item_id, key, update_interval, interfaceid, url, allow_traps, authtype, description, follow_redirects, headers, history, http_proxy, inventory_link, ipmi_sensor, jmx_endpoint, logtimefmt, master_itemid, params, item_parameters, password, body_type, body, privatekey, publickey, url_query, http_method, retrieve_mode, snmp_oid, ssl_cert_file, ssl_key_file, ssl_key_password, status_codes, timeout, allowed_hosts, trends, units, username, verify_host, verify_peer, tags, preprocessing):  
         try:
             if self._module.check_mode:
                 self._module.exit_json(changed=True)
@@ -210,6 +212,8 @@ class Item(ZabbixBase):
                     parameters["posts"] = body
                 if privatekey is not None:
                     parameters["privatekey"] = privatekey
+                if publickey is not None:
+                    parameters["publickey"] = publickey
                 if url_query is not None:
                     parameters["query_fields"] = url_query
                 if http_method is not None:
@@ -228,8 +232,8 @@ class Item(ZabbixBase):
                     parameters["status_codes"] = status_codes
                 if timeout is not None:
                     parameters["timeout"] = timeout
-                if trapper_hosts is not None:
-                    parameters["trapper_hosts"] = trapper_hosts
+                if allowed_hosts is not None:
+                    parameters["trapper_hosts"] = allowed_hosts
                 if trends is not None:
                     parameters["trends"] = trends
                 if units is not None:
@@ -263,7 +267,7 @@ class Item(ZabbixBase):
         else:
             return int(host_list[0]["hostid"])
         
-    def check_all_properties(self, item_id, key, host_id, host_name, update_interval, interfaceid, url, allow_traps, authtype, description, follow_redirects, headers, history, http_proxy, inventory_link, ipmi_sensor, jmx_endpoint, logtimefmt, master_itemid, params, parameters, password, body_type, body, privatekey, url_query, http_method, retrieve_mode, snmp_oid, ssl_cert_file, ssl_key_file, ssl_key_password, status_codes, timeout, trapper_hosts, trends, units, username, verify_host, verify_peer, tags, preprocessing):
+    def check_all_properties(self, item_id, key, host_id, host_name, update_interval, interfaceid, url, allow_traps, authtype, description, follow_redirects, headers, history, http_proxy, inventory_link, ipmi_sensor, jmx_endpoint, logtimefmt, master_itemid, params, parameters, password, body_type, body, privatekey, publickey, url_query, http_method, retrieve_mode, snmp_oid, ssl_cert_file, ssl_key_file, ssl_key_password, status_codes, timeout, allowed_hosts, trends, units, username, verify_host, verify_peer, tags, preprocessing):
         exist_item = self._zapi.item.get({"output": "extend", "filter": {"itemid": item_id}})[0]
         if host_id and host_id != int(exist_item["hostid"]):
             return True
@@ -311,6 +315,8 @@ class Item(ZabbixBase):
             return True
         if privatekey and privatekey != exist_item["privatekey"]:
             return True
+        if publickey and publickey != exist_item["publickey"]:
+            return True
         if url_query and url_query != exist_item["query_fields"]:
             return True
         if http_method and http_method != exist_item["request_method"]:
@@ -329,7 +335,7 @@ class Item(ZabbixBase):
             return True
         if timeout and timeout != exist_item["timeout"]:
             return True
-        if trapper_hosts and trapper_hosts != exist_item["trapper_hosts"]:
+        if allowed_hosts and allowed_hosts != exist_item["trapper_hosts"]:
             return True
         if trends and trends != exist_item["trends"]:
             return True
@@ -417,7 +423,10 @@ def main():
         privatekey=dict(type="str", no_log=True, required_if=[
             ["auth_type", 1, ["publickey"]]
         ]),
-        url_query=dict(type="dict", elements="dict"),
+        publickey=dict(type="str", no_log=True, required_if=[
+            ["auth_type", 1, ["publickey"]]
+        ]),
+        url_query=dict(type="dict"),
         http_method=dict(type="str", choices=["GET", "0", "POST", "1", "PUT", "2", "HEAD", "3"]),
         retrieve_mode=dict(type="str", choices=["body", "0", "headers", "1", "both", "2"]),
         snmp_oid=dict(type="str", required_if=[
@@ -428,7 +437,7 @@ def main():
         ssl_key_password=dict(type="str", no_log=True),
         status_codes=dict(type="list", elements="str", default=["200"]),
         timeout=dict(type="str"),
-        trapper_hosts=dict(type="str"),
+        allowed_hosts=dict(type="str"),
         trends=dict(type="str"),
         units=dict(type="str"),
         username=dict(type="str", no_log=True, required_if=[
@@ -509,6 +518,7 @@ def main():
     body_type = module.params["body_type"]
     body = module.params["body"]
     privatekey = module.params["privatekey"]
+    publickey = module.params["publickey"]
     url_query = module.params["url_query"]
     http_method = module.params["http_method"]
     retrieve_mode = module.params["retrieve_mode"]
@@ -518,7 +528,7 @@ def main():
     ssl_key_password = module.params["ssl_key_password"]
     status_codes = module.params["status_codes"]
     timeout = module.params["timeout"]
-    trapper_hosts = module.params["trapper_hosts"]
+    allowed_hosts = module.params["allowed_hosts"]
     trends = module.params["trends"]
     units = module.params["units"]
     username = module.params["username"]
@@ -617,9 +627,9 @@ def main():
             module.exit_json(changed=True, result="Successfully deleted item %s" % item_name)
         else:            
             # update item
-            if item.check_all_properties(item_id, key, host_id, host_name, update_interval, interface, url, allow_traps, authtype, description, follow_redirects, headers, history, http_proxy, inventory_link, ipmi_sensor, jmx_endpoint, logtimefmt, master_item, params, parameters, password, body_type, body, privatekey, url_query, http_method, retrieve_mode, snmp_oid, ssl_cert_file, ssl_key_file, ssl_key_password, status_codes, timeout, trapper_hosts, trends, units, username, verify_host, verify_peer, tags, preprocessing):
+            if item.check_all_properties(item_id, key, host_id, host_name, update_interval, interface, url, allow_traps, authtype, description, follow_redirects, headers, history, http_proxy, inventory_link, ipmi_sensor, jmx_endpoint, logtimefmt, master_item, params, parameters, password, body_type, body, privatekey, publickey, url_query, http_method, retrieve_mode, snmp_oid, ssl_cert_file, ssl_key_file, ssl_key_password, status_codes, timeout, allowed_hosts, trends, units, username, verify_host, verify_peer, tags, preprocessing):
                 # update the item
-                item.update_item(item_name, item_id, key, update_interval, interface, url, allow_traps, authtype, description, follow_redirects, headers, history, http_proxy, inventory_link, ipmi_sensor, jmx_endpoint, logtimefmt, master_item, params, parameters, password, body_type, body, privatekey, url_query, http_method, retrieve_mode, snmp_oid, ssl_cert_file, ssl_key_file, ssl_key_password, status_codes, timeout, trapper_hosts, trends, units, username, verify_host, verify_peer, tags, preprocessing)
+                item.update_item(item_name, item_id, key, update_interval, interface, url, allow_traps, authtype, description, follow_redirects, headers, history, http_proxy, inventory_link, ipmi_sensor, jmx_endpoint, logtimefmt, master_item, params, parameters, password, body_type, body, privatekey, publickey, url_query, http_method, retrieve_mode, snmp_oid, ssl_cert_file, ssl_key_file, ssl_key_password, status_codes, timeout, allowed_hosts, trends, units, username, verify_host, verify_peer, tags, preprocessing)
 
                 module.exit_json(changed=True, result="Successfully updated item %s on host %s" % (item_name, host_name))
             else:
@@ -634,7 +644,7 @@ def main():
             module.fail_json(msg="Specify a host when creating item '%s'" % item_name)
 
         # create item
-        item_id = item.add_item(item_name, key, host_id, type, value_type, update_interval, interface, url, allow_traps, authtype, description, follow_redirects, headers, history, http_proxy, inventory_link, ipmi_sensor, jmx_endpoint, logtimefmt, master_item, params, parameters, password, body_type, body, privatekey, url_query, http_method, retrieve_mode, snmp_oid, ssl_cert_file, ssl_key_file, ssl_key_password, status_codes, timeout, trapper_hosts, trends, units, username, verify_host, verify_peer, tags, preprocessing)
+        item_id = item.add_item(item_name, key, host_id, type, value_type, update_interval, interface, url, allow_traps, authtype, description, follow_redirects, headers, history, http_proxy, inventory_link, ipmi_sensor, jmx_endpoint, logtimefmt, master_item, params, parameters, password, body_type, body, privatekey, publickey, url_query, http_method, retrieve_mode, snmp_oid, ssl_cert_file, ssl_key_file, ssl_key_password, status_codes, timeout, allowed_hosts, trends, units, username, verify_host, verify_peer, tags, preprocessing)
 
         module.exit_json(changed=True, result="Successfully added item %s on host %s" % (item_name, host_name))
 
