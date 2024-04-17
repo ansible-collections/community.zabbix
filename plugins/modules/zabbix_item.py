@@ -64,11 +64,11 @@ class Item(ZabbixBase):
             else:
                 rule["error_handler"] = int(rule["error_handler"])
         
-            if rule["type"] in list(1, 2, 3, 4, 5, 11, 12, 13, 14, 15, 16, 17, 18, 20, 21, 22, 23, 24, 25, 28, 29):
+            if rule["type"] in list([1, 2, 3, 4, 5, 11, 12, 13, 14, 15, 16, 17, 18, 20, 21, 22, 23, 24, 25, 28, 29]):
                 if not rule["params"]:
                     self._module.fail_json(msg="Option 'params' required in combination with the preprocessing type %s" % list(preprocessing_type_types.keys())[rule["type"]])
             
-            if rule["error_handler"] in list(2, 3):
+            if rule["error_handler"] in list([2, 3]):
                 if not rule["error_handler_params"]:
                     self._module.fail_json(msg="Option 'error_handler_params' required in combination with the preprocessing error handling type %s" % list(preprocessing_type_types.keys())[rule["error_handler_type"]])
 
@@ -633,7 +633,7 @@ def main():
         parameters = array
      
     # conditional parameter filtering
-    if type in list(2, 17, 18):
+    if type in list([2, 17, 18]):
         update_interval = "0"
 
     if master_item:
