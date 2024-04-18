@@ -34,6 +34,13 @@ class Item(ZabbixBase):
             self._module.fail_json(msg="Host not found %s" % host_name)
         return True
     
+    def get_hostid_by_host_name(self, host_name):
+        host_list = self._zapi.host.get({"output": "extend", "filter": {"host": [host_name]}})
+        if len(host_list) < 1:
+            self._module.fail_json(msg="Host not found: %s" % host_name)
+        else:
+            return int(host_list[0]["hostid"])
+        
     def get_host_interfaceid_by_host(self, interface, host_id, host_name):
         if interface:
             ip, port = interface.split(":")
@@ -47,7 +54,7 @@ class Item(ZabbixBase):
                 return result[0]["interfaceid"]
             else:
                 self._module.fail_json(msg="Host interface %s not found on host %s" % (interface, host_name))
-        return "0"
+        return "0"        
 
     def construct_preprocessing(self, preprocessing):
         preprocessing_type_types = {"custom_multiplier": 1, "right_trim": 2, "left_trim": 3, "trim": 4, "regex": 5, "bool_to_dec": 6, "oct_to_dec": 7, "hex_to_dec": 8, "simple_change": 9, "change_per_sec": 10, "xml_xpath": 11, "jsonpath": 12, "in_range": 13, "regex_match": 14, "regex_not_match": 15, "json_error_check": 16, "xml_error_check": 17, "regex_error_check": 18, "discard_unchanged": 19, "discard_unchanged_with_heartbeat": 20, "javascript": 21, "prometheus_pattern": 22, "prometheus_to_json": 23, "csv_to_json": 24, "replace": 25, "check_unsupported": 26, "xml_to_json": 27, "snmp_walk_value": 28, "snmp_walk_to_json": 29}
@@ -58,12 +65,7 @@ class Item(ZabbixBase):
                 rule["type"] = preprocessing_type_types[rule["type"]]
             else:
                 rule["type"] = int(rule["type"])
-            
-            if rule["error_handler"] in list(preprocessing_error_handler_types.keys()):
-                rule["error_handler"] = preprocessing_error_handler_types[rule["error_handler"]]
-            else:
-                rule["error_handler"] = int(rule["error_handler"])
-        
+                    
             if rule["type"] in list([1, 2, 3, 4, 5, 11, 12, 13, 14, 15, 16, 17, 18, 20, 21, 22, 23, 24, 25, 28, 29]):
                 if not rule["params"]:
                     self._module.fail_json(msg="Option 'params' required in combination with the preprocessing type %s" % list(preprocessing_type_types.keys())[rule["type"]])
@@ -71,6 +73,11 @@ class Item(ZabbixBase):
             if rule["type"] in list([1,5,6,7,8,9,10,11,12,13,14,15,16,17,18,22,23,24,26,27,28,29]):
                 if not rule["error_handler"]:
                     self._module.fail_json(msg="Option 'error_handler' required in combination with the preprocessing type %s" % list(preprocessing_type_types.keys())[rule["type"]])
+                else:
+                    if rule["error_handler"] in list(preprocessing_error_handler_types.keys()):
+                        rule["error_handler"] = preprocessing_error_handler_types[rule["error_handler"]]
+                    else:
+                        rule["error_handler"] = int(rule["error_handler"])
             else:
                 rule["error_handler"] = "0"
                 rule["error_handler_params"] = ""
@@ -81,7 +88,7 @@ class Item(ZabbixBase):
 
         return preprocessing
 
-    def add_item(self, item_name, key, host_id, type, value_type, update_interval, interfaceid, url, allow_traps, authtype, description, follow_redirects, formula, headers, history, http_proxy, inventory_link, ipmi_sensor, jmx_endpoint, logtimefmt, master_itemid, script, item_parameters, password, body_type, body, privatekey, publickey, url_query, http_method, retrieve_mode, snmp_oid, db_query, ssl_cert_file, ssl_key_file, ssl_key_password, status_codes, timeout, allowed_hosts, trends, units, username, verify_host, verify_peer, tags, preprocessing):
+    def add_item(self, item_name, key, host_id, type, value_type, update_interval, interfaceid, url, allow_traps, authtype, convert_json, description, follow_redirects, formula, headers, history, http_proxy, inventory_link, ipmi_sensor, jmx_endpoint, logtimefmt, master_itemid, script, item_parameters, password, body_type, body, privatekey, publickey, url_query, http_method, retrieve_mode, snmp_oid, db_query, ssl_cert_file, ssl_key_file, ssl_key_password, status_codes, timeout, allowed_hosts, trends, units, username, verify_host, verify_peer, tags, preprocessing):
         try:
             if self._module.check_mode:
                 self._module.exit_json(changed=True)
@@ -98,6 +105,8 @@ class Item(ZabbixBase):
                     parameters["authtype"] = authtype
                 if description is not None:
                     parameters["description"] = description
+                if convert_json is not None:
+                    parameters["output_format"] = convert_json
                 if follow_redirects is not None:
                     parameters["follow_redirects"] = follow_redirects
                 if formula is not None:
@@ -168,14 +177,13 @@ class Item(ZabbixBase):
                     parameters["tags"] = tags
                 if preprocessing is not None:
                     parameters["preprocessing"] = preprocessing                
-                # raise Exception(parameters)
                 item_list = self._zapi.item.create(parameters)
                 if len(item_list["itemids"]) >= 1:
                     return item_list["itemids"][0]
         except Exception as e:
             self._module.fail_json(msg="Failed to create item %s: %s" % (item_name, e))
     
-    def update_item(self, item_name, item_id, key, update_interval, interfaceid, url, allow_traps, authtype, description, follow_redirects, formula, headers, history, http_proxy, inventory_link, ipmi_sensor, jmx_endpoint, logtimefmt, master_itemid, script, item_parameters, password, body_type, body, privatekey, publickey, url_query, http_method, retrieve_mode, snmp_oid, db_query, ssl_cert_file, ssl_key_file, ssl_key_password, status_codes, timeout, allowed_hosts, trends, units, username, verify_host, verify_peer, tags, preprocessing):
+    def update_item(self, item_name, item_id, key, update_interval, interfaceid, url, allow_traps, authtype, convert_json, description, follow_redirects, formula, headers, history, http_proxy, inventory_link, ipmi_sensor, jmx_endpoint, logtimefmt, master_itemid, script, item_parameters, password, body_type, body, privatekey, publickey, url_query, http_method, retrieve_mode, snmp_oid, db_query, ssl_cert_file, ssl_key_file, ssl_key_password, status_codes, timeout, allowed_hosts, trends, units, username, verify_host, verify_peer, tags, preprocessing):
         try:
             if self._module.check_mode:
                 self._module.exit_json(changed=True)
@@ -195,6 +203,8 @@ class Item(ZabbixBase):
                     parameters["allow_traps"] = allow_traps
                 if authtype is not None:
                     parameters["authtype"] = authtype
+                if convert_json is not None:
+                    parameters["output_format"] = convert_json
                 if description is not None:
                     parameters["description"] = description
                 if follow_redirects is not None:
@@ -266,7 +276,7 @@ class Item(ZabbixBase):
                 if tags is not None:
                     parameters["tags"] = tags
                 if preprocessing is not None:
-                    parameters["preprocessing"] = preprocessing                
+                    parameters["preprocessing"] = preprocessing
                 self._zapi.item.update(parameters)
         except Exception as e:
             self._module.fail_json(msg="Failed to update item %s: %s" % (item_name, e))
@@ -279,15 +289,8 @@ class Item(ZabbixBase):
         except Exception as e:
             self._module.fail_json(msg="Failed to delete item %s: %s" % (item_name, e))
 
-    def get_hostid_by_host_name(self, host_name):
-        host_list = self._zapi.host.get({"output": "extend", "filter": {"host": [host_name]}})
-        if len(host_list) < 1:
-            self._module.fail_json(msg="Host not found: %s" % host_name)
-        else:
-            return int(host_list[0]["hostid"])
-        
-    def check_all_properties(self, item_id, key, host_id, host_name, update_interval, interfaceid, url, allow_traps, authtype, description, follow_redirects, formula, headers, history, http_proxy, inventory_link, ipmi_sensor, jmx_endpoint, logtimefmt, master_itemid, script, parameters, password, body_type, body, privatekey, publickey, url_query, http_method, retrieve_mode, snmp_oid, db_query, ssl_cert_file, ssl_key_file, ssl_key_password, status_codes, timeout, allowed_hosts, trends, units, username, verify_host, verify_peer, tags, preprocessing):
-        exist_item = self._zapi.item.get({"output": "extend", "filter": {"itemid": item_id}})[0]
+    def check_all_properties(self, item_id, key, host_id, host_name, update_interval, interfaceid, url, allow_traps, authtype, convert_json, description, follow_redirects, formula, headers, history, http_proxy, inventory_link, ipmi_sensor, jmx_endpoint, logtimefmt, master_itemid, script, parameters, password, body_type, body, privatekey, publickey, url_query, http_method, retrieve_mode, snmp_oid, db_query, ssl_cert_file, ssl_key_file, ssl_key_password, status_codes, timeout, allowed_hosts, trends, units, username, verify_host, verify_peer, tags, preprocessing):
+        exist_item = self._zapi.item.get({"output": "extend", "selectPreprocessing": "extend", "selectTags": "extend", "filter": {"itemid": item_id}})[0]
         if host_id and host_id != int(exist_item["hostid"]):
             return True
         if key and key != exist_item["key_"]:
@@ -301,6 +304,8 @@ class Item(ZabbixBase):
         if allow_traps and allow_traps != exist_item["allow_traps"]:
             return True
         if authtype and authtype != exist_item["authtype"]:
+            return True
+        if convert_json and convert_json != exist_item["output_format"]:
             return True
         if description and description != exist_item["description"]:
             return True
@@ -422,7 +427,7 @@ def main():
         headers=dict(type="dict"),
         history=dict(type="str"),
         http_proxy=dict(type="str"),
-        inventory_link=dict(type="str"),
+        inventory_link=dict(type="str", choices=["type", "1", "type_full", "2", "name", "3", "alias", "4", "os", "5", "os_full", "6", "os_short", "7", "serialno_a", "8", "serialno_b", "9", "tag", "10", "asset_tag", "11", "macaddress_a", "12", "macaddress_b", "13", "hardware", "14", "hardware_full", "15", "software", "16", "software_full", "17", "software_app_a", "18", "software_app_b", "19", "software_app_c", "20", "software_app_d", "21", "software_app_e", "22", "contact", "23", "location", "24", "location_lat", "25", "location_lon", "26", "notes", "27", "chassis", "28", "model", "29", "hw_arch", "30", "vendor", "31", "contract_number", "32", "installer_name", "33", "deployment_status", "34", "url_a", "35", "url_b", "36", "url_c", "37", "host_networks", "38", "host_netmask", "39", "host_router", "40", "oob_ip", "41", "oob_netmask", "42", "oob_router", "43", "date_hw_purchase", "44", "date_hw_install", "45", "date_hw_expiry", "46", "date_hw_decomm", "47", "site_address_a", "48", "site_address_b", "49", "site_address_c", "50", "site_city", "51", "site_state", "52", "site_country", "53", "site_zip", "54", "site_rack", "55", "site_notes", "56", "poc_1_name", "57", "poc_1_email", "58", "poc_1_phone_a", "59", "poc_1_phone_b", "60", "poc_1_cell", "61", "poc_1_screen", "62", "poc_1_notes", "63", "poc_2_name", "64", "poc_2_email", "65", "poc_2_phone_a", "66", "poc_2_phone_b", "67", "poc_2_cell", "68", "poc_2_screen", "69", "poc_2_notes", "70"]),
         ipmi_sensor=dict(type="str", required_if=[
             ["type", 12, ["ipmi"]],
         ]),
@@ -431,7 +436,7 @@ def main():
         master_item=dict(type="str", required_if=[
             ["type", 18, ["dependent"]],
         ]),
-        output_format=dict(type="str", choices=["raw", "0", "json", "1"]),
+        convert_json=dict(type="bool"),
         parameters=dict(type="dict"),
         password=dict(type="str", no_log=True),
         body_type=dict(type="str", choices=["raw", "0", "json", "2", "xml", "3"]),
@@ -562,7 +567,7 @@ def main():
     jmx_endpoint = module.params["jmx_endpoint"]
     logtimefmt = module.params["logtimefmt"]
     master_item = module.params["master_item"]
-    output_format = module.params["output_format"]
+    convert_json = module.params["convert_json"]
     script = module.params["script"]
     db_query = module.params["db_query"]
     parameters = module.params["parameters"]
@@ -624,23 +629,41 @@ def main():
     if interface:
         interface = item.get_host_interfaceid_by_host(interface, host_id, host_name)
 
+    if inventory_link:
+        if value_type in list([0, 1, 3, 4]):
+            inventory = {"type":1,"type_full":2,"name":3,"alias":4,"os":5,"os_full":6,"os_short":7,"serialno_a":8,"serialno_b":9,"tag":10,"asset_tag":11,"macaddress_a":12,"macaddress_b":13,"hardware":14,"hardware_full":15,"software":16,"software_full":17,"software_app_a":18,"software_app_b":19,"software_app_c":20,"software_app_d":21,"software_app_e":22,"contact":23,"location":24,"location_lat":25,"location_lon":26,"notes":27,"chassis":28,"model":29,"hw_arch":30,"vendor":31,"contract_number":32,"installer_name":33,"deployment_status":34,"url_a":35,"url_b":36,"url_c":37,"host_networks":38,"host_netmask":39,"host_router":40,"oob_ip":41,"oob_netmask":42,"oob_router":43,"date_hw_purchase":44,"date_hw_install":45,"date_hw_expiry":46,"date_hw_decomm":47,"site_address_a":48,"site_address_b":49,"site_address_c":50,"site_city":51,"site_state":52,"site_country":53,"site_zip":54,"site_rack":55,"site_notes":56,"poc_1_name":57,"poc_1_email":58,"poc_1_phone_a":59,"poc_1_phone_b":60,"poc_1_cell":61,"poc_1_screen":62,"poc_1_notes":63,"poc_2_name":64,"poc_2_email":65,"poc_2_phone_a":66,"poc_2_phone_b":67,"poc_2_cell":68,"poc_2_screen":69,"poc_2_notes":70}
+            if inventory_link in list(inventory):
+                inventory_link = inventory[inventory_link]
+            else:
+                inventory_link = int(inventory_link)
+        else:
+            inventoryid = "0"
+
     # convert bools/choices to integers
     if allow_traps:
         allow_traps = 1 if allow_traps == True else 0
-    if authtype:
-        authtype_types = {"password": 0, "publickey": 1, "none": 0, "basic": 1, "ntlm": 2, "kerberos": 3}
-        if authtype in list(authtype_types.keys()):
-            authtype = authtype_types[authtype]
+    if type == 13:
+        if authtype:
+            authtype_types = {"password": 0, "publickey": 1}
+            if authtype in list(authtype_types.keys()):
+                authtype = authtype_types[authtype]
+            else:
+                authtype = int(authtype)
         else:
-            authtype = int(authtype)
+            authtype = 0
+    if type == 19:
+        if authtype:
+            authtype_types = {"password": 0, "publickey": 1, "none": 0, "basic": 1, "ntlm": 2, "kerberos": 3}
+            if authtype in list(authtype_types.keys()):
+                authtype = authtype_types[authtype]
+            else:
+                authtype = int(authtype)
+        else:
+            authtype = 0
     if follow_redirects:
         follow_redirects = 1 if follow_redirects == True else 0
-    if output_format:
-        output_format_types = {"raw": 0, "json": 1}
-        if output_format in list(output_format_types.keys()):
-            output_format = output_format_types[output_format]
-        else:
-            output_format = int(output_format)
+    if convert_json:
+        convert_json = 1 if convert_json == True else 0
     if body_type:
         body_type_types = {"raw": 0, "json": 2, "xml": 3}
         if body_type in list(body_type_types.keys()):
@@ -683,14 +706,9 @@ def main():
     # conditional parameter filtering
     if type in list([2, 17, 18]):
         update_interval = "0"
-    if type == 13 and authtype is None:
-        authtype = 0
-    if type == 19 and authtype is None:
-        authtype = 0
 
     if master_item:
         master_item = item.get_itemid_by_item_and_hostid(master_item, host_id)[0]["itemid"]
-
     # check if item exist
     is_item_exist = item.is_item_exist(item_name, host_name)
     if is_item_exist:
@@ -702,9 +720,9 @@ def main():
             module.exit_json(changed=True, result="Successfully deleted item %s" % item_name)
         else:            
             # update item
-            if item.check_all_properties(item_id, key, host_id, host_name, update_interval, interface, url, allow_traps, authtype, description, follow_redirects, formula, headers, history, http_proxy, inventory_link, ipmi_sensor, jmx_endpoint, logtimefmt, master_item, script, parameters, password, body_type, body, privatekey, publickey, url_query, http_method, retrieve_mode, snmp_oid, db_query, ssl_cert_file, ssl_key_file, ssl_key_password, status_codes, timeout, allowed_hosts, trends, units, username, verify_host, verify_peer, tags, preprocessing):
+            if item.check_all_properties(item_id, key, host_id, host_name, update_interval, interface, url, allow_traps, authtype, convert_json, description, follow_redirects, formula, headers, history, http_proxy, inventory_link, ipmi_sensor, jmx_endpoint, logtimefmt, master_item, script, parameters, password, body_type, body, privatekey, publickey, url_query, http_method, retrieve_mode, snmp_oid, db_query, ssl_cert_file, ssl_key_file, ssl_key_password, status_codes, timeout, allowed_hosts, trends, units, username, verify_host, verify_peer, tags, preprocessing):
                 # update the item
-                item.update_item(item_name, item_id, key, update_interval, interface, url, allow_traps, authtype, description, follow_redirects, formula, headers, history, http_proxy, inventory_link, ipmi_sensor, jmx_endpoint, logtimefmt, master_item, script, parameters, password, body_type, body, privatekey, publickey, url_query, http_method, retrieve_mode, snmp_oid, db_query, ssl_cert_file, ssl_key_file, ssl_key_password, status_codes, timeout, allowed_hosts, trends, units, username, verify_host, verify_peer, tags, preprocessing)
+                item.update_item(item_name, item_id, key, update_interval, interface, url, allow_traps, authtype, convert_json, description, follow_redirects, formula, headers, history, http_proxy, inventory_link, ipmi_sensor, jmx_endpoint, logtimefmt, master_item, script, parameters, password, body_type, body, privatekey, publickey, url_query, http_method, retrieve_mode, snmp_oid, db_query, ssl_cert_file, ssl_key_file, ssl_key_password, status_codes, timeout, allowed_hosts, trends, units, username, verify_host, verify_peer, tags, preprocessing)
 
                 module.exit_json(changed=True, result="Successfully updated item %s on host %s" % (item_name, host_name))
             else:
@@ -719,7 +737,7 @@ def main():
             module.fail_json(msg="Specify a host when creating item '%s'" % item_name)
 
         # create item
-        item_id = item.add_item(item_name, key, host_id, type, value_type, update_interval, interface, url, allow_traps, authtype, description, follow_redirects, formula, headers, history, http_proxy, inventory_link, ipmi_sensor, jmx_endpoint, logtimefmt, master_item, script, parameters, password, body_type, body, privatekey, publickey, url_query, http_method, retrieve_mode, snmp_oid, db_query, ssl_cert_file, ssl_key_file, ssl_key_password, status_codes, timeout, allowed_hosts, trends, units, username, verify_host, verify_peer, tags, preprocessing)
+        item_id = item.add_item(item_name, key, host_id, type, value_type, update_interval, interface, url, allow_traps, authtype, convert_json, description, follow_redirects, formula, headers, history, http_proxy, inventory_link, ipmi_sensor, jmx_endpoint, logtimefmt, master_item, script, parameters, password, body_type, body, privatekey, publickey, url_query, http_method, retrieve_mode, snmp_oid, db_query, ssl_cert_file, ssl_key_file, ssl_key_password, status_codes, timeout, allowed_hosts, trends, units, username, verify_host, verify_peer, tags, preprocessing)
 
         module.exit_json(changed=True, result="Successfully added item %s on host %s" % (item_name, host_name))
 
