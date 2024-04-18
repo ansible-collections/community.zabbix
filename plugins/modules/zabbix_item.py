@@ -7,9 +7,486 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
+DOCUMENTATION = r"""
+module: zabbix_item
+short_description: Create/update/delete Zabbix items on hosts
+description:
+    - This module allows you to create, modify and delete Zabbix item entries associated on hosts.
+author:
+    - "Cove (@cove)"
+    - Tony Minfei Ding (!UNKNOWN)
+    - Harrison Gu (@harrisongu)
+    - Werner Dijkerman (@dj-wasabi)
+    - Eike Frost (@eikef)
+    - Lars van der Hooft (@ljvdhooft)
+requirements:
+    - "python >= 3.9"
+options:
+    item_name:
+        description:
+            - Name of the item in Zabbix.
+        type: str
+        required: true
+    key:
+        description:
+            - Key of the item in Zabbix.
+            - Key must be unique from other items.
+            - Required if I(state="present")
+        type: str
+    description:
+        description:
+            - Description of the item in Zabbix.
+        type: str
+    host_name:
+        description:
+            - Name of the host associated to the item.
+            - Required if I(state="present")
+        type: str
+    state:
+        description:
+            - State of the item.
+            - On C(present), it will create if item does not exist or update the item if the associated data is different.
+            - On C(absent), it will remove an item if it exists.
+        choices: ["present", "absent"]
+        default: "present"
+        type: str
+    status:
+        description:
+            - Monitoring status of the item.
+        choices: ["enabled", "disabled"]
+        default: "enabled"
+        type: str
+    type:
+        description:
+            - Type of the check performed.
+            - Numerical values are also accepted for type.
+            - Required if I(state="present")
+            - 0 = zabbix_agent 
+            - 2 = zabbix_trapper 
+            - 3 = simple_check 
+            - 5 = zabbix_internal 
+            - 7 = zabbix_agent_active 
+            - 9 = web_item 
+            - 10 = external_check 
+            - 11 = database_monitor 
+            - 12 = ipmi 
+            - 13 = ssh 
+            - 14 = telnet 
+            - 15 = calculated 
+            - 16 = jmx 
+            - 17 = snmp_trap 
+            - 18 = dependent 
+            - 19 = http 
+            - 20 = snmp_agent 
+            - 21 = script        
+        choices: ["zabbix_agent", "0", "zabbix_trapper", "2", "simple_check", "3", "zabbix_internal", "5", "zabbix_agent_active", "7", "web_item", "9", "external_check", "10", "database_monitor", "11", "ipmi", "12", "ssh", "13", "telnet", "14", "calculated", "15", "jmx", "16", "snmp_trap", "17", "dependent", "18", "http", "19", "snmp_agent", "20", "script", "21"]
+        type: str
+    value_type:
+        description:
+            - Type of the data stored during the check.
+            - Required if I(state="present")
+            - Numerical values are also accepted for value_type.
+            - 0 = float
+            - 1 = character
+            - 2 = log
+            - 3 = unsigned
+            - 4 = text
+        choices: ["float", "0", "character", "1", "log", "2", "unsigned", "3", "text", "4"]
+        type: str
+    update_interval:
+        description:
+            - The interval at which the item should perform checks.
+            - Required if I(state="present")
+        type: str
+    interface:
+        description:
+            - The host's interface specified for checks.
+            - Formatted in [ip/dns]:[port]
+            - Required if I(type="zabbix_agent")
+            - Required if I(type="ipmi")
+            - Required if I(type="jmx")
+            - Required if I(type="snmp_trap")
+            - Required if I(type="snmp_agent")
+        type: str
+    url:
+        description:
+            - The URL to perform checks at.
+            - Required if I(type="http")
+        type: str
+    allow_traps:
+        description:
+            - Allow to populate value similarly to the trapper item.
+        type: bool
+    authtype:
+        description:
+            - Authentication method
+            - If I(type="ssh"): 0 = password (default)
+            - If I(type="ssh"): 1 = publickey
+            - If I(type="http"): 0 = none (default)
+            - If I(type="http"): 1 = basic
+            - If I(type="http"): 2 = ntlm
+            - If I(type="http"): 3 = kerberos
+        type: str
+        choices: ["password", "0", "publickey", "1", "none", "0", "basic", "1", "ntlm", "2", "kerberos", "3"]
+    follow_redirects:
+        description:
+            - Follow response redirects while polling http data.
+        type: bool
+    formula:
+        description:
+            - Formula for the calculated items when .
+        type: str
+    headers:
+        description:
+            - Headers used for a HTTP request.
+            - Headers must be formatted as a dict.
+        type: dict
+    history:
+        description:
+            - Defines the time that history data is stored.
+        type: str
+    http_proxy:
+        description:
+            - Proxy connection used in a HTTP request.
+        type: str
+    inventory_link:
+        description:
+            - Defines the property used to populate the inventory field with the check result
+            - Supported if I(value_type="float")
+            - Supported if I(value_type="character")
+            - Supported if I(value_type="unsigned")
+            - Supported if I(value_type="text")
+            - 1 = type
+            - 2 = type_full
+            - 3 = name
+            - 4 = alias
+            - 5 = os
+            - 6 = os_full
+            - 7 = os_short
+            - 8 = serialno_a
+            - 9 = serialno_b
+            - 10 = tag
+            - 11 = asset_tag
+            - 12 = macaddress_a
+            - 13 = macaddress_b
+            - 14 = hardware
+            - 15 = hardware_full
+            - 16 = software
+            - 17 = software_full
+            - 18 = software_app_a
+            - 19 = software_app_b
+            - 20 = software_app_c
+            - 21 = software_app_d
+            - 22 = software_app_e
+            - 23 = contact
+            - 24 = location
+            - 25 = location_lat
+            - 26 = location_lon
+            - 27 = notes
+            - 28 = chassis
+            - 29 = model
+            - 30 = hw_arch
+            - 31 = vendor
+            - 32 = contract_number
+            - 33 = installer_name
+            - 34 = deployment_status
+            - 35 = url_a
+            - 36 = url_b
+            - 37 = url_c
+            - 38 = host_networks
+            - 39 = host_netmask
+            - 40 = host_router
+            - 41 = oob_ip
+            - 42 = oob_netmask
+            - 43 = oob_router
+            - 44 = date_hw_purchase
+            - 45 = date_hw_install
+            - 46 = date_hw_expiry
+            - 47 = date_hw_decomm
+            - 48 = site_address_a
+            - 49 = site_address_b
+            - 50 = site_address_c
+            - 51 = site_city
+            - 52 = site_state
+            - 53 = site_country
+            - 54 = site_zip
+            - 55 = site_rack
+            - 56 = site_notes
+            - 57 = poc_1_name
+            - 58 = poc_1_email
+            - 59 = poc_1_phone_a
+            - 60 = poc_1_phone_b
+            - 61 = poc_1_cell
+            - 62 = poc_1_screen
+            - 63 = poc_1_notes
+            - 64 = poc_2_name
+            - 65 = poc_2_email
+            - 66 = poc_2_phone_a
+            - 67 = poc_2_phone_b
+            - 68 = poc_2_cell
+            - 69 = poc_2_screen
+            - 70 = poc_2_notes
+        choices: ["type", "1", "type_full", "2", "name", "3", "alias", "4", "os", "5", "os_full", "6", "os_short", "7", "serialno_a", "8", "serialno_b", "9", "tag", "10", "asset_tag", "11", "macaddress_a", "12", "macaddress_b", "13", "hardware", "14", "hardware_full", "15", "software", "16", "software_full", "17", "software_app_a", "18", "software_app_b", "19", "software_app_c", "20", "software_app_d", "21", "software_app_e", "22", "contact", "23", "location", "24", "location_lat", "25", "location_lon", "26", "notes", "27", "chassis", "28", "model", "29", "hw_arch", "30", "vendor", "31", "contract_number", "32", "installer_name", "33", "deployment_status", "34", "url_a", "35", "url_b", "36", "url_c", "37", "host_networks", "38", "host_netmask", "39", "host_router", "40", "oob_ip", "41", "oob_netmask", "42", "oob_router", "43", "date_hw_purchase", "44", "date_hw_install", "45", "date_hw_expiry", "46", "date_hw_decomm", "47", "site_address_a", "48", "site_address_b", "49", "site_address_c", "50", "site_city", "51", "site_state", "52", "site_country", "53", "site_zip", "54", "site_rack", "55", "site_notes", "56", "poc_1_name", "57", "poc_1_email", "58", "poc_1_phone_a", "59", "poc_1_phone_b", "60", "poc_1_cell", "61", "poc_1_screen", "62", "poc_1_notes", "63", "poc_2_name", "64", "poc_2_email", "65", "poc_2_phone_a", "66", "poc_2_phone_b", "67", "poc_2_cell", "68", "poc_2_screen", "69", "poc_2_notes", "70"]
+        type: str
+    ipmi_sensor:
+        description:
+            - Defines IPMI sensor.
+        type: str
+    jmx_endpoint:
+        description:
+            - Defines custom connection string for JMX agent.
+        type: str
+    logtimefmt:
+        description:
+            - Defines the format of the time in log entries.
+        type: str
+    master_item:
+        description:
+            - Defines the master item used in dependent checks.
+            - Required if I(type="dependent")
+        type: str
+    convert_json:
+        description:
+            - Defines if the response body should be converted to a JSON object.
+        type: bool
+    script:
+        description:
+            - The script used when I(type="script"), I(type="ssh") or I(type="telnet").
+        type: str
+    parameters:
+        description:
+            - Additional parameters for script type.
+        type: str
+    password:
+        description:
+            - Password used when I(type="jmx"), I(type="simple_check"), I(type="ssh"), I(type="telnet"), I(type="database_monitor"), I(type="http").
+            - Required if I(type="jmx") and username is set.
+        type: str
+    body_type:
+        description:
+            - Defines the body type of the HTTP request.
+            - 0 = raw
+            - 1 = json
+            - 2 = xml
+        choices: ["raw", "0", "json", "2", "xml", "3"]
+        type: str
+    body:
+        description:
+            - Defines the body used for the HTTP request.
+        type: str
+    privatekey:
+        description:
+            - Defines the path to the private key file used for the SSH agent when using public key authentication.
+            - Required if I(type="ssh") and I(authtype="publickey")
+        type: str
+    publickey:
+        description:
+            - Defines the path to the public key file used for the SSH agent when using public key authentication.
+            - Required if I(type="ssh") and I(authtype="publickey")
+        type: str
+    url_query:
+        description:
+            - Defines the query parameters used for the HTTP request.
+            - Query entries must be formatted in object form (dict).
+        type: dict
+    http_method:
+        description:
+            - Defines the HTTP method used for the request.
+            - 0 = GET
+            - 1 = POST
+            - 2 = PUT
+            - 3 = HEAD
+        choices: ["GET", "0", "POST", "1", "PUT", "2", "HEAD", "3"]
+        type: str
+    retrieve_mode:
+        description:
+            - Defines if either the body, headers or both are processed in response of the HTTP request.
+            - 0 = body (default)
+            - 1 = headers
+            - 2 = both
+        choices: ["body", "0", "headers", "1", "both", "2"]
+        type: str
+    snmp_oid:
+        description:
+            - Defines the OID filtered on with the SMTP agent.
+            - Required if I(type="snmp_agent")
+        type: str
+    db_query:
+        description:
+            - Defines the query used for the database_monitor check.
+            - Required if I(type="database_monitor")
+        type: str
+    ssl_cert_file:
+        description:
+            - Defines the path of the public SSL key file used with the HTTP check.
+        type: str
+    ssl_key_file:
+        description:
+            - Defines the path of the private SSL key file used with the HTTP check.
+        type: str
+    ssl_key_password:
+        description:
+            - Defines the password of the SSL key file used with the HTTP check.
+        type: str
+    status_codes:
+        description:
+            - Defines the response status codes filtered on with the HTTP check.
+            - Entries must be formatted in list
+        type: list
+    timeout:
+        description:
+            - Defines the timeout for item polling.
+        type: str
+    allowed_hosts:
+        description:
+            - Allowed hosts.
+        type: str
+    trends:
+        description:
+            - Defines the time of how long data should be stored.
+        type: str
+    units:
+        description:
+            - Defines the unit of the check's value.
+        type: str
+    username:
+        description:
+            - Username for check authentication.
+            - Required if I(type="ssh")
+            - Required if I(type="telnet")
+            - Required if I(type="jmx")
+        type: str
+    verify_host:
+        description:
+            - Defines an extra check if the host's name matches the certificate.
+        type: bool
+    verify_peer:
+        description:
+            - Defines an extra check if the host's certificate is authentic.
+        type: bool
+    tags:
+        description:
+            - Defines tags used by Zabbix.
+            - Entries must be formatted as a list with objects that contain 'tag' and 'value'
+        type: list
+        elements: dict
+        suboptions:
+            tag:
+                description:
+                    - The name of the tag
+                type: str
+            value:
+                description:
+                    - The value of the tag
+                type: str
+    preprocessing:
+        description:
+            - Defines the Zabbix preprocessing rules used for the item.
+            - Entries must be formatted as a list with objects that contain 'type', 
+        type: list
+        elements: dict
+        suboptions:
+            type:
+                description:
+                    - The type of Zabbix preprocessing used.
+                    - 1 = custom_multiplier
+                    - 2 = right_trim
+                    - 3 = left_trim
+                    - 4 = trim
+                    - 5 = regex
+                    - 6 = bool_to_dec
+                    - 7 = oct_to_dec
+                    - 8 = hex_to_dec
+                    - 9 = simple_change
+                    - 10 = change_per_sec
+                    - 11 = xml_xpath
+                    - 12 = jsonpath
+                    - 13 = in_range
+                    - 14 = regex_match
+                    - 15 = regex_not_match
+                    - 16 = json_error_check
+                    - 17 = xml_error_check
+                    - 18 = regex_error_check
+                    - 19 = discard_unchanged
+                    - 20 = discard_unchanged_with_heartbeat
+                    - 21 = javascript
+                    - 22 = prometheus_pattern
+                    - 23 = prometheus_to_json
+                    - 24 = csv_to_json
+                    - 25 = replace
+                    - 26 = check_unsupported
+                    - 27 = xml_to_json
+                    - 28 = snmp_walk_value
+                    - 29 = snmp_walk_to_json
+                choices: ["custom_multiplier", "1", "right_trim", "2", "left_trim", "3", "trim", "4", "regex", "5", "bool_to_dec", "6", "oct_to_dec", "7", "hex_to_dec", "8", "simple_change", "9", "change_per_sec", "10", "xml_xpath", "11", "jsonpath", "12", "in_range", "13", "regex_match", "14", "regex_not_match", "15", "json_error_check", "16", "xml_error_check", "17", "regex_error_check", "18", "discard_unchanged", "19", "discard_unchanged_with_heartbeat", "20", "javascript", "21", "prometheus_pattern", "22", "prometheus_to_json", "23", "csv_to_json", "24", "replace", "25", "check_unsupported", "26", "xml_to_json", "27", "snmp_walk_value", "28", "snmp_walk_to_json", "29"]
+                type: str
+            params:
+                description:
+                    - Additional parameters depending on the type of preprocessing.
+                    - Required if I(type="custom_multiplier")
+                    - Required if I(type="right_trim")
+                    - Required if I(type="left_trim")
+                    - Required if I(type="trim")
+                    - Required if I(type="regex")
+                    - Required if I(type="xml_xpath")
+                    - Required if I(type="jsonpath")
+                    - Required if I(type="in_range")
+                    - Required if I(type="regex_match")
+                    - Required if I(type="regex_not_match")
+                    - Required if I(type="json_error_check")
+                    - Required if I(type="xml_error_check")
+                    - Required if I(type="regex_error_check")
+                    - Required if I(type="discard_unchanged_with_heartbeat")
+                    - Required if I(type="javascript")
+                    - Required if I(type="prometheus_pattern")
+                    - Required if I(type="prometheus_to_json")
+                    - Required if I(type="csv_to_json")
+                    - Required if I(type="replace")
+                    - Required if I(type="snmp_walk_value")
+                    - Required if I(type="snmp_walk_to_jso")
+                type: str
+            error_handling:
+                description:
+                    - Defines the preprocessing error handling.
+                    - 0 = zabbix
+                    - 1 = discard
+                    - 2 = custom_value
+                    - 3 = custom_message
+                    - Required if I(type="custom_multiplier")
+                    - Required if I(type="regex")
+                    - Required if I(type="bool_to_dec")
+                    - Required if I(type="oct_to_dec")
+                    - Required if I(type="hex_to_dec")
+                    - Required if I(type="simple_change")
+                    - Required if I(type="change_per_sec")
+                    - Required if I(type="xml_xpath")
+                    - Required if I(type="jsonpath")
+                    - Required if I(type="in_range")
+                    - Required if I(type="regex_match")
+                    - Required if I(type="regex_not_match")
+                    - Required if I(type="json_error_check")
+                    - Required if I(type="xml_error_check")
+                    - Required if I(type="regex_error_check")
+                    - Required if I(type="prometheus_pattern")
+                    - Required if I(type="prometheus_to_json")
+                    - Required if I(type="csv_to_json")
+                    - Required if I(type="check_unsupported")
+                    - Required if I(type="xml_to_json")
+                    - Required if I(type="snmp_walk_value")
+                    - Required if I(type="snmp_walk_to_json)
+                choices: ["zabbix", "0", "discard", "1", "custom_value", "2", "custom_message", "3"]
+                type: str
+            error_handling_params:
+                description:
+                    - The parameters used when 'error_handling' is set to 'custom_value' or 'custom_message'
+                    - Required if I(error_handling="custom_value")
+                    - Required if I(error_handling="custom_message")
+                type: str
 
 
-import copy
+"""
+
+import copy, re
 
 from ansible.module_utils.basic import AnsibleModule
 
