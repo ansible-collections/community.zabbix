@@ -67,10 +67,17 @@ class Item(ZabbixBase):
             if rule["type"] in list([1, 2, 3, 4, 5, 11, 12, 13, 14, 15, 16, 17, 18, 20, 21, 22, 23, 24, 25, 28, 29]):
                 if not rule["params"]:
                     self._module.fail_json(msg="Option 'params' required in combination with the preprocessing type %s" % list(preprocessing_type_types.keys())[rule["type"]])
-            
+
+            if rule["type"] in list([1,5,6,7,8,9,10,11,12,13,14,15,16,17,18,22,23,24,26,27,28,29]):
+                if not rule["error_handler"]:
+                    self._module.fail_json(msg="Option 'error_handler' required in combination with the preprocessing type %s" % list(preprocessing_type_types.keys())[rule["type"]])
+            else:
+                rule["error_handler"] = "0"
+                rule["error_handler_params"] = ""
+
             if rule["error_handler"] in list([2, 3]):
                 if not rule["error_handler_params"]:
-                    self._module.fail_json(msg="Option 'error_handler_params' required in combination with the preprocessing error handling type %s" % list(preprocessing_type_types.keys())[rule["error_handler_type"]])
+                    self._module.fail_json(msg="Option 'error_handler_params' required in combination with the preprocessing error handling type %s" % list(preprocessing_error_handler_types.keys())[rule["error_handler_type"]])
 
         return preprocessing
 
@@ -496,7 +503,30 @@ def main():
                 ["type", 28, ["snmp_walk_value"]],
                 ["type", 29, ["snmp_walk_to_json"]]
                 ]),
-            error_handler=dict(type="str", default="0", choices=["zabbix", "0", "discard", "1", "custom_value", "2", "custom_message", "3"]),
+            error_handler=dict(type="str", choices=["zabbix", "0", "discard", "1", "custom_value", "2", "custom_message", "3"], required_if=[
+                ["type", 1, ["custom_multiplier"]],
+                ["type", 5, ["regex"]],
+                ["type", 6, ["bool_to_dec"]],
+                ["type", 7, ["oct_to_dec"]],
+                ["type", 8, ["hex_to_dec"]],
+                ["type", 9, ["simple_change"]],
+                ["type", 10, ["change_per_sec"]],
+                ["type", 11, ["xml_xpath"]],
+                ["type", 12, ["jsonpath"]],
+                ["type", 13, ["in_range"]],
+                ["type", 14, ["regex_match"]],
+                ["type", 15, ["regex_not_match"]],
+                ["type", 16, ["json_error_check"]],
+                ["type", 17, ["xml_error_check"]],
+                ["type", 18, ["regex_error_check"]],
+                ["type", 22, ["prometheus_pattern"]],
+                ["type", 23, ["prometheus_to_json"]],
+                ["type", 24, ["csv_to_json"]],
+                ["type", 26, ["check_unsupported"]],
+                ["type", 27, ["xml_to_json"]],
+                ["type", 28, ["snmp_walk_value"]],
+                ["type", 29, ["snmp_walk_to_json"]]
+                ]),
             error_handler_params=dict(type="str", required_if=[
                 ["error_handler", 2, "custom_value"], 
                 ["error_handler", 3, "custom_message"]
