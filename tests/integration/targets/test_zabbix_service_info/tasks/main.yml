@@ -47,9 +47,11 @@
 - name: test - cleanup test Zabbix child service
   community.zabbix.zabbix_service:
     state: absent
+    sortorder: 0
     name: ExampleChildService
 
 - name: test - cleanup test Zabbix service
   community.zabbix.zabbix_service:
     state: absent
+    sortorder: 0
     name: ExampleService
