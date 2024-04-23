@@ -31,9 +31,18 @@
         name: "{{ zabbix_proxy_dbuser }}"
         password: "{{ ('md5' + (zabbix_proxy_dbpassword + zabbix_proxy_dbuser)|hash('md5')) if zabbix_proxy_dbpassword_hash_method == 'md5' else zabbix_proxy_dbpassword }}"
         port: "{{ zabbix_proxy_dbport }}"
-        priv: ALL
         state: present
         encrypted: true
+
+    - name: PostgreSQL | Delegated | GRANT ALL PRIVILEGES ON SCHEMA public TO {{ zabbix_proxy_dbuser }}
+      community.postgresql.postgresql_privs:
+        db: "{{ zabbix_proxy_dbname }}"
+        role: "{{ zabbix_proxy_dbuser }}"
+        privs: ALL
+        type: schema
+        objs: public
+        state: present
+        port: "{{ zabbix_proxy_dbport }}"
   become: true
   become_user: postgres
   delegate_to: "{{ delegated_dbhost }}"
@@ -66,6 +75,17 @@
         priv: ALL
         state: present
         encrypted: true
+    - name: PostgreSQL | Remote | GRANT ALL PRIVILEGES ON SCHEMA public TO {{ zabbix_proxy_dbuser }}
+      community.postgresql.postgresql_privs:
+        login_host: "{{ zabbix_proxy_pgsql_login_host | default(omit) }}"
+        login_user: "{{ zabbix_proxy_pgsql_login_user | default(omit) }}"
+        login_password: "{{ zabbix_proxy_pgsql_login_password | default(omit) }}"
+        db: "{{ zabbix_proxy_dbname }}"
+        role: "{{ zabbix_proxy_dbuser }}"
+        type: schema
+        objs: public
+        state: present
+        port: "{{ zabbix_proxy_dbport }}"
   when:
     - zabbix_proxy_database_creation
     - zabbix_proxy_pgsql_login_host is defined
