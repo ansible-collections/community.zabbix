@@ -72,7 +72,6 @@
         name: "{{ zabbix_proxy_dbuser }}"
         password: "{{ ('md5' + (zabbix_proxy_dbpassword + zabbix_proxy_dbuser)|hash('md5')) if zabbix_proxy_dbpassword_hash_method == 'md5' else zabbix_proxy_dbpassword }}"
         port: "{{ zabbix_proxy_dbport }}"
-        priv: ALL
         state: present
         encrypted: true
     - name: PostgreSQL | Remote | GRANT ALL PRIVILEGES ON SCHEMA public TO {{ zabbix_proxy_dbuser }}
