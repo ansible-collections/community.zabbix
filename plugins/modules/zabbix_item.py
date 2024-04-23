@@ -31,7 +31,6 @@ options:
         description:
             - Key of the item in Zabbix.
             - Key must be unique from other items.
-            - Required if I(state="present")
         type: str
     description:
         description:
@@ -486,7 +485,7 @@ options:
 
 """
 
-import copy, re
+import copy, re, json
 
 from ansible.module_utils.basic import AnsibleModule
 
@@ -539,29 +538,33 @@ class Item(ZabbixBase):
 
         for rule in preprocessing:
             if rule["type"] in list(preprocessing_type_types.keys()):
-                rule["type"] = preprocessing_type_types[rule["type"]]
+                rule["type"] = str(preprocessing_type_types[rule["type"]])
             else:
-                rule["type"] = int(rule["type"])
+                rule["type"] = str(int(rule["type"]))
                     
-            if rule["type"] in list([1, 2, 3, 4, 5, 11, 12, 13, 14, 15, 16, 17, 18, 20, 21, 22, 23, 24, 25, 28, 29]):
+            if int(rule["type"]) in list([1, 2, 3, 4, 5, 11, 12, 13, 14, 15, 16, 17, 18, 20, 21, 22, 23, 24, 25, 28, 29]):
                 if not rule["params"]:
-                    self._module.fail_json(msg="Option 'params' required in combination with the preprocessing type %s" % list(preprocessing_type_types.keys())[rule["type"]])
+                    self._module.fail_json(msg="Option 'params' required in combination with the preprocessing type %s" % list(preprocessing_type_types.keys())[rule["type"] + 1])
+            else:
+                rule["params"] = ""
 
-            if rule["type"] in list([1,5,6,7,8,9,10,11,12,13,14,15,16,17,18,22,23,24,26,27,28,29]):
+            if int(rule["type"]) in list([1,5,6,7,8,9,10,11,12,13,14,15,16,17,18,22,23,24,26,27,28,29]):
                 if not rule["error_handler"]:
-                    self._module.fail_json(msg="Option 'error_handler' required in combination with the preprocessing type %s" % list(preprocessing_type_types.keys())[rule["type"]])
+                    self._module.fail_json(msg="Option 'error_handler' required in combination with the preprocessing type %s" % list(preprocessing_type_types.keys())[int(rule["type"])])
                 else:
                     if rule["error_handler"] in list(preprocessing_error_handler_types.keys()):
-                        rule["error_handler"] = preprocessing_error_handler_types[rule["error_handler"]]
+                        rule["error_handler"] = str(preprocessing_error_handler_types[rule["error_handler"]])
                     else:
-                        rule["error_handler"] = int(rule["error_handler"])
+                        rule["error_handler"] = str(int(rule["error_handler"]))
             else:
                 rule["error_handler"] = "0"
                 rule["error_handler_params"] = ""
 
-            if rule["error_handler"] in list([2, 3]):
+            if int(rule["error_handler"]) in list([2, 3]):
                 if not rule["error_handler_params"]:
                     self._module.fail_json(msg="Option 'error_handler_params' required in combination with the preprocessing error handling type %s" % list(preprocessing_error_handler_types.keys())[rule["error_handler_type"]])
+            else:
+                rule["error_handler_params"] = ""
 
         return preprocessing
 
@@ -774,19 +777,19 @@ class Item(ZabbixBase):
             return True
         if update_interval and update_interval != exist_item["delay"]:
             return True
-        if interfaceid and interfaceid != exist_item["interfaceid"]:
+        if interfaceid and int(interfaceid) != int(exist_item["interfaceid"]):
             return True
         if url and url != exist_item["url"]:
             return True
-        if allow_traps and allow_traps != exist_item["allow_traps"]:
+        if allow_traps and int(allow_traps) != int(exist_item["allow_traps"]):
             return True
-        if authtype and authtype != exist_item["authtype"]:
+        if authtype and int(authtype) != int(exist_item["authtype"]):
             return True
-        if convert_json and convert_json != exist_item["output_format"]:
+        if convert_json and int(convert_json) != int(exist_item["output_format"]):
             return True
         if description and description != exist_item["description"]:
             return True
-        if follow_redirects and follow_redirects != exist_item["follow_redirects"]:
+        if follow_redirects and int(follow_redirects) != int(exist_item["follow_redirects"]):
             return True
         if formula and formula != exist_item["params"]:
             return True
@@ -796,7 +799,7 @@ class Item(ZabbixBase):
             return True
         if http_proxy and http_proxy != exist_item["http_proxy"]:
             return True
-        if inventory_link and inventory_link != exist_item["inventory_link"]:
+        if inventory_link and int(inventory_link) != int(exist_item["inventory_link"]):
             return True
         if ipmi_sensor and ipmi_sensor != exist_item["ipmi_sensor"]:
             return True
@@ -804,7 +807,7 @@ class Item(ZabbixBase):
             return True
         if logtimefmt and logtimefmt != exist_item["logtimefmt"]:
             return True
-        if master_itemid and master_itemid != exist_item["master_itemid"]:
+        if master_itemid and int(master_itemid) != int(exist_item["master_itemid"]):
             return True
         if script and script != exist_item["params"]:
             return True
@@ -812,7 +815,7 @@ class Item(ZabbixBase):
             return True
         if password and password != exist_item["password"]:
             return True
-        if body_type and body_type != exist_item["post_type"]:
+        if body_type and int(body_type) != int(exist_item["post_type"]):
             return True
         if body and body != exist_item["posts"]:
             return True
@@ -822,9 +825,9 @@ class Item(ZabbixBase):
             return True
         if url_query and url_query != exist_item["query_fields"]:
             return True
-        if http_method and http_method != exist_item["request_method"]:
+        if http_method and int(http_method) != int(exist_item["request_method"]):
             return True
-        if retrieve_mode and retrieve_mode != exist_item["retrieve_mode"]:
+        if retrieve_mode and int(retrieve_mode) != int(exist_item["retrieve_mode"]):
             return True
         if snmp_oid and snmp_oid != exist_item["snmp_oid"]:
             return True
@@ -848,14 +851,14 @@ class Item(ZabbixBase):
             return True
         if username and username != exist_item["username"]:
             return True
-        if verify_host and verify_host != exist_item["verify_host"]:
+        if verify_host and int(verify_host) != int(exist_item["verify_host"]):
             return True
-        if verify_peer and verify_peer != exist_item["verify_peer"]:
+        if verify_peer and int(verify_peer) != int(exist_item["verify_peer"]):
             return True
         if tags and tags != exist_item["tags"]:
             return True
         if preprocessing and preprocessing != exist_item["preprocessing"]:
-            return True        
+            return True
 
         return False
     
@@ -1076,23 +1079,35 @@ def main():
 
     item = Item(module)
 
+    # check if item exist
+    is_item_exist = item.is_item_exist(item_name, host_name)
+
     preprocessing = item.construct_preprocessing(preprocessing)
 
-    type_types = {"zabbix_agent": 0, "zabbix_trapper": 2, "simple_check": 3, "zabbix_internal": 5, "zabbix_agent_active": 7, "web_item": 9, "external_check": 10, "database_monitor": 11, "ipmi": 12, "ssh": 13, "telnet": 14, "calculated": 15, "jmx": 16, "snmp_trap": 17, "dependent": 18, "http": 19, "snmp_agent": 20, "script": 21}
-    value_type_types = {"float": 0, "character": 1, "log": 2, "unsigned": 3, "text": 4}
     
     if state == "present":
-        if type in list(type_types.keys()):
-            type = type_types[type]
-        else:
-            type = int(type)
+        if not is_item_exist:
+            # check mandatory parameters
+            if not item_name:
+                module.fail_json(msg="Item name must be set.")
+            if not host_name:
+                module.fail_json(msg="Host name must be set.")
+            if type is None:
+                module.fail_json(msg="Type cannot be empty.")
+            
+            type_types = {"zabbix_agent": 0, "zabbix_trapper": 2, "simple_check": 3, "zabbix_internal": 5, "zabbix_agent_active": 7, "web_item": 9, "external_check": 10, "database_monitor": 11, "ipmi": 12, "ssh": 13, "telnet": 14, "calculated": 15, "jmx": 16, "snmp_trap": 17, "dependent": 18, "http": 19, "snmp_agent": 20, "script": 21}
+            if type in list(type_types.keys()):
+                type = type_types[type]
+            else:
+                type = int(type)
 
-        if value_type in list(value_type_types.keys()):
-            value_type = value_type_types[value_type]
-        else:
-            value_type = int(value_type)    
+            value_type_types = {"float": 0, "character": 1, "log": 2, "unsigned": 3, "text": 4}
+            if value_type in list(value_type_types.keys()):
+                value_type = value_type_types[value_type]
+            else:
+                value_type = int(value_type)    
 
-
+            
     # find host id
     host_id = ""
     if host_name is not None:
@@ -1114,7 +1129,7 @@ def main():
             else:
                 inventory_link = int(inventory_link)
         else:
-            inventoryid = "0"
+            inventory_link = "0"
 
     # convert bools/choices to integers
     if allow_traps:
@@ -1186,8 +1201,10 @@ def main():
 
     if master_item:
         master_item = item.get_itemid_by_item_and_hostid(master_item, host_id)[0]["itemid"]
-    # check if item exist
-    is_item_exist = item.is_item_exist(item_name, host_name)
+
+    if body and body_type == 2:
+        body = body.replace("\'", "\"")
+
     if is_item_exist:
         item_id = is_item_exist[0]["itemid"]
 
@@ -1198,6 +1215,7 @@ def main():
         else:            
             # update item
             if item.check_all_properties(item_id, key, host_id, host_name, update_interval, interface, url, allow_traps, authtype, convert_json, description, follow_redirects, formula, headers, history, http_proxy, inventory_link, ipmi_sensor, jmx_endpoint, logtimefmt, master_item, script, parameters, password, body_type, body, privatekey, publickey, url_query, http_method, retrieve_mode, snmp_oid, db_query, ssl_cert_file, ssl_key_file, ssl_key_password, status_codes, timeout, allowed_hosts, trends, units, username, verify_host, verify_peer, tags, preprocessing):
+                print("Item worth updating")
                 # update the item
                 item.update_item(item_name, item_id, key, update_interval, interface, url, allow_traps, authtype, convert_json, description, follow_redirects, formula, headers, history, http_proxy, inventory_link, ipmi_sensor, jmx_endpoint, logtimefmt, master_item, script, parameters, password, body_type, body, privatekey, publickey, url_query, http_method, retrieve_mode, snmp_oid, db_query, ssl_cert_file, ssl_key_file, ssl_key_password, status_codes, timeout, allowed_hosts, trends, units, username, verify_host, verify_peer, tags, preprocessing)
 
