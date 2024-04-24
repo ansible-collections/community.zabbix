@@ -3,11 +3,12 @@
 
 - name: Create a new item or rewrite an existing item's info
   community.zabbix.zabbix_item:
-    host_name: ExampleHost
+    host_name: ExampleHostForItem
     item_name: ExampleItem
     key: ExampleItem
     description: My ExampleItem Description
     type: zabbix_internal
+    value_type: text
     status: enabled
     state: present
     tags:
@@ -15,12 +16,14 @@
         value: ExampleTagValue
       - tag: ExampleItemTag2
         value: ExampleTagValue
+  register: zabbix_item_1
 
 - name: Update an existing item's check type
   community.zabbix.zabbix_item:
-    host_name: ExampleHost
+    host_name: ExampleHostForItem
     item_name: ExampleItem
     type: simple_check
+  register: zabbix_item_2
 
 - name: expect both to succeed
   ansible.builtin.assert:
