@@ -484,7 +484,60 @@ options:
 
 """
 
-import copy, re, json
+EXAMPLES = r"""
+# If you want to use Username and Password to be authenticated by Zabbix Server
+- name: Set credentials to access Zabbix Server API
+  ansible.builtin.set_fact:
+    ansible_user: Admin
+    ansible_httpapi_pass: zabbix
+
+# If you want to use API token to be authenticated by Zabbix Server
+# https://www.zabbix.com/documentation/current/en/manual/web_interface/frontend_sections/administration/general#api-tokens
+- name: Set API token
+  ansible.builtin.set_fact:
+    ansible_zabbix_auth_key: 8ec0d52432c15c91fcafe9888500cf9a607f44091ab554dbee860f6b44fac895
+
+- name: Create a new item or rewrite an existing item's info
+# Set task level following variables for Zabbix Server host in task
+  vars:
+    ansible_network_os: community.zabbix.zabbix
+    ansible_connection: httpapi
+    ansible_httpapi_port: 443
+    ansible_httpapi_use_ssl: true
+    ansible_httpapi_validate_certs: false
+    ansible_zabbix_url_path: "zabbixeu"  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
+  become: false
+  delegate_to: zabbix-example-fqdn.org# you can use delegate_to or task level ansible_host like next example
+  community.zabbix.zabbix_item:
+    host_name: ExampleHost
+    item_name: ExampleItem
+    description: My ExampleItem Description
+    type: zabbix_internal
+    status: enabled
+    state: present
+    tags:
+      - tag: ExampleHostsTag
+      - tag: ExampleHostsTag2
+        value: ExampleTagValue
+
+- name: Update an existing item's check type
+# Set current task level variables for Zabbix Server host in task
+  vars:
+    ansible_network_os: community.zabbix.zabbix
+    ansible_connection: httpapi
+    ansible_httpapi_port: 443
+    ansible_httpapi_use_ssl: true
+    ansible_httpapi_validate_certs: false
+    ansible_zabbix_url_path: "zabbixeu"  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
+    ansible_host: zabbix-example-fqdn.org # you can use task level ansible_host or delegate_to like in previous example
+  become: false
+  community.zabbix.zabbix_host:
+    host_name: ExampleHost
+    item_name: ExampleItem
+    type: simple_check
+"""
+
+import re
 
 from ansible.module_utils.basic import AnsibleModule
 
