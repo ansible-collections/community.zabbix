@@ -1,0 +1,68 @@
+---
+# set up a zabbix host to test zabbix_item with
+
+- name: Create a new host
+  community.zabbix.zabbix_host:
+    host_name: ExampleHostForItem
+    visible_name: ExampleHostForItem
+    description: My ExampleHost Description
+    host_groups:
+      - Linux servers
+      - Zabbix servers
+    status: enabled
+    state: present
+    inventory_mode: manual
+    inventory_zabbix:
+      tag: test-tag
+      alias: test-alias
+      notes: "Special Informations: test-info"
+      location: test-location
+      site_rack: test-rack
+      os: test-os
+      hardware: test-hw
+    interfaces:
+      - type: 1
+        main: 1
+        useip: 1
+        ip: 10.1.1.1
+        dns: "test-interface.zabbix.test"
+        port: "10050"
+      - type: 1
+        main: 0
+        useip: 1
+        ip: 10.1.1.1
+        dns: ""
+        port: "10055"
+      - type: 2
+        main: 1
+        useip: 1
+        ip: 10.1.1.1
+        dns: ""
+        port: "12345"
+        details: {
+          community: "zabbix"
+        }
+      - type: 3
+        main: 1
+        useip: 1
+        ip: 10.1.1.1
+        dns: ""
+        port: "12346"
+      - type: 4
+        main: 1
+        useip: 1
+        ip: 10.1.1.1
+        dns: ""
+        port: "77"
+
+    macros:
+      - macro: MACRO1
+        value: test1
+      - macro: "{$MACRO2}"
+        value: test2
+    tags:
+      - tag: Tag1
+      - tag: Tag2
+        value: test2
+  register: zabbix_host
+

@@ -1,6 +1,6 @@
 ---
 - block:
-  # - include_tasks: zabbix_item_setup.yml
+  - include_tasks: zabbix_item_setup.yml
 
   - include_tasks: zabbix_item_tests.yml
 
@@ -8,5 +8,16 @@
 
   # - include_tasks: zabbix_item_teardown.yml
 
-  # always:
-  #   - name: "Cleanup if test failed"
+  always:
+    - name: "Cleanup item if test failed"
+      community.zabbix.zabbix_item:
+        item_name: ExampleItem
+        host_name: ExampleHostForItem
+        state: absent
+      ignore_errors: true
+    - name: "Cleanup host if test failed"
+      community.zabbix.zabbix_host:
+        host_name: ExampleHostForItem
+        state: absent
+      ignore_errors: true
+
