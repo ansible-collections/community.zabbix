@@ -65,7 +65,6 @@ options:
             - 3 = simple_check 
             - 5 = zabbix_internal 
             - 7 = zabbix_agent_active 
-            - 9 = web_item 
             - 10 = external_check 
             - 11 = database_monitor 
             - 12 = ipmi 
@@ -568,13 +567,15 @@ class Item(ZabbixBase):
 
         return preprocessing
 
-    def add_item(self, item_name, key, host_id, type, value_type, update_interval, interfaceid, url, allow_traps, authtype, convert_json, description, follow_redirects, formula, headers, history, http_proxy, inventory_link, ipmi_sensor, jmx_endpoint, logtimefmt, master_itemid, script, item_parameters, password, body_type, body, privatekey, publickey, url_query, http_method, retrieve_mode, snmp_oid, db_query, ssl_cert_file, ssl_key_file, ssl_key_password, status_codes, timeout, allowed_hosts, trends, units, username, verify_host, verify_peer, tags, preprocessing):
+    def add_item(self, item_name, key, host_id, type, status, value_type, update_interval, interfaceid, url, allow_traps, authtype, convert_json, description, follow_redirects, formula, headers, history, http_proxy, inventory_link, ipmi_sensor, jmx_endpoint, logtimefmt, master_itemid, script, item_parameters, password, body_type, body, privatekey, publickey, url_query, http_method, retrieve_mode, snmp_oid, db_query, ssl_cert_file, ssl_key_file, ssl_key_password, status_codes, timeout, allowed_hosts, trends, units, username, verify_host, verify_peer, tags, preprocessing):
         try:
             if self._module.check_mode:
                 self._module.exit_json(changed=True)
             else:
                 parameters = {"name": item_name, "key_": key, "hostid": host_id, "type": type, "value_type": value_type, "delay": update_interval} #add more parameters
                 #add conditional parameters
+                if status is not None:
+                    parameters["status"] = status                
                 if interfaceid is not None:
                     parameters["interfaceid"] = interfaceid
                 if url is not None:
@@ -663,7 +664,7 @@ class Item(ZabbixBase):
         except Exception as e:
             self._module.fail_json(msg="Failed to create item %s: %s" % (item_name, e))
     
-    def update_item(self, item_name, item_id, key, update_interval, interfaceid, url, allow_traps, authtype, convert_json, description, follow_redirects, formula, headers, history, http_proxy, inventory_link, ipmi_sensor, jmx_endpoint, logtimefmt, master_itemid, script, item_parameters, password, body_type, body, privatekey, publickey, url_query, http_method, retrieve_mode, snmp_oid, db_query, ssl_cert_file, ssl_key_file, ssl_key_password, status_codes, timeout, allowed_hosts, trends, units, username, verify_host, verify_peer, tags, preprocessing):
+    def update_item(self, item_name, item_id, key, type, status, update_interval, interfaceid, url, allow_traps, authtype, convert_json, description, follow_redirects, formula, headers, history, http_proxy, inventory_link, ipmi_sensor, jmx_endpoint, logtimefmt, master_itemid, script, item_parameters, password, body_type, body, privatekey, publickey, url_query, http_method, retrieve_mode, snmp_oid, db_query, ssl_cert_file, ssl_key_file, ssl_key_password, status_codes, timeout, allowed_hosts, trends, units, username, verify_host, verify_peer, tags, preprocessing):
         try:
             if self._module.check_mode:
                 self._module.exit_json(changed=True)
@@ -673,6 +674,10 @@ class Item(ZabbixBase):
                     parameters["name"] = item_name
                 if key is not None:
                     parameters["key_"] = key
+                if type is not None:
+                    parameters["type"] = type                
+                if status is not None:
+                    parameters["status"] = status                
                 if update_interval is not None:
                     parameters["delay"] = update_interval
                 if interfaceid is not None:
@@ -769,11 +774,15 @@ class Item(ZabbixBase):
         except Exception as e:
             self._module.fail_json(msg="Failed to delete item %s: %s" % (item_name, e))
 
-    def check_all_properties(self, item_id, key, host_id, host_name, update_interval, interfaceid, url, allow_traps, authtype, convert_json, description, follow_redirects, formula, headers, history, http_proxy, inventory_link, ipmi_sensor, jmx_endpoint, logtimefmt, master_itemid, script, parameters, password, body_type, body, privatekey, publickey, url_query, http_method, retrieve_mode, snmp_oid, db_query, ssl_cert_file, ssl_key_file, ssl_key_password, status_codes, timeout, allowed_hosts, trends, units, username, verify_host, verify_peer, tags, preprocessing):
+    def check_all_properties(self, item_id, key, host_id, host_name, type, status, update_interval, interfaceid, url, allow_traps, authtype, convert_json, description, follow_redirects, formula, headers, history, http_proxy, inventory_link, ipmi_sensor, jmx_endpoint, logtimefmt, master_itemid, script, parameters, password, body_type, body, privatekey, publickey, url_query, http_method, retrieve_mode, snmp_oid, db_query, ssl_cert_file, ssl_key_file, ssl_key_password, status_codes, timeout, allowed_hosts, trends, units, username, verify_host, verify_peer, tags, preprocessing):
         exist_item = self._zapi.item.get({"output": "extend", "selectPreprocessing": "extend", "selectTags": "extend", "filter": {"itemid": item_id}})[0]
         if host_id and host_id != int(exist_item["hostid"]):
             return True
         if key and key != exist_item["key_"]:
+            return True
+        if type and int(type) != int(exist_item["type"]):
+            return True
+        if status and int(status) != int(exist_item["status"]):
             return True
         if update_interval and update_interval != exist_item["delay"]:
             return True
@@ -827,7 +836,9 @@ class Item(ZabbixBase):
             return True
         if http_method and int(http_method) != int(exist_item["request_method"]):
             return True
+        # raise Exception("%s - %s" % (retrieve_mode, exist_item["retrieve_mode"]))
         if retrieve_mode and int(retrieve_mode) != int(exist_item["retrieve_mode"]):
+            # raise Exception("retrieve_mode is different!    ")
             return True
         if snmp_oid and snmp_oid != exist_item["snmp_oid"]:
             return True
@@ -869,10 +880,10 @@ def main():
         key=dict(type="str", required_if=[["state", 1, ["present"]]]),
         host_name=dict(type="str", required_if=[["state", 1, ["present"]]]),
         state=dict(type="str", default="present", choices=["present", "absent"]),
-        status=dict(type="str", default="enabled", choices=["enabled", "disabled"]),
+        status=dict(type="str", choices=["enabled", "disabled"]),
         type=dict(type="str", choices=["zabbix_agent", "0", "zabbix_trapper", "2", "simple_check", "3", "zabbix_internal", "5", "zabbix_agent_active", "7", "web_item", "9", "external_check", "10", "database_monitor", "11", "ipmi", "12", "ssh", "13", "telnet", "14", "calculated", "15", "jmx", "16", "snmp_trap", "17", "dependent", "18", "http", "19", "snmp_agent", "20", "script", "21"], required_if=[["state", 1, ["present"]]]),
         value_type=dict(type="str", choices=["float", "0", "character", "1", "log", "2", "unsigned", "3", "text", "4"], required_if=[["state", 1, ["present"]]]),
-        update_interval=dict(type="str", default="10s", required_if=[
+        update_interval=dict(type="str", required_if=[
             ["type", 3, ["simple_check"]],
             ["type", 5, ["zabbix_internal"]],
             ["type", 7, ["zabbix_agent_active"]],
@@ -937,6 +948,7 @@ def main():
             ["type", 20, ["snmp_agent"]],
         ]),
         script=dict(type="str", required_if=[
+            ["type", 15, ["calculated"]],
             ["type", 21, ["script"]],
             ["type", 13, ["ssh"]],
             ["type", 14, ["telnet"]]
@@ -1074,9 +1086,6 @@ def main():
     tags = module.params["tags"]
     preprocessing = module.params["preprocessing"]
 
-
-    status = 1 if status == "disabled" else 0
-
     item = Item(module)
 
     # check if item exist
@@ -1084,7 +1093,25 @@ def main():
 
     preprocessing = item.construct_preprocessing(preprocessing)
 
-    
+    if type:
+        type_types = {"zabbix_agent": 0, "zabbix_trapper": 2, "simple_check": 3, "zabbix_internal": 5, "zabbix_agent_active": 7, "web_item": 9, "external_check": 10, "database_monitor": 11, "ipmi": 12, "ssh": 13, "telnet": 14, "calculated": 15, "jmx": 16, "snmp_trap": 17, "dependent": 18, "http": 19, "snmp_agent": 20, "script": 21}
+        if type in list(type_types.keys()):
+            type = type_types[type]
+        else:
+            type = int(type)
+    else:
+        if not is_item_exist:
+            module.fail_json(msg='"type" required when creating an item')
+    if value_type:
+        value_type_types = {"float": 0, "character": 1, "log": 2, "unsigned": 3, "text": 4}
+        if value_type in list(value_type_types.keys()):
+            value_type = value_type_types[value_type]
+        else:
+            value_type = int(value_type)
+    else:
+        if not is_item_exist:
+            module.fail_json(msg='"value_type" required when creating an item')
+   
     if state == "present":
         if not is_item_exist:
             # check mandatory parameters
@@ -1095,19 +1122,16 @@ def main():
             if type is None:
                 module.fail_json(msg="Type cannot be empty.")
             
-            type_types = {"zabbix_agent": 0, "zabbix_trapper": 2, "simple_check": 3, "zabbix_internal": 5, "zabbix_agent_active": 7, "web_item": 9, "external_check": 10, "database_monitor": 11, "ipmi": 12, "ssh": 13, "telnet": 14, "calculated": 15, "jmx": 16, "snmp_trap": 17, "dependent": 18, "http": 19, "snmp_agent": 20, "script": 21}
-            if type in list(type_types.keys()):
-                type = type_types[type]
+        if status:
+            if status == "enabled":
+                status = 1
+            elif status == "disabled":
+                status = 0
             else:
-                type = int(type)
+                module.fail_json(msg="Status must be enabled or disabled.")
+        else:
+            status = 1
 
-            value_type_types = {"float": 0, "character": 1, "log": 2, "unsigned": 3, "text": 4}
-            if value_type in list(value_type_types.keys()):
-                value_type = value_type_types[value_type]
-            else:
-                value_type = int(value_type)    
-
-            
     # find host id
     host_id = ""
     if host_name is not None:
@@ -1143,15 +1167,18 @@ def main():
                 authtype = int(authtype)
         else:
             authtype = 0
-    if type == 19:
+    elif type == 19:
         if authtype:
-            authtype_types = {"password": 0, "publickey": 1, "none": 0, "basic": 1, "ntlm": 2, "kerberos": 3}
+            authtype_types = {"none": 0, "basic": 1, "ntlm": 2, "kerberos": 3}
             if authtype in list(authtype_types.keys()):
                 authtype = authtype_types[authtype]
             else:
                 authtype = int(authtype)
         else:
             authtype = 0
+    else:
+        authtype = 0
+
     if follow_redirects:
         follow_redirects = 1 if follow_redirects == True else 0
     if convert_json:
@@ -1197,13 +1224,16 @@ def main():
      
     # conditional parameter filtering
     if type in list([2, 17, 18]):
-        update_interval = "0"
+        update_interval: "0"
+    else:
+        if not update_interval:
+            update_interval = "10s"
 
     if master_item:
         master_item = item.get_itemid_by_item_and_hostid(master_item, host_id)[0]["itemid"]
 
-    if body and body_type == 2:
-        body = body.replace("\'", "\"")
+    if body_type == 2:
+        body = body.replace("\'", '\"')
 
     if is_item_exist:
         item_id = is_item_exist[0]["itemid"]
@@ -1214,10 +1244,9 @@ def main():
             module.exit_json(changed=True, result="Successfully deleted item %s" % item_name)
         else:            
             # update item
-            if item.check_all_properties(item_id, key, host_id, host_name, update_interval, interface, url, allow_traps, authtype, convert_json, description, follow_redirects, formula, headers, history, http_proxy, inventory_link, ipmi_sensor, jmx_endpoint, logtimefmt, master_item, script, parameters, password, body_type, body, privatekey, publickey, url_query, http_method, retrieve_mode, snmp_oid, db_query, ssl_cert_file, ssl_key_file, ssl_key_password, status_codes, timeout, allowed_hosts, trends, units, username, verify_host, verify_peer, tags, preprocessing):
-                print("Item worth updating")
+            if item.check_all_properties(item_id, key, host_id, host_name, type, status, update_interval, interface, url, allow_traps, authtype, convert_json, description, follow_redirects, formula, headers, history, http_proxy, inventory_link, ipmi_sensor, jmx_endpoint, logtimefmt, master_item, script, parameters, password, body_type, body, privatekey, publickey, url_query, http_method, retrieve_mode, snmp_oid, db_query, ssl_cert_file, ssl_key_file, ssl_key_password, status_codes, timeout, allowed_hosts, trends, units, username, verify_host, verify_peer, tags, preprocessing):
                 # update the item
-                item.update_item(item_name, item_id, key, update_interval, interface, url, allow_traps, authtype, convert_json, description, follow_redirects, formula, headers, history, http_proxy, inventory_link, ipmi_sensor, jmx_endpoint, logtimefmt, master_item, script, parameters, password, body_type, body, privatekey, publickey, url_query, http_method, retrieve_mode, snmp_oid, db_query, ssl_cert_file, ssl_key_file, ssl_key_password, status_codes, timeout, allowed_hosts, trends, units, username, verify_host, verify_peer, tags, preprocessing)
+                item.update_item(item_name, item_id, key, type, status, update_interval, interface, url, allow_traps, authtype, convert_json, description, follow_redirects, formula, headers, history, http_proxy, inventory_link, ipmi_sensor, jmx_endpoint, logtimefmt, master_item, script, parameters, password, body_type, body, privatekey, publickey, url_query, http_method, retrieve_mode, snmp_oid, db_query, ssl_cert_file, ssl_key_file, ssl_key_password, status_codes, timeout, allowed_hosts, trends, units, username, verify_host, verify_peer, tags, preprocessing)
 
                 module.exit_json(changed=True, result="Successfully updated item %s on host %s" % (item_name, host_name))
             else:
@@ -1232,7 +1261,7 @@ def main():
             module.fail_json(msg="Specify a host when creating item '%s'" % item_name)
 
         # create item
-        item_id = item.add_item(item_name, key, host_id, type, value_type, update_interval, interface, url, allow_traps, authtype, convert_json, description, follow_redirects, formula, headers, history, http_proxy, inventory_link, ipmi_sensor, jmx_endpoint, logtimefmt, master_item, script, parameters, password, body_type, body, privatekey, publickey, url_query, http_method, retrieve_mode, snmp_oid, db_query, ssl_cert_file, ssl_key_file, ssl_key_password, status_codes, timeout, allowed_hosts, trends, units, username, verify_host, verify_peer, tags, preprocessing)
+        item_id = item.add_item(item_name, key, host_id, type, status, value_type, update_interval, interface, url, allow_traps, authtype, convert_json, description, follow_redirects, formula, headers, history, http_proxy, inventory_link, ipmi_sensor, jmx_endpoint, logtimefmt, master_item, script, parameters, password, body_type, body, privatekey, publickey, url_query, http_method, retrieve_mode, snmp_oid, db_query, ssl_cert_file, ssl_key_file, ssl_key_password, status_codes, timeout, allowed_hosts, trends, units, username, verify_host, verify_peer, tags, preprocessing)
 
         module.exit_json(changed=True, result="Successfully added item %s on host %s" % (item_name, host_name))
 
