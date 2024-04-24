@@ -511,13 +511,16 @@ EXAMPLES = r"""
   community.zabbix.zabbix_item:
     host_name: ExampleHost
     item_name: ExampleItem
+    key: ExampleItem
     description: My ExampleItem Description
     type: zabbix_internal
+    value_type: text
     status: enabled
     state: present
     tags:
-      - tag: ExampleHostsTag
-      - tag: ExampleHostsTag2
+      - tag: ExampleItemTag
+        value: ExampleTagValue
+      - tag: ExampleItemTag2
         value: ExampleTagValue
 
 - name: Update an existing item's check type
@@ -531,7 +534,7 @@ EXAMPLES = r"""
     ansible_zabbix_url_path: "zabbixeu"  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
     ansible_host: zabbix-example-fqdn.org # you can use task level ansible_host or delegate_to like in previous example
   become: false
-  community.zabbix.zabbix_host:
+  community.zabbix.zabbix_item:
     host_name: ExampleHost
     item_name: ExampleItem
     type: simple_check

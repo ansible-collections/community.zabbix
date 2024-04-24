@@ -4,9 +4,7 @@
 
   - include_tasks: zabbix_item_tests.yml
 
-  # - include_tasks: zabbix_item_doc.yml
-
-  # - include_tasks: zabbix_item_teardown.yml
+  - include_tasks: zabbix_item_doc.yml
 
   always:
     - name: "Cleanup item if test failed"

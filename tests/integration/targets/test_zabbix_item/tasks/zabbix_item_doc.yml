@@ -1,0 +1,29 @@
+---
+# These two tests are close to documentation example
+
+- name: Create a new item or rewrite an existing item's info
+  community.zabbix.zabbix_item:
+    host_name: ExampleHost
+    item_name: ExampleItem
+    key: ExampleItem
+    description: My ExampleItem Description
+    type: zabbix_internal
+    status: enabled
+    state: present
+    tags:
+      - tag: ExampleItemTag
+        value: ExampleTagValue
+      - tag: ExampleItemTag2
+        value: ExampleTagValue
+
+- name: Update an existing item's check type
+  community.zabbix.zabbix_item:
+    host_name: ExampleHost
+    item_name: ExampleItem
+    type: simple_check
+
+- name: expect both to succeed
+  ansible.builtin.assert:
+    that:
+      - "zabbix_item_1 is changed"
+      - "zabbix_item_2 is changed"
