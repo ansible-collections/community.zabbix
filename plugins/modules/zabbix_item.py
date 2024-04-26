@@ -888,9 +888,7 @@ class Item(ZabbixBase):
             return True
         if http_method and int(http_method) != int(exist_item["request_method"]):
             return True
-        # raise Exception("%s - %s" % (retrieve_mode, exist_item["retrieve_mode"]))
         if retrieve_mode and int(retrieve_mode) != int(exist_item["retrieve_mode"]):
-            # raise Exception("retrieve_mode is different!    ")
             return True
         if snmp_oid and snmp_oid != exist_item["snmp_oid"]:
             return True
