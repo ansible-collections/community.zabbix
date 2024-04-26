@@ -628,10 +628,8 @@ class Item(ZabbixBase):
             if self._module.check_mode:
                 self._module.exit_json(changed=True)
             else:
-                parameters = {"name": item_name, "key_": key, "hostid": host_id, "type": type, "value_type": value_type, "delay": update_interval} #add more parameters
+                parameters = {"name": item_name, "key_": key, "hostid": host_id, "status": status, "type": type, "value_type": value_type, "delay": update_interval} #add more parameters
                 #add conditional parameters
-                if status is not None:
-                    parameters["status"] = status                
                 if interfaceid is not None:
                     parameters["interfaceid"] = interfaceid
                 if url is not None:
@@ -725,15 +723,13 @@ class Item(ZabbixBase):
             if self._module.check_mode:
                 self._module.exit_json(changed=True)
             else:
-                parameters = {"itemid": item_id}
+                parameters = {"itemid": item_id, "status": status}
                 if item_name is not None:
                     parameters["name"] = item_name
                 if key is not None:
                     parameters["key_"] = key
                 if type is not None:
                     parameters["type"] = type                
-                if status is not None:
-                    parameters["status"] = status                
                 if update_interval is not None:
                     parameters["delay"] = update_interval
                 if interfaceid is not None:
@@ -936,7 +932,7 @@ def main():
         key=dict(type="str", required_if=[["state", 1, ["present"]]]),
         host_name=dict(type="str", required_if=[["state", 1, ["present"]]]),
         state=dict(type="str", default="present", choices=["present", "absent"]),
-        status=dict(type="str", choices=["enabled", "disabled"]),
+        status=dict(type="str", default="enabled", choices=["enabled", "disabled"]),
         type=dict(type="str", choices=["zabbix_agent", "0", "zabbix_trapper", "2", "simple_check", "3", "zabbix_internal", "5", "zabbix_agent_active", "7", "web_item", "9", "external_check", "10", "database_monitor", "11", "ipmi", "12", "ssh", "13", "telnet", "14", "calculated", "15", "jmx", "16", "snmp_trap", "17", "dependent", "18", "http", "19", "snmp_agent", "20", "script", "21"], required_if=[["state", 1, ["present"]]]),
         value_type=dict(type="str", choices=["float", "0", "character", "1", "log", "2", "unsigned", "3", "text", "4"], required_if=[["state", 1, ["present"]]]),
         update_interval=dict(type="str", required_if=[
@@ -1142,6 +1138,10 @@ def main():
     tags = module.params["tags"]
     preprocessing = module.params["preprocessing"]
 
+    # convert enabled to 0; disabled to 1
+    status = 1 if status == "disabled" else 0
+
+
     item = Item(module)
 
     # check if item exist
@@ -1178,16 +1178,6 @@ def main():
             if type is None:
                 module.fail_json(msg="Type cannot be empty.")
             
-        if status:
-            if status == "enabled":
-                status = 1
-            elif status == "disabled":
-                status = 0
-            else:
-                module.fail_json(msg="Status must be enabled or disabled.")
-        else:
-            status = 1
-
     # find host id
     host_id = ""
     if host_name is not None:
