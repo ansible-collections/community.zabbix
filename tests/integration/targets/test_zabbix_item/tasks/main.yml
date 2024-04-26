@@ -10,9 +10,6 @@
     # zabbix_item module tests
     - include_tasks: zabbix_tests.yml
 
-    # documentation example tests
-    #- include_tasks: zabbix_host_doc.yml
-
     # tear down stuff set up earlier
     - include_tasks: zabbix_teardown.yml
   always:
