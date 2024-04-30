@@ -2,7 +2,7 @@
 driver:
   name: docker
 platforms:
-  - name: zabbix-proxy-${MY_MOLECULE_CONTAINER:-centos}
+  - name: zabbix-proxy-${MY_MOLECULE_VERSION:-v64}-${MY_MOLECULE_DATABASE:-mysql}-${MY_MOLECULE_CONTAINER:-rockylinux8}
     image: geerlingguy/docker-${MY_MOLECULE_IMAGE:-rockylinux8}-ansible:latest
     privileged: true
     pre_build_image: true
