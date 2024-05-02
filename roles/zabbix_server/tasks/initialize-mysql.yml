@@ -137,11 +137,7 @@
         encoding: "{{ zabbix_server_dbencoding }}"
         collation: "{{ zabbix_server_dbcollation }}"
         state: import
-        target: "{{ is_legacy_version | ternary(legacy_path, modern_path) }}"
-      vars:
-        is_legacy_version: "{{ zabbix_server_version is version('6.0', '<') }}"
-        legacy_path: /usr/share/doc/zabbix-server-mysql/create.sql.gz
-        modern_path: /usr/share/zabbix-sql-scripts/mysql/server.sql.gz
+        target: /usr/share/zabbix-sql-scripts/mysql/server.sql.gz
 
   always:
     - name: "MySQL | Revert variable overrides for schema import"

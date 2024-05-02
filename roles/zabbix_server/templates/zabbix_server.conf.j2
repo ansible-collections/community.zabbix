@@ -8,9 +8,7 @@
 
 {{ (zabbix_server_alertscriptspath is defined and zabbix_server_alertscriptspath is not none) | ternary('', '# ') }}AlertScriptsPath={{ zabbix_server_alertscriptspath | default('') }}
 {{ (zabbix_server_allowroot is defined and zabbix_server_allowroot is not none) | ternary('', '# ') }}AllowRoot={{ zabbix_server_allowroot | default('') }}
-{% if zabbix_server_version is version('6.0', '>=') %}
 {{ (zabbix_server_allowunsupporteddbversions is defined and zabbix_server_allowunsupporteddbversions is not none) | ternary('', '# ') }}AllowUnsupportedDBVersions={{ zabbix_server_allowunsupporteddbversions | default('') }}
-{% endif %}
 {{ (zabbix_server_cachesize is defined and zabbix_server_cachesize is not none) | ternary('', '# ') }}CacheSize={{ zabbix_server_cachesize | default('') }}
 {{ (zabbix_server_cacheupdatefrequency is defined and zabbix_server_cacheupdatefrequency is not none) | ternary('', '# ') }}CacheUpdateFrequency={{ zabbix_server_cacheupdatefrequency | default('') }}
 {{ (zabbix_server_dbhost is defined and zabbix_server_dbhost is not none) | ternary('', '# ') }}DBHost={{ zabbix_server_dbhost | default('') }}
@@ -79,9 +77,7 @@
 {{ (zabbix_server_startpollersunreachable is defined and zabbix_server_startpollersunreachable is not none) | ternary('', '# ') }}StartPollersUnreachable={{ zabbix_server_startpollersunreachable | default('') }}
 {{ (zabbix_server_startpreprocessors is defined and zabbix_server_startpreprocessors is not none) | ternary('', '# ') }}StartPreprocessors={{ zabbix_server_startpreprocessors | default('') }}
 {{ (zabbix_server_startproxypollers is defined and zabbix_server_startproxypollers is not none) | ternary('', '# ') }}StartProxyPollers={{ zabbix_server_startproxypollers | default('') }}
-{% if zabbix_server_version is version('6.0', '>=') %}
 {{ (zabbix_server_startreportwriters is defined and zabbix_server_startreportwriters is not none) | ternary('', '# ') }}StartReportWriters={{ zabbix_server_startreportwriters | default('') }}
-{% endif %}
 {{ (zabbix_server_startsnmptrapper is defined and zabbix_server_startsnmptrapper is not none) | ternary('', '# ') }}StartSNMPTrapper={{ zabbix_server_startsnmptrapper | default('') }}
 {{ (zabbix_server_starttimers is defined and zabbix_server_starttimers is not none) | ternary('', '# ') }}StartTimers={{ zabbix_server_starttimers | default('') }}
 {{ (zabbix_server_starttrappers is defined and zabbix_server_starttrappers is not none) | ternary('', '# ') }}StartTrappers={{ zabbix_server_starttrappers | default('') }}
@@ -119,9 +115,7 @@
 {{ (zabbix_server_vaulttlscertfile is defined and zabbix_server_vaulttlscertfile is not none) | ternary('', '# ') }}VaultTLSCertFile={{ zabbix_server_vaulttlscertfile | default('') }}
 {% endif %}
 {{ (zabbix_server_vaulttoken is defined and zabbix_server_vaulttoken is not none) | ternary('', '# ') }}VaultToken={{ zabbix_server_vaulttoken | default('') }}
-{% if zabbix_server_version is version('6.0', '>=') %}
 {{ (zabbix_server_vaulturl is defined and zabbix_server_vaulturl is not none) | ternary('', '# ') }}VaultURL={{ zabbix_server_vaulturl | default('') }}
-{% endif %}
 {{ (zabbix_server_vmwarecachesize is defined and zabbix_server_vmwarecachesize is not none) | ternary('', '# ') }}VMwareCacheSize={{ zabbix_server_vmwarecachesize | default('') }}
 {{ (zabbix_server_vmwarefrequency is defined and zabbix_server_vmwarefrequency is not none) | ternary('', '# ') }}VMwareFrequency={{ zabbix_server_vmwarefrequency | default('') }}
 {{ (zabbix_server_vmwareperffrequency is defined and zabbix_server_vmwareperffrequency is not none) | ternary('', '# ') }}VMwarePerfFrequency={{ zabbix_server_vmwareperffrequency | default('') }}
