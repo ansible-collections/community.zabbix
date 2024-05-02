@@ -81,11 +81,7 @@
         port: "{{ zabbix_server_dbport }}"
         db: "{{ zabbix_server_dbname }}"
         state: restore
-        target: "{{ is_legacy_version | ternary(legacy_path, modern_path) }}"
-      vars:
-        is_legacy_version: "{{ zabbix_server_version is version('6.0', '<') }}"
-        legacy_path: /usr/share/doc/zabbix-server-pgsql/create.sql.gz
-        modern_path: /usr/share/zabbix-sql-scripts/postgresql/server.sql.gz
+        target: /usr/share/zabbix-sql-scripts/postgresql/server.sql.gz
 
 - name: "PostgreSQL | Create TimescaleDB hypertables"
   ansible.builtin.shell: |
