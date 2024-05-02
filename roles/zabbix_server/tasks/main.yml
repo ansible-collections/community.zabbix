@@ -32,16 +32,11 @@
 
 - name: Install zabbix-server packages
   ansible.builtin.package:
-    name: "{{ item.name }}"
+    name: "{{ _zabbix_server_packages }}"
     state: "{{ zabbix_server_package_state }}"
     update_cache: true
     disablerepo: "{{ zabbix_server_disable_repo | default(_zabbix_server_disable_repo | default(omit)) }}"
     install_recommends: "{{ zabbix_server_install_recommends | default(_zabbix_server_install_recommends | default(omit)) }}"
-  when: item.required | default(true)
-  loop:
-    - name: "{{ zabbix_server_package | default(_zabbix_server_package) }}"
-    - required: "{{ zabbix_server_version is version('6.0', '>=') }}"
-      name: "{{ _zabbix_server_sql_scripts_package }}"
   environment:
     http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
     https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
