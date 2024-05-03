@@ -123,11 +123,7 @@
         encoding: "{{ zabbix_proxy_dbencoding }}"
         collation: "{{ zabbix_proxy_dbcollation }}"
         state: import
-        target: "{{ is_legacy_version | ternary(legacy_path, modern_path) }}"
-      vars:
-        is_legacy_version: "{{ zabbix_proxy_version is version('6.0', '<') }}"
-        legacy_path: "{{ ls_output_schema.stdout }}"
-        modern_path: /usr/share/zabbix-sql-scripts/mysql/proxy.sql
+        target: /usr/share/zabbix-sql-scripts/mysql/proxy.sql
 
   always:
     - name: "MySQL | Revert variable overrides for schema import"
