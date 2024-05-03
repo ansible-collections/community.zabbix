@@ -62,6 +62,14 @@ jobs:
 
       - name: Build the collection
         run: |
+          # Pin versions to speed up CI
+          sed -i 's/ansible\.windows:\s*"\*"/ansible.windows: "2.3.0"/' galaxy.yml
+          sed -i 's/ansible\.netcommon:\s*"\*"/ansible.netcommon: "6.1.1"/' galaxy.yml
+          sed -i 's/ansible\.posix:\s*"\*"/ansible.posix: "1.5.4"/' galaxy.yml
+          sed -i 's/community\.general:\s*"\*"/community.general: "8.6.0"/' galaxy.yml
+          sed -i 's/community\.mysql:\s*"\*"/community.mysql: "3.9.0"/' galaxy.yml
+          sed -i 's/community\.postgresql:\s*"\*"/community.postgresql: "3.4.0"/' galaxy.yml
+
           collection_file=$( basename $(ansible-galaxy collection build -f | awk -F" " '{print $NF}'))
           echo "COLLECTION_FILE=$collection_file" >> $GITHUB_ENV
 
