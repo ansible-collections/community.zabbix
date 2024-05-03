@@ -64,7 +64,7 @@ jobs:
           echo "COLLECTION_FILE=$collection_file" >> $GITHUB_ENV
 
       - name: Install the collection
-        run: ansible-galaxy collection install $COLLECTION_FILE
+        run: ansible-galaxy collection install -vvvv $COLLECTION_FILE
 
       - name: Run role tests
         working-directory: molecule/zabbix_agent_tests
