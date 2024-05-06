@@ -1,0 +1,57 @@
+---
+- name: test - Create new Zabbix service
+  community.zabbix.zabbix_service:
+    name: ExampleService
+    description: ExampleService
+    sortorder: 0
+    propagation_rule: as_is
+    propagation_value: not_classified
+    algorithm: most_crit_of_child_serv
+  register: create_service_result
+
+- ansible.builtin.assert:
+    that:
+      - create_service_result.changed is sameas true
+
+- name: test - Create new Zabbix child service
+  community.zabbix.zabbix_service:
+    name: ExampleChildService
+    description: ExampleChildService
+    sortorder: 0
+    propagation_rule: as_is
+    propagation_value: not_classified
+    parents: ExampleService
+    problem_tags:
+      - tag: testtag
+        value: test
+  register: create_child_result
+
+- ansible.builtin.assert:
+    that:
+      - create_child_result.changed is sameas true
+
+- name: test - Get zabbix service information
+  community.zabbix.zabbix_service_info:
+    service_name: ExampleService
+  register: get_service_info_result
+
+- ansible.builtin.assert:
+    that:
+      - get_service_info_result["zabbix_service"].name == "ExampleService"
+      - get_service_info_result["zabbix_service"].children | length > 0
+      - get_service_info_result["zabbix_service"].children[0].name == "ExampleChildService"
+      - get_service_info_result["zabbix_service"].propagation_rule == "0"
+      - get_service_info_result["zabbix_service"].propagation_value == "0"
+      - get_service_info_result["zabbix_service"].sortorder == "0"
+
+- name: test - cleanup test Zabbix child service
+  community.zabbix.zabbix_service:
+    state: absent
+    sortorder: 0
+    name: ExampleChildService
+
+- name: test - cleanup test Zabbix service
+  community.zabbix.zabbix_service:
+    state: absent
+    sortorder: 0
+    name: ExampleService
