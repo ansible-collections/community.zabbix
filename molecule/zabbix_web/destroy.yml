@@ -17,9 +17,7 @@
 
     - name: Destroy 3rd party instance(s)
       docker_container:
-        name: '{{ item }}'
+        name: "{{ item.name }}-db"
         state: absent
         force_kill: true
-      with_items:
-        - mysql-host
-        - postgresql-host
+      loop: "{{ molecule_yml.platforms }}"

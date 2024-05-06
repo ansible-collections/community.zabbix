@@ -5,7 +5,7 @@
   pre_tasks:
     - name: "Create MySQL Container"
       docker_container:
-        name: mysql-host
+        name: "{{ item.name }}-db"
         image: mysql:8.0
         state: started
         recreate: true
@@ -20,7 +20,7 @@
 
     - name: "Create postgresql Container"
       docker_container:
-        name: postgresql-host
+        name: "{{ item.name }}-db"
         image: postgres:13
         state: started
         recreate: true
