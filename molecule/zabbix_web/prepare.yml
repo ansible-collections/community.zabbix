@@ -162,7 +162,14 @@
         - ansible_distribution_major_version >= '22'
         - ansible_os_family == "Debian"
 
-    - name: Set PHP packages (Ubuntu 2204)
+    - name: Set PHP Version (Ubuntu 2404)
+      ansible.builtin.set_fact:
+        __php_default_version_debian: "8.3"
+      when:
+        - ansible_distribution_major_version >= '24'
+        - ansible_os_family == "Debian"
+
+    - name: Set PHP packages (Ubuntu 2204 & 2404)
       ansible.builtin.set_fact:
         __php_packages:
           - php{{ __php_default_version_debian }}-common

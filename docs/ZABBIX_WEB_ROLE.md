@@ -59,6 +59,7 @@ See the following list of supported Operating Systems with the Zabbix releases.
 |---------------------|-----|-----|-----|
 | Red Hat Fam 9       |  V  |  V  |  V  |
 | Red Hat Fam 8       |  V  |  V  |  V  |
+| Ubuntu 24.04 noble  |  V  |     |  V  |
 | Ubuntu 22.04 jammy  |  V  |  V  |  V  |
 | Ubuntu 20.04 focal  |  V  |  V  |  V  |
 | Ubuntu 18.04 bionic |     |     |  V  |

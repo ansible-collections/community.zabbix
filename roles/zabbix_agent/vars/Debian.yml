@@ -28,6 +28,10 @@ zabbix_valid_agent_versions:
     - 6.2
     - 6.0
   # Ubuntu
+  "24":
+    - 6.4
+    - 6.0
+
   "22":
     - 6.4
     - 6.2

@@ -17,6 +17,9 @@ zabbix_valid_server_versions:
   "10":
     - 6.0
   # Ubuntu
+  "24":
+    - 6.4
+    - 6.0
   "22":
     - 6.4
     - 6.2

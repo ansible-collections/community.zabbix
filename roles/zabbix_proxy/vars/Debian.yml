@@ -11,6 +11,9 @@ zabbix_valid_proxy_versions:
     - 6.4
     - 6.2
     - 6.0
+  "24":
+    - 6.4
+    - 6.0
   "22":
     - 6.4
     - 6.2
@@ -36,6 +39,9 @@ mysql_client_pkgs:
     - mariadb-client
     - "{{ zabbix_python_prefix }}-mysqldb"
   # Ubuntu
+  "24":
+    - default-mysql-client
+    - "{{ zabbix_python_prefix }}-mysqldb"
   "22":
     - default-mysql-client
     - "{{ zabbix_python_prefix }}-mysqldb"
