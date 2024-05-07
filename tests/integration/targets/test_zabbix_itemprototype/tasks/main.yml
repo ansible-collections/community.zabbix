@@ -7,7 +7,7 @@
     # setup stuff
     - include_tasks: zabbix_setup.yml
 
-    # zabbix_item module tests
+    # zabbix_itemprototype module tests
     - include_tasks: zabbix_tests.yml
 
     # tear down stuff set up earlier

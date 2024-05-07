@@ -44,7 +44,7 @@
   ansible.builtin.assert:
     that: not zbxhosttrigger_existing is changed
 
-- name: test - update existing zabbix item
+- name: test - update existing zabbix trigger
   community.zabbix.zabbix_trigger:
     name: TestTrigger
     host_name: ExampleHost
@@ -123,7 +123,7 @@
   ansible.builtin.assert:
     that: not zbxtemptrigger_existing is changed
 
-- name: test - update existing zabbix item
+- name: test - update existing zabbix trigger
   community.zabbix.zabbix_trigger:
     name: TestTrigger
     template_name: ExampleTemplate
