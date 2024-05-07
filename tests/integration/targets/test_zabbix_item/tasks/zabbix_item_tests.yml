@@ -3,6 +3,7 @@
   community.zabbix.zabbix_item:
     item_name: ExampleItem1
     host_name: ExampleHostForItem
+    status: enabled
     key: ExampleItem1
     type: http
     url: localhost
@@ -235,9 +236,13 @@
     that:
       - "zabbix_item1 is changed"
 
-- name: "test: change type to zabbix_agent"
+- name: "test: create new item with type zabbix_agent"
   community.zabbix.zabbix_item:
-    item_name: ExampleItem1
+    state: present
+    status: enabled
+    item_name: ExampleItemZabbixAgent
+    key: ExampleItemZabbixAgent
+    value_type: text
     host_name: ExampleHostForItem
     type: zabbix_agent
     interface: test-interface.zabbix.test:10050
@@ -249,9 +254,13 @@
     that:
       - "zabbix_item1 is changed"
 
-- name: "test: change type zabbix_agent (again)"
+- name: "test: create new item with type zabbix_agent (again)"
   community.zabbix.zabbix_item:
-    item_name: ExampleItem1
+    state: present
+    status: enabled
+    item_name: ExampleItemZabbixAgent
+    key: ExampleItemZabbixAgent
+    value_type: text
     host_name: ExampleHostForItem
     type: zabbix_agent
     interface: test-interface.zabbix.test:10050
@@ -265,7 +274,7 @@
 
 - name: "test: change interface"
   community.zabbix.zabbix_item:
-    item_name: ExampleItem1
+    item_name: ExampleItemZabbixAgent
     host_name: ExampleHostForItem
     interface: 10.1.1.1:10055
   register: zabbix_item1
@@ -277,7 +286,7 @@
 
 - name: "test: change interface (again)"
   community.zabbix.zabbix_item:
-    item_name: ExampleItem1
+    item_name: ExampleItemZabbixAgent
     host_name: ExampleHostForItem
     interface: 10.1.1.1:10055
   register: zabbix_item1
@@ -287,25 +296,29 @@
     that:
       - "not zabbix_item1 is changed"
 
-- name: "test: change type zabbix_trapper"
+- name: "test: create new item with type zabbix_trapper"
   community.zabbix.zabbix_item:
-    item_name: ExampleItem1
+    item_name: ExampleItem1ZabbixTrapper
+    key: ExampleItem1ZabbixTrapper
+    host_name: ExampleHostForItem
+    type: zabbix_trapper
+    value_type: text
+    allowed_hosts: localhost
+    update_interval: 0
+  register: zabbix_item1
+
+- name: expect to succeed and that things changed
+  ansible.builtin.assert:
+    that:
+      - "zabbix_item1 is changed"
+
+- name: "test: create new item with type zabbix_trapper (again)"
+  community.zabbix.zabbix_item:
+    item_name: ExampleItem1ZabbixTrapper
     host_name: ExampleHostForItem
     type: zabbix_trapper
     allowed_hosts: localhost
-  register: zabbix_item1
-
-- name: expect to succeed and that things changed
-  ansible.builtin.assert:
-    that:
-      - "zabbix_item1 is changed"
-
-- name: "test: change type zabbix_trapper (again)"
-  community.zabbix.zabbix_item:
-    item_name: ExampleItem1
-    host_name: ExampleHostForItem
-    type: zabbix_trapper
-    allowed_hosts: localhost
+    update_interval: 0
   register: zabbix_item1
 
 - name: updating with same values should be idempotent
@@ -313,11 +326,13 @@
     that:
       - "not zabbix_item1 is changed"
 
-- name: "test: change type simple_check"
+- name: "test: create new item with type simple_check"
   community.zabbix.zabbix_item:
-    item_name: ExampleItem1
+    item_name: ExampleItem1SimpleCheck
+    key: ExampleItem1SimpleCheck
     host_name: ExampleHostForItem
     type: simple_check
+    value_type: text
   register: zabbix_item1
 
 - name: expect to succeed and that things changed
@@ -325,11 +340,13 @@
     that:
       - "zabbix_item1 is changed"
 
-- name: "test: change type simple_check (again)"
+- name: "test: create new item with type simple_check (again)"
   community.zabbix.zabbix_item:
-    item_name: ExampleItem1
+    item_name: ExampleItem1SimpleCheck
+    key: ExampleItem1SimpleCheck
     host_name: ExampleHostForItem
     type: simple_check
+    value_type: text
   register: zabbix_item1
 
 - name: updating with same values should be idempotent
@@ -337,11 +354,13 @@
     that:
       - "not zabbix_item1 is changed"
 
-- name: "test: change type zabbix_internal"
+- name: "test: create new item with type zabbix_internal"
   community.zabbix.zabbix_item:
-    item_name: ExampleItem1
+    item_name: ExampleItem1ZabbixInternal
+    key: ExampleItem1ZabbixInternal
     host_name: ExampleHostForItem
     type: zabbix_internal
+    value_type: text
   register: zabbix_item1
 
 - name: expect to succeed and that things changed
@@ -349,11 +368,13 @@
     that:
       - "zabbix_item1 is changed"
 
-- name: "test: change type zabbix_internal (again)"
+- name: "test: create new item with type zabbix_internal"
   community.zabbix.zabbix_item:
-    item_name: ExampleItem1
+    item_name: ExampleItem1ZabbixInternal
+    key: ExampleItem1ZabbixInternal
     host_name: ExampleHostForItem
     type: zabbix_internal
+    value_type: text
   register: zabbix_item1
 
 - name: updating with same values should be idempotent
@@ -361,11 +382,13 @@
     that:
       - "not zabbix_item1 is changed"
 
-- name: "test: change type zabbix_agent_active"
+- name: "test: create new item with type zabbix_agent_active"
   community.zabbix.zabbix_item:
-    item_name: ExampleItem1
+    item_name: ExampleItem1ZabbixAgentActive
+    key: ExampleItem1ZabbixAgentActive
     host_name: ExampleHostForItem
     type: zabbix_agent_active
+    value_type: text
   register: zabbix_item1
 
 - name: expect to succeed and that things changed
@@ -373,11 +396,13 @@
     that:
       - "zabbix_item1 is changed"
 
-- name: "test: change type zabbix_agent_active (again)"
+- name: "test: create new item with type zabbix_agent_active (again)"
   community.zabbix.zabbix_item:
-    item_name: ExampleItem1
+    item_name: ExampleItem1ZabbixAgentActive
+    key: ExampleItem1ZabbixAgentActive
     host_name: ExampleHostForItem
     type: zabbix_agent_active
+    value_type: text
   register: zabbix_item1
 
 - name: updating with same values should be idempotent
@@ -385,11 +410,13 @@
     that:
       - "not zabbix_item1 is changed"
 
-- name: "test: change type external_check with dns specified interface"
+- name: "test: create new item with type external_check with dns specified interface"
   community.zabbix.zabbix_item:
-    item_name: ExampleItem1
+    item_name: ExampleItem1ExternalCheck
+    key: ExampleItem1ExternalCheck
     host_name: ExampleHostForItem
     type: external_check
+    value_type: text
     interface: test-interface.zabbix.test:10050
   register: zabbix_item1
 
@@ -398,11 +425,13 @@
     that:
       - "zabbix_item1 is changed"
 
-- name: "test: change type external_check with dns specified interface (again)"
+- name: "test: create new item with type external_check with dns specified interface (again)"
   community.zabbix.zabbix_item:
-    item_name: ExampleItem1
+    item_name: ExampleItem1ExternalCheck
+    key: ExampleItem1ExternalCheck
     host_name: ExampleHostForItem
     type: external_check
+    value_type: text
     interface: test-interface.zabbix.test:10050
   register: zabbix_item1
 
@@ -411,11 +440,13 @@
     that:
       - "not zabbix_item1 is changed"
 
-- name: "test: change type database_monitor"
+- name: "test: create new item with type database_monitor"
   community.zabbix.zabbix_item:
-    item_name: ExampleItem1
+    item_name: ExampleItem1DatabaseMonitor
+    key: ExampleItem1DatabaseMonitor
     host_name: ExampleHostForItem
     type: database_monitor
+    value_type: text
     db_query: SELECT * FROM test
     username: test
     password: test
@@ -426,11 +457,13 @@
     that:
       - "zabbix_item1 is changed"
 
-- name: "test: change type database_monitor (again)"
+- name: "test: create new item with type database_monitor (again)"
   community.zabbix.zabbix_item:
-    item_name: ExampleItem1
+    item_name: ExampleItem1DatabaseMonitor
+    key: ExampleItem1DatabaseMonitor
     host_name: ExampleHostForItem
     type: database_monitor
+    value_type: text
     db_query: SELECT * FROM test
     username: test
     password: test
@@ -441,11 +474,13 @@
     that:
       - "not zabbix_item1 is changed"
 
-- name: "test: change type ipmi"
+- name: "test: create new item with type ipmi"
   community.zabbix.zabbix_item:
-    item_name: ExampleItem1
+    item_name: ExampleItem1Ipmi
+    key: ExampleItem1Ipmi
     host_name: ExampleHostForItem
     type: ipmi
+    value_type: text
     ipmi_sensor: root
     interface: 10.1.1.1:12346
   register: zabbix_item1
@@ -455,11 +490,13 @@
     that:
       - "zabbix_item1 is changed"
 
-- name: "test: change type ipmi (again)"
+- name: "test: create new item with type ipmi (again)"
   community.zabbix.zabbix_item:
-    item_name: ExampleItem1
+    item_name: ExampleItem1Ipmi
+    key: ExampleItem1Ipmi
     host_name: ExampleHostForItem
     type: ipmi
+    value_type: text
     ipmi_sensor: root
     interface: 10.1.1.1:12346
   register: zabbix_item1
@@ -469,11 +506,13 @@
     that:
       - "not zabbix_item1 is changed"
 
-- name: "test: change type ssh using password"
+- name: "test: create new item with type ssh using password"
   community.zabbix.zabbix_item:
-    item_name: ExampleItem1
+    item_name: ExampleItem1Ssh
+    key: ExampleItem1Ssh
     host_name: ExampleHostForItem
     type: ssh
+    value_type: text
     update_interval: 10m
     authtype: password
     username: root
@@ -487,11 +526,13 @@
     that:
       - "zabbix_item1 is changed"
 
-- name: "test: change type ssh using password (again)"
+- name: "test: create new item with type ssh using password (again)"
   community.zabbix.zabbix_item:
-    item_name: ExampleItem1
+    item_name: ExampleItem1Ssh
+    key: ExampleItem1Ssh
     host_name: ExampleHostForItem
     type: ssh
+    value_type: text
     update_interval: 10m
     authtype: password
     username: root
@@ -507,7 +548,7 @@
 
 - name: "test: change type ssh using publickey"
   community.zabbix.zabbix_item:
-    item_name: ExampleItem1
+    item_name: ExampleItem1Ssh
     host_name: ExampleHostForItem
     type: ssh
     update_interval: 10m
@@ -526,7 +567,7 @@
 
 - name: "test: change type ssh using publickey (again)"
   community.zabbix.zabbix_item:
-    item_name: ExampleItem1
+    item_name: ExampleItem1Ssh
     host_name: ExampleHostForItem
     type: ssh
     update_interval: 10m
@@ -543,11 +584,13 @@
     that:
       - "not zabbix_item1 is changed"
 
-- name: "test: change type telnet"
+- name: "test: create new item with type telnet"
   community.zabbix.zabbix_item:
-    item_name: ExampleItem1
+    item_name: ExampleItem1Telnet
+    key: ExampleItem1Telnet
     host_name: ExampleHostForItem
     type: telnet
+    value_type: text
     update_interval: 10m
     authtype: publickey
     username: root
@@ -561,11 +604,13 @@
     that:
       - "zabbix_item1 is changed"
 
-- name: "test: change type telnet (again)"
+- name: "test: create new item with type telnet (again)"
   community.zabbix.zabbix_item:
-    item_name: ExampleItem1
+    item_name: ExampleItem1Telnet
+    key: ExampleItem1Telnet
     host_name: ExampleHostForItem
     type: telnet
+    value_type: text
     update_interval: 10m
     authtype: publickey
     username: root
@@ -579,11 +624,13 @@
     that:
       - "not zabbix_item1 is changed"
 
-- name: "test: change type calculated"
+- name: "test: create new item with type calculated"
   community.zabbix.zabbix_item:
-    item_name: ExampleItem1
+    item_name: ExampleItem1Calculated
+    key: ExampleItem1Calculated
     host_name: ExampleHostForItem
     type: calculated
+    value_type: text
     update_interval: 10m
     script: 1 + 1
   register: zabbix_item1
@@ -593,11 +640,13 @@
     that:
       - "zabbix_item1 is changed"
 
-- name: "test: change type calculated (again)"
+- name: "test: create new item with type calculated (again)"
   community.zabbix.zabbix_item:
-    item_name: ExampleItem1
+    item_name: ExampleItem1Calculated
+    key: ExampleItem1Calculated
     host_name: ExampleHostForItem
     type: calculated
+    value_type: text
     update_interval: 10m
     script: 1 + 1
   register: zabbix_item1
@@ -607,11 +656,13 @@
     that:
       - "not zabbix_item1 is changed"
 
-- name: "test: change type jmx"
+- name: "test: create new item with type jmx"
   community.zabbix.zabbix_item:
-    item_name: ExampleItem1
+    item_name: ExampleItem1Jmx
+    key: ExampleItem1Jmx
     host_name: ExampleHostForItem
     type: jmx
+    value_type: text
     update_interval: 10m
     interface: 10.1.1.1:77
     jmx_endpoint: service:jmx
@@ -624,11 +675,13 @@
     that:
       - "zabbix_item1 is changed"
 
-- name: "test: change type jmx (again)"
+- name: "test: create new item with type jmx (again)"
   community.zabbix.zabbix_item:
-    item_name: ExampleItem1
+    item_name: ExampleItem1Jmx
+    key: ExampleItem1Jmx
     host_name: ExampleHostForItem
     type: jmx
+    value_type: text
     update_interval: 10m
     interface: 10.1.1.1:77
     jmx_endpoint: service:jmx
@@ -641,12 +694,15 @@
     that:
       - "not zabbix_item1 is changed"
 
-- name: "test: change type snmp_trap"
+- name: "test: create new item with type snmp_trap"
   community.zabbix.zabbix_item:
-    item_name: ExampleItem1
+    item_name: ExampleItem1SnmpTrap
+    key: ExampleItem1SnmpTrap
     host_name: ExampleHostForItem
     type: snmp_trap
+    value_type: text
     interface: 10.1.1.1:12345
+    update_interval: 0
   register: zabbix_item1
 
 - name: expect to succeed and that things changed
@@ -654,12 +710,15 @@
     that:
       - "zabbix_item1 is changed"
 
-- name: "test: change type snmp_trap (again)"
+- name: "test: create new item with type snmp_trap (again)"
   community.zabbix.zabbix_item:
-    item_name: ExampleItem1
+    item_name: ExampleItem1SnmpTrap
+    key: ExampleItem1SnmpTrap
     host_name: ExampleHostForItem
     type: snmp_trap
+    value_type: text
     interface: 10.1.1.1:12345
+    update_interval: 0
   register: zabbix_item1
 
 - name: updating with same values should be idempotent
@@ -677,12 +736,15 @@
     update_interval: 1m
   register: zabbix_item1
 
-- name: "test: change type dependent"
+- name: "test: create new item with type dependent"
   community.zabbix.zabbix_item:
-    item_name: ExampleItem1
+    item_name: ExampleItem1Dependent
+    key: ExampleItem1Dependent
     host_name: ExampleHostForItem
     type: dependent
+    value_type: text
     master_item: ExampleMasterItem
+    update_interval: 0
   register: zabbix_item1
 
 - name: expect to succeed and that things changed
@@ -690,12 +752,15 @@
     that:
       - "zabbix_item1 is changed"
 
-- name: "test: change type dependent (again)"
+- name: "test: create new item with type dependent (again)"
   community.zabbix.zabbix_item:
-    item_name: ExampleItem1
+    item_name: ExampleItem1Dependent
+    key: ExampleItem1Dependent
     host_name: ExampleHostForItem
     type: dependent
+    value_type: text
     master_item: ExampleMasterItem
+    update_interval: 0
   register: zabbix_item1
 
 - name: updating with same values should be idempotent
@@ -703,11 +768,13 @@
     that:
       - "not zabbix_item1 is changed"
 
-- name: "test: change type http no auth"
+- name: "test: create new item with type http no auth"
   community.zabbix.zabbix_item:
-    item_name: ExampleItem1
+    item_name: ExampleItem1Http
+    key: ExampleItem1Http
     host_name: ExampleHostForItem
     type: http
+    value_type: text
     update_interval: 1m
     interface: 10.1.1.1:10050
     allow_traps: true
@@ -742,11 +809,13 @@
     that:
       - "zabbix_item1 is changed"
 
-- name: "test: change type http no auth (again)"
+- name: "test: create new item with type http no auth (again)"
   community.zabbix.zabbix_item:
-    item_name: ExampleItem1
+    item_name: ExampleItem1Http
+    key: ExampleItem1Http
     host_name: ExampleHostForItem
     type: http
+    value_type: text
     update_interval: 1m
     interface: 10.1.1.1:10050
     allow_traps: true
@@ -783,7 +852,7 @@
 
 - name: "test: change type http basic auth"
   community.zabbix.zabbix_item:
-    item_name: ExampleItem1
+    item_name: ExampleItem1Http
     host_name: ExampleHostForItem
     authtype: basic
   register: zabbix_item1
@@ -795,7 +864,7 @@
 
 - name: "test: change type http no auth (again)"
   community.zabbix.zabbix_item:
-    item_name: ExampleItem1
+    item_name: ExampleItem1Http
     host_name: ExampleHostForItem
     authtype: basic
   register: zabbix_item1
@@ -807,7 +876,7 @@
 
 - name: "test: change type http ntlm auth"
   community.zabbix.zabbix_item:
-    item_name: ExampleItem1
+    item_name: ExampleItem1Http
     host_name: ExampleHostForItem
     type: http
     authtype: ntlm
@@ -820,7 +889,7 @@
 
 - name: "test: change type http ntlm auth (again)"
   community.zabbix.zabbix_item:
-    item_name: ExampleItem1
+    item_name: ExampleItem1Http
     host_name: ExampleHostForItem
     type: http
     authtype: ntlm
@@ -833,7 +902,7 @@
 
 - name: "test: change type http kerberos auth"
   community.zabbix.zabbix_item:
-    item_name: ExampleItem1
+    item_name: ExampleItem1Http
     host_name: ExampleHostForItem
     type: http
     authtype: kerberos
@@ -846,7 +915,7 @@
 
 - name: "test: change type http kerberos auth (again)"
   community.zabbix.zabbix_item:
-    item_name: ExampleItem1
+    item_name: ExampleItem1Http
     host_name: ExampleHostForItem
     type: http
     authtype: kerberos
@@ -859,7 +928,7 @@
 
 - name: "test: change type http body_type json"
   community.zabbix.zabbix_item:
-    item_name: ExampleItem1
+    item_name: ExampleItem1Http
     host_name: ExampleHostForItem
     body_type: json
     body: {
@@ -874,7 +943,7 @@
 
 - name: "test: change type http body_type json (again)"
   community.zabbix.zabbix_item:
-    item_name: ExampleItem1
+    item_name: ExampleItem1Http
     host_name: ExampleHostForItem
     body_type: json
     body: {
@@ -889,7 +958,7 @@
 
 - name: "test: change type http body_type xml"
   community.zabbix.zabbix_item:
-    item_name: ExampleItem1
+    item_name: ExampleItem1Http
     host_name: ExampleHostForItem
     body_type: xml
     body: "<xml />"
@@ -902,7 +971,7 @@
 
 - name: "test: change type http body_type xml (again)"
   community.zabbix.zabbix_item:
-    item_name: ExampleItem1
+    item_name: ExampleItem1Http
     host_name: ExampleHostForItem
     body_type: xml
     body: "<xml />"
@@ -915,7 +984,7 @@
 
 - name: "test: change type http http_method POST"
   community.zabbix.zabbix_item:
-    item_name: ExampleItem1
+    item_name: ExampleItem1Http
     host_name: ExampleHostForItem
     http_method: POST
   register: zabbix_item1
@@ -927,7 +996,7 @@
 
 - name: "test: change type http http_method POST (again)"
   community.zabbix.zabbix_item:
-    item_name: ExampleItem1
+    item_name: ExampleItem1Http
     host_name: ExampleHostForItem
     http_method: POST
   register: zabbix_item1
@@ -939,7 +1008,7 @@
 
 - name: "test: change type http http_method PUT"
   community.zabbix.zabbix_item:
-    item_name: ExampleItem1
+    item_name: ExampleItem1Http
     host_name: ExampleHostForItem
     http_method: PUT
   register: zabbix_item1
@@ -951,7 +1020,7 @@
 
 - name: "test: change type http http_method PUT (again)"
   community.zabbix.zabbix_item:
-    item_name: ExampleItem1
+    item_name: ExampleItem1Http
     host_name: ExampleHostForItem
     http_method: PUT
   register: zabbix_item1
@@ -963,7 +1032,7 @@
 
 - name: "test: change type http http_method HEAD"
   community.zabbix.zabbix_item:
-    item_name: ExampleItem1
+    item_name: ExampleItem1Http
     host_name: ExampleHostForItem
     http_method: HEAD
   register: zabbix_item1
@@ -975,7 +1044,7 @@
 
 - name: "test: change type http http_method HEAD (again)"
   community.zabbix.zabbix_item:
-    item_name: ExampleItem1
+    item_name: ExampleItem1Http
     host_name: ExampleHostForItem
     http_method: HEAD
   register: zabbix_item1
@@ -985,11 +1054,13 @@
     that:
       - "not zabbix_item1 is changed"
 
-- name: "test: change type snmp_agent"
+- name: "test: create new item with type snmp_agent"
   community.zabbix.zabbix_item:
-    item_name: ExampleItem1
+    item_name: ExampleItem1SnmpAgent
+    key: ExampleItem1SnmpAgent
     host_name: ExampleHostForItem
     type: snmp_agent
+    value_type: text
     interface: 10.1.1.1:12345
     snmp_oid: .1
     update_interval: 10m
@@ -1000,11 +1071,13 @@
     that:
       - "zabbix_item1 is changed"
 
-- name: "test: change type snmp_agent (again)"
+- name: "test: create new item with type snmp_agent (again)"
   community.zabbix.zabbix_item:
-    item_name: ExampleItem1
+    item_name: ExampleItem1SnmpAgent
+    key: ExampleItem1SnmpAgent
     host_name: ExampleHostForItem
     type: snmp_agent
+    value_type: text
     interface: 10.1.1.1:12345
     snmp_oid: .1
     update_interval: 10m
@@ -1015,11 +1088,13 @@
     that:
       - "not zabbix_item1 is changed"
 
-- name: "test: change type script"
+- name: "test: create new item with type script"
   community.zabbix.zabbix_item:
-    item_name: ExampleItem1
+    item_name: ExampleItem1Script
+    key: ExampleItem1Script
     host_name: ExampleHostForItem
     type: script
+    value_type: text
     update_interval: 10m
     script: echo "test"
     parameters: {
@@ -1033,11 +1108,13 @@
     that:
       - "zabbix_item1 is changed"
 
-- name: "test: change type script (again)"
+- name: "test: create new item with type script (again)"
   community.zabbix.zabbix_item:
-    item_name: ExampleItem1
+    item_name: ExampleItem1Script
+    key: ExampleItem1Script
     host_name: ExampleHostForItem
     type: script
+    value_type: text
     update_interval: 10m
     script: echo "test"
     parameters: {
