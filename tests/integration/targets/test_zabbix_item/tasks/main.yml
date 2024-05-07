@@ -22,7 +22,7 @@
 
     - name: "cleanup template item if tests failed"
       community.zabbix.zabbix_item:
-        template_name: test-template
+        template_name: ExampleTemplate
         name: TestItem
         state: absent
       ignore_errors: true

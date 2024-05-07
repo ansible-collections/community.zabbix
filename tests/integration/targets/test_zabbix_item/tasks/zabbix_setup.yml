@@ -2,7 +2,7 @@
 
 - name: Create test template
   community.zabbix.zabbix_template:
-    template_name: test-template
+    template_name: ExampleTemplate
     template_groups:
       - Templates
 
@@ -13,7 +13,7 @@
       - Linux servers
       - Zabbix servers
     link_templates:
-      - test-template
+      - ExampleTemplate
     status: enabled
     state: present
     interfaces:

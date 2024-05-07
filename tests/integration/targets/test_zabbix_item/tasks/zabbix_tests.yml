@@ -92,7 +92,7 @@
 - name: test - create new Zabbix item on template with many options set
   community.zabbix.zabbix_item:
     name: TestItem
-    template_name: test-template
+    template_name: ExampleTemplate
     params:
         type: zabbix_agent_active
         key: vfs.fs.get
@@ -119,7 +119,7 @@
 - name: test - create same Zabbix item group once again
   community.zabbix.zabbix_item:
     name: TestItem
-    template_name: test-template
+    template_name: ExampleTemplate
     params:
         type: zabbix_agent_active
         key: vfs.fs.get
@@ -146,7 +146,7 @@
 - name: test - update existing zabbix item
   community.zabbix.zabbix_item:
     name: TestItem
-    template_name: test-template
+    template_name: ExampleTemplate
     params:
       interval: 2m
     state: present
@@ -159,7 +159,7 @@
 - name: test - attempt to delete previously created zabbix item
   community.zabbix.zabbix_item:
     name: TestItem
-    template_name: test-template
+    template_name: ExampleTemplate
     state: absent
   register: zbxtempitem_existing_delete
 
@@ -170,7 +170,7 @@
 - name: test - attempt to delete non-existing zabbix item
   community.zabbix.zabbix_item:
     name: TestItem
-    template_name: test-template
+    template_name: ExampleTemplate
     state: absent
   register: zbxtempitem_missing_delete
 

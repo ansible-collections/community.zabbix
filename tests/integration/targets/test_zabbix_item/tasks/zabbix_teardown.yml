@@ -5,5 +5,5 @@
 
 - name: remove test template
   community.zabbix.zabbix_template:
-    template_name: test-template
+    template_name: ExampleTemplate
     state: absent
