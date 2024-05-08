@@ -1,0 +1,4 @@
+- bugfixes: 
+    - zabbix_web role, Add missing selinux.yml tasks.
+- minor_changes:
+    - zabbix_web role, Refactored zabbix_selinux variable names to correlate with selinux boolean names.
