@@ -91,21 +91,9 @@
       when:
         - ansible_os_family == 'RedHat'
 
-    - name: Enabeling PHP 8.0
-      block:
-        - name: Add epel
-          ansible.builtin.include_role:
-            name: geerlingguy.repo-epel
-
-        - name: Add remi
-          ansible.builtin.include_role:
-            name: geerlingguy.repo-remi
-
-        - name: Reset dnf library
-          ansible.builtin.shell: dnf module reset php
-
-        - name: Set php Version
-          ansible.builtin.shell: dnf module enable -y php:remi-8.0
+    - name: Enabling PHP 8.0
+      ansible.builtin.dnf:
+        name: "@php:8.0/common"
       when:
         - ansible_os_family == 'RedHat'
         - ansible_distribution_major_version == "8"

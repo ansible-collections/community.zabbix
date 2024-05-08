@@ -2,5 +2,3 @@
 - src: geerlingguy.apache
 - src: geerlingguy.nginx
 - src: geerlingguy.php
-- src: geerlingguy.repo-epel
-- src: geerlingguy.repo-remi
