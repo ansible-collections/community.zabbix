@@ -48,4 +48,21 @@ zabbix_valid_agent_versions:
     - 6.0
 
 debian_keyring_path: /etc/apt/keyrings/
-zabbix_gpg_key: "{{ debian_keyring_path }}zabbix-repo.asc"
+_zabbix_gpg_key_default_by_distrib:
+  "12": "{{ debian_keyring_path }}zabbix-repo.asc"
+  "11": "{{ debian_keyring_path }}zabbix-repo.asc"
+  "10": "{{ debian_keyring_path }}zabbix-repo.asc"
+  "9": "{{ debian_keyring_path }}zabbix-repo.asc"
+  "24": "{{ debian_keyring_path }}zabbix-repo.gpg"
+  "22": "{{ debian_keyring_path }}zabbix-repo.asc"
+  "20": "{{ debian_keyring_path }}zabbix-repo.asc"
+  "18": "{{ debian_keyring_path }}zabbix-repo.asc"
+_zabbix_repo_default_deb_gpg_key_url_by_distrib:
+  "12": https://repo.zabbix.com/zabbix-official-repo.key
+  "11": https://repo.zabbix.com/zabbix-official-repo.key
+  "10": https://repo.zabbix.com/zabbix-official-repo.key
+  "9": https://repo.zabbix.com/zabbix-official-repo.key
+  "24": https://repo.zabbix.com/zabbix-official-repo-apr2024.gpg
+  "22": https://repo.zabbix.com/zabbix-official-repo.key
+  "20": https://repo.zabbix.com/zabbix-official-repo.key
+  "18": https://repo.zabbix.com/zabbix-official-repo.key
