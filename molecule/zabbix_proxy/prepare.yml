@@ -60,10 +60,9 @@
       ansible.builtin.shell: "apt-get update && echo exit 0 > /usr/sbin/policy-rc.d"
       register: installation_dependencies
       until: installation_dependencies is succeeded
-      when:
-        - ansible_os_family != 'RedHat'
+      when: ansible_facts['os_family'] == 'Debian'
 
-    - name: "Installing packages on NON-CentOS"
+    - name: "Installing packages on Debian family"
       ansible.builtin.apt:
         name:
           - net-tools
@@ -76,8 +75,7 @@
         state: present
       register: installation_dependencies
       until: installation_dependencies is succeeded
-      when:
-        - ansible_os_family != 'RedHat'
+      when: ansible_facts['os_family'] == 'Debian'
 
     - name: "Configure SUDO."
       ansible.builtin.lineinfile:
