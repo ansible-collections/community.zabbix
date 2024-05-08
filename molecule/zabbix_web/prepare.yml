@@ -56,17 +56,6 @@
       when:
         - ansible_os_family == 'RedHat'
 
-    - name: "Installing MySQL on CentOS"
-      ansible.builtin.yum:
-        name:
-          - mysql
-        state: present
-      register: installation_dependencies
-      until: installation_dependencies is succeeded
-      when:
-        - ansible_os_family == 'RedHat'
-        - inventory_hostname in groups['mysql']
-
     - name: "Apt update"
       ansible.builtin.shell: "apt-get update"
       register: installation_dependencies
@@ -103,14 +92,6 @@
         state: absent
       when:
         - ansible_os_family == 'RedHat'
-
-    - name: PyMySQL
-      ansible.builtin.pip:
-        name: PyMySQL
-      register: installation_dependencies
-      until: installation_dependencies is succeeded
-      when:
-        - inventory_hostname in groups['mysql']
 
     - name: Enabeling PHP 8.0
       block:

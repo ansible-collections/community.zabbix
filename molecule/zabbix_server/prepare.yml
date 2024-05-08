@@ -56,17 +56,6 @@
       when:
         - ansible_os_family == 'RedHat'
 
-    - name: "Installing packages on CentOS"
-      ansible.builtin.yum:
-        name:
-          - mysql
-        state: present
-      register: installation_dependencies
-      until: installation_dependencies is succeeded
-      when:
-        - ansible_os_family == 'RedHat'
-        - inventory_hostname in groups['mysql']
-
     - name: "Apt update"
       ansible.builtin.shell: "apt-get update && echo exit 0 > /usr/sbin/policy-rc.d"
       register: installation_dependencies
