@@ -12,7 +12,7 @@
   become: true
   when:
     - ansible_os_family == "RedHat"
-    - selinux_allow_zabbix_can_network
+    - ansible_selinux.status == "enabled"
     - ansible_distribution_major_version == "7" or ansible_distribution_major_version == "6"
   tags:
     - install
@@ -30,22 +30,10 @@
   become: true
   when:
     - ansible_os_family == "RedHat"
-    - selinux_allow_zabbix_can_network
+    - ansible_selinux.status == "enabled"
     - ansible_distribution_major_version|int >= 8
   tags:
     - install
-
-- name: "SELinux | RedHat | Enable zabbix_can_network SELinux boolean"
-  ansible.posix.seboolean:
-    name: zabbix_can_network
-    state: true
-    persistent: true
-  become: true
-  when:
-    - ansible_os_family == "RedHat"
-    - selinux_allow_zabbix_can_network
-  tags:
-    - config
 
 - name: "SELinux | Allow httpd to connect to db (SELinux)"
   ansible.posix.seboolean:
@@ -55,7 +43,7 @@
   become: true
   when:
     - ansible_selinux.status == "enabled"
-    - selinux_allow_zabbix_can_network
+    - selinux_allow_httpd_can_network_connect_db | bool
   tags:
     - config
 
@@ -67,7 +55,7 @@
   become: true
   when:
     - ansible_selinux.status == "enabled"
-    - selinux_allow_zabbix_can_network
+    - selinux_allow_httpd_can_connect_zabbix | bool
   tags:
     - config
 
@@ -79,6 +67,6 @@
   become: true
   when:
     - ansible_selinux.status == "enabled"
-    - zabbix_apache_can_connect_ldap | bool
+    - selinux_allow_httpd_can_connect_ldap | bool
   tags:
     - config

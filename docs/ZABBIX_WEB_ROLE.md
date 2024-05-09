@@ -16,6 +16,7 @@
       - [Apache configuration](#apache-configuration)
       - [Nginx configuration](#nginx-configuration)
       - [PHP-FPM](#php-fpm)
+    - [SElinux](#selinux)
     - [Zabbix Server](#zabbix-server)
   * [proxy](#proxy)
 - [Example Playbook](#example-playbook)
@@ -120,7 +121,6 @@ The following is an overview of all available configuration defaults for this ro
 * `zabbix_web_vhost_port`: The port on which Zabbix HTTP vhost is running.
 * `zabbix_web_vhost_tls_port`: The port on which Zabbix HTTPS vhost is running.
 * `zabbix_web_vhost_listen_ip`: On which interface the Apache Virtual Host is available.
-* `zabbix_apache_can_connect_ldap`: Default: `false`. Set SELinux boolean to allow httpd to connect to LDAP.
 * `zabbix_web_max_execution_time`: PHP max execution time
 * `zabbix_web_memory_limit`: PHP memory limit
 * `zabbix_web_post_max_size`: PHP maximum post size
@@ -154,6 +154,13 @@ The following properties are specific to Zabbix 5.0 and for the PHP(-FPM) config
 * `zabbix_php_fpm_conf_user`: The owner of the socket file (When `zabbix_php_fpm_listen` contains a patch to a socket file).
 
 * `zabbix_php_fpm_conf_group`: The group of the owner of the socket file (When `zabbix_php_fpm_listen` contains a patch to a socket file).
+
+### SElinux
+
+* `zabbix_web_selinux`: Default: `False`. Enables an SELinux policy so that the web will run.
+* `selinux_allow_httpd_can_connect_zabbix`: Default: `false`. Set SELinux boolean to allow httpd to connect to zabbix.
+* `selinux_allow_httpd_can_connect_ldap`: Default: `false`. Set SELinux boolean to allow httpd to connect to LDAP.
+* `selinux_allow_httpd_can_network_connect_db`: Default: `false` Set SELinux boolean to allow httpd to connect databases over the network.
 
 ### Zabbix Server
 
