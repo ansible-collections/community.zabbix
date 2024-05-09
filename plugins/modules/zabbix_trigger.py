@@ -84,7 +84,7 @@ options:
         description:
             - Parameters to create/update trigger with.
             - Required if state is "present".
-            - Parameters as defined in: https://www.zabbix.com/documentation/current/en/manual/api/reference/trigger/object
+            - Parameters as defined at https://www.zabbix.com/documentation/current/en/manual/api/reference/trigger/object
             - Additionally supported parameters are below.
         required: false
         type: dict
@@ -251,6 +251,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.zabbix.plugins.module_utils.base import ZabbixBase
 import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabbix_utils
 
+
 class Trigger(ZabbixBase):
 
     PRIORITY_TYPES = {'not_classified': 0,
@@ -265,7 +266,7 @@ class Trigger(ZabbixBase):
                       'none': 2}
 
     def get_triggers(self, trigger_name, host_name, template_name):
-        if host_name != None:
+        if host_name is not None:
             host = host_name
         else:
             host = template_name
@@ -278,7 +279,7 @@ class Trigger(ZabbixBase):
 
     def sanitize_params(self, name, params, desc=None, dependencies=None):
         params['description'] = name
-        if desc != None:
+        if desc is not None:
             params['comments'] = desc
         if 'severity' in params:
             params['priority'] = params['severity']
@@ -323,7 +324,7 @@ class Trigger(ZabbixBase):
                 params['manual_close'] = 1
             else:
                 params['manual_close'] = 0
-        if dependencies != None:
+        if dependencies is not None:
             params['dependencies'] = []
             for dependency in dependencies:
                 host_name = None
@@ -371,6 +372,7 @@ class Trigger(ZabbixBase):
         except Exception as e:
             self._module.fail_json(msg="Failed to delete trigger: %s" % e)
         return results
+
 
 def main():
     argument_spec = zabbix_utils.zabbix_common_argument_spec()
@@ -435,6 +437,7 @@ def main():
                 if changed_trigger:
                     changed = True
             module.exit_json(changed=changed, result=results)
+
 
 if __name__ == '__main__':
     main()

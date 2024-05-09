@@ -50,14 +50,14 @@ params:
         description:
             - Parameters to create/update discovery rule with.
             - Required if state is "present".
-            - Parameters as defined in: https://www.zabbix.com/documentation/current/en/manual/api/reference/discoveryrule/object
+            - Parameters as defined at https://www.zabbix.com/documentation/current/en/manual/api/reference/discoveryrule/object
             - Additionally supported parameters are below
         required: false
         type: dict
         suboptions:
             key:
                 description:
-                    - LLD rule key. 
+                    - LLD rule key.
                     - Alias for "key_" in API docs
                 required: false
                 type: str
@@ -75,7 +75,7 @@ params:
                 choices: [ "enabled", "disabled" ]
             enabled:
                 description:
-                    - Status of the LLD rule. 
+                    - Status of the LLD rule.
                     - Overrides "status" in API docs
                 required: false
                 type: bool
@@ -107,7 +107,7 @@ params:
             preprocessing:
                 description:
                     - discovery rules preprocessing options.
-                    - Parameters as defined in: https://www.zabbix.com/documentation/current/en/manual/api/reference/discoveryrule/object#lld-rule-preprocessing
+                    - Parameters as defined at https://www.zabbix.com/documentation/current/en/manual/api/reference/discoveryrule/object#lld-rule-preprocessing
                     - Additionally supported parameters are below
                 required: false
                 type: list
@@ -252,6 +252,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.zabbix.plugins.module_utils.base import ZabbixBase
 import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabbix_utils
 
+
 class Discoveryrule(ZabbixBase):
     ITEM_TYPES = {'zabbix_agent': 0,
                   'zabbix_trapper': 2,
@@ -296,7 +297,7 @@ class Discoveryrule(ZabbixBase):
                                     'set_custom_error_message': 3}
 
     def get_hosts_templates(self, host_name, template_name):
-        if host_name != None:
+        if host_name is not None:
             try:
                 return self._zapi.host.get({"filter": {"host": host_name}})
             except Exception as e:
@@ -307,9 +308,8 @@ class Discoveryrule(ZabbixBase):
             except Exception as e:
                 self._module.fail_json(msg="Failed to get template: %s" % e)
 
-
     def get_discoveryrules(self, discoveryrule_name, host_name, template_name):
-        if host_name != None:
+        if host_name is not None:
             host = host_name
         else:
             host = template_name
@@ -387,6 +387,7 @@ class Discoveryrule(ZabbixBase):
             self._module.fail_json(msg="Failed to delete discoveryrule: %s" % e)
         return results
 
+
 def main():
     argument_spec = zabbix_utils.zabbix_common_argument_spec()
     argument_spec.update(dict(
@@ -453,6 +454,7 @@ def main():
                 if changed_rule:
                     changed = True
             module.exit_json(changed=changed, result=results)
+
 
 if __name__ == '__main__':
     main()
