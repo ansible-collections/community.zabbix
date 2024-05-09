@@ -86,6 +86,8 @@ See the following list of supported Operating systems with the Zabbix releases:
 | Debian 11 bullseye  |  V  |  V  |  V  |
 | Debian 10 buster    |     |     |  V  |
 
+You can bypass this matrix by setting `enable_version_check: false`
+
 # Installation
 
 Installing this role is very simple: `ansible-galaxy install community.zabbix.zabbix_server`
