@@ -1,18 +1,17 @@
 ---
-- name: "SELinux | RedHat | Install related SELinux package on RHEL8"
-  ansible.builtin.yum:
+- name: "SELinux | Install related SELinux packages"
+  ansible.builtin.package:
     name:
+      - checkpolicy
+      - policycoreutils
       - python3-libsemanage
-    state: present
+      - python3-policycoreutils
   environment:
     http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
     https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   register: zabbix_server_dependencies_installed
   until: zabbix_server_dependencies_installed is succeeded
   become: true
-  when:
-    - selinux_allow_zabbix_can_network
-    - ansible_distribution_major_version == "8"
   tags:
     - install
 
@@ -37,24 +36,6 @@
     - selinux_allow_zabbix_can_network
   tags:
     - config
-
-- name: "SELinux | RedHat | Install related SELinux package to fix issues on RHEL8"
-  ansible.builtin.yum:
-    name:
-      - policycoreutils
-      - checkpolicy
-      - python3-libsemanage
-    state: present
-  environment:
-    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
-    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
-  register: zabbix_server_dependencies_installed
-  until: zabbix_server_dependencies_installed is succeeded
-  become: true
-  when:
-    - ansible_distribution_major_version == "8"
-  tags:
-    - install
 
 - name: "SELinux | RedHat | Add SEmodule to fix SELinux issue: zabbix_server_alerter.sock"
   ansible.builtin.script:
