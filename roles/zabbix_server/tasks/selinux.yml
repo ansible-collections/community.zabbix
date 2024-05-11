@@ -15,27 +15,19 @@
   tags:
     - install
 
-- name: "SELinux | RedHat | Enable httpd_can_connect_zabbix SELinux boolean"
+- name: "SELinux | Set booleans"
   ansible.posix.seboolean:
-    name: httpd_can_connect_zabbix
-    state: true
+    name: "{{ item.name }}"
+    state: "{{ item.state }}"
     persistent: true
   become: true
-  when:
-    - selinux_allow_zabbix_can_http
   tags:
     - config
-
-- name: "SELinux | RedHat | Enable zabbix_can_network SELinux boolean"
-  ansible.posix.seboolean:
-    name: zabbix_can_network
-    state: true
-    persistent: true
-  become: true
-  when:
-    - selinux_allow_zabbix_can_network
-  tags:
-    - config
+  loop:
+    - name: httpd_can_connect_zabbix
+      state: "{{ selinux_allow_zabbix_can_http }}"
+    - name: zabbix_can_network
+      state: "{{ selinux_allow_zabbix_can_network }}"
 
 - name: "SELinux | RedHat | Add SEmodule to fix SELinux issue: zabbix_server_alerter.sock"
   ansible.builtin.script:
