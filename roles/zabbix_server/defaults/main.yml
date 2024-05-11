@@ -26,7 +26,6 @@ zabbix_server_database_creation: true
 zabbix_server_install_database_client: true
 
 # SELinux specific
-zabbix_server_selinux: false
 selinux_allow_zabbix_can_network: false
 selinux_allow_zabbix_can_http: false
 

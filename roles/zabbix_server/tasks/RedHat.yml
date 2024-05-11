@@ -36,5 +36,4 @@
 
 - name: "RedHat | Configure SELinux when enabled"
   ansible.builtin.include_tasks: selinux.yml
-  when:
-    - zabbix_server_selinux | bool
+  when: ansible_facts.selinux.status | default('disabled') == 'enabled'
