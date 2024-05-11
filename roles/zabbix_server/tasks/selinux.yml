@@ -1,30 +1,4 @@
 ---
-# straight to getenforce binary , workaround for missing python_selinux library
-- name: "SELinux | Get getenforce binary"
-  ansible.builtin.stat:
-    path: /usr/sbin/getenforce
-  register: getenforce_bin
-  become: true
-  tags:
-    - always
-
-- name: "SELinux | Collect getenforce output"
-  ansible.builtin.command: getenforce
-  register: sestatus
-  when: "getenforce_bin.stat.exists"
-  changed_when: false
-  become: true
-  check_mode: false
-  tags:
-    - always
-
-- name: "Set zabbix_server_selinux to true if getenforce returns Enforcing or Permissive"
-  ansible.builtin.set_fact:
-    zabbix_server_selinux: "{{ true }}"
-  when: 'getenforce_bin.stat.exists and ("Enforcing" in sestatus.stdout or "Permissive" in sestatus.stdout)'
-  tags:
-    - config
-
 - name: "SELinux | RedHat | Install related SELinux package"
   ansible.builtin.yum:
     name:
@@ -39,7 +13,6 @@
   until: zabbix_server_dependencies_installed is succeeded
   become: true
   when:
-    - ansible_os_family == "RedHat"
     - selinux_allow_zabbix_can_network
     - ansible_distribution_major_version == "7" or ansible_distribution_major_version == "6"
   tags:
@@ -57,7 +30,6 @@
   until: zabbix_server_dependencies_installed is succeeded
   become: true
   when:
-    - ansible_os_family == "RedHat"
     - selinux_allow_zabbix_can_network
     - ansible_distribution_major_version == "8"
   tags:
@@ -97,7 +69,6 @@
   until: zabbix_server_dependencies_installed is succeeded
   become: true
   when:
-    - ansible_os_family == "RedHat"
     - ansible_distribution_major_version == "7" or ansible_distribution_major_version == "6"
   tags:
     - install
@@ -116,7 +87,6 @@
   until: zabbix_server_dependencies_installed is succeeded
   become: true
   when:
-    - ansible_os_family == "RedHat"
     - ansible_distribution_major_version == "8"
   tags:
     - install
