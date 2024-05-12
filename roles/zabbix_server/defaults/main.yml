@@ -40,9 +40,8 @@ zabbix_server_version_minor: "*"
 zabbix_server_package_state: present
 zabbix_repo_yum_gpgcheck: 0
 zabbix_repo_yum_schema: https
+zabbix_repo_deb_url: "http://repo.zabbix.com/zabbix/{{ zabbix_server_version }}/{{ ansible_facts.lsb.id | default(ansible_facts['distribution']) | lower }}{% if ansible_facts['architecture'] == 'aarch64' and ansible_facts.lsb.id | default(ansible_facts['distribution']) in ['Debian', 'Ubuntu'] %}-arm64{% endif %}"
 zabbix_repo_deb_component: main
-zabbix_server_disable_repo:
-  - epel
 zabbix_repo_yum:
   - name: zabbix
     description: Zabbix Official Repository - $basearch
@@ -59,8 +58,9 @@ zabbix_repo_yum:
     gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-ZABBIX
     state: present
 zabbix_server_apt_priority:
-zabbix_server_install_recommends: true
 zabbix_server_conf_mode: 0640
+zabbix_repo_deb_gpg_key_url: http://repo.zabbix.com/zabbix-official-repo.key
+zabbix_repo_deb_include_deb_src: true
 
 # Server Configuration Variables (Only ones with role provided defaults)
 zabbix_server_alertscriptspath: /usr/lib/zabbix/alertscripts

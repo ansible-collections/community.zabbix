@@ -26,6 +26,9 @@ zabbix_agent2_deny_key: "{{ zabbix_agent_deny_key }}"
 # Selinux related vars
 selinux_allow_zabbix_run_sudo: false
 
+zabbix_repo_deb_gpg_key_url: http://repo.zabbix.com/zabbix-official-repo.key
+zabbix_repo_deb_include_deb_src: true
+
 zabbix_agent_install_agent_only: false
 zabbix_agent_packages:
   - "{{ zabbix_agent_package }}"
@@ -66,6 +69,7 @@ zabbix_repo_yum:
     gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-ZABBIX
     state: present
 
+zabbix_repo_deb_url: "http://repo.zabbix.com/zabbix/{{ zabbix_agent_version }}/{{ ansible_facts.lsb.id | default(ansible_facts['distribution']) | lower }}{% if ansible_facts['architecture'] == 'aarch64' and ansible_facts.lsb.id | default(ansible_facts['distribution']) in ['Debian', 'Ubuntu'] %}-arm64{% endif %}"
 zabbix_repo_deb_component: main
 
 # Zabbix API stuff
@@ -165,7 +169,7 @@ zabbix_agent_tls_config:
   cert: "4"
 
 # IPMI settings
-zabbix_agent_ipmi_authtype: 2
+zabbix_agent_ipmi_authtype: -1
 zabbix_agent_ipmi_password:
 zabbix_agent_ipmi_privilege: 2
 zabbix_agent_ipmi_username:

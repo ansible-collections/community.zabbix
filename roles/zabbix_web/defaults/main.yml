@@ -53,6 +53,7 @@ zabbix_web_apt_priority:
 zabbix_web_version_minor: "*"
 zabbix_repo_yum_gpgcheck: 0
 zabbix_repo_yum_schema: https
+zabbix_repo_deb_url: "http://repo.zabbix.com/zabbix/{{ zabbix_web_version }}/{{ ansible_facts.lsb.id | default(ansible_facts['distribution']) | lower }}{% if ansible_facts['architecture'] == 'aarch64' and ansible_facts.lsb.id | default(ansible_facts['distribution']) in ['Debian', 'Ubuntu'] %}-arm64{% endif %}"
 zabbix_repo_deb_component: main
 zabbix_web_disable_repo:
   - epel
@@ -86,9 +87,14 @@ zabbix_server_history_types:
   - "uint"
   - "dbl"
 
-zabbix_selinux: false
-# selinux_allow_zabbix_can_network: false
-# zabbix_apache_can_connect_ldap: false
+# SELinux specific
+zabbix_web_selinux: false
+selinux_allow_httpd_can_connect_ldap: false
+selinux_allow_httpd_can_network_connect_db: false
+selinux_allow_httpd_can_connect_zabbix: false
+
+zabbix_repo_deb_gpg_key_url: http://repo.zabbix.com/zabbix-official-repo.key
+zabbix_repo_deb_include_deb_src: true
 
 # SAML certificates
 # zabbix_saml_idp_crt:

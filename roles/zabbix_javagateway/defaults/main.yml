@@ -25,9 +25,13 @@ zabbix_repo_yum:
     gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-ZABBIX
     state: present
 
+zabbix_repo_deb_url: "http://repo.zabbix.com/zabbix/{{ zabbix_javagateway_version }}/{{ ansible_facts.lsb.id | default(ansible_facts['distribution']) | lower }}{% if ansible_facts['architecture'] == 'aarch64' and ansible_facts.lsb.id | default(ansible_facts['distribution']) in ['Debian', 'Ubuntu'] %}-arm64{% endif %}"
 zabbix_repo_deb_component: main
 
 zabbix_javagateway_pidfile: /run/zabbix/zabbix_java_gateway.pid
 zabbix_javagateway_listenip: 0.0.0.0
 zabbix_javagateway_listenport: 10052
 zabbix_javagateway_startpollers: 5
+
+zabbix_repo_deb_gpg_key_url: http://repo.zabbix.com/zabbix-official-repo.key
+zabbix_repo_deb_include_deb_src: true
