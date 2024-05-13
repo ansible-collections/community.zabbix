@@ -15,7 +15,7 @@ description:
    - Create items if they do not exist.
    - Delete existing items if they exist.
 author:
-    - "Andrew Lathrop"
+    - "Andrew Lathrop (@aplathrop)"
 requirements:
     - "python >= 2.6"
 
@@ -510,6 +510,7 @@ def main():
                 if changed_item:
                     changed = True
             module.exit_json(changed=changed, result=results)
+
 
 if __name__ == '__main__':
     main()

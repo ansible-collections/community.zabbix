@@ -15,7 +15,7 @@ description:
    - Create item prototypes if they do not exist.
    - Delete existing item prototypes if they exist.
 author:
-    - "Andrew Lathrop"
+    - "Andrew Lathrop (@aplathrop)"
 requirements:
     - "python >= 2.6"
 
@@ -124,7 +124,8 @@ options:
             preprocessing:
                 description:
                     - Item preprocessing options.
-                    - Parameters as defined at https://www.zabbix.com/documentation/current/en/manual/api/reference/itemprototype/object#item-prototype-preprocessing
+                    - Parameters as defined at
+                    - https://www.zabbix.com/documentation/current/en/manual/api/reference/itemprototype/object#item-prototype-preprocessing
                     - Additionally supported parameters are below
                 required: false
                 type: list

@@ -15,7 +15,7 @@ description:
    - Create discoveryrules if they do not exist.
    - Delete existing discoveryrules if they exist.
 author:
-    - "Andrew Lathrop"
+    - "Andrew Lathrop (@aplathrop)"
 requirements:
     - "python >= 2.6"
 
@@ -46,7 +46,7 @@ options:
             - Mutually exclusive with I(host_name).
         required: false
         type: str
-params:
+    params:
         description:
             - Parameters to create/update discovery rule with.
             - Required if state is "present".
@@ -63,7 +63,7 @@ params:
                 type: str
             interval:
                 description:
-                    - Update interval of the LLD rule. 
+                    - Update interval of the LLD rule.
                     - Alias for "delay" in API docs
                 required: false
                 type: str

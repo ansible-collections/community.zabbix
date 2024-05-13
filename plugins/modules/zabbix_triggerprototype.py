@@ -15,7 +15,7 @@ description:
    - Create triggerprototypes if they do not exist.
    - Delete existing triggerprototypes if they exist.
 author:
-    - "Andrew Lathrop"
+    - "Andrew Lathrop (@aplathrop)"
 requirements:
     - "python >= 2.6"
 
@@ -60,6 +60,7 @@ options:
             - list of trigger prototypes that this trigger prototype is dependent on
         required: false
         type: list
+        elements: dict
         suboptions:
                 name:
                     description:
@@ -127,7 +128,7 @@ options:
                     - OK event generation mode.
                     - Overrides "recovery_mode" in API docs.
                 required: false
-                type: string
+                type: str
                 choices:
                     - expression
                     - recovery_expression
@@ -137,7 +138,7 @@ options:
                     - OK event closes.
                     - Overrides "correlation_mode" in API docs.
                 required: false
-                type: string
+                type: str
                 choices: [ "all", "tag" ]
             manual_close:
                 description:
@@ -386,7 +387,7 @@ def main():
         template_name=dict(type='str', required=False),
         params=dict(type='dict', required=False),
         desc=dict(type='str', required=False, aliases=['description']),
-        dependencies=dict(type='list', required=False),
+        dependencies=dict(type='list', elements='dict', required=False),
         state=dict(type='str', default="present", choices=['present', 'absent']),
     ))
     module = AnsibleModule(
