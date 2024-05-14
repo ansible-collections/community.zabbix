@@ -1092,3 +1092,61 @@ releases:
     fragments:
     - 1156-bugfix_zabbix_user_directory_dryrun.yml
     release_date: '2024-01-10'
+  2.4.0:
+    changes:
+      bugfixes:
+      - zabbix_agent - Fixed IPMI authentication algorithm default setting
+      - zabbix_agent - Fixed issue to where scripts can be deployed alongside userparameters
+      - zabbix_host - Don't reset IPMI setting when update inventory data of a host
+      - zabbix_host - Finish task with failed if host_group parameter is empty list
+      - zabbix_server - proper indentaion of become in selinux.yaml
+      - zabbix_web - Added missing semicolon to nginx vhost template.
+      - zabbix_web role, Add missing selinux.yml tasks.
+      minor_changes:
+      - Add slash at the end of the location directives, to prevent path traversal
+        attacks.
+      - Added active_since and active_till in zabbix_maintenance
+      - Added content_type for email in zabbix_mediatypes
+      - Introduce flag `enable_version_check` to allow installations on non-supported
+        platforms.
+      - agent, javagateway, proxy, server, and web role - added the http_proxy and
+        https_proxy environment variables to "Debian | Download gpg key" analog to
+        other tasks
+      - agent, javagateway, proxy, server, and web role - introduced default variable
+        zabbix_repo_deb_gpg_key_url with value http://repo.zabbix.com/zabbix-official-repo.key
+      - agent, javagateway, proxy, server, and web role - introduced default variable
+        zabbix_repo_deb_include_deb_src with value true
+      - agent, javagateway, proxy, server, and web role - removed superfluous slash
+        in zabbix_gpg_key of the Debian vars and renamed key to zabbix-repo instead
+        of zabbix-official-repo
+      - agent, javagateway, proxy, server, and web role - used variable zabbix_repo_deb_include_deb_src
+        in "Debian | Installing repository" to determine whether deb-src should be
+        added to /etc/apt/sources.list.d/zabbix.sources
+      - agent, javagateway, proxy, server, and web role - used zabbix_repo_deb_gpg_key_url
+        in "Debian | Download gpg key" instead of hardcoded url
+      - zabbix_correlation module added
+      - zabbix_service_info module added
+      - zabbix_template - Add template_yaml parameter.
+      - zabbix_web role, Refactored zabbix_selinux variable names to correlate with
+        selinux boolean names.
+    fragments:
+    - 1157-add_template_yaml.yml
+    - 1162-do_not_update_ipmi_options.yml
+    - 1165-indent-become.yml
+    - 1168-finish-task-with-failed-if-host_group-parameter-is-empty_list.yml
+    - 1169-add_zabbix_correlation.yml
+    - 1176-content_type-in-mediatype.yml
+    - 1180-active_since-in-maintenance.yml
+    - 1183-nginx-fix-against-path-traversal.yml
+    - 1186-custom_gpg_key_url.yml
+    - 1188-agent_ipmi_authtype_fix.yml
+    - 1205-fix-zabbix-agent-scripts.yml
+    - 1206-fix-nginx-template-ssl-params.yml
+    - 1210-add_zabbix_service_info.yml
+    - 1220-refactor_selinux_tasks_and_variable_names_role_zabbix_web.yml
+    - 1224-enable-version-check.yml
+    modules:
+    - description: Create/update/delete Zabbix correlation
+      name: zabbix_correlation
+      namespace: ''
+    release_date: '2024-05-13'
