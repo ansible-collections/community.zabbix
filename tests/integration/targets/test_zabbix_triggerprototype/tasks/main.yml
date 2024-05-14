@@ -1,0 +1,44 @@
+---
+- name: test - do not run tests for Zabbix < 6.4
+  meta: end_play
+  when: zabbix_version is version('6.4', '<')
+
+- block:
+    # setup stuff
+    - include_tasks: zabbix_setup.yml
+
+    # zabbix_triggerprototype module tests
+    - include_tasks: zabbix_tests.yml
+
+    # tear down stuff set up earlier
+    - include_tasks: zabbix_teardown.yml
+  always:
+    - name: "cleanup host item if tests failed"
+      community.zabbix.zabbix_itemprototype:
+        host_name: ExampleHost
+        discoveryrule_name: ExampleHostRule
+        name: ExampleHostItem
+        state: absent
+      ignore_errors: true
+
+    - name: "cleanup template item if tests failed"
+      community.zabbix.zabbix_itemprototype:
+        template_name: ExampleTemplate
+        discoveryrule_name: ExampleTemplateRule
+        name: ExampleTemplateItem
+        state: absent
+      ignore_errors: true
+
+    - name: cleanup discovery rule on host if tests failed
+      community.zabbix.zabbix_discoveryrule:
+        name: ExampleHostRule
+        host_name: ExampleHost
+        state: absent
+      ignore_errors: true
+
+    - name: cleanup discovery rule on template if tests failed
+      community.zabbix.zabbix_discoveryrule:
+        name: ExampleTemplateRule
+        template_name: ExampleTemplate
+        state: absent
+      ignore_errors: true

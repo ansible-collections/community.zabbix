@@ -1,0 +1,159 @@
+---
+
+- name: test - create new Zabbix trigger on host with many options set
+  community.zabbix.zabbix_trigger:
+    name: TestTrigger
+    host_name: ExampleHost
+    description: test host trigger
+    params:
+      severity: warning
+      expression: 'nodata(/ExampleHost/agent.ping,2m)=1'
+      recovery_mode: recovery_expression
+      recovery_expression: 'nodata(/ExampleHost/agent.ping,2m)=0'
+      manual_close: True
+      enabled: True
+      tags:
+      - tag: tag
+        value: value
+    state: present
+  register: zbxhosttrigger_new
+
+- name: assert that trigger was created
+  ansible.builtin.assert:
+    that: zbxhosttrigger_new is changed
+
+- name: test - create same Zabbix trigger once again
+  community.zabbix.zabbix_trigger:
+    name: TestTrigger
+    host_name: ExampleHost
+    description: test host trigger
+    params:
+      severity: warning
+      expression: 'nodata(/ExampleHost/agent.ping,2m)=1'
+      recovery_mode: recovery_expression
+      recovery_expression: 'nodata(/ExampleHost/agent.ping,2m)=0'
+      manual_close: True
+      enabled: True
+      tags:
+      - tag: tag
+        value: value
+    state: present
+  register: zbxhosttrigger_existing
+
+- name: assert that nothing has been changed
+  ansible.builtin.assert:
+    that: not zbxhosttrigger_existing is changed
+
+- name: test - update existing zabbix trigger
+  community.zabbix.zabbix_trigger:
+    name: TestTrigger
+    host_name: ExampleHost
+    params:
+      manual_close: False
+    state: present
+  register: zbxhosttrigger_changed
+
+- name: expect to succeed and that things changed
+  ansible.builtin.assert:
+    that: zbxhosttrigger_changed is changed
+
+- name: test - attempt to delete previously created zabbix trigger
+  community.zabbix.zabbix_trigger:
+    name: TestTrigger
+    host_name: ExampleHost
+    state: absent
+  register: zbxhosttrigger_existing_delete
+
+- name: assert that trigger was deleted
+  ansible.builtin.assert:
+    that: zbxhosttrigger_existing_delete is changed
+
+- name: test - attempt to delete non-existing zabbix trigger
+  community.zabbix.zabbix_trigger:
+    name: TestTrigger
+    host_name: ExampleHost
+    state: absent
+  register: zbxhosttrigger_missing_delete
+
+- name: assert that nothing has been changed
+  ansible.builtin.assert:
+    that: not zbxhosttrigger_missing_delete is changed
+
+- name: test - create new Zabbix trigger on template with many options set
+  community.zabbix.zabbix_trigger:
+    name: TestTrigger
+    template_name: ExampleTemplate
+    description: test template trigger
+    params:
+      severity: warning
+      expression: 'count(/ExampleTemplate/system.cpu.load[percpu,avg1],#2,"gt","1.3")>1'
+      recovery_mode: recovery_expression
+      recovery_expression: 'count(/ExampleTemplate/system.cpu.load[percpu,avg1],#2,"lt","1.3")>1'
+      manual_close: True
+      enabled: True
+      tags:
+      - tag: tag
+        value: value
+    state: present
+  register: zbxtemptrigger_new
+
+- name: assert that trigger was created
+  ansible.builtin.assert:
+    that: zbxtemptrigger_new is changed
+
+- name: test - create same Zabbix trigger once again
+  community.zabbix.zabbix_trigger:
+    name: TestTrigger
+    template_name: ExampleTemplate
+    description: test template trigger
+    params:
+      severity: warning
+      expression: 'count(/ExampleTemplate/system.cpu.load[percpu,avg1],#2,"gt","1.3")>1'
+      recovery_mode: recovery_expression
+      recovery_expression: 'count(/ExampleTemplate/system.cpu.load[percpu,avg1],#2,"lt","1.3")>1'
+      manual_close: True
+      enabled: True
+      tags:
+      - tag: tag
+        value: value
+    state: present
+  register: zbxtemptrigger_existing
+
+- name: assert that nothing has been changed
+  ansible.builtin.assert:
+    that: not zbxtemptrigger_existing is changed
+
+- name: test - update existing zabbix trigger
+  community.zabbix.zabbix_trigger:
+    name: TestTrigger
+    template_name: ExampleTemplate
+    params:
+      manual_close: False
+    state: present
+  register: zbxtemptrigger_changed
+
+- name: expect to succeed and that things changed
+  ansible.builtin.assert:
+    that: zbxtemptrigger_changed is changed
+
+- name: test - attempt to delete previously created zabbix trigger
+  community.zabbix.zabbix_trigger:
+    name: TestTrigger
+    template_name: ExampleTemplate
+    state: absent
+  register: zbxtemptrigger_existing_delete
+
+- name: assert that trigger was deleted
+  ansible.builtin.assert:
+    that: zbxtemptrigger_existing_delete is changed
+
+- name: test - attempt to delete non-existing zabbix trigger
+  community.zabbix.zabbix_trigger:
+    name: TestTrigger
+    template_name: ExampleTemplate
+    state: absent
+  register: zbxtemptrigger_missing_delete
+
+- name: assert that nothing has been changed
+  ansible.builtin.assert:
+    that: not zbxtemptrigger_missing_delete is changed

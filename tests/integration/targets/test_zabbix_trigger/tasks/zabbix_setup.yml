@@ -1,0 +1,47 @@
+---
+
+- name: Create test template
+  community.zabbix.zabbix_template:
+    template_name: ExampleTemplate
+    template_groups:
+      - Templates
+
+- name: Create test host
+  community.zabbix.zabbix_host:
+    host_name: ExampleHost
+    host_groups:
+      - Linux servers
+      - Zabbix servers
+    link_templates:
+      - ExampleTemplate
+    status: enabled
+    state: present
+    interfaces:
+      - type: 1
+        main: 1
+        useip: 1
+        ip: 10.1.1.1
+        dns: ""
+        port: "10050"
+
+- name: Create test host item
+  community.zabbix.zabbix_item:
+    name: ExampleHostItem
+    host_name: ExampleHost
+    params:
+        type: zabbix_agent_active
+        key: agent.ping
+        value_type: numeric_unsigned
+        interval: 1m
+    state: present
+
+- name: Create test template item
+  community.zabbix.zabbix_item:
+    name: ExampleTemplateItem
+    template_name: ExampleTemplate
+    params:
+        type: zabbix_agent_active
+        key: system.cpu.load[percpu,avg1]
+        value_type: numeric_float
+        interval: 1m
+    state: present

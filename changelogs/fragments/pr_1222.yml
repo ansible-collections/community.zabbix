@@ -1,0 +1,6 @@
+minor_changes:
+  - zabbix_item module added
+  - zabbix_trigger module added
+  - zabbix_discoveryrule module added
+  - zabbix_itemprototype module added
+  - zabbix_triggerprototype module added
