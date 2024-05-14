@@ -1,2 +1,0 @@
-bugfixes:
-  - zabbix_agent - Fixed issue to where scripts can be deployed alongside userparameters
