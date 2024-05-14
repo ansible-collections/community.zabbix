@@ -1,8 +1,8 @@
 ---
 - name: "API | Create host groups"
   community.zabbix.zabbix_group:
-    host_group: "{{ zabbix_host_groups }}"
-    state: "{{ zabbix_agent_hostgroups_state }}"
+    host_groups: "{{ zabbix_host_groups }}"
+    state: present
   when:
     - zabbix_api_create_hostgroup | bool
   register: zabbix_api_hostgroup_created
@@ -35,7 +35,7 @@
     ipmi_password: "{{ zabbix_agent_ipmi_password| default(omit) }}"
     ipmi_privilege: "{{ zabbix_agent_ipmi_privilege | default(omit) }}"
     ipmi_username: "{{ zabbix_agent_ipmi_username | default(omit) }}"
-    tags: "{{ zabbix_agent_tags }}"
+    tags: "{{ zabbix_agent_tags | default(omit) }}"
   register: zabbix_api_host_created
   until: zabbix_api_host_created is succeeded
   delegate_to: "{{ zabbix_api_server_host }}"
@@ -51,7 +51,6 @@
     macro_type: "{{ item.macro_type|default('text') }}"
   with_items: "{{ zabbix_agent_macros | default([]) }}"
   when:
-    - zabbix_agent_macros is defined
     - item.macro_key is defined
   register: zabbix_api_hostmarcro_created
   until: zabbix_api_hostmarcro_created is succeeded

@@ -48,7 +48,9 @@ DenyKey={{ item }}
 {% else %}
 # DenyKey=
 {% endif %}
+{% if not zabbix_agent2 %}
 {{ (zabbix_agent_enableremotecommands is defined and zabbix_agent_enableremotecommands is not none) | ternary('', '# ') }}EnableRemoteCommands={{ zabbix_agent_enableremotecommands | default('') }}
+{% endif %}
 {% if zabbix_agent2 %}
 {{ (zabbix_agent_forceactivechecksonstart is defined and zabbix_agent_forceactivechecksonstart is not none) | ternary('', '# ') }}ForceActiveChecksOnStart={{ zabbix_agent_forceactivechecksonstart | default('') }}
 {% endif %}

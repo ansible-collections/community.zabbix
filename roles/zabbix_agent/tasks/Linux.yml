@@ -21,7 +21,6 @@
   ansible.builtin.set_fact:
     zabbix_agent_ip: "{{ ansible_all_ipv4_addresses | ansible.netcommon.ipaddr('public') | first }}"
     # zabbix_agent_server: "{{ zabbix_agent_server_public_ip | default(zabbix_agent_server) }}"
-    # zabbix_agent_serveractive: "{{ zabbix_agent_serveractive_public_ip | default(zabbix_agent_serveractive) }}"
     # zabbix_agent2_server: "{{ zabbix_agent_server_public_ip | default(zabbix_agent2_server) }}"
     # zabbix_agent2_serveractive: "{{ zabbix_agent_serveractive_public_ip | default(zabbix_agent2_serveractive) }}"
   when:
@@ -121,7 +120,7 @@
 - name: "Configure zabbix-agent"
   ansible.builtin.template:
     src: agent.conf.j2
-    dest: "/etc/zabbix/zabbix_agentd{{ '2' if zabbix_agent2 | bool }}.conf"
+    dest: "/etc/zabbix/zabbix_agent{{ (zabbix_agent2 | bool) | ternary('2', 'd') }}.conf"
     owner: root
     group: root
     mode: "{{ zabbix_agent_conf_mode }}"
@@ -141,23 +140,7 @@
   become: true
   when:
     - zabbix_agent_tlspskfile is defined
-    - zabbix_agent_tlspskfile # https://github.com/ansible-collections/community.zabbix/issues/680
-    - not (zabbix_agent2 | bool)
-  tags:
-    - config
-
-- name: "Create directory for PSK file if not exist (zabbix-agent2)"
-  ansible.builtin.file:
-    path: "{{ zabbix_agent2_tlspskfile | dirname }}"
-    mode: 0755
-    state: directory
-  become: true
-  when:
-    - zabbix_agent2_tlspskfile is defined
-    - zabbix_agent2_tlspskfile # https://github.com/ansible-collections/community.zabbix/issues/680
-    - zabbix_agent2 | bool
-  tags:
-    - config
+    - zabbix_agent_tlspskfile
 
 - name: "Place TLS PSK File"
   ansible.builtin.copy:
@@ -169,27 +152,8 @@
   become: true
   when:
     - zabbix_agent_tlspskfile is defined
-    - zabbix_agent_tlspskfile # https://github.com/ansible-collections/community.zabbix/issues/680
+    - zabbix_agent_tlspskfile
     - zabbix_agent_tlspsk_secret is defined
-    - not (zabbix_agent2 | bool)
-  notify:
-    - restart zabbix-agent
-  tags:
-    - config
-
-- name: "Place TLS PSK File (zabbix-agent2)"
-  ansible.builtin.copy:
-    dest: "{{ zabbix_agent2_tlspskfile }}"
-    content: "{{ zabbix_agent2_tlspsk_secret }}"
-    owner: zabbix
-    group: zabbix
-    mode: 0400
-  become: true
-  when:
-    - zabbix_agent2_tlspskfile is defined
-    - zabbix_agent2_tlspskfile # https://github.com/ansible-collections/community.zabbix/issues/680
-    - zabbix_agent2_tlspsk_secret is defined
-    - zabbix_agent2 | bool
   notify:
     - restart zabbix-agent
   tags:

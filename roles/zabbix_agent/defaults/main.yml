@@ -2,40 +2,33 @@
 # defaults file for zabbix_agent
 
 zabbix_agent2: false
-# zabbix_agent_version: 6.4
 zabbix_agent_version_minor: "*"
 zabbix_version_patch: 0
 zabbix_agent_package_remove: false
-# zabbix_agent_package: zabbix-agent
-zabbix_sender_package: zabbix-sender
-zabbix_get_package: zabbix-get
+zabbix_sender_package: zabbix-sender # Depricate in 3.0
+zabbix_agent_sender_package: "{{ zabbix_sender_package }}"
+zabbix_get_package: zabbix-get # Depricate in 3.0
+zabbox_agent_get_package: "{{ zabbix_get_package }}"
 zabbix_agent_package_state: present
 zabbix_selinux: false
-zabbix_agent_apt_priority:
 zabbix_agent_conf_mode: "0644"
 zabbix_agent_dont_detect_ip: false
 
-zabbix_agent_tlspskfile: "/etc/zabbix/tls_psk_auto.secret"
-zabbix_agent_tlspskidentity_file: "/etc/zabbix/tls_psk_auto.identity"
-# Selinux related vars
+zabbix_agent_tlspskidentity_file:
+  "/etc/zabbix/tls_psk_auto.identity"
+  # Selinux related vars
 selinux_allow_zabbix_run_sudo: false
 
 zabbix_repo_deb_gpg_key_url: http://repo.zabbix.com/zabbix-official-repo.key
 zabbix_repo_deb_include_deb_src: true
 
 zabbix_agent_install_agent_only: false
-zabbix_agent_packages:
-  - "{{ zabbix_agent_package }}"
-  - "{{ zabbix_sender_package }}"
-  - "{{ zabbix_get_package }}"
 
 # Zabbix role related vars
 zabbix_apt_force_apt_get: true
 zabbix_apt_install_recommends: false
 
 # Override Ansible specific facts
-zabbix_agent_distribution_major_version: "{{ ansible_distribution_major_version }}"
-zabbix_agent_distribution_release: "{{ ansible_distribution_release }}"
 zabbix_repo_yum_gpgcheck: 0
 zabbix_repo_yum_schema: https
 zabbix_agent_disable_repo:
@@ -43,21 +36,21 @@ zabbix_agent_disable_repo:
 zabbix_repo_yum:
   - name: zabbix
     description: Zabbix Official Repository - $basearch
-    baseurl: "{{ zabbix_repo_yum_schema }}://repo.zabbix.com/zabbix/{{ zabbix_agent_version }}/rhel/{{ zabbix_agent_distribution_major_version }}/$basearch/"
+    baseurl: "{{ zabbix_repo_yum_schema }}://repo.zabbix.com/zabbix/{{ zabbix_agent_version }}/rhel/{{ ansible_distribution_major_version }}/$basearch/"
     mode: "0644"
     gpgcheck: "{{ zabbix_repo_yum_gpgcheck }}"
     gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-ZABBIX
     state: present
   - name: zabbix-non-supported
     description: Zabbix Official Repository non-supported - $basearch
-    baseurl: "{{ zabbix_repo_yum_schema }}://repo.zabbix.com/non-supported/rhel/{{ zabbix_agent_distribution_major_version }}/$basearch/"
+    baseurl: "{{ zabbix_repo_yum_schema }}://repo.zabbix.com/non-supported/rhel/{{ ansible_distribution_major_version }}/$basearch/"
     mode: "0644"
     gpgcheck: "{{ zabbix_repo_yum_gpgcheck }}"
     gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-ZABBIX
     state: present
   - name: zabbix-agent2-plugins
     description: Zabbix Official Repository (Agent2 Plugins) - $basearch
-    baseurl: "{{ zabbix_repo_yum_schema }}://repo.zabbix.com/zabbix-agent2-plugins/1/rhel/{{ zabbix_agent_distribution_major_version }}/$basearch/"
+    baseurl: "{{ zabbix_repo_yum_schema }}://repo.zabbix.com/zabbix-agent2-plugins/1/rhel/{{ ansible_distribution_major_version }}/$basearch/"
     mode: "0644"
     gpgcheck: "{{ zabbix_repo_yum_gpgcheck }}"
     gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-ZABBIX
@@ -65,10 +58,9 @@ zabbix_repo_yum:
 
 zabbix_repo_deb_url: "http://repo.zabbix.com/zabbix/{{ zabbix_agent_version }}/{{ ansible_facts.lsb.id | default(ansible_facts['distribution']) | lower }}{% if ansible_facts['architecture'] == 'aarch64' and ansible_facts.lsb.id | default(ansible_facts['distribution']) in ['Debian', 'Ubuntu'] %}-arm64{% endif %}"
 zabbix_repo_deb_component: main
-# zabbix_agent_tlsservercertsubject:
+
 # Zabbix API stuff
 zabbix_api_server_host: localhost
-# zabbix_api_server_port: 80
 zabbix_api_login_user: Admin
 zabbix_api_use_ssl: false
 zabbix_api_login_pass: !unsafe zabbix
@@ -76,10 +68,10 @@ zabbix_api_validate_certs: false
 ansible_httpapi_pass: "{{ zabbix_api_login_pass }}"
 ansible_httpapi_port: "{{ zabbix_api_server_port }}"
 ansible_httpapi_validate_certs: "{{ zabbix_api_validate_certs }}"
-zabbix_api_timeout: 30
+
+# API Related Variables
 zabbix_api_create_hostgroup: false
 zabbix_api_create_hosts: false
-zabbix_agent_hostgroups_state: present # or absent
 zabbix_agent_host_state: present # or absent
 zabbix_agent_host_update: true
 zabbix_host_status: enabled # or disabled
@@ -100,54 +92,32 @@ zabbix_agent_interfaces:
     port: "{{ (zabbix_agent2 == True) | ternary(zabbix_agent2_listenport, zabbix_agent_listenport) }}"
 
 # Zabbix configuration variables
-# zabbix_agent_enableremotecommands: 0
-# zabbix_agent_allowkeys:
-# zabbix_agent_denykeys:
-# zabbix_agent_logremotecommands: 0
-# zabbix_agent_jmx_listenport:
 zabbix_agent_listeninterface:
-# zabbix_agent_startagents: 3
-# zabbix_agent_maxlinespersecond: 100
-# zabbix_agent_allowroot: 0
-zabbix_agent_zabbix_alias: # Deprecate after 3.0
-zabbix_agent_alias: "{{ zabbix_agent_zabbix_alias }}"
-# zabbix_agent_timeout: 3
-# zabbix_agent_userparameters: []
-# zabbix_agent_userparameters_templates_src: "userparameters"
-# zabbix_agent_userparameters_scripts_src: "scripts"
-# zabbix_agent_custom_scripts: false
-# zabbix_agent_loadmodulepath: ${libdir}/modules
-# zabbix_agent_loadmodule:
-# zabbix_agent_become_on_localhost: true
-# zabbix_agent_description:
-# zabbix_agent_inventory_zabbix: {}
-# zabbix_agent_heartbeatfrequency: 60
-# zabbix_agent_macros: []
-# zabbix_agent_tags: []
-# zabbix_agent_chassis: false
+
+# statusportzabbix_agent_zabbix_alias: # Deprecate after 3.0
+zabbix_agent_alias: "{{ statusportzabbix_agent_zabbix_alias is defined | ternary(statusportzabbix_agent_zabbix_alias, zabbix_agent_alias) | default(omit) }}"
+zabbix_agent_userparameters_templates_src: "userparameters"
+zabbix_agent_userparameters_scripts_src: "scripts"
+zabbix_agent_chassis: false
 
 zabbix_agent_tls_config:
   unencrypted: "1"
   psk: "2"
-  cert: "4"
+  cert:
+    "4"
 
-# IPMI settings
+    # IPMI settings
 zabbix_agent_ipmi_authtype: -1
 zabbix_agent_ipmi_password:
 zabbix_agent_ipmi_privilege: 2
 zabbix_agent_ipmi_username:
 
-# Zabbix Agent2
-# zabbix_agent2_statusport: 9999
-# zabbix_agent2_hostinterface:
-# zabbix_agent2_hostinterfaceitem:
-# zabbix_agent2_enablepersistentbuffer: 0
-# zabbix_agent2_persistentbufferperiod: 1h
-# zabbix_agent2_persistentbufferfile:
-# zabbix_agent2_zabbix_alias:
-# zabbix_agent2_timeout: 3
-# zabbix_agent2_controlsocket: /tmp/agent.sock
-# zabbix_agent2_plugins: []
+####### Agent 1 Stuff Only
+
+zabbix_agent_loadmodulepath: ${libdir}/modules
+zabbix_agent_logremotecommands: 0
+zabbix_agent_maxlinespersecond: 100
+zabbix_agent_startagents: 3
 
 # Windows/macOS Related
 zabbix_version_long: 5.2.4
@@ -158,7 +128,6 @@ zabbix_win_install_dir: 'C:\Zabbix'
 zabbix_win_install_dir_conf: '{{ zabbix_win_install_dir }}\\conf'
 zabbix_win_install_dir_bin: '{{ zabbix_win_install_dir }}\\bin'
 zabbix_agent_win_include: "{{ zabbix_win_install_dir }}\\zabbix_agent.d\\"
-zabbix_agent_win_svc_recovery: true
 zabbix_win_firewall_management: true
 
 # macOS Related
