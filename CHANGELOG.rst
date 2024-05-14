@@ -4,6 +4,42 @@ community.zabbix Release Notes
 
 .. contents:: Topics
 
+v2.4.0
+======
+
+Minor Changes
+-------------
+
+- Add slash at the end of the location directives, to prevent path traversal attacks.
+- Added active_since and active_till in zabbix_maintenance
+- Added content_type for email in zabbix_mediatypes
+- Introduce flag `enable_version_check` to allow installations on non-supported platforms.
+- agent, javagateway, proxy, server, and web role - added the http_proxy and https_proxy environment variables to "Debian | Download gpg key" analog to other tasks
+- agent, javagateway, proxy, server, and web role - introduced default variable zabbix_repo_deb_gpg_key_url with value http://repo.zabbix.com/zabbix-official-repo.key
+- agent, javagateway, proxy, server, and web role - introduced default variable zabbix_repo_deb_include_deb_src with value true
+- agent, javagateway, proxy, server, and web role - removed superfluous slash in zabbix_gpg_key of the Debian vars and renamed key to zabbix-repo instead of zabbix-official-repo
+- agent, javagateway, proxy, server, and web role - used variable zabbix_repo_deb_include_deb_src in "Debian | Installing repository" to determine whether deb-src should be added to /etc/apt/sources.list.d/zabbix.sources
+- agent, javagateway, proxy, server, and web role - used zabbix_repo_deb_gpg_key_url in "Debian | Download gpg key" instead of hardcoded url
+- zabbix_correlation module added
+- zabbix_service_info module added
+- zabbix_template - Add template_yaml parameter.
+- zabbix_web role, Refactored zabbix_selinux variable names to correlate with selinux boolean names.
+
+Bugfixes
+--------
+
+- zabbix_agent - Fixed IPMI authentication algorithm default setting
+- zabbix_agent - Fixed issue to where scripts can be deployed alongside userparameters
+- zabbix_host - Don't reset IPMI setting when update inventory data of a host
+- zabbix_host - Finish task with failed if host_group parameter is empty list
+- zabbix_server - proper indentaion of become in selinux.yaml
+- zabbix_web - Added missing semicolon to nginx vhost template.
+- zabbix_web role, Add missing selinux.yml tasks.
+
+New Modules
+-----------
+
+- community.zabbix.zabbix_correlation - Create/update/delete Zabbix correlation
 
 v2.3.1
 ======
@@ -598,7 +634,6 @@ Release Summary
 
 | Release date: 2020-10-22
 
-
 Minor Changes
 -------------
 
@@ -624,7 +659,6 @@ Release Summary
 ---------------
 
 | Release date: 2020-08-16
-
 
 Minor Changes
 -------------
@@ -664,7 +698,6 @@ Release Summary
 ---------------
 
 | Release date: 2020-07-26
-
 
 Minor Changes
 -------------
@@ -737,7 +770,6 @@ Release Summary
 ---------------
 
 | Release date: 2020-06-15
-
 
 Minor Changes
 -------------

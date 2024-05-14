@@ -1,2 +1,0 @@
-bugfixes:
-  - zabbix_server - proper indentaion of become in selinux.yaml
