@@ -1,2 +1,0 @@
-minor_changes:
-  - Introduce flag `enable_version_check` to allow installations on non-supported platforms.

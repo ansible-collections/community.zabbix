@@ -1,12 +1,10 @@
-objects:
-  role: {}
+objects: {}
 plugins:
   become: {}
   cache: {}
   callback: {}
   cliconf: {}
   connection: {}
-  filter: {}
   httpapi:
     zabbix:
       description: HttpApi Plugin for Zabbix
@@ -39,6 +37,11 @@ plugins:
       name: zabbix_autoregister
       namespace: ''
       version_added: 1.6.0
+    zabbix_correlation:
+      description: Create/update/delete Zabbix correlation
+      name: zabbix_correlation
+      namespace: ''
+      version_added: 2.4.0
     zabbix_discovery_rule:
       description: Create/delete/update Zabbix discovery rules
       name: zabbix_discovery_rule
@@ -129,6 +132,11 @@ plugins:
       name: zabbix_service
       namespace: ''
       version_added: null
+    zabbix_service_info:
+      description: Gather information about Zabbix service
+      name: zabbix_service_info
+      namespace: ''
+      version_added: null
     zabbix_settings:
       description: Update Zabbix global settings.
       name: zabbix_settings
@@ -187,6 +195,5 @@ plugins:
   netconf: {}
   shell: {}
   strategy: {}
-  test: {}
   vars: {}
-version: 2.3.1
+version: 2.4.0
