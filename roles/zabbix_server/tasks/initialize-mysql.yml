@@ -27,7 +27,7 @@
 
 - name: "MySQL Database prep"
   when: zabbix_server_database_creation
-  delegate_to: "{{ zabbix_server_real_dbhost | default(zabbix_server_dbhost_run_install | ternary(delegated_dbhost, inventory_hostname)) }}"
+  delegate_to: "{{ zabbix_server_real_dbhost | default(zabbix_server_dbhost_run_install | ternary(delegated_dbhost, inventory_hostname), true) }}"
   vars:
     delegated_dbhost: "{{ (zabbix_server_dbhost == 'localhost') | ternary(inventory_hostname, zabbix_server_dbhost) }}"
   tags:
@@ -81,7 +81,7 @@
         query: 'SELECT mandatory FROM dbversion'
   rescue:
     - name: "MySQL | Get and set schema import overrides"
-      delegate_to: "{{ zabbix_server_real_dbhost | default(zabbix_server_dbhost_run_install | ternary(delegated_dbhost, inventory_hostname)) }}"
+      delegate_to: "{{ zabbix_server_real_dbhost | default(zabbix_server_dbhost_run_install | ternary(delegated_dbhost, inventory_hostname), true) }}"
       block:
         - name: "MySQL | Get current value for variables"
           community.mysql.mysql_variables:
@@ -141,7 +141,7 @@
 
   always:
     - name: "MySQL | Revert variable overrides for schema import"
-      delegate_to: "{{ zabbix_server_real_dbhost | default(zabbix_server_dbhost_run_install | ternary(delegated_dbhost, inventory_hostname)) }}"
+      delegate_to: "{{ zabbix_server_real_dbhost | default(zabbix_server_dbhost_run_install | ternary(delegated_dbhost, inventory_hostname), true) }}"
       community.mysql.mysql_variables:
         variable: "{{ item.name }}"
         value: "{{ item.msg }}"

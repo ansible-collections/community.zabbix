@@ -83,7 +83,7 @@
       when: ansible_version.full is version("2.14", "<")
 
     - name: "Apt update"
-      ansible.builtin.shell: "apt-get update && echo exit 0 > /usr/sbin/policy-rc.d"
+      ansible.builtin.shell: "apt-get update"
       args:
         warn: "{{ produce_warn | default(omit) }}"
       register: installation_dependencies

@@ -22,7 +22,7 @@ jobs:
         container:
           - rockylinux9
           - rockylinux8
-          # - ubuntu2404
+          - ubuntu2404
           - ubuntu2204
           - ubuntu2004
           - ubuntu1804
@@ -45,8 +45,8 @@ jobs:
             version: v62
           - container: debian10
             version: v62
-          # - container: ubuntu2404
-          #   version: v62
+          - container: ubuntu2404
+            version: v62
           - container: ubuntu1804
             version: v62
           - container: ubuntu1804
