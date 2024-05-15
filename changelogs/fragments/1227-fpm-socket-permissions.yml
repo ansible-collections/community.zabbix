@@ -1,2 +1,2 @@
 bugfixes:
-  - zabbix_web - make the FPM socket group-writable so the web server can properly forward requests to the FPM process (https://github.com/ansible-collections/community.zabbix/pull/1227)
+  - zabbix_web - make the FPM socket group-writable so the web server can properly forward requests to the FPM process
