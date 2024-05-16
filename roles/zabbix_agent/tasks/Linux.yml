@@ -132,33 +132,6 @@
   tags:
     - config
 
-- name: "Create directory for PSK file if not exist."
-  ansible.builtin.file:
-    path: "{{ zabbix_agent_tlspskfile | dirname }}"
-    mode: 0755
-    state: directory
-  become: true
-  when:
-    - zabbix_agent_tlspskfile is defined
-    - zabbix_agent_tlspskfile
-
-- name: "Place TLS PSK File"
-  ansible.builtin.copy:
-    dest: "{{ zabbix_agent_tlspskfile }}"
-    content: "{{ zabbix_agent_tlspsk_secret }}"
-    owner: zabbix
-    group: zabbix
-    mode: 0400
-  become: true
-  when:
-    - zabbix_agent_tlspskfile is defined
-    - zabbix_agent_tlspskfile
-    - zabbix_agent_tlspsk_secret is defined
-  notify:
-    - restart zabbix-agent
-  tags:
-    - config
-
 - name: "Create include dir zabbix-agent"
   ansible.builtin.file:
     path: "{{ zabbix_agent_include }}"

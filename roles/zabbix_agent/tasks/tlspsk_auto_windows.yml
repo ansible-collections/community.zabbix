@@ -26,7 +26,7 @@
   register: zabbix_agent_tlspsk_base64
   when:
     - zabbix_agent_tlspskcheck.stat.exists
-  no_log: "{{ ansible_verbosity < 3 }}"
+  #no_log: "{{ ansible_verbosity < 3 }}"
   tags:
     - config
 
@@ -35,7 +35,7 @@
     src: "{{ zabbix_agent_tlspskidentity_file }}"
   register: zabbix_agent_tlspskidentity_base64
   when: zabbix_agent_tlspskidentity_check.stat.exists
-  no_log: "{{ ansible_verbosity < 3 }}"
+  #no_log: "{{ ansible_verbosity < 3 }}"
   tags:
     - config
 

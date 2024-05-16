@@ -51,6 +51,7 @@
     zabbix_agent_statusport: "{{ zabbix_agent_statusport is defined | ternary(zabbix_agent_statusport, zabbix_agent2_statusport) | default(9999) }}"
     zabbix_agent_timeout: "{{ zabbix_agent_timeout is defined | ternary(zabbix_agent_timeout, zabbix_agent2_timeout) | default(3) }}"
     zabbix_agent_tlspsk_auto: "{{ zabbix_agent_tlspsk_auto is defined | ternary(zabbix_agent_tlspsk_auto, zabbix_agent2_tlspsk_auto) | default(false) }}"
+    zabbix_agent_tlspskfile: "{{ zabbix_agent_tlspskfile is defined | ternary(zabbix_agent_tlspskfile, zabbix_agent2_tlspskfile) | default('/etc/zabbix/tls_psk_auto.secret') }}"
     zabbix_agent_unsafeuserparameters: "{{ zabbix_agent_unsafeuserparameters is defined | ternary(zabbix_agent_unsafeuserparameters, zabbix_agent2_unsafeuserparameters) | default(0) }}"
 
 - name: Set More Variables # Remove for 3.0 release
@@ -64,6 +65,7 @@
     zabbix_agent_hostnameitem: "{{ zabbix_agent_hostnameitem is defined | ternary(zabbix_agent_hostnameitem, zabbix_agent2_hostnameitem) | default(omit) }}"
     zabbix_agent_listenip: "{{ zabbix_agent_listenip is defined | ternary(zabbix_agent_listenip, zabbix_agent2_listenip) | default(omit) }}"
     zabbix_agent_persistentbufferfile: "{{ zabbix_agent_persistentbufferfile is defined | ternary(zabbix_agent_persistentbufferfile, zabbix_agent2_persistentbufferfile) | default(omit) }}"
+    zabbix_agent_plugins: "{{ zabbix_agent_plugins is defined | ternary(zabbix_agent_plugins, zabbix_agent2_plugins) | default(omit) }}"
     zabbix_agent_server: "{{ zabbix_agent_server is defined | ternary(zabbix_agent_server, zabbix_agent2_server) | default(omit) }}"
     zabbix_agent_serveractive: "{{ zabbix_agent_serveractive is defined | ternary(zabbix_agent_serveractive, zabbix_agent2_serveractive) | default(omit) }}"
     zabbix_agent_sourceip: "{{ zabbix_agent_sourceip is defined | ternary(zabbix_agent_sourceip, zabbix_agent2_sourceip) | default(omit) }}"
@@ -74,7 +76,7 @@
     zabbix_agent_tlscrlfile: "{{ zabbix_agent_tlscrlfile is defined | ternary(zabbix_agent_tlscrlfile, zabbix_agent2_tlscrlfile) | default(omit) }}"
     zabbix_agent_tlskeyfile: "{{ zabbix_agent_tlskeyfile is defined | ternary(zabbix_agent_tlskeyfile, zabbix_agent2_tlskeyfile) | default(omit) }}"
     zabbix_agent_tlspskidentity: "{{ zabbix_agent_tlspskidentity is defined | ternary(zabbix_agent_tlspskidentity, zabbix_agent2_tlspskidentity) | default(omit) }}"
-    zabbix_agent_tlspskfile: "{{ zabbix_agent_tlspskfile is defined | ternary(zabbix_agent_tlspskfile, zabbix_agent2_tlspskfile) | default('/etc/zabbix/tls_psk_auto.secret') }}"
+    zabbix_agent_tlspsk_secret: "{{ zabbix_agent_tlspsk_secret is defined | ternary(zabbix_agent_tlspsk_secret, zabbix_agent2_tlspsk_secret) | default(omit) }}"
     zabbix_agent_tlsservercertissuer: "{{ zabbix_agent_tlsservercertissuer is defined | ternary(zabbix_agent_tlsservercertissuer, zabbix_agent2_tlsservercertissuer) | default(omit) }}"
     zabbix_agent_tlsservercertsubject: "{{ zabbix_agent_tlsservercertsubject is defined | ternary(zabbix_agent_tlsservercertsubject, zabbix_agent2_tlsservercertsubject) | default(omit) }}"
     zabbix_agent_aliases: "{{ zabbix_agent_aliases is defined | ternary(zabbix_agent_aliases, zabbix_agent_zabbix_alias) | default(omit) }}"
@@ -89,23 +91,37 @@
   when:
     - not (zabbix_agent_docker | bool)
 
-- name: "Encrypt with TLS PSK auto management"
-  block:
-    - ansible.builtin.include_tasks: tlspsk_auto_linux.yml
-      when: (ansible_os_family != "Windows") or (zabbix_agent_docker | bool)
+# - name: "Encrypt with TLS PSK auto management"
+#   block:
+#     - ansible.builtin.include_tasks: tlspsk_auto_linux.yml
+#       when: (ansible_os_family != "Windows") or (zabbix_agent_docker | bool)
 
-    - ansible.builtin.include_tasks: tlspsk_auto_windows.yml
-      when: ansible_os_family == "Windows"
+#     - ansible.builtin.include_tasks: tlspsk_auto_windows.yml
+#       when: ansible_os_family == "Windows"
 
-    - name: AutoPSK | Default tlsaccept and tlsconnect to enforce PSK
-      ansible.builtin.set_fact:
-        zabbix_agent_tlsaccept: psk
-        zabbix_agent_tlsconnect: psk
-      when: zabbix_api_create_hosts
-      tags:
-        - config
-  when:
-    - zabbix_agent_tlspsk_auto | bool
+#     - name: AutoPSK | Default tlsaccept and tlsconnect to enforce PSK
+#       ansible.builtin.set_fact:
+#         zabbix_agent_tlsaccept: psk
+#         zabbix_agent_tlsconnect: psk
+#       when: zabbix_api_create_hosts
+#       tags:
+#         - config
+#   when:
+#     - zabbix_agent_tlspsk_auto | bool
+
+- name: Gather PSK Secret Info
+  ansible.builtin.include_tasks: psk_secret.yml
+
+- name: Gather PSK Identity Info
+  ansible.builtin.include_tasks: psk_identity.yml
+
+- name: AutoPSK | Default tlsaccept and tlsconnect to enforce PSK
+  ansible.builtin.set_fact:
+    zabbix_agent_tlsaccept: psk
+    zabbix_agent_tlsconnect: psk
+  when: zabbix_agent_tlspsk_auto | bool
+  tags:
+    - config
 
 - name: "Configure Agent"
   ansible.builtin.include_tasks: Windows_conf.yml

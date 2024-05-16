@@ -93,6 +93,16 @@ DenyKey={{ item }}
 {% if ansible_os_family != "Windows" %}
 {{ (zabbix_agent_pidfile is defined and zabbix_agent_pidfile is not none) | ternary('', '# ') }}PidFile={{ zabbix_agent_pidfile | default('') }}
 {% endif %}
+{% if zabbix_agent_plugins is defined and zabbix_agent_plugins %}
+{% for entry in zabbix_agent_plugins %}
+{% set my_name = entry['name'] %}
+{% for property in entry['options'] %}
+{% set param = property['parameter'] %}
+{% set value = property['value'] %}
+Plugins.{{ my_name }}.{{ param }}={{ value }}
+{% endfor %}
+{% endfor %}
+{% endif %}
 {{ (zabbix_agent_pluginsocket is defined and zabbix_agent_pluginsocket is not none) | ternary('', '# ') }}PluginSocket={{ zabbix_agent_pluginsocket | default('') }}
 {{ (zabbix_agent_plugintimeout is defined and zabbix_agent_plugintimeout is not none) | ternary('', '# ') }}PluginTimeout={{ zabbix_agent_plugintimeout | default('') }}
 {{ (zabbix_agent_refreshactivechecks is defined and zabbix_agent_refreshactivechecks is not none) | ternary('', '# ') }}RefreshActiveChecks={{ zabbix_agent_refreshactivechecks | default('') }}

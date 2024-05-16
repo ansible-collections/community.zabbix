@@ -22,7 +22,7 @@
   become: true
   when:
     - zabbix_agent_tlspskcheck.stat.exists
-  no_log: "{{ ansible_verbosity < 3 }}"
+  #no_log: "{{ ansible_verbosity < 3 }}"
   tags:
     - config
 
@@ -32,7 +32,7 @@
   register: zabbix_agent_tlspskidentity_base64
   become: true
   when: zabbix_agent_tlspskidentity_check.stat.exists
-  no_log: "{{ ansible_verbosity < 3 }}"
+  #no_log: "{{ ansible_verbosity < 3 }}"
   tags:
     - config
 
