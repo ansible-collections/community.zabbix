@@ -14,9 +14,8 @@ zabbix_selinux: false
 zabbix_agent_conf_mode: "0644"
 zabbix_agent_dont_detect_ip: false
 
-zabbix_agent_tlspskidentity_file:
-  "/etc/zabbix/tls_psk_auto.identity"
-  # Selinux related vars
+zabbix_agent_tlspskidentity_file: "/etc/zabbix/tls_psk_auto.identity"
+# Selinux related vars
 selinux_allow_zabbix_run_sudo: false
 
 zabbix_repo_deb_gpg_key_url: http://repo.zabbix.com/zabbix-official-repo.key

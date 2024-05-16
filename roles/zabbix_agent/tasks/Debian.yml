@@ -73,7 +73,7 @@
   when:
     - zabbix_agent_apt_priority is defined
     - zabbix_agent_apt_priority | int
-  ansible.builtin.block:
+  block:
     - name: "Debian | Create /etc/apt/preferences.d/"
       ansible.builtin.file:
         path: /etc/apt/preferences.d/
