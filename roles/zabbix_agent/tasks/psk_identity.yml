@@ -1,0 +1,84 @@
+- name: AutoPSK | Check for existing TLS PSK identity
+  block:
+    - name: AutoPSK | Check for existing TLS PSK identity | Windows
+      ansible.windows.win_stat:
+        path: "{{ zabbix_agent_tlspskidentity_file }}"
+      register: zabbix_agent_tlspskidentity_check
+      when:
+        - ansible_os_family == "Windows"
+
+    - name: AutoPSK | Check for existing TLS PSK identity | Linux
+      ansible.builtin.stat:
+        path: "{{ zabbix_agent_tlspskidentity_file }}"
+      register: zabbix_agent_tlspskidentity_check
+      become: true
+      when:
+        - ansible_os_family != "Windows"
+  tags:
+    - config
+
+- name: AutoPSK | Read existing TLS PSK identity file
+  ansible.builtin.slurp:
+    src: "{{ zabbix_agent_tlspskidentity_file }}"
+  register: zabbix_agent_tlspskidentity_base64
+  become: true
+  when: zabbix_agent_tlspskidentity_check.stat.exists
+  no_log: "{{ ansible_verbosity < 3 }}"
+  tags:
+    - config
+
+- name: AutoPSK | Use existing TLS PSK identity
+  ansible.builtin.set_fact:
+    zabbix_agent_tlspskidentity: "{{ zabbix_agent_tlspskidentity_base64['content'] | b64decode | trim }}"
+  when:
+    - zabbix_agent_tlspskidentity_check.stat.exists
+  no_log: "{{ ansible_verbosity < 3 }}"
+  tags:
+    - config
+
+- name: AutoPSK | Generate new TLS PSK identity
+  ansible.builtin.set_fact:
+    zabbix_agent_tlspskidentity: >-
+      {{
+        zabbix_agent_visible_hostname
+        | default(zabbix_agent_hostname)
+        + '_'
+        + lookup('password', '/dev/null chars=hexdigits length=4')
+      }}
+  when:
+    - not zabbix_agent_tlspskidentity_check.stat.exists
+    - zabbix_agent_tlspskidentity is undefined
+    - zabbix_agent_tlspsk_auto | bool
+  no_log: "{{ ansible_verbosity < 3 }}"
+  tags:
+    - config
+
+- name: AutoPSK | Template PSK Identity
+  block:
+    - name: AutoPSK | Template PSK Identity | Windows
+      ansible.windows.win_copy:
+        dest: "{{ zabbix_agent_tlspskidentity_file }}"
+        content: "{{ zabbix_agent_tlspskidentity }}"
+      when:
+        - ansible_os_family == "Windows"
+      notify:
+        - restart win zabbix agent
+
+    - name: AutoPSK | Template PSK Identity | Linux
+      ansible.builtin.copy:
+        dest: "{{ zabbix_agent_tlspskidentity_file }}"
+        content: "{{ zabbix_agent_tlspskidentity }}"
+        owner: zabbix
+        group: zabbix
+        mode: 0400
+      become: true
+      when:
+        - ansible_os_family != "Windows"
+      notify:
+        - restart zabbix-agent
+        - restart mac zabbix agent
+  when:
+    - zabbix_agent_tlspskidentity_file is defined
+    - zabbix_agent_tlspskidentity is defined
+  tags:
+    - config

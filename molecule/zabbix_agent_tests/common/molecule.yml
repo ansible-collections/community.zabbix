@@ -28,8 +28,6 @@ provisioner:
   inventory:
     group_vars:
       all:
-        zabbix_agent_src_reinstall: false
-        zabbix_install_pip_packages: false
         zabbix_agent_server: 192.168.3.33
         zabbix_agent_serveractive: 192.168.3.33
         zabbix_agent_listenip: 0.0.0.0

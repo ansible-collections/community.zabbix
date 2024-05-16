@@ -38,7 +38,7 @@
       (ansible_distribution == "Debian" and ansible_distribution_major_version < "12")
 
 - name: "Debian | Download gpg key"
-  when: not ansible_check_mode  # Because get_url always has changed status in check_mode.
+  when: not ansible_check_mode # Because get_url always has changed status in check_mode.
   ansible.builtin.get_url:
     url: "{{ zabbix_repo_deb_gpg_key_url }}"
     dest: "{{ zabbix_gpg_key }}"
@@ -69,29 +69,28 @@
   tags:
     - install
 
-- name: "Debian | Create /etc/apt/preferences.d/"
-  ansible.builtin.file:
-    path: /etc/apt/preferences.d/
-    state: directory
-    mode: "0755"
+- name: Configure APT Prefrence
   when:
+    - zabbix_agent_apt_priority is defined
     - zabbix_agent_apt_priority | int
-  become: true
-  tags:
-    - install
+  block:
+    - name: "Debian | Create /etc/apt/preferences.d/"
+      ansible.builtin.file:
+        path: /etc/apt/preferences.d/
+        state: directory
+        mode: "0755"
+      become: true
 
-- name: "Debian | Configuring the weight for APT"
-  ansible.builtin.copy:
-    dest: "/etc/apt/preferences.d/zabbix-agent-{{ zabbix_underscore_version }}"
-    content: |
-      Package: {{ zabbix_agent_package }}
-      Pin: origin repo.zabbix.com
-      Pin-Priority: {{ zabbix_agent_apt_priority | int }}
-    owner: root
-    mode: "0644"
-  when:
-    - zabbix_agent_apt_priority | int
-  become: true
+    - name: "Debian | Configuring the weight for APT"
+      ansible.builtin.copy:
+        dest: "/etc/apt/preferences.d/zabbix-agent-{{ zabbix_underscore_version }}"
+        content: |
+          Package: {{ zabbix_agent_package }}
+          Pin: origin repo.zabbix.com
+          Pin-Priority: {{ zabbix_agent_apt_priority | int }}
+        owner: root
+        mode: "0644"
+      become: true
   tags:
     - install
 
@@ -115,8 +114,8 @@
 - name: "Debian | Installing zabbix-{sender,get}"
   ansible.builtin.apt:
     pkg:
-      - "{{ zabbix_sender_package }}"
-      - "{{ zabbix_get_package }}"
+      - "{{ zabbix_agent_sender_package }}"
+      - "{{ zabbox_agent_get_package }}"
     state: "{{ zabbix_agent_package_state }}"
     update_cache: true
     cache_valid_time: 0
