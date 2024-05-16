@@ -19,7 +19,10 @@ zabbix_server_dbuser: zabbix-server
 zabbix_server_dbpassword: zabbix-server
 zabbix_server_dbpassword_hash_method: md5
 #zabbix_server_dbsocket:
-zabbix_server_dbport: 5432
+_zabbix_server_database_default_port:
+  mysql: 3306
+  pgsql: 5432
+zabbix_server_dbport: "{{ _zabbix_server_database_default_port[zabbix_server_database] }}"
 zabbix_server_dbhost_run_install: true
 zabbix_server_database: pgsql
 zabbix_server_database_creation: true
