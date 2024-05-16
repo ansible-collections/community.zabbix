@@ -8,7 +8,7 @@ listen.acl_users = {{ zabbix_php_fpm_conf_user if zabbix_php_fpm_conf_user is de
 {% endif %}
 listen.owner = {{ zabbix_php_fpm_conf_user if zabbix_php_fpm_conf_user is defined else zabbix_web_user }}
 listen.group = {{ _nginx_group if zabbix_web_http_server=='nginx' else _apache_group }}
-listen.mode = 0644
+listen.mode = 0660
 listen.allowed_clients = 127.0.0.1
 
 pm = dynamic
