@@ -1,0 +1,15 @@
+- name: remove test template item
+  community.zabbix.zabbix_item:
+    name: ExampleTemplateItem
+    template_name: ExampleTemplate
+    state: absent
+
+- name: remove test host
+  community.zabbix.zabbix_host:
+    host_name: ExampleHost
+    state: absent
+
+- name: remove test template
+  community.zabbix.zabbix_template:
+    template_name: ExampleTemplate
+    state: absent
