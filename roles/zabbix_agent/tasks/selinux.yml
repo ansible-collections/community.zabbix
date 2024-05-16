@@ -29,7 +29,7 @@
   until: zabbix_agent_policycoreutils_installed is succeeded
   when:
     - ansible_os_family == "RedHat"
-    - (zabbix_agent_distribution_major_version == "6" or zabbix_agent_distribution_major_version == "7")
+    - ansible_distribution_major_version == "7"
   become: true
   tags:
     - install
