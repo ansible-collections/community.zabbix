@@ -81,11 +81,3 @@
         dest: /etc/sudoers
         line: "Defaults    !requiretty"
         state: present
-
-    - name: "Make sure the docs are installed."
-      ansible.builtin.lineinfile:
-        dest: /etc/yum.conf
-        line: "tsflags=nodocs"
-        state: absent
-      when:
-        - ansible_os_family == 'RedHat'

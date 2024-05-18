@@ -70,7 +70,6 @@
           - python3-pip
           - gpg-agent
           - sudo
-          - doc-base
         update_cache: true
         state: present
       register: installation_dependencies

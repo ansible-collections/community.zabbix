@@ -83,14 +83,6 @@
         line: "Defaults    !requiretty"
         state: present
 
-    - name: "Make sure the docs are installed."
-      ansible.builtin.lineinfile:
-        dest: /etc/yum.conf
-        line: "tsflags=nodocs"
-        state: absent
-      when:
-        - ansible_os_family == 'RedHat'
-
     - name: Enabling PHP 8.0
       ansible.builtin.dnf:
         name: "@php:8.0/common"
