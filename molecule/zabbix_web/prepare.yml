@@ -107,7 +107,6 @@
           - php-pecl-apcu
           - php-xml
       when:
-        - ansible_distribution_major_version >= '8'
         - ansible_os_family == "RedHat"
 
     - name: Workaround for geerlingguy.php missing ubuntu-24.04 support
