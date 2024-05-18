@@ -35,13 +35,6 @@
     zabbix_api_server_port: "{{ '443' if zabbix_api_use_ssl|bool else '80' }}"
   when: zabbix_api_server_port is undefined
 
-- name: Set Path to SQL File
-  ansible.builtin.set_fact:
-    datafile_path: "{{ db_file_path[zabbix_short_version] }}"
-  tags:
-    - install
-    - config
-
 - name: "Set default ip address for zabbix_proxy_ip"
   ansible.builtin.set_fact:
     zabbix_proxy_ip: "{{ hostvars[inventory_hostname]['ansible_default_ipv4'].address }}"
@@ -56,52 +49,43 @@
 - name: "Complete OS Specific Tasks"
   ansible.builtin.include_tasks: "{{ ansible_os_family }}.yml"
 
-- name: "Get the file for database schema"
-  ansible.builtin.shell: ls -1 {{ db_file_path[zabbix_short_version] }}
-  changed_when: false
-  become: true
-  when:
-    - zabbix_proxy_database_sqlload
-  register: ls_output_schema
-  tags:
-    - database
-
-- name: "Installing the database"
-  ansible.builtin.include_tasks: "{{ zabbix_proxy_db_long }}.yml"
-
-- name: "Create include dir zabbix-proxy"
-  ansible.builtin.file:
-    path: "{{ zabbix_proxy_include }}"
-    owner: "{{ zabbix_os_user }}"
-    group: "{{ zabbix_os_user }}"
-    mode: "{{ zabbix_proxy_include_mode }}"
-    state: directory
+- name: "Install zabbix-proxy packages"
+  ansible.builtin.package:
+    name: "{{ _zabbix_proxy_packages }}"
+    state: "{{ zabbix_proxy_package_state }}"
+    update_cache: true
+    disablerepo: "{{ zabbix_proxy_disable_repo | default(_zabbix_proxy_disable_repo | default(omit)) }}"
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
+  register: _zabbix_proxy_package_installed
+  until: _zabbix_proxy_package_installed is succeeded
   become: true
   tags:
     - install
-    - config
 
-- name: "Create module dir zabbix-proxy"
+- name: "Initialize the database"
+  ansible.builtin.include_tasks: "initialize-{{ zabbix_proxy_database }}.yml"
+
+- name: "Create directories"
   ansible.builtin.file:
-    path: "{{ zabbix_proxy_loadmodulepath }}"
+    state: directory
+    path: "{{ item.path }}"
     owner: "{{ zabbix_os_user }}"
     group: "{{ zabbix_os_user }}"
-    state: directory
-    mode: "0755"
+    mode: "{{ item.mode | default('0755') }}"
   become: true
+  loop:
+    - path: "{{ zabbix_proxy_include }}"
+      mode: "{{ zabbix_proxy_include_mode }}"
+    - path: "{{ zabbix_proxy_loadmodulepath }}"
+    - required: "{{ zabbix_proxy_tlspskfile is defined }}"
+      path: "{{ zabbix_proxy_tlspskfile | default('/path/to/zabbix_proxy_tlspskfile/zabbix_proxy.psk') | dirname }}"
+  loop_control:
+    label: "{{ item.path }}"
+  when: item.required | default(true)
   tags:
     - install
-    - config
-
-- name: "Create directory for PSK file if not exist."
-  ansible.builtin.file:
-    path: "{{ zabbix_proxy_tlspskfile | dirname }}"
-    mode: 0755
-    state: directory
-  become: true
-  when:
-    - zabbix_proxy_tlspskfile is defined
-  tags:
     - config
 
 - name: "Place TLS PSK File"
