@@ -32,7 +32,6 @@
         port: "{{ zabbix_server_dbport }}"
         login_unix_socket: "{{ zabbix_server_pgsql_login_unix_socket | default(omit) }}"
         name: "{{ zabbix_server_dbname }}"
-        state: present
 
     - name: "PostgreSQL | Create database user"
       community.postgresql.postgresql_user:
@@ -43,10 +42,19 @@
         login_unix_socket: "{{ zabbix_server_pgsql_login_unix_socket | default(omit) }}"
         name: "{{ zabbix_server_dbuser }}"
         password: "{{ ('md5' + (zabbix_server_dbpassword + zabbix_server_dbuser)|hash('md5')) if zabbix_server_dbpassword_hash_method == 'md5' else zabbix_server_dbpassword }}"
+
+    - name: "PostgreSQL | Set database/user permissions"
+      community.postgresql.postgresql_privs:
+        login_user: "{{ zabbix_server_pgsql_login_user | default(omit) }}"
+        login_password: "{{ zabbix_server_pgsql_login_password | default(omit) }}"
+        login_host: "{{ zabbix_server_pgsql_login_host | default(omit) }}"
+        port: "{{ zabbix_server_dbport }}"
+        login_unix_socket: "{{ zabbix_server_pgsql_login_unix_socket | default(omit) }}"
         db: "{{ zabbix_server_dbname }}"
-        priv: ALL
-        state: present
-        encrypted: true
+        privs: ALL
+        type: schema
+        objs: public
+        role: "{{ zabbix_server_dbuser }}"
 
     - name: "PostgreSQL | Create timescaledb extension"
       when: zabbix_server_database_timescaledb

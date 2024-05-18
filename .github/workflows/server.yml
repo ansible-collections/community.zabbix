@@ -38,8 +38,6 @@ jobs:
           - v64
           - v62
           - v60
-        include:
-          - interpreter: python3
         exclude:
           - container: debian12
             version: v62
@@ -89,6 +87,5 @@ jobs:
           MY_MOLECULE_IMAGE=${{ matrix.container }}
           MY_MOLECULE_VERSION=${{ matrix.version }}
           MY_MOLECULE_DATABASE=${{ matrix.database }}
-          MY_MOLECULE_INTERPRETER=${{ matrix.interpreter }}
           MY_MOLECULE_DOCKER_COMMAND=${{ matrix.command }}
           molecule test -s ${{ matrix.collection_role }}

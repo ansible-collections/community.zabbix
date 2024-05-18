@@ -27,7 +27,8 @@
 
 - name: "MySQL Database prep"
   when: zabbix_server_database_creation
-  delegate_to: "{{ zabbix_server_real_dbhost | default(zabbix_server_dbhost_run_install | ternary(delegated_dbhost, inventory_hostname), true) }}"
+  become: "{{ zabbix_server_dbhost_run_install }}"
+  delegate_to: "{{ zabbix_server_real_dbhost | default(zabbix_server_dbhost_run_install | ternary(delegated_dbhost, inventory_hostname)) }}"
   vars:
     delegated_dbhost: "{{ (zabbix_server_dbhost == 'localhost') | ternary(inventory_hostname, zabbix_server_dbhost) }}"
   tags:

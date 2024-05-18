@@ -8,25 +8,27 @@ zabbix_server_manage_service: true
 # Database
 zabbix_server_database_sqlload: true
 zabbix_server_database_timescaledb: false
-zabbix_server_real_dbhost:
+#zabbix_server_real_dbhost:
 zabbix_server_dbhost: localhost
 zabbix_server_dbname: zabbix-server
 zabbix_server_privileged_host: localhost
 zabbix_server_dbencoding: utf8
 zabbix_server_dbcollation: utf8_bin
-zabbix_server_dbschema:
+#zabbix_server_dbschema:
 zabbix_server_dbuser: zabbix-server
 zabbix_server_dbpassword: zabbix-server
 zabbix_server_dbpassword_hash_method: md5
-zabbix_server_dbsocket:
-zabbix_server_dbport: 5432
+#zabbix_server_dbsocket:
+_zabbix_server_database_default_port:
+  mysql: 3306
+  pgsql: 5432
+zabbix_server_dbport: "{{ _zabbix_server_database_default_port[zabbix_server_database] }}"
 zabbix_server_dbhost_run_install: true
 zabbix_server_database: pgsql
 zabbix_server_database_creation: true
 zabbix_server_install_database_client: true
 
 # SELinux specific
-zabbix_server_selinux: false
 selinux_allow_zabbix_can_network: false
 selinux_allow_zabbix_can_http: false
 

@@ -1,0 +1,2 @@
+bugfixes:
+  - zabbix_web - make the FPM socket group-writable so the web server can properly forward requests to the FPM process
