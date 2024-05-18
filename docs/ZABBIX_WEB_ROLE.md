@@ -59,6 +59,7 @@ See the following list of supported Operating Systems with the Zabbix releases.
 |---------------------|-----|-----|-----|
 | Red Hat Fam 9       |  V  |  V  |  V  |
 | Red Hat Fam 8       |  V  |  V  |  V  |
+| Ubuntu 24.04 noble  |  V  |     |  V  |
 | Ubuntu 22.04 jammy  |  V  |  V  |  V  |
 | Ubuntu 20.04 focal  |  V  |  V  |  V  |
 | Ubuntu 18.04 bionic |     |     |  V  |
@@ -97,7 +98,7 @@ The following is an overview of all available configuration defaults for this ro
 * `zabbix_web_conf_mode`: Default: `0644`. The "mode" for the Zabbix configuration file.
 * `zabbix_repo_deb_url`: The URL to the Zabbix repository.  Default `http://repo.zabbix.com/zabbix/{{ zabbix_web_version }}/{{ ansible_distribution.lower() }}`
 * `zabbix_repo_deb_component`: The repository component for Debian installs. Default `main`.
-* `zabbix_repo_deb_gpg_key_url`: The URL to download the Zabbix GPG key from. Default `http://repo.zabbix.com/zabbix-official-repo.key`.
+* `zabbix_repo_deb_gpg_key_url`: The URL to download the Zabbix GPG key from. Default `http://repo.zabbix.com/zabbix-official-repo.key` (or `https://repo.zabbix.com/zabbix-official-repo-apr2024.gpg` for Ubuntu 24.04 repo).
 * `zabbix_repo_deb_include_deb_src`: True, if deb-src should be included in the zabbix.sources entry. Default `true`.
 
 ### Zabbix Web specific
