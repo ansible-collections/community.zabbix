@@ -3,40 +3,6 @@
   ansible.builtin.set_fact:
     zabbix_short_version: "{{ zabbix_server_version | regex_replace('\\.', '') }}"
     zabbix_underscore_version: "{{ zabbix_server_version | regex_replace('\\.', '_') }}"
-    zabbix_python_prefix: "python{% if ansible_python_version is version('3', '>=') %}3{% endif %}"
-  tags:
-    - always
-
-- name: "Debian | Installing lsb-release"
-  ansible.builtin.apt:
-    pkg: lsb-release
-    update_cache: true
-    cache_valid_time: 3600
-    force: true
-    state: present
-  environment:
-    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
-    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
-  become: true
-  tags:
-    - install
-
-- name: "Debian | Update ansible_lsb fact"
-  ansible.builtin.setup:
-    gather_subset:
-      - lsb
-
-- name: "Debian | Repo URL"
-  ansible.builtin.set_fact:
-    zabbix_repo_deb_url: "{{ _zabbix_repo_deb_url }}/{{ ansible_lsb.id.lower() }}{{ '-arm64' if ansible_machine == 'aarch64' and ansible_lsb.id == 'debian' else ''}}"
-  when:
-    - zabbix_repo_deb_url is undefined
-  tags:
-    - always
-
-- name: "Debian | Set some facts for Zabbix"
-  ansible.builtin.set_fact:
-    datafiles_path: /usr/share/zabbix-sql-scripts/{{ 'postgresql' if zabbix_server_database == 'pgsql' else 'mysql' }}
   tags:
     - always
 
@@ -72,8 +38,8 @@
 - name: "Debian | Download gpg key"
   when: not ansible_check_mode  # Because get_url always has changed status in check_mode.
   ansible.builtin.get_url:
-    url: "{{ zabbix_repo_deb_gpg_key_url }}"
-    dest: "{{ zabbix_gpg_key }}"
+    url: "{{ zabbix_repo_deb_gpg_key_url | default(_zabbix_repo_default_deb_gpg_key_url_by_distrib[ansible_distribution_major_version]) }}"
+    dest: "{{ zabbix_gpg_key | default(_zabbix_gpg_key_default_by_distrib[ansible_distribution_major_version]) }}"
     mode: "0644"
     force: true
   environment:
@@ -98,7 +64,7 @@
       Suites: {{ ansible_distribution_release }}
       Components: {{ zabbix_repo_deb_component }}
       Architectures: {{ 'amd64' if ansible_machine != 'aarch64' else 'arm64'}}
-      Signed-By: {{ zabbix_gpg_key }}
+      Signed-By: {{ zabbix_gpg_key | default(_zabbix_gpg_key_default_by_distrib[ansible_distribution_major_version]) }}
   become: true
   tags:
     - install
@@ -128,117 +94,3 @@
   become: true
   tags:
     - install
-
-# On certain 18.04 images, such as docker or lxc, dpkg is configured not to
-# install files into paths /usr/share/doc/*
-# Since this is where Zabbix installs its database schemas, we need to allow
-# files to be installed to /usr/share/doc/zabbix*
-- name: "Debian | Check for the dpkg exclude line"
-  ansible.builtin.command: grep -F 'path-exclude=/usr/share/doc/*' /etc/dpkg/dpkg.cfg.d/excludes
-  register: dpkg_exclude_line
-  failed_when: false
-  changed_when: false
-  check_mode: false
-  become: true
-  tags:
-    - install
-
-- name: "Debian | Allow Zabbix dpkg installs to /usr/share/doc/zabbix*"
-  ansible.builtin.lineinfile:
-    path: /etc/dpkg/dpkg.cfg.d/excludes
-    line: "path-include=/usr/share/doc/zabbix*"
-  become: true
-  when:
-    - dpkg_exclude_line.rc == 0
-  tags:
-    - install
-
-- name: "Debian | Installing zabbix-server-{{ zabbix_server_database }}"
-  ansible.builtin.apt:
-    pkg: zabbix-server-{{ zabbix_server_database }}
-    state: "{{ zabbix_server_package_state }}"
-    update_cache: true
-    cache_valid_time: 0
-    install_recommends: "{{ zabbix_server_install_recommends }}"
-    default_release: "{{ ansible_distribution_release }}"
-  environment:
-    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
-    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
-  register: zabbix_server_package_installed
-  until: zabbix_server_package_installed is succeeded
-  become: true
-  tags:
-    - install
-
-- name: "Debian | Installing zabbix-sql-scripts"
-  ansible.builtin.apt:
-    pkg: zabbix-sql-scripts
-    state: "{{ zabbix_server_package_state }}"
-    update_cache: true
-    cache_valid_time: 0
-    install_recommends: "{{ zabbix_server_install_recommends }}"
-    default_release: "{{ ansible_distribution_release }}"
-  environment:
-    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
-    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
-  register: zabbix_server_package_sql_installed
-  until: zabbix_server_package_sql_installed is succeeded
-  when:
-    - zabbix_server_version is version('5.4', '>=')
-  become: true
-  tags:
-    - install
-
-- name: "Debian | Install Database Client Package"
-  block:
-    - name: "Debian | Install Mysql Client package"
-      ansible.builtin.apt:
-        name:
-          - default-mysql-client
-          - "{{ zabbix_python_prefix }}-mysqldb"
-        state: present
-      environment:
-        http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
-        https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
-      register: zabbix_server_dependencies_installed
-      until: zabbix_server_dependencies_installed is succeeded
-      become: true
-      when:
-        - zabbix_server_database == 'mysql'
-        - ansible_distribution_release != "buster"
-
-    - name: "Debian 10 | Install Mysql Client package"
-      ansible.builtin.apt:
-        name:
-          - mariadb-client
-          - "{{ zabbix_python_prefix }}-mysqldb"
-        state: present
-      environment:
-        http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
-        https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
-      register: zabbix_server_dependencies_installed
-      until: zabbix_server_dependencies_installed is succeeded
-      become: true
-      when:
-        - zabbix_server_database == 'mysql'
-        - ansible_distribution_release == "buster"
-
-    - name: "Debian | Install PostgreSQL Client package"
-      ansible.builtin.apt:
-        name:
-          - postgresql-client
-          - "{{ zabbix_python_prefix }}-psycopg2"
-        state: present
-      environment:
-        http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
-        https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
-      register: zabbix_server_dependencies_installed
-      until: zabbix_server_dependencies_installed is succeeded
-      become: true
-      when:
-        - zabbix_server_database == 'pgsql'
-  when: zabbix_server_install_database_client
-  tags:
-    - install
-    - database
-    - dependencies

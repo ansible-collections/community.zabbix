@@ -109,11 +109,3 @@
         state: absent
       when:
         - ansible_os_family == 'RedHat'
-
-    - name: PyMySQL
-      ansible.builtin.pip:
-        name: PyMySQL
-      register: installation_dependencies
-      until: installation_dependencies is succeeded
-      when:
-        - inventory_hostname in groups['mysql']

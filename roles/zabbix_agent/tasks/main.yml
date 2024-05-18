@@ -12,54 +12,98 @@
   tags:
     - always
 
-- name: Set More Variables
-  ansible.builtin.set_fact:
-    zabbix_valid_version: "{{ zabbix_agent_version|float in zabbix_valid_agent_versions[ansible_distribution_major_version] }}"
+- name: Check that version is supported
+  when: enable_version_check | default(true) | bool
+  ansible.builtin.assert:
+    that:
+      - "{{ zabbix_agent_version|float in zabbix_valid_agent_versions[ansible_distribution_major_version] }}"
+    fail_msg: Zabbix version {{ zabbix_agent_version }} is not supported on {{ ansible_distribution }} {{ ansible_distribution_major_version }}
   tags:
     - always
 
-- name: Stopping Install of Invalid Version
-  ansible.builtin.fail:
-    msg: Zabbix version {{ zabbix_agent_version }} is not supported on {{ ansible_distribution }} {{ ansible_distribution_major_version }}
-  when: not zabbix_valid_version
-  tags:
-    - always
+- name: Load Appropriate Defaults
+  ansible.builtin.include_vars: "agent{{ '2' if zabbix_agent2 is defined and zabbix_agent2|bool }}_vars.yml"
+
+- name: Set Variables
+  ansible.builtin.set_fact:
+    zabbix_agent_include: "{{ zabbix_agent_include is defined | ternary(zabbix_agent_include, zabbix_agent2_include) | default(_include) }}"
+    zabbix_agent_logfile: "{{ zabbix_agent_logfilee is defined | ternary(zabbix_agent_logfile, zabbix_agent2_logfile) | default(_logfile) }}"
+    zabbix_agent_package: "{{ zabbix_agent_package is defined | ternary(zabbix_agent_package, zabbix_agent2_package) | default(_agent_package) }}"
+    zabbix_agent_pidfile: "{{ zabbix_agent_pidfile is defined | ternary(zabbix_agent_pidfile, zabbix_agent2_pidfile) | default(_pidfile) }}"
+    zabbix_agent_service: "{{ zabbix_agent_service is defined | ternary(zabbix_agent_service, zabbix_agent2_service) | default(_agent_service) }}"
+    zabbix_agent_tls_subject: "{{ zabbix_agent_tls_subject is defined | ternary(zabbix_agent_tls_subject, zabbix_agent2_tls_subject) | default(_tls_subject) }}"
+
+- name: Set More Varaibles # Move to defaults after 3.0
+  ansible.builtin.set_fact:
+    zabbix_agent_buffersend: "{{ zabbix_agent_buffersend is defined | ternary(zabbix_agent_buffersend, zabbix_agent2_buffersend) | default(5) }}"
+    zabbix_agent_buffersize: "{{ zabbix_agent_buffersize is defined | ternary(zabbix_agent_buffersize, zabbix_agent2_buffersize) | default(100) }}"
+    zabbix_agent_controlsocket: "{{ zabbix_agent_controlsocket is defined | ternary(zabbix_agent_controlsocket, zabbix_agent2_controlsocket) | default('/tmp/agent.sock') }}"
+    zabbix_agent_debuglevel: "{{ zabbix_agent_debuglevel is defined | ternary(zabbix_agent_debuglevel, zabbix_agent2_debuglevel) | default(3) }}"
+    zabbix_agent_enableremotecommands: "{{ zabbix_agent_enableremotecommands is defined | ternary(zabbix_agent_enableremotecommands, zabbix_agent2_enableremotecommands) | default(0) }}"
+    zabbix_agent_heartbeatfrequency: "{{ zabbix_agent_heartbeatfrequency is defined | ternary(zabbix_agent_heartbeatfrequency, zabbix_agent2_heartbeatfrequency) | default(60) }}"
+    zabbix_agent_hostname: "{{ zabbix_agent_hostname is defined | ternary(zabbix_agent_hostname, zabbix_agent2_hostname) | default(inventory_hostname) }}"
+    zabbix_agent_include_mode: "{{ zabbix_agent_include_mode is defined | ternary(zabbix_agent_include_mode, zabbix_agent2_include_mode) | default('0750') }}"
+    zabbix_agent_listenport: "{{ zabbix_agent_listenport is defined | ternary(zabbix_agent_listenport, zabbix_agent2_listenport) | default(10050) }}"
+    zabbix_agent_logfilesize: "{{ zabbix_agent_logfilesize is defined | ternary(zabbix_agent_logfilesize, zabbix_agent2_logfilesize) | default(100) }}"
+    zabbix_agent_logtype: "{{ zabbix_agent_logtype is defined | ternary(zabbix_agent_logtype, zabbix_agent2_logtype) | default('file') }}"
+    zabbix_agent_persistentbufferperiod: "{{ zabbix_agent_persistentbufferperiod is defined | ternary(zabbix_agent_persistentbufferperiod, zabbix_agent2_persistentbufferperiod) | default('1h') }}"
+    zabbix_agent_refreshactivechecks: "{{ zabbix_agent_refreshactivechecks is defined | ternary(zabbix_agent_refreshactivechecks, zabbix_agent2_refreshactivechecks) | default(120) }}"
+    zabbix_agent_statusport: "{{ zabbix_agent_statusport is defined | ternary(zabbix_agent_statusport, zabbix_agent2_statusport) | default(9999) }}"
+    zabbix_agent_timeout: "{{ zabbix_agent_timeout is defined | ternary(zabbix_agent_timeout, zabbix_agent2_timeout) | default(3) }}"
+    zabbix_agent_tlspsk_auto: "{{ zabbix_agent_tlspsk_auto is defined | ternary(zabbix_agent_tlspsk_auto, zabbix_agent2_tlspsk_auto) | default(false) }}"
+    zabbix_agent_tlspskfile: "{{ zabbix_agent_tlspskfile is defined | ternary(zabbix_agent_tlspskfile, zabbix_agent2_tlspskfile) | default('/etc/zabbix/tls_psk_auto.secret') }}"
+    zabbix_agent_unsafeuserparameters: "{{ zabbix_agent_unsafeuserparameters is defined | ternary(zabbix_agent_unsafeuserparameters, zabbix_agent2_unsafeuserparameters) | default(0) }}"
+
+- name: Set More Variables # Remove for 3.0 release
+  ansible.builtin.set_fact:
+    zabbix_agent_allowkeys: "{{ zabbix_agent_allowkeys is defined | ternary(zabbix_agent_allowkeys, zabbix_agent2_allow_key) | default(omit) }}"
+    zabbix_agent_denykeys: "{{ zabbix_agent_denykeys is defined | ternary(zabbix_agent_denykeys, zabbix_agent2_deny_key) | default(omit) }}"
+    zabbix_agent_hostinterface: "{{ zabbix_agent_hostinterface is defined | ternary(zabbix_agent_hostinterface, zabbix_agent2_hostinterface) | default(omit) }}"
+    zabbix_agent_hostinterfaceitem: "{{ zabbix_agent_hostinterfaceitem is defined | ternary(zabbix_agent_hostinterfaceitem, zabbix_agent2_hostinterfaceitem) | default(omit) }}"
+    zabbix_agent_hostmetadata: "{{ zabbix_agent_hostmetadata is defined | ternary(zabbix_agent_hostmetadata, zabbix_agent2_hostmetadata) | default(omit) }}"
+    zabbix_agent_hostmetadataitem: "{{ zabbix_agent_hostmetadataitem is defined | ternary(zabbix_agent_hostmetadataitem, zabbix_agent2_hostmetadataitem) | default(omit) }}"
+    zabbix_agent_hostnameitem: "{{ zabbix_agent_hostnameitem is defined | ternary(zabbix_agent_hostnameitem, zabbix_agent2_hostnameitem) | default(omit) }}"
+    zabbix_agent_listenip: "{{ zabbix_agent_listenip is defined | ternary(zabbix_agent_listenip, zabbix_agent2_listenip) | default(omit) }}"
+    zabbix_agent_persistentbufferfile: "{{ zabbix_agent_persistentbufferfile is defined | ternary(zabbix_agent_persistentbufferfile, zabbix_agent2_persistentbufferfile) | default(omit) }}"
+    zabbix_agent_plugins: "{{ zabbix_agent_plugins is defined | ternary(zabbix_agent_plugins, zabbix_agent2_plugins) | default(omit) }}"
+    zabbix_agent_server: "{{ zabbix_agent_server is defined | ternary(zabbix_agent_server, zabbix_agent2_server) | default(omit) }}"
+    zabbix_agent_serveractive: "{{ zabbix_agent_serveractive is defined | ternary(zabbix_agent_serveractive, zabbix_agent2_serveractive) | default(omit) }}"
+    zabbix_agent_sourceip: "{{ zabbix_agent_sourceip is defined | ternary(zabbix_agent_sourceip, zabbix_agent2_sourceip) | default(omit) }}"
+    zabbix_agent_tlsaccept: "{{ zabbix_agent_tlsaccept is defined | ternary(zabbix_agent_tlsaccept, zabbix_agent2_tlsaccept) | default(omit) }}"
+    zabbix_agent_tlscafile: "{{ zabbix_agent_tlscafile is defined | ternary(zabbix_agent_tlscafile, zabbix_agent2_tlscafile) | default(omit) }}"
+    zabbix_agent_tlscertfile: "{{ zabbix_agent_tlscertfile is defined | ternary(zabbix_agent_tlscertfile, zabbix_agent2_tlscertfile) | default(omit) }}"
+    zabbix_agent_tlsconnect: "{{ zabbix_agent_tlsconnect is defined | ternary(zabbix_agent_tlsconnect, zabbix_agent2_tlsconnect) | default(omit) }}"
+    zabbix_agent_tlscrlfile: "{{ zabbix_agent_tlscrlfile is defined | ternary(zabbix_agent_tlscrlfile, zabbix_agent2_tlscrlfile) | default(omit) }}"
+    zabbix_agent_tlskeyfile: "{{ zabbix_agent_tlskeyfile is defined | ternary(zabbix_agent_tlskeyfile, zabbix_agent2_tlskeyfile) | default(omit) }}"
+    zabbix_agent_tlspskidentity: "{{ zabbix_agent_tlspskidentity is defined | ternary(zabbix_agent_tlspskidentity, zabbix_agent2_tlspskidentity) | default(omit) }}"
+    zabbix_agent_tlspsk_secret: "{{ zabbix_agent_tlspsk_secret is defined | ternary(zabbix_agent_tlspsk_secret, zabbix_agent2_tlspsk_secret) | default(omit) }}"
+    zabbix_agent_tlsservercertissuer: "{{ zabbix_agent_tlsservercertissuer is defined | ternary(zabbix_agent_tlsservercertissuer, zabbix_agent2_tlsservercertissuer) | default(omit) }}"
+    zabbix_agent_tlsservercertsubject: "{{ zabbix_agent_tlsservercertsubject is defined | ternary(zabbix_agent_tlsservercertsubject, zabbix_agent2_tlsservercertsubject) | default(omit) }}"
+    zabbix_agent_aliases: "{{ zabbix_agent_aliases is defined | ternary(zabbix_agent_aliases, zabbix_agent_zabbix_alias) | default(omit) }}"
 
 - name: Setting Zabbix API Server Port
   ansible.builtin.set_fact:
     zabbix_api_server_port: "{{ '443' if zabbix_api_use_ssl|bool else '80' }}"
   when: zabbix_api_server_port is undefined
 
-- name: "Set variables specific for Zabbix Agent 2"
-  ansible.builtin.set_fact:
-    zabbix_agent_service: zabbix-agent2
-    zabbix_agent_package: zabbix-agent2
-  when:
-    - zabbix_agent2 is defined
-    - zabbix_agent2
-  tags:
-    - always
-
 - name: "Install the correct repository"
   ansible.builtin.include_tasks: "{{ ansible_os_family }}.yml"
   when:
     - not (zabbix_agent_docker | bool)
 
-- name: "Encrypt with TLS PSK auto management"
-  ansible.builtin.include_tasks: tlspsk_auto.yml
-  when:
-    - not zabbix_agent2
-    - zabbix_agent_tlspsk_auto | bool
-    - (zabbix_agent_tlspskfile is undefined) or (zabbix_agent_tlspskfile | length == '0')
-    - (zabbix_agent_tlspsk_secret is undefined) or (zabbix_agent_tlspsk_secret | length == '0')
+- name: Gather PSK Secret Info
+  ansible.builtin.include_tasks: psk_secret.yml
 
-- name: "Encrypt with TLS PSK auto management"
-  ansible.builtin.include_tasks: tlspsk_auto_agent2.yml
-  when:
-    - zabbix_agent2 | bool
-    - zabbix_agent2_tlspsk_auto | bool
-    - (zabbix_agent2_tlspskfile is undefined) or (zabbix_agent2_tlspskfile | length == '0')
-    - (zabbix_agent2_tlspsk_secret is undefined) or (zabbix_agent2_tlspsk_secret | length == '0')
+- name: Gather PSK Identity Info
+  ansible.builtin.include_tasks: psk_identity.yml
+
+- name: AutoPSK | Default tlsaccept and tlsconnect to enforce PSK
+  ansible.builtin.set_fact:
+    zabbix_agent_tlsaccept: psk
+    zabbix_agent_tlsconnect: psk
+  when: zabbix_agent_tlspsk_auto | bool
+  tags:
+    - config
 
 - name: "Configure Agent"
   ansible.builtin.include_tasks: Windows_conf.yml
@@ -89,6 +133,6 @@
 
 - name: "Including userparameters"
   ansible.builtin.include_tasks: "userparameter.yml"
-  when: zabbix_agent_userparameters|length > 0
+  when: zabbix_agent_userparameters | default ([]) | length > 0
   tags:
     - config

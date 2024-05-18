@@ -16,6 +16,7 @@
       - [Apache configuration](#apache-configuration)
       - [Nginx configuration](#nginx-configuration)
       - [PHP-FPM](#php-fpm)
+    - [SElinux](#selinux)
     - [Zabbix Server](#zabbix-server)
   * [proxy](#proxy)
 - [Example Playbook](#example-playbook)
@@ -58,12 +59,15 @@ See the following list of supported Operating Systems with the Zabbix releases.
 |---------------------|-----|-----|-----|
 | Red Hat Fam 9       |  V  |  V  |  V  |
 | Red Hat Fam 8       |  V  |  V  |  V  |
+| Ubuntu 24.04 noble  |  V  |     |  V  |
 | Ubuntu 22.04 jammy  |  V  |  V  |  V  |
 | Ubuntu 20.04 focal  |  V  |  V  |  V  |
 | Ubuntu 18.04 bionic |     |     |  V  |
 | Debian 12 bookworm  |  V  |     |  V  |
 | Debian 11 bullseye  |  V  |  V  |  V  |
 | Debian 10 buster    |     |     |  V  |
+
+You can bypass this matrix by setting `enable_version_check: false`
 
 # Installation
 
@@ -94,7 +98,7 @@ The following is an overview of all available configuration defaults for this ro
 * `zabbix_web_conf_mode`: Default: `0644`. The "mode" for the Zabbix configuration file.
 * `zabbix_repo_deb_url`: The URL to the Zabbix repository.  Default `http://repo.zabbix.com/zabbix/{{ zabbix_web_version }}/{{ ansible_distribution.lower() }}`
 * `zabbix_repo_deb_component`: The repository component for Debian installs. Default `main`.
-* `zabbix_repo_deb_gpg_key_url`: The URL to download the Zabbix GPG key from. Default `http://repo.zabbix.com/zabbix-official-repo.key`.
+* `zabbix_repo_deb_gpg_key_url`: The URL to download the Zabbix GPG key from. Default `http://repo.zabbix.com/zabbix-official-repo.key` (or `https://repo.zabbix.com/zabbix-official-repo-apr2024.gpg` for Ubuntu 24.04 repo).
 * `zabbix_repo_deb_include_deb_src`: True, if deb-src should be included in the zabbix.sources entry. Default `true`.
 
 ### Zabbix Web specific
@@ -118,7 +122,6 @@ The following is an overview of all available configuration defaults for this ro
 * `zabbix_web_vhost_port`: The port on which Zabbix HTTP vhost is running.
 * `zabbix_web_vhost_tls_port`: The port on which Zabbix HTTPS vhost is running.
 * `zabbix_web_vhost_listen_ip`: On which interface the Apache Virtual Host is available.
-* `zabbix_apache_can_connect_ldap`: Default: `false`. Set SELinux boolean to allow httpd to connect to LDAP.
 * `zabbix_web_max_execution_time`: PHP max execution time
 * `zabbix_web_memory_limit`: PHP memory limit
 * `zabbix_web_post_max_size`: PHP maximum post size
@@ -152,6 +155,13 @@ The following properties are specific to Zabbix 5.0 and for the PHP(-FPM) config
 * `zabbix_php_fpm_conf_user`: The owner of the socket file (When `zabbix_php_fpm_listen` contains a patch to a socket file).
 
 * `zabbix_php_fpm_conf_group`: The group of the owner of the socket file (When `zabbix_php_fpm_listen` contains a patch to a socket file).
+
+### SElinux
+
+* `zabbix_web_selinux`: Default: `False`. Enables an SELinux policy so that the web will run.
+* `selinux_allow_httpd_can_connect_zabbix`: Default: `false`. Set SELinux boolean to allow httpd to connect to zabbix.
+* `selinux_allow_httpd_can_connect_ldap`: Default: `false`. Set SELinux boolean to allow httpd to connect to LDAP.
+* `selinux_allow_httpd_can_network_connect_db`: Default: `false` Set SELinux boolean to allow httpd to connect databases over the network.
 
 ### Zabbix Server
 

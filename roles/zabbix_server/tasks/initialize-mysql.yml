@@ -1,0 +1,156 @@
+---
+# task file for mysql
+- name: "Install MySQL dependencies"
+  ansible.builtin.package:
+    name: "{{ _zabbix_server_mysql_dependencies | select | list }}"
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
+  register: _zabbix_server_dependencies_installed
+  until: _zabbix_server_dependencies_installed is succeeded
+  become: true
+  tags:
+    - install
+    - database
+    - dependencies
+
+# NOTE: Upgrading system-packages with pip is generally a bad idea, but
+# ubuntu-18.04 comes with pymysql==0.8.0, which seems to have a problem with
+# versions 8 and above of mysql.
+- name: Upgrade pymysql
+  when:
+    - ansible_facts['distribution'] == 'Ubuntu'
+    - ansible_facts['distribution_release'] == 'bionic'
+  ansible.builtin.pip:
+    name: "pymysql>=0.10.0,<0.11.0"
+    state: latest
+
+- name: "MySQL Database prep"
+  when: zabbix_server_database_creation
+  become: "{{ zabbix_server_dbhost_run_install }}"
+  delegate_to: "{{ zabbix_server_real_dbhost | default(zabbix_server_dbhost_run_install | ternary(delegated_dbhost, inventory_hostname)) }}"
+  vars:
+    delegated_dbhost: "{{ (zabbix_server_dbhost == 'localhost') | ternary(inventory_hostname, zabbix_server_dbhost) }}"
+  tags:
+    - database
+  block:
+    - name: "MySQL | Create database"
+      community.mysql.mysql_db:
+        login_user: "{{ zabbix_server_mysql_login_user | default(omit) }}"
+        login_password: "{{ zabbix_server_mysql_login_password | default(omit) }}"
+        login_host: "{{ zabbix_server_mysql_login_host | default(omit) }}"
+        login_port: "{{ zabbix_server_mysql_login_port | default(omit) }}"
+        login_unix_socket: "{{ zabbix_server_mysql_login_unix_socket | default(omit) }}"
+        name: "{{ zabbix_server_dbname }}"
+        encoding: "{{ zabbix_server_dbencoding }}"
+        collation: "{{ zabbix_server_dbcollation }}"
+        state: present
+      register: zabbix_database_created
+
+    - name: "MySQL | Create database user"
+      community.mysql.mysql_user:
+        login_user: "{{ zabbix_server_mysql_login_user | default(omit) }}"
+        login_password: "{{ zabbix_server_mysql_login_password | default(omit) }}"
+        login_host: "{{ zabbix_server_mysql_login_host | default(omit) }}"
+        login_port: "{{ zabbix_server_mysql_login_port | default(omit) }}"
+        login_unix_socket: "{{ zabbix_server_mysql_login_unix_socket | default(omit) }}"
+        name: "{{ zabbix_server_dbuser }}"
+        password: "{{ zabbix_server_dbpassword }}"
+        host: "{{ zabbix_server_privileged_host }}"
+        plugin: "{{ 'mysql_native_password' if (ansible_os_family == 'RedHat' and ansible_distribution_major_version == '7') else omit }}"
+        priv: "{{ zabbix_server_dbname }}.*:ALL"
+        state: present
+
+- name: "MySQL verify or create schema"
+  when: zabbix_server_database_sqlload | bool
+  vars:
+    delegated_dbhost: "{{ (zabbix_server_dbhost == 'localhost') | ternary(inventory_hostname, zabbix_server_dbhost) }}"
+  tags:
+    - database
+  block:
+    # If this check fails, then there's no dbversion table in the database,
+    # hence it has not been populated, and we'll create it, below.
+    # Otherwise, the module will succees and we could
+    # access the database version, for example 5000000 for Zabbix 5.0.
+    - name: "MySQL | Get current database version"
+      community.mysql.mysql_query:
+        login_user: "{{ zabbix_server_dbuser }}"
+        login_password: "{{ zabbix_server_dbpassword }}"
+        login_host: "{{ zabbix_server_dbhost }}"
+        login_port: "{{ zabbix_server_dbport }}"
+        login_db: "{{ zabbix_server_dbname }}"
+        query: 'SELECT mandatory FROM dbversion'
+  rescue:
+    - name: "MySQL | Get and set schema import overrides"
+      delegate_to: "{{ zabbix_server_real_dbhost | default(zabbix_server_dbhost_run_install | ternary(delegated_dbhost, inventory_hostname), true) }}"
+      block:
+        - name: "MySQL | Get current value for variables"
+          community.mysql.mysql_variables:
+            variable: "{{ name }}"
+            login_user: "{{ zabbix_server_mysql_login_user | default(omit) }}"
+            login_password: "{{ zabbix_server_mysql_login_password | default(omit) }}"
+            login_host: "{{ zabbix_server_mysql_login_host | default(omit) }}"
+            login_port: "{{ zabbix_server_mysql_login_port | default(omit) }}"
+            login_unix_socket: "{{ zabbix_server_mysql_login_unix_socket | default(omit) }}"
+          loop:
+            - innodb_default_row_format
+            - log_bin_trust_function_creators
+          loop_control:
+            loop_var: name
+          register: _mysql_variable_defaults
+
+        - name: "MySQL | Set variable overrides for schema import"
+          community.mysql.mysql_variables:
+            variable: "{{ item.name }}"
+            value: "{{ _mysql_schema_import_overrides[item.name] }}"
+            login_user: "{{ zabbix_server_mysql_login_user | default(omit) }}"
+            login_password: "{{ zabbix_server_mysql_login_password | default(omit) }}"
+            login_host: "{{ zabbix_server_mysql_login_host | default(omit) }}"
+            login_port: "{{ zabbix_server_mysql_login_port | default(omit) }}"
+            login_unix_socket: "{{ zabbix_server_mysql_login_unix_socket | default(omit) }}"
+          when: item.msg != _mysql_schema_import_overrides[item.name]
+          loop: "{{ _mysql_variable_defaults.results }}"
+          loop_control:
+            label: "{{ item.name }}: {{ _mysql_schema_import_overrides[item.name] }}"
+          vars:
+            _mysql_schema_import_overrides:
+              innodb_default_row_format: "dynamic"
+              log_bin_trust_function_creators: "ON"
+
+        - name: "MySQL | Disable InnoDB Strict Mode"
+          when: ansible_facts['distribution_release'] == "buster"
+          community.mysql.mysql_variables:
+            variable: innodb_strict_mode
+            value: 0
+            login_user: "{{ zabbix_server_mysql_login_user | default(omit) }}"
+            login_password: "{{ zabbix_server_mysql_login_password | default(omit) }}"
+            login_host: "{{ zabbix_server_mysql_login_host | default(omit) }}"
+            login_port: "{{ zabbix_server_mysql_login_port | default(omit) }}"
+            login_unix_socket: "{{ zabbix_server_mysql_login_unix_socket | default(omit) }}"
+
+    - name: "MySQL | Import schema"
+      community.mysql.mysql_db:
+        login_user: "{{ zabbix_server_dbuser }}"
+        login_password: "{{ zabbix_server_dbpassword }}"
+        login_host: "{{ zabbix_server_dbhost }}"
+        login_port: "{{ zabbix_server_dbport }}"
+        name: "{{ zabbix_server_dbname }}"
+        encoding: "{{ zabbix_server_dbencoding }}"
+        collation: "{{ zabbix_server_dbcollation }}"
+        state: import
+        target: /usr/share/zabbix-sql-scripts/mysql/server.sql.gz
+
+  always:
+    - name: "MySQL | Revert variable overrides for schema import"
+      delegate_to: "{{ zabbix_server_real_dbhost | default(zabbix_server_dbhost_run_install | ternary(delegated_dbhost, inventory_hostname), true) }}"
+      community.mysql.mysql_variables:
+        variable: "{{ item.name }}"
+        value: "{{ item.msg }}"
+        login_user: "{{ zabbix_server_mysql_login_user | default(omit) }}"
+        login_password: "{{ zabbix_server_mysql_login_password | default(omit) }}"
+        login_host: "{{ zabbix_server_mysql_login_host | default(omit) }}"
+        login_port: "{{ zabbix_server_mysql_login_port | default(omit) }}"
+        login_unix_socket: "{{ zabbix_server_mysql_login_unix_socket | default(omit) }}"
+      loop: "{{ _mysql_variable_defaults.results | default([]) }}"
+      loop_control:
+        label: "{{ item.name }}: {{ item.msg }}"

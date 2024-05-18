@@ -41,7 +41,7 @@ zabbix_proxy_version_minor: "*"
 # Yum/APT Variables
 zabbix_repo_yum_schema: https
 zabbix_repo_yum_gpgcheck: 0
-zabbix_repo_deb_url: "http://repo.zabbix.com/zabbix/{{ zabbix_proxy_version }}/{{ ansible_facts.lsb.id | default(ansible_facts['distribution']) | lower }}{% if ansible_facts['architecture'] == 'aarch64' and ansible_facts.lsb.id | default(ansible_facts['distribution']) == 'Debian' %}-arm64{% endif %}"
+zabbix_repo_deb_url: "http://repo.zabbix.com/zabbix/{{ zabbix_proxy_version }}/{{ ansible_facts.lsb.id | default(ansible_facts['distribution']) | lower }}{% if ansible_facts['architecture'] == 'aarch64' and ansible_facts.lsb.id | default(ansible_facts['distribution']) in ['Debian', 'Ubuntu'] %}-arm64{% endif %}"
 zabbix_repo_deb_component: main
 zabbix_repo_yum:
   - name: zabbix
@@ -60,7 +60,6 @@ zabbix_repo_yum:
     state: present
 zabbix_proxy_apt_priority:
 zabbix_proxy_package_state: present
-zabbix_repo_deb_gpg_key_url: http://repo.zabbix.com/zabbix-official-repo.key
 zabbix_repo_deb_include_deb_src: true
 
 # Proxy Configuration Variables (Only ones with role provided defaults)

@@ -1,0 +1,142 @@
+{{ ansible_managed | comment }}
+# This is a configuration file for Zabbix Server process
+# To get more information about Zabbix, visit http://www.zabbix.com
+
+# This configuration file is "minimalized", which means all the original comments 
+# are removed. The full documentation for your Zabbix Server can be found here:
+# https://www.zabbix.com/documentation/{{ zabbix_agent_version }}/en/manual/appendix/config/
+
+{% if zabbix_agent_aliases is defined and zabbix_agent_aliases %}
+{% if zabbix_agent_aliases is string %}
+Alias={{ zabbix_agent_aliases }}
+{% else %}
+{% for item in zabbix_agent_aliases %}
+Alias={{ item }}
+{% endfor %}
+{% endif %}
+{% else %}
+# Alias=
+{% endif %}
+{% if zabbix_agent_allowkeys is defined and zabbix_agent_allowkeys %}
+{% if zabbix_agent_allowkeys is string %}
+AllowKey={{ zabbix_agent_allowkeys }}
+{% else %}
+{% for item in zabbix_agent_allowkeys %}
+AllowKey={{ item }}
+{% endfor %}
+{% endif %}
+{% else %}
+# AllowKey=
+{% endif %}
+{% if not zabbix_agent2 and ansible_os_family != "Windows" %}
+{{ (zabbix_agent_allowroot is defined and zabbix_agent_allowroot is not none) | ternary('', '# ') }}AllowRoot={{ zabbix_agent_allowroot | default('') }}
+{% endif %}
+{{ (zabbix_agent_buffersend is defined and zabbix_agent_buffersend is not none) | ternary('', '# ') }}BufferSend={{ zabbix_agent_buffersend | default('') }}
+{{ (zabbix_agent_buffersize is defined and zabbix_agent_buffersize is not none) | ternary('', '# ') }}BufferSize={{ zabbix_agent_buffersize | default('') }}
+{% if zabbix_agent2 %}
+{{ (zabbix_agent_controlsocket is defined and zabbix_agent_controlsocket is not none) | ternary('', '# ') }}ControlSocket={{ zabbix_agent_controlsocket | default('') }}
+{% endif %}
+{{ (zabbix_agent_debuglevel is defined and zabbix_agent_debuglevel is not none) | ternary('', '# ') }}DebugLevel={{ zabbix_agent_debuglevel | default('') }}
+{% if zabbix_agent_denykeys is defined and zabbix_agent_denykeys %}
+{% if zabbix_agent_denykeys is string %}
+DenyKey={{ zabbix_agent_denykeys }}
+{% else %}
+{% for item in zabbix_agent_denykeys %}
+DenyKey={{ item }}
+{% endfor %}
+{% endif %}
+{% else %}
+# DenyKey=
+{% endif %}
+{% if not zabbix_agent2 %}
+{{ (zabbix_agent_enableremotecommands is defined and zabbix_agent_enableremotecommands is not none) | ternary('', '# ') }}EnableRemoteCommands={{ zabbix_agent_enableremotecommands | default('') }}
+{% endif %}
+{% if zabbix_agent2 %}
+{{ (zabbix_agent_forceactivechecksonstart is defined and zabbix_agent_forceactivechecksonstart is not none) | ternary('', '# ') }}ForceActiveChecksOnStart={{ zabbix_agent_forceactivechecksonstart | default('') }}
+{% endif %}
+{% if zabbix_agent_version is version_compare('6.2', '>=') %}
+{{ (zabbix_agent_heartbeatfrequency is defined and zabbix_agent_heartbeatfrequency is not none) | ternary('', '# ') }}HeartbeatFrequency={{ zabbix_agent_heartbeatfrequency | default('') }}
+{% endif %}
+{{ (zabbix_agent_hostinterface is defined and zabbix_agent_hostinterface is not none) | ternary('', '# ') }}HostInterface={{ zabbix_agent_hostinterface | default('') }}
+{{ (zabbix_agent_hostinterfaceitem is defined and zabbix_agent_hostinterfaceitem is not none) | ternary('', '# ') }}HostInterfaceItem={{ zabbix_agent_hostinterfaceitem | default('') }}
+{{ (zabbix_agent_hostmetadata is defined and zabbix_agent_hostmetadata is not none) | ternary('', '# ') }}HostMetadata={{ zabbix_agent_hostmetadata | default('') }}
+{{ (zabbix_agent_hostmetadataitem is defined and zabbix_agent_hostmetadataitem is not none) | ternary('', '# ') }}HostMetadataItem={{ zabbix_agent_hostmetadataitem | default('') }}
+{{ (zabbix_agent_hostname is defined and zabbix_agent_hostname is not none) | ternary('', '# ') }}Hostname={{ zabbix_agent_hostname | default('') }}
+{{ (zabbix_agent_hostnameitem is defined and zabbix_agent_hostnameitem is not none) | ternary('', '# ') }}HostnameItem={{ zabbix_agent_hostnameitem | default('') }}
+{{ (zabbix_agent_include is defined and zabbix_agent_include is not none) | ternary('', '# ') }}Include={{ zabbix_agent_include | default('') }}
+{% if not zabbix_agent2 %}
+{{ (zabbix_agent_listenbacklog is defined and zabbix_agent_listenbacklog is not none) | ternary('', '# ') }}ListenBacklog={{ zabbix_agent_listenbacklog | default('') }}
+{% endif %}
+{{ (zabbix_agent_listenip is defined and zabbix_agent_listenip is not none) | ternary('', '# ') }}ListenIP={{ zabbix_agent_listenip | default('') }}
+{{ (zabbix_agent_listenport is defined and zabbix_agent_listenport is not none) | ternary('', '# ') }}ListenPort={{ zabbix_agent_listenport | default('') }}
+{% if not zabbix_agent2 and ansible_os_family != "Windows" %}
+{{ (zabbix_agent_loadmodule is defined and zabbix_agent_loadmodule is not none) | ternary('', '# ') }}LoadModule={{ zabbix_agent_loadmodule | default('') }}
+{{ (zabbix_agent_loadmodulepath is defined and zabbix_agent_loadmodulepath is not none) | ternary('', '# ') }}LoadModulePath={{ zabbix_agent_loadmodulepath | default('') }}
+{% endif %}
+{{ (zabbix_agent_logfile is defined and zabbix_agent_logfile is not none) | ternary('', '# ') }}LogFile={{ zabbix_agent_logfile | default('') }}
+{{ (zabbix_agent_logfilesize is defined and zabbix_agent_logfilesize is not none) | ternary('', '# ') }}LogFileSize={{ zabbix_agent_logfilesize | default('') }}
+{% if not zabbix_agent2 %}
+{{ (zabbix_agent_logremotecommands is defined and zabbix_agent_logremotecommands is not none) | ternary('', '# ') }}LogRemoteCommands={{ zabbix_agent_logremotecommands | default('') }}
+{% endif %}
+{{ (zabbix_agent_logtype is defined and zabbix_agent_logtype is not none) | ternary('', '# ') }}LogType={{ zabbix_agent_logtype | default('') }}
+{% if not zabbix_agent2 %}
+{{ (zabbix_agent_maxlinespersecond is defined and zabbix_agent_maxlinespersecond is not none) | ternary('', '# ') }}MaxLinesPerSecond={{ zabbix_agent_maxlinespersecond | default('') }}
+{% endif %}
+{% if not zabbix_agent2 and ansible_os_family == "Windows" %}
+{{ (zabbix_agent_perfcounter is defined and zabbix_agent_perfcounter is not none) | ternary('', '# ') }}PerfCounter={{ zabbix_agent_perfcounter | default('') }}
+{{ (zabbix_agent_perfcounteren is defined and zabbix_agent_perfcounteren is not none) | ternary('', '# ') }}PerfCounterEn={{ zabbix_agent_perfcounteren | default('') }}
+{% endif %}
+{% if zabbix_agent2 %}
+{{ (zabbix_agent_persistentbufferfile is defined and zabbix_agent_persistentbufferfile is not none) | ternary('', '# ') }}PersistentBufferFile={{ zabbix_agent_persistentbufferfile | default('') }}
+{{ (zabbix_agent_persistentbufferperiod is defined and zabbix_agent_persistentbufferperiod is not none) | ternary('', '# ') }}PersistentBufferPeriod={{ zabbix_agent_persistentbufferperiod | default('') }}
+{% endif %}
+{% if ansible_os_family != "Windows" %}
+{{ (zabbix_agent_pidfile is defined and zabbix_agent_pidfile is not none) | ternary('', '# ') }}PidFile={{ zabbix_agent_pidfile | default('') }}
+{% endif %}
+{% if zabbix_agent_plugins is defined and zabbix_agent_plugins %}
+{% for entry in zabbix_agent_plugins %}
+{% set my_name = entry['name'] %}
+{% for property in entry['options'] %}
+{% set param = property['parameter'] %}
+{% set value = property['value'] %}
+Plugins.{{ my_name }}.{{ param }}={{ value }}
+{% endfor %}
+{% endfor %}
+{% endif %}
+{{ (zabbix_agent_pluginsocket is defined and zabbix_agent_pluginsocket is not none) | ternary('', '# ') }}PluginSocket={{ zabbix_agent_pluginsocket | default('') }}
+{{ (zabbix_agent_plugintimeout is defined and zabbix_agent_plugintimeout is not none) | ternary('', '# ') }}PluginTimeout={{ zabbix_agent_plugintimeout | default('') }}
+{{ (zabbix_agent_refreshactivechecks is defined and zabbix_agent_refreshactivechecks is not none) | ternary('', '# ') }}RefreshActiveChecks={{ zabbix_agent_refreshactivechecks | default('') }}
+{{ (zabbix_agent_server is defined and zabbix_agent_server is not none) | ternary('', '# ') }}Server={{ zabbix_agent_server | default('') }}
+{{ (zabbix_agent_serveractive is defined and zabbix_agent_serveractive is not none) | ternary('', '# ') }}ServerActive={{ zabbix_agent_serveractive | default('') }}
+{{ (zabbix_agent_sourceip is defined and zabbix_agent_sourceip is not none) | ternary('', '# ') }}SourceIP={{ zabbix_agent_sourceip | default('') }}
+{% if not zabbix_agent2 %}
+{{ (zabbix_agent_startagents is defined and zabbix_agent_startagents is not none) | ternary('', '# ') }}StartAgents={{ zabbix_agent_startagents | default('') }}
+{% endif %}
+{% if zabbix_agent2 %}
+{{ (zabbix_agent_statusport is defined and zabbix_agent_statusport is not none) | ternary('', '# ') }}StatusPort={{ zabbix_agent_statusport | default('') }}
+{% endif %}
+{{ (zabbix_agent_timeout is defined and zabbix_agent_timeout is not none) | ternary('', '# ') }}Timeout={{ zabbix_agent_timeout | default('') }}
+{{ (zabbix_agent_tlsconnect is defined and zabbix_agent_tlsconnect is not none) | ternary('', '# ') }}TLSAccept={{ zabbix_agent_tlsconnect | default('') }}
+{{ (zabbix_agent_tlscafile is defined and zabbix_agent_tlscafile is not none) | ternary('', '# ') }}TLSCAFile={{ zabbix_agent_tlscafile | default('') }}
+{{ (zabbix_agent_tlscertfile is defined and zabbix_agent_tlscertfile is not none) | ternary('', '# ') }}TLSCertFile={{ zabbix_agent_tlscertfile | default('') }}
+{% if not zabbix_agent2 and ansible_os_family != "Windows" %}
+{{ (zabbix_agent_tlscipherall is defined and zabbix_agent_tlscipherall is not none) | ternary('', '# ') }}TLSCipherAll={{ zabbix_agent_tlscipherall | default('') }}
+{{ (zabbix_agent_tlscipherall13 is defined and zabbix_agent_tlscipherall13 is not none) | ternary('', '# ') }}TLSCipherAll13={{ zabbix_agent_tlscipherall13 | default('') }}
+{{ (zabbix_agent_tlsciphercert is defined and zabbix_agent_tlsciphercert is not none) | ternary('', '# ') }}TLSCipherCert={{ zabbix_agent_tlsciphercert | default('') }}
+{{ (zabbix_agent_tlsciphercert13 is defined and zabbix_agent_tlsciphercert13 is not none) | ternary('', '# ') }}TLSCipherCert13={{ zabbix_agent_tlsciphercert13 | default('') }}
+{{ (zabbix_agent_tlscipherpsk is defined and zabbix_agent_tlscipherpsk is not none) | ternary('', '# ') }}TLSCipherPSK={{ zabbix_agent_tlscipherpsk | default('') }}
+{{ (zabbix_agent_tlscipherpsk13 is defined and zabbix_agent_tlscipherpsk13 is not none) | ternary('', '# ') }}TLSCipherPSK13={{ zabbix_agent_tlscipherpsk13 | default('') }}
+{% endif %}
+{{ (zabbix_agent_tlsconnect is defined and zabbix_agent_tlsconnect is not none) | ternary('', '# ') }}TLSConnect={{ zabbix_agent_tlsconnect | default('') }}
+{{ (zabbix_agent_tlscrlfile is defined and zabbix_agent_tlscrlfile is not none) | ternary('', '# ') }}TLSCRLFile={{ zabbix_agent_tlscrlfile | default('') }}
+{{ (zabbix_agent_tlskeyfile is defined and zabbix_agent_tlskeyfile is not none) | ternary('', '# ') }}TLSKeyFile={{ zabbix_agent_tlskeyfile | default('') }}
+{{ (zabbix_agent_tlspskfile is defined and zabbix_agent_tlspskfile is not none) | ternary('', '# ') }}TLSPSKFile={{ zabbix_agent_tlspskfile | default('') }}
+{{ (zabbix_agent_tlspskidentity is defined and zabbix_agent_tlspskidentity is not none) | ternary('', '# ') }}TLSPSKIdentity={{ zabbix_agent_tlspskidentity | default('') }}
+{{ (zabbix_agent_tlsservercertissuer is defined and zabbix_agent_tlsservercertissuer is not none) | ternary('', '# ') }}TLSServerCertIssuer={{ zabbix_agent_tlsservercertissuer | default('') }}
+{{ (zabbix_agent_tlsservercertsubject is defined and zabbix_agent_tlsservercertsubject is not none) | ternary('', '# ') }}TLSServerCertSubject={{ zabbix_agent_tlsservercertsubject | default('') }}
+{{ (zabbix_agent_unsafeuserparameters is defined and zabbix_agent_unsafeuserparameters is not none) | ternary('', '# ') }}UnsafeUserParameters={{ zabbix_agent_unsafeuserparameters | default('') }}
+{% if not zabbix_agent2 and ansible_os_family != "Windows" %}
+{{ (zabbix_agent_runas_user is defined and zabbix_agent_runas_user is not none) | ternary('', '# ') }}User={{ zabbix_agent_runas_user | default('') }}
+{% endif %}
+{{ (zabbix_agent_userparamater is defined and zabbix_agent_userparamater is not none) | ternary('', '# ') }}UserParameter={{ zabbix_agent_userparamater | default('') }}
+{{ (zabbix_agent_userparamaterdir is defined and zabbix_agent_userparamaterdir is not none) | ternary('', '# ') }}UserParameterDir={{ zabbix_agent_userparamaterdir | default('') }}

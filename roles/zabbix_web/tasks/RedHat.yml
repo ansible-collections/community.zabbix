@@ -57,3 +57,8 @@
     - ansible_distribution_major_version == '9'
   tags:
     - install
+
+- name: "Configure SELinux when enabled"
+  ansible.builtin.include_tasks: selinux.yml
+  when:
+    - zabbix_web_selinux | bool

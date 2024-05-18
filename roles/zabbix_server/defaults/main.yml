@@ -8,25 +8,27 @@ zabbix_server_manage_service: true
 # Database
 zabbix_server_database_sqlload: true
 zabbix_server_database_timescaledb: false
-zabbix_server_real_dbhost:
+#zabbix_server_real_dbhost:
 zabbix_server_dbhost: localhost
 zabbix_server_dbname: zabbix-server
 zabbix_server_privileged_host: localhost
 zabbix_server_dbencoding: utf8
 zabbix_server_dbcollation: utf8_bin
-zabbix_server_dbschema:
+#zabbix_server_dbschema:
 zabbix_server_dbuser: zabbix-server
 zabbix_server_dbpassword: zabbix-server
 zabbix_server_dbpassword_hash_method: md5
-zabbix_server_dbsocket:
-zabbix_server_dbport: 5432
+#zabbix_server_dbsocket:
+_zabbix_server_database_default_port:
+  mysql: 3306
+  pgsql: 5432
+zabbix_server_dbport: "{{ _zabbix_server_database_default_port[zabbix_server_database] }}"
 zabbix_server_dbhost_run_install: true
 zabbix_server_database: pgsql
 zabbix_server_database_creation: true
 zabbix_server_install_database_client: true
 
 # SELinux specific
-zabbix_server_selinux: false
 selinux_allow_zabbix_can_network: false
 selinux_allow_zabbix_can_http: false
 
@@ -40,9 +42,8 @@ zabbix_server_version_minor: "*"
 zabbix_server_package_state: present
 zabbix_repo_yum_gpgcheck: 0
 zabbix_repo_yum_schema: https
+zabbix_repo_deb_url: "http://repo.zabbix.com/zabbix/{{ zabbix_server_version }}/{{ ansible_facts.lsb.id | default(ansible_facts['distribution']) | lower }}{% if ansible_facts['architecture'] == 'aarch64' and ansible_facts.lsb.id | default(ansible_facts['distribution']) in ['Debian', 'Ubuntu'] %}-arm64{% endif %}"
 zabbix_repo_deb_component: main
-zabbix_server_disable_repo:
-  - epel
 zabbix_repo_yum:
   - name: zabbix
     description: Zabbix Official Repository - $basearch
@@ -59,9 +60,7 @@ zabbix_repo_yum:
     gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-ZABBIX
     state: present
 zabbix_server_apt_priority:
-zabbix_server_install_recommends: true
 zabbix_server_conf_mode: 0640
-zabbix_repo_deb_gpg_key_url: http://repo.zabbix.com/zabbix-official-repo.key
 zabbix_repo_deb_include_deb_src: true
 
 # Server Configuration Variables (Only ones with role provided defaults)
