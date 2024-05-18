@@ -40,12 +40,11 @@ jobs:
           - v64
           - v62
           - v60
-        include:
-          - interpreter: python3
-          - interpreter: python
-            container: centos7
         exclude:
-          - container: debian12
+          - container:
+              name: debian12
+              base_image: debian:12
+              os_family: debian
             version: v62
           - container: ubuntu2404
             version: v62
@@ -81,10 +80,9 @@ jobs:
 
       - name: Run role tests
         run: >-
-          MY_MOLECULE_CONTAINER=${{ matrix.container }}
-          MY_MOLECULE_IMAGE=${{ matrix.container }}
+          MY_MOLECULE_CONTAINER=${{ matrix.container.name }}
+          MY_MOLECULE_IMAGE=${{ matrix.container.base_image }}
+          MY_MOLECULE_OS_FAMILY=${{ matrix.container.os_family }}
           MY_MOLECULE_VERSION=${{ matrix.version }}
           MY_MOLECULE_DATABASE=${{ matrix.database }}
-          MY_MOLECULE_INTERPRETER=${{ matrix.interpreter }}
-          MY_MOLECULE_DOCKER_COMMAND=${{ matrix.command }}
           molecule test -s ${{ matrix.collection_role }}

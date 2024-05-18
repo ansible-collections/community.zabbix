@@ -3,10 +3,11 @@ driver:
   name: docker
 platforms:
   - name: zabbix-proxy-${MY_MOLECULE_VERSION:-v64}-${MY_MOLECULE_DATABASE:-mysql}-${MY_MOLECULE_CONTAINER:-rockylinux8}
-    image: geerlingguy/docker-${MY_MOLECULE_IMAGE:-rockylinux8}-ansible:latest
+    dockerfile: Dockerfile.${MY_MOLECULE_OS_FAMILY:-redhat}.j2
+    base_image: ${MY_MOLECULE_IMAGE:-rockylinux/rockylinux:8-ubi-init}
+    image: ${MY_MOLECULE_CONTAINER:-rockylinux8}
     privileged: true
-    pre_build_image: true
-    command: ${MOLECULE_DOCKER_COMMAND:-""}
+    command: /sbin/init
     networks:
       - name: zabbix
     volumes:
@@ -22,10 +23,8 @@ provisioner:
     ANSIBLE_ROLES_PATH: $HOME/.ansible/collections/ansible_collections/community/zabbix/roles
   inventory:
     group_vars:
-      python3:
+      all:
         ansible_python_interpreter: /usr/bin/python3
-      python:
-        ansible_python_interpreter: /usr/bin/python
       v64:
         zabbix_proxy_version: 6.4
       v62:

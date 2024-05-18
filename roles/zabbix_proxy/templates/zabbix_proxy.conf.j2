@@ -7,9 +7,7 @@
 # https://www.zabbix.com/documentation/{{ zabbix_proxy_version }}/en/manual/appendix/config/zabbix_proxy
 
 {{ (zabbix_proxy_allowroot is defined and zabbix_proxy_allowroot is not none) | ternary('','# ') }}AllowRoot={{ zabbix_proxy_allowroot | default('') }}
-{% if zabbix_proxy_version is version('6.0', '>=') %}
 {{ (zabbix_proxy_allowunsupporteddbversions is defined and zabbix_proxy_allowunsupporteddbversions is not none) | ternary('','# ') }}AllowUnsupportedDBVersions={{ zabbix_proxy_allowunsupporteddbversions | default('') }}
-{% endif %}
 {{ (zabbix_proxy_cachesize is defined and zabbix_proxy_cachesize is not none) | ternary('','# ') }}CacheSize={{ zabbix_proxy_cachesize | default('') }}
 {{ (zabbix_proxy_configfrequency is defined and zabbix_proxy_configfrequency is not none) | ternary('','# ') }}ConfigFrequency={{ zabbix_proxy_configfrequency | default('') }}
 {{ (zabbix_proxy_datasenderfrequency is defined and zabbix_proxy_datasenderfrequency is not none) | ternary('','# ') }}DataSenderFrequency={{ zabbix_proxy_datasenderfrequency | default('') }}

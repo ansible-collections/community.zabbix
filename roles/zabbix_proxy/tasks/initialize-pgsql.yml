@@ -1,0 +1,73 @@
+---
+# task file for postgresql
+- name: "Install PostgreSQL dependencies"
+  when: zabbix_proxy_database_creation or zabbix_proxy_database_sqlload
+  ansible.builtin.package:
+    name: "{{ _zabbix_proxy_pgsql_dependencies | select | list }}"
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
+  become: true
+  register: _zabbix_proxy_pgsql_packages_installed
+  until: _zabbix_proxy_pgsql_packages_installed is succeeded
+  tags:
+    - install
+    - database
+    - dependencies
+
+- name: "PostgreSQL Database prep"
+  when: zabbix_proxy_database_creation | bool
+  become: "{{ zabbix_proxy_dbhost_run_install }}"
+  become_user: postgres
+  delegate_to: "{{ zabbix_proxy_dbhost_run_install | ternary(delegated_dbhost, inventory_hostname) }}"
+  vars:
+    delegated_dbhost: "{{ (zabbix_proxy_dbhost == 'localhost') | ternary(inventory_hostname, zabbix_proxy_dbhost) }}"
+  tags:
+    - database
+  block:
+    - name: "PostgreSQL | Create database"
+      community.postgresql.postgresql_db:
+        login_user: "{{ zabbix_proxy_pgsql_login_user | default(omit) }}"
+        login_password: "{{ zabbix_proxy_pgsql_login_password | default(omit) }}"
+        login_host: "{{ zabbix_proxy_pgsql_login_host | default(omit) }}"
+        port: "{{ zabbix_proxy_dbport }}"
+        login_unix_socket: "{{ zabbix_proxy_pgsql_login_unix_socket | default(omit) }}"
+        name: "{{ zabbix_proxy_dbname }}"
+        state: present
+
+    - name: "PostgreSQL | Create database user"
+      community.postgresql.postgresql_user:
+        login_user: "{{ zabbix_proxy_pgsql_login_user | default(omit) }}"
+        login_password: "{{ zabbix_proxy_pgsql_login_password | default(omit) }}"
+        login_host: "{{ zabbix_proxy_pgsql_login_host | default(omit) }}"
+        port: "{{ zabbix_proxy_dbport }}"
+        name: "{{ zabbix_proxy_dbuser }}"
+        password: "{{ ('md5' + (zabbix_proxy_dbpassword + zabbix_proxy_dbuser)|hash('md5')) if zabbix_proxy_dbpassword_hash_method == 'md5' else zabbix_proxy_dbpassword }}"
+        db: "{{ zabbix_proxy_dbname }}"
+        priv: ALL
+        state: present
+        encrypted: true
+
+- name: "PostgreSQL verify or create schema"
+  when: zabbix_proxy_database_sqlload | bool
+  tags:
+    - database
+  block:
+    - name: "PostgreSQL | Get current database version"
+      community.postgresql.postgresql_query:
+        login_user: "{{ zabbix_proxy_dbuser }}"
+        login_password: "{{ zabbix_proxy_dbpassword }}"
+        login_host: "{{ zabbix_proxy_dbhost }}"
+        port: "{{ zabbix_proxy_dbport }}"
+        db: "{{ zabbix_proxy_dbname }}"
+        query: 'SELECT mandatory FROM dbversion'
+  rescue:
+    - name: "PostgreSQL | Import schema"
+      community.postgresql.postgresql_db:
+        login_user: "{{ zabbix_proxy_dbuser }}"
+        login_password: "{{ zabbix_proxy_dbpassword }}"
+        login_host: "{{ zabbix_proxy_dbhost }}"
+        port: "{{ zabbix_proxy_dbport }}"
+        db: "{{ zabbix_proxy_dbname }}"
+        state: restore
+        target: /usr/share/zabbix-sql-scripts/postgresql/proxy.sql

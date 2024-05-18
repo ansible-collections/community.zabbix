@@ -27,30 +27,37 @@ zabbix_valid_proxy_versions:
     - 6.2
     - 6.0
 
-mysql_client_pkgs:
+_zabbix_proxy_pgsql_dependencies:
+  - "{{ zabbix_proxy_install_database_client | ternary('postgresql-client', '') }}"
+  - python3-psycopg2
+
+_zabbix_proxy_mysql_dependencies:
   # Debian
   "12":
     - default-mysql-client
-    - "{{ zabbix_python_prefix }}-mysqldb"
+    - python3-pymysql
   "11":
     - default-mysql-client
-    - "{{ zabbix_python_prefix }}-mysqldb"
+    - python3-pymysql
   "10":
     - mariadb-client
-    - "{{ zabbix_python_prefix }}-mysqldb"
+    - python3-pymysql
   # Ubuntu
   "24":
     - default-mysql-client
     - "{{ zabbix_python_prefix }}-mysqldb"
   "22":
     - default-mysql-client
-    - "{{ zabbix_python_prefix }}-mysqldb"
+    - python3-pymysql
   "20":
     - default-mysql-client
-    - "{{ zabbix_python_prefix }}-mysqldb"
+    - python3-pymysql
   "18":
     - default-mysql-client
-    - "{{ zabbix_python_prefix }}-mysqldb"
+    - python3-pymysql
+
+_zabbix_proxy_sqlite3_dependencies:
+  - sqlite3
 
 mysql_plugin:
   "18": mysql_native_password
@@ -73,6 +80,9 @@ _zabbix_repo_default_deb_gpg_key_url_by_distrib:
   "22": https://repo.zabbix.com/zabbix-official-repo.key
   "20": https://repo.zabbix.com/zabbix-official-repo.key
   "18": https://repo.zabbix.com/zabbix-official-repo.key
-
 _zabbix_proxy_fping6location: /usr/bin/fping6
 _zabbix_proxy_fpinglocation: /usr/bin/fping
+
+_zabbix_proxy_packages:
+  - "zabbix-proxy-{{ zabbix_proxy_database }}"
+  - "zabbix-sql-scripts"

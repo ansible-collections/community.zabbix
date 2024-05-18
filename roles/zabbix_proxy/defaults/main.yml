@@ -43,8 +43,6 @@ zabbix_repo_yum_schema: https
 zabbix_repo_yum_gpgcheck: 0
 zabbix_repo_deb_url: "http://repo.zabbix.com/zabbix/{{ zabbix_proxy_version }}/{{ ansible_facts.lsb.id | default(ansible_facts['distribution']) | lower }}{% if ansible_facts['architecture'] == 'aarch64' and ansible_facts.lsb.id | default(ansible_facts['distribution']) in ['Debian', 'Ubuntu'] %}-arm64{% endif %}"
 zabbix_repo_deb_component: main
-zabbix_proxy_disable_repo:
-  - epel
 zabbix_repo_yum:
   - name: zabbix
     description: Zabbix Official Repository - $basearch
