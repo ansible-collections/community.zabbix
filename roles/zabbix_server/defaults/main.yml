@@ -61,7 +61,6 @@ zabbix_repo_yum:
     state: present
 zabbix_server_apt_priority:
 zabbix_server_conf_mode: 0640
-zabbix_repo_deb_gpg_key_url: http://repo.zabbix.com/zabbix-official-repo.key
 zabbix_repo_deb_include_deb_src: true
 
 # Server Configuration Variables (Only ones with role provided defaults)

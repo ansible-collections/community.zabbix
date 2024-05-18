@@ -46,8 +46,8 @@
 - name: "Debian | Download gpg key"
   when: not ansible_check_mode  # Because get_url always has changed status in check_mode.
   ansible.builtin.get_url:
-    url: "{{ zabbix_repo_deb_gpg_key_url }}"
-    dest: "{{ zabbix_gpg_key }}"
+    url: "{{ zabbix_repo_deb_gpg_key_url | default(_zabbix_repo_default_deb_gpg_key_url_by_distrib[ansible_distribution_major_version]) }}"
+    dest: "{{ zabbix_gpg_key | default(_zabbix_gpg_key_default_by_distrib[ansible_distribution_major_version]) }}"
     mode: "0644"
     force: true
   environment:
@@ -72,7 +72,7 @@
       Suites: {{ ansible_distribution_release }}
       Components: {{ zabbix_repo_deb_component }}
       Architectures: {{ 'amd64' if ansible_machine != 'aarch64' else 'arm64'}}
-      Signed-By: {{ zabbix_gpg_key }}
+      Signed-By: {{ zabbix_gpg_key | default(_zabbix_gpg_key_default_by_distrib[ansible_distribution_major_version]) }}
   become: true
   tags:
     - install

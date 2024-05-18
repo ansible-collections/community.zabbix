@@ -62,7 +62,6 @@ zabbix_repo_yum:
     state: present
 zabbix_proxy_apt_priority:
 zabbix_proxy_package_state: present
-zabbix_repo_deb_gpg_key_url: http://repo.zabbix.com/zabbix-official-repo.key
 zabbix_repo_deb_include_deb_src: true
 
 # Proxy Configuration Variables (Only ones with role provided defaults)
