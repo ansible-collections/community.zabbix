@@ -426,12 +426,12 @@ class Item(ZabbixBase):
                 self._module.fail_json(msg="Status must be 'enabled' or 'disabled', got %s" % status)
         if 'master_item' in params:
             if 'host_name' not in params['master_item']:
-              params['master_item']['host_name'] = None
+                params['master_item']['host_name'] = None
             if 'template_name' not in params['master_item']:
-              params['master_item']['template_name'] = None
+                params['master_item']['template_name'] = None
             master_items = self.get_items(params['master_item']['item_name'], params['master_item']['host_name'], params['master_item']['template_name'])
             if len(master_items) == 0:
-              self._module.fail_json(msg="No items with the name %s exist to depend on" % params['master_item']['item_name'])
+                self._module.fail_json(msg="No items with the name %s exist to depend on" % params['master_item']['item_name'])
             params['master_itemid'] = master_items[0]['itemid']
             params.pop('master_item')
         if 'preprocessing' in params:
