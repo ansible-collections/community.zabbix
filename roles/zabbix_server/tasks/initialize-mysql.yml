@@ -25,7 +25,7 @@
     state: latest
 
 - name: "MySQL Database prep"
-  when: zabbix_server_database_creation
+  when: zabbix_server_database_creation | bool
   become: "{{ zabbix_server_dbhost_run_install }}"
   delegate_to: "{{ zabbix_server_real_dbhost | default(zabbix_server_dbhost_run_install | ternary(delegated_dbhost, inventory_hostname)) }}"
   vars:
