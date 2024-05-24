@@ -7,16 +7,8 @@
     params:
         type: zabbix_agent_active
         key: vfs.fs.get
-        value_type: numeric_float
-        units: '%'
+        value_type: text
         interval: 1m
-        preprocessing:
-          - type: jsonpath
-            params: '$[?(@.fstype == "ext4")]'
-            error_handler: zabbix_server
-          - type: jsonpath
-            params: "$[*].['bytes', 'inodes'].pused.max()"
-            error_handler: zabbix_server
         tags:
           - tag: tag
             value: value
@@ -27,23 +19,15 @@
   ansible.builtin.assert:
     that: zbxhostitem_new is changed
 
-- name: test - create same Zabbix item group once again
+- name: test - create same Zabbix item once again
   community.zabbix.zabbix_item:
     name: TestItem
     host_name: ExampleHost
     params:
         type: zabbix_agent_active
         key: vfs.fs.get
-        value_type: numeric_float
-        units: '%'
+        value_type: text
         interval: 1m
-        preprocessing:
-          - type: jsonpath
-            params: '$[?(@.fstype == "ext4")]'
-            error_handler: zabbix_server
-          - type: jsonpath
-            params: "$[*].['bytes', 'inodes'].pused.max()"
-            error_handler: zabbix_server
         tags:
           - tag: tag
             value: value
@@ -67,6 +51,32 @@
   ansible.builtin.assert:
     that: zbxhostitem_changed is changed
 
+- name: create dependent item
+  community.zabbix.zabbix_item:
+    name: TestDependItem
+    host_name: ExampleHost
+    params:
+        type: dependent_item
+        key: vfs.fs.pused
+        value_type: numeric_float
+        units: '%'
+        master_item:
+          item_name: TestItem
+          host_name: ExampleHost
+        preprocessing:
+          - type: jsonpath
+            params: '$[?(@.fstype == "ext4")]'
+            error_handler: zabbix_server
+          - type: jsonpath
+            params: "$[*].['bytes', 'inodes'].pused.max()"
+            error_handler: zabbix_server
+    state: present
+  register: zbxhostdependitem_new
+
+- name: assert that item was created
+  ansible.builtin.assert:
+    that: zbxhostdependitem_new is changed
+
 - name: test - attempt to delete previously created zabbix item
   community.zabbix.zabbix_item:
     name: TestItem
@@ -77,6 +87,17 @@
 - name: assert that item was deleted
   ansible.builtin.assert:
     that: zbxhostitem_existing_delete is changed
+
+- name: test - attempt to delete dependent item
+  community.zabbix.zabbix_item:
+    name: TestDependItem
+    host_name: ExampleHost
+    state: absent
+  register: zbxhostdependitem_delete
+
+- name: assert that the item had been removed with its master
+  ansible.builtin.assert:
+    that: not zbxhostdependitem_delete is changed
 
 - name: test - attempt to delete non-existing zabbix item
   community.zabbix.zabbix_item:
@@ -116,7 +137,7 @@
   ansible.builtin.assert:
     that: zbxtempitem_new is changed
 
-- name: test - create same Zabbix item group once again
+- name: test - create same Zabbix item once again
   community.zabbix.zabbix_item:
     name: TestItem
     template_name: ExampleTemplate
