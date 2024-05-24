@@ -121,6 +121,34 @@ options:
                     - log
                     - numeric_unsigned
                     - text
+            master_item:
+                description:
+                    - item that is the master of the current one
+                    - Overrides "master_itemid" in API docs
+                required: false
+                type: dict
+                suboptions:
+                    item_name:
+                        description:
+                          - name of the master item
+                        required: true
+                        type: str
+                    discovery_rule:
+                        description:
+                          - name of the discovery rule the master item belongs to
+                        required: true
+                        type: str
+                    host_name:
+                        description:
+                          - name of the host the master item belongs to
+                          - Required when I(template_name) is not used.
+                          - Mutually exclusive with I(template_name).
+                        required: false
+                    template_name:
+                        description:
+                          - name of the template the master item belongs to
+                          - Required when I(host_name) is not used.
+                          - Mutually exclusive with I(host_name).
             preprocessing:
                 description:
                     - Item preprocessing options.
@@ -423,6 +451,13 @@ class Itemprototype(ZabbixBase):
         if 'enabled' in params:
             params['status'] = params['enabled']
             params.pop('enabled')
+        if 'master_item' in params:
+            if 'host_name' not in params['master_item']:
+              params['master_item']['host_name'] = None
+            if 'template_name' not in params['master_item']:
+              params['master_item']['template_name'] = None
+            params['master_itemid'] = self.get_itemprototypes(params['master_item']['item_name'], params['master_item']['discoveryrule_name'], params['master_item']['host_name'], params['master_item']['template_name'])[0]['itemid']
+            params.pop('master_item')
         if 'preprocessing' in params:
             for param in params['preprocessing']:
                 preprocess_type_int = self.PREPROCESSING_TYPES[param['type']]

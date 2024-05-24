@@ -116,6 +116,29 @@ options:
                     - log
                     - numeric_unsigned
                     - text
+            master_item:
+                description:
+                    - item that is the master of the current one
+                    - Overrides "master_itemid" in API docs
+                required: false
+                type: dict
+                suboptions:
+                    item_name:
+                        description:
+                          - name of the master item
+                        required: true
+                        type: str
+                    host_name:
+                        description:
+                          - name of the host the master item belongs to
+                          - Required when I(template_name) is not used.
+                          - Mutually exclusive with I(template_name).
+                        required: false
+                    template_name:
+                        description:
+                          - name of the template the master item belongs to
+                          - Required when I(host_name) is not used.
+                          - Mutually exclusive with I(host_name).
             preprocessing:
                 description:
                     - Item preprocessing options.
@@ -401,6 +424,13 @@ class Item(ZabbixBase):
                 params['status'] = 1
             else:
                 self._module.fail_json(msg="Status must be 'enabled' or 'disabled', got %s" % status)
+        if 'master_item' in params:
+            if 'host_name' not in params['master_item']:
+              params['master_item']['host_name'] = None
+            if 'template_name' not in params['master_item']:
+              params['master_item']['template_name'] = None
+            params['master_itemid'] = self.get_items(params['master_item']['item_name'], params['master_item']['host_name'], params['master_item']['template_name'])[0]['itemid']
+            params.pop('master_item')
         if 'preprocessing' in params:
             for param in params['preprocessing']:
                 preprocess_type_int = self.PREPROCESSING_TYPES[param['type']]
