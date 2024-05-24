@@ -27,6 +27,7 @@
 
 - name: "MySQL Database prep"
   when: zabbix_proxy_database_creation | bool
+  become: "{{ zabbix_proxy_dbhost_run_install }}"
   delegate_to: "{{ zabbix_proxy_real_dbhost | default(zabbix_proxy_dbhost_run_install | ternary(delegated_dbhost, inventory_hostname)) }}"
   vars:
     delegated_dbhost: "{{ (zabbix_proxy_dbhost == 'localhost') | ternary(inventory_hostname, zabbix_proxy_dbhost) }}"
@@ -62,6 +63,8 @@
 
 - name: "MySQL verify or create schema"
   when: zabbix_proxy_database_sqlload | bool
+  vars:
+    delegated_dbhost: "{{ (zabbix_proxy_dbhost == 'localhost') | ternary(inventory_hostname, zabbix_proxy_dbhost) }}"
   tags:
     - database
   block:
@@ -76,8 +79,6 @@
   rescue:
     - name: "MySQL | Get and set schema import overrides"
       delegate_to: "{{ zabbix_proxy_real_dbhost | default(zabbix_proxy_dbhost_run_install | ternary(delegated_dbhost, inventory_hostname)) }}"
-      vars:
-        delegated_dbhost: "{{ (zabbix_proxy_dbhost == 'localhost') | ternary(inventory_hostname, zabbix_proxy_dbhost) }}"
       block:
         - name: "MySQL | Get current value for variables"
           community.mysql.mysql_variables:
@@ -128,8 +129,6 @@
     - name: "MySQL | Revert variable overrides for schema import"
       when: _mysql_variable_defaults is defined
       delegate_to: "{{ zabbix_proxy_real_dbhost | default(zabbix_proxy_dbhost_run_install | ternary(delegated_dbhost, inventory_hostname)) }}"
-      vars:
-        delegated_dbhost: "{{ (zabbix_proxy_dbhost == 'localhost') | ternary(inventory_hostname, zabbix_proxy_dbhost) }}"
       community.mysql.mysql_variables:
         variable: "{{ item.name }}"
         value: "{{ item.msg }}"
