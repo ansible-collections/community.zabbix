@@ -6,7 +6,7 @@
     - name: "Create MySQL Container"
       docker_container:
         name: "{{ item.name }}-db"
-        image: mysql:8.0.32
+        image: mysql:8.0
         state: started
         recreate: true
         networks:
