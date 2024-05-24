@@ -112,7 +112,7 @@ The following is an overview of all available configuration default for this rol
 * `zabbix_service_enabled`: Default: `True` Can be overridden to `False` if needed
 * `zabbix_repo_deb_url`: The URL to the Zabbix repository.  Default `http://repo.zabbix.com/zabbix/{{ zabbix_server_version }}/{{ ansible_distribution.lower() }}`
 * `zabbix_repo_deb_component`: The repository component for Debian installs. Default `main`.
-* `zabbix_repo_deb_gpg_key_url`: The URL to download the Zabbix GPG key from. Default `http://repo.zabbix.com/zabbix-official-repo.key` (or `https://repo.zabbix.com/zabbix-official-repo-apr2024.gpg` for Ubuntu 24.04 repo).
+* `zabbix_repo_deb_gpg_key_url`: The URL to download the Zabbix GPG key from. Default `http://repo.zabbix.com/zabbix-official-repo.key`.
 * `zabbix_repo_deb_include_deb_src`: True, if deb-src should be included in the zabbix.sources entry. Default `true`.
 
 ### SElinux
