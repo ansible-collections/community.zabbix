@@ -69,7 +69,6 @@ zabbix_server_history_types:
   - "dbl"
 
 # SELinux specific
-zabbix_web_selinux: false
 selinux_allow_httpd_can_connect_ldap: false
 selinux_allow_httpd_can_network_connect_db: false
 selinux_allow_httpd_can_connect_zabbix: false
