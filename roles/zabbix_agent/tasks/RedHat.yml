@@ -20,6 +20,14 @@
   tags:
     - install
 
+- name: "RedHat | Install GPG key"
+  ansible.builtin.rpm_key:
+    state: present
+    key: "{{ zabbix_repo_rpm_gpg_key_url }}"
+  become: true
+  tags:
+    - install
+
 - name: Check if warn parameter can be used for shell module
   ansible.builtin.set_fact:
     produce_warn: False

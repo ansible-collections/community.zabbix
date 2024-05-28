@@ -21,6 +21,8 @@ selinux_allow_zabbix_run_sudo: false
 zabbix_repo_deb_gpg_key_url: http://repo.zabbix.com/zabbix-official-repo.key
 zabbix_repo_deb_include_deb_src: true
 
+zabbix_repo_rpm_gpg_key_url: http://repo.zabbix.com/RPM-GPG-KEY-ZABBIX-08EFA7DD
+
 zabbix_agent_install_agent_only: false
 
 # Zabbix role related vars
