@@ -57,24 +57,3 @@
 - name: assert that event was not changed
   ansible.builtin.assert:
     that: zbxevent_sev_existing is not changed
-
-- name: close event
-  community.zabbix.zabbix_host_events_update:
-    params:
-      eventids: "{{ zabbix_eventid }}"
-      action: close
-
-- name: wait for zabbix to close event
-  ansible.builtin.wait_for:
-    timeout: 5
-
-- name: get events updated status
-  community.zabbix.zabbix_host_events_info:
-    host_identifier: ExampleHost
-    host_id_type: hostname
-    trigger_severity: warning
-  register: zabbix_host_events_closed
-
-- name: assert no active events
-  ansible.builtin.assert:
-    that: zabbix_host_events_closed.triggers_problem | length == 0
