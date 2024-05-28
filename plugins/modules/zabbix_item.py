@@ -283,6 +283,36 @@ EXAMPLES = r'''
             value: application
     state: present
 
+- name: create a dependent item
+  # set task level variables as we change ansible_connection plugin here
+  vars:
+    ansible_network_os: community.zabbix.zabbix
+    ansible_connection: httpapi
+    ansible_httpapi_port: 443
+    ansible_httpapi_use_ssl: true
+    ansible_httpapi_validate_certs: false
+    ansible_zabbix_url_path: "zabbixeu"  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
+    ansible_host: zabbix-example-fqdn.org
+  community.zabbix.zabbix_item:
+    name: depend_item
+    host_name: example_host
+    params:
+        type: dependent_item
+        key: vfs.fs.pused
+        value_type: numeric_float
+        units: '%'
+        master_item:
+          item_name: example_item
+          host_name: example_host
+        preprocessing:
+          - type: jsonpath
+            params: '$[?(@.fstype == "ext4")]'
+            error_handler: zabbix_server
+          - type: jsonpath
+            params: "$[*].['bytes', 'inodes'].pused.max()"
+            error_handler: zabbix_server
+    state: present
+
 - name: Delete Zabbix item
   # set task level variables as we change ansible_connection plugin here
   vars:

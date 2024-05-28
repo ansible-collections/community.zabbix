@@ -300,6 +300,35 @@ EXAMPLES = r'''
             value: application
     state: present
 
+- name: create dependent item
+  # set task level variables as we change ansible_connection plugin here
+  vars:
+    ansible_network_os: community.zabbix.zabbix
+    ansible_connection: httpapi
+    ansible_httpapi_port: 443
+    ansible_httpapi_use_ssl: true
+    ansible_httpapi_validate_certs: false
+    ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
+    ansible_host: zabbix-example-fqdn.org
+  community.zabbix.zabbix_itemprototype:
+    name: '{% raw %}{#FSNAME}:example_depend_item_prototype{% endraw %}'
+    discoveryrule_name: example_rule
+    host_name: example_host
+    params:
+        type: dependent_item
+        key: '{% raw %}vfs.fs.size.half[{#FSNAME}]{% endraw %}'
+        value_type: numeric_float
+        units: B
+        master_item:
+          item_name: '{% raw %}{#FSNAME}:example_item_prototype{% endraw %}'
+          discoveryrule_name: example_rule
+          host_name: example_host
+        preprocessing:
+          - type: javascript
+            params: 'return value / 2;'
+            error_handler: zabbix_server
+    state: present
+
 - name: Delete Zabbix item prototype
   # set task level variables as we change ansible_connection plugin here
   vars:
