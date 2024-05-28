@@ -66,7 +66,7 @@
 
 - name: wait for zabbix to close event
   ansible.builtin.wait_for:
-    timeout: 10
+    timeout: 5
 
 - name: get events updated status
   community.zabbix.zabbix_host_events_info:
