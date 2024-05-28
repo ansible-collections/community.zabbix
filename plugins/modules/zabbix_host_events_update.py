@@ -34,7 +34,7 @@ options:
                   - Required when I(actions) is not used.
                   - Mutually exclusive with I(actions).
                 required: false
-                type: string
+                type: str
                 choices:
                   - close_problem
                   - close
@@ -65,6 +65,7 @@ options:
                   - Mutually exclusive with I(action).
                 required: false
                 type: list
+                elements: str
                 choices:
                   - close_problem
                   - close
@@ -92,7 +93,7 @@ options:
                   - New severity for events.
                   - Overrides "severity" in API docs
                 required: False
-                type: string
+                type: str
                 choices:
                     - not_classified
                     - information
@@ -105,7 +106,7 @@ options:
                   - Text of the message.
                   - Alias for "message" in API docs
                 required: False
-                type: string
+                type: str
 
 extends_documentation_fragment:
 - community.zabbix.zabbix
@@ -145,6 +146,7 @@ from ansible.module_utils.basic import AnsibleModule
 
 from ansible_collections.community.zabbix.plugins.module_utils.base import ZabbixBase
 import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabbix_utils
+
 
 class Hosteventsupdate(ZabbixBase):
     ACTIONS = {'close_problem': 1,
@@ -211,12 +213,13 @@ class Hosteventsupdate(ZabbixBase):
         try:
             results = self._zapi.event.acknowledge(params)
         except Exception as e:
-             self._module.fail_json(msg="Failed to update event: %s" % e)
+            self._module.fail_json(msg="Failed to update event: %s" % e)
         return results
 
     def check_events_changed(self, eventids, old_events):
         new_events = self.get_events(eventids)
         return old_events != new_events
+
 
 def main():
     argument_spec = zabbix_utils.zabbix_common_argument_spec()
@@ -235,6 +238,7 @@ def main():
     results = hosteventsupdate.update_event(params)
     changed = hosteventsupdate.check_events_changed(params['eventids'], events)
     module.exit_json(changed=changed, result=results)
+
 
 if __name__ == '__main__':
     main()
