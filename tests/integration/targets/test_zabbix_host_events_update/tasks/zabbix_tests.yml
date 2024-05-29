@@ -1,0 +1,59 @@
+---
+
+- name: test - acknowledge event
+  community.zabbix.zabbix_host_events_update:
+    params:
+      eventids: "{{ zabbix_eventid }}"
+      action: ack
+      msg: "event acknowledged"
+  register: zbxevent_ack
+
+- name: assert that event was changed
+  ansible.builtin.assert:
+    that: zbxevent_ack is changed
+
+- name: get events updated status
+  community.zabbix.zabbix_host_events_info:
+    host_identifier: ExampleHost
+    host_id_type: hostname
+    trigger_severity: warning
+  register: zabbix_host_events_ack
+
+- name: assert that event was acknowledged
+  ansible.builtin.assert:
+    that: zabbix_host_events_ack.triggers_problem[0].last_event.acknowledged
+
+- name: test - change severity and unacknowledge
+  community.zabbix.zabbix_host_events_update:
+    params:
+      eventids: "{{ zabbix_eventid }}"
+      actions: ['severity', 'unack']
+      severity: high
+  register: zbxevent_sev
+
+- name: assert that event was changed
+  ansible.builtin.assert:
+    that: zbxevent_sev is changed
+
+- name: get events updated status
+  community.zabbix.zabbix_host_events_info:
+    host_identifier: ExampleHost
+    host_id_type: hostname
+    trigger_severity: warning
+  register: zabbix_host_events_unack
+
+- name: assert that event was unacknowledged
+  ansible.builtin.assert:
+    that: zabbix_host_events_unack.triggers_problem[0].last_event.acknowledged == "0"
+
+- name: test - change severity to same
+  community.zabbix.zabbix_host_events_update:
+    params:
+      eventids: "{{ zabbix_eventid }}"
+      action: severity
+      severity: high
+  register: zbxevent_sev_existing
+
+- name: assert that event was not changed
+  ansible.builtin.assert:
+    that: zbxevent_sev_existing is not changed

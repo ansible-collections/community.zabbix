@@ -1,0 +1,61 @@
+---
+
+- name: Create example template
+  community.zabbix.zabbix_template:
+    template_name: ExampleTemplate
+    template_groups:
+      - Templates
+
+- name: Create example host
+  community.zabbix.zabbix_host:
+    host_name: ExampleHost
+    host_groups:
+      - Linux servers
+      - Zabbix servers
+    link_templates:
+      - ExampleTemplate
+    status: enabled
+    state: present
+    interfaces:
+      - type: 1
+        main: 1
+        useip: 1
+        ip: 10.1.1.1
+        dns: ""
+        port: "10050"
+
+- name: create ping item
+  community.zabbix.zabbix_item:
+    name: ping
+    template_name: ExampleTemplate
+    params:
+      type: zabbix_agent_active
+      key: agent.ping
+      value_type: numeric_unsigned
+      interval: 20s
+    state: present
+
+- name: create ping trigger
+  community.zabbix.zabbix_trigger:
+    name: ping
+    template_name: ExampleTemplate
+    params:
+      severity: warning
+      expression: 'nodata(/ExampleTemplate/agent.ping,1m)=1'
+      manual_close: True
+    state: present
+
+- name: Wait to ensure triggers are firing
+  ansible.builtin.wait_for:
+    timeout: 120
+
+- name: get events for host
+  community.zabbix.zabbix_host_events_info:
+    host_identifier: ExampleHost
+    host_id_type: hostname
+    trigger_severity: warning
+  register: zabbix_host_events
+
+- name: get eventid
+  ansible.builtin.set_fact:
+    zabbix_eventid: "{{ zabbix_host_events.triggers_problem[0].last_event.eventid }}"
