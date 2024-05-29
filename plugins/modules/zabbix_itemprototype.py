@@ -121,6 +121,34 @@ options:
                     - log
                     - numeric_unsigned
                     - text
+            master_item:
+                description:
+                    - item that is the master of the current one
+                    - Overrides "master_itemid" in API docs
+                required: false
+                type: dict
+                suboptions:
+                    item_name:
+                        description:
+                          - name of the master item
+                        required: true
+                        type: str
+                    discovery_rule:
+                        description:
+                          - name of the discovery rule the master item belongs to
+                        required: true
+                        type: str
+                    host_name:
+                        description:
+                          - name of the host the master item belongs to
+                          - Required when I(template_name) is not used.
+                          - Mutually exclusive with I(template_name).
+                        required: false
+                    template_name:
+                        description:
+                          - name of the template the master item belongs to
+                          - Required when I(host_name) is not used.
+                          - Mutually exclusive with I(host_name).
             preprocessing:
                 description:
                     - Item preprocessing options.
@@ -270,6 +298,35 @@ EXAMPLES = r'''
       tags:
           - tag: class
             value: application
+    state: present
+
+- name: create dependent item
+  # set task level variables as we change ansible_connection plugin here
+  vars:
+    ansible_network_os: community.zabbix.zabbix
+    ansible_connection: httpapi
+    ansible_httpapi_port: 443
+    ansible_httpapi_use_ssl: true
+    ansible_httpapi_validate_certs: false
+    ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
+    ansible_host: zabbix-example-fqdn.org
+  community.zabbix.zabbix_itemprototype:
+    name: '{% raw %}{#FSNAME}:example_depend_item_prototype{% endraw %}'
+    discoveryrule_name: example_rule
+    host_name: example_host
+    params:
+        type: dependent_item
+        key: '{% raw %}vfs.fs.size.half[{#FSNAME}]{% endraw %}'
+        value_type: numeric_float
+        units: B
+        master_item:
+          item_name: '{% raw %}{#FSNAME}:example_item_prototype{% endraw %}'
+          discoveryrule_name: example_rule
+          host_name: example_host
+        preprocessing:
+          - type: javascript
+            params: 'return value / 2;'
+            error_handler: zabbix_server
     state: present
 
 - name: Delete Zabbix item prototype
@@ -423,6 +480,17 @@ class Itemprototype(ZabbixBase):
         if 'enabled' in params:
             params['status'] = params['enabled']
             params.pop('enabled')
+        if 'master_item' in params:
+            if 'host_name' not in params['master_item']:
+                params['master_item']['host_name'] = None
+            if 'template_name' not in params['master_item']:
+                params['master_item']['template_name'] = None
+            master_items = self.get_itemprototypes(params['master_item']['item_name'], params['master_item']['discoveryrule_name'],
+                                                   params['master_item']['host_name'], params['master_item']['template_name'])
+            if len(master_items) == 0:
+                self._module.fail_json(msg="No items with the name %s exist to depend on" % params['master_item']['item_name'])
+            params['master_itemid'] = master_items[0]['itemid']
+            params.pop('master_item')
         if 'preprocessing' in params:
             for param in params['preprocessing']:
                 preprocess_type_int = self.PREPROCESSING_TYPES[param['type']]
