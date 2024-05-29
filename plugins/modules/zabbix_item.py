@@ -116,6 +116,29 @@ options:
                     - log
                     - numeric_unsigned
                     - text
+            master_item:
+                description:
+                    - item that is the master of the current one
+                    - Overrides "master_itemid" in API docs
+                required: false
+                type: dict
+                suboptions:
+                    item_name:
+                        description:
+                          - name of the master item
+                        required: true
+                        type: str
+                    host_name:
+                        description:
+                          - name of the host the master item belongs to
+                          - Required when I(template_name) is not used.
+                          - Mutually exclusive with I(template_name).
+                        required: false
+                    template_name:
+                        description:
+                          - name of the template the master item belongs to
+                          - Required when I(host_name) is not used.
+                          - Mutually exclusive with I(host_name).
             preprocessing:
                 description:
                     - Item preprocessing options.
@@ -260,6 +283,36 @@ EXAMPLES = r'''
             value: application
     state: present
 
+- name: create a dependent item
+  # set task level variables as we change ansible_connection plugin here
+  vars:
+    ansible_network_os: community.zabbix.zabbix
+    ansible_connection: httpapi
+    ansible_httpapi_port: 443
+    ansible_httpapi_use_ssl: true
+    ansible_httpapi_validate_certs: false
+    ansible_zabbix_url_path: "zabbixeu"  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
+    ansible_host: zabbix-example-fqdn.org
+  community.zabbix.zabbix_item:
+    name: depend_item
+    host_name: example_host
+    params:
+        type: dependent_item
+        key: vfs.fs.pused
+        value_type: numeric_float
+        units: '%'
+        master_item:
+          item_name: example_item
+          host_name: example_host
+        preprocessing:
+          - type: jsonpath
+            params: '$[?(@.fstype == "ext4")]'
+            error_handler: zabbix_server
+          - type: jsonpath
+            params: "$[*].['bytes', 'inodes'].pused.max()"
+            error_handler: zabbix_server
+    state: present
+
 - name: Delete Zabbix item
   # set task level variables as we change ansible_connection plugin here
   vars:
@@ -401,6 +454,16 @@ class Item(ZabbixBase):
                 params['status'] = 1
             else:
                 self._module.fail_json(msg="Status must be 'enabled' or 'disabled', got %s" % status)
+        if 'master_item' in params:
+            if 'host_name' not in params['master_item']:
+                params['master_item']['host_name'] = None
+            if 'template_name' not in params['master_item']:
+                params['master_item']['template_name'] = None
+            master_items = self.get_items(params['master_item']['item_name'], params['master_item']['host_name'], params['master_item']['template_name'])
+            if len(master_items) == 0:
+                self._module.fail_json(msg="No items with the name %s exist to depend on" % params['master_item']['item_name'])
+            params['master_itemid'] = master_items[0]['itemid']
+            params.pop('master_item')
         if 'preprocessing' in params:
             for param in params['preprocessing']:
                 preprocess_type_int = self.PREPROCESSING_TYPES[param['type']]

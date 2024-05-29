@@ -80,6 +80,76 @@
   ansible.builtin.assert:
     that: not zbxhostitem_missing_delete is changed
 
+- name: test - create new Zabbix master item on host
+  community.zabbix.zabbix_itemprototype:
+    name: '{% raw %}{#FSNAME}:TestItemPrototype{% endraw %}'
+    discoveryrule_name: ExampleHostRule
+    host_name: ExampleHost
+    params:
+        type: zabbix_agent_active
+        key: '{% raw %}vfs.fs.size[{#FSNAME},used]{% endraw %}'
+        value_type: numeric_unsigned
+        units: B
+        interval: 1m
+        tags:
+          - tag: tag
+            value: value
+    state: present
+  register: zbxhostmstitem_new
+
+- name: assert that item was created
+  ansible.builtin.assert:
+    that: zbxhostmstitem_new is changed
+
+- name: create dependent item
+  community.zabbix.zabbix_itemprototype:
+    name: '{% raw %}{#FSNAME}:TestDependItemPrototype{% endraw %}'
+    discoveryrule_name: ExampleHostRule
+    host_name: ExampleHost
+    params:
+        type: dependent_item
+        key: '{% raw %}vfs.fs.size.half[{#FSNAME}]{% endraw %}'
+        value_type: numeric_float
+        units: B
+        master_item:
+          item_name: '{% raw %}{#FSNAME}:TestItemPrototype{% endraw %}'
+          discoveryrule_name: ExampleHostRule
+          host_name: ExampleHost
+        preprocessing:
+          - type: javascript
+            params: 'return value / 2;'
+            error_handler: zabbix_server
+    state: present
+  register: zbxhostdependitem_new
+
+- name: assert that item was created
+  ansible.builtin.assert:
+    that: zbxhostdependitem_new is changed
+
+- name: test - attempt to delete previously created zabbix item
+  community.zabbix.zabbix_itemprototype:
+    name: '{% raw %}{#FSNAME}:TestItemPrototype{% endraw %}'
+    discoveryrule_name: ExampleHostRule
+    host_name: ExampleHost
+    state: absent
+  register: zbxhostmstitem_existing_delete
+
+- name: assert that item was deleted
+  ansible.builtin.assert:
+    that: zbxhostmstitem_existing_delete is changed
+
+- name: test - attempt to delete dependent item
+  community.zabbix.zabbix_itemprototype:
+    name: '{% raw %}{#FSNAME}:TestDependItemPrototype{% endraw %}'
+    discoveryrule_name: ExampleHostRule
+    host_name: ExampleHost
+    state: absent
+  register: zbxhostdependitem_delete
+
+- name: assert that the item had been removed with its master
+  ansible.builtin.assert:
+    that: not zbxhostdependitem_delete is changed
+
 - name: remove host rule
   community.zabbix.zabbix_discoveryrule:
     name: ExampleHostRule
@@ -106,7 +176,7 @@
         type: zabbix_agent_active
         key: '{% raw %}vfs.fs.size[{#FSNAME},used]{% endraw %}'
         value_type: numeric_unsigned
-        units: GB
+        units: B
         interval: 1m
         tags:
           - tag: tag
@@ -127,7 +197,7 @@
         type: zabbix_agent_active
         key: '{% raw %}vfs.fs.size[{#FSNAME},used]{% endraw %}'
         value_type: numeric_unsigned
-        units: GB
+        units: B
         interval: 1m
         tags:
           - tag: tag
