@@ -1150,3 +1150,29 @@ releases:
       name: zabbix_correlation
       namespace: ''
     release_date: '2024-05-13'
+  2.5.0:
+    changes:
+      bugfixes:
+      - zabbix_web - make the FPM socket group-writable so the web server can properly
+        forward requests to the FPM process
+      minor_changes:
+      - agent role - Standardized all configuration variables using the `zabbix_agent`
+        prefix vs `zabbix_agent2`.  Support for `zabbix_agent2` to be removed in 3.0.0
+      - agent role - Standardized templating of agent.conf file
+      - all roles - Added support for Ubuntu 24.04 (Noble Numbat)
+      - zabbix_discoveryrule module added
+      - zabbix_host_events_update module added
+      - zabbix_item - add support for setting master items by name
+      - zabbix_item module added
+      - zabbix_itemprototype - add support for setting master items by name
+      - zabbix_itemprototype module added
+      - zabbix_trigger module added
+      - zabbix_triggerprototype module added
+    fragments:
+    - 1221-add_support_for_ubuntu_24.04.yml
+    - 1227-fpm-socket-permissions.yml
+    - agent.yml
+    - pr_1222.yml
+    - pr_1234.yml
+    - pr_1238.yml
+    release_date: '2024-05-30'

@@ -4,6 +4,29 @@ community.zabbix Release Notes
 
 .. contents:: Topics
 
+v2.5.0
+======
+
+Minor Changes
+-------------
+
+- agent role - Standardized all configuration variables using the `zabbix_agent` prefix vs `zabbix_agent2`.  Support for `zabbix_agent2` to be removed in 3.0.0
+- agent role - Standardized templating of agent.conf file
+- all roles - Added support for Ubuntu 24.04 (Noble Numbat)
+- zabbix_discoveryrule module added
+- zabbix_host_events_update module added
+- zabbix_item - add support for setting master items by name
+- zabbix_item module added
+- zabbix_itemprototype - add support for setting master items by name
+- zabbix_itemprototype module added
+- zabbix_trigger module added
+- zabbix_triggerprototype module added
+
+Bugfixes
+--------
+
+- zabbix_web - make the FPM socket group-writable so the web server can properly forward requests to the FPM process
+
 v2.4.0
 ======
 

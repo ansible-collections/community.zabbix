@@ -47,6 +47,11 @@ plugins:
       name: zabbix_discovery_rule
       namespace: ''
       version_added: null
+    zabbix_discoveryrule:
+      description: Create/delete Zabbix discovery rules
+      name: zabbix_discoveryrule
+      namespace: ''
+      version_added: null
     zabbix_globalmacro:
       description: Create/update/delete Zabbix Global macros
       name: zabbix_globalmacro
@@ -77,6 +82,11 @@ plugins:
       name: zabbix_host_events_info
       namespace: ''
       version_added: null
+    zabbix_host_events_update:
+      description: update the status of event(s).
+      name: zabbix_host_events_update
+      namespace: ''
+      version_added: null
     zabbix_host_info:
       description: Gather information about Zabbix host
       name: zabbix_host_info
@@ -92,6 +102,16 @@ plugins:
       name: zabbix_housekeeping
       namespace: ''
       version_added: 1.6.0
+    zabbix_item:
+      description: Create/delete Zabbix items
+      name: zabbix_item
+      namespace: ''
+      version_added: null
+    zabbix_itemprototype:
+      description: Create/delete Zabbix item prototypes
+      name: zabbix_itemprototype
+      namespace: ''
+      version_added: null
     zabbix_maintenance:
       description: Create Zabbix maintenance windows
       name: zabbix_maintenance
@@ -162,6 +182,16 @@ plugins:
       name: zabbix_token
       namespace: ''
       version_added: 2.1.0
+    zabbix_trigger:
+      description: Create/delete Zabbix triggers
+      name: zabbix_trigger
+      namespace: ''
+      version_added: null
+    zabbix_triggerprototype:
+      description: Create/delete Zabbix triggerprototypes
+      name: zabbix_triggerprototype
+      namespace: ''
+      version_added: null
     zabbix_user:
       description: Create/update/delete Zabbix users
       name: zabbix_user
@@ -196,4 +226,4 @@ plugins:
   shell: {}
   strategy: {}
   vars: {}
-version: 2.4.0
+version: 2.5.0
