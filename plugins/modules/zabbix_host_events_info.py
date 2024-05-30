@@ -185,6 +185,7 @@ options:
             - list of tags to filter by
         required: false
         type: list
+        elements: dict
         suboptions:
           tag:
             description:
@@ -310,7 +311,7 @@ def main():
     )
 
     trigger_severity_map = {"not_classified": 0, "information": 1, "warning": 2, "average": 3, "high": 4, "disaster": 5}
-    tags_operator_map  = {"like": 0, "equal": 1, "not_like": 2, "not_equal": 3, "exists": 4, "not_exists": 5}
+    tags_operator_map = {"like": 0, "equal": 1, "not_like": 2, "not_equal": 3, "exists": 4, "not_exists": 5}
     host_id = module.params["host_identifier"]
     host_id_type = module.params["host_id_type"]
     trigger_severity = trigger_severity_map[module.params["trigger_severity"]]
