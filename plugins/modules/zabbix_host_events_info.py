@@ -246,6 +246,25 @@ EXAMPLES = """
 - fail:
     msg: "machine alert in zabbix"
   when: zbx_host["triggers_problem"]|length > 0
+
+
+- name: filter events for host based on tag
+  # set task level variables as we change ansible_connection plugin here
+  vars:
+      ansible_network_os: community.zabbix.zabbix
+      ansible_connection: httpapi
+      ansible_httpapi_port: 443
+      ansible_httpapi_use_ssl: true
+      ansible_httpapi_validate_certs: false
+      ansible_zabbix_url_path: "zabbixeu"  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
+      ansible_host: zabbix-example-fqdn.org
+  community.zabbix.zabbix_host_events_info:
+      host_identifier: "{{inventory_hostname}}"
+      host_id_type: "hostname"
+      tags:
+        - tag: ExampleTag
+          value: ExampleValue
+          operator: equal
 """
 
 
