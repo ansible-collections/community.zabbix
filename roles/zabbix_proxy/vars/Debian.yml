@@ -34,7 +34,7 @@ _zabbix_proxy_mysql_dependencies:
   # Ubuntu
   "24":
     - default-mysql-client
-    - "{{ zabbix_python_prefix }}-mysqldb"
+    - python3-mysqldb
   "22":
     - default-mysql-client
     - python3-pymysql
@@ -44,9 +44,6 @@ _zabbix_proxy_mysql_dependencies:
 
 _zabbix_proxy_sqlite3_dependencies:
   - sqlite3
-
-mysql_plugin:
-  "10": mysql_native_password
 
 debian_keyring_path: /etc/apt/keyrings/
 zabbix_gpg_key: "{{ debian_keyring_path }}zabbix-repo.asc"

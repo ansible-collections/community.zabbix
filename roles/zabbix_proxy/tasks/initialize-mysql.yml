@@ -58,7 +58,6 @@
         password: "{{ zabbix_proxy_dbpassword }}"
         priv: "{{ zabbix_proxy_dbname }}.*:ALL"
         host: "{{ zabbix_proxy_privileged_host }}"
-        plugin: "{{ 'mysql_native_password' if (ansible_os_family == 'RedHat' and ansible_distribution_major_version == '7') else omit }}"
         state: present
 
 - name: "MySQL verify or create schema"
@@ -73,7 +72,7 @@
         login_host: "{{ zabbix_proxy_dbhost }}"
         login_port: "{{ zabbix_proxy_dbport }}"
         login_db: "{{ zabbix_proxy_dbname }}"
-        query: 'SELECT mandatory FROM dbversion'
+        query: "SELECT mandatory FROM dbversion"
   rescue:
     - name: "MySQL | Get and set schema import overrides"
       delegate_to: "{{ zabbix_proxy_real_dbhost | default(zabbix_proxy_dbhost_run_install | ternary(delegated_dbhost, inventory_hostname)) }}"

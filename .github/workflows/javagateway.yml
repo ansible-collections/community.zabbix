@@ -22,7 +22,6 @@ jobs:
         container:
           - rockylinux9
           - rockylinux8
-          - centos7
           - ubuntu2404
           - ubuntu2204
           - ubuntu2004
@@ -34,8 +33,6 @@ jobs:
           - v60
         include:
           - interpreter: python3
-          - interpreter: python
-            container: centos7
         exclude:
           - container: debian12
             version: v62
