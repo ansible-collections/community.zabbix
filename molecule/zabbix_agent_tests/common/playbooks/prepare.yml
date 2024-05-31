@@ -27,7 +27,7 @@
     - name: "Installing packages on Debian family"
       ansible.builtin.apt:
         name:
-          - "{{ 'net-tools' if ansible_distribution_major_version not in ['10','18', '20'] else 'iproute2' }}"
+          - "{{ 'net-tools' if ansible_distribution_major_version not in ['18', '20'] else 'iproute2' }}"
         state: present
         update_cache: true
       register: zabbix_agent_prepare_packages_install
@@ -47,7 +47,7 @@
   hosts: docker
   tasks:
     - name: "Download Docker CE repo file"
-      when: not ansible_check_mode  # Because get_url always has changed status in check_mode.
+      when: not ansible_check_mode # Because get_url always has changed status in check_mode.
       ansible.builtin.get_url:
         url: https://download.docker.com/linux/centos/docker-ce.repo
         dest: /etc/yum.repos.d/docker-ce.repo
