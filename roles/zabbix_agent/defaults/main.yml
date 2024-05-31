@@ -90,6 +90,9 @@ zabbix_agent_interfaces:
     dns: "{{ ansible_fqdn }}"
     port: "{{ (zabbix_agent2 == True) | ternary(zabbix_agent2_listenport, zabbix_agent_listenport) }}"
 
+zabbix_agent_listenport: 10050
+zabbix_agent2_listenport: 10050
+
 # Zabbix configuration variables
 zabbix_agent_listeninterface:
 
