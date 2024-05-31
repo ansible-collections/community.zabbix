@@ -1,5 +1,6 @@
 ---
 - name: "API | Create host groups"
+  throttle: 1
   community.zabbix.zabbix_group:
     host_groups: "{{ zabbix_host_groups }}"
     state: present
@@ -45,6 +46,7 @@
     - api
 
 - name: "API | Updating host configuration with macros"
+  throttle: 1
   community.zabbix.zabbix_hostmacro:
     host_name: "{{ zabbix_agent_hostname }}"
     macro_name: "{{ item.macro_key }}"
