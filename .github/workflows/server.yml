@@ -27,7 +27,6 @@ jobs:
           - ubuntu2004
           - debian12
           - debian11
-          - debian10
         collection_role:
           - zabbix_server
         database:
@@ -40,12 +39,8 @@ jobs:
         exclude:
           - container: debian12
             version: v62
-          - container: debian10
-            version: v62
           - container: ubuntu2404
             version: v62
-          - container: debian10
-            version: v64
     steps:
       - name: Check out code
         uses: actions/checkout@v4

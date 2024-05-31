@@ -84,7 +84,6 @@ See the following list of supported Operating systems with the Zabbix releases:
 | Ubuntu 20.04 focal  |  V  |  V  |  V  |
 | Debian 12 bookworm  |  V  |     |  V  |
 | Debian 11 bullseye  |  V  |  V  |  V  |
-| Debian 10 buster    |     |     |  V  |
 
 You can bypass this matrix by setting `enable_version_check: false`
 
