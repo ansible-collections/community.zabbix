@@ -60,4 +60,4 @@
 
 - name: Wait to ensure triggers are firing
   ansible.builtin.wait_for:
-    timeout: 150
+    timeout: 180
