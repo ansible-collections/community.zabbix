@@ -4,6 +4,14 @@ community.zabbix Release Notes
 
 .. contents:: Topics
 
+v2.5.1
+======
+
+Bugfixes
+-------------
+
+- zabbix_agent - Fix reading existing psk
+
 v2.5.0
 ======
 
