@@ -29,7 +29,6 @@ jobs:
           - ubuntu1804
           - debian12
           - debian11
-          - debian10
         version:
           - v64
           - v62
