@@ -51,7 +51,7 @@
     network_interface: ansible_{{ zabbix_agent_listeninterface }}
   when:
     - (zabbix_agent_listeninterface)
-    - not zabbix_agent_listenip
+    - zabbix_agent_listenip is undefined
   tags:
     - config
 
@@ -60,7 +60,7 @@
     zabbix_agent_listenip: "{{ hostvars[inventory_hostname][network_interface]['ipv4'].address | default('0.0.0.0') }}"
   when:
     - (zabbix_agent_listeninterface)
-    - not zabbix_agent_listenip
+    - zabbix_agent_listenip is undefined
   tags:
     - config
     - api
@@ -69,7 +69,7 @@
   ansible.builtin.set_fact:
     zabbix_agent_listenip: "0.0.0.0"
   when:
-    - not (zabbix_agent_listenip)
+    - zabbix_agent_listenip is undefined
   tags:
     - config
 
