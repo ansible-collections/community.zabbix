@@ -28,7 +28,6 @@ jobs:
           - ubuntu1804
           - debian12
           - debian11
-          - debian10
         collection_role:
           - zabbix_web
         database:
@@ -44,14 +43,10 @@ jobs:
         include:
           - interpreter: python3
         exclude:
-          - container: debian10
-            version: v62
           - container: ubuntu2404
             version: v62
           - container: ubuntu1804
             version: v62
-          - container: debian10
-            version: v64
           - container: ubuntu1804
             version: v64
           - container: debian12
