@@ -1,2 +1,0 @@
-minor_changes:
-  - zabbix_agent - Fix role when zabbix_agent_listenip is undefined
