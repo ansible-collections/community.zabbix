@@ -4,6 +4,15 @@ community.zabbix Release Notes
 
 .. contents:: Topics
 
+v2.5.1
+======
+
+Bugfixes
+-------------
+
+- zabbix_agent - Fix reading existing psk
+- zabbix_agent - Fix role when zabbix_agent_listenip is undefined
+
 v2.5.0
 ======
 
