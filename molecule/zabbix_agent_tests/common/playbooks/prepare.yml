@@ -27,7 +27,7 @@
     - name: "Installing packages on Debian family"
       ansible.builtin.apt:
         name:
-          - "{{ 'net-tools' if ansible_distribution_major_version not in ['18', '20'] else 'iproute2' }}"
+          - "{{ 'net-tools' if ansible_distribution_major_version not in ['20'] else 'iproute2' }}"
         state: present
         update_cache: true
       register: zabbix_agent_prepare_packages_install

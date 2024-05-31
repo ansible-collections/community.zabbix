@@ -20,10 +20,6 @@ zabbix_valid_javagateway_versions:
     - 6.4
     - 6.2
     - 6.0
-  "18":
-    - 6.4
-    - 6.2
-    - 6.0
 
 debian_keyring_path: /etc/apt/keyrings/
 zabbix_gpg_key: "{{ debian_keyring_path }}zabbix-repo.asc"
