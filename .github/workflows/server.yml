@@ -25,7 +25,6 @@ jobs:
           - ubuntu2404
           - ubuntu2204
           - ubuntu2004
-          - ubuntu1804
           - debian12
           - debian11
           - debian10
@@ -45,10 +44,6 @@ jobs:
             version: v62
           - container: ubuntu2404
             version: v62
-          - container: ubuntu1804
-            version: v62
-          - container: ubuntu1804
-            version: v64
           - container: debian10
             version: v64
     steps:

@@ -14,17 +14,6 @@
     - database
     - dependencies
 
-# NOTE: Upgrading system-packages with pip is generally a bad idea, but
-# ubuntu-18.04 comes with pymysql==0.8.0, which seems to have a problem with
-# versions 8 and above of mysql.
-- name: Upgrade pymysql
-  when:
-    - ansible_facts['distribution'] == 'Ubuntu'
-    - ansible_facts['distribution_release'] == 'bionic'
-  ansible.builtin.pip:
-    name: "pymysql>=0.10.0,<0.11.0"
-    state: latest
-
 - name: "MySQL Database prep"
   when: zabbix_server_database_creation
   become: "{{ zabbix_server_dbhost_run_install }}"
@@ -79,7 +68,7 @@
         login_host: "{{ zabbix_server_dbhost }}"
         login_port: "{{ zabbix_server_dbport }}"
         login_db: "{{ zabbix_server_dbname }}"
-        query: 'SELECT mandatory FROM dbversion'
+        query: "SELECT mandatory FROM dbversion"
   rescue:
     - name: "MySQL | Get and set schema import overrides"
       delegate_to: "{{ zabbix_server_real_dbhost | default(zabbix_server_dbhost_run_install | ternary(delegated_dbhost, inventory_hostname), true) }}"
