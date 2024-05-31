@@ -25,7 +25,6 @@ jobs:
           - ubuntu2404
           - ubuntu2204
           - ubuntu2004
-          - ubuntu1804
           - debian12
           - debian11
         collection_role:
@@ -42,10 +41,6 @@ jobs:
             version: v62
           - container: ubuntu2404
             version: v62
-          - container: ubuntu1804
-            version: v62
-          - container: ubuntu1804
-            version: v64
     steps:
       - name: Check out code
         uses: actions/checkout@v4

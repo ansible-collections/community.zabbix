@@ -82,7 +82,6 @@ See the following list of supported Operating systems with the Zabbix releases:
 | Ubuntu 24.04 noble  |  V  |     |  V  |
 | Ubuntu 22.04 jammy  |  V  |  V  |  V  |
 | Ubuntu 20.04 focal  |  V  |  V  |  V  |
-| Ubuntu 18.04 bionic |     |     |  V  |
 | Debian 12 bookworm  |  V  |     |  V  |
 | Debian 11 bullseye  |  V  |  V  |  V  |
 
