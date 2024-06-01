@@ -46,7 +46,6 @@
         name: "{{ zabbix_server_dbuser }}"
         password: "{{ zabbix_server_dbpassword }}"
         host: "{{ zabbix_server_privileged_host }}"
-        plugin: "{{ 'mysql_native_password' if (ansible_os_family == 'RedHat' and ansible_distribution_major_version == '7') else omit }}"
         priv: "{{ zabbix_server_dbname }}.*:ALL"
         state: present
 
