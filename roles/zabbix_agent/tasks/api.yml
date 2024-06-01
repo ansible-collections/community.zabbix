@@ -1,6 +1,6 @@
 ---
 - name: "API | Create host groups"
-  throttle: 1
+  throttle: "{{ zabbix_api_throttle | int }}"
   community.zabbix.zabbix_group:
     host_groups: "{{ zabbix_host_groups }}"
     state: present
@@ -13,7 +13,7 @@
     - api
 
 - name: "API | Create a new host or update an existing host's info"
-  throttle: 1
+  throttle: "{{ zabbix_api_throttle | int }}"
   community.zabbix.zabbix_host:
     host_name: "{{ zabbix_agent_hostname }}"
     host_groups: "{{ zabbix_host_groups }}"
@@ -46,7 +46,7 @@
     - api
 
 - name: "API | Updating host configuration with macros"
-  throttle: 1
+  throttle: "{{ zabbix_api_throttle | int }}"
   community.zabbix.zabbix_hostmacro:
     host_name: "{{ zabbix_agent_hostname }}"
     macro_name: "{{ item.macro_key }}"
