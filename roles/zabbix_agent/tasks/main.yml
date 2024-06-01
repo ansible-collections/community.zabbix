@@ -43,7 +43,7 @@
     zabbix_agent_heartbeatfrequency: "{{ zabbix_agent_heartbeatfrequency is defined | ternary(zabbix_agent_heartbeatfrequency, zabbix_agent2_heartbeatfrequency) | default(60) }}"
     zabbix_agent_hostname: "{{ zabbix_agent_hostname is defined | ternary(zabbix_agent_hostname, zabbix_agent2_hostname) | default(inventory_hostname) }}"
     zabbix_agent_include_mode: "{{ zabbix_agent_include_mode is defined | ternary(zabbix_agent_include_mode, zabbix_agent2_include_mode) | default('0750') }}"
-    zabbix_agent_listenport: "{{ zabbix_agent_listenport | default(zabbix_agent2_listenport) | default(10050) }}"
+    zabbix_agent_listenport: "{{ zabbix_agent_listenport is defined | ternary(zabbix_agent_listenport, zabbix_agent2_listenport) | default(10050) }}"
     zabbix_agent_logfilesize: "{{ zabbix_agent_logfilesize is defined | ternary(zabbix_agent_logfilesize, zabbix_agent2_logfilesize) | default(100) }}"
     zabbix_agent_logtype: "{{ zabbix_agent_logtype is defined | ternary(zabbix_agent_logtype, zabbix_agent2_logtype) | default('file') }}"
     zabbix_agent_persistentbufferperiod: "{{ zabbix_agent_persistentbufferperiod is defined | ternary(zabbix_agent_persistentbufferperiod, zabbix_agent2_persistentbufferperiod) | default('1h') }}"

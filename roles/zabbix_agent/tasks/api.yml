@@ -7,6 +7,7 @@
     - zabbix_api_create_hostgroup | bool
   register: zabbix_api_hostgroup_created
   until: zabbix_api_hostgroup_created is succeeded
+  retries: 10
   delegate_to: "{{ zabbix_api_server_host }}"
   tags:
     - api
@@ -38,6 +39,7 @@
     tags: "{{ zabbix_agent_tags | default(omit) }}"
   register: zabbix_api_host_created
   until: zabbix_api_host_created is succeeded
+  retries: 10
   delegate_to: "{{ zabbix_api_server_host }}"
   changed_when: false
   tags:
@@ -54,6 +56,7 @@
     - item.macro_key is defined
   register: zabbix_api_hostmarcro_created
   until: zabbix_api_hostmarcro_created is succeeded
+  retries: 10
   delegate_to: "{{ zabbix_api_server_host }}"
   tags:
     - api
