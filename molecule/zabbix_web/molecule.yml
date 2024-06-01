@@ -22,7 +22,6 @@ platforms:
     groups:
       - ${MY_MOLECULE_DATABASE:-mysql}
       - ${MY_MOLECULE_VERSION:-v64}
-      - ${MY_MOLECULE_INTERPRETER:-python3}
       - ${MY_MOLECULE_WEB_SERVER:-apache}
 
 provisioner:
@@ -34,10 +33,6 @@ provisioner:
     group_vars:
       all:
         zabbix_api_server_url: zabbix-web-${MY_MOLECULE_VERSION:-v64}-${MY_MOLECULE_DATABASE:-mysql}-${MY_MOLECULE_CONTAINER:-rockylinux8}
-      python3:
-        ansible_python_interpreter: /usr/bin/python3
-      python:
-        ansible_python_interpreter: /usr/bin/python
       v64:
         zabbix_server_version: 6.4
         zabbix_web_version: 6.4

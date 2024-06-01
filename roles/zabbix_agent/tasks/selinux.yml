@@ -18,22 +18,6 @@
   tags:
     - install
 
-- name: "SELinux | RedHat | Install policycoreutils-python"
-  ansible.builtin.package:
-    name: policycoreutils-python
-    state: installed
-  environment:
-    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
-    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
-  register: zabbix_agent_policycoreutils_installed
-  until: zabbix_agent_policycoreutils_installed is succeeded
-  when:
-    - ansible_os_family == "RedHat"
-    - ansible_distribution_major_version == "7"
-  become: true
-  tags:
-    - install
-
 - name: "SELinux | RedHat | Install python3-policycoreutils on RHEL8"
   ansible.builtin.package:
     name: python3-policycoreutils

@@ -9,7 +9,6 @@
   ansible.builtin.set_fact:
     zabbix_short_version: "{{ zabbix_web_version | regex_replace('\\.', '') }}"
     zabbix_underscore_version: "{{ zabbix_web_version | regex_replace('\\.', '_') }}"
-    zabbix_python_prefix: "python{% if ansible_python_version is version('3', '>=') %}3{% endif %}"
   tags:
     - always
 
@@ -61,7 +60,7 @@
       (ansible_distribution == "Debian" and ansible_distribution_major_version < "12")
 
 - name: "Debian | Download gpg key"
-  when: not ansible_check_mode  # Because get_url always has changed status in check_mode.
+  when: not ansible_check_mode # Because get_url always has changed status in check_mode.
   ansible.builtin.get_url:
     url: "{{ zabbix_repo_deb_gpg_key_url }}"
     dest: "{{ zabbix_gpg_key }}"
