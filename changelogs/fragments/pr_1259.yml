@@ -1,7 +1,7 @@
 minor_changes:
-  - added 10 retries to agent API calls to workaround connection problems on macOS
+  - zabbix_agent - added 10 retries to agent API calls to workaround connection problems on macOS
 bugfixes:
-  - in ``zabbix_agent_interfaces`` directly use ``zabbix_agent_listenport``, which does already contains the agent2 
-    value if needed
-  - fix error when ``zabbix_agent_tlsaccept`` is not set
-  - fix error when ``zabbix_agent_tlsconnect`` is not set
+  - zabbix_agent - in ``zabbix_agent_interfaces`` directly use ``zabbix_agent_listenport``, which does already contains
+    the agent2 value if needed
+  - zabbix_agent - fix error when ``zabbix_agent_tlsaccept`` is not set
+  - zabbix_agent - fix error when ``zabbix_agent_tlsconnect`` is not set
