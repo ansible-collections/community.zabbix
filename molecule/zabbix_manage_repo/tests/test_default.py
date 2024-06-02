@@ -11,10 +11,9 @@ testinfra_hosts = testinfra.utils.ansible_runner.AnsibleRunner(
 
 
 def test_zabbix_manage_repo_installed(host):
-    os_familiy = host.ansible("setup")["ansible_os_family"]
-    if os_familiy == "RedHat":
+    try:
         result = host.ansible("command", "yum update -y", check=False, become=True)["rc"]
-    else:
+    except:
         result = host.ansible("command", "apt update", check=False, become=True)["rc"]
     assert result == 0
 
