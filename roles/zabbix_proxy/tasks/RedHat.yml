@@ -34,11 +34,6 @@
   tags:
     - install
 
-- name: "RedHat | Add EPEL Repo (Centos 7 Only)"
-  when: ansible_facts['distribution_major_version'] == '7'
-  ansible.builtin.yum:
-    name: epel-release
-
 - name: "Configure SELinux when enabled"
   ansible.builtin.include_tasks: selinux.yml
   when:
