@@ -1,0 +1,116 @@
+---
+# defaults file for zabbix_server
+# zabbix_server_version:
+# zabbix_os_user: zabbix
+# zabbix_service_enabled: true
+# zabbix_server_manage_service: true
+
+# # Database
+# zabbix_server_database_sqlload: true
+# zabbix_server_database_timescaledb: false
+# #zabbix_server_real_dbhost:
+# zabbix_server_dbhost: localhost
+# zabbix_server_dbname: zabbix-server
+# zabbix_server_privileged_host: localhost
+# zabbix_server_dbencoding: utf8
+# zabbix_server_dbcollation: utf8_bin
+# #zabbix_server_dbschema:
+# zabbix_server_dbuser: zabbix-server
+# zabbix_server_dbpassword: zabbix-server
+# zabbix_server_dbpassword_hash_method: md5
+# #zabbix_server_dbsocket:
+# _zabbix_server_database_default_port:
+#   mysql: 3306
+#   pgsql: 5432
+# zabbix_server_dbport: "{{ _zabbix_server_database_default_port[zabbix_server_database] }}"
+# zabbix_server_dbhost_run_install: true
+# zabbix_server_database: pgsql
+# zabbix_server_database_creation: true
+# zabbix_server_install_database_client: true
+
+# # SELinux specific
+# selinux_allow_zabbix_can_network: false
+# selinux_allow_zabbix_can_http: false
+
+# #Misc.
+# zabbix_server_include_mode: "0755"
+# zabbix_server_config: /etc/zabbix/zabbix_server.conf
+# zabbix_service_state: started
+
+# Yum/APT  Variables
+zabbix_server_version_minor: "*"
+zabbix_server_package_state: present
+zabbix_repo_yum_gpgcheck: 0
+zabbix_repo_yum_schema: https
+zabbix_repo_deb_url: "http://repo.zabbix.com/zabbix/{{ zabbix_server_version }}/{{ ansible_facts.lsb.id | default(ansible_facts['distribution']) | lower }}{% if ansible_facts['architecture'] == 'aarch64' and ansible_facts.lsb.id | default(ansible_facts['distribution']) in ['Debian', 'Ubuntu'] %}-arm64{% endif %}"
+zabbix_repo_deb_component: main
+zabbix_repo_yum:
+  - name: zabbix
+    description: Zabbix Official Repository - $basearch
+    baseurl: "{{ zabbix_repo_yum_schema }}://repo.zabbix.com/zabbix/{{ zabbix_server_version | regex_search('^[0-9]+.[0-9]+') }}/rhel/{{ ansible_distribution_major_version }}/$basearch/"
+    gpgcheck: "{{ zabbix_repo_yum_gpgcheck }}"
+    mode: "0644"
+    gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-ZABBIX
+    state: present
+  - name: zabbix-non-supported
+    description: Zabbix Official Repository non-supported - $basearch
+    baseurl: "{{ zabbix_repo_yum_schema }}://repo.zabbix.com/non-supported/rhel/{{ ansible_distribution_major_version }}/$basearch/"
+    mode: "0644"
+    gpgcheck: "{{ zabbix_repo_yum_gpgcheck }}"
+    gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-ZABBIX
+    state: present
+zabbix_server_apt_priority:
+zabbix_server_conf_mode: 0640
+zabbix_repo_deb_gpg_key_url: http://repo.zabbix.com/zabbix-official-repo.key
+zabbix_repo_deb_include_deb_src: true
+# # Server Configuration Variables (Only ones with role provided defaults)
+# zabbix_server_alertscriptspath: /usr/lib/zabbix/alertscripts
+# zabbix_server_allowroot: 0
+# zabbix_server_allowunsupporteddbversions: 0
+# zabbix_server_debuglevel: 3
+# zabbix_server_exportfilesize: 1G
+# zabbix_server_externalscriptspath: /usr/lib/zabbix/externalscripts
+# zabbix_server_historystoragedateindex: 0
+# zabbix_server_historystoragetypes: uint,dbl,str,log,text
+# zabbix_server_housekeepingfrequency: 1
+# zabbix_server_include: /etc/zabbix/zabbix_server.conf.d
+# zabbix_server_javagatewayport: 10052
+# zabbix_server_listenport: 10051
+# zabbix_server_loadmodulepath: ${libdir}/modules
+# zabbix_server_logfile: /var/log/zabbix/zabbix_server.log
+# zabbix_server_logfilesize: 10
+# zabbix_server_logslowqueries: 0
+# zabbix_server_logtype: file
+# zabbix_server_maxhousekeeperdelete: 500
+# zabbix_server_pidfile: /var/run/zabbix/zabbix_server.pid
+# zabbix_server_proxydatafrequency: 1
+# zabbix_server_snmptrapperfile: /tmp/zabbix_traps.tmp
+# zabbix_server_socketdir: /var/run/zabbix
+# zabbix_server_sslcertlocation: ${datadir}/zabbix/ssl/certs
+# zabbix_server_sslkeylocation: ${datadir}/zabbix/ssl/keys
+# zabbix_server_startdbsyncers: 4
+# zabbix_server_startdiscoverers: 1
+# zabbix_server_startescalators: 1
+# zabbix_server_starthttppollers: 1
+# zabbix_server_startipmipollers: 0
+# zabbix_server_startjavapollers: 0
+# zabbix_server_startpingers: 1
+# zabbix_server_startpollers: 5
+# zabbix_server_startpollersunreachable: 1
+# zabbix_server_startproxypollers: 1
+# zabbix_server_startreportwriters: 0
+# zabbix_server_startsnmptrapper: 0
+# zabbix_server_starttimers: 1
+# zabbix_server_starttrappers: 5
+# zabbix_server_startvmwarecollectors: 0
+# zabbix_server_timeout: 3
+# zabbix_server_tmpdir: /tmp
+# zabbix_server_trappertimeout: 300
+# zabbix_server_unavailabledelay: 60
+# zabbix_server_unreachabledelay: 15
+# zabbix_server_unreachableperiod: 45
+# zabbix_server_user: zabbix
+# zabbix_server_vaulturl: https://127.0.0.1:8200
+# zabbix_server_vmwarefrequency: 60
+# zabbix_server_vmwareperffrequency: 60
+# zabbix_server_vmwaretimeout: 10

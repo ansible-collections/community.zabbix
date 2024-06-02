@@ -1,0 +1,36 @@
+---
+# apache_user: apache
+# apache_group: apache
+# apache_log: httpd
+
+# mysql_create_dir: create/
+
+__epel_repo:
+  - epel
+
+# zabbix_valid_server_versions:
+#   "9":
+#     - 6.4
+#     - 6.2
+#     - 6.0
+#   "8":
+#     - 6.4
+#     - 6.2
+#     - 6.0
+
+# _zabbix_server_pgsql_dependencies:
+#   - "{{ zabbix_server_install_database_client | ternary('postgresql', '') }}"
+#   - python3-psycopg2
+
+# _zabbix_server_mysql_dependencies:
+#   - "{{ zabbix_server_install_database_client | ternary('mysql', '') }}"
+#   - python3-PyMySQL
+
+# _zabbix_server_fping6location: /usr/sbin/fping6
+# _zabbix_server_fpinglocation: /usr/sbin/fping
+
+# _zabbix_server_packages:
+#   - "zabbix-server-{{ zabbix_server_database }}-{{ zabbix_server_version }}.{{ zabbix_server_version_minor }}"
+#   - "zabbix-sql-scripts-{{ zabbix_server_version }}.{{ zabbix_server_version_minor }}"
+_zabbix_server_disable_repo:
+  - epel

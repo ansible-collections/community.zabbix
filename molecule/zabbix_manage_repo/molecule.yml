@@ -1,0 +1,33 @@
+---
+driver:
+  name: docker
+platforms:
+  - name: zabbix-repo-${MY_MOLECULE_VERSION:-v64}-${MY_MOLECULE_CONTAINER:-rockylinux8}
+    image: geerlingguy/docker-${MY_MOLECULE_IMAGE:-rockylinux8}-ansible:latest
+    privileged: true
+    pre_build_image: true
+    command: ${MOLECULE_DOCKER_COMMAND:-""}
+    networks:
+      - name: zabbix
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    groups:
+      - ${MY_MOLECULE_DATABASE:-mysql}
+      - ${MY_MOLECULE_VERSION:-v64}
+
+provisioner:
+  name: ansible
+  env:
+    ANSIBLE_COLLECTIONS_PATHS: $HOME/.ansible/collections/ansible_collections/community/zabbix
+    ANSIBLE_ROLES_PATH: $HOME/.ansible/collections/ansible_collections/community/zabbix/roles
+  inventory:
+    group_vars:
+      v64:
+        zabbix_server_version: 6.4
+      v62:
+        zabbix_server_version: 6.2
+      v60:
+        zabbix_server_version: 6.0
+
+verifier:
+  name: testinfra

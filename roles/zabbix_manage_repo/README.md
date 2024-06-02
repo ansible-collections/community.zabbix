@@ -1,0 +1,1 @@
+../../docs/ZABBIX_SERVER_ROLE.md
