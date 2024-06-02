@@ -1,5 +1,5 @@
 ---
-name: "community.zabbix.zabbix_server"
+name: "community.zabbix.zabbix_manage_repo"
 on:
   push:
     paths:
