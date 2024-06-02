@@ -1,0 +1,356 @@
+---
+- name: test - create new passive Zabbix proxy server
+  community.zabbix.zabbix_proxy:
+    proxy_name: zbxproxy_example01
+    description: Example Zabbix Proxy
+    state: present
+    operating_mode: passive
+    address: 10.1.1.2
+    port: 10051
+  register: zbxproxy_new
+
+- name: assert that proxy was created
+  ansible.builtin.assert:
+    that: zbxproxy_new is changed
+
+- name: test - create same passive Zabbix proxy server
+  community.zabbix.zabbix_proxy:
+    proxy_name: zbxproxy_example01
+    description: Example Zabbix Proxy
+    state: present
+    operating_mode: passive
+    address: 10.1.1.2
+    port: 10051
+  register: zbxproxy_existing
+
+- name: assert that nothing has been changed
+  ansible.builtin.assert:
+    that: not zbxproxy_existing is changed
+
+- name: test - update Zabbix proxy server description
+  community.zabbix.zabbix_proxy:
+    proxy_name: zbxproxy_example01
+    description: Example Zabbix Proxy desc
+    state: present
+    operating_mode: passive
+    address: 10.1.1.2
+    port: 10051
+  register: zbxproxy_desc_update
+
+- name: assert that description has been updated
+  ansible.builtin.assert:
+    that: zbxproxy_desc_update is changed
+
+- name: test - update Zabbix proxy server interface
+  community.zabbix.zabbix_proxy:
+    proxy_name: zbxproxy_example01
+    description: Example Zabbix Proxy desc
+    state: present
+    operating_mode: passive
+    address: 10.1.1.3
+    port: 10051
+  register: zbxproxy_interface_update
+
+- name: assert that interface has been updated
+  ansible.builtin.assert:
+    that: zbxproxy_interface_update is changed
+
+- name: test - update Zabbix proxy server description & interface (again)
+  community.zabbix.zabbix_proxy:
+    proxy_name: zbxproxy_example01
+    description: Example Zabbix Proxy desc
+    state: present
+    operating_mode: passive
+    address: 10.1.1.3
+    port: 10051
+  register: zbxproxy_desc_interface_update
+
+- name: assert that nothing has been changed
+  ansible.builtin.assert:
+    that: not zbxproxy_desc_interface_update is changed
+
+- name: test - update Zabbix proxy server interface to use DNS
+  community.zabbix.zabbix_proxy:
+    proxy_name: zbxproxy_example01
+    description: Example Zabbix Proxy desc
+    state: present
+    operating_mode: passive
+    address: test-proxy01.local
+    port: 10051
+  register: zbxproxy_interface_dns
+
+- name: assert that interface has been updated
+  ansible.builtin.assert:
+    that: zbxproxy_interface_dns is changed
+
+- name: test - update Zabbix proxy server interface to use DNS again
+  community.zabbix.zabbix_proxy:
+    proxy_name: zbxproxy_example01
+    description: Example Zabbix Proxy desc
+    state: present
+    operating_mode: passive
+    address: test-proxy01.local
+    port: 10051
+  register: zbxproxy_interface_dns_again
+
+- name: assert that nothing has been changed
+  ansible.builtin.assert:
+    that: not zbxproxy_interface_dns_again is changed
+
+- name: test - update Zabbix proxy server to be active
+  community.zabbix.zabbix_proxy:
+    proxy_name: zbxproxy_example01
+    description: Example Zabbix Proxy
+    state: present
+    operating_mode: active
+  register: zbxproxy_active_update
+
+- name: assert that proxy was updated
+  ansible.builtin.assert:
+    that: zbxproxy_active_update is changed
+
+- name: test - update Zabbix proxy server to be active (again)
+  community.zabbix.zabbix_proxy:
+    proxy_name: zbxproxy_example01
+    description: Example Zabbix Proxy
+    state: present
+    operating_mode: active
+  register: zbxproxy_active_update_again
+
+- name: assert that nothing has been changed
+  ansible.builtin.assert:
+    that: not zbxproxy_active_update_again is changed
+
+- name: test - update Zabbix proxy server to be active and use allowed_addresses
+  community.zabbix.zabbix_proxy:
+    proxy_name: zbxproxy_example01
+    description: Example Zabbix Proxy
+    state: present
+    operating_mode: active
+    allowed_addresses: 10.1.1.0/24,zabbix.example.com
+  register: zbxproxy_active_allowed_addresses
+
+- name: assert that proxy was updated
+  ansible.builtin.assert:
+    that: zbxproxy_active_allowed_addresses is changed
+
+- name: test - update Zabbix proxy server to be active use allowed_addresses (again)
+  community.zabbix.zabbix_proxy:
+    proxy_name: zbxproxy_example01
+    description: Example Zabbix Proxy
+    state: present
+    operating_mode: active
+    allowed_addresses: 10.1.1.0/24,zabbix.example.com
+  register: zbxproxy_active_allowed_addresses_again
+
+- name: assert that nothing has been changed
+  ansible.builtin.assert:
+    that: not zbxproxy_active_allowed_addresses_again is changed
+
+- name: test - update Zabbix proxy server to use encryption
+  community.zabbix.zabbix_proxy:
+    proxy_name: zbxproxy_example01
+    description: Example Zabbix Proxy
+    state: present
+    operating_mode: active
+    tls_psk_identity: test
+    tls_connect: PSK
+    tls_accept: PSK
+    tls_psk: 123456789abcdef123456789abcdef12
+  register: zbxproxy_encryption
+
+- name: assert that encryption has been enabled
+  ansible.builtin.assert:
+    that: zbxproxy_encryption is changed
+
+- name: test - update Zabbix proxy server to use encryption (again)
+  community.zabbix.zabbix_proxy:
+    proxy_name: zbxproxy_example01
+    description: Example Zabbix Proxy
+    state: present
+    operating_mode: active
+    tls_psk_identity: test
+    tls_connect: PSK
+    tls_accept: PSK
+    tls_psk: 123456789abcdef123456789abcdef12
+  register: zbxproxy_encryption_again
+
+- name: assert that nothing has been changed
+  ansible.builtin.assert:
+    that: zbxproxy_encryption_again is changed
+
+- name: test - update Zabbix proxy server encryption settings
+  community.zabbix.zabbix_proxy:
+    proxy_name: zbxproxy_example01
+    description: Example Zabbix Proxy
+    state: present
+    operating_mode: active
+    tls_connect: certificate
+    tls_accept: certificate
+    tls_issuer: AcmeCorp
+    tls_subject: AcmeCorpServer
+  register: zbxproxy_encryption_update
+
+- name: assert that encryption has been updated
+  ansible.builtin.assert:
+    that: zbxproxy_encryption_update is changed
+
+- name: test - update Zabbix proxy server back to being passive
+  community.zabbix.zabbix_proxy:
+    proxy_name: zbxproxy_example01
+    description: Example Zabbix Proxy
+    state: present
+    operating_mode: passive
+    address: test-proxy01.local
+    port: 10051
+  register: zbxproxy_passive_update
+
+- name: assert that proxy was updated
+  ansible.builtin.assert:
+    that: zbxproxy_passive_update is changed
+
+- name: test - create Zabbix proxy group
+  community.zabbix.zabbix_proxy_group:
+    name: zbxproxy_group_example01
+    state: present
+
+- name: test - add Zabbix proxy to Zabbix proxy group
+  community.zabbix.zabbix_proxy:
+    proxy_name: zbxproxy_example01
+    proxy_group: zbxproxy_group_example01
+    state: present
+    local_address: test-proxy01.local
+    local_port: 10051
+  register: zbxproxy_add_to_group
+
+- name: assert that proxy was updated
+  ansible.builtin.assert:
+    that: zbxproxy_add_to_group is changed
+
+- name: test - add Zabbix proxy to Zabbix proxy group again
+  community.zabbix.zabbix_proxy:
+    proxy_name: zbxproxy_example01
+    proxy_group: zbxproxy_group_example01
+    local_address: test-proxy01.local
+    local_port: 10051
+    state: present
+  register: zbxproxy_add_to_group_again
+
+- name: assert that nothing has been changed
+  ansible.builtin.assert:
+    that: not zbxproxy_add_to_group_again is changed
+
+- name: test - delete proxy
+  community.zabbix.zabbix_proxy:
+    proxy_name: zbxproxy_example01
+    state: absent
+
+- name: test - create Zabbix proxy with custom timeouts
+  community.zabbix.zabbix_proxy:
+    proxy_name: zbxproxy_example01
+    description: Example Zabbix Proxy
+    state: present
+    address: 10.1.1.2
+    operating_mode: passive
+    custom_timeouts: 1
+    timeout_zabbix_agent: "10"
+    timeout_simple_check: "15"
+    timeout_snmp_agent: "16"
+    timeout_external_check: "20"
+    timeout_db_monitor: "25"
+    timeout_http_agent: "30"
+    timeout_ssh_agent: "15"
+    timeout_telnet_agent: "10"
+    timeout_script: "15"
+    timeout_browser: "30"
+  register: zbxproxy_create_with_timeouts
+
+- name: assert that proxy was created
+  ansible.builtin.assert:
+    that: zbxproxy_create_with_timeouts is changed
+
+- name: test - reate Zabbix proxy with custom timeouts again
+  community.zabbix.zabbix_proxy:
+    proxy_name: zbxproxy_example01
+    description: Example Zabbix Proxy
+    state: present
+    address: 10.1.1.2
+    operating_mode: passive
+    custom_timeouts: 1
+    timeout_zabbix_agent: "10"
+    timeout_simple_check: "15"
+    timeout_snmp_agent: "16"
+    timeout_external_check: "20"
+    timeout_db_monitor: "25"
+    timeout_http_agent: "30"
+    timeout_ssh_agent: "15"
+    timeout_telnet_agent: "10"
+    timeout_script: "15"
+    timeout_browser: "30"
+  register: zbxproxy_create_with_timeouts_again
+
+- name: assert that nothing has changed
+  ansible.builtin.assert:
+    that: not zbxproxy_create_with_timeouts_again is changed
+
+- name: test - update timeout_zabbix_agent timeout for Zabbix proxy
+  community.zabbix.zabbix_proxy:
+    proxy_name: zbxproxy_example01
+    description: Example Zabbix Proxy
+    state: present
+    address: 10.1.1.2
+    operating_mode: passive
+    custom_timeouts: 1
+    timeout_zabbix_agent: "15"
+    timeout_simple_check: "15"
+    timeout_snmp_agent: "16"
+    timeout_external_check: "20"
+    timeout_db_monitor: "25"
+    timeout_http_agent: "30"
+    timeout_ssh_agent: "15"
+    timeout_telnet_agent: "10"
+    timeout_script: "15"
+    timeout_browser: "30"
+  register: zbxproxy_update_with_timeouts
+
+- name: assert that nothing has changed
+  ansible.builtin.assert:
+    that: zbxproxy_update_with_timeouts is changed
+
+- name: test - delete proxy
+  community.zabbix.zabbix_proxy:
+    proxy_name: zbxproxy_example01
+    state: absent
+
+- name: test - create Zabbix proxy and add it to Zabbix proxy group
+  community.zabbix.zabbix_proxy:
+    proxy_name: zbxproxy_example01
+    proxy_group: zbxproxy_group_example01
+    local_address: test-proxy01.local
+    local_port: 10051
+    state: present
+  register: zbxproxy_create_add_to_group_again
+
+- name: assert that proxy was created
+  ansible.builtin.assert:
+    that: zbxproxy_create_add_to_group_again is changed
+
+- name: test - delete Zabbix proxy server
+  community.zabbix.zabbix_proxy:
+    proxy_name: zbxproxy_example01
+    state: absent
+  register: zbxproxy_delete
+
+- name: assert that proxy has been deleted
+  ansible.builtin.assert:
+    that: zbxproxy_delete is changed
+
+- name: test - delete Zabbix proxy server (again)
+  community.zabbix.zabbix_proxy:
+    proxy_name: zbxproxy_example01
+    state: absent
+  register: zbxproxy_delete_again
+
+- name: assert that nothing has been changed
+  ansible.builtin.assert:
+    that: not zbxproxy_delete_again is changed
