@@ -14,7 +14,6 @@ platforms:
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
     groups:
       - ${MY_MOLECULE_VERSION:-v64}
-      - ${MY_MOLECULE_INTERPRETER:-python3}
 provisioner:
   name: ansible
   env:
@@ -22,10 +21,6 @@ provisioner:
     ANSIBLE_ROLES_PATH: $HOME/.ansible/collections/ansible_collections/community/zabbix/roles
   inventory:
     group_vars:
-      python3:
-        ansible_python_interpreter: /usr/bin/python3
-      python:
-        ansible_python_interpreter: /usr/bin/python
       v64:
         zabbix_javagateway_version: 6.4
       v62:

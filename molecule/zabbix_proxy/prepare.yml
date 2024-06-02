@@ -36,10 +36,6 @@
 - name: Prepare
   hosts: all
   tasks:
-    - name: "Set short version name"
-      ansible.builtin.set_fact:
-        zabbix_python_prefix: "python{% if ansible_python_version is version('3', '>=') %}3{% endif %}"
-
     - name: "Create group for imaginary host"
       add_host:
         name: imaginary-host
@@ -72,7 +68,7 @@
         name:
           - net-tools
           - apt-utils
-          - "{{ zabbix_python_prefix }}-pip"
+          - python3-pip
           - gpg-agent
           - sudo
           - doc-base

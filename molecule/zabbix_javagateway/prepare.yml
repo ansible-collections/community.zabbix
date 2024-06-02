@@ -2,10 +2,6 @@
 - name: Prepare
   hosts: all
   pre_tasks:
-    - name: "Set short version name"
-      ansible.builtin.set_fact:
-        zabbix_python_prefix: "python{% if ansible_python_version is version('3', '>=') %}3{% endif %}"
-
     - name: "Installing packages on CentOS"
       ansible.builtin.yum:
         name:
@@ -40,9 +36,9 @@
           - net-tools
           - apt-utils
           - procps
-          - "{{ zabbix_python_prefix }}-pip"
+          - python3-pip
           - gpg-agent
-          - "{{ zabbix_python_prefix }}-apt"
+          - python3-apt
           - sudo
           - software-properties-common
         update_cache: true

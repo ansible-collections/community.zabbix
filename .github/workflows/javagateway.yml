@@ -22,7 +22,6 @@ jobs:
         container:
           - rockylinux9
           - rockylinux8
-          - centos7
           - ubuntu2404
           - ubuntu2204
           - ubuntu2004
@@ -32,10 +31,6 @@ jobs:
           - v64
           - v62
           - v60
-        include:
-          - interpreter: python3
-          - interpreter: python
-            container: centos7
         exclude:
           - container: debian12
             version: v62
@@ -79,5 +74,4 @@ jobs:
           MY_MOLECULE_IMAGE=${{ matrix.container }}
           MY_MOLECULE_VERSION=${{ matrix.version }}
           MY_MOLECULE_DOCKER_COMMAND=${{ matrix.command }}
-          MY_MOLECULE_INTERPRETER=${{ matrix.interpreter }}
           molecule test -s ${{ matrix.collection_role }}
