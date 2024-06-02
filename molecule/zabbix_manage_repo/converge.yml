@@ -1,5 +1,4 @@
 ---
 - hosts: all
-  become: true
   roles:
     - role: zabbix_manage_repo

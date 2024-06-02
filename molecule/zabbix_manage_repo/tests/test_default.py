@@ -10,6 +10,14 @@ testinfra_hosts = testinfra.utils.ansible_runner.AnsibleRunner(
 ).get_hosts("all")
 
 
+def test_zabbix_manage_repo_installed(host):
+    os_familiy = host.ansible("setup")["ansible_os_family"]
+    if os_familiy == "RedHat":
+        result = host.ansible("command", "yum update -y", check=False, become=True)["rc"]
+    else:
+        result = host.ansible("command", "apt update", check=False, become=True)["rc"]
+    assert result == 0
+
 # def test_zabbiserver_running_and_enabled(host):
 #     zabbix = host.service("zabbix-server")
 #     if host.system_info.distribution == "centos":
