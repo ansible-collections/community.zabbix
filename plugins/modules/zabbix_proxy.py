@@ -157,7 +157,6 @@ options:
             - Proxy group name.
         required: false
         type: str
-        default: "0"
     local_address:
         description:
             - Parameter introduced in Zabbix 7.0.
@@ -202,7 +201,7 @@ options:
             - Parameter introduced in Zabbix 7.0.
             - Spend no more than this number of seconds on Zabbix agent checks processing.
             - Accepts seconds or time unit with suffix (e.g., 30s, 1m).
-            - Possible values range: 1-600s.
+            - "Possible values range: 1-600s."
             - Rired if if C(custom_timeouts) is set to 1.
         required: false
         type: str
@@ -212,7 +211,7 @@ options:
             - Parameter introduced in Zabbix 7.0.
             - Spend no more than this number of seconds on simple checks processing.
             - Accepts seconds or time unit with suffix (e.g., 30s, 1m).
-            - Possible values range: 1-600s.
+            - "Possible values range: 1-600s."
             - Required if if C(custom_timeouts) is set to 1.
         required: false
         type: str
@@ -222,7 +221,7 @@ options:
             - Parameter introduced in Zabbix 7.0.
             - Spend no more than this number of seconds on SNMP agent checks processing.
             - Accepts seconds or time unit with suffix (e.g., 30s, 1m).
-            - Possible values range: 1-600s.
+            - "Possible values range: 1-600s."
             - Required if if C(custom_timeouts) is set to 1.
         required: false
         type: str
@@ -232,7 +231,7 @@ options:
             - Parameter introduced in Zabbix 7.0.
             - Spend no more than this number of seconds on external checks processing.
             - Accepts seconds or time unit with suffix (e.g., 30s, 1m).
-            - Possible values range: 1-600s.
+            - "Possible values range: 1-600s."
             - Required if if C(custom_timeouts) is set to 1.
         required: false
         type: str
@@ -242,7 +241,7 @@ options:
             - Parameter introduced in Zabbix 7.0.
             - Spend no more than this number of seconds on DB checks processing.
             - Accepts seconds or time unit with suffix (e.g., 30s, 1m).
-            - Possible values range: 1-600s.
+            - "Possible values range: 1-600s."
             - Required if if C(custom_timeouts) is set to 1.
         required: false
         type: str
@@ -252,7 +251,7 @@ options:
             - Parameter introduced in Zabbix 7.0.
             - Spend no more than this number of seconds on HTTPagent checks processing.
             - Accepts seconds or time unit with suffix (e.g., 30s, 1m).
-            - Possible values range: 1-600s.
+            - "Possible values range: 1-600s."
             - Required if if C(custom_timeouts) is set to 1.
         required: false
         type: str
@@ -262,7 +261,7 @@ options:
             - Parameter introduced in Zabbix 7.0.
             - Spend no more than this number of seconds on SSH checks processing.
             - Accepts seconds or time unit with suffix (e.g., 30s, 1m).
-            - Possible values range: 1-600s.
+            - "Possible values range: 1-600s."
             - Required if if C(custom_timeouts) is set to 1.
         required: false
         type: str
@@ -272,7 +271,7 @@ options:
             - Parameter introduced in Zabbix 7.0.
             - Spend no more than this number of seconds on Telnet checks processing.
             - Accepts seconds or time unit with suffix (e.g., 30s, 1m).
-            - Possible values range: 1-600s.
+            - "Possible values range: 1-600s."
             - Required if if C(custom_timeouts) is set to 1.
         required: false
         type: str
@@ -282,7 +281,7 @@ options:
             - Parameter introduced in Zabbix 7.0.
             - Spend no more than this number of seconds on script type checks processing.
             - Accepts seconds or time unit with suffix (e.g., 30s, 1m).
-            - Possible values range: 1-600s.
+            - "Possible values range: 1-600s."
             - Required if if C(custom_timeouts) is set to 1.
         required: false
         type: str
@@ -292,7 +291,7 @@ options:
             - Parameter introduced in Zabbix 7.0.
             - Spend no more than this number of seconds on browser type checks processing.
             - Accepts seconds or time unit with suffix (e.g., 30s, 1m).
-            - Possible values range: 1-600s.
+            - "Possible values range: 1-600s."
             - Required if if C(custom_timeouts) is set to 1.
         required: false
         type: str
@@ -622,7 +621,7 @@ def main():
         address=dict(type="str", required=False, default=None),
         port=dict(type="str", required=False, default="10051"),
         proxy_group=dict(type="str", required=False, default=None),
-        local_address=dict(type="str", required=False, default=None),
+        local_address=dict(type="str", required=False, default="10051"),
         local_port=dict(type="str", required=False, default="10051"),
         custom_timeouts=dict(type="int", required=False, default=0, choices=[0, 1]),
         timeout_zabbix_agent=dict(type="str", required=False, default=None),

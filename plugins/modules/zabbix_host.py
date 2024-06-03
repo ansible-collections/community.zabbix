@@ -1077,8 +1077,8 @@ def main():
     module = AnsibleModule(
         argument_spec=argument_spec,
         required_if=([
-            ["monigored_by", "proxy", ("proxy",)],
-            ["monigored_by", "proxy_group", ("proxy_group",)]
+            ["monitored_by", "proxy", ("proxy",)],
+            ["monitored_by", "proxy_group", ("proxy_group",)]
         ]),
         supports_check_mode=True
     )

@@ -56,6 +56,13 @@ options:
         required: false
         type: str
         default: 1m
+    min_online:
+        description:
+            - Minimum number of online proxies required for the group to be online.
+            - "Possible values range: 1-1000."
+        required: false
+        type: str
+        default: "1"
     state:
         description:
             - State of the proxy group.
@@ -64,6 +71,9 @@ options:
         choices: ["present", "absent"]
         default: "present"
         type: str
+
+extends_documentation_fragment:
+- community.zabbix.zabbix
 
 """
 
@@ -119,7 +129,7 @@ class ProxyGroup(ZabbixBase):
 
     def proxy_group_exists(self, proxy_group_name):
         result = self._zapi.proxygroup.get({"output": "extend",
-                                       "filter": {"name": proxy_group_name}})
+                                            "filter": {"name": proxy_group_name}})
 
         if len(result) > 0 and "proxy_groupid" in result[0]:
             self.existing_data = result[0]

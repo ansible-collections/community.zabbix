@@ -299,4 +299,3 @@
 - name: assert that nothing has been changed
   ansible.builtin.assert:
     that: not zbxproxy_delete_again is changed
-
