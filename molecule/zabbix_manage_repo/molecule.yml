@@ -12,7 +12,6 @@ platforms:
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
     groups:
-      - ${MY_MOLECULE_DATABASE:-mysql}
       - ${MY_MOLECULE_VERSION:-v64}
 
 provisioner:
@@ -22,6 +21,9 @@ provisioner:
     ANSIBLE_ROLES_PATH: $HOME/.ansible/collections/ansible_collections/community/zabbix/roles
   inventory:
     group_vars:
+      all:
+        zabbix_repo_apt_priority: 1
+        zabbix_repo_yum_gpg_check: 1
       v64:
         zabbix_server_version: 6.4
       v62:

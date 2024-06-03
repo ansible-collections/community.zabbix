@@ -33,6 +33,8 @@ provisioner:
     group_vars:
       all:
         zabbix_api_server_url: zabbix-web-${MY_MOLECULE_VERSION:-v64}-${MY_MOLECULE_DATABASE:-mysql}-${MY_MOLECULE_CONTAINER:-rockylinux8}
+        zabbix_repo_apt_priority: 1
+        zabbix_repo_yum_gpg_check: 1
       v64:
         zabbix_server_version: 6.4
         zabbix_web_version: 6.4

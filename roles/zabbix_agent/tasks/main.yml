@@ -86,6 +86,14 @@
     zabbix_api_server_port: "{{ '443' if zabbix_api_use_ssl|bool else '80' }}"
   when: zabbix_api_server_port is undefined
 
+- name: Install Repository
+  ansible.builtin.include_role:
+    name: community.zabbix.zabbix_manage_repo
+  vars:
+    zabbix_repo_version: "{{ zabbix_agent_version }}"
+    zabbix_repo_package: "{{ zabbix_agent_package }}"
+    zabbix_repo_apt_priority: "{{ zabbix_agent_apt_priority | default (omit) }}"
+
 - name: "Install the correct repository"
   ansible.builtin.include_tasks: "{{ ansible_os_family }}.yml"
   when:

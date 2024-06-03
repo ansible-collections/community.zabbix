@@ -9,6 +9,14 @@
   tags:
     - install
 
+- name: "RedHat | Install GPG key"
+  ansible.builtin.rpm_key:
+    state: present
+    key: "{{ zabbix_repo_rpm_gpg_key_url }}"
+  become: true
+  tags:
+    - install
+
 - name: "RedHat | Install basic repo file"
   ansible.builtin.yum_repository:
     name: "{{ item.name }}"

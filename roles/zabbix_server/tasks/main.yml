@@ -27,8 +27,13 @@
   tags:
     - always
 
-- name: Install the correct repository
-  ansible.builtin.include_tasks: "{{ ansible_os_family }}.yml"
+- name: Install Repository
+  ansible.builtin.include_role:
+    name: community.zabbix.zabbix_manage_repo
+  vars:
+    zabbix_repo_apt_priority: "{{ zabbix_server_apt_priority | default (omit) }}"
+    zabbix_repo_version: "{{ zabbix_server_version }}"
+    zabbix_repo_package: "zabbix_server-{{ zabbix_proxy_database }}"
 
 - name: Install zabbix-server packages
   ansible.builtin.package:

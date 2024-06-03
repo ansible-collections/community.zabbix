@@ -26,7 +26,7 @@
     - name: "RedHat | Install zabbix-apache-conf"
       ansible.builtin.yum:
         name:
-          - "zabbix-apache-conf-{{ zabbix_web_version }}.{{ zabbix_web_version_minor }}"
+          - "zabbix-apache-conf-{{ zabbix_web_version }}.{{ zabbix_web_version_minor | default ('*')}}"
         state: "{{ zabbix_web_package_state }}"
         update_cache: true
         disablerepo: "{{ zabbix_agent_disable_repo | default(omit) }}"

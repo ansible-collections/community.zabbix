@@ -2,42 +2,6 @@
 - name: Prepare
   hosts: all
   tasks:
-    # - name: "Create group for imaginary host"
-    #   add_host:
-    #     name: imaginary-host
-    #     groups:
-    #       - mysql
-    #       - postgresql
-    #   changed_when: false
-
-    # - name: "Installing packages on CentOS"
-    #   ansible.builtin.yum:
-    #     name:
-    #       - net-tools
-    #       - which
-    #       - sudo
-    #     state: present
-    #   register: installation_dependencies
-    #   until: installation_dependencies is succeeded
-    #   when:
-    #     - ansible_os_family == 'RedHat'
-
-    # - name: "Installing packages on CentOS"
-    #   ansible.builtin.yum:
-    #     name:
-    #       - mysql
-    #     state: present
-    #   register: installation_dependencies
-    #   until: installation_dependencies is succeeded
-    #   when:
-    #     - ansible_os_family == 'RedHat'
-    #     - inventory_hostname in groups['mysql']
-
-    # - name: Check if warn parameter can be used for shell module
-    #   ansible.builtin.set_fact:
-    #     produce_warn: false
-    #   when: ansible_version.full is version("2.14", "<")
-
     - name: "Apt update"
       ansible.builtin.shell: "apt-get update && echo exit 0 > /usr/sbin/policy-rc.d"
       args:
@@ -46,21 +10,6 @@
       until: installation_dependencies is succeeded
       when:
         - ansible_os_family != 'RedHat'
-
-    # - name: "Installing packages on NON-CentOS"
-    #   ansible.builtin.apt:
-    #     name:
-    #       - net-tools
-    #       - apt-utils
-    #       - python3-pip
-    #       - gpg-agent
-    #       - sudo
-    #     update_cache: true
-    #     state: present
-    #   register: installation_dependencies
-    #   until: installation_dependencies is succeeded
-    #   when:
-    #     - ansible_os_family != 'RedHat'
 
     - name: "Configure SUDO."
       ansible.builtin.lineinfile:

@@ -18,9 +18,6 @@ zabbix_agent_tlspskidentity_file: "/etc/zabbix/tls_psk_auto.identity"
 # Selinux related vars
 selinux_allow_zabbix_run_sudo: false
 
-zabbix_repo_deb_gpg_key_url: http://repo.zabbix.com/zabbix-official-repo.key
-zabbix_repo_deb_include_deb_src: true
-
 zabbix_agent_install_agent_only: false
 
 # Zabbix role related vars
@@ -28,35 +25,8 @@ zabbix_apt_force_apt_get: true
 zabbix_apt_install_recommends: false
 
 # Override Ansible specific facts
-zabbix_repo_yum_gpgcheck: 0
-zabbix_repo_yum_schema: https
 zabbix_agent_disable_repo:
   - epel
-zabbix_repo_yum:
-  - name: zabbix
-    description: Zabbix Official Repository - $basearch
-    baseurl: "{{ zabbix_repo_yum_schema }}://repo.zabbix.com/zabbix/{{ zabbix_agent_version }}/rhel/{{ ansible_distribution_major_version }}/$basearch/"
-    mode: "0644"
-    gpgcheck: "{{ zabbix_repo_yum_gpgcheck }}"
-    gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-ZABBIX
-    state: present
-  - name: zabbix-non-supported
-    description: Zabbix Official Repository non-supported - $basearch
-    baseurl: "{{ zabbix_repo_yum_schema }}://repo.zabbix.com/non-supported/rhel/{{ ansible_distribution_major_version }}/$basearch/"
-    mode: "0644"
-    gpgcheck: "{{ zabbix_repo_yum_gpgcheck }}"
-    gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-ZABBIX
-    state: present
-  - name: zabbix-agent2-plugins
-    description: Zabbix Official Repository (Agent2 Plugins) - $basearch
-    baseurl: "{{ zabbix_repo_yum_schema }}://repo.zabbix.com/zabbix-agent2-plugins/1/rhel/{{ ansible_distribution_major_version }}/$basearch/"
-    mode: "0644"
-    gpgcheck: "{{ zabbix_repo_yum_gpgcheck }}"
-    gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-ZABBIX
-    state: present
-
-zabbix_repo_deb_url: "http://repo.zabbix.com/zabbix/{{ zabbix_agent_version }}/{{ ansible_facts.lsb.id | default(ansible_facts['distribution']) | lower }}{% if ansible_facts['architecture'] == 'aarch64' and ansible_facts.lsb.id | default(ansible_facts['distribution']) in ['Debian', 'Ubuntu'] %}-arm64{% endif %}"
-zabbix_repo_deb_component: main
 
 # Zabbix API stuff
 zabbix_api_server_host: localhost
@@ -102,8 +72,7 @@ zabbix_agent_chassis: false
 zabbix_agent_tls_config:
   unencrypted: "1"
   psk: "2"
-  cert:
-    "4"
+  cert: "4"
 
 # IPMI settings
 zabbix_agent_ipmi_authtype: -1

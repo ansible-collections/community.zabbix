@@ -1,39 +1,6 @@
 ---
 # Tasks specific for RedHat systems
 
-- name: "RedHat | Set short version name"
-  ansible.builtin.set_fact:
-    zabbix_short_version: "{{ zabbix_server_version | regex_replace('\\.', '') }}"
-  tags:
-    - always
-
-- name: "RedHat | Make sure old file is absent"
-  ansible.builtin.file:
-    path: /etc/yum.repos.d/zabbix-supported.repo
-    state: absent
-  become: true
-  tags:
-    - install
-
-- name: "RedHat | Install basic repo file"
-  ansible.builtin.yum_repository:
-    name: "{{ item.name }}"
-    description: "{{ item.description }}"
-    baseurl: "{{ item.baseurl }}"
-    gpgcheck: "{{ item.gpgcheck }}"
-    gpgkey: "{{ item.gpgkey }}"
-    mode: "{{ item.mode | default('0644') }}"
-    priority: "{{ item.priority | default('99') }}"
-    state: "{{ item.state | default('present') }}"
-    proxy: "{{ zabbix_http_proxy | default(omit) }}"
-  with_items: "{{ zabbix_repo_yum }}"
-  register: yum_repo_installed
-  become: true
-  notify:
-    - "clean repo files from proxy creds"
-  tags:
-    - install
-
 - name: "RedHat | Configure SELinux when enabled"
   ansible.builtin.include_tasks: selinux.yml
   when: ansible_facts.selinux.status | default('disabled') == 'enabled'

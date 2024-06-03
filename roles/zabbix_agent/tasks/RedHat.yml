@@ -1,24 +1,24 @@
 ---
 # Tasks specific for RedHat systems
 
-- name: "RedHat | Install basic repo file"
-  ansible.builtin.yum_repository:
-    name: "{{ item.name }}"
-    description: "{{ item.description }}"
-    baseurl: "{{ item.baseurl }}"
-    gpgcheck: "{{ item.gpgcheck }}"
-    gpgkey: "{{ item.gpgkey }}"
-    mode: "{{ item.mode | default('0644') }}"
-    priority: "{{ item.priority | default('99') }}"
-    state: "{{ item.state | default('present') }}"
-    proxy: "{{ zabbix_http_proxy | default(omit) }}"
-  with_items: "{{ zabbix_repo_yum }}"
-  register: yum_repo_installed
-  become: true
-  notify:
-    - "clean repo files from proxy creds"
-  tags:
-    - install
+# - name: "RedHat | Install basic repo file"
+#   ansible.builtin.yum_repository:
+#     name: "{{ item.name }}"
+#     description: "{{ item.description }}"
+#     baseurl: "{{ item.baseurl }}"
+#     gpgcheck: "{{ item.gpgcheck }}"
+#     gpgkey: "{{ item.gpgkey }}"
+#     mode: "{{ item.mode | default('0644') }}"
+#     priority: "{{ item.priority | default('99') }}"
+#     state: "{{ item.state | default('present') }}"
+#     proxy: "{{ zabbix_http_proxy | default(omit) }}"
+#   with_items: "{{ zabbix_repo_yum }}"
+#   register: yum_repo_installed
+#   become: true
+#   notify:
+#     - "clean repo files from proxy creds"
+#   tags:
+#     - install
 
 - name: Check if warn parameter can be used for shell module
   ansible.builtin.set_fact:

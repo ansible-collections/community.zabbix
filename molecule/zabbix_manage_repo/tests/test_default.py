@@ -11,9 +11,10 @@ testinfra_hosts = testinfra.utils.ansible_runner.AnsibleRunner(
 
 
 def test_zabbix_manage_repo_installed(host):
-    try:
+    os = host.system_info.distribution
+    if os in ["rocky"]:
         result = host.ansible("command", "yum update -y", check=False, become=True)["rc"]
-    except:
+    elif os in ["debian", "ubuntu"]:
         result = host.ansible("command", "apt update", check=False, become=True)["rc"]
     assert result == 0
 
