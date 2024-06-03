@@ -79,7 +79,7 @@
         login_host: "{{ zabbix_server_dbhost }}"
         port: "{{ zabbix_server_dbport }}"
         db: "{{ zabbix_server_dbname }}"
-        query: 'SELECT mandatory FROM dbversion'
+        query: "SELECT mandatory FROM dbversion"
   rescue:
     - name: "PostgreSQL | Import schema"
       community.postgresql.postgresql_db:
@@ -105,7 +105,6 @@
   args:
     creates: /etc/zabbix/timescaledb.done
     executable: /bin/bash
-    warn: "{{ produce_warn | default(omit) }}"
   environment:
     PGPASSWORD: "{{ zabbix_server_dbpassword }}"
   become: true
