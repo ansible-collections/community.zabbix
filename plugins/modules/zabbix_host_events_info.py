@@ -299,9 +299,8 @@ class Host(ZabbixBase):
     def get_last_event_by_trigger_id(self, triggers_id):
         """ Get the last event from triggerid"""
         output = ["eventid", "clock", "acknowledged", "value"]
-        select_acknowledges = ["clock", "alias", "message"]
         event = self._zapi.event.get({"output": output, "objectids": triggers_id,
-                                      "select_acknowledges": select_acknowledges, "selectTags": "extend", "limit": 1, "sortfield": "clock",
+                                      "select_acknowledges": "extend", "limit": 1, "sortfield": "clock",
                                       "sortorder": "DESC"})
         return event[0]
 
