@@ -164,7 +164,6 @@ options:
             - Required if proxy_groupid is not 0
         required: false
         type: str
-        default: "10051"
     local_port:
         description:
             - Parameter introduced in Zabbix 7.0.
@@ -621,7 +620,7 @@ def main():
         address=dict(type="str", required=False, default=None),
         port=dict(type="str", required=False, default="10051"),
         proxy_group=dict(type="str", required=False, default=None),
-        local_address=dict(type="str", required=False, default="10051"),
+        local_address=dict(type="str", required=False, default=None),
         local_port=dict(type="str", required=False, default="10051"),
         custom_timeouts=dict(type="int", required=False, default=0, choices=[0, 1]),
         timeout_zabbix_agent=dict(type="str", required=False, default=None),
@@ -659,9 +658,6 @@ def main():
     module = AnsibleModule(
         argument_spec=argument_spec,
         required_if=required,
-        required_together=[
-            [("proxy_group",), ("local_address",)]
-        ],
         supports_check_mode=True
     )
 
@@ -705,6 +701,9 @@ def main():
         timeout_telnet_agent = module.params["timeout_telnet_agent"]
         timeout_script = module.params["timeout_script"]
         timeout_browser = module.params["timeout_browser"]
+        if proxy_group:
+            if local_address is None:
+                module.fail_json(msg="local_address parameter is required when proxy_group is specified.")
 
     if tls_connect == "certificate":
         tls_connect = 4
