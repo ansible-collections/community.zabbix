@@ -7,6 +7,7 @@
     - zabbix_api_create_hostgroup | bool
   register: zabbix_api_hostgroup_created
   until: zabbix_api_hostgroup_created is succeeded
+  retries: 10
   delegate_to: "{{ zabbix_api_server_host }}"
   tags:
     - api
@@ -27,8 +28,8 @@
     tls_psk_identity: "{{ zabbix_agent_tlspskidentity | default(omit) }}"
     tls_issuer: "{{ zabbix_agent_tlsservercertissuer | default(omit) }}"
     tls_subject: "{{ zabbix_agent_tls_subject | default(omit) }}"
-    tls_accept: "{{ zabbix_agent_tls_config[zabbix_agent_tlsaccept if zabbix_agent_tlsaccept else 'unencrypted'] }}"
-    tls_connect: "{{ zabbix_agent_tls_config[zabbix_agent_tlsconnect if zabbix_agent_tlsconnect else 'unencrypted'] }}"
+    tls_accept: "{{ zabbix_agent_tls_config[zabbix_agent_tlsaccept | default('unencrypted')] }}"
+    tls_connect: "{{ zabbix_agent_tls_config[zabbix_agent_tlsconnect | default('unencrypted')] }}"
     description: "{{ zabbix_agent_description | default(omit) }}"
     inventory_zabbix: "{{ zabbix_agent_inventory_zabbix | default({}) }}"
     ipmi_authtype: "{{ zabbix_agent_ipmi_authtype | default(omit) }}"
@@ -38,6 +39,7 @@
     tags: "{{ zabbix_agent_tags | default(omit) }}"
   register: zabbix_api_host_created
   until: zabbix_api_host_created is succeeded
+  retries: 10
   delegate_to: "{{ zabbix_api_server_host }}"
   changed_when: false
   tags:
@@ -54,6 +56,7 @@
     - item.macro_key is defined
   register: zabbix_api_hostmarcro_created
   until: zabbix_api_hostmarcro_created is succeeded
+  retries: 10
   delegate_to: "{{ zabbix_api_server_host }}"
   tags:
     - api

@@ -88,7 +88,7 @@ zabbix_agent_interfaces:
     useip: "{{ zabbix_useuip }}"
     ip: "{{ zabbix_agent_ip }}"
     dns: "{{ ansible_fqdn }}"
-    port: "{{ (zabbix_agent2 == True) | ternary(zabbix_agent2_listenport, zabbix_agent_listenport) }}"
+    port: "{{ zabbix_agent_listenport }}"
 
 # Zabbix configuration variables
 zabbix_agent_listeninterface:
