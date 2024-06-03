@@ -25,14 +25,21 @@ jobs:
           - version: "6.4"
         ansible:
           # https://docs.ansible.com/ansible/latest/reference_appendices/release_and_maintenance.html#ansible-core-changelogs
-          - stable-2.12
-          - stable-2.13
-          - stable-2.14
           - stable-2.15
           - stable-2.16
           - devel
         python:
+          - '3.9'
           - '3.10'
+          - '3.11'
+          - '3.12'
+        exclude:
+          - ansible: stable-2.15
+            python: '3.12'
+          - ansible: stable-2.16
+            python: '3.9'
+          - ansible: devel
+            python: '3.9'
 
     steps:
       - name: Check out code
