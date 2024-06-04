@@ -10,7 +10,7 @@ __metaclass__ = type
 DOCUMENTATION = r'''
 ---
 module: zabbix_discoveryrule
-short_description: Create/delete Zabbix discovery rules
+short_description: Create/delete Zabbix low-level discovery (LLD) rules
 description:
    - Create discoveryrules if they do not exist.
    - Delete existing discoveryrules if they exist.
@@ -206,7 +206,7 @@ EXAMPLES = r'''
         enabled: True
     state: present
 
-# Add tags to the existing Zabbix LLD rule
+# Change interval for existing Zabbix LLD rule
 - name: update rule
   # set task level variables as we change ansible_connection plugin here
   vars:
@@ -221,13 +221,7 @@ EXAMPLES = r'''
     name: mounted_filesystem_discovery
     template_name: example_template
     params:
-        type: zabbix_agent
-        key: 'vfs.fs.discovery'
-        interval: 1h
-        enabled: True
-        tags:
-          - tag: class
-            value: application
+        interval: 2h
     state: present
 
 # Delete LLD rule
