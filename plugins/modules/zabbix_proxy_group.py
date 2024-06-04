@@ -21,12 +21,6 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-from ansible.module_utils.basic import AnsibleModule
-
-from ansible_collections.community.zabbix.plugins.module_utils.base import ZabbixBase
-
-import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabbix_utils
-
 
 DOCUMENTATION = r"""
 ---
@@ -120,6 +114,15 @@ EXAMPLES = r"""
     name: ProxyGroup01
     state: absent
 """
+
+RETURN = r""" # """
+
+
+from ansible.module_utils.basic import AnsibleModule
+
+from ansible_collections.community.zabbix.plugins.module_utils.base import ZabbixBase
+
+import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabbix_utils
 
 
 class ProxyGroup(ZabbixBase):

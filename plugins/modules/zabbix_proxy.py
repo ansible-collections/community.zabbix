@@ -204,7 +204,6 @@ options:
             - Rired if if C(custom_timeouts) is set to 1.
         required: false
         type: str
-        default: ""
     timeout_simple_check:
         description:
             - Parameter introduced in Zabbix 7.0.
@@ -214,7 +213,6 @@ options:
             - Required if if C(custom_timeouts) is set to 1.
         required: false
         type: str
-        default: ""
     timeout_snmp_agent:
         description:
             - Parameter introduced in Zabbix 7.0.
@@ -224,7 +222,6 @@ options:
             - Required if if C(custom_timeouts) is set to 1.
         required: false
         type: str
-        default: ""
     timeout_external_check:
         description:
             - Parameter introduced in Zabbix 7.0.
@@ -234,7 +231,6 @@ options:
             - Required if if C(custom_timeouts) is set to 1.
         required: false
         type: str
-        default: ""
     timeout_db_monitor:
         description:
             - Parameter introduced in Zabbix 7.0.
@@ -244,7 +240,6 @@ options:
             - Required if if C(custom_timeouts) is set to 1.
         required: false
         type: str
-        default: ""
     timeout_http_agent:
         description:
             - Parameter introduced in Zabbix 7.0.
@@ -254,7 +249,6 @@ options:
             - Required if if C(custom_timeouts) is set to 1.
         required: false
         type: str
-        default: ""
     timeout_ssh_agent:
         description:
             - Parameter introduced in Zabbix 7.0.
@@ -264,7 +258,6 @@ options:
             - Required if if C(custom_timeouts) is set to 1.
         required: false
         type: str
-        default: ""
     timeout_telnet_agent:
         description:
             - Parameter introduced in Zabbix 7.0.
@@ -274,7 +267,6 @@ options:
             - Required if if C(custom_timeouts) is set to 1.
         required: false
         type: str
-        default: ""
     timeout_script:
         description:
             - Parameter introduced in Zabbix 7.0.
@@ -284,7 +276,6 @@ options:
             - Required if if C(custom_timeouts) is set to 1.
         required: false
         type: str
-        default: ""
     timeout_browser:
         description:
             - Parameter introduced in Zabbix 7.0.
@@ -294,7 +285,6 @@ options:
             - Required if if C(custom_timeouts) is set to 1.
         required: false
         type: str
-        default: ""
 
 extends_documentation_fragment:
 - community.zabbix.zabbix
