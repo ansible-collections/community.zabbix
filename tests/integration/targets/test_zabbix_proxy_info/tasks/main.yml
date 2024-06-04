@@ -13,6 +13,12 @@
   register: create_proxy_result
   when: zabbix_version is version('7.0', '<')
 
+
+- ansible.builtin.assert:
+    that:
+      - create_proxy_result.changed is sameas true
+  when: zabbix_version is version('7.0', '<')
+
 - name: test - Create new Zabbix proxy for Zabbix >= 7.0
   community.zabbix.zabbix_proxy:
     state: present
@@ -27,6 +33,7 @@
 - ansible.builtin.assert:
     that:
       - create_proxy_result.changed is sameas true
+  when: zabbix_version is version('7.0', '>=')
 
 - name: test - Create new Zabbix host monitored by the proxy
   community.zabbix.zabbix_host:
