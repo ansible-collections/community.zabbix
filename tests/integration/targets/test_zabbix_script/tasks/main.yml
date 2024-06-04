@@ -147,21 +147,16 @@
         that:
           - update_action_script_again_result.changed is sameas false
 
-      # FIXME: temporarily disabling this check for Zabbix >= 7.0
-      # EnableGlobalScripts must be 1 in Zabbix server config
-      # We need to prepare Zabbix server container for that
     - name: test - Update action operation script to execute on server
       zabbix_script:
         script_type: script
         execute_on: zabbix_server
         command: echo 1
       register: update_action_script_server_result
-      when: zabbix_version is version('7.0', '<')
 
     - assert:
         that:
           - update_action_script_server_result.changed is sameas true
-      when: zabbix_version is version('7.0', '<')
 
     - name: test - Update action operation script to execute on server again
       zabbix_script:
@@ -169,12 +164,10 @@
         execute_on: zabbix_server
         command: echo 1
       register: update_action_script_server_again_result
-      when: zabbix_version is version('7.0', '<')
 
     - assert:
         that:
           - update_action_script_server_again_result.changed is sameas false
-      when: zabbix_version is version('7.0', '<')
 
     - name: test - Update action operation script to execute on server or proxy
       zabbix_script:
