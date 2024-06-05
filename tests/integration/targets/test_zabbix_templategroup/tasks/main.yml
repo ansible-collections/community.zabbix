@@ -30,7 +30,7 @@
     template_groups:
       - Templates
     state: present
-  register: zbxtempgrp_default_existig
+  register: zbxtempgrp_default_existing
 
 - name: assert that nothing has been changed
   ansible.builtin.assert:
