@@ -1,0 +1,72 @@
+---
+name: "community.zabbix.zabbix_manage_repo"
+on:
+  push:
+    paths:
+      - "roles/zabbix_manage_repo/**"
+      - "molecule/zabbix_manage_repo/**"
+      - "molecule/requirements.txt"
+      - ".github/workflows/server.yml"
+  pull_request:
+    paths:
+      - "roles/zabbix_manage_repo/**"
+      - "molecule/zabbix_manage_repo/**"
+      - "molecule/requirements.txt"
+      - ".github/workflows/server.yml"
+jobs:
+  molecule:
+    runs-on: ubuntu-20.04
+    strategy:
+      fail-fast: false
+      matrix:
+        container:
+          - rockylinux9
+          - rockylinux8
+          - ubuntu2404
+          - ubuntu2204
+          - ubuntu2004
+          - debian12
+          - debian11
+        collection_role:
+          - zabbix_manage_repo
+        version:
+          - v64
+          - v60
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.9
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r molecule/requirements.txt
+
+      - name: Build the collection
+        run: |
+          # Pin versions to speed up CI
+          sed -i 's/ansible\.windows:\s*"\*"/ansible.windows: "2.3.0"/' galaxy.yml
+          sed -i 's/ansible\.netcommon:\s*"\*"/ansible.netcommon: "6.1.1"/' galaxy.yml
+          sed -i 's/ansible\.posix:\s*"\*"/ansible.posix: "1.5.4"/' galaxy.yml
+          sed -i 's/community\.general:\s*"\*"/community.general: "8.6.0"/' galaxy.yml
+          sed -i 's/community\.mysql:\s*"\*"/community.mysql: "3.9.0"/' galaxy.yml
+          sed -i 's/community\.postgresql:\s*"\*"/community.postgresql: "3.4.0"/' galaxy.yml
+
+          collection_file=$( basename $(ansible-galaxy collection build -f | awk -F" " '{print $NF}'))
+          echo "COLLECTION_FILE=$collection_file" >> $GITHUB_ENV
+
+      - name: Install the collection
+        run: ansible-galaxy collection install -vvvv $COLLECTION_FILE
+
+      - name: Run server role tests
+        run: >-
+          MY_MOLECULE_CONTAINER=${{ matrix.container }}
+          MY_MOLECULE_IMAGE=${{ matrix.container }}
+          MY_MOLECULE_VERSION=${{ matrix.version }}
+          MY_MOLECULE_DOCKER_COMMAND=${{ matrix.command }}
+          molecule test -s ${{ matrix.collection_role }}
