@@ -90,7 +90,7 @@ triggers_problem:
                     description: acknowledges informations
                     type: complex
                     contains:
-                        alias:
+                        username:
                             description: Account who acknowledge
                             type: str
                         clock:
@@ -208,6 +208,9 @@ EXAMPLES = """
 from ansible.module_utils.basic import AnsibleModule
 
 from ansible_collections.community.zabbix.plugins.module_utils.base import ZabbixBase
+
+from ansible.module_utils.compat.version import LooseVersion
+
 import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabbix_utils
 
 
@@ -228,10 +231,14 @@ class Host(ZabbixBase):
     def get_last_event_by_trigger_id(self, triggers_id):
         """ Get the last event from triggerid"""
         output = ["eventid", "clock", "acknowledged", "value"]
-        select_acknowledges = ["clock", "alias", "message"]
-        event = self._zapi.event.get({"output": output, "objectids": triggers_id,
-                                      "select_acknowledges": select_acknowledges, "limit": 1, "sortfield": "clock",
-                                      "sortorder": "DESC"})
+        if LooseVersion(self._zbx_api_version) < LooseVersion("7.0"):
+            event = self._zapi.event.get({"output": output, "objectids": triggers_id,
+                                          "select_acknowledges": "extend", "limit": 1, "sortfield": "clock",
+                                          "sortorder": "DESC"})
+        else:
+            event = self._zapi.event.get({"output": output, "objectids": triggers_id,
+                                          "selectAcknowledges": "extend", "limit": 1, "sortfield": "clock",
+                                          "sortorder": "DESC"})
         return event[0]
 
 

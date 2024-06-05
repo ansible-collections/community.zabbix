@@ -214,16 +214,31 @@
       ansible.builtin.assert:
         that: drule_reset is changed
 
-    - name: test - create new active Zabbix proxy server
+    - name: test - create new active Zabbix proxy server (Zabbix < 7.0)
       community.zabbix.zabbix_proxy:
         proxy_name: ACME_proxy
         status: active
         state: present
       register: zbxproxy_active
+      when: zabbix_version is version('7.0', '<')
 
     - name: assert that proxy was created
       ansible.builtin.assert:
         that: zbxproxy_active is changed
+      when: zabbix_version is version('7.0', '<')
+
+    - name: test - create new active Zabbix proxy server (Zabbix >= 7.0)
+      community.zabbix.zabbix_proxy:
+        proxy_name: ACME_proxy
+        operating_mode: active
+        state: present
+      register: zbxproxy_active
+      when: zabbix_version is version('7.0', '>=')
+
+    - name: assert that proxy was created
+      ansible.builtin.assert:
+        that: zbxproxy_active is changed
+      when: zabbix_version is version('7.0', '>=')
 
     - name: test - update Zabbix discovery rule proxy
       community.zabbix.zabbix_discovery_rule:

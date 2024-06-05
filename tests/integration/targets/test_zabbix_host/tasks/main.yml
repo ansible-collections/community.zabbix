@@ -21,3 +21,9 @@
         - ExampleHost
         - ExampleHost1
         - ExampleHost2
+
+    - name: "clean up Zabbix Proxy Group if tests failed"
+      community.zabbix.zabbix_proxy_group:
+        name: TestProxyGroup
+        state: absent
+      when: zabbix_version is version('7.0', '>=')
