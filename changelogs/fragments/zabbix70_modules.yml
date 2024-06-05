@@ -1,0 +1,5 @@
+breaking_changes:
+  - Remove support for Zabbix 6.2
+minor_changes:
+  - zabbix_discovery_rule, zabbix_group_events_info, zabbix_host, zabbix_host_events_info, zabbix_proxy, zabbix_proxy_info modules updated to work wih Zabbix 7.0
+  - added new module zabbix_proxy_group (Zabbix 7.0)

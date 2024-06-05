@@ -123,6 +123,7 @@ zabbix_proxy:
 from ansible.module_utils.basic import AnsibleModule
 
 from ansible_collections.community.zabbix.plugins.module_utils.base import ZabbixBase
+from ansible.module_utils.compat.version import LooseVersion
 import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabbix_utils
 
 
@@ -130,13 +131,21 @@ class Proxy(ZabbixBase):
 
     def get_proxy(self, name, hosts=False):
         result = {}
-        params = {
-            "filter": {
-                "host": name
-            },
-            "output": "extend",
-            "selectInterface": "extend",
-        }
+        if LooseVersion(self._zbx_api_version) < LooseVersion("7.0"):
+            params = {
+                "filter": {
+                    "host": name
+                },
+                "selectInterface": "extend",
+                "output": "extend"
+            }
+        else:
+            params = {
+                "filter": {
+                    "name": name
+                },
+                "output": "extend"
+            }
 
         if hosts:
             params["selectHosts"] = ["host", "hostid"]

@@ -1,0 +1,10 @@
+---
+- block:
+    - include_tasks: zabbix_proxy_group_tests.yml
+
+  always:
+    - name: Cleanup
+      community.zabbix.zabbix_proxy_group:
+        name: TestProxyGroup
+        state: absent
+      ignore_errors: true

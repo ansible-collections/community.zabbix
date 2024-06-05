@@ -428,11 +428,18 @@ class DiscoveryRule(ZabbixBase):
             proxy matching proxy name
         """
         try:
-            proxy_list = self._zapi.proxy.get({
-                "output": "extend",
-                "selectInterface": "extend",
-                "filter": {"host": [proxy_name]}
-            })
+            if LooseVersion(self._zbx_api_version) < LooseVersion("7.0"):
+                proxy_list = self._zapi.proxy.get({
+                    "output": "extend",
+                    "selectInterface": "extend",
+                    "filter": {"host": [proxy_name]}
+                })
+            else:
+                proxy_list = self._zapi.proxy.get({
+                    "output": "extend",
+                    "filter": {"name": [proxy_name]}
+                })
+
             if len(proxy_list) < 1:
                 self._module.fail_json(msg="Proxy not found: %s" % proxy_name)
             else:
@@ -458,7 +465,11 @@ class DiscoveryRule(ZabbixBase):
             "dchecks": kwargs["dchecks"]
         }
         if kwargs["proxy"]:
-            _params["proxy_hostid"] = self.get_proxy_by_proxy_name(kwargs["proxy"])["proxyid"]
+            if LooseVersion(self._zbx_api_version) < LooseVersion("7.0"):
+                _params["proxy_hostid"] = self.get_proxy_by_proxy_name(kwargs["proxy"])["proxyid"]
+            else:
+                _params["proxyid"] = self.get_proxy_by_proxy_name(kwargs["proxy"])["proxyid"]
+
         return _params
 
     def check_difference(self, **kwargs):

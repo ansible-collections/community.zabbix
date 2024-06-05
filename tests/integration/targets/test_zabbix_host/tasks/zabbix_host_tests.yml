@@ -40,6 +40,7 @@
         ip: 10.1.1.1
         dns: ""
         port: "12345"
+    monitored_by: "{{ zabbix_version is version('7.0', '>=') | ternary('proxy', omit) }}"
     proxy: ExampleProxy
     macros:
       - macro: MACRO1
@@ -98,6 +99,7 @@
         ip: 10.1.1.1
         dns: ""
         port: "12345"
+    monitored_by: "{{ zabbix_version is version('7.0', '>=') | ternary('proxy', omit) }}"
     proxy: ExampleProxy
     macros:
       - macro: MACRO1
@@ -157,6 +159,7 @@
         ip: 10.1.1.1
         dns: ""
         port: "12345"
+    monitored_by: "{{ zabbix_version is version('7.0', '>=') | ternary('proxy', omit) }}"
     proxy: ExampleProxy
   register: zabbix_host1
 
@@ -207,6 +210,7 @@
         ip: 10.1.1.1
         dns: ""
         port: "12345"
+    monitored_by: "{{ zabbix_version is version('7.0', '>=') | ternary('proxy', omit) }}"
     proxy: ExampleProxy
   register: zabbix_host1
 
@@ -487,6 +491,7 @@
 - name: "test: remove host proxy"
   community.zabbix.zabbix_host:
     host_name: ExampleHost
+    monitored_by: "{{ zabbix_version is version('7.0', '>=') | ternary('zabbix_server', omit) }}"
     proxy: ""
   register: zabbix_host1
 
@@ -498,6 +503,7 @@
 - name: "test: add host proxy"
   community.zabbix.zabbix_host:
     host_name: ExampleHost
+    monitored_by: "{{ zabbix_version is version('7.0', '>=') | ternary('proxy', omit) }}"
     proxy: ExampleProxy
   register: zabbix_host1
 
@@ -509,6 +515,7 @@
 - name: "test: add host proxy (again)"
   community.zabbix.zabbix_host:
     host_name: ExampleHost
+    monitored_by: "{{ zabbix_version is version('7.0', '>=') | ternary('proxy', omit) }}"
     proxy: ExampleProxy
   register: zabbix_host1
 
@@ -1424,3 +1431,83 @@
   community.zabbix.zabbix_host:
     host_name: ExampleHost
     state: absent
+
+- name: perform tests for Zabbix >= 7.0
+  when: zabbix_version is version('7.0', '>=')
+  block:
+  - name: create zabbix proxy group
+    community.zabbix.zabbix_proxy_group:
+      name: TestProxyGroup
+
+  - name: create host monitored by zabbix proxy group
+    community.zabbix.zabbix_host:
+      host_name: ExampleHost
+      state: present
+      host_groups:
+        - Linux servers
+      monitored_by: proxy_group
+      proxy_group: TestProxyGroup
+    register: zbx_host_create_proxy_group
+
+  - name: expect host to be created (changed)
+    ansible.builtin.assert:
+      that: zbx_host_create_proxy_group is changed
+
+  - name: create host monitored by zabbix proxy group again
+    community.zabbix.zabbix_host:
+      host_name: ExampleHost
+      state: present
+      host_groups:
+        - Linux servers
+      monitored_by: proxy_group
+      proxy_group: TestProxyGroup
+    register: zbx_host_create_proxy_group_again
+
+  - name: expect host to be not changed
+    ansible.builtin.assert:
+      that: zbx_host_create_proxy_group_again is not changed
+
+  - name: update host monitored by zabbix server
+    community.zabbix.zabbix_host:
+      host_name: ExampleHost
+      state: present
+      monitored_by: zabbix_server
+    register: zbx_host_update_zabbix_server
+
+  - name: expect host to be changed
+    ansible.builtin.assert:
+      that: zbx_host_update_zabbix_server is changed
+
+  - name: update host to be monitored by zabbix proxy group
+    community.zabbix.zabbix_host:
+      host_name: ExampleHost
+      state: present
+      monitored_by: proxy_group
+      proxy_group: TestProxyGroup
+    register: zbx_host_update_proxy_group
+
+  - name: expect host to be changed
+    ansible.builtin.assert:
+      that: zbx_host_update_proxy_group is changed
+
+  - name: update host to be monitored by zabbix proxy group again
+    community.zabbix.zabbix_host:
+      host_name: ExampleHost
+      state: present
+      monitored_by: proxy_group
+      proxy_group: TestProxyGroup
+    register: zbx_host_update_proxy_group_again
+
+  - name: expect host not to be changed
+    ansible.builtin.assert:
+      that: zbx_host_update_proxy_group_again is not changed
+
+  - name: cleanup host
+    community.zabbix.zabbix_host:
+      host_name: ExampleHost
+      state: absent
+
+  - name: cleanup proxy group
+    community.zabbix.zabbix_proxy_group:
+      name: TestProxyGroup
+      state: absent

@@ -18,6 +18,8 @@ services:
       - "zabbix-db"
     links:
       - "zabbix-db"
+    env_file:
+      - ./.env_srv
   zabbix-web:
     image: zabbix/zabbix-web-nginx-pgsql:ubuntu-${zabbix_version}-latest
     environment:
