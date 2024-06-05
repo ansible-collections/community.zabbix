@@ -27,7 +27,7 @@
 - ansible.builtin.assert:
     that:
       - fetch_template_json_format_result.template_json[template_export_key].date is defined
-  when: zabbix_version is version('6.2', '<=')
+  when: zabbix_version is version('6.0', '=')
 
 - ansible.builtin.assert:
     that:

@@ -35,8 +35,6 @@ provisioner:
         zabbix_agent_tlsaccept: psk
       v64:
         zabbix_agent_version: 6.4
-      v62:
-        zabbix_agent_version: 6.2
       v60:
         zabbix_agent_version: 6.0
 scenario:

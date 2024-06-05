@@ -29,18 +29,12 @@ jobs:
           - debian11
         version:
           - v64
-          - v62
           - v60
         scenario_name:
           - default
           - autopsk
           - agent2
           - agent2autopsk
-        exclude:
-          - container: debian12
-            version: v62
-          - container: ubuntu2404
-            version: v62
 
     steps:
       - name: Check out code
