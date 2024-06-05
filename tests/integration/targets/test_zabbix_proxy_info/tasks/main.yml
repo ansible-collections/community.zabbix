@@ -1,5 +1,5 @@
 ---
-- name: test - Create new Zabbix proxy
+- name: test - Create new Zabbix proxy for Zabbix < 7.0
   community.zabbix.zabbix_proxy:
     state: present
     proxy_name: ExampleProxy
@@ -11,10 +11,29 @@
       port: 10051
       dns: ExampleProxy.local
   register: create_proxy_result
+  when: zabbix_version is version('7.0', '<')
+
 
 - ansible.builtin.assert:
     that:
       - create_proxy_result.changed is sameas true
+  when: zabbix_version is version('7.0', '<')
+
+- name: test - Create new Zabbix proxy for Zabbix >= 7.0
+  community.zabbix.zabbix_proxy:
+    state: present
+    proxy_name: ExampleProxy
+    description: ExampleProxy
+    operating_mode: passive
+    address: 10.1.1.2
+    port: 10051
+  register: create_proxy_result
+  when: zabbix_version is version('7.0', '>=')
+
+- ansible.builtin.assert:
+    that:
+      - create_proxy_result.changed is sameas true
+  when: zabbix_version is version('7.0', '>=')
 
 - name: test - Create new Zabbix host monitored by the proxy
   community.zabbix.zabbix_host:
@@ -23,6 +42,7 @@
     host_groups:
       - Linux servers
     status: enabled
+    monitored_by: "{{ zabbix_version is version('7.0', '>=') | ternary('proxy', omit) }}"
     proxy: ExampleProxy
     interfaces:
       - type: 1
@@ -43,6 +63,7 @@
     proxy_hosts: true
   register: get_proxy_info_result
 
+- debug: var=get_proxy_info_result
 - ansible.builtin.assert:
     that:
       - get_proxy_info_result["zabbix_proxy"].host == "ExampleProxy"
@@ -53,6 +74,16 @@
       - get_proxy_info_result["zabbix_proxy"].interface.useip == "1"
       - get_proxy_info_result["zabbix_proxy"].interface.port == "10051"
       - get_proxy_info_result["zabbix_proxy"].interface.dns == "ExampleProxy.local"
+  when: zabbix_version is version('7.0', '<')
+
+- ansible.builtin.assert:
+    that:
+      - get_proxy_info_result["zabbix_proxy"].name== "ExampleProxy"
+      - get_proxy_info_result["zabbix_proxy"].hosts | length > 0
+      - get_proxy_info_result["zabbix_proxy"].hosts[0].host == "ExampleHost"
+      - get_proxy_info_result["zabbix_proxy"].address == "10.1.1.2"
+      - get_proxy_info_result["zabbix_proxy"].port == "10051"
+  when: zabbix_version is version('7.0', '>=')
 
 - name: test - cleanup test Zabbix host
   community.zabbix.zabbix_host:
