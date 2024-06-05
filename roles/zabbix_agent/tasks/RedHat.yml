@@ -1,13 +1,6 @@
 ---
 # Tasks specific for RedHat systems
 
-- name: Check if warn parameter can be used for shell module
-  ansible.builtin.set_fact:
-    produce_warn: False
-  when: ansible_version.full is version("2.14", "<")
-  tags:
-    - always
-
 - name: "RedHat | Installing zabbix-agent"
   ansible.builtin.package:
     pkg:

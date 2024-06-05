@@ -48,6 +48,7 @@ DenyKey={{ item }}
 {% else %}
 # DenyKey=
 {% endif %}
+{{ (zabbix_agent_enablepersistentbuffer is defined and zabbix_agent_enablepersistentbuffer is not none) | ternary('', '# ') }}EnablePersistentBuffer={{ zabbix_agent_enablepersistentbuffer | default('') }}
 {% if not zabbix_agent2 %}
 {{ (zabbix_agent_enableremotecommands is defined and zabbix_agent_enableremotecommands is not none) | ternary('', '# ') }}EnableRemoteCommands={{ zabbix_agent_enableremotecommands | default('') }}
 {% endif %}
