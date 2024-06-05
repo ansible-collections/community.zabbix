@@ -31,13 +31,8 @@ jobs:
           - zabbix_manage_repo
         version:
           - v64
-          - v62
           - v60
-        exclude:
-          - container: debian12
-            version: v62
-          - container: ubuntu2404
-            version: v62
+
     steps:
       - name: Check out code
         uses: actions/checkout@v4
