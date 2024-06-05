@@ -1,0 +1,2 @@
+minor_changes:
+ - zabbix_agent_distribution_release - Overload ansible_distribution_release on Debian when choosing packages to install
