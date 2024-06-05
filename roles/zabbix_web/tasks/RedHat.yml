@@ -4,25 +4,6 @@
   tags:
     - always
 
-# - name: "RedHat | Install basic repo file"
-#   ansible.builtin.yum_repository:
-#     name: "{{ item.name }}"
-#     description: "{{ item.description | default(omit) }}"
-#     baseurl: "{{ item.baseurl }}"
-#     gpgcheck: "{{ item.gpgcheck | default(omit) }}"
-#     gpgkey: "{{ item.gpgkey | default(omit) }}"
-#     mode: "{{ item.mode | default('0644') }}"
-#     priority: "{{ item.priority | default('99') }}"
-#     state: "{{ item.state | default('present') }}"
-#     proxy: "{{ zabbix_http_proxy | default(omit) }}"
-#   with_items: "{{ zabbix_repo_yum }}"
-#   register: yum_repo_installed
-#   become: true
-#   notify:
-#     - "clean repo files from proxy creds"
-#   tags:
-#     - install
-
 - name: "RedHat | Install zabbix-web-{{ zabbix_server_database }}"
   ansible.builtin.yum:
     name:
