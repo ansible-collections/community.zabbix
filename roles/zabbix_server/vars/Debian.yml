@@ -12,7 +12,6 @@ zabbix_valid_server_versions:
     - 6.0
   "11":
     - 6.4
-    - 6.2
     - 6.0
   # Ubuntu
   "24":
@@ -20,11 +19,9 @@ zabbix_valid_server_versions:
     - 6.0
   "22":
     - 6.4
-    - 6.2
     - 6.0
   "20":
     - 6.4
-    - 6.2
     - 6.0
 
 _zabbix_server_pgsql_dependencies:

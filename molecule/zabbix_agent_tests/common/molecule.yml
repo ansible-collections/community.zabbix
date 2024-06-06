@@ -37,8 +37,6 @@ provisioner:
         zabbix_repo_yum_gpg_check: 1
       v64:
         zabbix_agent_version: 6.4
-      v62:
-        zabbix_agent_version: 6.2
       v60:
         zabbix_agent_version: 6.0
 scenario:
