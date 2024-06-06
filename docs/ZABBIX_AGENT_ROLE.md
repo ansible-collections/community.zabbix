@@ -119,10 +119,12 @@ The following is an overview of all available configuration default for this rol
 * `zabbix_repo_deb_component`: The repository component for Debian installs. Default `main`.
 * `zabbix_repo_deb_gpg_key_url`: The URL to download the Zabbix GPG key from. Default `http://repo.zabbix.com/zabbix-official-repo.key.
 * `zabbix_repo_deb_include_deb_src`: True, if deb-src should be included in the zabbix.sources entry. Default `true`.
+* `zabbix_manage_repo`: Have the collection install and configure the Zabbix repo Default `true`.
 
 ### SElinux
 
-* `zabbix_selinux`: Default: `False`. Enables an SELinux policy so that the server will run.
+Selinux changes will be installed based on the status of selinux running on the target system.
+
 * `selinux_allow_zabbix_run_sudo`: Default: `False`.  Enable Zabbix root access on system.
 
 ### Zabbix Agent

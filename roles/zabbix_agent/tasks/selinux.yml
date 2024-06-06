@@ -67,7 +67,7 @@
 
 - name: "SELinux | Set zabbix_selinux to true if getenforce returns Enforcing or Permissive"
   ansible.builtin.set_fact:
-    zabbix_selinux: "{{ true }}"
+    zabbix_agent_selinux: "{{ true }}"
   when:
     - 'getenforce_bin.stat.exists and ("Enforcing" in sestatus.stdout or "Permissive" in sestatus.stdout)'
   tags:

@@ -1,0 +1,3 @@
+---
+zabbix_repo_keyring_path: /etc/apt/keyrings/
+zabbix_repo_gpg_key: "{{ zabbix_repo_keyring_path }}zabbix-repo.asc"

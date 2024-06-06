@@ -1,16 +1,18 @@
 ---
 # Tasks specific for RedHat systems
 
-- name: "RedHat | Set short version name"
-  ansible.builtin.set_fact:
-    zabbix_short_version: "{{ zabbix_server_version | regex_replace('\\.', '') }}"
-  tags:
-    - always
-
 - name: "RedHat | Make sure old file is absent"
   ansible.builtin.file:
     path: /etc/yum.repos.d/zabbix-supported.repo
     state: absent
+  become: true
+  tags:
+    - install
+
+- name: "RedHat | Install GPG key"
+  ansible.builtin.rpm_key:
+    state: present
+    key: "{{ zabbix_repo_rpm_gpg_key_url }}"
   become: true
   tags:
     - install
@@ -20,12 +22,15 @@
     name: "{{ item.name }}"
     description: "{{ item.description }}"
     baseurl: "{{ item.baseurl }}"
-    gpgcheck: "{{ item.gpgcheck }}"
+    gpgcheck: "{{ item.gpgcheck | default(omit) }}"
     gpgkey: "{{ item.gpgkey }}"
     mode: "{{ item.mode | default('0644') }}"
     priority: "{{ item.priority | default('99') }}"
     state: "{{ item.state | default('present') }}"
     proxy: "{{ zabbix_http_proxy | default(omit) }}"
+    username: "{{ item.username | default(omit) }}"
+    password: "{{ item.password | default(omit) }}"
+    sslverify: "{{ item.sslverify  | default('true') }}"
   with_items: "{{ zabbix_repo_yum }}"
   register: yum_repo_installed
   become: true
@@ -33,7 +38,3 @@
     - "clean repo files from proxy creds"
   tags:
     - install
-
-- name: "RedHat | Configure SELinux when enabled"
-  ansible.builtin.include_tasks: selinux.yml
-  when: ansible_facts.selinux.status | default('disabled') == 'enabled'

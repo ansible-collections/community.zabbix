@@ -1,9 +1,8 @@
 ---
 driver:
   name: docker
-
 platforms:
-  - name: zabbix-server-${MY_MOLECULE_VERSION:-v64}-${MY_MOLECULE_DATABASE:-mysql}-${MY_MOLECULE_CONTAINER:-rockylinux8}
+  - name: zabbix-repo-${MY_MOLECULE_VERSION:-v64}-${MY_MOLECULE_CONTAINER:-rockylinux8}
     image: geerlingguy/docker-${MY_MOLECULE_IMAGE:-rockylinux8}-ansible:latest
     privileged: true
     pre_build_image: true
@@ -14,6 +13,7 @@ platforms:
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
     groups:
       - ${MY_MOLECULE_VERSION:-v64}
+
 provisioner:
   name: ansible
   env:
@@ -25,11 +25,9 @@ provisioner:
         zabbix_repo_apt_priority: 1
         zabbix_repo_yum_gpg_check: 1
       v64:
-        zabbix_javagateway_version: 6.4
-      v62:
-        zabbix_javagateway_version: 6.2
+        zabbix_server_version: 6.4
       v60:
-        zabbix_javagateway_version: 6.0
+        zabbix_server_version: 6.0
 
 verifier:
   name: testinfra

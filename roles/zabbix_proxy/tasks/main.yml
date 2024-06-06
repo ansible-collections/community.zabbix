@@ -15,7 +15,6 @@
 - name: Set More Variables
   ansible.builtin.set_fact:
     zabbix_proxy_db_long: "{{ 'postgresql' if zabbix_proxy_database == 'pgsql' else zabbix_proxy_database }}"
-    zabbix_short_version: "{{ zabbix_proxy_version | regex_replace('\\.', '') }}"
     zabbix_proxy_fpinglocation: "{{ zabbix_proxy_fpinglocation if zabbix_proxy_fpinglocation is defined else _zabbix_proxy_fpinglocation}}"
     zabbix_proxy_fping6location: "{{ zabbix_proxy_fping6location if zabbix_proxy_fping6location is defined else _zabbix_proxy_fping6location}}"
   tags:
@@ -46,8 +45,18 @@
     - config
     - api
 
-- name: "Complete OS Specific Tasks"
-  ansible.builtin.include_tasks: "{{ ansible_os_family }}.yml"
+- name: Install Repository
+  ansible.builtin.include_role:
+    name: community.zabbix.zabbix_repo
+  vars:
+    zabbix_repo_apt_priority: "{{ zabbix_proxy_apt_priority | default (omit) }}"
+    zabbix_repo_version: "{{ zabbix_proxy_version }}"
+    zabbix_repo_package: "zabbix-proxy-{{ zabbix_proxy_database }}"
+  when: zabbix_manage_repo | default(true)
+
+- name: "Configure SELinux when enabled"
+  ansible.builtin.include_tasks: selinux.yml
+  when: ansible_facts.selinux.status | default('disabled') == 'enabled'
 
 - name: "Install zabbix-proxy packages"
   ansible.builtin.package:

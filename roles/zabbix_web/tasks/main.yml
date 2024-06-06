@@ -50,6 +50,15 @@
     - config
     - install
 
+- name: Install Repository
+  ansible.builtin.include_role:
+    name: community.zabbix.zabbix_repo
+  vars:
+    zabbix_repo_version: "{{ zabbix_web_version }}"
+    zabbix_repo_package: "zabbix-web-service"
+    zabbix_repo_apt_priority: "{{ zabbix_web_apt_priority | default (omit) }}"
+  when: zabbix_manage_repo | default(true)
+
 - name: Include OS Specific Tasks
   ansible.builtin.include_tasks: "{{ ansible_os_family }}.yml"
 

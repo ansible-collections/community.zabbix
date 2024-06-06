@@ -88,16 +88,12 @@ The following is an overview of all available configuration defaults for this ro
 
 * `zabbix_web_version`: Optional. The latest available major.minor version of Zabbix will be installed on the host(s). If you want to use an older version, please specify this in the major.minor format. Example: `zabbix_web_version: 6.0`.
 * `zabbix_web_version_minor`: When you want to specify a minor version to be installed. RedHat only. Default set to: `*` (latest available)
-* `zabbix_repo_yum`: A list with Yum repository configuration.
-* `zabbix_repo_yum_schema`: Default: `https`. Option to change the web schema for the yum repository(http/https)
 * `zabbix_web_disable_repo`: A list of repos to disable during install.  Default `epel`.
 * `zabbix_web_package_state`: Default: `present`. Can be overridden to `latest` to update packages when needed.
 * `zabbix_web_doubleprecision`: Default: `False`. For upgraded installations, please read database [upgrade notes](https://www.zabbix.com/documentation/current/manual/installation/upgrade_notes_500) (Paragraph "Enabling extended range of numeric (float) values") before enabling this option.
 * `zabbix_web_conf_mode`: Default: `0644`. The "mode" for the Zabbix configuration file.
-* `zabbix_repo_deb_url`: The URL to the Zabbix repository.  Default `http://repo.zabbix.com/zabbix/{{ zabbix_web_version }}/{{ ansible_distribution.lower() }}`
-* `zabbix_repo_deb_component`: The repository component for Debian installs. Default `main`.
-* `zabbix_repo_deb_gpg_key_url`: The URL to download the Zabbix GPG key from. Default `http://repo.zabbix.com/zabbix-official-repo.key`.
-* `zabbix_repo_deb_include_deb_src`: True, if deb-src should be included in the zabbix.sources entry. Default `true`.
+* `zabbix_manage_repo`: Have the collection install and configure the Zabbix repo Default `true`.
+
 
 ### Zabbix Web specific
 
@@ -156,7 +152,8 @@ The following properties are specific to Zabbix 5.0 and for the PHP(-FPM) config
 
 ### SElinux
 
-* `zabbix_web_selinux`: Default: `False`. Enables an SELinux policy so that the web will run.
+Selinux changes will be installed based on the status of selinux running on the target system.
+
 * `selinux_allow_httpd_can_connect_zabbix`: Default: `false`. Set SELinux boolean to allow httpd to connect to zabbix.
 * `selinux_allow_httpd_can_connect_ldap`: Default: `false`. Set SELinux boolean to allow httpd to connect to LDAP.
 * `selinux_allow_httpd_can_network_connect_db`: Default: `false` Set SELinux boolean to allow httpd to connect databases over the network.

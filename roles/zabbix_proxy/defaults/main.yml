@@ -39,29 +39,7 @@ zabbix_proxy_tls_config:
 zabbix_proxy_version_minor: "*"
 
 # Yum/APT Variables
-zabbix_repo_yum_schema: https
-zabbix_repo_yum_gpgcheck: 0
-zabbix_repo_deb_url: "http://repo.zabbix.com/zabbix/{{ zabbix_proxy_version }}/{{ ansible_facts.lsb.id | default(ansible_facts['distribution']) | lower }}{% if ansible_facts['architecture'] == 'aarch64' and ansible_facts.lsb.id | default(ansible_facts['distribution']) in ['Debian', 'Ubuntu'] %}-arm64{% endif %}"
-zabbix_repo_deb_component: main
-zabbix_repo_yum:
-  - name: zabbix
-    description: Zabbix Official Repository - $basearch
-    baseurl: "{{ zabbix_repo_yum_schema }}://repo.zabbix.com/zabbix/{{ zabbix_proxy_version | regex_search('^[0-9]+.[0-9]+') }}/rhel/{{ ansible_distribution_major_version }}/$basearch/"
-    gpgcheck: "{{ zabbix_repo_yum_gpgcheck }}"
-    mode: "0644"
-    gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-ZABBIX
-    state: present
-  - name: zabbix-non-supported
-    description: Zabbix Official Repository non-supported - $basearch
-    baseurl: "{{ zabbix_repo_yum_schema }}://repo.zabbix.com/non-supported/rhel/{{ ansible_distribution_major_version }}/$basearch/"
-    mode: "0644"
-    gpgcheck: "{{ zabbix_repo_yum_gpgcheck }}"
-    gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-ZABBIX
-    state: present
-zabbix_proxy_apt_priority:
 zabbix_proxy_package_state: present
-zabbix_repo_deb_gpg_key_url: http://repo.zabbix.com/zabbix-official-repo.key
-zabbix_repo_deb_include_deb_src: true
 
 # Proxy Configuration Variables (Only ones with role provided defaults)
 zabbix_proxy_allowroot: 0

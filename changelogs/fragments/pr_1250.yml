@@ -1,0 +1,7 @@
+major_changes:
+  - All Roles - Separate installation of Zabbix repo from all other roles and link them together.
+minor_changes:
+  - All Roles - Include installation of GPG key for RHEL based operating systems.
+  - All Roles - Add support for yum authentication on RHEL based operating systems.
+  - All Roles - Add the `zabbix_manage_repo` variable.
+  - All Roles - Changed logic for installing selinux related changes based the status of selinux on the target system.
