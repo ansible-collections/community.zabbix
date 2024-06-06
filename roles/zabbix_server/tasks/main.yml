@@ -40,7 +40,7 @@
   ansible.builtin.include_tasks: selinux.yml
   when:
     - zabbix_server_selinux | default (false) | bool
-    - ansiblle_os_family == "RedHat"
+    - ansible_os_family == "RedHat"
 
 - name: Install zabbix-server packages
   ansible.builtin.package:

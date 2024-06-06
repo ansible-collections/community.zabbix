@@ -58,7 +58,7 @@
   ansible.builtin.include_tasks: selinux.yml
   when:
     - zabbix_proxy_selinux | default (false) | bool
-    - ansiblle_os_family == "RedHat"
+    - ansible_os_family == "RedHat"
 
 - name: "Install zabbix-proxy packages"
   ansible.builtin.package:
