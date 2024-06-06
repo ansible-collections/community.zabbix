@@ -139,7 +139,7 @@ The following is an overview of all available configuration default for this rol
 
 ### SElinux
 
-* `zabbix_proxy_selinux`: Default: `False`. Enables an SELinux policy so that the Proxy will run.
+Selinux options will be installed based on the status of selinux running on the target system.
 
 ## Proxy
 

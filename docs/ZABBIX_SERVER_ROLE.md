@@ -111,7 +111,7 @@ The following is an overview of all available configuration default for this rol
 
 ### SElinux
 
-* `zabbix_server_selinux`: Default: `False`. Enables an SELinux policy so that the server will run.
+Selinux options will be installed based on the status of selinux running on the target system.
 * `selinux_allow_zabbix_can_network`: Default: `False`. 
 * `selinux_allow_zabbix_can_http`: Default: `False`. 
 

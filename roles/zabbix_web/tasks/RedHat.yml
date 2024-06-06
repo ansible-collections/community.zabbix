@@ -41,5 +41,4 @@
 
 - name: "Configure SELinux when enabled"
   ansible.builtin.include_tasks: selinux.yml
-  when:
-    - zabbix_web_selinux | default (false) | bool
+  when: ansible_facts.selinux.status | default('disabled') == 'enabled'
