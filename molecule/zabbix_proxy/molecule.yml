@@ -26,6 +26,8 @@ provisioner:
       all:
         zabbix_repo_apt_priority: 1
         zabbix_repo_yum_gpg_check: 1
+      v70:
+        zabbix_proxy_version: 7.0
       v64:
         zabbix_proxy_version: 6.4
       v62:
