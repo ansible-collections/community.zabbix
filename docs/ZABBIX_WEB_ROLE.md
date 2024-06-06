@@ -152,7 +152,8 @@ The following properties are specific to Zabbix 5.0 and for the PHP(-FPM) config
 
 ### SElinux
 
-Selinux options will be installed based on the status of selinux running on the target system.
+Selinux changes will be installed based on the status of selinux running on the target system.
+
 * `selinux_allow_httpd_can_connect_zabbix`: Default: `false`. Set SELinux boolean to allow httpd to connect to zabbix.
 * `selinux_allow_httpd_can_connect_ldap`: Default: `false`. Set SELinux boolean to allow httpd to connect to LDAP.
 * `selinux_allow_httpd_can_network_connect_db`: Default: `false` Set SELinux boolean to allow httpd to connect databases over the network.

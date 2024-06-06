@@ -139,7 +139,7 @@ The following is an overview of all available configuration default for this rol
 
 ### SElinux
 
-Selinux options will be installed based on the status of selinux running on the target system.
+Selinux changes will be installed based on the status of selinux running on the target system.
 
 ## Proxy
 
