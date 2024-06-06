@@ -49,29 +49,9 @@ zabbix_server_dbverifyhost: false
 zabbix_server_dbschema:
 
 # Yum/APT Variables
-zabbix_web_apt_priority:
 zabbix_web_version_minor: "*"
-zabbix_repo_yum_gpgcheck: 0
-zabbix_repo_yum_schema: https
-zabbix_repo_deb_url: "http://repo.zabbix.com/zabbix/{{ zabbix_web_version }}/{{ ansible_facts.lsb.id | default(ansible_facts['distribution']) | lower }}{% if ansible_facts['architecture'] == 'aarch64' and ansible_facts.lsb.id | default(ansible_facts['distribution']) in ['Debian', 'Ubuntu'] %}-arm64{% endif %}"
-zabbix_repo_deb_component: main
 zabbix_web_disable_repo:
   - epel
-zabbix_repo_yum:
-  - name: zabbix
-    description: Zabbix Official Repository - $basearch
-    baseurl: "{{ zabbix_repo_yum_schema }}://repo.zabbix.com/zabbix/{{ zabbix_web_version | regex_search('^[0-9]+.[0-9]+') }}/rhel/{{ ansible_distribution_major_version }}/$basearch/"
-    gpgcheck: "{{ zabbix_repo_yum_gpgcheck | default('0') }}"
-    mode: "0644"
-    gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-ZABBIX
-    state: present
-  - name: zabbix-non-supported
-    description: Zabbix Official Repository non-supported - $basearch
-    baseurl: "{{ zabbix_repo_yum_schema }}://repo.zabbix.com/non-supported/rhel/{{ ansible_distribution_major_version }}/$basearch/"
-    mode: "0644"
-    gpgcheck: "{{ zabbix_repo_yum_gpgcheck | default('0') }}"
-    gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-ZABBIX
-    state: present
 
 # Elasticsearch
 # zabbix_server_history_url:
@@ -95,7 +75,6 @@ selinux_allow_httpd_can_connect_zabbix: false
 
 zabbix_repo_deb_gpg_key_url: http://repo.zabbix.com/zabbix-official-repo.key
 zabbix_repo_deb_include_deb_src: true
-
 # SAML certificates
 # zabbix_saml_idp_crt:
 # zabbix_saml_sp_crt:

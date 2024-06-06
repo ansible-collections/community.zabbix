@@ -1,18 +1,4 @@
 ---
-- name: "Debian | Set short version name"
-  ansible.builtin.set_fact:
-    zabbix_short_version: "{{ zabbix_proxy_version | regex_replace('\\.', '') }}"
-    zabbix_underscore_version: "{{ zabbix_proxy_version | regex_replace('\\.', '_') }}"
-  tags:
-    - always
-
-- name: "Debian | Set some facts for Zabbix"
-  ansible.builtin.set_fact:
-    datafiles_path: /usr/share/doc/zabbix-sql-scripts/{{ zabbix_proxy_db_long }}
-  tags:
-    - install
-    - config
-
 - name: "Debian | Installing gnupg"
   ansible.builtin.apt:
     pkg: gnupg
@@ -32,9 +18,9 @@
 # In releases older than Debian 12 and Ubuntu 22.04, /etc/apt/keyrings does not exist by default.
 # It SHOULD be created with permissions 0755 if it is needed and does not already exist.
 # See: https://wiki.debian.org/DebianRepository/UseThirdParty
-- name: "Debian | Create /etc/apt/keyrings/ on older versions"
+- name: "Debian | Create {{ zabbix_repo_keyring_path }} on older versions"
   ansible.builtin.file:
-    path: /etc/apt/keyrings/
+    path: "{{ zabbix_repo_keyring_path }}"
     state: directory
     mode: "0755"
   become: true
@@ -43,17 +29,17 @@
       (ansible_distribution == "Debian" and ansible_distribution_major_version < "12")
 
 - name: "Debian | Download gpg key"
-  when: not ansible_check_mode  # Because get_url always has changed status in check_mode.
+  when: not ansible_check_mode # Because get_url always has changed status in check_mode.
   ansible.builtin.get_url:
     url: "{{ zabbix_repo_deb_gpg_key_url }}"
-    dest: "{{ zabbix_gpg_key }}"
+    dest: "{{ zabbix_repo_gpg_key }}"
     mode: "0644"
     force: true
   environment:
     http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
     https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
-  register: are_zabbix_proxy_dependency_packages_installed
-  until: are_zabbix_proxy_dependency_packages_installed is succeeded
+  register: zabbix_repo_files_installed
+  until: zabbix_repo_files_installed is succeeded
   become: true
   tags:
     - install
@@ -71,7 +57,8 @@
       Suites: {{ ansible_distribution_release }}
       Components: {{ zabbix_repo_deb_component }}
       Architectures: {{ 'amd64' if ansible_machine != 'aarch64' else 'arm64'}}
-      Signed-By: {{ zabbix_gpg_key }}
+      Signed-By: {{ zabbix_repo_gpg_key }}
+  register: zabbix_repo
   become: true
   tags:
     - install
@@ -82,22 +69,31 @@
     state: directory
     mode: "0755"
   when:
-    - zabbix_proxy_apt_priority | int
+    - zabbix_repo_apt_priority is defined
+    - zabbix_repo_apt_priority | int
   become: true
   tags:
     - install
 
 - name: "Debian | Configuring the weight for APT"
   ansible.builtin.copy:
-    dest: "/etc/apt/preferences.d/zabbix-proxy-{{ zabbix_proxy_database }}"
+    dest: "/etc/apt/preferences.d/{{ zabbix_repo_package }}"
     content: |
-      Package: zabbix-proxy-{{ zabbix_proxy_database }}
+      Package: {{ zabbix_repo_package }}
       Pin: origin repo.zabbix.com
-      Pin-Priority: {{ zabbix_proxy_apt_priority }}
+      Pin-Priority: {{ zabbix_repo_apt_priority }}
     owner: root
     mode: "0644"
   when:
-    - zabbix_proxy_apt_priority | int
+    - zabbix_repo_apt_priority is defined
+    - zabbix_repo_apt_priority | int
+    - zabbix_repo_package is defined
+    - zabbix_repo_package
   become: true
   tags:
     - install
+
+- name: "Debian | Update apt cache if repo was added"
+  ansible.builtin.apt: update_cache=yes
+  when: zabbix_repo is changed
+  become: true

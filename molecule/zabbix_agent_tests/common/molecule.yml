@@ -33,6 +33,8 @@ provisioner:
         zabbix_agent_listenip: 0.0.0.0
         zabbix_agent_tlsconnect: psk
         zabbix_agent_tlsaccept: psk
+        zabbix_repo_apt_priority: 1
+        zabbix_repo_yum_gpg_check: 1
       v64:
         zabbix_agent_version: 6.4
       v62:

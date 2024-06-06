@@ -103,19 +103,16 @@ The following is an overview of all available configuration default for this rol
 
 * `zabbix_server_version`: Optional. The latest available major.minor version of Zabbix will be installed on the host(s). If you want to use an older version, please specify this in the major.minor format. Example: `zabbix_server_version: 6.0`.
 * `zabbix_server_version_minor`: When you want to specify a minor version to be installed. RedHat only. Default set to: `*` (latest available)
-* `zabbix_repo_yum`: A list with Yum repository configuration.
-* `zabbix_repo_yum_schema`: Default: `https`. Option to change the web schema for the yum repository(http/https)
 * `zabbix_server_disable_repo`: A list of repos to disable during install.  Default `epel`.
 * `zabbix_service_state`: Default: `started`. Can be overridden to stopped if needed
 * `zabbix_service_enabled`: Default: `True` Can be overridden to `False` if needed
-* `zabbix_repo_deb_url`: The URL to the Zabbix repository.  Default `http://repo.zabbix.com/zabbix/{{ zabbix_server_version }}/{{ ansible_distribution.lower() }}`
-* `zabbix_repo_deb_component`: The repository component for Debian installs. Default `main`.
-* `zabbix_repo_deb_gpg_key_url`: The URL to download the Zabbix GPG key from. Default `http://repo.zabbix.com/zabbix-official-repo.key`.
-* `zabbix_repo_deb_include_deb_src`: True, if deb-src should be included in the zabbix.sources entry. Default `true`.
+* `zabbix_manage_repo`: Have the collection install and configure the Zabbix repo Default `true`.
+
 
 ### SElinux
 
-* `zabbix_server_selinux`: Default: `False`. Enables an SELinux policy so that the server will run.
+Selinux changes will be installed based on the status of selinux running on the target system.
+
 * `selinux_allow_zabbix_can_network`: Default: `False`. 
 * `selinux_allow_zabbix_can_http`: Default: `False`. 
 

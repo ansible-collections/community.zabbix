@@ -1,0 +1,26 @@
+---
+galaxy_info:
+  author: Werner Dijkerman
+  description: Installing and maintaining zabbix-server for RedHat/Debian/Ubuntu.
+  company: myCompany.Dotcom
+  license: MIT
+  min_ansible_version: 2.4
+  platforms:
+    - name: EL
+      versions:
+        - 6
+        - 7
+    - name: Ubuntu
+      versions:
+        - lucid
+        - precise
+        - trusty
+    - name: Debian
+      versions:
+        - squeeze
+        - wheezy
+  galaxy_tags:
+    - zabbix
+    - monitoring
+
+dependencies: []

@@ -22,6 +22,15 @@
   tags:
     - always
 
+- name: Install Repository
+  ansible.builtin.include_role:
+    name: community.zabbix.zabbix_repo
+  vars:
+    zabbix_repo_apt_priority: "{{ zabbix_proxy_javagateway_priority | default (omit) }}"
+    zabbix_repo_version: "{{ zabbix_javagateway_version }}"
+    zabbix_repo_package: "zabbix-java-gateway"
+  when: zabbix_manage_repo | default(true)
+
 - name: "Install the correct repository"
   ansible.builtin.include_tasks: "{{ ansible_os_family }}.yml"
 

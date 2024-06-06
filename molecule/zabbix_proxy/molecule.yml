@@ -23,6 +23,9 @@ provisioner:
     ANSIBLE_ROLES_PATH: $HOME/.ansible/collections/ansible_collections/community/zabbix/roles
   inventory:
     group_vars:
+      all:
+        zabbix_repo_apt_priority: 1
+        zabbix_repo_yum_gpg_check: 1
       v64:
         zabbix_proxy_version: 6.4
       v62:
