@@ -39,7 +39,7 @@
 - name: "Configure SELinux when enabled"
   ansible.builtin.include_tasks: selinux.yml
   when:
-    - zabbix_proxy_selinux | bool
+    - zabbix_server_selinux | bool | default (false)
     - ansiblle_os_family == "RedHat"
 
 - name: Install zabbix-server packages

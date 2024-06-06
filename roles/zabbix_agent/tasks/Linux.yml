@@ -86,7 +86,7 @@
 - name: "Configure SELinux when enabled"
   ansible.builtin.include_tasks: selinux.yml
   when:
-    - zabbix_selinux | bool
+    - zabbix_agent_selinux | bool | default (false)
 
 - name: "Adding zabbix group"
   ansible.builtin.group:

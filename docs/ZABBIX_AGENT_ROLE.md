@@ -123,7 +123,7 @@ The following is an overview of all available configuration default for this rol
 
 ### SElinux
 
-* `zabbix_selinux`: Default: `False`. Enables an SELinux policy so that the server will run.
+* `zabbix_agent_selinux`: Default: `False`. Enables an SELinux policy so that the server will run.
 * `selinux_allow_zabbix_run_sudo`: Default: `False`.  Enable Zabbix root access on system.
 
 ### Zabbix Agent
