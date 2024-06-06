@@ -28,6 +28,7 @@ jobs:
           - debian12
           - debian11
         version:
+          - v70
           - v64
           - v62
           - v60
