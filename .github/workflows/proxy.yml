@@ -36,16 +36,8 @@ jobs:
         version:
           - v70
           - v64
-          - v62
           - v60
-        exclude:
-          - container:
-              name: debian12
-              base_image: debian:12
-              os_family: debian
-            version: v62
-          - container: ubuntu2404
-            version: v62
+
     steps:
       - name: Check out code
         uses: actions/checkout@v4

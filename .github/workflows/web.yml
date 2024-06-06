@@ -37,13 +37,7 @@ jobs:
           - apache
         version:
           - v64
-          - v62
           - v60
-        exclude:
-          - container: ubuntu2404
-            version: v62
-          - container: debian12
-            version: v62
     steps:
       - name: Check out code
         uses: actions/checkout@v4

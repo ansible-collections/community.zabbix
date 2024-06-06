@@ -12,12 +12,10 @@ zabbix_valid_server_versions:
   "9":
     - 7.0
     - 6.4
-    - 6.2
     - 6.0
   "8":
     - 7.0
     - 6.4
-    - 6.2
     - 6.0
 
 _zabbix_server_pgsql_dependencies:

@@ -49,7 +49,7 @@
       community.zabbix.zabbix_host_info:
       register: gather_all_facts_result
 
-    - when: zabbix_version is version('5.4', '>=') and zabbix_version is version('6.2', '<')
+    - when: zabbix_version is version('6.0', '=')
       ansible.builtin.assert:
         that:
           - gather_all_facts_result.hosts | length == 1
@@ -70,7 +70,7 @@
           - gather_all_facts_result.hosts.0.hostinterfaces.0.type == "1"
           - gather_all_facts_result.hosts.0.hostinterfaces.0.useip == "1"
 
-    - when: zabbix_version is version('6.2', '>=')
+    - when: zabbix_version is version('6.4', '>=')
       ansible.builtin.assert:
         that:
           - gather_all_facts_result.hosts | length == 1

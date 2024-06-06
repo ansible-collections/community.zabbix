@@ -29,8 +29,6 @@ provisioner:
         zabbix_server_version: 7.0
       v64:
         zabbix_server_version: 6.4
-      v62:
-        zabbix_server_version: 6.2
       v60:
         zabbix_server_version: 6.0
       mysql:
