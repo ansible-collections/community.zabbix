@@ -89,11 +89,12 @@
 
 - name: Install Repository
   ansible.builtin.include_role:
-    name: community.zabbix.zabbix_manage_repo
+    name: community.zabbix.zabbix_repo
   vars:
     zabbix_repo_version: "{{ zabbix_agent_version }}"
     zabbix_repo_package: "{{ zabbix_agent_package }}"
     zabbix_repo_apt_priority: "{{ zabbix_agent_apt_priority | default (omit) }}"
+  when: zabbix_manage_repo | default(true)
 
 - name: "Install the correct repository"
   ansible.builtin.include_tasks: "{{ ansible_os_family }}.yml"

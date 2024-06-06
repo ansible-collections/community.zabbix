@@ -3,3 +3,4 @@ major_changes:
 minor_changes:
   - All Roles - Include installation of GPG key for RHEL based operating systems.
   - All Roles - Add support for yum authentication on RHEL based operating systems.
+  - All Roles - Add the `zabbix_manage_repo` variable.

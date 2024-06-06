@@ -1,7 +1,0 @@
----
-# Tasks specific for RedHat systems
-
-- name: "Configure SELinux when enabled"
-  ansible.builtin.include_tasks: selinux.yml
-  when:
-    - zabbix_proxy_selinux | bool

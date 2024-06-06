@@ -47,14 +47,18 @@
 
 - name: Install Repository
   ansible.builtin.include_role:
-    name: community.zabbix.zabbix_manage_repo
+    name: community.zabbix.zabbix_repo
   vars:
     zabbix_repo_apt_priority: "{{ zabbix_proxy_apt_priority | default (omit) }}"
     zabbix_repo_version: "{{ zabbix_proxy_version }}"
     zabbix_repo_package: "zabbix-proxy-{{ zabbix_proxy_database }}"
+  when: zabbix_manage_repo | default(true)
 
-# - name: "Complete OS Specific Tasks"
-#   ansible.builtin.include_tasks: "{{ ansible_os_family }}.yml"
+- name: "Configure SELinux when enabled"
+  ansible.builtin.include_tasks: selinux.yml
+  when:
+    - zabbix_proxy_selinux | bool
+    - ansiblle_os_family == "RedHat"
 
 - name: "Install zabbix-proxy packages"
   ansible.builtin.package:

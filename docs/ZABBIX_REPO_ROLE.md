@@ -76,7 +76,7 @@ Including an example of how to use your role (for instance, with variables passe
 ```yaml
   - hosts: zabbix-server
     roles:
-      - role: community.zabbix.zabbix_manage_repo
+      - role: community.zabbix.zabbix_repo
 ```
 
 # License

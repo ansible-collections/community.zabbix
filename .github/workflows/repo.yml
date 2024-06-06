@@ -1,16 +1,16 @@
 ---
-name: "community.zabbix.zabbix_manage_repo"
+name: "community.zabbix.zabbix_repo"
 on:
   push:
     paths:
-      - "roles/zabbix_manage_repo/**"
-      - "molecule/zabbix_manage_repo/**"
+      - "roles/zabbix_repo/**"
+      - "molecule/zabbix_repo/**"
       - "molecule/requirements.txt"
       - ".github/workflows/server.yml"
   pull_request:
     paths:
-      - "roles/zabbix_manage_repo/**"
-      - "molecule/zabbix_manage_repo/**"
+      - "roles/zabbix_repo/**"
+      - "molecule/zabbix_repo/**"
       - "molecule/requirements.txt"
       - ".github/workflows/server.yml"
 jobs:
@@ -28,7 +28,7 @@ jobs:
           - debian12
           - debian11
         collection_role:
-          - zabbix_manage_repo
+          - zabbix_repo
         version:
           - v64
           - v60

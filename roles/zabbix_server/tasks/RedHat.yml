@@ -1,6 +1,0 @@
----
-# Tasks specific for RedHat systems
-
-- name: "RedHat | Configure SELinux when enabled"
-  ansible.builtin.include_tasks: selinux.yml
-  when: ansible_facts.selinux.status | default('disabled') == 'enabled'
