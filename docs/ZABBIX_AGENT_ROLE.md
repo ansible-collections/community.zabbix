@@ -89,15 +89,15 @@ To successfully complete the install the role requires `python-netaddr` on the c
 
 See the following list of supported Operating systems with the Zabbix releases:
 
-| Zabbix              | 6.4 | 6.2 | 6.0 |
-|---------------------|-----|-----|-----|
-| Red Hat Fam 9       |  V  |  V  |  V  |
-| Red Hat Fam 8       |  V  |  V  |  V  |
-| Ubuntu 24.04 noble  |  V  |     |  V  |
-| Ubuntu 22.04 jammy  |  V  |  V  |  V  |
-| Ubuntu 20.04 focal  |  V  |  V  |  V  |
-| Debian 12 bookworm  |  V  |  V  |  V  |
-| Debian 11 bullseye  |  V  |  V  |  V  |
+| Zabbix              | 6.4 | 6.0 |
+|---------------------|-----|-----|
+| Red Hat Fam 9       |  V  |  V  |
+| Red Hat Fam 8       |  V  |  V  |
+| Ubuntu 24.04 noble  |  V  |  V  |
+| Ubuntu 22.04 jammy  |  V  |  V  |
+| Ubuntu 20.04 focal  |  V  |  V  |
+| Debian 12 bookworm  |  V  |  V  |
+| Debian 11 bullseye  |  V  |  V  |
 
 You can bypass this matrix by setting `enable_version_check: false`
 
@@ -109,7 +109,7 @@ The following is an overview of all available configuration default for this rol
 
 ### Overall Zabbix
 
-* `zabbix_agent_version`: This is the version of zabbix. Default: The highest supported version for the operating system. Can be overridden to 6.4, 6.2, or 6.0
+* `zabbix_agent_version`: This is the version of zabbix. Default: The highest supported version for the operating system. Can be overridden to 6.4 or 6.0
 * `zabbix_agent_version_minor`: When you want to specify a minor version to be installed. Is also used for `zabbix_sender` and `zabbix_get`. RedHat only. Default set to: `*` (latest available)
 * `zabbix_repo_yum`: A list with Yum repository configuration.
 * `zabbix_repo_yum_gpgcheck`: If Yum should check GPG keys on installation

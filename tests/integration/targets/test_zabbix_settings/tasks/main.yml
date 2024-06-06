@@ -73,8 +73,8 @@
     that:
       - zbx_settings.changed is sameas False
 
-- when: zabbix_version is version('6.2', '>=')
-  name: support Zabbix version (>=6.2)
+- when: zabbix_version is version('6.4', '>=')
+  name: support Zabbix version (>=6.4)
   block:
     - name: test - Zabbix settings (same as default)
       community.zabbix.zabbix_settings:

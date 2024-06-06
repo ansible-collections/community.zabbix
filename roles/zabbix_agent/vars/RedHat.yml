@@ -6,9 +6,7 @@ zabbix_agent: zabbix-agent
 zabbix_valid_agent_versions:
   "9":
     - 6.4
-    - 6.2
     - 6.0
   "8":
     - 6.4
-    - 6.2
     - 6.0
