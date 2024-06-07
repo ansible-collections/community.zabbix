@@ -5,8 +5,10 @@ zabbix_agent: zabbix-agent
 
 zabbix_valid_agent_versions:
   "9":
+    - 7.0
     - 6.4
     - 6.0
   "8":
+    - 7.0
     - 6.4
     - 6.0

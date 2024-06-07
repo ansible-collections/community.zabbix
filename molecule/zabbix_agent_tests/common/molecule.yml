@@ -35,6 +35,8 @@ provisioner:
         zabbix_agent_tlsaccept: psk
         zabbix_repo_apt_priority: 1
         zabbix_repo_yum_gpg_check: 1
+      v70:
+        zabbix_agent_version: 7.0
       v64:
         zabbix_agent_version: 6.4
       v60:
