@@ -14,7 +14,7 @@ platforms:
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
     groups:
       - agent
-      - ${MY_MOLECULE_VERSION:-v64}
+      - ${MY_MOLECULE_VERSION:-v70}
 
 provisioner:
   name: ansible

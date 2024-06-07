@@ -10,7 +10,7 @@ dependency:
 driver:
   name: docker
 platforms:
-  - name: zabbix-web-${MY_MOLECULE_VERSION:-v64}-${MY_MOLECULE_DATABASE:-mysql}-${MY_MOLECULE_CONTAINER:-rockylinux8}
+  - name: zabbix-web-${MY_MOLECULE_VERSION:-v70}-${MY_MOLECULE_DATABASE:-mysql}-${MY_MOLECULE_CONTAINER:-rockylinux8}
     image: geerlingguy/docker-${MY_MOLECULE_IMAGE:-rockylinux8}-ansible:latest
     privileged: true
     pre_build_image: true
@@ -21,7 +21,7 @@ platforms:
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
     groups:
       - ${MY_MOLECULE_DATABASE:-mysql}
-      - ${MY_MOLECULE_VERSION:-v64}
+      - ${MY_MOLECULE_VERSION:-v70}
       - ${MY_MOLECULE_WEB_SERVER:-apache}
 
 provisioner:
