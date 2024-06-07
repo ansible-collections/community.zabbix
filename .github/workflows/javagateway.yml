@@ -7,12 +7,18 @@ on:
       - "molecule/zabbix_javagateway/**"
       - "molecule/requirements.txt"
       - ".github/workflows/javagateway.yml"
+      - "roles/zabbix_repo/**"
+      - "molecule/zabbix_repo/**"
+      - ".github/workflows/repo.yml"
   pull_request:
     paths:
       - "roles/zabbix_javagateway/**"
       - "molecule/zabbix_javagateway/**"
       - "molecule/requirements.txt"
       - ".github/workflows/javagateway.yml"
+      - "roles/zabbix_repo/**"
+      - "molecule/zabbix_repo/**"
+      - ".github/workflows/repo.yml"
 jobs:
   molecule:
     runs-on: ubuntu-20.04
@@ -28,6 +34,7 @@ jobs:
           - debian12
           - debian11
         version:
+          - v70
           - v64
           - v60
         collection_role:
