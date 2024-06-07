@@ -3,7 +3,7 @@
   hosts: all
   tasks:
     - name: "Installing packages on CentOS family"
-      package:
+      ansible.builtin.package:
         pkg:
           - net-tools
           - which
@@ -14,7 +14,7 @@
         - ansible_os_family == 'RedHat'
 
     - name: "Installing packages on CentOS (Sangoma) family"
-      package:
+      ansible.builtin.package:
         pkg:
           - net-tools
           - which
@@ -25,9 +25,9 @@
         - ansible_os_family == 'Sangoma'
 
     - name: "Installing packages on Debian family"
-      apt:
+      ansible.builtin.apt:
         name:
-          - "{{ 'net-tools' if ansible_distribution_major_version not in ['10','18', '20'] else 'iproute2' }}"
+          - "{{ 'net-tools' if ansible_distribution_major_version not in ['20'] else 'iproute2' }}"
         state: present
         update_cache: true
       register: zabbix_agent_prepare_packages_install
@@ -36,7 +36,7 @@
         - ansible_os_family == 'Debian'
 
     - name: "Installing packages on Suse family"
-      shell: zypper install -y python-xml python-libxml2 net-tools which
+      ansible.builtin.shell: zypper install -y python-xml python-libxml2 net-tools which
       register: zabbix_agent_prepare_packages_install
       until: zabbix_agent_prepare_packages_install is succeeded
       when: ansible_os_family == 'Suse'
@@ -47,7 +47,8 @@
   hosts: docker
   tasks:
     - name: "Download Docker CE repo file"
-      get_url:
+      when: not ansible_check_mode # Because get_url always has changed status in check_mode.
+      ansible.builtin.get_url:
         url: https://download.docker.com/linux/centos/docker-ce.repo
         dest: /etc/yum.repos.d/docker-ce.repo
         mode: 0644
@@ -55,7 +56,7 @@
       until: zabbix_agent_prepare_docker_repo is succeeded
 
     - name: "Installing Epel"
-      package:
+      ansible.builtin.package:
         pkg:
           - epel-release
         state: present
@@ -63,7 +64,7 @@
       until: zabbix_agent_prepare_docker_install is succeeded
 
     - name: "Installing Docker"
-      package:
+      ansible.builtin.package:
         pkg:
           - docker-ce
           - python-pip
@@ -73,7 +74,7 @@
       until: zabbix_agent_prepare_docker_install is succeeded
 
     - name: "Installing Docker Python"
-      pip:
+      ansible.builtin.pip:
         name:
           - docker
         state: present
@@ -81,6 +82,6 @@
       until: zabbix_agent_prepare_docker_install is succeeded
 
     - name: "Starting Docker service"
-      service:
+      ansible.builtin.service:
         name: docker
         state: started

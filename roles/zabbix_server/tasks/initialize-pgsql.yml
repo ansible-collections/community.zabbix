@@ -1,0 +1,114 @@
+---
+# task file for postgresql
+- name: "Install PostgreSQL dependencies"
+  ansible.builtin.package:
+    name: "{{ _zabbix_server_pgsql_dependencies | select | list }}"
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
+  register: _zabbix_server_dependencies_installed
+  until: _zabbix_server_dependencies_installed is succeeded
+  become: true
+  tags:
+    - install
+    - database
+    - dependencies
+
+- name: "PostgreSQL Database prep"
+  when: zabbix_server_database_creation
+  become: "{{ zabbix_server_dbhost_run_install }}"
+  become_user: postgres
+  delegate_to: "{{ zabbix_server_dbhost_run_install | ternary(delegated_dbhost, inventory_hostname) }}"
+  vars:
+    delegated_dbhost: "{{ (zabbix_server_dbhost == 'localhost') | ternary(inventory_hostname, zabbix_server_dbhost) }}"
+  tags:
+    - database
+  block:
+    - name: "PostgreSQL | Create database"
+      community.postgresql.postgresql_db:
+        login_user: "{{ zabbix_server_pgsql_login_user | default(omit) }}"
+        login_password: "{{ zabbix_server_pgsql_login_password | default(omit) }}"
+        login_host: "{{ zabbix_server_pgsql_login_host | default(omit) }}"
+        port: "{{ zabbix_server_dbport }}"
+        login_unix_socket: "{{ zabbix_server_pgsql_login_unix_socket | default(omit) }}"
+        name: "{{ zabbix_server_dbname }}"
+
+    - name: "PostgreSQL | Create database user"
+      community.postgresql.postgresql_user:
+        login_user: "{{ zabbix_server_pgsql_login_user | default(omit) }}"
+        login_password: "{{ zabbix_server_pgsql_login_password | default(omit) }}"
+        login_host: "{{ zabbix_server_pgsql_login_host | default(omit) }}"
+        port: "{{ zabbix_server_dbport }}"
+        login_unix_socket: "{{ zabbix_server_pgsql_login_unix_socket | default(omit) }}"
+        name: "{{ zabbix_server_dbuser }}"
+        password: "{{ ('md5' + (zabbix_server_dbpassword + zabbix_server_dbuser)|hash('md5')) if zabbix_server_dbpassword_hash_method == 'md5' else zabbix_server_dbpassword }}"
+
+    - name: "PostgreSQL | Set database/user permissions"
+      community.postgresql.postgresql_privs:
+        login_user: "{{ zabbix_server_pgsql_login_user | default(omit) }}"
+        login_password: "{{ zabbix_server_pgsql_login_password | default(omit) }}"
+        login_host: "{{ zabbix_server_pgsql_login_host | default(omit) }}"
+        port: "{{ zabbix_server_dbport }}"
+        login_unix_socket: "{{ zabbix_server_pgsql_login_unix_socket | default(omit) }}"
+        db: "{{ zabbix_server_dbname }}"
+        privs: ALL
+        type: schema
+        objs: public
+        role: "{{ zabbix_server_dbuser }}"
+
+    - name: "PostgreSQL | Create timescaledb extension"
+      when: zabbix_server_database_timescaledb
+      community.postgresql.postgresql_ext:
+        login_user: "{{ zabbix_server_pgsql_login_user | default(omit) }}"
+        login_password: "{{ zabbix_server_pgsql_login_password | default(omit) }}"
+        login_host: "{{ zabbix_server_pgsql_login_host | default(omit) }}"
+        port: "{{ zabbix_server_dbport }}"
+        login_unix_socket: "{{ zabbix_server_pgsql_login_unix_socket | default(omit) }}"
+        db: "{{ zabbix_server_dbname }}"
+        name: timescaledb
+
+- name: "PostgreSQL verify or create schema"
+  when: zabbix_server_database_sqlload
+  tags:
+    - database
+  block:
+    - name: "PostgreSQL | Get current database version"
+      community.postgresql.postgresql_query:
+        login_user: "{{ zabbix_server_dbuser }}"
+        login_password: "{{ zabbix_server_dbpassword }}"
+        login_host: "{{ zabbix_server_dbhost }}"
+        port: "{{ zabbix_server_dbport }}"
+        db: "{{ zabbix_server_dbname }}"
+        query: "SELECT mandatory FROM dbversion"
+  rescue:
+    - name: "PostgreSQL | Import schema"
+      community.postgresql.postgresql_db:
+        login_user: "{{ zabbix_server_dbuser }}"
+        login_password: "{{ zabbix_server_dbpassword }}"
+        login_host: "{{ zabbix_server_dbhost }}"
+        port: "{{ zabbix_server_dbport }}"
+        db: "{{ zabbix_server_dbname }}"
+        state: restore
+        target: /usr/share/zabbix-sql-scripts/postgresql/server.sql.gz
+
+- name: "PostgreSQL | Create TimescaleDB hypertables"
+  ansible.builtin.shell: |
+    set -euxo pipefail
+    cd /usr/share/zabbix-sql-scripts/postgresql &&
+    if [ -f timescaledb.sql.gz ]; then zcat timescaledb.sql.gz > /etc/timescaledb.sql ; else cp -p timescaledb.sql /etc/timescaledb.sql ; fi
+    cat /etc/timescaledb.sql | psql -h '{{ zabbix_server_dbhost }}' \
+    -U '{{ zabbix_server_dbuser }}' \
+    -d '{{ zabbix_server_dbname }}' \
+    -p '{{ zabbix_server_dbport }}'
+    touch /etc/zabbix/timescaledb.done
+    rm -f /tmp/timescaledb.sql
+  args:
+    creates: /etc/zabbix/timescaledb.done
+    executable: /bin/bash
+  environment:
+    PGPASSWORD: "{{ zabbix_server_dbpassword }}"
+  become: true
+  when:
+    - zabbix_server_database_timescaledb
+  tags:
+    - database

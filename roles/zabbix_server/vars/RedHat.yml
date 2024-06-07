@@ -10,24 +10,27 @@ __epel_repo:
 
 zabbix_valid_server_versions:
   "9":
+    - 7.0
     - 6.4
-    - 6.2
     - 6.0
   "8":
+    - 7.0
     - 6.4
-    - 6.2
     - 6.0
 
-pgsql_depenencies:
-  "9":
-    - python3-psycopg2
-  "8":
-    - python3-psycopg2
+_zabbix_server_pgsql_dependencies:
+  - "{{ zabbix_server_install_database_client | ternary('postgresql', '') }}"
+  - python3-psycopg2
 
-mysql_client_pkgs:
-  "9":
-    - mysql
-    - python3-PyMySQL
-  "8":
-    - mysql
-    - python3-PyMySQL
+_zabbix_server_mysql_dependencies:
+  - "{{ zabbix_server_install_database_client | ternary('mysql', '') }}"
+  - python3-PyMySQL
+
+_zabbix_server_fping6location: /usr/sbin/fping6
+_zabbix_server_fpinglocation: /usr/sbin/fping
+
+_zabbix_server_packages:
+  - "zabbix-server-{{ zabbix_server_database }}-{{ zabbix_server_version }}.{{ zabbix_server_version_minor }}"
+  - "zabbix-sql-scripts-{{ zabbix_server_version }}.{{ zabbix_server_version_minor }}"
+_zabbix_server_disable_repo:
+  - epel

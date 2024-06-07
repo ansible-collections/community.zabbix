@@ -1,0 +1,135 @@
+---
+
+- name: test - create new Zabbix discoveryrule on host with many options set
+  community.zabbix.zabbix_discoveryrule:
+    name: TestRule
+    host_name: ExampleHost
+    params:
+        type: zabbix_agent_active
+        key: 'vfs.fs.discovery'
+        interval: 1m
+        enabled: True
+    state: present
+  register: zbxhostrule_new
+
+- name: assert that rule was created
+  ansible.builtin.assert:
+    that: zbxhostrule_new is changed
+
+- name: test - create same Zabbix discoveryrule once again
+  community.zabbix.zabbix_discoveryrule:
+    name: TestRule
+    host_name: ExampleHost
+    params:
+        type: zabbix_agent_active
+        key: 'vfs.fs.discovery'
+        interval: 1m
+        enabled: True
+    state: present
+  register: zbxhostrule_existing
+
+- name: assert that nothing has been changed
+  ansible.builtin.assert:
+    that: not zbxhostrule_existing is changed
+
+- name: test - update existing zabbix discoveryrule
+  community.zabbix.zabbix_discoveryrule:
+    name: TestRule
+    host_name: ExampleHost
+    params:
+        interval: 2m
+    state: present
+  register: zbxhostrule_changed
+
+- name: expect to succeed and that things changed
+  ansible.builtin.assert:
+    that: zbxhostrule_changed is changed
+
+- name: test - attempt to delete previously created zabbix discoveryrule
+  community.zabbix.zabbix_discoveryrule:
+    name: TestRule
+    host_name: ExampleHost
+    state: absent
+  register: zbxhostrule_existing_delete
+
+- name: assert that trigger was deleted
+  ansible.builtin.assert:
+    that: zbxhostrule_existing_delete is changed
+
+- name: test - attempt to delete non-existing zabbix discoveryrule
+  community.zabbix.zabbix_discoveryrule:
+    name: TestRule
+    host_name: ExampleHost
+    state: absent
+  register: zbxhostrule_missing_delete
+
+- name: assert that nothing has been changed
+  ansible.builtin.assert:
+    that: not zbxhostrule_missing_delete is changed
+
+- name: test - create new Zabbix discoveryrule on template with many options set
+  community.zabbix.zabbix_discoveryrule:
+    name: TestRule
+    template_name: ExampleTemplate
+    params:
+        type: zabbix_agent_active
+        key: 'vfs.fs.discovery'
+        interval: 1m
+        enabled: True
+    state: present
+  register: zbxtemprule_new
+
+- name: assert that rule was created
+  ansible.builtin.assert:
+    that: zbxtemprule_new is changed
+
+- name: test - create same Zabbix discoveryrule once again
+  community.zabbix.zabbix_discoveryrule:
+    name: TestRule
+    template_name: ExampleTemplate
+    params:
+        type: zabbix_agent_active
+        key: 'vfs.fs.discovery'
+        interval: 1m
+        enabled: True
+    state: present
+  register: zbxtemprule_existing
+
+- name: assert that nothing has been changed
+  ansible.builtin.assert:
+    that: not zbxtemprule_existing is changed
+
+- name: test - update existing zabbix discoveryrule
+  community.zabbix.zabbix_discoveryrule:
+    name: TestRule
+    template_name: ExampleTemplate
+    params:
+        interval: 2m
+    state: present
+  register: zbxtemprule_changed
+
+- name: expect to succeed and that things changed
+  ansible.builtin.assert:
+    that: zbxtemprule_changed is changed
+
+- name: test - attempt to delete previously created zabbix discoveryrule
+  community.zabbix.zabbix_discoveryrule:
+    name: TestRule
+    template_name: ExampleTemplate
+    state: absent
+  register: zbxtemprule_existing_delete
+
+- name: assert that trigger was deleted
+  ansible.builtin.assert:
+    that: zbxtemprule_existing_delete is changed
+
+- name: test - attempt to delete non-existing zabbix discoveryrule
+  community.zabbix.zabbix_discoveryrule:
+    name: TestRule
+    template_name: ExampleTemplate
+    state: absent
+  register: zbxtemprule_missing_delete
+
+- name: assert that nothing has been changed
+  ansible.builtin.assert:
+    that: not zbxtemprule_missing_delete is changed

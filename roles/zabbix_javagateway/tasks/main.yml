@@ -2,50 +2,57 @@
 # tasks file for zabbix_javagateway
 
 - name: Include OS-specific variables
-  include_vars: "{{ ansible_os_family }}.yml"
+  ansible.builtin.include_vars: "{{ ansible_os_family }}.yml"
   tags:
     - always
 
 - name: Determine Latest Supported Zabbix Version
-  set_fact:
+  ansible.builtin.set_fact:
     zabbix_javagateway_version: "{{ zabbix_valid_javagateway_versions[ansible_distribution_major_version][0] | default(6.4) }}"
   when: zabbix_javagateway_version is not defined
   tags:
     - always
 
-- name: Set More Variables
-  set_fact:
-    zabbix_valid_version: "{{ zabbix_javagateway_version|float in zabbix_valid_javagateway_versions[ansible_distribution_major_version] }}"
+- name: Check that version is supported
+  when: enable_version_check | default(true) | bool
+  ansible.builtin.assert:
+    that:
+      - "{{ zabbix_javagateway_version|float in zabbix_valid_javagateway_versions[ansible_distribution_major_version] }}"
+    fail_msg: Zabbix version {{ zabbix_javagateway_version }} is not supported on {{ ansible_distribution }} {{ ansible_distribution_major_version }}
   tags:
     - always
 
-- name: Stopping Install of Invalid Version
-  fail:
-    msg: Zabbix version {{ zabbix_javagateway_version }} is not supported on {{ ansible_distribution }} {{ ansible_distribution_major_version }}
-  when: not zabbix_valid_version
-  tags:
-    - always
+- name: Install Repository
+  ansible.builtin.include_role:
+    name: community.zabbix.zabbix_repo
+  vars:
+    zabbix_repo_apt_priority: "{{ zabbix_proxy_javagateway_priority | default (omit) }}"
+    zabbix_repo_version: "{{ zabbix_javagateway_version }}"
+    zabbix_repo_package: "zabbix-java-gateway"
+  when: zabbix_manage_repo | default(true)
 
 - name: "Install the correct repository"
-  include: "{{ ansible_os_family }}.yml"
+  ansible.builtin.include_tasks: "{{ ansible_os_family }}.yml"
 
 - name: "Configure zabbix-proxy"
-  template:
+  ansible.builtin.template:
     src: zabbix_java_gateway.conf.j2
     dest: /etc/zabbix/zabbix_java_gateway.conf
     owner: zabbix
     group: zabbix
     mode: "{{ zabbix_java_gateway_conf_mode }}"
+  become: true
   notify:
     - zabbix-java-gateway restarted
   tags:
     - config
 
 - name: "Make sure Zabbix Java Gateway is running"
-  systemd:
+  ansible.builtin.systemd:
     name: zabbix-java-gateway
     state: started
     enabled: true
     daemon_reload: true
+  become: true
   tags:
     - service

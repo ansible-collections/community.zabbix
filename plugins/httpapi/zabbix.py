@@ -29,7 +29,8 @@ options:
   zabbix_url_path:
     type: str
     description:
-      - Specifies path portion in Zabbix WebUI URL, e.g. for https://myzabbixfarm.com/zabbixeu zabbix_url_path=zabbixeu
+      - Specifies path portion in Zabbix WebUI URL, e.g. for https://myzabbixfarm.com/zabbixeu zabbix_url_path=zabbixeu.
+      - "If Zabbix WebUI is running at the root, i.e. https://myzabbixfarm.com/, then assign empty string to this variable C(zabbix_url_path: '')."
     default: zabbix
     env:
       - name: ANSIBLE_ZABBIX_URL_PATH
@@ -165,11 +166,15 @@ class HttpApi(HttpApiBase):
 
             try:
                 json_data = json.loads(value) if value else {}
-                if "result" in json_data:
-                    json_data = json_data["result"]
             # JSONDecodeError only available on Python 3.5+
             except ValueError:
                 raise ConnectionError("Invalid JSON response: %s" % value)
+
+            if "error" in json_data:
+                raise ConnectionError("REST API returned %s when sending %s" % (json_data["error"], data))
+
+            if "result" in json_data:
+                json_data = json_data["result"]
 
             try:
                 # Some methods return bool not a dict in "result"
@@ -177,9 +182,6 @@ class HttpApi(HttpApiBase):
             except TypeError:
                 # Do not try to find "error" if it is not a dict
                 return response.getcode(), json_data
-
-            if "error" in json_data:
-                raise ConnectionError("REST API returned %s when sending %s" % (json_data["error"], data))
 
             return response.getcode(), json_data
         except AnsibleConnectionFailure as e:

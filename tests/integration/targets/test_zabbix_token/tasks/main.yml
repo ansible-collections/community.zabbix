@@ -1,0 +1,99 @@
+---
+- name: Create token
+  community.zabbix.zabbix_token:
+    name: test token
+    description: Admin test token
+    username: Admin
+    status: true
+    expires_at: 1700000000
+    state: present
+  register: zbx_token
+
+- name: assert that token was created
+  ansible.builtin.assert:
+    that:
+      - zbx_token is changed
+
+- name: Update token
+  community.zabbix.zabbix_token:
+    name: test token
+    description: Admin test token (Updated)
+    username: Admin
+    status: false
+    expires_at: 0
+  register: zbx_token
+
+- name: assert that token was updated
+  ansible.builtin.assert:
+    that:
+      - zbx_token is changed
+
+- name: Update token (not changes)
+  community.zabbix.zabbix_token:
+    name: test token
+    description: Admin test token (Updated)
+    username: Admin
+    status: false
+    expires_at: 0
+  register: zbx_token
+
+- name: assert that token was NOT updated
+  ansible.builtin.assert:
+    that:
+      - not zbx_token is changed
+
+- name: Delete token
+  community.zabbix.zabbix_token:
+    name: test token
+    username: Admin
+    state: absent
+  register: zbx_token
+
+- name: assert that token was deleted
+  ansible.builtin.assert:
+    that:
+      - zbx_token is changed
+
+- name: Delete token (already deleted)
+  community.zabbix.zabbix_token:
+    name: test token
+    username: Admin
+    state: absent
+  register: zbx_token
+
+- name: assert that token was not deleted
+  ansible.builtin.assert:
+    that:
+      - not zbx_token is changed
+
+- name: Create token with generating token
+  community.zabbix.zabbix_token:
+    name: test token
+    username: Admin
+    generate_token: true
+  register: zbx_token
+
+- name: assert that token was created
+  ansible.builtin.assert:
+    that:
+      - zbx_token is changed
+
+- name: Re-generate token
+  community.zabbix.zabbix_token:
+    name: test token
+    username: Admin
+    generate_token: true
+  register: zbx_new_token
+
+- name: assert that token was updated
+  ansible.builtin.assert:
+    that:
+      - zbx_token is changed
+      - zbx_token.token != zbx_new_token.token
+
+- name: Delete token
+  community.zabbix.zabbix_token:
+    name: test token
+    username: Admin
+    state: absent
+  register: zbx_token

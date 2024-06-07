@@ -20,6 +20,7 @@ zabbix_proxy_dbencoding: utf8
 zabbix_proxy_dbhost: localhost
 zabbix_proxy_dbname: zabbix_proxy
 zabbix_proxy_dbpassword: zabbix_proxy
+zabbix_proxy_dbpassword_hash_method: md5
 zabbix_proxy_dbuser: zabbix_proxy
 zabbix_proxy_install_database_client: true
 
@@ -38,24 +39,6 @@ zabbix_proxy_tls_config:
 zabbix_proxy_version_minor: "*"
 
 # Yum/APT Variables
-zabbix_repo_yum_schema: https
-zabbix_repo_yum_gpgcheck: 0
-zabbix_repo_yum:
-  - name: zabbix
-    description: Zabbix Official Repository - $basearch
-    baseurl: "{{ zabbix_repo_yum_schema }}://repo.zabbix.com/zabbix/{{ zabbix_proxy_version | regex_search('^[0-9]+.[0-9]+') }}/rhel/{{ ansible_distribution_major_version }}/$basearch/"
-    gpgcheck: "{{ zabbix_repo_yum_gpgcheck }}"
-    mode: "0644"
-    gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-ZABBIX
-    state: present
-  - name: zabbix-non-supported
-    description: Zabbix Official Repository non-supported - $basearch
-    baseurl: "{{ zabbix_repo_yum_schema }}://repo.zabbix.com/non-supported/rhel/{{ ansible_distribution_major_version }}/$basearch/"
-    mode: "0644"
-    gpgcheck: "{{ zabbix_repo_yum_gpgcheck }}"
-    gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-ZABBIX
-    state: present
-zabbix_proxy_apt_priority:
 zabbix_proxy_package_state: present
 
 # Proxy Configuration Variables (Only ones with role provided defaults)
@@ -68,8 +51,6 @@ zabbix_proxy_dbport: 5432
 zabbix_proxy_debuglevel: 3
 zabbix_proxy_enableremotecommands: 0
 zabbix_proxy_externalscripts: /usr/lib/zabbix/externalscripts
-zabbix_proxy_fping6location: /usr/sbin/fping6
-zabbix_proxy_fpinglocation: /usr/sbin/fping
 zabbix_proxy_heartbeatfrequency: 60
 zabbix_proxy_historycachesize: 8M
 zabbix_proxy_historyindexcachesize: 4M
@@ -110,14 +91,18 @@ zabbix_proxy_vmwarefrequency: 60
 # Zabbix API stuff
 zabbix_api_server_host: localhost
 zabbix_api_use_ssl: false
-zabbix_api_server_port: 80
+# zabbix_api_server_port: 80
 zabbix_api_login_user: Admin
 zabbix_api_login_pass: !unsafe zabbix
 zabbix_api_validate_certs: false
 ansible_httpapi_pass: "{{ zabbix_api_login_pass }}"
 ansible_httpapi_port: "{{ zabbix_api_server_port }}"
-ensible_httpapi_validate_certs: "{{ zabbix_api_validate_certs }}"
+ansible_httpapi_validate_certs: "{{ zabbix_api_validate_certs }}"
 zabbix_api_timeout: 30
 zabbix_api_create_proxy: false
 zabbix_proxy_state: present
 zabbix_proxy_status: active # or passive
+
+# TLS setttings
+zabbix_proxy_tlsaccept:
+zabbix_proxy_tlsconnect:

@@ -4,7 +4,7 @@ driver:
 
 platforms:
   - name: zabbix-agent-${MY_MOLECULE_CONTAINER:-centos}
-    image: geerlingguy/docker-${MY_MOLECULE_IMAGE:-"centos8"}-ansible:latest
+    image: geerlingguy/docker-${MY_MOLECULE_IMAGE:-rockylinux8}-ansible:latest
     command: ${MOLECULE_DOCKER_COMMAND:-""}
     privileged: true
     pre_build_image: true
@@ -14,7 +14,7 @@ platforms:
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
     groups:
       - agent
-      - ${MY_MOLECULE_VERSION:-6.2}
+      - ${MY_MOLECULE_VERSION:-v70}
 
 provisioner:
   name: ansible
@@ -28,17 +28,17 @@ provisioner:
   inventory:
     group_vars:
       all:
-        zabbix_agent_src_reinstall: false
-        zabbix_install_pip_packages: false
         zabbix_agent_server: 192.168.3.33
         zabbix_agent_serveractive: 192.168.3.33
         zabbix_agent_listenip: 0.0.0.0
         zabbix_agent_tlsconnect: psk
         zabbix_agent_tlsaccept: psk
+        zabbix_repo_apt_priority: 1
+        zabbix_repo_yum_gpg_check: 1
+      v70:
+        zabbix_agent_version: 7.0
       v64:
         zabbix_agent_version: 6.4
-      v62:
-        zabbix_agent_version: 6.2
       v60:
         zabbix_agent_version: 6.0
 scenario:

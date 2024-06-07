@@ -35,6 +35,7 @@ options:
             - Name of the host in Zabbix.
             - host_name is the unique identifier used and cannot be updated using this module.
             - Required when I(host_ip) is not used.
+            - If neither host_name nor host_ip specified then all the hosts configured in Zabbix returned.
         required: false
         type: str
         default: ""
@@ -72,14 +73,14 @@ extends_documentation_fragment:
 EXAMPLES = r"""
 # If you want to use Username and Password to be authenticated by Zabbix Server
 - name: Set credentials to access Zabbix Server API
-  set_fact:
+  ansible.builtin.set_fact:
     ansible_user: Admin
     ansible_httpapi_pass: zabbix
 
 # If you want to use API token to be authenticated by Zabbix Server
 # https://www.zabbix.com/documentation/current/en/manual/web_interface/frontend_sections/administration/general#api-tokens
 - name: Set API token
-  set_fact:
+  ansible.builtin.set_fact:
     ansible_zabbix_auth_key: 8ec0d52432c15c91fcafe9888500cf9a607f44091ab554dbee860f6b44fac895
 
 - name: Get host info
@@ -95,7 +96,6 @@ EXAMPLES = r"""
   community.zabbix.zabbix_host_info:
     host_name: ExampleHost
     host_ip: 127.0.0.1
-    timeout: 10
     exact_match: no
     remove_duplicate: yes
 
@@ -115,7 +115,6 @@ EXAMPLES = r"""
       - os
       - tag
     host_ip: 127.0.0.1
-    timeout: 10
     exact_match: no
     remove_duplicate: yes
 """
@@ -209,7 +208,7 @@ def main():
 
     host = Host(module)
 
-    if host_name:
+    if host_name != "" or (host_name == "" and len(host_ips) == 0):
         hosts = host.get_hosts_by_host_name(host_name, exact_match, host_inventory)
         if is_remove_duplicate:
             hosts = host.delete_duplicate_hosts(hosts)

@@ -10,6 +10,7 @@ zabbix_api_server_url: zabbix.example.com
 zabbix_web_http_server: apache
 zabbix_url_aliases: []
 zabbix_web_create_vhost: true
+zabbix_web_create_php_fpm: "{{ zabbix_web_create_vhost }}"
 
 zabbix_server_name: "{{ inventory_hostname }}"
 zabbix_server_hostname: "{{ inventory_hostname }}"
@@ -48,26 +49,9 @@ zabbix_server_dbverifyhost: false
 zabbix_server_dbschema:
 
 # Yum/APT Variables
-zabbix_web_apt_priority:
 zabbix_web_version_minor: "*"
-zabbix_repo_yum_gpgcheck: 0
-zabbix_repo_yum_schema: https
-zabbix_repo_yum_enabled: []
-zabbix_repo_yum:
-  - name: zabbix
-    description: Zabbix Official Repository - $basearch
-    baseurl: "{{ zabbix_repo_yum_schema }}://repo.zabbix.com/zabbix/{{ zabbix_web_version | regex_search('^[0-9]+.[0-9]+') }}/rhel/{{ ansible_distribution_major_version }}/$basearch/"
-    gpgcheck: "{{ zabbix_repo_yum_gpgcheck | default('0') }}"
-    mode: "0644"
-    gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-ZABBIX
-    state: present
-  - name: zabbix-non-supported
-    description: Zabbix Official Repository non-supported - $basearch
-    baseurl: "{{ zabbix_repo_yum_schema }}://repo.zabbix.com/non-supported/rhel/{{ ansible_distribution_major_version }}/$basearch/"
-    mode: "0644"
-    gpgcheck: "{{ zabbix_repo_yum_gpgcheck | default('0') }}"
-    gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-ZABBIX
-    state: present
+zabbix_web_disable_repo:
+  - epel
 
 # Elasticsearch
 # zabbix_server_history_url:
@@ -83,10 +67,14 @@ zabbix_server_history_types:
   - "uint"
   - "dbl"
 
-zabbix_selinux: false
-# selinux_allow_zabbix_can_network: false
-# zabbix_apache_can_connect_ldap: false
+# SELinux specific
+zabbix_web_selinux: false
+selinux_allow_httpd_can_connect_ldap: false
+selinux_allow_httpd_can_network_connect_db: false
+selinux_allow_httpd_can_connect_zabbix: false
 
+zabbix_repo_deb_gpg_key_url: http://repo.zabbix.com/zabbix-official-repo.key
+zabbix_repo_deb_include_deb_src: true
 # SAML certificates
 # zabbix_saml_idp_crt:
 # zabbix_saml_sp_crt:

@@ -155,6 +155,15 @@ options:
             - SSL verify peer for SMTP.
             - Can be specified when I(smtp_security=STARTTLS) or I(smtp_security=SSL/TLS)
         default: false
+    content_type:
+        type: "str"
+        description:
+            - Can be used when I(type=email).
+            - Message format.
+        choices:
+            - plaintext
+            - html
+        default: html
     message_text_limit:
         type: "str"
         description:
@@ -272,14 +281,14 @@ RETURN = r""" # """
 EXAMPLES = r"""
 # If you want to use Username and Password to be authenticated by Zabbix Server
 - name: Set credentials to access Zabbix Server API
-  set_fact:
+  ansible.builtin.set_fact:
     ansible_user: Admin
     ansible_httpapi_pass: zabbix
 
 # If you want to use API token to be authenticated by Zabbix Server
 # https://www.zabbix.com/documentation/current/en/manual/web_interface/frontend_sections/administration/general#api-tokens
 - name: Set API token
-  set_fact:
+  ansible.builtin.set_fact:
     ansible_zabbix_auth_key: 8ec0d52432c15c91fcafe9888500cf9a607f44091ab554dbee860f6b44fac895
 
 - name: "Create an email mediatype with SMTP authentication"
@@ -525,6 +534,7 @@ class MediaTypeModule(ZabbixBase):
                 smtp_authentication=truths.get(str(self._module.params["smtp_authentication"])),
                 smtp_verify_host=truths.get(str(self._module.params["smtp_verify_host"])),
                 smtp_verify_peer=truths.get(str(self._module.params["smtp_verify_peer"])),
+                content_type={"plaintext": "0", "html": "1"}.get(str(self._module.params["content_type"])),
                 username=self._module.params["username"],
                 passwd=self._module.params["password"]
             ))
@@ -693,6 +703,7 @@ def main():
         smtp_authentication=dict(type="bool", default=False, required=False),
         smtp_verify_host=dict(type="bool", default=False, required=False),
         smtp_verify_peer=dict(type="bool", default=False, required=False),
+        content_type=dict(type="str", choices=["plaintext", "html"], default="html", required=False),
         # EZ Text
         message_text_limit=dict(type="str", required=False, choices=["USA", "Canada"]),
         # Webhook

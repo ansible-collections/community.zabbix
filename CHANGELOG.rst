@@ -4,6 +4,179 @@ community.zabbix Release Notes
 
 .. contents:: Topics
 
+v2.5.1
+======
+
+Bugfixes
+-------------
+
+- zabbix_agent - Fix reading existing psk
+- zabbix_agent - Fix role when zabbix_agent_listenip is undefined
+
+v2.5.0
+======
+
+Minor Changes
+-------------
+
+- agent role - Standardized all configuration variables using the `zabbix_agent` prefix vs `zabbix_agent2`.  Support for `zabbix_agent2` to be removed in 3.0.0
+- agent role - Standardized templating of agent.conf file
+- all roles - Added support for Ubuntu 24.04 (Noble Numbat)
+- zabbix_discoveryrule module added
+- zabbix_host_events_update module added
+- zabbix_item - add support for setting master items by name
+- zabbix_item module added
+- zabbix_itemprototype - add support for setting master items by name
+- zabbix_itemprototype module added
+- zabbix_trigger module added
+- zabbix_triggerprototype module added
+
+Bugfixes
+--------
+
+- zabbix_web - make the FPM socket group-writable so the web server can properly forward requests to the FPM process
+
+v2.4.0
+======
+
+Minor Changes
+-------------
+
+- Add slash at the end of the location directives, to prevent path traversal attacks.
+- Added active_since and active_till in zabbix_maintenance
+- Added content_type for email in zabbix_mediatypes
+- Introduce flag `enable_version_check` to allow installations on non-supported platforms.
+- agent, javagateway, proxy, server, and web role - added the http_proxy and https_proxy environment variables to "Debian | Download gpg key" analog to other tasks
+- agent, javagateway, proxy, server, and web role - introduced default variable zabbix_repo_deb_gpg_key_url with value http://repo.zabbix.com/zabbix-official-repo.key
+- agent, javagateway, proxy, server, and web role - introduced default variable zabbix_repo_deb_include_deb_src with value true
+- agent, javagateway, proxy, server, and web role - removed superfluous slash in zabbix_gpg_key of the Debian vars and renamed key to zabbix-repo instead of zabbix-official-repo
+- agent, javagateway, proxy, server, and web role - used variable zabbix_repo_deb_include_deb_src in "Debian | Installing repository" to determine whether deb-src should be added to /etc/apt/sources.list.d/zabbix.sources
+- agent, javagateway, proxy, server, and web role - used zabbix_repo_deb_gpg_key_url in "Debian | Download gpg key" instead of hardcoded url
+- zabbix_correlation module added
+- zabbix_service_info module added
+- zabbix_template - Add template_yaml parameter.
+- zabbix_web role, Refactored zabbix_selinux variable names to correlate with selinux boolean names.
+
+Bugfixes
+--------
+
+- zabbix_agent - Fixed IPMI authentication algorithm default setting
+- zabbix_agent - Fixed issue to where scripts can be deployed alongside userparameters
+- zabbix_host - Don't reset IPMI setting when update inventory data of a host
+- zabbix_host - Finish task with failed if host_group parameter is empty list
+- zabbix_server - proper indentaion of become in selinux.yaml
+- zabbix_web - Added missing semicolon to nginx vhost template.
+- zabbix_web role, Add missing selinux.yml tasks.
+
+New Modules
+-----------
+
+- community.zabbix.zabbix_correlation - Create/update/delete Zabbix correlation
+
+v2.3.1
+======
+
+Bugfixes
+--------
+
+- Avoid to update user-directory configuration in dry run.
+
+v2.3.0
+======
+
+Minor Changes
+-------------
+
+- api_requests - Handled error from depricated CertificateError class
+- multiple roles - Removed unneeded Apt Clean commands.
+- proxy role - Updated MariaDB version for Centos 7 to 10.11
+- zabbix web - Allowed the independent configuration of php-fpm without creating vhost.
+- zabbix_host_info - added ability to get all the hosts configured in Zabbix
+- zabbix_proxy role - Add variable zabbix_proxy_dbpassword_hash_method to control whether you want postgresql user password to be hashed with md5 or want to use db default. When zabbix_proxy_dbpassword_hash_method is set to anything other than md5 then do not hash the password with md5 so you could use postgresql scram-sha-256 hashing method.
+- zabbix_server role - Add variable zabbix_server_dbpassword_hash_method to control whether you want postgresql user password to be hashed with md5 or want to use db default. When zabbix_server_dbpassword_hash_method is set to anything other than md5 then do not hash the password with md5 so you could use postgresql scram-sha-256 hashing method.
+- zabbix_templategroup module added
+
+Bugfixes
+--------
+
+- api module - Fixed certificiate errors
+- proxy and server roles - Defaulted location of fping and fping6 based on OS.
+- proxy role - Removed requirement for mysql group definition.
+- server role - typo in configuration var StasAllowedIP to StatsAllowedIP
+- zabbix-{agent, javagateway, proxy, server, web} - support raspberry pi without repository url specification
+
+v2.2.0
+======
+
+Minor Changes
+-------------
+
+- Added zabbix_group_events_info module
+- action module - Added notify_if_canceled property
+- agent and proxy roles - Set default `zabbix_api_server_port` to 80 or 443 based on `zabbix_api_use_ssl`
+- agent role - Removed duplicative Windows agent task
+- agent role - Standardized default yum priority to 99
+- all roles - Re-added ability to override Debian repo source
+- all roles - Updated Debian repository format to 822 standard
+- various - updated testing modules
+- various - updated to fully qualified module names
+- zabbix agent - Added capability to add additional configuration includes
+- zabbix_api_info module added
+- zabbix_user module - add current_passwd optional parameter to enable password updating of the currently logged in user (https://www.zabbix.com/documentation/6.4/en/manual/api/reference/user/update)
+
+Bugfixes
+--------
+
+- zabbix_inventory - fixed handeling of add_zabbix_groups option
+- zabbix_template - fix template export when template's content has "error" word
+- zabbix_web role - fix variable naming issues (undefined) to zabbix_web_version and zabbix_web_apt_repository
+
+v2.1.0
+======
+
+Minor Changes
+-------------
+
+- Multiple Roles - Replaced depricated 'include' statements with 'include_tasks'
+- Update action_groups variable in runtime.yml
+- all roles - Added support for Debian 12 (Bookworm)
+- all roles - Delete gpg ids variable.
+- all roles - Modified to allow a non-root user to run the role.
+- all roles - Updated testing to account for the correct version of Zabbix
+- zabbix_hostmacro module - Add description property for Host macro creation/update. Allow to set/update description of Zabbix host macros.
+- zabbix_proxy - Added installation of PyMySQL pip package
+- zabbix_proxy - Modified installation of Centos 7 MySQL client
+- zabbix_proxy - Standardized MySQL client installed on Debian and Ubuntu
+- zabbix_regexp module added
+- zabbix_settings module added
+- zabbix_token module added
+
+Bugfixes
+--------
+
+- agent role - Added missing become statement to allow run to role as nonroot
+- zabbix_host module - fix updating hosts that were discovered via LLD
+- zabbix_proxy role - failed at version validation. Fix adds cast of zabbix_proxy_version to float, similarly to the other roles.
+- zabbix_proxy role - undefined vars at updating proxy definition. Fix adds null defaults for zabbix_proxy_tlsaccept and zabbix_proxy_tlsconnect.
+- zabbix_web role - removed 'ssl on;' nginx configuration, which is no longer supported since nginx version 1.25.1.
+
+New Modules
+-----------
+
+- community.zabbix.zabbix_regexp - Create/update/delete Zabbix regular expression
+- community.zabbix.zabbix_settings - Update Zabbix global settings.
+- community.zabbix.zabbix_token - Create/Update/Generate/Delete Zabbix token.
+
+v2.0.1
+======
+
+Bugfixes
+--------
+
+- Proxy and Agent Roles - Added `zabbix_api_use_ssl` variable to allow secure API connections
+- Web Role - Added defaults and documentation for `zabbix_apache_custom_includes`
+- agent - Handled undefined variable error for Windows default versions
+- all roles - Added option to selectively disable a repo on Redhat installs
 
 v2.0.0
 ======
@@ -493,7 +666,6 @@ Release Summary
 
 | Release date: 2020-10-22
 
-
 Minor Changes
 -------------
 
@@ -519,7 +691,6 @@ Release Summary
 ---------------
 
 | Release date: 2020-08-16
-
 
 Minor Changes
 -------------
@@ -559,7 +730,6 @@ Release Summary
 ---------------
 
 | Release date: 2020-07-26
-
 
 Minor Changes
 -------------
@@ -632,7 +802,6 @@ Release Summary
 ---------------
 
 | Release date: 2020-06-15
-
 
 Minor Changes
 -------------

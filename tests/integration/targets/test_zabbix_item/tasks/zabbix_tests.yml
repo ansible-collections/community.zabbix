@@ -1,0 +1,246 @@
+---
+
+- name: test - create new Zabbix item on host with many options set
+  community.zabbix.zabbix_item:
+    name: TestItem
+    host_name: ExampleHost
+    params:
+        type: zabbix_agent_active
+        key: vfs.fs.get
+        value_type: numeric_float
+        units: '%'
+        interval: 1m
+        preprocessing:
+          - type: jsonpath
+            params: '$[?(@.fstype == "ext4")]'
+            error_handler: zabbix_server
+          - type: jsonpath
+            params: "$[*].['bytes', 'inodes'].pused.max()"
+            error_handler: zabbix_server
+        tags:
+          - tag: tag
+            value: value
+    state: present
+  register: zbxhostitem_new
+
+- name: assert that item was created
+  ansible.builtin.assert:
+    that: zbxhostitem_new is changed
+
+- name: test - create same Zabbix item group once again
+  community.zabbix.zabbix_item:
+    name: TestItem
+    host_name: ExampleHost
+    params:
+        type: zabbix_agent_active
+        key: vfs.fs.get
+        value_type: numeric_float
+        units: '%'
+        interval: 1m
+        preprocessing:
+          - type: jsonpath
+            params: '$[?(@.fstype == "ext4")]'
+            error_handler: zabbix_server
+          - type: jsonpath
+            params: "$[*].['bytes', 'inodes'].pused.max()"
+            error_handler: zabbix_server
+        tags:
+          - tag: tag
+            value: value
+    state: present
+  register: zbxhostitem_existing
+
+- name: assert that nothing has been changed
+  ansible.builtin.assert:
+    that: not zbxhostitem_existing is changed
+
+- name: test - update existing zabbix item
+  community.zabbix.zabbix_item:
+    name: TestItem
+    host_name: ExampleHost
+    params:
+      interval: 2m
+    state: present
+  register: zbxhostitem_changed
+
+- name: expect to succeed and that things changed
+  ansible.builtin.assert:
+    that: zbxhostitem_changed is changed
+
+- name: test - attempt to delete previously created zabbix item
+  community.zabbix.zabbix_item:
+    name: TestItem
+    host_name: ExampleHost
+    state: absent
+  register: zbxhostitem_existing_delete
+
+- name: assert that item was deleted
+  ansible.builtin.assert:
+    that: zbxhostitem_existing_delete is changed
+
+- name: test - attempt to delete non-existing zabbix item
+  community.zabbix.zabbix_item:
+    name: TestItem
+    host_name: ExampleHost
+    state: absent
+  register: zbxhostitem_missing_delete
+
+- name: assert that nothing has been changed
+  ansible.builtin.assert:
+    that: not zbxhostitem_missing_delete is changed
+
+- name: test - create new Zabbix master item on host
+  community.zabbix.zabbix_item:
+    name: TestItem
+    host_name: ExampleHost
+    params:
+        type: zabbix_agent_active
+        key: vfs.fs.get
+        value_type: text
+        interval: 1m
+        tags:
+          - tag: tag
+            value: value
+    state: present
+  register: zbxhostmstitem_new
+
+- name: assert that item was created
+  ansible.builtin.assert:
+    that: zbxhostmstitem_new is changed
+
+- name: create dependent item
+  community.zabbix.zabbix_item:
+    name: TestDependItem
+    host_name: ExampleHost
+    params:
+        type: dependent_item
+        key: vfs.fs.pused
+        value_type: numeric_float
+        units: '%'
+        master_item:
+          item_name: TestItem
+          host_name: ExampleHost
+        preprocessing:
+          - type: jsonpath
+            params: '$[?(@.fstype == "ext4")]'
+            error_handler: zabbix_server
+          - type: jsonpath
+            params: "$[*].['bytes', 'inodes'].pused.max()"
+            error_handler: zabbix_server
+    state: present
+  register: zbxhostdependitem_new
+
+- name: assert that item was created
+  ansible.builtin.assert:
+    that: zbxhostdependitem_new is changed
+
+- name: test - attempt to delete previously created zabbix master item
+  community.zabbix.zabbix_item:
+    name: TestItem
+    host_name: ExampleHost
+    state: absent
+  register: zbxhostmstitem_existing_delete
+
+- name: assert that item was deleted
+  ansible.builtin.assert:
+    that: zbxhostmstitem_existing_delete is changed
+
+- name: test - attempt to delete dependent item
+  community.zabbix.zabbix_item:
+    name: TestDependItem
+    host_name: ExampleHost
+    state: absent
+  register: zbxhostdependitem_delete
+
+- name: assert that the item had been removed with its master
+  ansible.builtin.assert:
+    that: not zbxhostdependitem_delete is changed
+
+- name: test - create new Zabbix item on template with many options set
+  community.zabbix.zabbix_item:
+    name: TestItem
+    template_name: ExampleTemplate
+    params:
+        type: zabbix_agent_active
+        key: vfs.fs.get
+        value_type: numeric_float
+        units: '%'
+        interval: 1m
+        preprocessing:
+          - type: jsonpath
+            params: '$[?(@.fstype == "ext4")]'
+            error_handler: zabbix_server
+          - type: jsonpath
+            params: "$[*].['bytes', 'inodes'].pused.max()"
+            error_handler: zabbix_server
+        tags:
+          - tag: tag
+            value: value
+    state: present
+  register: zbxtempitem_new
+
+- name: assert that item was created
+  ansible.builtin.assert:
+    that: zbxtempitem_new is changed
+
+- name: test - create same Zabbix item once again
+  community.zabbix.zabbix_item:
+    name: TestItem
+    template_name: ExampleTemplate
+    params:
+        type: zabbix_agent_active
+        key: vfs.fs.get
+        value_type: numeric_float
+        units: '%'
+        interval: 1m
+        preprocessing:
+          - type: jsonpath
+            params: '$[?(@.fstype == "ext4")]'
+            error_handler: zabbix_server
+          - type: jsonpath
+            params: "$[*].['bytes', 'inodes'].pused.max()"
+            error_handler: zabbix_server
+        tags:
+          - tag: tag
+            value: value
+    state: present
+  register: zbxtempitem_existing
+
+- name: assert that nothing has been changed
+  ansible.builtin.assert:
+    that: not zbxtempitem_existing is changed
+
+- name: test - update existing zabbix item
+  community.zabbix.zabbix_item:
+    name: TestItem
+    template_name: ExampleTemplate
+    params:
+      interval: 2m
+    state: present
+  register: zbxtempitem_changed
+
+- name: expect to succeed and that things changed
+  ansible.builtin.assert:
+    that: zbxtempitem_changed is changed
+
+- name: test - attempt to delete previously created zabbix item
+  community.zabbix.zabbix_item:
+    name: TestItem
+    template_name: ExampleTemplate
+    state: absent
+  register: zbxtempitem_existing_delete
+
+- name: assert that item was deleted
+  ansible.builtin.assert:
+    that: zbxtempitem_existing_delete is changed
+
+- name: test - attempt to delete non-existing zabbix item
+  community.zabbix.zabbix_item:
+    name: TestItem
+    template_name: ExampleTemplate
+    state: absent
+  register: zbxtempitem_missing_delete
+
+- name: assert that nothing has been changed
+  ansible.builtin.assert:
+    that: not zbxtempitem_missing_delete is changed

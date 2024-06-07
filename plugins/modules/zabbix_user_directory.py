@@ -316,14 +316,14 @@ EXAMPLES = r"""
 ---
 # If you want to use Username and Password to be authenticated by Zabbix Server
 - name: Set credentials to access Zabbix Server API
-  set_fact:
+  ansible.builtin.set_fact:
     ansible_user: Admin
     ansible_httpapi_pass: zabbix
 
 # If you want to use API token to be authenticated by Zabbix Server
 # https://www.zabbix.com/documentation/current/en/manual/web_interface/frontend_sections/administration/general#api-tokens
 - name: Set API token
-  set_fact:
+  ansible.builtin.set_fact:
     ansible_zabbix_auth_key: 8ec0d52432c15c91fcafe9888500cf9a607f44091ab554dbee860f6b44fac895
 
 - name: Create new user directory or update existing info (Zabbix <= 6.2)
@@ -691,6 +691,8 @@ def main():
     else:
         # User Directory with given name exists
         if state == "absent":
+            if module.check_mode:
+                module.exit_json(changed=True)
             user_directory._zapi.userdirectory.delete([directory[0]["userdirectoryid"]])
             module.exit_json(
                 changed=True,
@@ -705,6 +707,8 @@ def main():
                 parameters, directory[0], diff_dict
             ):
                 parameters["userdirectoryid"] = directory[0]["userdirectoryid"]
+                if module.check_mode:
+                    module.exit_json(changed=True)
                 user_directory._zapi.userdirectory.update(parameters)
                 module.exit_json(
                     changed=True,

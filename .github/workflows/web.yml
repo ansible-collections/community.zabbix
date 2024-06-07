@@ -7,12 +7,18 @@ on:
       - "molecule/zabbix_web/**"
       - "molecule/requirements.txt"
       - ".github/workflows/web.yml"
+      - "roles/zabbix_repo/**"
+      - "molecule/zabbix_repo/**"
+      - ".github/workflows/repo.yml"
   pull_request:
     paths:
       - "roles/zabbix_web/**"
       - "molecule/zabbix_web/**"
       - "molecule/requirements.txt"
       - ".github/workflows/web.yml"
+      - "roles/zabbix_repo/**"
+      - "molecule/zabbix_repo/**"
+      - ".github/workflows/repo.yml"
 jobs:
   molecule:
     runs-on: ubuntu-20.04
@@ -22,11 +28,11 @@ jobs:
         container:
           - rockylinux9
           - rockylinux8
+          - ubuntu2404
           - ubuntu2204
           - ubuntu2004
-          - ubuntu1804
+          - debian12
           - debian11
-          - debian10
         collection_role:
           - zabbix_web
         database:
@@ -34,29 +40,24 @@ jobs:
           - pgsql
         web_server:
           - nginx
+          - apache
         version:
+          - v70
           - v64
-          - v62
           - v60
-        include:
-          - interpreter: python3
         exclude:
-          - container: debian10
-            version: v62
-          - container: ubuntu1804
-            version: v62
-          - container: debian10
-            version: v64
-          - container: ubuntu1804
-            version: v64
+          - container: ubuntu2004
+            version: v70
+          - container: debian11
+            version: v70
     steps:
       - name: Check out code
-        uses: actions/checkout@v1
+        uses: actions/checkout@v4
 
-      - name: Set up Python 3.9
-        uses: actions/setup-python@v1
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
         with:
-          python-version: 3.9
+          python-version: 3.11
 
       - name: Install dependencies
         run: |
@@ -65,11 +66,19 @@ jobs:
 
       - name: Build the collection
         run: |
+          # Pin versions to speed up CI
+          sed -i 's/ansible\.windows:\s*"\*"/ansible.windows: "2.3.0"/' galaxy.yml
+          sed -i 's/ansible\.netcommon:\s*"\*"/ansible.netcommon: "6.1.1"/' galaxy.yml
+          sed -i 's/ansible\.posix:\s*"\*"/ansible.posix: "1.5.4"/' galaxy.yml
+          sed -i 's/community\.general:\s*"\*"/community.general: "8.6.0"/' galaxy.yml
+          sed -i 's/community\.mysql:\s*"\*"/community.mysql: "3.9.0"/' galaxy.yml
+          sed -i 's/community\.postgresql:\s*"\*"/community.postgresql: "3.4.0"/' galaxy.yml
+
           collection_file=$( basename $(ansible-galaxy collection build -f | awk -F" " '{print $NF}'))
           echo "COLLECTION_FILE=$collection_file" >> $GITHUB_ENV
 
       - name: Install the collection
-        run: ansible-galaxy collection install $COLLECTION_FILE
+        run: ansible-galaxy collection install -vvvv $COLLECTION_FILE
 
       - name: Run role tests
         run: >-
@@ -78,6 +87,5 @@ jobs:
           MY_MOLECULE_VERSION=${{ matrix.version }}
           MY_MOLECULE_DATABASE=${{ matrix.database }}
           MY_MOLECULE_WEB_SERVER=${{ matrix.web_server }}
-          MY_MOLECULE_INTERPRETER=${{ matrix.interpreter }}
           MY_MOLECULE_DOCKER_COMMAND=${{ matrix.command }}
           molecule test -s ${{ matrix.collection_role }}

@@ -12,7 +12,7 @@ __metaclass__ = type
 
 from uuid import uuid4
 
-from ansible.module_utils.urls import CertificateError
+from ssl import CertificateError
 from ansible.module_utils.connection import ConnectionError
 from ansible.module_utils.connection import Connection
 from ansible.module_utils._text import to_text

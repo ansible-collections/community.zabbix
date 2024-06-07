@@ -38,14 +38,14 @@ extends_documentation_fragment:
 EXAMPLES = """
 # If you want to use Username and Password to be authenticated by Zabbix Server
 - name: Set credentials to access Zabbix Server API
-  set_fact:
+  ansible.builtin.set_fact:
     ansible_user: Admin
     ansible_httpapi_pass: zabbix
 
 # If you want to use API token to be authenticated by Zabbix Server
 # https://www.zabbix.com/documentation/current/en/manual/web_interface/frontend_sections/administration/general#api-tokens
 - name: Set API token
-  set_fact:
+  ansible.builtin.set_fact:
     ansible_zabbix_auth_key: 8ec0d52432c15c91fcafe9888500cf9a607f44091ab554dbee860f6b44fac895
 
 - name: Get zabbix proxy info alongside the list of hosts monitored by the proxy
@@ -123,6 +123,7 @@ zabbix_proxy:
 from ansible.module_utils.basic import AnsibleModule
 
 from ansible_collections.community.zabbix.plugins.module_utils.base import ZabbixBase
+from ansible.module_utils.compat.version import LooseVersion
 import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabbix_utils
 
 
@@ -130,13 +131,21 @@ class Proxy(ZabbixBase):
 
     def get_proxy(self, name, hosts=False):
         result = {}
-        params = {
-            "filter": {
-                "host": name
-            },
-            "output": "extend",
-            "selectInterface": "extend",
-        }
+        if LooseVersion(self._zbx_api_version) < LooseVersion("7.0"):
+            params = {
+                "filter": {
+                    "host": name
+                },
+                "selectInterface": "extend",
+                "output": "extend"
+            }
+        else:
+            params = {
+                "filter": {
+                    "name": name
+                },
+                "output": "extend"
+            }
 
         if hosts:
             params["selectHosts"] = ["host", "hostid"]

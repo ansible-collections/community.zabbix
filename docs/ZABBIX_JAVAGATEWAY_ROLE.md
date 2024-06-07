@@ -34,16 +34,17 @@ So, you'll need one of those operating systems.. :-)
 
 See the following list of supported Operating systems with the Zabbix releases.
 
-| Zabbix              | 6.4 | 6.2 | 6.0 |
-|---------------------|-----|-----|-----|
-| Red Hat Fam 9       |  V  |  V  |  V  |
-| Red Hat Fam 8       |  V  |  V  |  V  |
-| Red Hat Fam 7       |  V  |  V  |  V  |
-| Ubuntu 22.04 jammy  |  V  |  V  |  V  |
-| Ubuntu 20.04 focal  |  V  |  V  |  V  |
-| Ubuntu 18.04 bionic |  V  |  V  |  V  |
-| Debian 11 bullseye  |  V  |  V  |  V  |
-| Debian 10 buster    |  V  |  V  |  V  |
+| Zabbix              | 6.4 | 6.0 |
+|---------------------|-----|-----|
+| Red Hat Fam 9       |  V  |  V  |
+| Red Hat Fam 8       |  V  |  V  |
+| Ubuntu 24.04 noble  |  V  |  V  |
+| Ubuntu 22.04 jammy  |  V  |  V  |
+| Ubuntu 20.04 focal  |  V  |  V  |
+| Debian 12 bookworm  |  V  |  V  |
+| Debian 11 bullseye  |  V  |  V  |
+
+You can bypass this matrix by setting `enable_version_check: false`
 
 # Role Variables
 
@@ -56,8 +57,14 @@ The following is an overview of all available configuration default for this rol
 The `zabbix_javagateway_version` is optional. The latest available major.minor version of Zabbix will be installed on the host(s). If you want to use an older version, please specify this in the major.minor format. Example: `zabbix_javagateway_version: 6.0`.
 * `zabbix_repo_yum`: A list with Yum repository configuration.
 * `zabbix_repo_yum_schema`: Default: `https`. Option to change the web schema for the yum repository(http/https)
+* `zabbix_javagateway_disable_repo`: A list of repos to disable during install.  Default `epel`.
 * `zabbix_javagateway_package_state`: Default: `present`. Can be overridden to `latest` to update packages when needed.
 * `zabbix_javagateway_conf_mode`: Default: `0644`. The "mode" for the Zabbix configuration file.
+* `zabbix_repo_deb_url`: The URL to the Zabbix repository.  Default `http://repo.zabbix.com/zabbix/{{ zabbix_agent_version }}/{{ ansible_distribution.lower() }}`
+* `zabbix_repo_deb_component`: The repository component for Debian installs. Default `main`.
+* `zabbix_repo_deb_gpg_key_url`: The URL to download the Zabbix GPG key from. Default `http://repo.zabbix.com/zabbix-official-repo.key`.
+* `zabbix_repo_deb_include_deb_src`: True, if deb-src should be included in the zabbix.sources entry. Default `true`.
+* `zabbix_manage_repo`: Have the collection install and configure the Zabbix repo Default `true`.
 
 ### Java Gatewaty
 

@@ -16,6 +16,7 @@
       - [Apache configuration](#apache-configuration)
       - [Nginx configuration](#nginx-configuration)
       - [PHP-FPM](#php-fpm)
+    - [SElinux](#selinux)
     - [Zabbix Server](#zabbix-server)
   * [proxy](#proxy)
 - [Example Playbook](#example-playbook)
@@ -54,15 +55,17 @@ ansible-galaxy collection install community.general
 
 See the following list of supported Operating Systems with the Zabbix releases.
 
-| Zabbix              | 6.4 | 6.2 | 6.0 |
-|---------------------|-----|-----|-----|
-| Red Hat Fam 9       |  V  |  V  |  V  |
-| Red Hat Fam 8       |  V  |  V  |  V  |
-| Ubuntu 22.04 jammy  |  V  |  V  |  V  |
-| Ubuntu 20.04 focal  |  V  |  V  |  V  |
-| Ubuntu 18.04 bionic |     |     |  V  |
-| Debian 11 bullseye  |  V  |  V  |  V  |
-| Debian 10 buster    |     |     |  V  |
+| Zabbix              | 6.4 | 6.0 |
+|---------------------|-----|-----|
+| Red Hat Fam 9       |  V  |  V  |
+| Red Hat Fam 8       |  V  |  V  |
+| Ubuntu 24.04 noble  |  V  |  V  |
+| Ubuntu 22.04 jammy  |  V  |  V  |
+| Ubuntu 20.04 focal  |  V  |  V  |
+| Debian 12 bookworm  |  V  |  V  |
+| Debian 11 bullseye  |  V  |  V  |
+
+You can bypass this matrix by setting `enable_version_check: false`
 
 # Installation
 
@@ -85,19 +88,21 @@ The following is an overview of all available configuration defaults for this ro
 
 * `zabbix_web_version`: Optional. The latest available major.minor version of Zabbix will be installed on the host(s). If you want to use an older version, please specify this in the major.minor format. Example: `zabbix_web_version: 6.0`.
 * `zabbix_web_version_minor`: When you want to specify a minor version to be installed. RedHat only. Default set to: `*` (latest available)
-* `zabbix_repo_yum`: A list with Yum repository configuration.
-* `zabbix_repo_yum_schema`: Default: `https`. Option to change the web schema for the yum repository(http/https)
-
+* `zabbix_web_disable_repo`: A list of repos to disable during install.  Default `epel`.
 * `zabbix_web_package_state`: Default: `present`. Can be overridden to `latest` to update packages when needed.
 * `zabbix_web_doubleprecision`: Default: `False`. For upgraded installations, please read database [upgrade notes](https://www.zabbix.com/documentation/current/manual/installation/upgrade_notes_500) (Paragraph "Enabling extended range of numeric (float) values") before enabling this option.
 * `zabbix_web_conf_mode`: Default: `0644`. The "mode" for the Zabbix configuration file.
+* `zabbix_manage_repo`: Have the collection install and configure the Zabbix repo Default `true`.
+
 
 ### Zabbix Web specific
 
 * `zabbix_api_server_url`: This is the url on which the zabbix web interface is available. Default is zabbix.example.com, you should override it. For example, see "Example Playbook"
+* `zabbix_web_http_server`: Which web server is in use.  Valid values are 'apache' and 'nginx'.  Default is `apache`
 * `zabbix_url_aliases`: A list with Aliases for the Apache Virtual Host configuration.
 * `zabbix_timezone`: Default: `Europe/Amsterdam`. This is the timezone. The Apache Virtual Host needs this parameter.
 * `zabbix_web_create_vhost`: Default: `true`. When you don't want to create an Apache Virtual Host configuration, you can set it to False.
+* `zabbix_web_create_php_fpm`: Configure php-fpm (Debian hosts only).  Default is to use the same value as `zabbix_web_create_vhost`.
 * `zabbix_web_env`: (Optional) A Dictionary of PHP Environments settings.
 * `zabbix_web_user`: When provided, the user (which should already exist on the host) will be used for ownership for web/php related processes. (Default set to either `apache` (`www-data` for Debian) or `nginx`).
 * `zabbix_web_group`: When provided, the group (which should already exist on the host) will be used for ownership for web/php related processes. (Default set to either `apache` (`www-data` for Debian) or `nginx`).
@@ -111,7 +116,6 @@ The following is an overview of all available configuration defaults for this ro
 * `zabbix_web_vhost_port`: The port on which Zabbix HTTP vhost is running.
 * `zabbix_web_vhost_tls_port`: The port on which Zabbix HTTPS vhost is running.
 * `zabbix_web_vhost_listen_ip`: On which interface the Apache Virtual Host is available.
-* `zabbix_apache_can_connect_ldap`: Default: `false`. Set SELinux boolean to allow httpd to connect to LDAP.
 * `zabbix_web_max_execution_time`: PHP max execution time
 * `zabbix_web_memory_limit`: PHP memory limit
 * `zabbix_web_post_max_size`: PHP maximum post size
@@ -145,6 +149,14 @@ The following properties are specific to Zabbix 5.0 and for the PHP(-FPM) config
 * `zabbix_php_fpm_conf_user`: The owner of the socket file (When `zabbix_php_fpm_listen` contains a patch to a socket file).
 
 * `zabbix_php_fpm_conf_group`: The group of the owner of the socket file (When `zabbix_php_fpm_listen` contains a patch to a socket file).
+
+### SElinux
+
+Selinux changes will be installed based on the status of selinux running on the target system.
+
+* `selinux_allow_httpd_can_connect_zabbix`: Default: `false`. Set SELinux boolean to allow httpd to connect to zabbix.
+* `selinux_allow_httpd_can_connect_ldap`: Default: `false`. Set SELinux boolean to allow httpd to connect to LDAP.
+* `selinux_allow_httpd_can_network_connect_db`: Default: `false` Set SELinux boolean to allow httpd to connect databases over the network.
 
 ### Zabbix Server
 
@@ -257,7 +269,7 @@ zabbix.conf.php, for example to add LDAP CA certificates. To do this add a `zabb
       php_packages:
         - php
         - php-fpm
-        - php-acpu
+        - php-apcu
     - role: geerlingguy.apache-php-fpm
     - role: community.zabbix.zabbix_web
       zabbix_api_server_url: zabbix.mydomain.com

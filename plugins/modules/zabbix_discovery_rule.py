@@ -181,14 +181,14 @@ extends_documentation_fragment:
 EXAMPLES = r"""
 # If you want to use Username and Password to be authenticated by Zabbix Server
 - name: Set credentials to access Zabbix Server API
-  set_fact:
+  ansible.builtin.set_fact:
     ansible_user: Admin
     ansible_httpapi_pass: zabbix
 
 # If you want to use API token to be authenticated by Zabbix Server
 # https://www.zabbix.com/documentation/current/en/manual/web_interface/frontend_sections/administration/general#api-tokens
 - name: Set API token
-  set_fact:
+  ansible.builtin.set_fact:
     ansible_zabbix_auth_key: 8ec0d52432c15c91fcafe9888500cf9a607f44091ab554dbee860f6b44fac895
 
 # Base create discovery rule example
@@ -428,11 +428,18 @@ class DiscoveryRule(ZabbixBase):
             proxy matching proxy name
         """
         try:
-            proxy_list = self._zapi.proxy.get({
-                "output": "extend",
-                "selectInterface": "extend",
-                "filter": {"host": [proxy_name]}
-            })
+            if LooseVersion(self._zbx_api_version) < LooseVersion("7.0"):
+                proxy_list = self._zapi.proxy.get({
+                    "output": "extend",
+                    "selectInterface": "extend",
+                    "filter": {"host": [proxy_name]}
+                })
+            else:
+                proxy_list = self._zapi.proxy.get({
+                    "output": "extend",
+                    "filter": {"name": [proxy_name]}
+                })
+
             if len(proxy_list) < 1:
                 self._module.fail_json(msg="Proxy not found: %s" % proxy_name)
             else:
@@ -458,7 +465,11 @@ class DiscoveryRule(ZabbixBase):
             "dchecks": kwargs["dchecks"]
         }
         if kwargs["proxy"]:
-            _params["proxy_hostid"] = self.get_proxy_by_proxy_name(kwargs["proxy"])["proxyid"]
+            if LooseVersion(self._zbx_api_version) < LooseVersion("7.0"):
+                _params["proxy_hostid"] = self.get_proxy_by_proxy_name(kwargs["proxy"])["proxyid"]
+            else:
+                _params["proxyid"] = self.get_proxy_by_proxy_name(kwargs["proxy"])["proxyid"]
+
         return _params
 
     def check_difference(self, **kwargs):

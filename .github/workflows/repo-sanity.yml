@@ -10,16 +10,16 @@ jobs:
     strategy:
       matrix:
         python:
-          - 3.9
+          - '3.10'
     runs-on: ubuntu-latest
     steps:
       - name: Check out code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           path: ansible_collections/community/zabbix
 
       - name: Set up Python ${{ matrix.python }}
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
 
@@ -39,25 +39,23 @@ jobs:
           # Testing against `devel` may fail as new tests are added.
 
           # https://docs.ansible.com/ansible/latest/reference_appendices/release_and_maintenance.html#ansible-core-changelogs
-          - stable-2.12
-          - stable-2.13
-          - stable-2.14
           - stable-2.15
+          - stable-2.16
           - devel
         python:
-          - 3.9
+          - '3.11'
     runs-on: ubuntu-latest
     steps:
       # ansible-test requires the collection to be in a directory in the form
       # .../ansible_collections/NAMESPACE/COLLECTION_NAME/
 
       - name: Check out code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           path: ansible_collections/community/zabbix
 
       - name: Set up Python ${{ matrix.ansible }}
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
 

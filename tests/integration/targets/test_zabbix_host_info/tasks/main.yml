@@ -1,6 +1,6 @@
 ---
 - name: "test - Prepare host for zabbix_host_info module"
-  zabbix_host:
+  community.zabbix.zabbix_host:
     host_name: ExampleHostForHostInfoModule
     visible_name: ExampleHostForHostInfoModuleName
     description: Test Host
@@ -24,7 +24,7 @@
     state: present
   register: prepare_host_result
 
-- assert:
+- ansible.builtin.assert:
     that:
       - prepare_host_result.changed is sameas true
 
@@ -35,7 +35,7 @@
   environment:
     ZABBIX_VALIDATE_CERTS: false
 
-- assert:
+- ansible.builtin.assert:
     that:
       - env_vars_usage.hosts[0].name == "ExampleHostForHostInfoModuleName"
 
@@ -46,11 +46,11 @@
 
   block:
     - name: "test - Gather all facts of zabbix host"
-      zabbix_host_info:
+      community.zabbix.zabbix_host_info:
       register: gather_all_facts_result
 
-    - when: zabbix_version is version('5.4', '>=') and zabbix_version is version('6.2', '<')
-      assert:
+    - when: zabbix_version is version('6.0', '=')
+      ansible.builtin.assert:
         that:
           - gather_all_facts_result.hosts | length == 1
           - gather_all_facts_result.hosts.0.host == "ExampleHostForHostInfoModule"
@@ -70,8 +70,8 @@
           - gather_all_facts_result.hosts.0.hostinterfaces.0.type == "1"
           - gather_all_facts_result.hosts.0.hostinterfaces.0.useip == "1"
 
-    - when: zabbix_version is version('6.2', '>=')
-      assert:
+    - when: zabbix_version is version('6.4', '>=')
+      ansible.builtin.assert:
         that:
           - gather_all_facts_result.hosts | length == 1
           - gather_all_facts_result.hosts.0.host == "ExampleHostForHostInfoModule"
@@ -92,44 +92,57 @@
           - gather_all_facts_result.hosts.0.hostinterfaces.0.useip == "1"
 
     - name: "test - Gather facts of zabbix host with host_inventory"
-      zabbix_host_info:
+      community.zabbix.zabbix_host_info:
         host_inventory:
           - tag
           - os
       register: gather_facts_with_host_inventory_result
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - gather_facts_with_host_inventory_result.hosts.0.inventory | length == 2
           - gather_facts_with_host_inventory_result.hosts.0.inventory.tag == "tag1"
           - gather_facts_with_host_inventory_result.hosts.0.inventory.os == "Linux"
 
     - name: "test - Partial match of zabbix host name"
-      zabbix_host_info:
+      community.zabbix.zabbix_host_info:
         host_name: HostForHostInfo
         exact_match: false
       register: partial_match_result
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - partial_match_result.hosts | length == 1
 
     - name: "test - Exact match of zabbix host name"
-      zabbix_host_info:
+      community.zabbix.zabbix_host_info:
         exact_match: true
       register: exact_match_result
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - exact_match_result.hosts | length == 1
 
     - name: "test - Exact match of zabbix host name(expectations - host not found)"
-      zabbix_host_info:
+      community.zabbix.zabbix_host_info:
         host_name: HostForHostInfo
         exact_match: true
       register: exact_match_host_not_found_result
       ignore_errors: true
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - exact_match_host_not_found_result.failed is sameas true
+
+- name: Get all hosts
+  community.zabbix.zabbix_host_info:
+  register: get_all_hosts_result
+
+- ansible.builtin.assert:
+    that:
+      - get_all_hosts_result.hosts | length == 2
+
+- name: Clean up test host
+  community.zabbix.zabbix_host:
+    host_name: ExampleHostForHostInfoModule
+    state: absent

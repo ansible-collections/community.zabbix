@@ -21,34 +21,39 @@ jobs:
       matrix:
         zabbix_container:
           - version: "6.0"
-          - version: "6.2"
           - version: "6.4"
+          - version: "7.0"
         ansible:
           # https://docs.ansible.com/ansible/latest/reference_appendices/release_and_maintenance.html#ansible-core-changelogs
-          - stable-2.12
-          - stable-2.13
-          - stable-2.14
           - stable-2.15
+          - stable-2.16
           - devel
         python:
-          - 3.9
+          - '3.9'
+          - '3.10'
+          - '3.11'
+          - '3.12'
+        exclude:
+          - ansible: stable-2.15
+            python: '3.12'
+          - ansible: stable-2.16
+            python: '3.9'
+          - ansible: devel
+            python: '3.9'
 
     steps:
       - name: Check out code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           path: ansible_collections/community/zabbix
 
       - name: Set up Python ${{ matrix.python }}
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
 
       - name: Install ansible-base (${{ matrix.ansible }})
         run: pip install https://github.com/ansible/ansible/archive/${{ matrix.ansible }}.tar.gz --disable-pip-version-check
-
-      - name: Install dependencies
-        run: pip install docker-compose
 
       - name: Install ansible.netcommon collection
         run: ansible-galaxy collection install ansible.netcommon -p $GITHUB_WORKSPACE
@@ -58,8 +63,9 @@ jobs:
       # the Zabbix server. To do this we spin up a Docker container using the `matrix`
       # of version and ports specified earlier.
       - name: Zabbix container server provisioning
-        run: docker-compose up -d
-        working-directory: ./ansible_collections/community/zabbix
+        uses: isbang/compose-action@v1.5.0
+        with:
+          compose-file: "./ansible_collections/community/zabbix/docker-compose.yml"
         env:
           zabbix_version: ${{ matrix.zabbix_container.version }}
 
@@ -76,6 +82,6 @@ jobs:
         working-directory: ./ansible_collections/community/zabbix
 
       # See the repots at https://codecov.io/gh/ansible-collections/community.zabbix
-      - uses: codecov/codecov-action@v1
+      - uses: codecov/codecov-action@v3
         with:
           fail_ci_if_error: false

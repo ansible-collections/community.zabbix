@@ -1,124 +1,124 @@
 ---
 - name: Create FTP Service Template
-  zabbix_template:
+  community.zabbix.zabbix_template:
     template_name: FTP Service
     template_groups:
-      - 'Templates'
+      - "Templates"
     state: present
 
 - name: Create a new Zabbix template (check mode).
-  zabbix_template:
+  community.zabbix.zabbix_template:
     template_name: ExampleHost
     template_groups:
-      - 'Templates'
-      - 'Templates/Applications'
+      - "Templates"
+      - "Templates/Applications"
     state: present
   register: create_zabbix_template_result
   check_mode: true
 
-- assert:
+- ansible.builtin.assert:
     that:
       - create_zabbix_template_result.changed is sameas true
 
 - name: Create a new Zabbix template.
-  zabbix_template:
+  community.zabbix.zabbix_template:
     template_name: ExampleHost
     template_groups:
-      - 'Templates'
-      - 'Templates/Applications'
+      - "Templates"
+      - "Templates/Applications"
     state: present
   register: create_zabbix_template_result
 
-- assert:
+- ansible.builtin.assert:
     that:
       - create_zabbix_template_result.changed is sameas true
 
 - name: Create a new Zabbix template (idempotency check).
-  zabbix_template:
+  community.zabbix.zabbix_template:
     template_name: ExampleHost
     template_groups:
-      - 'Templates'
-      - 'Templates/Applications'
+      - "Templates"
+      - "Templates/Applications"
     state: present
   register: create_zabbix_template_result
 
-- assert:
+- ansible.builtin.assert:
     that:
       - create_zabbix_template_result.changed is sameas false
 
 - name: Create a new Zabbix template with linked templates.
-  zabbix_template:
+  community.zabbix.zabbix_template:
     template_name: ExampleHostWithLinked
     template_groups:
-      - 'Templates'
-      - 'Templates/Applications'
+      - "Templates"
+      - "Templates/Applications"
     link_templates:
-      - 'Zabbix proxy health'
-      - 'FTP Service'
+      - "Zabbix proxy health"
+      - "FTP Service"
     state: present
   register: create_zabbix_template_linked_result
 
-- assert:
+- ansible.builtin.assert:
     that:
       - create_zabbix_template_linked_result.changed is sameas true
 
 - name: Gather Zabbix template infomation.
-  zabbix_template_info:
+  community.zabbix.zabbix_template_info:
     template_name: ExampleHost
     format: json
   register: gather_template_result
 
 - name: "test - Set key to template_export_key variable(This deals with the key being masked)"
-  set_fact:
+  ansible.builtin.set_fact:
     template_export_key: "{{ item }}"
   loop: "{{ gather_template_result.template_json.keys() | list }}"
   when:
     - item | regex_search('_export')
 
-- assert:
+- ansible.builtin.assert:
     that:
       - gather_template_result.template_json[template_export_key][template_groups_key].0.name == 'Templates'
       - gather_template_result.template_json[template_export_key][template_groups_key].1.name == 'Templates/Applications'
 
 - name: Add link_templates to Zabbix template.
-  zabbix_template:
+  community.zabbix.zabbix_template:
     template_name: ExampleHost
     template_groups:
-      - 'Templates'
-      - 'Templates/Applications'
+      - "Templates"
+      - "Templates/Applications"
     link_templates:
-      - 'Zabbix proxy health'
-      - 'FTP Service'
+      - "Zabbix proxy health"
+      - "FTP Service"
     state: present
   register: update_zabbix_template_result
 
-- assert:
+- ansible.builtin.assert:
     that:
       - update_zabbix_template_result.changed is sameas true
 
 - name: Add link_templates to Zabbix template (idempotency check).
-  zabbix_template:
+  community.zabbix.zabbix_template:
     template_name: ExampleHost
     template_groups:
-      - 'Templates'
-      - 'Templates/Applications'
+      - "Templates"
+      - "Templates/Applications"
     link_templates:
-      - 'Zabbix proxy health'
-      - 'FTP Service'
+      - "Zabbix proxy health"
+      - "FTP Service"
     state: present
   register: update_zabbix_template_result
 
-- assert:
+- ansible.builtin.assert:
     that:
       - update_zabbix_template_result.changed is sameas false
 
 - name: Gather Zabbix template infomation.
-  zabbix_template_info:
+  community.zabbix.zabbix_template_info:
     template_name: ExampleHost
     format: json
   register: gather_template_result
 
-- assert:
+- ansible.builtin.assert:
     that:
       - gather_template_result.template_json[template_export_key][template_groups_key].0.name == 'Templates'
       - gather_template_result.template_json[template_export_key][template_groups_key].1.name == 'Templates/Applications'
@@ -126,61 +126,61 @@
       - gather_template_result.template_json[template_export_key].templates.0.templates.1.name == 'Zabbix proxy health'
 
 - name: Add macros to Zabbix template.
-  zabbix_template:
+  community.zabbix.zabbix_template:
     template_name: ExampleHost
     template_groups:
-      - 'Templates'
-      - 'Templates/Applications'
+      - "Templates"
+      - "Templates/Applications"
     link_templates:
-      - 'Zabbix proxy health'
-      - 'FTP Service'
+      - "Zabbix proxy health"
+      - "FTP Service"
     macros:
-      - macro: '{$EXAMPLE_MACRO1}'
+      - macro: "{$EXAMPLE_MACRO1}"
         value: 1000
-      - macro: '{$EXAMPLE_MACRO2}'
-        value: 'text'
+      - macro: "{$EXAMPLE_MACRO2}"
+        value: "text"
     state: present
   register: update_zabbix_template_result
 
-- assert:
+- ansible.builtin.assert:
     that:
       - update_zabbix_template_result.changed is sameas true
 
 - name: Add macros to Zabbix template (idempotency check).
-  zabbix_template:
+  community.zabbix.zabbix_template:
     template_name: ExampleHost
     template_groups:
-      - 'Templates'
-      - 'Templates/Applications'
+      - "Templates"
+      - "Templates/Applications"
     link_templates:
-      - 'Zabbix proxy health'
-      - 'FTP Service'
+      - "Zabbix proxy health"
+      - "FTP Service"
     macros:
-      - macro: '{$EXAMPLE_MACRO1}'
+      - macro: "{$EXAMPLE_MACRO1}"
         value: 1000
-      - macro: '{$EXAMPLE_MACRO2}'
-        value: 'text'
+      - macro: "{$EXAMPLE_MACRO2}"
+        value: "text"
     state: present
   register: update_zabbix_template_result
 
-- assert:
+- ansible.builtin.assert:
     that:
       - update_zabbix_template_result.changed is sameas false
 
 - name: Add tags to Zabbix template.
-  zabbix_template:
+  community.zabbix.zabbix_template:
     template_name: ExampleHost
     template_groups:
-      - 'Templates'
-      - 'Templates/Applications'
+      - "Templates"
+      - "Templates/Applications"
     link_templates:
-      - 'Zabbix proxy health'
-      - 'FTP Service'
+      - "Zabbix proxy health"
+      - "FTP Service"
     macros:
-      - macro: '{$EXAMPLE_MACRO1}'
+      - macro: "{$EXAMPLE_MACRO1}"
         value: 1000
-      - macro: '{$EXAMPLE_MACRO2}'
-        value: 'text'
+      - macro: "{$EXAMPLE_MACRO2}"
+        value: "text"
     tags:
       - tag: tag1
         value: 1000
@@ -189,23 +189,23 @@
     state: present
   register: update_zabbix_template_result
 
-- assert:
+- ansible.builtin.assert:
     that: update_zabbix_template_result is changed
 
 - name: Add tags to Zabbix template (idempotency check).
-  zabbix_template:
+  community.zabbix.zabbix_template:
     template_name: ExampleHost
     template_groups:
-      - 'Templates'
-      - 'Templates/Applications'
+      - "Templates"
+      - "Templates/Applications"
     link_templates:
-      - 'Zabbix proxy health'
-      - 'FTP Service'
+      - "Zabbix proxy health"
+      - "FTP Service"
     macros:
-      - macro: '{$EXAMPLE_MACRO1}'
+      - macro: "{$EXAMPLE_MACRO1}"
         value: 1000
-      - macro: '{$EXAMPLE_MACRO2}'
-        value: 'text'
+      - macro: "{$EXAMPLE_MACRO2}"
+        value: "text"
     tags:
       - tag: tag1
         value: 1000
@@ -214,37 +214,37 @@
     state: present
   register: update_zabbix_template_result
 
-- assert:
+- ansible.builtin.assert:
     that: update_zabbix_template_result is not changed
 
 - name: Remove tags from Zabbix template.
-  zabbix_template:
+  community.zabbix.zabbix_template:
     template_name: ExampleHost
     template_groups:
-      - 'Templates'
-      - 'Templates/Applications'
+      - "Templates"
+      - "Templates/Applications"
     link_templates:
-      - 'Zabbix proxy health'
-      - 'FTP Service'
+      - "Zabbix proxy health"
+      - "FTP Service"
     macros:
-      - macro: '{$EXAMPLE_MACRO1}'
+      - macro: "{$EXAMPLE_MACRO1}"
         value: 1000
-      - macro: '{$EXAMPLE_MACRO2}'
-        value: 'text'
+      - macro: "{$EXAMPLE_MACRO2}"
+        value: "text"
     tags: []
     state: present
   register: update_zabbix_template_result
 
-- assert:
+- ansible.builtin.assert:
     that: update_zabbix_template_result is changed
 
 - name: Delete Zabbix template.
-  zabbix_template:
+  community.zabbix.zabbix_template:
     template_name: ExampleHost
     state: absent
   register: delete_zabbix_template_result
 
-- assert:
+- ansible.builtin.assert:
     that:
       - delete_zabbix_template_result.changed is sameas true
 
@@ -253,35 +253,35 @@
 #
 
 - name: Import Zabbix template from JSON file (idempotency check).
-  zabbix_template:
+  community.zabbix.zabbix_template:
     template_json: "{{ lookup('file', 'template3_54_higher.json') }}"
     state: present
   register: import_template_json
 
 - name: Assert Zabbix template from JSON file (idempotency check).
-  assert:
+  ansible.builtin.assert:
     that:
       - import_template_json.changed is sameas true
 
 - name: Import Zabbix template from JSON file with matching values (idempotency check).
-  zabbix_template:
+  community.zabbix.zabbix_template:
     template_json: "{{ lookup('file', 'template3_54_higher.json') }}"
     state: present
   register: import_template_json
 
 - name: Assert Zabbix template from JSON file with matching values (idempotency check).
-  assert:
+  ansible.builtin.assert:
     that:
       - import_template_json.changed is sameas false
 
 - name: Gather Zabbix template infomation.
-  zabbix_template_info:
+  community.zabbix.zabbix_template_info:
     template_name: ExampleHost
     format: json
   register: gather_template_result
 
 - block:
-    - assert:
+    - ansible.builtin.assert:
         that:
           - gather_template_result.template_json[template_export_key][template_groups_key].0.name == 'Templates'
           - gather_template_result.template_json[template_export_key][template_groups_key].1.name == 'Templates/Applications'
@@ -293,22 +293,22 @@
           - gather_template_result.template_json[template_export_key].templates.0.macros.1.value == 'text'
 
 - name: Import Zabbix template from JSON file with updated values.
-  zabbix_template:
+  community.zabbix.zabbix_template:
     template_json: "{{ lookup('file', 'template3-changed_54_higher.json') }}"
     state: present
   register: import_template_json
 
-- assert:
+- ansible.builtin.assert:
     that:
       - import_template_json.changed is sameas true
 
 - name: Gather Zabbix template infomation.
-  zabbix_template_info:
+  community.zabbix.zabbix_template_info:
     template_name: ExampleHost
     format: json
   register: gather_template_result
 
-- assert:
+- ansible.builtin.assert:
     that:
       - gather_template_result.template_json[template_export_key].templates.0.macros.0.macro == '{$EXAMPLE_MACRO1}'
       - gather_template_result.template_json[template_export_key].templates.0.macros.0.value == '1000'
@@ -323,24 +323,24 @@
 
 - block:
     - name: Import Zabbix template from XML file with updated values.
-      zabbix_template:
+      community.zabbix.zabbix_template:
         template_xml: "{{ lookup('file', 'template3_54_higher.xml') }}"
         state: present
       register: import_template_xml
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - import_template_xml.changed is sameas true
 
 - name: Gather Zabbix template infomation.
-  zabbix_template_info:
+  community.zabbix.zabbix_template_info:
     template_name: ExampleHost
     format: json
   register: gather_template_result
 
 # zabbix returns values sorted alphabetically so HTTP Service template comes before Zabbix Proxy template
 - block:
-    - assert:
+    - ansible.builtin.assert:
         that:
           - gather_template_result.template_json[template_export_key].templates.0.templates.0.name == 'FTP Service'
           - gather_template_result.template_json[template_export_key].templates.0.templates.1.name == 'Zabbix proxy health'
@@ -350,24 +350,101 @@
 #
 
 - name: Delete Zabbix template.
-  zabbix_template:
+  community.zabbix.zabbix_template:
     template_name: ExampleHost
     state: absent
   register: delete_zabbix_template_result
 
-- assert:
+- ansible.builtin.assert:
     that:
       - delete_zabbix_template_result.changed is sameas true
 
 - name: Delete Zabbix template (idempotency check).
-  zabbix_template:
+  community.zabbix.zabbix_template:
     template_name: ExampleHost
     state: absent
   register: delete_zabbix_template_result
 
-- assert:
+- ansible.builtin.assert:
     that:
       - delete_zabbix_template_result.changed is sameas false
+
+#
+# template_file_context parameter
+#
+
+- name: Import Zabbix template from a file using configuration.importcompare api
+  block:
+    - name: Import Zabbix template from YAML file.
+      community.zabbix.zabbix_template:
+        template_yaml: "{{ lookup('file', 'template4_60_higher.yaml') }}"
+        state: present
+      register: import_template_yaml
+
+    - ansible.builtin.assert:
+        that:
+          - import_template_xml.changed is sameas true
+
+    - name: Import Zabbix same template from XML file.
+      community.zabbix.zabbix_template:
+        template_xml: "{{ lookup('file', 'template4_60_higher.xml') }}"
+        state: present
+      register: import_same_template_xml
+
+    - ansible.builtin.assert:
+        that:
+          - import_same_template_xml.changed is sameas false
+
+    - name: Delete Zabbix template.
+      community.zabbix.zabbix_template:
+        template_name: ExampleTemplate
+        state: absent
+      register: delete_zabbix_template_result
+
+    - ansible.builtin.assert:
+        that:
+          - delete_zabbix_template_result.changed is sameas true
+
+    - name: Import Zabbix same template from XML file (after deleting template).
+      community.zabbix.zabbix_template:
+        template_xml: "{{ lookup('file', 'template4_60_higher.xml') }}"
+        state: present
+      register: import_same_template_xml
+
+    - ansible.builtin.assert:
+        that:
+          - import_same_template_xml.changed is sameas true
+
+    - name: Import Zabbix same template from JSON file.
+      community.zabbix.zabbix_template:
+        template_json: "{{ lookup('file', 'template4_60_higher.json') }}"
+        state: present
+      register: import_same_template_json
+
+    - ansible.builtin.assert:
+        that:
+          - import_same_template_json.changed is sameas false
+
+    - name: Delete Zabbix template.
+      community.zabbix.zabbix_template:
+        template_name: ExampleTemplate
+        state: absent
+      register: delete_zabbix_template_result
+
+    - ansible.builtin.assert:
+        that:
+          - delete_zabbix_template_result.changed is sameas true
+
+    - name: Delete Zabbix template (idempotency check).
+      community.zabbix.zabbix_template:
+        template_name: ExampleTemplate
+        state: absent
+      register: delete_zabbix_template_result
+
+    - ansible.builtin.assert:
+        that:
+          - delete_zabbix_template_result.changed is sameas false
+
 
 #
 # Unicode stuff
@@ -376,33 +453,33 @@
 # The test if decode Unicode correctly and to be imported the template.
 # https://github.com/ansible-collections/community.zabbix/issues/314
 - name: Import Zabbix template from JSON file with unicode.
-  zabbix_template:
+  community.zabbix.zabbix_template:
     template_json: "{{ lookup('file', 'template1_50_higher_decode_unicode.json') }}"
     state: present
   register: import_template_json
 
 - name: Gather Zabbix template infomation.
-  zabbix_template_info:
+  community.zabbix.zabbix_template_info:
     template_name: ExampleTemplate314
     format: json
   register: gather_template_result
 
-- assert:
+- ansible.builtin.assert:
     that:
       - import_template_json.changed is sameas true
       - gather_template_result.template_json.zabbix_export.templates.0.description == "\u30c6\u30b9\u30c8\u30b3\u30e1\u30f3\u30c8"
 
 - name: Delete Zabbix template.
-  zabbix_template:
+  community.zabbix.zabbix_template:
     template_name: ExampleTemplate314
     state: absent
   register: delete_zabbix_template_result
 
-- assert:
+- ansible.builtin.assert:
     that:
       - delete_zabbix_template_result.changed is sameas true
 
 - name: Clean up ExampleHostWithLinked template
-  zabbix_template:
+  community.zabbix.zabbix_template:
     template_name: ExampleHostWithLinked
     state: absent

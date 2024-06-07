@@ -5,7 +5,7 @@
   pre_tasks:
     - name: "Create MySQL Container"
       docker_container:
-        name: mysql-host
+        name: "{{ item.name }}-db"
         image: mysql:8.0
         state: started
         recreate: true
@@ -20,7 +20,7 @@
 
     - name: "Create postgresql Container"
       docker_container:
-        name: postgresql-host
+        name: "{{ item.name }}-db"
         image: postgres:13
         state: started
         recreate: true
@@ -36,10 +36,6 @@
 - name: Prepare
   hosts: all
   tasks:
-    - name: "Set short version name"
-      set_fact:
-        zabbix_python_prefix: "python{% if ansible_python_version is version('3', '>=') %}3{% endif %}"
-
     - name: "Create group for imaginary host"
       add_host:
         name: imaginary-host
@@ -49,7 +45,7 @@
       changed_when: false
 
     - name: "Installing packages on CentOS"
-      yum:
+      ansible.builtin.yum:
         name:
           - net-tools
           - which
@@ -60,26 +56,19 @@
       when:
         - ansible_os_family == 'RedHat'
 
-    - name: Check if warn parameter can be used for shell module
-      set_fact:
-        produce_warn: False
-      when: ansible_version.full is version("2.14", "<")
-
     - name: "Apt update"
-      shell: "apt-get update && echo exit 0 > /usr/sbin/policy-rc.d"
-      args:
-        warn: "{{ produce_warn | default(omit) }}"
+      ansible.builtin.shell: "apt-get update && echo exit 0 > /usr/sbin/policy-rc.d"
       register: installation_dependencies
       until: installation_dependencies is succeeded
       when:
         - ansible_os_family != 'RedHat'
 
     - name: "Installing packages on NON-CentOS"
-      apt:
+      ansible.builtin.apt:
         name:
           - net-tools
           - apt-utils
-          - "{{ zabbix_python_prefix }}-pip"
+          - python3-pip
           - gpg-agent
           - sudo
           - doc-base
@@ -91,76 +80,7 @@
         - ansible_os_family != 'RedHat'
 
     - name: "Configure SUDO."
-      lineinfile:
+      ansible.builtin.lineinfile:
         dest: /etc/sudoers
         line: "Defaults    !requiretty"
         state: present
-
-    - name: "Make sure the docs can be installed. (RedHat)"
-      lineinfile:
-        dest: /etc/yum.conf
-        line: "tsflags=nodocs"
-        state: absent
-      when:
-        - ansible_os_family == 'RedHat'
-
-    - name: "Make sure the docs can be installed. (Debian)"
-      lineinfile:
-        path: /etc/dpkg/dpkg.cfg.d/excludes
-        state: absent
-        regexp: "path-exclude=/usr/share/doc/*"
-      when:
-        - ansible_os_family != 'RedHat'
-
-    - name: PyMySQL
-      pip:
-        name: PyMySQL
-      register: installation_dependencies
-      until: installation_dependencies is succeeded
-      when:
-        - inventory_hostname in groups['mysql']
-
-    - name: Install MariaDB (RHEL)
-      block:
-        - name: Add MariaDB Repo
-          ansible.builtin.yum_repository:
-            name: mariadb
-            description: MariaDB 10.8 CentOS repository list
-            file: mariadb
-            baseurl: "https://mirror.rackspace.com/mariadb/yum/10.8/centos{{ ansible_distribution_major_version }}-amd64"
-            gpgcheck: no
-          when: ansible_distribution_major_version <= '8'
-
-        - name: Install MariaDB Client
-          yum:
-            name:
-              - "{{ 'mariadb' if ansible_distribution_major_version >= '8' else 'MariaDB-client' }}"
-              - "{{ 'python3-PyMySQL' if ansible_distribution_major_version >= '8' else 'MySQL-python' }}"
-      when:
-        - ansible_os_family == 'RedHat'
-        - zabbix_proxy_database == 'mysql'
-
-    - name: Install MariaDB (Debian)
-      block:
-        - name: Add an Apt signing key, uses whichever key is at the URL
-          ansible.builtin.apt_key:
-            url: https://mariadb.org/mariadb_release_signing_key.asc
-            state: present
-
-        - name: Add specified repository into sources list
-          ansible.builtin.apt_repository:
-            repo: "deb https://mirror.rackspace.com/mariadb/repo/10.8/{{ ansible_distribution | lower }} {{ ansible_distribution_release }} main"
-            state: present
-            validate_certs: false
-
-        - name: Install MariaDB Client
-          ansible.builtin.apt:
-            name:
-              - mariadb-client
-              - "{{ zabbix_python_prefix }}-mysqldb"
-            state: present
-            update_cache: true
-            allow_unauthenticated: true
-      when:
-        - ansible_os_family == 'Debian'
-        - zabbix_proxy_database == 'mysql'

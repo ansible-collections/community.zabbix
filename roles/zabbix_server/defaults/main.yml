@@ -8,24 +8,27 @@ zabbix_server_manage_service: true
 # Database
 zabbix_server_database_sqlload: true
 zabbix_server_database_timescaledb: false
-zabbix_server_real_dbhost:
+#zabbix_server_real_dbhost:
 zabbix_server_dbhost: localhost
 zabbix_server_dbname: zabbix-server
 zabbix_server_privileged_host: localhost
 zabbix_server_dbencoding: utf8
 zabbix_server_dbcollation: utf8_bin
-zabbix_server_dbschema:
+#zabbix_server_dbschema:
 zabbix_server_dbuser: zabbix-server
 zabbix_server_dbpassword: zabbix-server
-zabbix_server_dbsocket:
-zabbix_server_dbport: 5432
+zabbix_server_dbpassword_hash_method: md5
+#zabbix_server_dbsocket:
+_zabbix_server_database_default_port:
+  mysql: 3306
+  pgsql: 5432
+zabbix_server_dbport: "{{ _zabbix_server_database_default_port[zabbix_server_database] }}"
 zabbix_server_dbhost_run_install: true
 zabbix_server_database: pgsql
 zabbix_server_database_creation: true
 zabbix_server_install_database_client: true
 
 # SELinux specific
-zabbix_server_selinux: false
 selinux_allow_zabbix_can_network: false
 selinux_allow_zabbix_can_http: false
 
@@ -37,26 +40,6 @@ zabbix_service_state: started
 # Yum/APT  Variables
 zabbix_server_version_minor: "*"
 zabbix_server_package_state: present
-zabbix_repo_yum_gpgcheck: 0
-zabbix_repo_yum_schema: https
-zabbix_repo_yum_enabled: []
-zabbix_repo_yum:
-  - name: zabbix
-    description: Zabbix Official Repository - $basearch
-    baseurl: "{{ zabbix_repo_yum_schema }}://repo.zabbix.com/zabbix/{{ zabbix_server_version | regex_search('^[0-9]+.[0-9]+') }}/rhel/{{ ansible_distribution_major_version }}/$basearch/"
-    gpgcheck: "{{ zabbix_repo_yum_gpgcheck }}"
-    mode: "0644"
-    gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-ZABBIX
-    state: present
-  - name: zabbix-non-supported
-    description: Zabbix Official Repository non-supported - $basearch
-    baseurl: "{{ zabbix_repo_yum_schema }}://repo.zabbix.com/non-supported/rhel/{{ ansible_distribution_major_version }}/$basearch/"
-    mode: "0644"
-    gpgcheck: "{{ zabbix_repo_yum_gpgcheck }}"
-    gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-ZABBIX
-    state: present
-zabbix_server_apt_priority:
-zabbix_server_install_recommends: true
 zabbix_server_conf_mode: 0640
 
 # Server Configuration Variables (Only ones with role provided defaults)
@@ -66,8 +49,6 @@ zabbix_server_allowunsupporteddbversions: 0
 zabbix_server_debuglevel: 3
 zabbix_server_exportfilesize: 1G
 zabbix_server_externalscriptspath: /usr/lib/zabbix/externalscripts
-zabbix_server_fping6location: /usr/sbin/fping6
-zabbix_server_fpinglocation: /usr/sbin/fping
 zabbix_server_historystoragedateindex: 0
 zabbix_server_historystoragetypes: uint,dbl,str,log,text
 zabbix_server_housekeepingfrequency: 1

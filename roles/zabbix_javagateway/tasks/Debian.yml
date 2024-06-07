@@ -1,72 +1,6 @@
 ---
-- name: "Debian | Include Zabbix gpg ids"
-  include_vars: zabbix.yml
-  tags:
-    - always
-
-- name: "Debian | Set some variables"
-  set_fact:
-    zabbix_short_version: "{{ zabbix_javagateway_version | regex_replace('\\.', '') }}"
-  tags:
-    - always
-
-- name: "Debian | Set some variables"
-  set_fact:
-    zabbix_javagateway_apt_repository:
-      - "http://repo.zabbix.com/zabbix/{{ zabbix_javagateway_version }}/{{ ansible_distribution.lower() }}/"
-      - "{{ ansible_distribution_release }}"
-      - "main"
-  when:
-    - ansible_machine != "aarch64"
-  tags:
-    - install
-
-- name: "Debian | Set some variables"
-  set_fact:
-    zabbix_javagateway_apt_repository:
-      - "http://repo.zabbix.com/zabbix/{{ zabbix_javagateway_version }}/{{ ansible_distribution.lower() }}-arm64/"
-      - "{{ ansible_distribution_release }}"
-      - "main"
-  when:
-    - ansible_machine == "aarch64"
-  tags:
-    - install
-
-# In releases older than Debian 12 and Ubuntu 22.04, /etc/apt/keyrings does not exist by default. 
-# It SHOULD be created with permissions 0755 if it is needed and does not already exist.
-# See: https://wiki.debian.org/DebianRepository/UseThirdParty
-- name: "Debian | Create /etc/apt/keyrings/ on older versions"
-  ansible.builtin.file:
-    path: /etc/apt/keyrings/
-    state: directory
-    mode: '0755'
-  when:
-    - (ansible_distribution == "Ubuntu" and ansible_distribution_major_version < "22") or
-      (ansible_distribution == "Debian" and ansible_distribution_major_version < "12")
-
-- name: "Debian | Download gpg key"
-  ansible.builtin.get_url:
-    url: http://repo.zabbix.com/zabbix-official-repo.key
-    dest: "{{ zabbix_gpg_key }}"
-    mode: '0644'
-    force: true
-  become: true
-  tags:
-    - install
-
-- name: "Debian | Installing repository Debian"
-  apt_repository:
-    repo: "{{ item }} [signed-by={{ zabbix_gpg_key }}] {{ zabbix_javagateway_apt_repository | join(' ') }}"
-    state: present
-  become: true
-  with_items:
-    - deb-src
-    - deb
-  tags:
-    - install
-
 - name: "Debian | Installing zabbix-java-gateway"
-  apt:
+  ansible.builtin.apt:
     pkg: zabbix-java-gateway
     state: "{{ zabbix_javagateway_package_state }}"
     update_cache: true
@@ -82,11 +16,12 @@
     - install
 
 - name: "Debian | Make sure Zabbix Java Gateway is not yet running"
-  systemd:
+  ansible.builtin.systemd:
     name: zabbix-java-gateway
     state: stopped
     enabled: true
     daemon_reload: true
+  become: true
   when:
     - zabbix_java_gateway_install.changed
   tags:

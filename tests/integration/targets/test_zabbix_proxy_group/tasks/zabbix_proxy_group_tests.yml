@@ -1,0 +1,64 @@
+---
+- name: test - do not run tests for Zabbix < 7.0
+  meta: end_play
+  when: zabbix_version is version('7.0', '<')
+
+- name: set module defaults
+  module_defaults:
+    community.zabbix.zabbix_proxy_group:
+      name: TestProxyGroup
+
+  block:
+  - name: test - create new Zabbix proxy group
+    community.zabbix.zabbix_proxy_group:
+      description: Example Zabbix Proxy Group
+      state: present
+      failover_delay: 10s
+      min_online: 2
+    register: proxy_group_new
+  
+  - name: assert that proxy group was created
+    ansible.builtin.assert:
+      that: proxy_group_new is changed
+  
+  - name: test - create same Zabbix proxy group
+    community.zabbix.zabbix_proxy_group:
+      description: Example Zabbix Proxy Group
+      state: present
+      failover_delay: 10s
+      min_online: 2
+    register: proxy_group_existing
+  
+  - name: assert that nothing has been changed
+    ansible.builtin.assert:
+      that: not proxy_group_existing is changed
+  
+  - name: test - update Zabbix proxy group
+    community.zabbix.zabbix_proxy_group:
+      description: Example Zabbix Proxy Group
+      state: present
+      failover_delay: 20s
+      min_online: 1
+    register: proxy_group_update
+  
+  - name: assert that proxy group has changed
+    ansible.builtin.assert:
+      that: proxy_group_update is changed
+  
+  - name: test - delete Zabbix proxy group
+    community.zabbix.zabbix_proxy_group:
+      state: absent
+    register: proxy_group_delete
+  
+  - name: assert that proxy group has been deleted
+    ansible.builtin.assert:
+      that: proxy_group_delete is changed
+  
+  - name: test - delete Zabbix proxy group (again)
+    community.zabbix.zabbix_proxy_group:
+      state: absent
+    register: proxy_group_delete_again
+  
+  - name: assert that nothing has been changed
+    ansible.builtin.assert:
+      that: not proxy_group_delete_again is changed

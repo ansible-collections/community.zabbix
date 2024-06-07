@@ -1,0 +1,62 @@
+---
+# task file for sqlite3
+- name: "Install SQLite3 dependencies"
+  when: zabbix_proxy_database_creation or zabbix_proxy_database_sqlload
+  ansible.builtin.package:
+    name: "{{ _zabbix_proxy_sqlite3_dependencies }}"
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
+  become: true
+  register: _zabbix_proxy_sqlite3_packages_installed
+  until: _zabbix_proxy_sqlite3_packages_installed is succeeded
+  tags:
+    - install
+    - database
+    - dependencies
+
+- name: "SQLite3 | Set path for default dbname"
+  when: zabbix_proxy_dbname == "zabbix_proxy"
+  ansible.builtin.set_fact:
+    zabbix_proxy_dbname: /var/lib/zabbix/zabbix_proxy.db
+  tags:
+    - database
+
+- name: "SQLite3 Database prep"
+  when: zabbix_proxy_database_creation | bool
+  become: true
+  tags:
+    - database
+  block:
+    - name: "SQLite3 | Create path directories"
+      ansible.builtin.file:
+        state: directory
+        name: "{{ zabbix_proxy_dbname | dirname }}"
+        mode: "0744"
+        owner: "{{ zabbix_os_user }}"
+        group: "{{ zabbix_os_user }}"
+        seuser: system_u
+        serole: object_r
+        setype: zabbix_var_lib_t
+
+    - name: "SQLite3 | Import schema"
+      when: zabbix_proxy_database_sqlload
+      become_user: "{{ zabbix_os_user }}"
+      ansible.builtin.shell: |
+        set -euxo pipefail
+        sqlite3 {{ zabbix_proxy_dbname }} < /usr/share/zabbix-sql-scripts/sqlite3/proxy.sql
+      args:
+        creates: "{{ zabbix_proxy_dbname }}"
+        executable: /bin/bash
+
+    - name: "Sqlite3 | Fix zabbix db file permission (SELinux)"
+      when: ansible_selinux.status == "enabled"
+      ansible.builtin.file:
+        state: file
+        path: "{{ zabbix_proxy_dbname }}"
+        mode: "0600"
+        owner: "{{ zabbix_os_user }}"
+        group: "{{ zabbix_os_user }}"
+        seuser: system_u
+        serole: object_r
+        setype: zabbix_var_lib_t

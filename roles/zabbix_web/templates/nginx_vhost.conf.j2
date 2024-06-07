@@ -20,7 +20,7 @@ server {
         try_files       $uri $uri/ =404;
     }
 
-    location /assets {
+    location /assets/ {
         access_log      off;
         expires         10d;
     }
@@ -68,12 +68,11 @@ server {
     server_tokens off;
     server_name {{ zabbix_api_server_url }} {% for alias in zabbix_url_aliases -%}{{ alias -}} {% endfor %};
 
-    ssl on;
     ssl_certificate {{ zabbix_web_tls_crt }};
     ssl_certificate_key {{ zabbix_web_tls_key }};
-    {{ (zabbix_web_ssl_cipher_suite is defined and zabbix_web_ssl_cipher_suite is not none) | ternary('', '# ') }}ssl_ciphers {{ zabbix_web_ssl_cipher_suite | default('') }}
-    {{ (zabbix_web_SSLSessionCache is defined and zabbix_web_SSLSessionCache is not none) | ternary('', '# ') }}ssl_session_cache  {{ zabbix_web_SSLSessionCache | default('') }}
-    {{ (zabbix_web_SSLSessionCacheTimeout is defined and zabbix_web_SSLSessionCacheTimeout is not none) | ternary('', '# ') }}ssl_session_timeout {{ zabbix_web_SSLSessionCacheTimeout | default('') }}
+    {{ (zabbix_web_ssl_cipher_suite is defined and zabbix_web_ssl_cipher_suite is not none) | ternary('', '# ') }}ssl_ciphers {{ zabbix_web_ssl_cipher_suite | default('') }};
+    {{ (zabbix_web_SSLSessionCache is defined and zabbix_web_SSLSessionCache is not none) | ternary('', '# ') }}ssl_session_cache  {{ zabbix_web_SSLSessionCache | default('') }};
+    {{ (zabbix_web_SSLSessionCacheTimeout is defined and zabbix_web_SSLSessionCacheTimeout is not none) | ternary('', '# ') }}ssl_session_timeout {{ zabbix_web_SSLSessionCacheTimeout | default('') }};
     root    /usr/share/zabbix;
 
     index   index.php;
@@ -86,7 +85,7 @@ server {
         try_files       $uri $uri/ =404;
     }
 
-    location /assets {
+    location /assets/ {
         access_log      off;
         expires         10d;
     }

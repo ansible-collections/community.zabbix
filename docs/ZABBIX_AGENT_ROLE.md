@@ -28,7 +28,6 @@
   * [proxy](#proxy)
 - [Dependencies](#dependencies)
 - [Example Playbook](#example-playbook)
-  * [zabbix_agent2_plugins](#zabbix-agent2-plugins)
   * [agent_interfaces](#agent-interfaces)
   * [Other interfaces](#other-interfaces)
   * [Vars in role configuration](#vars-in-role-configuration)
@@ -90,35 +89,17 @@ To successfully complete the install the role requires `python-netaddr` on the c
 
 See the following list of supported Operating systems with the Zabbix releases:
 
-| Zabbix              | 6.4 | 6.2 | 6.0 |
-|---------------------|-----|-----|-----|
-| Red Hat Fam 9       |  V  |  V  |  V  |
-| Red Hat Fam 8       |  V  |  V  |  V  |
-| Red Hat Fam 7       |  V  |  V  |  V  |
-| Ubuntu 22.04 jammy  |  V  |  V  |  V  |
-| Ubuntu 20.04 focal  |  V  |  V  |  V  |
-| Ubuntu 18.04 bionic |  V  |  V  |  V  |
-| Debian 11 bullseye  |  V  |  V  |  V  |
-| Debian 10 buster    |  V  |  V  |  V  |
+| Zabbix              | 6.4 | 6.0 |
+|---------------------|-----|-----|
+| Red Hat Fam 9       |  V  |  V  |
+| Red Hat Fam 8       |  V  |  V  |
+| Ubuntu 24.04 noble  |  V  |  V  |
+| Ubuntu 22.04 jammy  |  V  |  V  |
+| Ubuntu 20.04 focal  |  V  |  V  |
+| Debian 12 bookworm  |  V  |  V  |
+| Debian 11 bullseye  |  V  |  V  |
 
-
-# Getting started
-
-## Minimal Configuration
-
-In order to get the Zabbix Agent running, you'll have to define the following properties before executing the role:
-
-* `zabbix_agent_version`
-* `zabbix_agent(2)_server`
-* `zabbix_agent(2)_serveractive` (When using active checks)
-
-The `zabbix_agent_version` is optional. The latest available major.minor version of Zabbix will be installed on the host(s). If you want to use an older version, please specify this in the major.minor format. Example: `zabbix_agent_version: 6.0`.
-
-The `zabbix_agent(2)_server` (and `zabbix_agent(2)_serveractive`) should contain the ip or fqdn of the host running the Zabbix Server.
-
-## Issues
-
-Due to issue discussed on [#291](https://github.com/dj-wasabi/ansible-zabbix-agent/issues/291), the Ansible Version 2.9.{0,1,2} isn't working correctly on Windows related targets.
+You can bypass this matrix by setting `enable_version_check: false`
 
 # Role Variables
 
@@ -128,111 +109,71 @@ The following is an overview of all available configuration default for this rol
 
 ### Overall Zabbix
 
-* `zabbix_agent_version`: This is the version of zabbix. Default: The highest supported version for the operating system. Can be overridden to 6.4, 6.2, or 6.0
+* `zabbix_agent_version`: This is the version of zabbix. Default: The highest supported version for the operating system. Can be overridden to 6.4 or 6.0
 * `zabbix_agent_version_minor`: When you want to specify a minor version to be installed. Is also used for `zabbix_sender` and `zabbix_get`. RedHat only. Default set to: `*` (latest available)
 * `zabbix_repo_yum`: A list with Yum repository configuration.
+* `zabbix_repo_yum_gpgcheck`: If Yum should check GPG keys on installation
 * `zabbix_repo_yum_schema`: Default: `https`. Option to change the web schema for the yum repository(http/https)
+* `zabbix_agent_disable_repo`: A list of repos to disable during install.  Default `epel`.
+* `zabbix_repo_deb_url`: The URL to the Zabbix repository.  Default `http://repo.zabbix.com/zabbix/{{ zabbix_agent_version }}/{{ ansible_distribution.lower() }}`
+* `zabbix_repo_deb_component`: The repository component for Debian installs. Default `main`.
+* `zabbix_repo_deb_gpg_key_url`: The URL to download the Zabbix GPG key from. Default `http://repo.zabbix.com/zabbix-official-repo.key.
+* `zabbix_repo_deb_include_deb_src`: True, if deb-src should be included in the zabbix.sources entry. Default `true`.
+* `zabbix_manage_repo`: Have the collection install and configure the Zabbix repo Default `true`.
 
 ### SElinux
 
-* `zabbix_selinux`: Default: `False`. Enables an SELinux policy so that the server will run.
+Selinux changes will be installed based on the status of selinux running on the target system.
+
+* `selinux_allow_zabbix_run_sudo`: Default: `False`.  Enable Zabbix root access on system.
 
 ### Zabbix Agent
 
-* `zabbix_agent_ip`: The IP address of the host. When not provided, it will be determined via the `ansible_default_ipv4` fact.
 * `zabbix_agent2`: Default: `False`. When you want to install the `Zabbix Agent2` instead of the "old" `Zabbix Agent`.zabbix_agent_version
-* `zabbix_agent_listeninterface`: Interface zabbix-agent listens on. Leave blank for all.
-* `zabbix_agent_package_remove`: If `zabbix_agent2: True` and you want to remove the old installation. Default: `False`.
-* `zabbix_agent_package`: The name of the zabbix-agent package. Default: `zabbix-agent`. In case for EPEL, it is automatically renamed.
-* `zabbix_sender_package`: The name of the zabbix-sender package. Default: `zabbix-sender`. In case for EPEL, it is automatically renamed.
-* `zabbix_get_package`: The name of the zabbix-get package. Default: `zabbix-get`. In case for EPEL, it is automatically renamed.
-* `zabbix_agent_package_state`: If Zabbix-agent needs to be `present` or `latest`.
-* `zabbix_agent_interfaces`: A list that configured the interfaces you can use when configuring via API.
-* `zabbix_agent_install_agent_only`: Only install the Zabbix Agent and not the `zabbix-sender` and `zabbix-get` packages. Default: `False`
-* `zabbix_agent_userparameters`: Default: `[]]`. List of userparameter names and scripts (if any). Detailed description is given in the [Deploying Userparameters](#deploying-userparameters) section.
-    * `name`: Userparameter name (should be the same with userparameter template file name)
-    * `scripts_dir`: Directory name of the custom scripts needed for userparameters
-* `zabbix_agent_userparameters_templates_src`: indicates the relative path (from `templates/`) where userparameter templates are searched
-* `zabbix_agent_userparameters_scripts_src`: indicates the relative path (from `files/`) where userparameter scripts are searched
-* `zabbix_agent_runas_user`: Drop privileges to a specific, existing user on the system. Only has effect if run as 'root' and AllowRoot is disabled.
-* `zabbix_agent_become_on_localhost`: Default: `True`. Set to `False` if you don't need to elevate privileges on localhost to install packages locally with pip.
 * `zabbix_agent_apt_priority`: Add a weight (`Pin-Priority`) for the APT repository.
+* `zabbix_agent_chassis`: Default: `false`. When set to `true`, it will give Zabbix Agent access to the Linux DMI table allowing system.hw.chassis info to populate.
 * `zabbix_agent_conf_mode`: Default: `0644`. The "mode" for the Zabbix configuration file.
 * `zabbix_agent_dont_detect_ip`: Default `false`. When set to `true`, it won't detect available ip addresses on the host and no need for the Python module `netaddr` to be installed.
-* `zabbix_agent_chassis`: Default: `false`. When set to `true`, it will give Zabbix Agent access to the Linux DMI table allowing system.hw.chassis info to populate.
-
-### Zabbix Agent vs Zabbix Agent 2 configuration
-
-The following provides an overview of all the properties that can be set in the Zabbix Agent configuration file. When `(2)` is used in the name of the property, like `zabbix_agent(2)_pidfile`, it will show that you can configure `zabbix_agent_pidfile` for the Zabbix Agent configuration file and `zabbix_agent2_pidfile` for the Zabbix Agent 2 configuration file.
-
-Otherwise it just for the Zabbix Agent or for the Zabbix Agent 2.
-
-* `zabbix_agent(2)_server`: The ip address for the zabbix-server or zabbix-proxy.
-* `zabbix_agent(2)_serveractive`: The ip address for the zabbix-server or zabbix-proxy for active checks.
-* `zabbix_agent(2)_allow_key`: list of AllowKey configurations.
-* `zabbix_agent(2)_deny_key`: list of DenyKey configurations.
-* `zabbix_agent(2)_pidfile`: name of pid file.
-* `zabbix_agent(2)_logfile`: name of log file.
-* `zabbix_agent(2)_logfilesize`: maximum size of log file in mb.
-* `zabbix_agent(2)_logtype`: Specifies where log messages are written to
-* `zabbix_agent(2)_debuglevel`: specifies debug level
-* `zabbix_agent(2)_sourceip`: source ip address for outgoing connections.
-* `zabbix_agent_enableremotecommands`: whether remote commands from zabbix server are allowed.
-* `zabbix_agent_logremotecommands`: enable logging of executed shell commands as warnings.
-* `zabbix_agent(2)_listenport`: agent will listen on this port for connections from the server.
-* `zabbix_agent2_statusport`: Agent will listen on this port for HTTP status requests.
-* `zabbix_agent(2)_listenip`: list of comma delimited ip addresses that the agent should listen on.
-* `zabbix_agent_startagents`: number of pre-forked instances of zabbix_agentd that process passive checks.
-* `zabbix_agent(2)_hostname`: unique, case sensitive hostname.
-* `zabbix_agent(2)_hostnameitem`: item used for generating hostname if it is undefined.
-* `zabbix_agent(2)_hostmetadata`: optional parameter that defines host metadata.
-* `zabbix_agent(2)_hostmetadataitem`: optional parameter that defines an item used for getting the metadata.
-* `zabbix_agent(2)_refreshactivechecks`: how often list of active checks is refreshed, in seconds.
-* `zabbix_agent(2)_buffersend`: do not keep data longer than n seconds in buffer.
-* `zabbix_agent(2)_buffersize`: maximum number of values in a memory buffer. the agent will send all collected data to zabbix server or proxy if the buffer is full.
-* `zabbix_agent2_enablepersistentbuffer`: 0 - disabled, in-memory buffer is used (default); 1 - use persistent buffer
-* `zabbix_agent2_persistentbufferperiod`: Zabbix Agent2 will keep data for this time period in case of no connectivity with Zabbix server or proxy. Older data will be lost. Log data will be preserved.
-* `zabbix_agent2_persistentbufferfile`: Zabbix Agent2 will keep SQLite database in this file	* n is valid if `EnablePersistentBuffer=1`
-* `zabbix_agent_maxlinespersecond`: maximum number of new lines the agent will send per second to zabbix server or proxy processing 'log' and 'logrt' active checks.
-* `zabbix_agent_allowroot`: allow the agent to run as 'root'. if disabled and the agent is started by 'root', the agent will try to switch to user 'zabbix' instead. has no effect if started under a regular user.
-* `zabbix_agent(2)_zabbix_alias`: sets an alias for parameter. it can be useful to substitute long and complex parameter name with a smaller and simpler one. Can be both a string as an list.
-* `zabbix_agent(2)_timeout`: spend no more than timeout seconds on processing
-* `zabbix_agent(2)_include`: you may include individual files or all files in a directory in the configuration file.
-* `zabbix_agent(2)_include_pattern`: Optional file pattern used for included files.
-* `zabbix_agent(2)_include_mode`: The mode for the directory mentioned above.
-* `zabbix_agent(2)_unsafeuserparameters`: allow all characters to be passed in arguments to user-defined parameters.
-* `zabbix_agent_loadmodulepath`: Full path to location of agent modules.
-* `zabbix_agent_loadmodule`: Module to load at agent startup. Modules are used to extend functionality of the agent.
-* `zabbix_agent2_controlsocket`: The control socket, used to send runtime commands with '-R' option.
-* `zabbix_agent_allowroot`:  Allow the agent to run as 'root'. 0 - do not allow, 1 - allow
-* `zabbix_agent2_plugins`: A list containing plugin configuration.
-* `zabbix_agent(2)_listenbacklog`: The maximum number of pending connections in the queue.
+* `zabbix_agent_get_package`: The name of the zabbix-get package. Default: `zabbix-get`.
+* `zabbix_agent_include_mode`: The mode for the directory mentioned above.
+* `zabbix_agent_install_agent_only`: Only install the Zabbix Agent and not the `zabbix-sender` and `zabbix-get` packages. Default: `False`
+* `zabbix_agent_listeninterface`: Interface zabbix-agent listens on. Leave blank for all.
+* `zabbix_agent_package_remove`: If `zabbix_agent2: True` and you want to remove the old installation. Default: `False`.
+* `zabbix_agent_package_state`: If Zabbix-agent needs to be `present` (default) or `latest`.
+* `zabbix_agent_package`: The name of the zabbix-agent package. Default: `zabbix-agent` if `zabbix_agent2` is fale and `zabbix-agent2` if `true`.
+* `zabbix_agent_sender_package`: The name of the zabbix-sender package. Default: `zabbix-sender`.
+* `zabbix_agent_userparameters`: Default: `[]]`. List of userparameter names and scripts (if any). Detailed description is given in the [Deploying Userparameters](#deploying-userparameters) section.
+  * `name`: Userparameter name (should be the same with userparameter template file name)
+  * `scripts_dir`: Directory name of the custom scripts needed for userparameters
+* `zabbix_agent_userparameters_scripts_src`: indicates the relative path (from `files/`) where userparameter scripts are searched
+* `zabbix_agent_userparameters_templates_src`: indicates the relative path (from `templates/`) where userparameter templates are searched
 
 ## TLS Specific configuration
+* `zabbix_agent_tlspsk_auto`: Enables auto generation and storing of individual pre-shared keys and identities on clients. Is false by default. If set to true and if `zabbix_agent_tlspskfile` and `zabbix_agent_tlspsk_secret` are undefined, it generates the files `/etc/zabbix/tls_psk_auto.identity` and `/etc/zabbix/tls_psk_auto.secret`, which are populated by values automatically (identity is set to hostname, underscore and 4 random alphanumeric digits; secret is 64 random alphanumeric digits) in such a way that the values are generated once and are never overwritten.
 
-These variables are specific for Zabbix 3.0 and higher. When `(2)` is used in the name of the property, like `zabbix_agent(2)_tlsconnect`, it will show that you can configure `zabbix_agent_tlsconnect` for the Zabbix Agent configuration file and `zabbix_agent2_tlsconnect` for the Zabbix Agent 2 configuration file.
-
-* `zabbix_agent(2)_tlsconnect`: How the agent should connect to server or proxy. Used for active checks.
+* `zabbix_agent_tlsconnect`: How the agent should connect to server or proxy. Used for active checks.
     Possible values:
     * unencrypted
     * psk
     * cert
-* `zabbix_agent(2)_tlsaccept`: What incoming connections to accept.
+* `zabbix_agent_tlsaccept`: What incoming connections to accept.
     Possible values:
     * unencrypted
     * psk
     * cert
-* `zabbix_agent(2)_tlscafile`: Full pathname of a file containing the top-level CA(s) certificates for peer certificate verification.
-* `zabbix_agent(2)_tlscrlfile`: Full pathname of a file containing revoked certificates.
-* `zabbix_agent(2)_tlsservercertissuer`: Allowed server certificate issuer.
-* `zabbix_agent(2)_tlsservercertsubject`: Allowed server certificate subject.
-* `zabbix_agent(2)_tlscertfile`: Full pathname of a file containing the agent certificate or certificate chain.
-* `zabbix_agent(2)_tlskeyfile`: Full pathname of a file containing the agent private key.
-* `zabbix_agent(2)_tlspskidentity`: Unique, case sensitive string used to identify the pre-shared key.
-* `zabbix_agent(2)_tlspskidentity_file`: Full pathname of a file containing the pre-shared key identity.
-* `zabbix_agent(2)_tlspskfile`: Full pathname of a file containing the pre-shared key.
-* `zabbix_agent(2)_tlspsk_secret`: The pre-shared secret key that should be placed in the file configured with `agent_tlspskfile`.
-* `zabbix_agent(2)_tlspsk_auto`: Enables auto generation and storing of individual pre-shared keys and identities on clients. Is false by default. If set to true and if `zabbix_agent_tlspskfile` and `zabbix_agent_tlspsk_secret` are undefined, it generates the files `/etc/zabbix/tls_psk_auto.identity` and `/etc/zabbix/tls_psk_auto.secret`, which are populated by values automatically (identity is set to hostname, underscore and 4 random alphanumeric digits; secret is 64 random alphanumeric digits) in such a way that the values are generated once and are never overwritten.
+
+* `zabbix_agent_tlscafile`: Full pathname of a file containing the top-level CA(s) certificates for peer certificate verification.
+* `zabbix_agent_tlscertfile`: Full pathname of a file containing the agent certificate or certificate chain.
+* `zabbix_agent_tlscrlfile`: Full pathname of a file containing revoked certificates.
+* `zabbix_agent_tlskeyfile`: Full pathname of a file containing the agent private key.
+* `zabbix_agent_tlspskfile`: Full pathname of a file containing the pre-shared key.
+* `zabbix_agent_tlspskidentity`: Unique, case sensitive string used to identify the pre-shared key.
+* `zabbix_agent_tlspskidentity_file`: Full pathname of a file containing the pre-shared key identity.
+* `zabbix_agent_tlspsk_secret`: The pre-shared secret key for the agent.
+* `zabbix_agent_tlsservercertissuer`: Allowed server certificate issuer.
+* `zabbix_agent_tlsservercertsubject`: Allowed server certificate subject.
+* `zabbix_agent_tls_subject`:  The subject of the TLS certificate.
+* `zabbix_agent_visible_hostname` : Configure Zabbix visible name inside Zabbix web UI for the node.
 
 The results are stored in the Ansible variables `zabbix_agent_tlspskidentity` and `zabbix_agent_tlspsk_secret`, so that they may be used later in the code, for example with [zabbix_host](https://docs.ansible.com/ansible/latest/collections/community/zabbix/zabbix_host_module.html) to configure the Zabbix server or with `debug: msg:` to display them to the user.
 
@@ -242,52 +183,49 @@ These variables need to be overridden when you want to make use of the Zabbix AP
 
 Host encryption configuration will be set to match agent configuration.
 
-* `zabbix_api_server_host`: The IP or hostname/FQDN of Zabbix server. Example: zabbix.example.com
-* `zabbix_api_use_ssl`: Is SSL required to connect to the Zabbix API server?  Default: `false`
-* `zabbix_api_server_port`: TCP port to use to connect to Zabbix server. Example: 8080
-* `zabbix_api_login_user`: Username of user which has API access.
-* `zabbix_api_login_pass`: Password for the user which has API access.
-* `zabbix_api_http_user`: The http user to access zabbix url with Basic Auth (if your Zabbix is behind a proxy with HTTP Basic Auth).
-* `zabbix_api_http_password`: The http password to access zabbix url with Basic Auth (if your Zabbix is behind a proxy with HTTP Basic Auth).
-* `zabbix_api_validate_certs`: yes (Default) if we need to validate tls certificates of the API. Use `no` in case self-signed certificates are used.
-* `zabbix_api_timeout`: How many seconds to wait for API response (default 30s).
-* `zabbix_api_create_hosts`: Default: `False`. When you want to enable the Zabbix API to create/delete the host. This has to be set to `True` if you want to make use of `zabbix_agent_host_state`.
-* `zabbix_api_create_hostgroup`: When you want to enable the Zabbix API to create/delete the hostgroups. This has to be set to `True` if you want to make use of `zabbix_agent_hostgroups_state`.Default: `False`
-* `zabbix_api_use_ssl`: yes (Default) if we need to connect to Zabbix server over HTTPS
-* `ansible_zabbix_url_path`: URL path if Zabbix WebUI running on non-default (zabbix) path, e.g. if http://<FQDN>/zabbixeu then set to `zabbixeu`
-* `zabbix_agent_hostgroups_state`: present (Default) if the hostgroup needs to be created or absent if you want to delete it. This only works when `zabbix_api_create_hostgroup` is set to `True`.
-* `zabbix_host_status`: enabled (Default) when host in monitored, disabled when host is disabled for monitoring.
+* `zabbix_agent_description`: Description of the host in Zabbix.
 * `zabbix_agent_host_state`: present (Default) if the host needs to be created or absent is you want to delete it. This only works when `zabbix_api_create_hosts` is set to `True`.
 * `zabbix_agent_host_update`: yes (Default) if the host should be updated if already present. This only works when `zabbix_api_create_hosts` is set to `True`.
-* `zabbix_useuip`: 1 if connection to zabbix-agent is made via ip, 0 for fqdn.
-* `zabbix_host_groups`: A list of hostgroups which this host belongs to.
-* `zabbix_agent_link_templates`: A list of templates which needs to be link to this host. The templates should exist.
+* `zabbix_agent_interfaces`: A list of interfaces and their configurations you can use when configuring via API.
+* `zabbix_agent_inventory_mode`: Configure Zabbix inventory mode. Needed for building inventory data, manually when configuring a host or automatically by using some automatic population options. This has to be set to `automatic` if you want to make automatically building inventory data.  Default `disabled`
+* `zabbix_agent_inventory_zabbix`: Adds Facts for a zabbix inventory.  Default `{}`
+* `zabbix_agent_ip`: The IP address of the host. When not provided, it will be determined via the `ansible_default_ipv4` fact.
+* `zabbix_agent_link_templates`: A list of templates which needs to be link to this host. The templates should exist.  Default:  "Templated Linux by Zabbix agent"
 * `zabbix_agent_macros`: A list with macro_key and macro_value for creating hostmacro's.
+* `zabbix_agent_proxy`:  The name of the Zabbix proxy (if used).  Default `null`
 * `zabbix_agent_tags`: A list with tag and (optionally) value for creating host tags.
-* `zabbix_agent_inventory_mode`: Configure Zabbix inventory mode. Needed for building inventory data, manually when configuring a host or automatically by using some automatic population options. This has to be set to `automatic` if you want to make automatically building inventory data.
-* `zabbix_agent_visible_hostname` : Configure Zabbix visible name inside Zabbix web UI for the node.
-* `zabbix_agent_description`: Description of the host in Zabbix.
-* `zabbix_agent_inventory_zabbix`: Adds Facts for a zabbix inventory
+* `zabbix_api_create_hostgroup`: When you want to enable the Zabbix API to create/delete the hostgroups. Default: `False`
+* `zabbix_api_create_hosts`: Default: `False`. When you want to enable the Zabbix API to create/delete the host. This has to be set to `True` if you want to make use of `zabbix_agent_host_state`.
+* `zabbix_api_http_password`: The http password to access zabbix url with Basic Auth (if your Zabbix is behind a proxy with HTTP Basic Auth).
+* `zabbix_api_http_user`: The http user to access zabbix url with Basic Auth (if your Zabbix is behind a proxy with HTTP Basic Auth).
+* `zabbix_api_login_pass`: Password for the user which has API access.
+* `zabbix_api_login_user`: Username of user which has API access.
+* `zabbix_api_server_host`: The IP or hostname/FQDN of Zabbix server. Example: zabbix.example.com
+* `zabbix_api_server_port`: 80 if `zabbix_api_use_ssl` is `false` and 443 if `true` (Default) TCP port to use to connect to Zabbix server. Example: 8080
+* `zabbix_api_use_ssl`: Is SSL required to connect to the Zabbix API server?  Default: `false`
+* `zabbix_api_validate_certs`: `True` if we need to validate tls certificates of the API. Use `False` in case self-signed certificates are used.  Default: `False`
+* `zabbix_host_groups`: A list of hostgroups which this host belongs to.  Default:  "Linux Servers"
+* `zabbix_host_status`: enabled (Default) when host in monitored, disabled when host is disabled for monitoring.
+* `zabbix_useuip`: 1 if connection to zabbix-agent is made via ip, 0 for fqdn.
 
 ## Windows Variables
 
 **NOTE**
 
-_Supporting Windows is a best effort (We don't have the possibility to either test/verify changes on the various amount of available Windows instances). PRs specific to Windows will almost immediately be merged, unless someone is able to provide a Windows test mechanism via Travis for Pull Requests._
-When `(2)` is used in the name of the property, like `zabbix_agent(2)_win_logfile`, it will show that you can configure `zabbix_agent_win_logfile` for the Zabbix Agent configuration file and `zabbix_agent2_win_logfile` for the Zabbix Agent 2 configuration file.
+Supporting Windows is a best effort (We don't have the possibility to either test/verify changes on the various amount of available Windows instances). PRs specific to Windows will almost immediately be merged, unless someone is able to provide a Windows test mechanism via Travis for Pull Requests._
+When `` is used in the name of the property, like `zabbix_agent_win_logfile`, it will show that you can configure `zabbix_agent_win_logfile` for the Zabbix Agent configuration file and `zabbix_agent2_win_logfile` for the Zabbix Agent 2 configuration file.
 
 Otherwise it just for the Zabbix Agent or for the Zabbix Agent 2.
 
-* `zabbix(2)_win_package`: file name pattern (zip only). This will be used to generate the `zabbix(2)_win_download_link` variable.
-* `zabbix_version_long`: The long (major.minor.patch) version of the Zabbix Agent. This will be used to generate the `zabbix(2)_win_package` and `zabbix(2)_win_download_link` variables. This takes precedence over `zabbix_agent_version`.
-* `zabbix(2)_win_download_link`: The download url to the `win.zip` file.
+* `zabbix_agent_win_include`: The directory in which the Zabbix Agent specific configuration files are stored.
+* `zabbix_agent_win_logfile`: The full path to the logfile for the Zabbix Agent.
+* `zabbix_version_long`: The long (major.minor.patch) version of the Zabbix Agent. This will be used to generate the `zabbix_win_package` and `zabbix_win_download_link` variables. This takes precedence over `zabbix_agent_version`.
+* `zabbix_win_download_link`: The download url to the `win.zip` file.
+* `zabbix_win_firewall_management`: Enable Windows firewall management (add service and port to allow rules). Default: `True`
 * `zabbix_win_install_dir`: The directory where Zabbix needs to be installed.
 * `zabbix_win_install_dir_conf`: The directory where Zabbix configuration file needs to be installed.
 * `zabbix_win_install_dir_bin`: The directory where Zabbix binary file needs to be installed.
-* `zabbix_agent(2)_win_logfile`: The full path to the logfile for the Zabbix Agent.
-* `zabbix_agent_win_include`: The directory in which the Zabbix Agent specific configuration files are stored.
-* `zabbix_agent_win_svc_recovery`: Enable Zabbix Agent service auto-recovery settings.
-* `zabbix_win_firewall_management`: Enable Windows firewall management (add service and port to allow rules). Default: `True`
+* `zabbix_win_package`: file name pattern (zip only). This will be used to generate the `zabbix_win_download_link` variable.
 
 ## macOS Variables
 
@@ -295,8 +233,10 @@ Otherwise it just for the Zabbix Agent or for the Zabbix Agent 2.
 
 _Supporting Windows is a best effort (We don't have the possibility to either test/verify changes on the various amount of available Windows instances). PRs specific to Windows will almost immediately be merged, unless someone is able to provide a Windows test mechanism via Travis for Pull Requests._
 
-* `zabbix_version_long`: The long (major.minor.patch) version of the Zabbix Agent. This will be used to generate the `zabbix_mac_download_link` link.
 * `zabbix_mac_download_link`: The download url to the `pkg` file.
+* `zabbix_mac_download_url`: The download url.  Default `https://cdn.zabbix.com/zabbix/binaries/stable`
+* `zabbix_mac_package`: The name of the mac install package.  Default `zabbix_agent-{{ zabbix_version_long }}-macos-amd64-openssl.pkg`
+* `zabbix_version_long`: The long (major.minor.patch) version of the Zabbix Agent. This will be used to generate the `zabbix_mac_download_link` link.
 
 ## Docker Variables
 
@@ -317,26 +257,97 @@ The following directories are mounted in the Container:
 Keep in mind that using the Zabbix Agent in a Container requires changes to the Zabbix Template for Linux as `/proc`, `/sys` and `/etc` are mounted in a directory `/hostfs`.
 
 * `zabbix_agent_docker`: Default: `False`. When set to `True`, it will install a Docker container on the target host instead of installation on the target.
-* `zabbix_agent_docker_state`: Default: `started`
-* `zabbix_agent_docker_name`: The name of the Container. Default: `zabbix-agent`
+* `zabbix_agent_docker_env`: A dict with all environment variables that needs to be set for the Container.
 * `zabbix_agent_docker_image`: The name of the Docker image. Default: `zabbix/zabbix-agent`
 * `zabbix_agent_docker_image_tag`: The tag of the Docker image.
-* `zabbix_agent_docker_user_gid`: The group id of the zabbix user in the Container.
-* `zabbix_agent_docker_user_uid`: The user id of the zabbix user in the Container.
+* `zabbix_agent_docker_name`: The name of the Container. Default: `zabbix-agent`
 * `zabbix_agent_docker_network_mode`: The name of the (Docker) network that should be used for the Container. Default `host`.
 * `zabbix_agent_docker_restart_policy`: Default: `unless-stopped`. The restart policy of the Container.
-* `zabbix_agent_docker_privileged`: When set to `True`, the container is running in privileged mode.
-* `zabbix_agent_docker_ports`: A list with `<PORT>:<PORT>` values to open ports to the container.
+* `zabbix_agent_docker_ports`: A list with `<PORT>:<PORT>` values to open ports to the container.  Default `10050`
+* `zabbix_agent_docker_privileged`: When set to `True`, the container is running in privileged mode.  Default `false`
 * `zabbix_agent_docker_security_opts`: A list with available security options.
+* `zabbix_agent_docker_state`: Default: `started`
+* `zabbix_agent_docker_user_gid`: The group id of the zabbix user in the Container.
+* `zabbix_agent_docker_user_uid`: The user id of the zabbix user in the Container.
 * `zabbix_agent_docker_volumes`: A list with all directories that needs to be available in the Container.
-* `zabbix_agent_docker_env`: A dict with all environment variables that needs to be set for the Container.
 
 ## IPMI variables
 
-* `zabbix_agent_ipmi_authtype`: IPMI authentication algorithm. Possible values are 1 (callback), 2 (user), 3 (operator), 4 (admin), 5 (OEM), with 2 being the API default.
+* `zabbix_agent_ipmi_authtype`: IPMI authentication algorithm. Possible values are -1 (default), 0 (none), 1 (MD2), 2 (MD5), 4 (straight), 5 (OEM), 6 (RMCP+), with -1 being the API default.
 * `zabbix_agent_ipmi_password`: IPMI password.
 * `zabbix_agent_ipmi_privilege`: IPMI privilege level. Possible values are 1 (callback), 2 (user), 3 (operator), 4 (admin), 5 (OEM), with 2 being the API default.
 * `zabbix_agent_ipmi_username`: IPMI username.
+
+## Configuration Variables
+The following table lists all variables that are exposed to modify the configuration of the zabbix_agent.conf file.  Specific details of each variable can be found in the Zabbix documentation.
+
+**NOTE**:  Only variables with a default value appear in the defaults file, all others must be added.
+
+| Zabbix Name | Variable Name | Default Value | Notes |
+|-----------|------------------|--------|--------|
+| Alias | zabbix_agent_aliases |  | Can be a string or list |
+| AllowKey | zabbix_agent_allowkeys |  |  |
+| AllowRoot | zabbix_agent_allowroot |  | Linux Systems Only |
+| BufferSend | zabbix_agent_buffersend | 5 |  |
+| BufferSize | zabbix_agent_buffersize | 100 |  |
+| ControlSocket | zabbix_agent_controlsocket | /tmp/agent.sock | Agent 2 Only |
+| DebugLevel | zabbix_agent_debuglevel | 3 |  |
+| DenyKey | zabbix_agent_denykeys |  | Can be a string or a list |
+| EnableRemoteCommands | zabbix_agent_enableremotecommands | 0 | Agent Only |
+| ForceActiveChecksOnStart | zabbix_agent_forceactivechecksonstart |  | Agent 2 Only |
+| HeartbeatFrequency | zabbix_agent_heartbeatfrequency | 60 | Version >= 6.2 |
+| HostInterface | zabbix_agent_hostinterface |  |  |
+| HostInterfaceItem | zabbix_agent_hostinterfaceitem |  |  |
+| HostMetadata | zabbix_agent_hostmetadata |  |  |
+| HostMetadataItem | zabbix_agent_hostmetadataitem |  |  |
+| Hostname | zabbix_agent_hostname |  | `{{ inventory_hostname }}` |
+| HostnameItem | zabbix_agent_hostnameitem |  |  |
+| Include | zabbix_agent_include | /etc/zabbix/`{ agent version specific }`.d |  |
+| ListenBacklog | zabbix_agent_listenbacklog |  | Agent Only |
+| ListenIP | zabbix_agent_listenip |  | list of IPs |
+| ListenPort | zabbix_agent_listenport | 10050 |  |
+| LoadModule | zabbix_agent_loadmodule |  | Agent On Linux Only |
+| LoadModulePath | zabbix_agent_loadmodulepath |  | Agent On Linux Only |
+| LogFile | zabbix_agent_logfile | /var/log/zabbix/`{ agent version specific }`.log |  |
+| LogFileSize | zabbix_agent_logfilesize | 100 |  |
+| LogRemoteCommands | zabbix_agent_logremotecommands |  | Agent Only |
+| LogType | zabbix_agent_logtype | file |  |
+| MaxLinesPerSecond | zabbix_agent_maxlinespersecond |  | Agent Only |
+| PerfCounter | zabbix_agent_perfcounter |  | Agent Only |
+| PerfCounterEn | zabbix_agent_perfcounteren |  | Agent Only |
+| PersistentBufferFile | zabbix_agent_persistentbufferfile |  | Agent 2 Only |
+| PersistentBufferPeriod | zabbix_agent_persistentbufferperiod | 1h | Agent 2 Only |
+| PidFile | zabbix_agent_pidfile | /var/run/zabbix/`{ agent version specific }`.pid | Linux Systems Only |
+| Plugin | zabbix_agent_plugins |  |  |
+| PluginSocket | zabbix_agent_pluginsocket |  |  |
+| PluginTimeout | zabbix_agent_plugintimeout |  |  |
+| RefreshActiveChecks | zabbix_agent_refreshactivechecks | 120 |  |
+| Server | zabbix_agent_server |  |  |
+| ServerActive | zabbix_agent_serveractive |  |  |
+| SourceIP | zabbix_agent_sourceip |  |  |
+| StartAgents | zabbix_agent_startagents |  | Agent Only |
+| StatusPort | zabbix_agent_statusport | 9999 | Agent 2 Only |
+| Timeout | zabbix_agent_timeout | 3 |  |
+| TLSAccept | zabbix_agent_tlsconnect |  |  |
+| TLSCAFile | zabbix_agent_tlscafile | /etc/zabbix/tls_psk_auto.secret |  |
+| TLSCertFile | zabbix_agent_tlscertfile |  |  |
+| TLSCipherAll | zabbix_agent_tlscipherall |  | Agent on Linux Only |
+| TLSCipherAll13 | zabbix_agent_tlscipherall13 |  | Agent on Linux Only |
+| TLSCipherCert | zabbix_agent_tlsciphercert |  | Agent on Linux Only |
+| TLSCipherCert13 | zabbix_agent_tlsciphercert13 |  | Agent on Linux Only |
+| TLSCipherPSK | zabbix_agent_tlscipherpsk |  | Agent on Linux Only |
+| TLSCipherPSK13 | zabbix_agent_tlscipherpsk13 |  | Agent on Linux Only |
+| TLSConnect | zabbix_agent_tlsconnect |  |  |
+| TLSCRLFile | zabbix_agent_tlscrlfile |  |  |
+| TLSKeyFile | zabbix_agent_tlskeyfile |  |  |
+| TLSPSKFile | zabbix_agent_tlspskfile |  |  |
+| TLSPSKIdentity | zabbix_agent_tlspskidentity |  |  |
+| TLSServerCertIssuer | zabbix_agent_tlsservercertissuer |  |  |
+| TLSServerCertSubject | zabbix_agent_tlsservercertsubject |  |  |
+| UnsafeUserParameters | zabbix_agent_unsafeuserparameters |  |  |
+| User | zabbix_agent_runas_user |  | Agent on Linux Only |
+| UserParameter | zabbix_agent_userparamater | 0 |  |
+
 
 ## proxy
 
@@ -361,18 +372,6 @@ The majority of tasks within this role are tagged as follows:
 There are no dependencies on other roles.
 
 # Example Playbook
-
-## zabbix_agent2_plugins
-
-Specifically for the Zabbix Agent 2, a list of extra plugins can be configured. The following provides an overview of configuring the `SystemRun` plugin by setting the `LogRemoteCommands` to `0`:
-
-```yaml
-zabbix_agent2_plugins:
-  - name: SystemRun
-    options:
-      - parameter: LogRemoteCommands
-        value: 0
-```
 
 In the `zabbix_agent2.conf` an entry will be created with the following content:
 

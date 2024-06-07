@@ -43,6 +43,7 @@ Click on the name of a plugin or module to view that content's documentation:
     - [zabbix_discovery_rule](https://docs.ansible.com/ansible/latest/collections/community/zabbix/zabbix_discovery_rule_module.html)
     - [zabbix_globalmacro](https://docs.ansible.com/ansible/latest/collections/community/zabbix/zabbix_globalmacro_module.html)
     - [zabbix_group_info](https://docs.ansible.com/ansible/latest/collections/community/zabbix/zabbix_group_info_module.html)
+    - [zabbix_group_events_info](https://docs.ansible.com/ansible/latest/collections/community/zabbix/zabbix_group_events_info_module.html)
     - [zabbix_group](https://docs.ansible.com/ansible/latest/collections/community/zabbix/zabbix_group_module.html)
     - [zabbix_host_events_info](https://docs.ansible.com/ansible/latest/collections/community/zabbix/zabbix_host_events_info_module.html)
     - [zabbix_host_info](https://docs.ansible.com/ansible/latest/collections/community/zabbix/zabbix_host_info_module.html)
@@ -74,15 +75,21 @@ Click on the name of a plugin or module to view that content's documentation:
 
 ### Requirements
 
-Each component in this collection requires additional dependencies. Review components you are interested in by visiting links present in the [Included content](#included-content) section.
+Some of the components in this collection requires additional dependencies. Review components you are interested in by visiting links present in the [Included content](#included-content) section.
 
-This is especially important for some of the Zabbix roles that require you to **install additional standalone roles** from Ansible Galaxy.
+While the various roles and modules may work with earlier versions of Python and Ansible, they are only tested and maintained against Ansible Core >= 2.15 and python >= 3.9 
 
-For the majority of modules, however, you can get away with just:
+#### External Collections
 
-#### Ansible 2.10 and higher
+Additional collections may be required when running the various roles.
 
-With the release of Ansible 2.10, modules have been moved into collections.  With the exception of ansible.builtin modules, this means additonal collections must be installed in order to use modules such as seboolean (now ansible.posix.seboolean).  The following collections are now frequently required: `ansible.posix` and `community.general`.  Installing the collections:
+* `ansible.posix`:  Required if using SELinux portion of any roles
+* `ansible.general`:  Required if using SELinux portion of any roles
+* `ansible.netcommon`:  Required when using the agent role
+* `community.mysql`:  Required for the proxy or server roles if using MySQL
+* `community.postgresql`:  Required for the proxy or server roles if using PostgreSQL
+* `community.windows`:  Required for the agent role if installing on Windows
+
 
 ```bash
 ansible-galaxy collection install ansible.posix
@@ -103,7 +110,7 @@ You can also include it in a `requirements.yml` file along with other required c
 ---
 collections:
   - name: community.zabbix
-    version: 2.0.0
+    version: 2.5.1
   - name: ansible.posix
     version: 1.3.0
   - name: community.general
@@ -130,7 +137,7 @@ To use a module or role from this collection, reference them with their Fully Qu
       ...
 
 - name: If Zabbix WebUI runs on non-default (zabbix) path, e.g. http://<FQDN>/zabbixeu
-  set_fact:
+  ansible.builtin.set_fact:
     ansible_zabbix_url_path: 'zabbixeu'
 
 - name: Using Zabbix collection to manage Zabbix Server's elements with username/password
@@ -203,7 +210,7 @@ Or you include collection name `community.zabbix` in the playbook's `collections
     ansible_zabbix_auth_key: 8ec0d52432c15c91fcafe9888500cf9a607f44091ab554dbee860f6b44fac895
   tasks:
     - name: Ensure host is monitored by Zabbix
-      zabbix_host:
+      community.zabbix.zabbix_host:
         ...
 ```
 

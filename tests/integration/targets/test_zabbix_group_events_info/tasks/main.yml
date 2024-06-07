@@ -1,0 +1,58 @@
+---
+- name: Import trigger test template
+  zabbix_template:
+    template_json: "{{ lookup('file', 'trigger_testing.json') }}"
+    state: present
+
+- name: Create host group
+  zabbix_group:
+    state: present
+    host_groups:
+      - Example group
+
+- name: Create new host with template
+  zabbix_host:
+    host_name: Example host
+    link_templates:
+      - Trigger testing
+    host_groups:
+      - Example group
+
+- name: Wait a minute to ensure triggers are firing
+  ansible.builtin.wait_for:
+    timeout: 60
+
+- name: Get hostgroup events
+  zabbix_group_events_info:
+    hostgroup_name: Example group
+    trigger_severity: not_classified
+  register: hostgroup_events_results
+
+- name: Assert that trigger results are as expected
+  ansible.builtin.assert:
+    that:
+      - hostgroup_events_results.triggers_ok[0].description == "Ok Trigger"
+      - hostgroup_events_results.triggers_ok[0].value == "0"
+      - hostgroup_events_results.triggers_ok[0].status == "0"
+      # TODO:  Need to figure out why this periodically fails for no reason.  False Alarm
+      # - hostgroup_events_results.triggers_problem[0].description == "Problem Trigger"
+      # - hostgroup_events_results.triggers_problem[0].value == "1"
+      # - hostgroup_events_results.triggers_problem[0].status == "0"
+      # - hostgroup_events_results.triggers_problem[0].last_event.acknowledged == "0"
+      # - hostgroup_events_results.triggers_problem[0].last_event.value == "1"
+
+- name: Clean up host
+  zabbix_host:
+    host_name: Example host
+    state: absent
+
+- name: Clean up host group
+  zabbix_group:
+    host_groups:
+      - Example group
+    state: absent
+
+- name: Clean up template
+  zabbix_template:
+    template_name: "Trigger testing"
+    state: absent

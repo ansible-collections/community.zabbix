@@ -1,6 +1,6 @@
 ---
 - name: "Set default ip address for zabbix_agent_ip"
-  set_fact:
+  ansible.builtin.set_fact:
     zabbix_agent_ip: "{{ hostvars[inventory_hostname]['ansible_default_ipv4'].address }}"
   when:
     - zabbix_agent_ip is not defined
@@ -9,7 +9,7 @@
     - config
 
 - name: "Get Total Private IP Addresses"
-  set_fact:
+  ansible.builtin.set_fact:
     total_private_ip_addresses: "{{ ansible_all_ipv4_addresses | ansible.utils.ipaddr('private') | length }}"
   when:
     - ansible_all_ipv4_addresses is defined
@@ -18,12 +18,8 @@
     - config
 
 - name: "Set first public ip address for zabbix_agent_ip"
-  set_fact:
+  ansible.builtin.set_fact:
     zabbix_agent_ip: "{{ ansible_all_ipv4_addresses | ansible.netcommon.ipaddr('public') | first }}"
-    zabbix_agent_server: "{{ zabbix_agent_server_public_ip | default(zabbix_agent_server) }}"
-    zabbix_agent_serveractive: "{{ zabbix_agent_serveractive_public_ip | default(zabbix_agent_serveractive) }}"
-    zabbix_agent2_server: "{{ zabbix_agent_server_public_ip | default(zabbix_agent2_server) }}"
-    zabbix_agent2_serveractive: "{{ zabbix_agent_serveractive_public_ip | default(zabbix_agent2_serveractive) }}"
   when:
     - zabbix_agent_ip is not defined
     - total_private_ip_addresses is defined
@@ -32,7 +28,7 @@
     - config
 
 - name: "Set first private ip address for zabbix_agent_ip"
-  set_fact:
+  ansible.builtin.set_fact:
     zabbix_agent_ip: "{{ ansible_all_ipv4_addresses | ansible.netcommon.ipaddr('private') | first }}"
   when:
     - zabbix_agent_ip is not defined
@@ -42,7 +38,7 @@
     - config
 
 - name: "Fail invalid specified agent_listeninterface"
-  fail:
+  ansible.builtin.fail:
     msg: "The specified network interface does not exist"
   when:
     - (zabbix_agent_listeninterface)
@@ -51,34 +47,34 @@
     - config
 
 - name: "Set network interface"
-  set_fact:
+  ansible.builtin.set_fact:
     network_interface: ansible_{{ zabbix_agent_listeninterface }}
   when:
     - (zabbix_agent_listeninterface)
-    - not zabbix_agent_listenip
+    - zabbix_agent_listenip is undefined
   tags:
     - config
 
 - name: "Get IP of agent_listeninterface when no agent_listenip specified"
-  set_fact:
+  ansible.builtin.set_fact:
     zabbix_agent_listenip: "{{ hostvars[inventory_hostname][network_interface]['ipv4'].address | default('0.0.0.0') }}"
   when:
     - (zabbix_agent_listeninterface)
-    - not zabbix_agent_listenip
+    - zabbix_agent_listenip is undefined
   tags:
     - config
     - api
 
 - name: "Default agent_listenip to all when not specified"
-  set_fact:
+  ansible.builtin.set_fact:
     zabbix_agent_listenip: "0.0.0.0"
   when:
-    - not (zabbix_agent_listenip)
+    - zabbix_agent_listenip is undefined
   tags:
     - config
 
 - name: "Fail invalid specified agent_listenip"
-  fail:
+  ansible.builtin.fail:
     msg: "The agent_listenip does not exist"
   when:
     - zabbix_agent_listenip != '0.0.0.0'
@@ -88,12 +84,11 @@
     - config
 
 - name: "Configure SELinux when enabled"
-  include_tasks: selinux.yml
-  when:
-    - zabbix_selinux | bool
+  ansible.builtin.include_tasks: selinux.yml
+  when: ansible_facts.selinux.status | default('disabled') == 'enabled'
 
 - name: "Adding zabbix group"
-  group:
+  ansible.builtin.group:
     name: zabbix
     state: present
     gid: "{{ zabbix_agent_docker_user_gid | default(omit) }}"
@@ -104,7 +99,7 @@
     - config
 
 - name: "Adding zabbix user"
-  user:
+  ansible.builtin.user:
     name: zabbix
     group: zabbix
     state: present
@@ -119,9 +114,9 @@
     - config
 
 - name: "Configure zabbix-agent"
-  template:
-    src: "{{ 'zabbix_agentd.conf.j2' if not zabbix_agent2 else 'zabbix_agent2.conf.j2' }}"
-    dest: "/etc/zabbix/{{ zabbix_agent_conf if not zabbix_agent2 else zabbix_agent2_conf }}"
+  ansible.builtin.template:
+    src: agent.conf.j2
+    dest: "/etc/zabbix/zabbix_agent{{ (zabbix_agent2 | bool) | ternary('2', 'd') }}.conf"
     owner: root
     group: root
     mode: "{{ zabbix_agent_conf_mode }}"
@@ -133,92 +128,30 @@
   tags:
     - config
 
-- name: "Create directory for PSK file if not exist."
-  file:
-    path: "{{ zabbix_agent_tlspskfile | dirname }}"
-    mode: 0755
-    state: directory
-  become: true
-  when:
-    - zabbix_agent_tlspskfile is defined
-    - zabbix_agent_tlspskfile # https://github.com/ansible-collections/community.zabbix/issues/680
-    - not (zabbix_agent2 | bool)
-  tags:
-    - config
-
-- name: "Create directory for PSK file if not exist (zabbix-agent2)"
-  file:
-    path: "{{ zabbix_agent2_tlspskfile | dirname }}"
-    mode: 0755
-    state: directory
-  become: true
-  when:
-    - zabbix_agent2_tlspskfile is defined
-    - zabbix_agent2_tlspskfile # https://github.com/ansible-collections/community.zabbix/issues/680
-    - zabbix_agent2 | bool
-  tags:
-    - config
-
-- name: "Place TLS PSK File"
-  copy:
-    dest: "{{ zabbix_agent_tlspskfile }}"
-    content: "{{ zabbix_agent_tlspsk_secret }}"
-    owner: zabbix
-    group: zabbix
-    mode: 0400
-  become: true
-  when:
-    - zabbix_agent_tlspskfile is defined
-    - zabbix_agent_tlspskfile # https://github.com/ansible-collections/community.zabbix/issues/680
-    - zabbix_agent_tlspsk_secret is defined
-    - not (zabbix_agent2 | bool)
-  notify:
-    - restart zabbix-agent
-  tags:
-    - config
-
-- name: "Place TLS PSK File (zabbix-agent2)"
-  copy:
-    dest: "{{ zabbix_agent2_tlspskfile }}"
-    content: "{{ zabbix_agent2_tlspsk_secret }}"
-    owner: zabbix
-    group: zabbix
-    mode: 0400
-  become: true
-  when:
-    - zabbix_agent2_tlspskfile is defined
-    - zabbix_agent2_tlspskfile # https://github.com/ansible-collections/community.zabbix/issues/680
-    - zabbix_agent2_tlspsk_secret is defined
-    - zabbix_agent2 | bool
-  notify:
-    - restart zabbix-agent
-  tags:
-    - config
-
 - name: "Create include dir zabbix-agent"
-  file:
-    path: "{{ zabbix_agent_include if not zabbix_agent2 else zabbix_agent2_include }}"
+  ansible.builtin.file:
+    path: "{{ zabbix_agent_include }}"
     owner: root
     group: zabbix
-    mode: "{{ zabbix_agent_include_mode if not zabbix_agent2 else zabbix_agent2_include_mode }}"
+    mode: "{{ zabbix_agent_include_mode }}"
     state: directory
   become: true
   tags:
     - config
 
 - name: "Install the Docker container"
-  include_tasks: Docker.yml
+  ansible.builtin.include_tasks: Docker.yml
   when:
     - zabbix_agent_docker | bool
 
 - name: "Remove zabbix-agent installation when zabbix-agent2 is used."
-  include_tasks: remove.yml
+  ansible.builtin.include_tasks: remove.yml
   when:
     - zabbix_agent2 | bool
     - zabbix_agent_package_remove
 
 - name: "Make sure the zabbix-agent service is running"
-  service:
+  ansible.builtin.service:
     name: "{{ zabbix_agent_service }}"
     state: started
     enabled: true
@@ -229,10 +162,13 @@
     - service
 
 - name: "Give zabbix-agent access to system.hw.chassis info"
-  file:
+  ansible.builtin.file:
     path: /sys/firmware/dmi/tables/DMI
     owner: root
     group: zabbix
-  when: zabbix_agent_chassis | bool
+  become: true
+  when:
+    - zabbix_agent_chassis is defined
+    - zabbix_agent_chassis | bool
   tags:
     - config

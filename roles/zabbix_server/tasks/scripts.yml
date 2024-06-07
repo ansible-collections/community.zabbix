@@ -1,24 +1,26 @@
 ---
 - name: "Configure zabbix-server alertscripts"
-  template:
+  ansible.builtin.template:
     src: "{{ item.path }}"
     dest: "{{ zabbix_server_alertscriptspath }}/{{ item.name }}"
     owner: "{{ zabbix_os_user }}"
     group: "{{ zabbix_os_user }}"
     mode: 0755
   with_items: "{{ zabbix_server_alertscripts }}"
+  become: true
   when: zabbix_server_alertscripts is defined
   tags:
     - config
 
 - name: "Configure zabbix-server externalscripts"
-  template:
+  ansible.builtin.template:
     src: "{{ item.path }}"
     dest: "{{ zabbix_server_externalscriptspath }}/{{ item.name }}"
     owner: "{{ zabbix_os_user }}"
     group: "{{ zabbix_os_user }}"
     mode: 0755
   with_items: "{{ zabbix_server_externalscripts }}"
+  become: true
   when: zabbix_server_externalscripts is defined
   tags:
     - config

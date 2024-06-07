@@ -1,7 +1,7 @@
 ---
 # New host create test from here
 - name: "test - Create a new host"
-  zabbix_host:
+  community.zabbix.zabbix_host:
     host_name: example
     host_groups:
       - Linux servers
@@ -14,24 +14,24 @@
         port: 10050
   register: create_host_result
 
-- assert:
+- ansible.builtin.assert:
     that:
       - create_host_result.changed is sameas true
 
 - name: "test - Create maintenance with a host_name param"
-  zabbix_maintenance:
+  community.zabbix.zabbix_maintenance:
     name: maintenance
     host_name: example
     state: present
   register: create_maintenance_host_name_result
 
-- assert:
+- ansible.builtin.assert:
     that:
       - create_maintenance_host_name_result.changed is sameas true
 
 # This check doesn't modify maintenace object and thus will be changed=false unless there are hosts without visible name defined
 - name: "test - Create maintenance with a host_name param and disabled visible_name"
-  zabbix_maintenance:
+  community.zabbix.zabbix_maintenance:
     name: maintenance
     host_name: example
     visible_name: false
@@ -40,12 +40,12 @@
 
 # BUGGED: sometimes when test "lags" and some time passes since previous tasks,
 # maintenance_start will not match and be updated, thus resulting in changed
-# - assert:
+# - ansible.builtin.assert:
 #     that:
 #       - create_maintenance_host_name_result.changed is sameas false
 
 - name: "test - Create maintenance with a host_name param(again - expectations: false change will occur)"
-  zabbix_maintenance:
+  community.zabbix.zabbix_maintenance:
     name: maintenance
     host_name: example
     state: present
@@ -53,12 +53,12 @@
 
 # BUGGED: sometimes when test "lags" and some time passes since previous tasks,
 # maintenance_start will not match and be updated, thus resulting in changed
-# - assert:
+# - ansible.builtin.assert:
 #     that:
 #       - create_maintenance_host_name_again_result.changed is sameas false
 
 - name: "test - Update maintenance with a desc param"
-  zabbix_maintenance:
+  community.zabbix.zabbix_maintenance:
     name: maintenance
     host_name: example
     desc: "test description"
@@ -67,12 +67,12 @@
 
 - debug: msg="{{ update_maintenance_desc_result }}"
 
-- assert:
+- ansible.builtin.assert:
     that:
       - update_maintenance_desc_result.changed is sameas true
 
 - name: "test - Update maintenance with a desc param(again - expectations: no change will occur)"
-  zabbix_maintenance:
+  community.zabbix.zabbix_maintenance:
     name: maintenance
     host_name: example
     desc: "test description"
@@ -81,12 +81,12 @@
 
 # BUGGED: sometimes when test "lags" and some time passes since previous tasks,
 # maintenance_start will not match and be updated, thus resulting in changed
-# - assert:
+# - ansible.builtin.assert:
 #     that:
 #       - update_maintenance_desc_again_result.changed is sameas false
 
 - name: "test - Update maintenance with a collect_data"
-  zabbix_maintenance:
+  community.zabbix.zabbix_maintenance:
     name: maintenance
     host_name: example
     desc: "test description"
@@ -94,12 +94,12 @@
     state: present
   register: update_maintenance_collect_data_result
 
-- assert:
+- ansible.builtin.assert:
     that:
       - update_maintenance_collect_data_result.changed is sameas true
 
 - name: "test - Update maintenance with a collect_data(again - expectations: no change will occur)"
-  zabbix_maintenance:
+  community.zabbix.zabbix_maintenance:
     name: maintenance
     host_name: example
     desc: "test description"
@@ -109,12 +109,12 @@
 
 # BUGGED: sometimes when test "lags" and some time passes since previous tasks,
 # maintenance_start will not match and be updated, thus resulting in changed
-# - assert:
+# - ansible.builtin.assert:
 #     that:
 #       - update_maintenance_collect_data_again_result.changed is sameas false
 
 - name: "test - Update maintenance with a minutes param"
-  zabbix_maintenance:
+  community.zabbix.zabbix_maintenance:
     name: maintenance
     host_name: example
     desc: "test description"
@@ -123,12 +123,12 @@
     state: present
   register: update_maintenance_minutes_result
 
-- assert:
+- ansible.builtin.assert:
     that:
       - update_maintenance_minutes_result.changed is sameas true
 
 - name: "test - Update maintenance with a minutes param(again - expectations: no change will occur)"
-  zabbix_maintenance:
+  community.zabbix.zabbix_maintenance:
     name: maintenance
     host_name: example
     desc: "test description"
@@ -139,12 +139,12 @@
 
 # BUGGED: sometimes when test "lags" and some time passes since previous tasks,
 # maintenance_start will not match and be updated, thus resulting in changed
-# - assert:
+# - ansible.builtin.assert:
 #     that:
 #       - update_maintenance_minutes_again_result.changed is sameas false
 
 - name: "test - Update maintenance with a host_groups param"
-  zabbix_maintenance:
+  community.zabbix.zabbix_maintenance:
     name: maintenance
     host_name: example
     host_groups:
@@ -156,12 +156,12 @@
     state: present
   register: update_maintenance_host_groups_result
 
-- assert:
+- ansible.builtin.assert:
     that:
       - update_maintenance_host_groups_result.changed is sameas true
 
 - name: "test - Update maintenance with a host_groups param(again - expectations: no change will occur)"
-  zabbix_maintenance:
+  community.zabbix.zabbix_maintenance:
     name: maintenance
     host_name: example
     host_groups:
@@ -175,12 +175,12 @@
 
 # BUGGED: sometimes when test "lags" and some time passes since previous tasks,
 # maintenance_start will not match and be updated, thus resulting in changed
-# - assert:
+# - ansible.builtin.assert:
 #     that:
 #       - update_maintenance_host_groups_again_result.changed is sameas false
 
 - name: "test - Update maintenance with change host_name to host_names param"
-  zabbix_maintenance:
+  community.zabbix.zabbix_maintenance:
     name: maintenance
     host_names:
       - example
@@ -194,12 +194,12 @@
     state: present
   register: update_maintenance_host_names_result
 
-- assert:
+- ansible.builtin.assert:
     that:
       - update_maintenance_host_names_result.changed is sameas true
 
 - name: "test - Update maintenance with change host_name to host_names param(again - expectations: no change will occur)"
-  zabbix_maintenance:
+  community.zabbix.zabbix_maintenance:
     name: maintenance
     host_names:
       - example
@@ -215,12 +215,12 @@
 
 # BUGGED: sometimes when test "lags" and some time passes since previous tasks,
 # maintenance_start will not match and be updated, thus resulting in changed
-# - assert:
+# - ansible.builtin.assert:
 #     that:
 #       - update_maintenance_host_names_again_result.changed is sameas false
 
 - name: "test - Update maintenance with tags"
-  zabbix_maintenance:
+  community.zabbix.zabbix_maintenance:
     name: maintenance
     host_names:
       - example
@@ -229,7 +229,7 @@
       - Linux servers
       - Hypervisors
     desc: "test description"
-    collect_data: yes  # required for tags
+    collect_data: yes # required for tags
     minutes: 90
     state: present
     tags:
@@ -241,12 +241,12 @@
         operator: 0
   register: update_maintenance_host_tags
 
-- assert:
+- ansible.builtin.assert:
     that:
       - update_maintenance_host_tags.changed is sameas true
 
 - name: "test - Update maintenance with tags (again)"
-  zabbix_maintenance:
+  community.zabbix.zabbix_maintenance:
     name: maintenance
     host_names:
       - example
@@ -269,12 +269,62 @@
 
 # BUGGED: sometimes when test "lags" and some time passes since previous tasks,
 # maintenance_start will not match and be updated, thus resulting in changed
-#- assert:
+#- ansible.builtin.assert:
 #    that:
 #      - update_maintenance_host_tags.changed is sameas false
 
+- name: "test - Create maintenance with an active_since param"
+  community.zabbix.zabbix_maintenance:
+    name: maintenance
+    host_name: example
+    active_since: "1979-09-19"
+    state: present
+  register: create_maintenance_active_since_result
+
+- ansible.builtin.assert:
+    that:
+      - create_maintenance_active_since_result.changed is sameas true
+
+- name: "test - Create maintenance with a active_since param(again - expectations: false change will occur)"
+  community.zabbix.zabbix_maintenance:
+    name: maintenance
+    host_name: example
+    active_since: "1979-09-19"
+    state: present
+  register: create_maintenance_active_since_again_result
+
+- ansible.builtin.assert:
+    that:
+      - create_maintenance_active_since_again_result.changed is sameas false
+
+- name: "test - Create maintenance with an active_till param"
+  community.zabbix.zabbix_maintenance:
+    name: maintenance
+    host_name: example
+    active_since: "1979-09-19 00:00"
+    active_till: "1979-09-19 23:59"
+    state: present
+  register: create_maintenance_active_till_result
+
+- ansible.builtin.assert:
+    that:
+      - create_maintenance_active_till_result.changed is sameas true
+
+- name: "test - Create maintenance with a active_till param(again - expectations: false change will occur)"
+  community.zabbix.zabbix_maintenance:
+    name: maintenance
+    host_name: example
+    active_since: "1979-09-19 00:00"
+    active_till: "1979-09-19 23:59"
+    state: present
+  register: create_maintenance_active_till_again_result
+
+- ansible.builtin.assert:
+    that:
+      - create_maintenance_active_till_again_result.changed is sameas false
+
 - name: "test - Delete maintenance"
-  zabbix_maintenance:
+  community.zabbix.zabbix_maintenance:
     name: maintenance
     host_name: example
     state: absent
@@ -282,23 +332,23 @@
   tags:
     - cleanup
 
-- assert:
+- ansible.builtin.assert:
     that:
       - delete_maintenance_result.changed is sameas true
 
 - name: "test - Delete maintenance(again - expectations: no change will occur)"
-  zabbix_maintenance:
+  community.zabbix.zabbix_maintenance:
     name: maintenance
     host_name: example
     state: absent
   register: delete_maintenance_again_result
 
-- assert:
+- ansible.builtin.assert:
     that:
       - delete_maintenance_again_result.changed is sameas false
 
 - name: "test - Delete testing host"
-  zabbix_host:
+  community.zabbix.zabbix_host:
     host_name: example
     state: absent
   tags:

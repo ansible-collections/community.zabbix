@@ -1,0 +1,59 @@
+---
+- name: test - do not run tests for Zabbix = 6.0
+  meta: end_play
+  when: zabbix_version is version('6.0', '=')
+
+- name: test - create new Zabbix template group
+  community.zabbix.zabbix_templategroup:
+    template_groups:
+      - zbxtempgrp_example_group01
+    state: present
+  register: zbxtempgrp_new
+
+- name: assert that group was created
+  ansible.builtin.assert:
+    that: zbxtempgrp_new is changed
+
+- name: test - create same Zabbix template group once again
+  community.zabbix.zabbix_templategroup:
+    template_groups:
+      - zbxtempgrp_example_group01
+    state: present
+  register: zbxtempgrp_existing
+
+- name: assert that nothing has been changed
+  ansible.builtin.assert:
+    that: not zbxtempgrp_existing is changed
+
+- name: test - attempt to create new Zabbix template group matching name of default Zabbix template group
+  community.zabbix.zabbix_templategroup:
+    template_groups:
+      - Templates
+    state: present
+  register: zbxtempgrp_default_existing
+
+- name: assert that nothing has been changed
+  ansible.builtin.assert:
+    that: not zbxtempgrp_default_existing is changed
+
+- name: test - attempt to delete previously created zabbix template group
+  community.zabbix.zabbix_templategroup:
+    template_groups:
+      - zbxtempgrp_example_group01
+    state: absent
+  register: zbxtempgrp_existing_delete
+
+- name: assert that group was deleted
+  ansible.builtin.assert:
+    that: zbxtempgrp_existing_delete is changed
+
+- name: test - attempt to delete non-existing zabbix template group
+  community.zabbix.zabbix_templategroup:
+    template_groups:
+      - zbxtempgrp_example_group01
+    state: absent
+  register: zbxtempgrp_missing_delete
+
+- name: assert that nothing has been changed
+  ansible.builtin.assert:
+    that: not zbxtempgrp_missing_delete is changed

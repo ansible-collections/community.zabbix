@@ -1,69 +1,100 @@
 ---
 - name: Include OS-specific variables
-  include_vars: "{{ ansible_os_family }}.yml"
+  ansible.builtin.include_vars: "{{ ansible_os_family }}.yml"
   tags:
     - always
 
 - name: Determine Latest Supported Zabbix Version
-  set_fact:
+  ansible.builtin.set_fact:
     zabbix_server_version: "{{ zabbix_valid_server_versions[ansible_distribution_major_version][0] | default(6.4) }}"
   when: zabbix_server_version is not defined
   tags:
     - always
 
 - name: Set More Variables
-  set_fact:
-    zabbix_db_type_long: "{{ 'postgresql' if zabbix_server_database == 'pgsql' else 'mysql' }}"
-    zabbix_valid_version: "{{ zabbix_server_version|float in zabbix_valid_server_versions[ansible_distribution_major_version] }}"
+  ansible.builtin.set_fact:
+    zabbix_server_fpinglocation: "{{ zabbix_server_fpinglocation if zabbix_server_fpinglocation is defined else _zabbix_server_fpinglocation}}"
+    zabbix_server_fping6location: "{{ zabbix_server_fping6location if zabbix_server_fping6location is defined else _zabbix_server_fping6location}}"
   tags:
     - always
 
-- name: Stopping Install of Invalid Version
-  fail:
-    msg: Zabbix version {{ zabbix_server_version }} is not supported on {{ ansible_distribution }} {{ ansible_distribution_major_version }}
-  when: not zabbix_valid_version
+- name: Check that version is supported
+  when: enable_version_check | default(true) | bool
+  ansible.builtin.assert:
+    that:
+      - "{{ zabbix_server_version|float in zabbix_valid_server_versions[ ansible_facts['distribution_major_version'] ] }}"
+    fail_msg: Zabbix version {{ zabbix_server_version }} is not supported on {{ ansible_facts['distribution'] }} {{ ansible_facts['distribution_major_version'] }}
   tags:
     - always
 
-- name: Install the correct repository
-  include_tasks: "{{ ansible_os_family }}.yml"
+- name: Install Repository
+  ansible.builtin.include_role:
+    name: community.zabbix.zabbix_repo
+  vars:
+    zabbix_repo_apt_priority: "{{ zabbix_server_apt_priority | default (omit) }}"
+    zabbix_repo_version: "{{ zabbix_server_version }}"
+    zabbix_repo_package: "zabbix_server-{{ zabbix_proxy_database }}"
+  when: zabbix_manage_repo | default(true)
 
-- name: Installing the {{ zabbix_db_type_long }} database
-  include_tasks: "{{ zabbix_db_type_long }}.yml"
+- name: "Configure SELinux when enabled"
+  ansible.builtin.include_tasks: selinux.yml
+  when: ansible_facts.selinux.status | default('disabled') == 'enabled'
+
+- name: Install zabbix-server packages
+  ansible.builtin.package:
+    name: "{{ _zabbix_server_packages }}"
+    state: "{{ zabbix_server_package_state }}"
+    update_cache: true
+    disablerepo: "{{ zabbix_server_disable_repo | default(_zabbix_server_disable_repo | default(omit)) }}"
+    install_recommends: "{{ zabbix_server_install_recommends | default(_zabbix_server_install_recommends | default(omit)) }}"
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
+  register: _zabbix_server_package_installed
+  until: _zabbix_server_package_installed is succeeded
+  become: true
+  tags:
+    - install
+
+- name: "Initialize the database"
+  ansible.builtin.include_tasks: "initialize-{{ zabbix_server_database }}.yml"
 
 - name: "Configure zabbix-server"
-  template:
+  ansible.builtin.template:
     src: zabbix_server.conf.j2
     dest: "{{ zabbix_server_config }}"
     owner: "{{ zabbix_os_user }}"
     group: "{{ zabbix_os_user }}"
     mode: "{{ zabbix_server_conf_mode }}"
+  become: true
   notify:
     - zabbix-server restarted
   tags:
     - config
 
 - name: "Create include dir zabbix-server"
-  file:
+  ansible.builtin.file:
     path: "{{ zabbix_server_include }}"
     owner: "{{ zabbix_os_user }}"
     group: "{{ zabbix_os_user }}"
     state: directory
     mode: "{{ zabbix_server_include_mode }}"
+  become: true
   tags:
     - install
     - config
 
 - name: "Add zabbix-server scripts"
-  include: "scripts.yml"
+  ansible.builtin.include_tasks: "scripts.yml"
   when: ( zabbix_server_alertscripts is defined ) or
     ( zabbix_server_externalscripts is defined )
 
 - name: "Zabbix-server started"
-  service:
+  ansible.builtin.service:
     name: zabbix-server
     state: "{{ zabbix_service_state }}"
     enabled: "{{ zabbix_service_enabled }}"
+  become: true
   tags:
     - service
   when: zabbix_server_manage_service | bool

@@ -2,7 +2,7 @@
 # set up a zabbix proxy to test zabbix_host with
 
 - name: Create a new proxy
-  zabbix_proxy:
+  community.zabbix.zabbix_proxy:
     proxy_name: ExampleProxy
     description: ExampleProxy
     status: active
@@ -15,7 +15,7 @@
   register: zabbix_proxy
 
 - name: Create Templates
-  zabbix_template:
+  community.zabbix.zabbix_template:
     template_name: "{{ item }}"
     template_groups:
       - Templates

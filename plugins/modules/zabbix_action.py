@@ -58,6 +58,12 @@ options:
             - Can be used when I(event_source=trigger).
         type: "bool"
         default: true
+    notify_if_canceled:
+        description:
+            - Weather to notify when escalation is canceled.
+            - Can be used when I(event_source=trigger).
+        type: "bool"
+        default: true
     esc_period:
         type: str
         description:
@@ -650,14 +656,14 @@ extends_documentation_fragment:
 EXAMPLES = """
 # If you want to use Username and Password to be authenticated by Zabbix Server
 - name: Set credentials to access Zabbix Server API
-  set_fact:
+  ansible.builtin.set_fact:
     ansible_user: Admin
     ansible_httpapi_pass: zabbix
 
 # If you want to use API token to be authenticated by Zabbix Server
 # https://www.zabbix.com/documentation/current/en/manual/web_interface/frontend_sections/administration/general#api-tokens
 - name: Set API token
-  set_fact:
+  ansible.builtin.set_fact:
     ansible_zabbix_auth_key: 8ec0d52432c15c91fcafe9888500cf9a607f44091ab554dbee860f6b44fac895
 
 # Trigger action with only one condition
@@ -1151,6 +1157,7 @@ class Action(Zapi):
             _params["pause_suppressed"] = "1" if kwargs["pause_in_maintenance"] else "0"
             if LooseVersion(self._zbx_api_version) >= LooseVersion("6.4"):
                 _params["pause_symptoms"] = "1" if kwargs["pause_symptoms"] else "0"
+            _params["notify_if_canceled"] = "1" if kwargs["notify_if_canceled"] else "0"
 
         _params["update_operations"] = kwargs.get("update_operations")
         if "update_operations" in _params and not isinstance(_params.get("update_operations", None), type(None)):
@@ -1504,6 +1511,7 @@ class RecoveryOperations(Operations):
     """
     Restructures the user defined recovery operations data to fit the Zabbix API requirements
     """
+
     def _construct_operationtype(self, operation):
         """Construct operation type.
 
@@ -1572,6 +1580,7 @@ class AcknowledgeOperations(Operations):
     """
     Restructures the user defined acknowledge operations data to fit the Zabbix API requirements
     """
+
     def _construct_operationtype(self, operation):
         """Construct operation type.
 
@@ -2177,7 +2186,8 @@ def main():
                 ["type", "send_message", ["send_to_users", "send_to_groups"], True]
             ]
         ),
-        pause_symptoms=dict(type="bool", required=False, default=True)
+        pause_symptoms=dict(type="bool", required=False, default=True),
+        notify_if_canceled=dict(type="bool", required=False, default=True)
     ))
     module = AnsibleModule(
         argument_spec=argument_spec,
@@ -2202,6 +2212,7 @@ def main():
     recovery_operations = module.params["recovery_operations"]
     acknowledge_operations = module.params["acknowledge_operations"]
     pause_symptoms = module.params["pause_symptoms"]
+    notify_if_canceled = module.params["notify_if_canceled"]
 
     zapi_wrapper = Zapi(module)
     action = Action(module)
@@ -2227,7 +2238,8 @@ def main():
                 pause_in_maintenance=pause_in_maintenance,
                 operations=ops.construct_the_data(operations, event_source),
                 recovery_operations=recovery_ops.construct_the_data(recovery_operations),
-                conditions=fltr.construct_the_data(eval_type, formula, conditions)
+                conditions=fltr.construct_the_data(eval_type, formula, conditions),
+                notify_if_canceled=notify_if_canceled
             )
 
             if LooseVersion(zapi_wrapper._zbx_api_version) >= LooseVersion("6.4"):
@@ -2257,7 +2269,8 @@ def main():
                 pause_in_maintenance=pause_in_maintenance,
                 operations=ops.construct_the_data(operations, event_source),
                 recovery_operations=recovery_ops.construct_the_data(recovery_operations),
-                conditions=fltr.construct_the_data(eval_type, formula, conditions)
+                conditions=fltr.construct_the_data(eval_type, formula, conditions),
+                notify_if_canceled=notify_if_canceled
             )
 
             kwargs[argument_spec["acknowledge_operations"]["aliases"][0]] = acknowledge_ops.construct_the_data(acknowledge_operations)

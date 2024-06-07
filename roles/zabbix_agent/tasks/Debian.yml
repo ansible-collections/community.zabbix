@@ -1,125 +1,8 @@
 ---
 # Tasks specific for Debian/Ubuntu Systems
 
-- name: "Include Zabbix gpg ids"
-  include_vars: zabbix.yml
-
-- name: "Debian | Set some variables"
-  set_fact:
-    zabbix_short_version: "{{ zabbix_agent_version | regex_replace('\\.', '') }}"
-    zabbix_agent_apt_repository:
-      - "http://repo.zabbix.com/zabbix/{{ zabbix_agent_version }}/{{ ansible_distribution.lower() }}/"
-      - "{{ ansible_distribution_release }}"
-      - "main"
-    zabbix_underscore_version: "{{ zabbix_agent_version | regex_replace('\\.', '_') }}"
-  when:
-    - ansible_machine != "aarch64"
-  tags:
-    - always
-
-- name: "Debian | Set some variables"
-  set_fact:
-    zabbix_short_version: "{{ zabbix_agent_version | regex_replace('\\.', '') }}"
-    zabbix_agent_apt_repository:
-      - "http://repo.zabbix.com/zabbix/{{ zabbix_agent_version }}/{{ ansible_distribution.lower() }}-arm64/"
-      - "{{ ansible_distribution_release }}"
-      - "main"
-    zabbix_underscore_version: "{{ zabbix_agent_version | regex_replace('\\.', '_') }}"
-  when:
-    - ansible_machine == "aarch64"
-  tags:
-    - always
-
-- name: "Debian | Installing gnupg"
-  apt:
-    pkg: gnupg
-    update_cache: true
-    cache_valid_time: 3600
-    force: true
-    state: present
-  environment:
-    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
-    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
-  register: gnupg_installed
-  until: gnupg_installed is succeeded
-  become: true
-  tags:
-    - install
-
-# In releases older than Debian 12 and Ubuntu 22.04, /etc/apt/keyrings does not exist by default. 
-# It SHOULD be created with permissions 0755 if it is needed and does not already exist.
-# See: https://wiki.debian.org/DebianRepository/UseThirdParty
-- name: "Debian | Create /etc/apt/keyrings/ on older versions"
-  ansible.builtin.file:
-    path: /etc/apt/keyrings/
-    state: directory
-    mode: '0755'
-  when:
-    - (ansible_distribution == "Ubuntu" and ansible_distribution_major_version < "22") or
-      (ansible_distribution == "Debian" and ansible_distribution_major_version < "12")
-
-- name: "Debian | Download gpg key"
-  ansible.builtin.get_url:
-    url: http://repo.zabbix.com/zabbix-official-repo.key
-    dest: "{{ zabbix_gpg_key }}"
-    mode: '0644'
-    force: true
-  environment:
-    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
-    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
-  become: true
-  tags:
-    - install
-
-- name: "Debian | Installing repository {{ ansible_distribution }}"
-  apt_repository:
-    repo: "{{ item }} [signed-by={{ zabbix_gpg_key }}] {{ zabbix_agent_apt_repository | join(' ') }}"
-    state: present
-  become: true
-  with_items:
-    - deb-src
-    - deb
-  tags:
-    - install
-
-- name: "Debian | Create /etc/apt/preferences.d/"
-  file:
-    path: /etc/apt/preferences.d/
-    state: directory
-    mode: "0755"
-  when:
-    - zabbix_agent_apt_priority | int
-  become: true
-  tags:
-    - install
-
-- name: "Debian | Configuring the weight for APT"
-  copy:
-    dest: "/etc/apt/preferences.d/zabbix-agent-{{ zabbix_underscore_version }}"
-    content: |
-      Package: {{ zabbix_agent_package }}
-      Pin: origin repo.zabbix.com
-      Pin-Priority: {{ zabbix_agent_apt_priority | int }}
-    owner: root
-    mode: "0644"
-  when:
-    - zabbix_agent_apt_priority | int
-  become: true
-  tags:
-    - install
-
-- name: "Debian | apt-get clean"
-  shell: apt-get clean; apt-get update
-  args:
-    warn: "{{ produce_warn | default(omit) }}"
-  changed_when: false
-  become: true
-  tags:
-    - skip_ansible_lint
-    - install
-
 - name: "Debian | Installing zabbix-agent"
-  apt:
+  ansible.builtin.apt:
     pkg: "{{ zabbix_agent_package }}"
     state: "{{ zabbix_agent_package_state }}"
     update_cache: true
@@ -136,10 +19,10 @@
     - install
 
 - name: "Debian | Installing zabbix-{sender,get}"
-  apt:
+  ansible.builtin.apt:
     pkg:
-      - "{{ zabbix_sender_package }}"
-      - "{{ zabbix_get_package }}"
+      - "{{ zabbix_agent_sender_package }}"
+      - "{{ zabbox_agent_get_package }}"
     state: "{{ zabbix_agent_package_state }}"
     update_cache: true
     cache_valid_time: 0
@@ -158,7 +41,7 @@
     - install
 
 - name: "Debian | Enable the service"
-  service:
+  ansible.builtin.service:
     name: "{{ zabbix_agent_service }}"
     enabled: true
     use: service

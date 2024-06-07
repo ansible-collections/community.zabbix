@@ -1,0 +1,42 @@
+---
+
+- name: test - get warning and higher events for host
+  community.zabbix.zabbix_host_events_info:
+    host_identifier: ExampleHost
+    host_id_type: hostname
+    trigger_severity: warning
+  register: zabbix_host_events_warning
+
+- name: assert that both events are listed as problem
+  ansible.builtin.assert:
+    that: zabbix_host_events_warning.triggers_problem | length == 2
+
+- name: test - get events high and higher for host
+  community.zabbix.zabbix_host_events_info:
+    host_identifier: ExampleHost
+    host_id_type: hostname
+    trigger_severity: high
+  register: zabbix_host_events_high
+
+- name: assert that only high event is listed as problem
+  ansible.builtin.assert:
+    that: zabbix_host_events_high.triggers_problem | length == 1
+
+- name: test - get events with tag for host
+  community.zabbix.zabbix_host_events_info:
+    host_identifier: ExampleHost
+    host_id_type: hostname
+    trigger_severity: warning
+    tags:
+      - tag: ExampleTag
+        value: ExampleValue
+        operator: equal
+  register: zabbix_host_events_tags
+
+- name: assert that only matching tag is listed as problem
+  ansible.builtin.assert:
+    that: zabbix_host_events_tags.triggers_problem | length == 1
+
+- name: assert tags are returned
+  ansible.builtin.assert:
+    that: zabbix_host_events_tags.triggers_problem[0].last_event.tags[0].tag == 'ExampleTag'

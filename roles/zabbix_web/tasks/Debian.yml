@@ -1,45 +1,18 @@
 ---
-- name: "Debian | Include Zabbix gpg ids"
-  include_vars: zabbix.yml
-  tags:
-    - always
-
 - name: "Debian | Set PHP Dependencies"
-  set_fact:
+  ansible.builtin.set_fact:
     zabbix_web_php_dependencies: "{{ _apache_php_dependencies if zabbix_web_http_server == 'apache' else _nginx_php_dependencies }}"
   tags:
     - config
 
 - name: "Debian | Set some variables"
-  set_fact:
-    zabbix_short_version: "{{ zabbix_web_version | regex_replace('\\.', '') }}"
-    zabbix_server_apt_repository:
-      - "http://repo.zabbix.com/zabbix/{{ zabbix_server_version }}/{{ ansible_distribution.lower() }}/"
-      - "{{ ansible_distribution_release }}"
-      - "main"
+  ansible.builtin.set_fact:
     zabbix_underscore_version: "{{ zabbix_web_version | regex_replace('\\.', '_') }}"
-    zabbix_python_prefix: "python{% if ansible_python_version is version('3', '>=') %}3{% endif %}"
-  when:
-    - ansible_machine != "aarch64"
-  tags:
-    - always
-
-- name: "Debian | Set some variables"
-  set_fact:
-    zabbix_short_version: "{{ zabbix_web_version | regex_replace('\\.', '') }}"
-    zabbix_server_apt_repository:
-      - "http://repo.zabbix.com/zabbix/{{ zabbix_server_version }}/{{ ansible_distribution.lower() }}-arm64/"
-      - "{{ ansible_distribution_release }}"
-      - "main"
-    zabbix_underscore_version: "{{ zabbix_server_version | regex_replace('\\.', '_') }}"
-    zabbix_python_prefix: "python{% if ansible_python_version is version('3', '>=') %}3{% endif %}"
-  when:
-    - ansible_machine == "aarch64"
   tags:
     - always
 
 - name: "Debian | Install PHP Dependencies"
-  apt:
+  ansible.builtin.apt:
     pkg: "{{ zabbix_web_php_dependencies }}"
     state: "present"
     update_cache: true
@@ -55,7 +28,7 @@
     - dependencies
 
 - name: "Debian | Install PgSQL Dependencies"
-  apt:
+  ansible.builtin.apt:
     pkg: "php{{ zabbix_web_php_installed_version }}-pgsql"
     state: "present"
     update_cache: true
@@ -72,77 +45,8 @@
     - dependencies
     - database
 
-# In releases older than Debian 12 and Ubuntu 22.04, /etc/apt/keyrings does not exist by default. 
-# It SHOULD be created with permissions 0755 if it is needed and does not already exist.
-# See: https://wiki.debian.org/DebianRepository/UseThirdParty
-- name: "Debian | Create /etc/apt/keyrings/ on older versions"
-  ansible.builtin.file:
-    path: /etc/apt/keyrings/
-    state: directory
-    mode: '0755'
-  when:
-    - (ansible_distribution == "Ubuntu" and ansible_distribution_major_version < "22") or
-      (ansible_distribution == "Debian" and ansible_distribution_major_version < "12")
-
-- name: "Debian | Download gpg key"
-  ansible.builtin.get_url:
-    url: http://repo.zabbix.com/zabbix-official-repo.key
-    dest: "{{ zabbix_gpg_key }}"
-    mode: '0644'
-    force: true
-  become: true
-  tags:
-    - install
-
-- name: "Debian | Installing repository {{ ansible_distribution }}"
-  apt_repository:
-    repo: "{{ item }} [signed-by={{ zabbix_gpg_key }}] {{ zabbix_server_apt_repository | join(' ') }}"
-    state: present
-  become: true
-  with_items:
-    - deb-src
-    - deb
-  tags:
-    - install
-
-- name: "Debian | Create /etc/apt/preferences.d/"
-  file:
-    path: /etc/apt/preferences.d/
-    state: directory
-    mode: "0755"
-  when:
-    - zabbix_web_apt_priority | int
-  become: true
-  tags:
-    - install
-
-- name: "Debian | Configuring the weight for APT"
-  copy:
-    dest: "/etc/apt/preferences.d/zabbix_server-{{ zabbix_proxy_database }}"
-    content: |
-      Package: zabbix_server-{{ zabbix_proxy_database }}
-      Pin: origin repo.zabbix.com
-      Pin-Priority: {{ zabbix_web_apt_priority }}
-    owner: root
-    mode: "0644"
-  when:
-    - zabbix_web_apt_priority | int
-  become: true
-  tags:
-    - install
-
-- name: "Debian | apt-get clean"
-  shell: apt-get clean; apt-get update
-  args:
-    warn: "{{ produce_warn | default(omit) }}"
-  changed_when: false
-  become: true
-  tags:
-    - skip_ansible_lint
-    - install
-
 - name: "Debian | Install zabbix-web"
-  apt:
+  ansible.builtin.apt:
     pkg: "zabbix-frontend-php"
     state: "{{ zabbix_web_package_state }}"
     update_cache: true
@@ -157,9 +61,10 @@
     - install
 
 - name: "Debian | Link graphfont.ttf (workaround ZBX-10467)"
-  file:
+  ansible.builtin.file:
     src: "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
     path: "/usr/share/zabbix/fonts/graphfont.ttf"
     state: link
+  become: true
   tags:
     - install

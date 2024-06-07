@@ -26,16 +26,19 @@
     git push origin X.Y.Z
     ```
 
-2. Create new Release pointing to new X.Y.Z tag https://github.com/ansible-collections/community.zabbix/releases
+2. All community.* collections are usually published by Zuul, which works by you having to push a tag, and Zuul will build the collection from that tag (with the version in galaxy.yml set to the tag's version) and publish it. It's usually a good idea to take a look at [Zuul](https://ansible.softwarefactory-project.io/zuul/status) when pushing a tag and watch the release process to see whether it succeeds or not (and afterwards check on [Galaxy](https://galaxy.ansible.com/community/zabbix) whether the newest version shows up - note that it can make a few seconds after publishing finished until it actually shows up; that's new with the new Galaxy).
 
-Additional manual steps are required when automatic publish to Ansible Galaxy is not enabled in the repository. This
-requires a user who has access to the `community.zabbix` namespace on Ansible Galaxy to publish the build artifact.
+   If there is an error in building and it seems to be on Zuul side, the best thing is to re-push the tag to trigger the publish step another time. For that, assuming the remote for github.com/ansible-collections/community.zabbix is called upstream, you can do
 
-3. Run the following commands to build and release the new version on Galaxy:
 
-   ```
-   ansible-galaxy collection build
-   ansible-galaxy collection publish ./community-zabbix-$VERSION_HERE.tar.gz
-   ```
+    ```
+    git push upstream :2.3.0 # to delete the tag
+    git push --tags upstream # to re-push all tags
+    ```
+   That should delete and re-create the tag, and thus trigger Zuul again to publish the collection.
 
-After the version is published, verify it exists on the [Zabbix Collection Galaxy page](https://galaxy.ansible.com/community/zabbix).
+3. If still having problems in step 2. then create a post in "Get Help" section of [Ansible forum](https://forum.ansible.com/c/help/6/none) so somebody from admins can take a look and see/fix why new version has not been published to Galaxy (e.g. https://forum.ansible.com/t/access-to-collection/2295/4).
+
+4. Create new Release pointing to new X.Y.Z tag https://github.com/ansible-collections/community.zabbix/releases
+
+

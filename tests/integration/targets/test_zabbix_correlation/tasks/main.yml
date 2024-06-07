@@ -1,0 +1,328 @@
+---
+- name: test - create simple correlation
+  community.zabbix.zabbix_correlation:
+    name: new event tag correlation
+    filter:
+      evaltype: and_or
+      conditions:
+        - type: new_event_tag
+          tag: ok
+    operations:
+      - type: close_old_events
+  register: zbxcorrelation_create
+
+- name: assert that correlation was created
+  ansible.builtin.assert:
+    that:
+      - zbxcorrelation_create.changed is sameas True
+
+- name: test - update simple correlation (without changes)
+  community.zabbix.zabbix_correlation:
+    name: new event tag correlation
+    filter:
+      evaltype: and_or
+      conditions:
+        - type: new_event_tag
+          tag: ok
+    operations:
+      - type: close_old_events
+  register: zbxcorrelation_create
+
+- name: assert that correlation was not updated
+  ansible.builtin.assert:
+    that:
+      - zbxcorrelation_create.changed is sameas False
+
+- name: test - update simple correlation
+  community.zabbix.zabbix_correlation:
+    name: new event tag correlation
+    filter:
+      evaltype: and_or
+      conditions:
+        - type: new_event_tag
+          tag: ng
+    operations:
+      - type: close_old_events
+  register: zbxcorrelation_create
+
+- name: assert that correlation was updated
+  ansible.builtin.assert:
+    that:
+      - zbxcorrelation_create.changed is sameas True
+
+- name: test - delete simple correlation
+  community.zabbix.zabbix_correlation:
+    name: new event tag correlation
+    state: absent
+  register: zbxcorrelation_delete
+
+- name: assert that correlation was deleted
+  ansible.builtin.assert:
+    that:
+      - zbxcorrelation_delete.changed is sameas True
+
+- name: prepare - create hostgroup
+  community.zabbix.zabbix_group:
+    host_groups:
+      - correlation_group_A
+      - correlation_group_B
+    state: present
+  register: zbxgroup_create
+
+- name: test - create custom_expression correlation
+  community.zabbix.zabbix_correlation:
+    name: new host group correlation
+    description: a custom description
+    filter:
+      evaltype: custom_expression
+      formula: A or B
+      conditions:
+        - type: new_event_host_group
+          hostgroup: correlation_group_A
+          operator: not_equal
+          formulaid: A
+        - type: new_event_host_group
+          hostgroup: correlation_group_B
+          operator: not_equal
+          formulaid: B
+    operations:
+      - type: close_old_events
+  register: zbxcorrelation_create
+
+- name: assert that correlation was created
+  ansible.builtin.assert:
+    that:
+      - zbxcorrelation_create.changed is sameas True
+
+- name: test - create custom_expression correlation (again)
+  community.zabbix.zabbix_correlation:
+    name: new host group correlation
+    description: a custom description
+    filter:
+      evaltype: custom_expression
+      formula: A or B
+      conditions:
+        - type: new_event_host_group
+          hostgroup: correlation_group_A
+          operator: not_equal
+          formulaid: A
+        - type: new_event_host_group
+          hostgroup: correlation_group_B
+          operator: not_equal
+          formulaid: B
+    operations:
+      - type: close_old_events
+  register: zbxcorrelation_create
+
+- name: assert that correlation was not updated
+  ansible.builtin.assert:
+    that:
+      - zbxcorrelation_create.changed is sameas False
+
+- name: test - delete custom_expression correlation
+  community.zabbix.zabbix_correlation:
+    name: new host group correlation
+    state: absent
+  register: zbxcorrelation_delete
+
+- name: assert that correlation was deleted
+  ansible.builtin.assert:
+    that:
+      - zbxcorrelation_delete.changed is sameas True
+
+- name: cleanup - delete hostgroup
+  community.zabbix.zabbix_group:
+    host_groups:
+      - correlation_group_A
+      - correlation_group_B
+    state: absent
+  register: zbxgroup_delete
+
+- name: test - create correlation with old_event_tag condition
+  community.zabbix.zabbix_correlation:
+    name: tag correlation
+    filter:
+      evaltype: and_or
+      conditions:
+        - type: old_event_tag
+          tag: old_tag
+    operations:
+      - type: close_old_events
+      - type: close_new_event
+  register: zbxcorrelation_create
+
+- name: assert that correlation was created
+  ansible.builtin.assert:
+    that:
+      - zbxcorrelation_create.changed is sameas True
+
+- name: test - update correlation with new_event_tag condition
+  community.zabbix.zabbix_correlation:
+    name: tag correlation
+    filter:
+      evaltype: and_or
+      conditions:
+        - type: new_event_tag
+          tag: new_tag
+    operations:
+      - type: close_old_events
+      - type: close_new_event
+  register: zbxcorrelation_update
+
+- name: assert that correlation was updated
+  ansible.builtin.assert:
+    that:
+      - zbxcorrelation_update.changed is sameas True
+
+- name: test - update correlation with event_tag_pair condition
+  community.zabbix.zabbix_correlation:
+    name: tag correlation
+    filter:
+      evaltype: and_or
+      conditions:
+        - type: event_tag_pair
+          oldtag: oldtag_pair
+          newtag: newtag_pair
+    operations:
+      - type: close_old_events
+      - type: close_new_event
+  register: zbxcorrelation_update
+
+- name: assert that correlation was updated
+  ansible.builtin.assert:
+    that:
+      - zbxcorrelation_update.changed is sameas True
+
+- name: test - update correlation with old_event_tag_value condition
+  community.zabbix.zabbix_correlation:
+    name: tag correlation
+    filter:
+      evaltype: and_or
+      conditions:
+        - type: old_event_tag_value
+          tag: old_tag_value
+          value: old
+          operator: equal
+    operations:
+      - type: close_old_events
+      - type: close_new_event
+  register: zbxcorrelation_update
+
+- name: assert that correlation was updated
+  ansible.builtin.assert:
+    that:
+      - zbxcorrelation_update.changed is sameas True
+
+- name: test - update correlation with new_event_tag_value condition
+  community.zabbix.zabbix_correlation:
+    name: tag correlation
+    filter:
+      evaltype: and_or
+      conditions:
+        - type: new_event_tag_value
+          tag: new_tag_value
+          value: new
+          operator: equal
+    operations:
+      - type: close_old_events
+      - type: close_new_event
+  register: zbxcorrelation_update
+
+- name: assert that correlation was updated
+  ansible.builtin.assert:
+    that:
+      - zbxcorrelation_update.changed is sameas True
+
+- name: test - delete tag correlation
+  community.zabbix.zabbix_correlation:
+    name: tag correlation
+    state: absent
+  register: zbxcorrelation_delete
+
+- name: assert that correlation was deleted
+  ansible.builtin.assert:
+    that:
+      - zbxcorrelation_delete.changed is sameas True
+
+- name: prepare - create hostgroup
+  community.zabbix.zabbix_group:
+    host_groups:
+      - correlation_group
+    state: present
+  register: zbxgroup_create
+
+- name: test - create host group correlation with wrong operator (like)
+  community.zabbix.zabbix_correlation:
+    name: new host group correlation
+    description: a custom description
+    filter:
+      evaltype: and_or
+      conditions:
+        - type: new_event_host_group
+          hostgroup: correlation_group
+          operator: like
+    operations:
+      - type: close_old_events
+  ignore_errors: yes
+  register: zbxcorrelation_create
+
+- name: assert that correlation was failed
+  ansible.builtin.assert:
+    that:
+      - zbxcorrelation_create is failed
+
+- name: test - create host group correlation with wrong operator (not_like)
+  community.zabbix.zabbix_correlation:
+    name: new host group correlation
+    description: a custom description
+    filter:
+      evaltype: and_or
+      conditions:
+        - type: new_event_host_group
+          hostgroup: correlation_group
+          operator: not_like
+    operations:
+      - type: close_old_events
+  ignore_errors: yes
+  register: zbxcorrelation_create
+
+- name: assert that correlation was failed
+  ansible.builtin.assert:
+    that:
+      - zbxcorrelation_create is failed
+
+- name: prepare - delete hostgroup
+  community.zabbix.zabbix_group:
+    host_groups:
+      - correlation_group
+    state: absent
+  register: zbxgroup_delete
+
+- name: test - create tag correlation with wrong formulaid
+  community.zabbix.zabbix_correlation:
+    name: new tag correlation
+    description: a custom description
+    filter:
+      evaltype: custom_expression
+      formula: a
+      conditions:
+        - type: new_event_tag_value
+          tag: new_tag_value
+          value: new
+          operator: equal
+          formulaid: a
+    operations:
+      - type: close_old_events
+  ignore_errors: yes
+  register: zbxcorrelation_create
+
+- name: assert that correlation was failed
+  ansible.builtin.assert:
+    that:
+      - zbxcorrelation_create is failed
+
+- name: test - delete custom_expression correlation
+  community.zabbix.zabbix_correlation:
+    name: new tag correlation
+    state: absent
+  register: zbxcorrelation_delete

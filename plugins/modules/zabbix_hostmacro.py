@@ -43,6 +43,11 @@ options:
         required: false
         choices: ["text", "secret", "vault"]
         default: "text"
+    macro_description:
+        description:
+            - Text Description of the global macro.
+        type: str
+        default: ""
     state:
         description:
             - State of the macro.
@@ -66,14 +71,14 @@ extends_documentation_fragment:
 EXAMPLES = r"""
 # If you want to use Username and Password to be authenticated by Zabbix Server
 - name: Set credentials to access Zabbix Server API
-  set_fact:
+  ansible.builtin.set_fact:
     ansible_user: Admin
     ansible_httpapi_pass: zabbix
 
 # If you want to use API token to be authenticated by Zabbix Server
 # https://www.zabbix.com/documentation/current/en/manual/web_interface/frontend_sections/administration/general#api-tokens
 - name: Set API token
-  set_fact:
+  ansible.builtin.set_fact:
     ansible_zabbix_auth_key: 8ec0d52432c15c91fcafe9888500cf9a607f44091ab554dbee860f6b44fac895
 
 - name: Create new host macro or update an existing macro's value
@@ -90,6 +95,7 @@ EXAMPLES = r"""
     host_name: ExampleHost
     macro_name: EXAMPLE.MACRO
     macro_value: Example value
+    macro_description: Example description
     state: present
 
 # Values with curly brackets need to be quoted otherwise they will be interpreted as a dictionary
@@ -107,6 +113,7 @@ EXAMPLES = r"""
     host_name: ExampleHost
     macro_name: "{$EXAMPLE.MACRO}"
     macro_value: Example value
+    macro_description: Example description
     state: present
 
 - name: Delete existing host macro
@@ -158,26 +165,27 @@ class HostMacro(ZabbixBase):
             self._module.fail_json(msg="Failed to get host macro %s: %s" % (macro_name, e))
 
     # create host macro
-    def create_host_macro(self, macro_name, macro_value, macro_type, host_id):
+    def create_host_macro(self, macro_name, macro_value, macro_type, macro_description, host_id):
         try:
             if self._module.check_mode:
                 self._module.exit_json(changed=True)
-            self._zapi.usermacro.create({"hostid": host_id, "macro": macro_name, "value": macro_value, "type": macro_type})
+            self._zapi.usermacro.create({"hostid": host_id, "macro": macro_name, "value": macro_value, "type": macro_type, "description": macro_description})
             self._module.exit_json(changed=True, result="Successfully added host macro %s" % macro_name)
         except Exception as e:
             self._module.fail_json(msg="Failed to create host macro %s: %s" % (macro_name, e))
 
     # update host macro
-    def update_host_macro(self, host_macro_obj, macro_name, macro_value, macro_type):
+    def update_host_macro(self, host_macro_obj, macro_name, macro_value, macro_type, macro_description):
         host_macro_id = host_macro_obj["hostmacroid"]
         if host_macro_obj["macro"] == macro_name:
             # no change only when macro type == 0. when type = 1 or 2 zabbix will not output value of it.
-            if host_macro_obj["type"] == "0" and macro_type == "0" and host_macro_obj["value"] == macro_value:
+            if (host_macro_obj["type"] == "0" and macro_type == "0" and host_macro_obj["value"] == macro_value
+                    and host_macro_obj["description"] == macro_description):
                 self._module.exit_json(changed=False, result="Host macro %s already up to date" % macro_name)
         try:
             if self._module.check_mode:
                 self._module.exit_json(changed=True)
-            self._zapi.usermacro.update({"hostmacroid": host_macro_id, "value": macro_value, "type": macro_type})
+            self._zapi.usermacro.update({"hostmacroid": host_macro_id, "value": macro_value, "type": macro_type, "description": macro_description})
             self._module.exit_json(changed=True, result="Successfully updated host macro %s" % macro_name)
         except Exception as e:
             self._module.fail_json(msg="Failed to update host macro %s: %s" % (macro_name, e))
@@ -217,6 +225,7 @@ def main():
         macro_name=dict(type="str", required=True),
         macro_value=dict(type="str", required=False),
         macro_type=dict(type="str", default="text", choices=["text", "secret", "vault"]),
+        macro_description=dict(type="str", default=""),
         state=dict(type="str", default="present", choices=["present", "absent"]),
         force=dict(type="bool", default=True)
     ))
@@ -231,6 +240,7 @@ def main():
     host_name = module.params["host_name"]
     macro_name = normalize_macro_name(module.params["macro_name"])
     macro_value = module.params["macro_value"]
+    macro_description = module.params["macro_description"]
     state = module.params["state"]
     force = module.params["force"]
     if module.params["macro_type"] == "secret":
@@ -255,10 +265,10 @@ def main():
     else:
         if not host_macro_obj:
             # create host macro
-            host_macro_class_obj.create_host_macro(macro_name, macro_value, macro_type, host_id)
+            host_macro_class_obj.create_host_macro(macro_name, macro_value, macro_type, macro_description, host_id)
         elif force:
             # update host macro
-            host_macro_class_obj.update_host_macro(host_macro_obj, macro_name, macro_value, macro_type)
+            host_macro_class_obj.update_host_macro(host_macro_obj, macro_name, macro_value, macro_type, macro_description)
         else:
             module.exit_json(changed=False, result="Host macro %s already exists and force is set to no" % macro_name)
 

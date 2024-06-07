@@ -1,12 +1,14 @@
 ---
 namespace: community
 name: zabbix
-version: 2.0.0
+version: 2.5.1
 readme: README.md
 authors:
-- Dusan Matejka (@D3DeFi)
-- sky-joker (@sky-joker)
-- Werner Dijkerman (@dj-wasabi)
+  - Dusan Matejka (@D3DeFi)
+  - sky-joker (@sky-joker)
+  - Werner Dijkerman (@dj-wasabi)
+  - Troy Ward (@pyrodie18)
+  - Evgeny Yurchenko (@BGmot)
 description: Collection allowing to configure resources in Zabbix monitoring system
 license_file: LICENSE
 tags:

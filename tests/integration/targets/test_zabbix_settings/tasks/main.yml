@@ -1,0 +1,332 @@
+---
+- name: test - Update zabbix settings (same as default)
+  community.zabbix.zabbix_settings:
+    alert_usrgrp: "Zabbix administrators"
+    auditlog_enabled: true
+    blink_period: "2m"
+    connect_timeout: "3s"
+    custom_color: false
+    default_inventory_mode: disabled
+    default_lang: en_US
+    default_theme: blue-theme
+    default_timezone: system
+    discovery_group: "Discovered hosts"
+    geomaps_attribution: ""
+    geomaps_max_zoom: false
+    geomaps_tile_provider: "OpenStreetMap.Mapnik"
+    geomaps_tile_url: ""
+    history_period: "24h"
+    iframe_sandboxing_enabled: true
+    iframe_sandboxing_exceptions: ""
+    item_test_timeout: "60s"
+    login_attempts: 5
+    login_block: "30s"
+    max_in_table: 50
+    max_overview_table_size: 50
+    max_period: "2y"
+    media_type_test_timeout: "65s"
+    ok_ack_color: "009900"
+    ok_ack_style: true
+    ok_period: "5m"
+    ok_unack_color: "009900"
+    ok_unack_style: true
+    period_default: "1h"
+    problem_ack_color: "CC0000"
+    problem_ack_style: true
+    problem_unack_color: "CC0000"
+    problem_unack_style: true
+    report_test_timeout: "60s"
+    script_timeout: "60s"
+    search_limit: 1000
+    server_check_interval: true
+    severity_color_0: "97AAB3"
+    severity_color_1: "7499FF"
+    severity_color_2: "FFC859"
+    severity_color_3: "FFA059"
+    severity_color_4: "E97659"
+    severity_color_5: "E45959"
+    severity_name_0: "Not classified"
+    severity_name_1: "Information"
+    severity_name_2: "Warning"
+    severity_name_3: "Average"
+    severity_name_4: "High"
+    severity_name_5: "Disaster"
+    show_technical_errors: false
+    snmptrap_logging: true
+    socket_timeout: "3s"
+    uri_valid_schemes:
+      - http
+      - https
+      - ftp
+      - file
+      - mailto
+      - tel
+      - ssh
+    frontend_url: ""
+    validate_uri_schemes: true
+    work_period: "1-5,09:00-18:00"
+    x_frame_options: "SAMEORIGIN"
+  register: zbx_settings
+
+- name: assert that settings was NOT updated
+  ansible.builtin.assert:
+    that:
+      - zbx_settings.changed is sameas False
+
+- when: zabbix_version is version('6.4', '>=')
+  name: support Zabbix version (>=6.4)
+  block:
+    - name: test - Zabbix settings (same as default)
+      community.zabbix.zabbix_settings:
+        vault_provider: HashiCorp_Vault
+      register: zbx_settings
+
+    - name: assert that settings was NOT updated
+      ansible.builtin.assert:
+        that:
+          - zbx_settings.changed is sameas False
+
+    - name: test - Update zabbix settings
+      community.zabbix.zabbix_settings:
+        vault_provider: CyberArk_Vault
+      register: zbx_settings
+
+    - name: assert that settings was updated
+      ansible.builtin.assert:
+        that:
+          - zbx_settings.changed is sameas True
+
+- name: test - Update zabbix settings
+  community.zabbix.zabbix_settings:
+    alert_usrgrp: "0"
+    auditlog_enabled: false
+    blink_period: "10m"
+    connect_timeout: "30s"
+    custom_color: false
+    default_inventory_mode: automatic
+    default_lang: en_GB
+    default_theme: hc-dark
+    default_timezone: Asia/Tokyo
+    discovery_group: "Hypervisors"
+    geomaps_attribution: "hogehoge"
+    geomaps_max_zoom: true
+    geomaps_tile_provider: "another"
+    geomaps_tile_url: ""
+    history_period: "1w"
+    iframe_sandboxing_enabled: false
+    iframe_sandboxing_exceptions: "hogehoge"
+    item_test_timeout: "5m"
+    login_attempts: 30
+    login_block: "5m"
+    max_in_table: 1000
+    max_overview_table_size: 1000
+    max_period: "1y"
+    media_type_test_timeout: "1m"
+    ok_ack_color: "0099AA"
+    ok_ack_style: false
+    ok_period: "10m"
+    ok_unack_color: "0099BB"
+    ok_unack_style: false
+    period_default: "2h"
+    problem_ack_color: "CC0000"
+    problem_ack_style: false
+    problem_unack_color: "CC0000"
+    problem_unack_style: false
+    report_test_timeout: "2m"
+    script_timeout: "2m"
+    search_limit: 10000
+    server_check_interval: false
+    severity_color_0: "97AAAA"
+    severity_color_1: "7499BB"
+    severity_color_2: "FFC8CC"
+    severity_color_3: "FFA0DD"
+    severity_color_4: "E976EE"
+    severity_color_5: "E459FF"
+    severity_name_0: "Not classified(test)"
+    severity_name_1: "Information(test)"
+    severity_name_2: "Warning(test)"
+    severity_name_3: "Average(test)"
+    severity_name_4: "High(test)"
+    severity_name_5: "Disaster(test)"
+    show_technical_errors: true
+    snmptrap_logging: false
+    socket_timeout: "30s"
+    uri_valid_schemes:
+      - https
+      - ftp
+      - file
+      - mailto
+      - tel
+      - ssh
+    frontend_url: "https://www.zabbix.com/"
+    validate_uri_schemes: false
+    work_period: "1-5,09:00-18:00;1-5,22:00-23:00"
+    x_frame_options: "SAMEORIGIN(TEST)"
+  register: zbx_settings
+
+- name: assert that settings was updated
+  ansible.builtin.assert:
+    that:
+      - zbx_settings.changed is sameas True
+
+- name: test - Update zabbix settings (same setting)
+  community.zabbix.zabbix_settings:
+    alert_usrgrp: "0"
+    auditlog_enabled: false
+    blink_period: "10m"
+    connect_timeout: "30s"
+    custom_color: false
+    default_inventory_mode: automatic
+    default_lang: en_GB
+    default_theme: hc-dark
+    default_timezone: Asia/Tokyo
+    discovery_group: "Hypervisors"
+    geomaps_attribution: "hogehoge"
+    geomaps_max_zoom: true
+    geomaps_tile_provider: "another"
+    geomaps_tile_url: ""
+    history_period: "1w"
+    iframe_sandboxing_enabled: false
+    iframe_sandboxing_exceptions: "hogehoge"
+    item_test_timeout: "5m"
+    login_attempts: 30
+    login_block: "5m"
+    max_in_table: 1000
+    max_overview_table_size: 1000
+    max_period: "1y"
+    media_type_test_timeout: "1m"
+    ok_ack_color: "0099AA"
+    ok_ack_style: false
+    ok_period: "10m"
+    ok_unack_color: "0099BB"
+    ok_unack_style: false
+    period_default: "2h"
+    problem_ack_color: "CC0000"
+    problem_ack_style: false
+    problem_unack_color: "CC0000"
+    problem_unack_style: false
+    report_test_timeout: "2m"
+    script_timeout: "2m"
+    search_limit: 10000
+    server_check_interval: false
+    severity_color_0: "97AAAA"
+    severity_color_1: "7499BB"
+    severity_color_2: "FFC8CC"
+    severity_color_3: "FFA0DD"
+    severity_color_4: "E976EE"
+    severity_color_5: "E459FF"
+    severity_name_0: "Not classified(test)"
+    severity_name_1: "Information(test)"
+    severity_name_2: "Warning(test)"
+    severity_name_3: "Average(test)"
+    severity_name_4: "High(test)"
+    severity_name_5: "Disaster(test)"
+    show_technical_errors: true
+    snmptrap_logging: false
+    socket_timeout: "30s"
+    uri_valid_schemes:
+      - https
+      - ftp
+      - file
+      - mailto
+      - tel
+      - ssh
+    frontend_url: "https://www.zabbix.com/"
+    validate_uri_schemes: false
+    work_period: "1-5,09:00-18:00;1-5,22:00-23:00"
+    x_frame_options: "SAMEORIGIN(TEST)"
+  register: zbx_settings
+
+- name: assert that settings was NOT updated
+  ansible.builtin.assert:
+    that:
+      - zbx_settings.changed is sameas False
+
+- name: test - Update zabbix alert_usrgrp setting
+  community.zabbix.zabbix_settings:
+    alert_usrgrp: "No access to the frontend"
+  register: zbx_settings
+
+- name: assert that setting was updated
+  ansible.builtin.assert:
+    that:
+      - zbx_settings.changed is sameas True
+
+- name: test - Update zabbix alert_usrgrp setting (same parameter)
+  community.zabbix.zabbix_settings:
+    alert_usrgrp: "No access to the frontend"
+  register: zbx_settings
+
+- name: assert that settings was NOT updated
+  ansible.builtin.assert:
+    that:
+      - zbx_settings.changed is sameas False
+
+- name: test - Update zabbix settings (same as default)
+  community.zabbix.zabbix_settings:
+    alert_usrgrp: "Zabbix administrators"
+    auditlog_enabled: true
+    blink_period: "2m"
+    connect_timeout: "3s"
+    custom_color: false
+    default_inventory_mode: disabled
+    default_lang: en_US
+    default_theme: blue-theme
+    default_timezone: system
+    discovery_group: "Discovered hosts"
+    geomaps_attribution: ""
+    geomaps_max_zoom: false
+    geomaps_tile_provider: "OpenStreetMap.Mapnik"
+    geomaps_tile_url: ""
+    history_period: "24h"
+    iframe_sandboxing_enabled: true
+    iframe_sandboxing_exceptions: ""
+    item_test_timeout: "60s"
+    login_attempts: 5
+    login_block: "30s"
+    max_in_table: 50
+    max_overview_table_size: 50
+    max_period: "2y"
+    media_type_test_timeout: "65s"
+    ok_ack_color: "009900"
+    ok_ack_style: true
+    ok_period: "5m"
+    ok_unack_color: "009900"
+    ok_unack_style: true
+    period_default: "1h"
+    problem_ack_color: "CC0000"
+    problem_ack_style: true
+    problem_unack_color: "CC0000"
+    problem_unack_style: true
+    report_test_timeout: "60s"
+    script_timeout: "60s"
+    search_limit: 1000
+    server_check_interval: true
+    severity_color_0: "97AAB3"
+    severity_color_1: "7499FF"
+    severity_color_2: "FFC859"
+    severity_color_3: "FFA059"
+    severity_color_4: "E97659"
+    severity_color_5: "E45959"
+    severity_name_0: "Not classified"
+    severity_name_1: "Information"
+    severity_name_2: "Warning"
+    severity_name_3: "Average"
+    severity_name_4: "High"
+    severity_name_5: "Disaster"
+    show_technical_errors: false
+    snmptrap_logging: true
+    socket_timeout: "3s"
+    uri_valid_schemes:
+      - http
+      - https
+      - ftp
+      - file
+      - mailto
+      - tel
+      - ssh
+    frontend_url: ""
+    validate_uri_schemes: true
+    work_period: "1-5,09:00-18:00"
+    x_frame_options: "SAMEORIGIN"
+  register: zbx_settings
