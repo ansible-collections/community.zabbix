@@ -15,7 +15,7 @@
   ansible.builtin.set_fact:
     windows_arch: 64
   when:
-    - ansible_architecture == "64-bit"
+    - '"64" in ansible_architecture'
   tags:
     - always
 
