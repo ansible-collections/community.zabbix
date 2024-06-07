@@ -6,6 +6,7 @@
       - policycoreutils
       - python3-libsemanage
       - python3-policycoreutils
+      - zabbix-selinux-policy
   environment:
     http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
     https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"

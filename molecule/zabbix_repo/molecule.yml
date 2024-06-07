@@ -2,7 +2,7 @@
 driver:
   name: docker
 platforms:
-  - name: zabbix-repo-${MY_MOLECULE_VERSION:-v64}-${MY_MOLECULE_CONTAINER:-rockylinux8}
+  - name: zabbix-repo-${MY_MOLECULE_VERSION:-v70}-${MY_MOLECULE_CONTAINER:-rockylinux8}
     image: geerlingguy/docker-${MY_MOLECULE_IMAGE:-rockylinux8}-ansible:latest
     privileged: true
     pre_build_image: true
@@ -12,7 +12,7 @@ platforms:
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
     groups:
-      - ${MY_MOLECULE_VERSION:-v64}
+      - ${MY_MOLECULE_VERSION:-v70}
 
 provisioner:
   name: ansible
@@ -24,6 +24,8 @@ provisioner:
       all:
         zabbix_repo_apt_priority: 1
         zabbix_repo_yum_gpg_check: 1
+      v70:
+        zabbix_server_version: 7.0
       v64:
         zabbix_server_version: 6.4
       v60:
