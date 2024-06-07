@@ -7,12 +7,18 @@ on:
       - "molecule/zabbix_web/**"
       - "molecule/requirements.txt"
       - ".github/workflows/web.yml"
+      - "roles/zabbix_repo/**"
+      - "molecule/zabbix_repo/**"
+      - ".github/workflows/repo.yml"
   pull_request:
     paths:
       - "roles/zabbix_web/**"
       - "molecule/zabbix_web/**"
       - "molecule/requirements.txt"
       - ".github/workflows/web.yml"
+      - "roles/zabbix_repo/**"
+      - "molecule/zabbix_repo/**"
+      - ".github/workflows/repo.yml"
 jobs:
   molecule:
     runs-on: ubuntu-20.04
@@ -36,6 +42,7 @@ jobs:
           - nginx
           - apache
         version:
+          - v70
           - v64
           - v60
     steps:

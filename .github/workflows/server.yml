@@ -7,12 +7,18 @@ on:
       - "molecule/zabbix_server/**"
       - "molecule/requirements.txt"
       - ".github/workflows/server.yml"
+      - "roles/zabbix_repo/**"
+      - "molecule/zabbix_repo/**"
+      - ".github/workflows/repo.yml"
   pull_request:
     paths:
       - "roles/zabbix_server/**"
       - "molecule/zabbix_server/**"
       - "molecule/requirements.txt"
       - ".github/workflows/server.yml"
+      - "roles/zabbix_repo/**"
+      - "molecule/zabbix_repo/**"
+      - ".github/workflows/repo.yml"
 jobs:
   molecule:
     runs-on: ubuntu-20.04
@@ -33,6 +39,7 @@ jobs:
           - mysql
           - pgsql
         version:
+          - v70
           - v64
           - v60
         exclude:

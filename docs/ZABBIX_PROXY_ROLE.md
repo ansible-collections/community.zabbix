@@ -338,8 +338,12 @@ The following table lists all variables that are exposed to modify the configura
 | LogRemoteCommands | zabbix_proxy_logremotecommands || |
 | LogSlowQueries | zabbix_proxy_logslowqueries || |
 | LogType | zabbix_proxy_logtype | file| |
+| MaxConcurrentChecksPerPoller | zabbix_proxy_maxconcurrentchecksperpoller | | Version 7.0 or Greater |
 | PidFile | zabbix_proxy_pidfile | /var/run/zabbix/zabbix_proxy.pid| |
+| ProxyBufferMode | zabbix_proxy_proxybuffermode | | Version 7.0 or Greater |
 | ProxyLocalBuffer | zabbix_proxy_proxylocalbuffer |0| |
+| ProxyMemoryBufferAge | zabbix_proxy_proxymemorybufferage || Version 7.0 or Greater |
+| ProxyMemoryBufferSize | zabbix_proxy_proxymemorybuffersize || Version 7.0 or Greater |
 | ProxyMode | zabbix_proxy_proxymode || |
 | ProxyOfflineBuffer | zabbix_proxy_proxyofflinebuffer |1| |
 | Server | zabbix_proxy_server | 192.168.1.1| |
@@ -350,8 +354,11 @@ The following table lists all variables that are exposed to modify the configura
 | SSLCALocation | zabbix_proxy_sslcalocation || |
 | SSLCertLocation | zabbix_proxy_sslcertlocation || |
 | SSLKeyLocation | zabbix_proxy_sslkeylocation || |
+| StartAgentPollers | zabbix_proxy_startagentpollers || Version 7.0 or Greater |
+| StartBrowserPollers | zabbix_proxy_startbrowserpollers || Version 7.0 or Greater |
 | StartDBSyncers | zabbix_proxy_startdbsyncers |4| |
 | StartDiscoverers | zabbix_proxy_startdiscoverers |1| |
+| StartHTTPAgentPollers | zabbix_proxy_httpagentpollers | | Version 7.0 or Greater |
 | StartHTTPPollers | zabbix_proxy_starthttppollers |1| |
 | StartIPMIPollers | zabbix_proxy_startipmipollers |0| |
 | StartJavaPollers | zabbix_proxy_startjavapollers || |
@@ -360,6 +367,7 @@ The following table lists all variables that are exposed to modify the configura
 | StartPollers | zabbix_proxy_startpollers |5| |
 | StartPollersUnreachable | zabbix_proxy_startpollersunreachable |1| |
 | StartPreprocessors | zabbix_proxy_startpreprocessors |3| |
+| StartSNMPPollers | zabbix_proxy_startsnmppollers | | Version 7.0 or Greater |
 | StartSNMPTrapper | zabbix_proxy_startsnmptrapper || |
 | StartTrappers | zabbix_proxy_starttrappers |5| |
 | StartVMwareCollectors | zabbix_proxy_startvmwarecollectors || |
@@ -389,14 +397,16 @@ The following table lists all variables that are exposed to modify the configura
 | User | zabbix_proxy_user || |
 | Vault | zabbix_proxy_vault || Version 6.2 or Greater |
 | VaultDBPath | zabbix_proxy_vaultdbpath || |
-| VaultTLSCertFile | zabbix_proxy_vaulttlscertfile || Version 6.2 or Greater |
-| VaultTLSKeyFile | zabbix_proxy_vaulttlskeyfile || Version 6.2 or Greater |
+| VaultPrefix | zabbix_proxy_vaultprefix || Version 7.0 or Greater |
+| VaultTLSCertFile | zabbix_proxy_vaulttlscertfile || Version 6.4 or Greater |
+| VaultTLSKeyFile | zabbix_proxy_vaulttlskeyfile || Version 6.4 or Greater |
 | VaultToken | zabbix_proxy_vaulttoken || |
 | VaultURL | zabbix_proxy_vaulturl |https://127.0.0.1:8200| |
 | VMwareCacheSize | zabbix_proxy_vmwarecachesize | 8M| |
 | VMwareFrequency | zabbix_proxy_vmwarefrequency |60| |
 | VMwarePerfFrequency | zabbix_proxy_vmwareperffrequency | | |
 | VMwareTimeout | zabbix_proxy_vmwaretimeout | | |
+| WebDriverURL | zabbix_proxy_webdriverurl | | Version 7.0 or Greater |
 
 ## Tags
 
