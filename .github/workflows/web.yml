@@ -45,6 +45,11 @@ jobs:
           - v70
           - v64
           - v60
+        exclude:
+          - container: ubuntu2004
+            version: v70
+          - container: debian11
+            version: v70
     steps:
       - name: Check out code
         uses: actions/checkout@v4
