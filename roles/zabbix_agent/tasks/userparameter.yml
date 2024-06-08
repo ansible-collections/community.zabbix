@@ -1,90 +1,45 @@
 ---
-- block:
-    - name: "Windows | Installing user-defined userparameters"
-      ansible.windows.win_template:
-        src: "{{ zabbix_agent_userparameters_templates_src }}/{{ item.name }}.j2"
-        dest: '{{ zabbix_agent_win_include }}\{{ item.name }}.conf'
+- tags:
+    - config
+  block:
+    - when:
+        - ansible_os_family == "Windows"
       notify:
         - restart win zabbix agent
-      with_items: "{{ zabbix_agent_userparameters }}"
-      when: item.scripts_dir is not defined
+      block:
+        - name: Windows | Install user-defined userparameters
+          ansible.windows.win_template:
+            src: "{{ zabbix_agent_userparameters_templates_src }}/{{ item.name }}.j2"
+            dest: '{{ zabbix_agent_win_include }}\{{ item.name }}.conf'
+          loop: "{{ zabbix_agent_userparameters | rejectattr('scripts_dir', 'defined') }}"
 
-    - name: "Windows | Installing user-defined scripts"
-      ansible.windows.win_copy:
-        src: "{{ zabbix_agent_userparameters_scripts_src }}/{{ item.scripts_dir }}"
-        dest: '{{ zabbix_win_install_dir }}\scripts\'
-      notify:
-        - restart win zabbix agent
-      with_items: "{{ zabbix_agent_userparameters }}"
-      when: item.scripts_dir is defined
-  when: ansible_os_family == "Windows"
-  tags:
-    - config
+        - name: Windows | Install user-defined scripts
+          ansible.windows.win_copy:
+            src: "{{ zabbix_agent_userparameters_scripts_src }}/{{ item.scripts_dir }}"
+            dest: '{{ zabbix_win_install_dir }}\scripts\'
+          loop: "{{ zabbix_agent_userparameters | selectattr('scripts_dir', 'defined') }}"
 
-- block:
-    - name: "Installing user-defined userparameters"
-      ansible.builtin.template:
-        src: "{{ zabbix_agent_userparameters_templates_src }}/{{ item.name }}.j2"
-        dest: "{{ zabbix_agent_include }}/userparameter_{{ item.name }}.conf"
-        owner: zabbix
-        group: zabbix
-        mode: 0644
+    - when:
+        - ansible_os_family != 'Windows'
       notify:
         - restart zabbix-agent
         - restart mac zabbix agent
       become: true
-      with_items: "{{ zabbix_agent_userparameters }}"
-      when: item.scripts_dir is not defined
+      block:
+        - name: Install user-defined userparameters
+          ansible.builtin.template:
+            src: "{{ zabbix_agent_userparameters_templates_src }}/{{ item.name }}.j2"
+            dest: "{{ zabbix_agent_include }}/userparameter_{{ item.name }}.conf"
+            owner: zabbix
+            group: zabbix
+            mode: "0644"
+          loop: "{{ zabbix_agent_userparameters | rejectattr('scripts_dir', 'defined') }}"
 
-    - name: "Installing user-defined scripts"
-      ansible.builtin.copy:
-        src: "{{ zabbix_agent_userparameters_scripts_src }}/{{ item.scripts_dir }}"
-        dest: "/etc/zabbix/scripts/"
-        owner: zabbix
-        group: zabbix
-        mode: 0755
-      notify:
-        - restart zabbix-agent
-        - restart mac zabbix agent
-      become: true
-      with_items: "{{ zabbix_agent_userparameters }}"
-      when: item.scripts_dir is defined
-  when:
-    - ansible_os_family != "Windows"
-    - not zabbix_agent2
-  tags:
-    - config
-
-- block:
-    - name: "Installing user-defined userparameters"
-      ansible.builtin.template:
-        src: "{{ zabbix_agent_userparameters_templates_src }}/{{ item.name }}.j2"
-        dest: "{{ zabbix_agent2_include }}/userparameter_{{ item.name }}.conf"
-        owner: zabbix
-        group: zabbix
-        mode: 0644
-      notify:
-        - restart zabbix-agent
-        - restart mac zabbix agent
-      become: true
-      with_items: "{{ zabbix_agent_userparameters }}"
-      when: item.scripts_dir is not defined
-
-    - name: "Installing user-defined scripts"
-      ansible.builtin.copy:
-        src: "{{ zabbix_agent_userparameters_scripts_src }}/{{ item.scripts_dir }}"
-        dest: "/etc/zabbix/scripts/"
-        owner: zabbix
-        group: zabbix
-        mode: 0755
-      notify:
-        - restart zabbix-agent
-        - restart mac zabbix agent
-      become: true
-      with_items: "{{ zabbix_agent_userparameters }}"
-      when: item.scripts_dir is defined
-  when:
-    - ansible_os_family != "Windows"
-    - zabbix_agent2
-  tags:
-    - config
+        - name: Install user-defined scripts
+          ansible.builtin.copy:
+            src: "{{ zabbix_agent_userparameters_scripts_src }}/{{ item.scripts_dir }}"
+            dest: /etc/zabbix/scripts/
+            owner: zabbix
+            group: zabbix
+            mode: "0755"
+          loop: "{{ zabbix_agent_userparameters | selectattr('scripts_dir', 'defined') }}"
