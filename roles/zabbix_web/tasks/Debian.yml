@@ -1,6 +1,1 @@
 ---
-- name: "Debian | Set some variables"
-  ansible.builtin.set_fact:
-    zabbix_underscore_version: "{{ zabbix_web_version | regex_replace('\\.', '_') }}"
-  tags:
-    - always
