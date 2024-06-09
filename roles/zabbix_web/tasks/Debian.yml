@@ -1,31 +1,9 @@
 ---
-- name: "Debian | Set PHP Dependencies"
-  ansible.builtin.set_fact:
-    zabbix_web_php_dependencies: "{{ _apache_php_dependencies if zabbix_web_http_server == 'apache' else _nginx_php_dependencies }}"
-  tags:
-    - config
-
 - name: "Debian | Set some variables"
   ansible.builtin.set_fact:
     zabbix_underscore_version: "{{ zabbix_web_version | regex_replace('\\.', '_') }}"
   tags:
     - always
-
-- name: "Debian | Install PHP Dependencies"
-  ansible.builtin.apt:
-    pkg: "{{ zabbix_web_php_dependencies }}"
-    state: "present"
-    update_cache: true
-    cache_valid_time: 0
-  environment:
-    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
-    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
-  register: zabbix_web_php_dependencies_install
-  until: zabbix_web_php_dependencies_install is succeeded
-  become: true
-  tags:
-    - install
-    - dependencies
 
 - name: "Debian | Install PgSQL Dependencies"
   ansible.builtin.apt:

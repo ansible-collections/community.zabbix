@@ -9,7 +9,7 @@
 
 - name: "Apache | Installing Zabbix Apache Conf"
   package:
-    name: "{{ _zabbix_web_apache_package }}"
+    name: "{{ _zabbix_web_apache_packages + _zabbix_web_apache_php_dependencies | default([]) }}"
     state: "{{ zabbix_web_package_state }}"
     update_cache: true
     disablerepo: "{{ zabbix_web_disable_repo | default(_zabbix_web_disable_repo | default(omit)) }}"

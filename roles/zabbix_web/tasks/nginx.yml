@@ -12,7 +12,7 @@
 
 - name: "Nginx | Installing Zabbix Nginx Conf"
   package:
-    name: "{{ _zabbix_web_nginx_package }}"
+    name: "{{ _zabbix_web_nginx_packages + _zabbix_web_nginx_php_dependencies | default([]) }}"
     state: "{{ zabbix_web_package_state }}"
     update_cache: true
     disablerepo: "{{ zabbix_web_disable_repo | default(_zabbix_web_disable_repo | default(omit)) }}"
