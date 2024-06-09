@@ -76,9 +76,9 @@ jobs:
 
       - name: Run role tests
         run: >-
-          MY_MOLECULE_CONTAINER=${{ matrix.container }}
-          MY_MOLECULE_IMAGE=${{ matrix.container }}
+          MY_MOLECULE_CONTAINER=${{ matrix.container.name }}
+          MY_MOLECULE_IMAGE=${{ matrix.container.base_image }}
+          MY_MOLECULE_OS_FAMILY=${{ matrix.container.os_family }}
           MY_MOLECULE_VERSION=${{ matrix.version }}
           MY_MOLECULE_DATABASE=${{ matrix.database }}
-          MY_MOLECULE_DOCKER_COMMAND=${{ matrix.command }}
           molecule test -s ${{ matrix.collection_role }}
