@@ -46,3 +46,4 @@ zabbix_valid_web_versions:
     - 6.0
 
 _zabbix_web_package: zabbix-frontend-php
+_zabbix_web_apache_package: zabbix-apache-conf
