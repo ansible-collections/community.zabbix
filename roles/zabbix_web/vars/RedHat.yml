@@ -30,5 +30,6 @@ zabbix_valid_web_versions:
 
 _zabbix_web_package: "zabbix-web-{{ zabbix_server_database }}-{{ zabbix_web_version }}.{{ zabbix_web_version_minor }}"
 _zabbix_web_apache_package: "zabbix-apache-conf-{{ zabbix_web_version }}.{{ zabbix_web_version_minor }}"
+_zabbix_web_nginx_package: "zabbix-nginx-conf-{{ zabbix_web_version }}.{{ zabbix_web_version_minor }}"
 _zabbix_web_disable_repo:
   - epel
