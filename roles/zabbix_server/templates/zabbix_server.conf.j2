@@ -88,7 +88,7 @@
 {{ (zabbix_server_startescalators is defined and zabbix_server_startescalators is not none) | ternary('', '# ') }}StartEscalators={{ zabbix_server_startescalators | default('') }}
 {{ (zabbix_server_starthistorypollers is defined and zabbix_server_starthistorypollers is not none) | ternary('', '# ') }}StartHistoryPollers={{ zabbix_server_starthistorypollers | default('') }}
 {% if zabbix_server_version is version('7.0', '>=') %}
-{{ (zabbix_server_starthttpagentpollers is defined and zabbix_server_starthttpagentpollers is not none) | ternary('', '# ') }}StartHTPAgentPollers={{ zabbix_server_starthttpagentpollers | default('') }}
+{{ (zabbix_server_starthttpagentpollers is defined and zabbix_server_starthttpagentpollers is not none) | ternary('', '# ') }}StartHTTPAgentPollers={{ zabbix_server_starthttpagentpollers | default('') }}
 {% endif %}
 {{ (zabbix_server_starthttppollers is defined and zabbix_server_starthttppollers is not none) | ternary('', '# ') }}StartHTTPPollers={{ zabbix_server_starthttppollers | default('') }}
 {{ (zabbix_server_startipmipollers is defined and zabbix_server_startipmipollers is not none) | ternary('', '# ') }}StartIPMIPollers={{ zabbix_server_startipmipollers | default('') }}
