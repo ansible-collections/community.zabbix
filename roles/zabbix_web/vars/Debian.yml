@@ -48,6 +48,8 @@ _zabbix_web_apache_packages:
   - zabbix-apache-conf
 _zabbix_web_apache_php_dependencies:
   - "libapache2-mod-php{{ zabbix_web_php_installed_version }}"
+  - "php{{ zabbix_web_php_installed_version }}-{{ zabbix_server_database }}"
 _zabbix_web_nginx_packages:
   - zabbix-nginx-conf
-_zabbix_web_nginx_php_dependencies: []
+_zabbix_web_nginx_php_dependencies:
+  - "php{{ zabbix_web_php_installed_version }}-{{ zabbix_server_database }}"

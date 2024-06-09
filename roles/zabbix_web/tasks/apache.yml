@@ -21,6 +21,8 @@
   become: true
   tags:
     - install
+    - dependencies
+    - database
 
 - name: "Apache | Get Apache version"
   ansible.builtin.shell: |
