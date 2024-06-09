@@ -4,25 +4,6 @@
   tags:
     - always
 
-- name: "RedHat | Install zabbix-web-configuration"
-  ansible.builtin.yum:
-    name:
-      - "zabbix-{{ zabbix_web_http_server }}-conf"
-    state: "{{ zabbix_web_package_state }}"
-    update_cache: true
-    disablerepo: "{{ zabbix_web_disable_repo | default(omit) }}"
-  environment:
-    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
-    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
-  register: zabbix_web_package_install
-  until: zabbix_web_package_install is succeeded
-  become: true
-  when:
-    - zabbix_web_version is version('6.0', '!=')
-    - ansible_distribution_major_version == '9'
-  tags:
-    - install
-
 - name: "Configure SELinux when enabled"
   ansible.builtin.include_tasks: selinux.yml
   when: ansible_facts.selinux.status | default('disabled') == 'enabled'
