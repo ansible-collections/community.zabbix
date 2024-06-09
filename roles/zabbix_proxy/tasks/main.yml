@@ -29,15 +29,6 @@
   tags:
     - always
 
-- name: "Suse | Abort if database is not supported"
-  fail:
-    msg: "Database '{{ zabbix_proxy_database }}' is not supported on Suse using ansible"
-  when:
-    - zabbix_proxy_database == 'mysql'
-    - ansible_os_family == 'Suse'
-  tags:
-    - always
-
 - name: Setting Zabbix API Server Port
   ansible.builtin.set_fact:
     zabbix_api_server_port: "{{ '443' if zabbix_api_use_ssl|bool else '80' }}"

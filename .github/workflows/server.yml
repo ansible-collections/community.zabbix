@@ -48,8 +48,6 @@ jobs:
             version: v70
           - container: debian11
             version: v70
-          - container: opensuseleap15
-            database: mysql
     steps:
       - name: Check out code
         uses: actions/checkout@v4

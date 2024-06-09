@@ -27,15 +27,6 @@
   tags:
     - always
 
-- name: "Suse | Abort if database is not supported"
-  fail:
-    msg: "Database '{{ zabbix_server_database }}' is not supported on Suse using ansible"
-  when:
-    - zabbix_server_database == 'mysql'
-    - ansible_os_family == 'Suse'
-  tags:
-    - always
-
 - name: Install Repository
   ansible.builtin.include_role:
     name: community.zabbix.zabbix_repo

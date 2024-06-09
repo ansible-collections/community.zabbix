@@ -44,10 +44,6 @@ jobs:
           - v70
           - v64
           - v60
-        exclude:
-          - container: opensuseleap15
-            database: mysql
-
     steps:
       - name: Check out code
         uses: actions/checkout@v4

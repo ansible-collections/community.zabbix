@@ -10,6 +10,11 @@ _zabbix_proxy_pgsql_dependencies:
   - gzip
   - python3-psycopg2
 
+_zabbix_proxy_mysql_dependencies:
+  "15":
+    - "{{ zabbix_proxy_install_database_client | ternary('mysql', '') }}"
+    - python3-PyMySQL
+
 _zabbix_proxy_sqlite3_dependencies:
   - sqlite
 
