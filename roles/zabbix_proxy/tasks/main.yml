@@ -151,12 +151,20 @@
   tags:
     - api
 
-- name: "zabbix-proxy started"
-  ansible.builtin.service:
-    name: zabbix-proxy
-    state: started
-    enabled: true
-  become: true
-  when: zabbix_proxy_manage_service | bool
-  tags:
-    - service
+- block:
+    - name: "zabbix-proxy started"
+      ansible.builtin.service:
+        name: zabbix-proxy
+        state: started
+        enabled: true
+      become: true
+      when: zabbix_proxy_manage_service | bool
+      tags:
+        - service
+  rescue:
+    - slurp:
+        path: /var/log/zabbix/zabbix_agent.log
+      register: _res
+    - debug:
+        var: _res.content | b64decode
+    - fail:
