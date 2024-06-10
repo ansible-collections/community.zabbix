@@ -163,7 +163,7 @@
         - service
   rescue:
     - slurp:
-        path: /var/log/zabbix/zabbix_agent.log
+        path: /var/log/zabbix/zabbix_proxy.log
       register: _res
     - debug:
         var: _res.content | b64decode
