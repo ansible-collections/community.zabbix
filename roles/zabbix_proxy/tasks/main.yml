@@ -162,8 +162,8 @@
       tags:
         - service
   rescue:
-    - slurp:
-        path: /var/log/zabbix/zabbix_proxy.log
+    - shell:
+        cmd: journalctl -xe
       register: _res
     - debug:
         var: _res.content | b64decode
