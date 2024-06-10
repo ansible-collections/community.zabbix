@@ -110,8 +110,6 @@
     group: "{{ zabbix_web_group }}"
     mode: "{{ zabbix_web_conf_mode }}"
   become: true
-  notify:
-    - "restart {{ zabbix_web_http_server }}"
   tags:
     - config
 
