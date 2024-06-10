@@ -297,14 +297,15 @@ The following table lists all variables that are exposed to modify the configura
 
 | Zabbix Name | Variable Name | Default Value |Notes |
 |-----------|------------------|--------|--------|
-| AllowRoot | zabbix_proxy_allowroot |0| |
-| AllowUnsupportedDBVersions | zabbix_proxy_allowunsupporteddbversions |0| |
-| CacheSize | zabbix_proxy_cachesize | 8M| |
-| ConfigFrequency | zabbix_proxy_configfrequency |3600| |
-| DataSenderFrequency | zabbix_proxy_datasenderfrequency |1| |
+| AllowRoot | zabbix_proxy_allowroot | `False` | `True`/`False` |
+| AllowUnsupportedDBVersions | zabbix_proxy_allowunsupporteddbversions | `False` | `True`/`False` |
+| CacheSize | zabbix_proxy_cachesize | 32M | |
+| ConfigFrequency | zabbix_proxy_configfrequency | 3600 | |
+| DataSenderFrequency | zabbix_proxy_datasenderfrequency | 1 | |
 | DBHost | zabbix_proxy_dbhost | localhost| |
 | DBName | zabbix_proxy_dbname | zabbix_proxy| |
 | DBPassword | zabbix_proxy_dbpassword | zabbix_proxy| |
+| DBPort | zabbix_proxy_dbport | Varies by database | |
 | DBSchema | zabbix_proxy_dbschema || |
 | DBSocket | zabbix_proxy_dbsocket || |
 | DBTLSCAFile | zabbix_proxy_dbtlscafile || |
@@ -315,62 +316,64 @@ The following table lists all variables that are exposed to modify the configura
 | DBTLSKeyFile | zabbix_proxy_dbtlskeyfile || |
 | DBUser | zabbix_proxy_dbuser | zabbix_proxy| |
 | DebugLevel | zabbix_proxy_debuglevel |3| |
-| EnableRemoteCommands | zabbix_proxy_enableremotecommands |0| |
+| EnableRemoteCommands | zabbix_proxy_enableremotecommands | `False` | `True`/`False` |
 | ExternalScripts | zabbix_proxy_externalscripts | /usr/lib/zabbix/externalscripts| |
 | Fping6Location | zabbix_proxy_fping6location | OS Specific Value | |
 | FpingLocation | zabbix_proxy_fpinglocation | OS Specific Value | |
-| HeartbeatFrequency | zabbix_proxy_heartbeatfrequency |60| Version 6.2 or Lower|
-| HistoryCacheSize | zabbix_proxy_historycachesize | 8M| |
+| HeartbeatFrequency | zabbix_proxy_heartbeatfrequency |60| Version 6.0 |
+| HistoryCacheSize | zabbix_proxy_historycachesize | 16M| |
 | HistoryIndexCacheSize | zabbix_proxy_historyindexcachesize | 4M| |
 | Hostname | zabbix_proxy_hostname | "{{ inventory_hostname }}"| |
 | HostnameItem | zabbix_proxy_hostnameitem || |
 | HousekeepingFrequency | zabbix_proxy_housekeepingfrequency |1| |
-| Include | zabbix_proxy_include | /etc/zabbix/zabbix_proxy.conf.d| |
+| Include | zabbix_proxy_include | /etc/zabbix/zabbix_proxy.conf.d/*.conf | |
 | JavaGateway | zabbix_proxy_javagateway || |
 | JavaGatewayPort | zabbix_proxy_javagatewayport |10052| |
 | ListenBacklog | zabbix_proxy_listenbacklog || |
-| ListenIP | zabbix_proxy_listenip || |
+| ListenIP | zabbix_proxy_listenip |0.0.0.0 | |
 | ListenPort | zabbix_proxy_listenport |10051| |
 | LoadModule | zabbix_proxy_loadmodule || |
 | LoadModulePath | zabbix_proxy_loadmodulepath | /usr/lib/zabbix/modules| |
 | LogFile | zabbix_proxy_logfile | /var/log/zabbix/zabbix_proxy.log| |
 | LogFileSize | zabbix_proxy_logfilesize |10| |
-| LogRemoteCommands | zabbix_proxy_logremotecommands || |
-| LogSlowQueries | zabbix_proxy_logslowqueries || |
+| LogRemoteCommands | zabbix_proxy_logremotecommands | `False` | `True`/`False` |
+| LogSlowQueries | zabbix_proxy_logslowqueries | 0 | |
 | LogType | zabbix_proxy_logtype | file| |
-| MaxConcurrentChecksPerPoller | zabbix_proxy_maxconcurrentchecksperpoller | | Version 7.0 or Greater |
+| MaxConcurrentChecksPerPoller | zabbix_proxy_maxconcurrentchecksperpoller | 1000 | Version 7.0 or Greater |
 | PidFile | zabbix_proxy_pidfile | /var/run/zabbix/zabbix_proxy.pid| |
-| ProxyBufferMode | zabbix_proxy_proxybuffermode | | Version 7.0 or Greater |
+| ProxyBufferMode | zabbix_proxy_proxybuffermode | disk | Version 7.0 or Greater |
+| ProxyConfigFrequency | zabbix_proxy_proxyconfigfrequency | 10 | Version 6.4 or Lower |
 | ProxyLocalBuffer | zabbix_proxy_proxylocalbuffer |0| |
-| ProxyMemoryBufferAge | zabbix_proxy_proxymemorybufferage || Version 7.0 or Greater |
-| ProxyMemoryBufferSize | zabbix_proxy_proxymemorybuffersize || Version 7.0 or Greater |
-| ProxyMode | zabbix_proxy_proxymode || |
-| ProxyOfflineBuffer | zabbix_proxy_proxyofflinebuffer |1| |
+| ProxyMemoryBufferAge | zabbix_proxy_proxymemorybufferage | 0 | Version 7.0 or Greater |
+| ProxyMemoryBufferSize | zabbix_proxy_proxymemorybuffersize | 0 | Version 7.0 or Greater |
+| ProxyMode | zabbix_proxy_proxymode | 0 | `0`: Active `1`: Passive |
+| ProxyOfflineBuffer | zabbix_proxy_proxyofflinebuffer | 1 | |
 | Server | zabbix_proxy_server | 192.168.1.1| |
-| SNMPTrapperFile | zabbix_proxy_snmptrapperfile | /tmp/zabbix_traps.tmp| |
-| SocketDir | zabbix_proxy_socketdir | /var/run/zabbix| |
+| SNMPTrapperFile | zabbix_proxy_snmptrapperfile | /tmp/zabbix_traps.tmp | |
+| SocketDir | zabbix_proxy_socketdir | /var/run/zabbix | |
 | SourceIP | zabbix_proxy_sourceip || |
 | SSHKeyLocation | zabbix_proxy_sshkeylocation || |
 | SSLCALocation | zabbix_proxy_sslcalocation || |
 | SSLCertLocation | zabbix_proxy_sslcertlocation || |
 | SSLKeyLocation | zabbix_proxy_sslkeylocation || |
-| StartAgentPollers | zabbix_proxy_startagentpollers || Version 7.0 or Greater |
-| StartBrowserPollers | zabbix_proxy_startbrowserpollers || Version 7.0 or Greater |
+| StartAgentPollers | zabbix_proxy_startagentpollers | 1 | Version 7.0 or Greater |
+| StartBrowserPollers | zabbix_proxy_startbrowserpollers | 1 | Version 7.0 or Greater |
 | StartDBSyncers | zabbix_proxy_startdbsyncers |4| |
 | StartDiscoverers | zabbix_proxy_startdiscoverers |1| |
-| StartHTTPAgentPollers | zabbix_proxy_httpagentpollers | | Version 7.0 or Greater |
+| StartHistoryPollers | zabbix_proxy_starthistorypollers | 1 | Version 6.0 |
+| StartHTTPAgentPollers | zabbix_proxy_starthttpagentpollers | 1 | Version 7.0 or Greater |
 | StartHTTPPollers | zabbix_proxy_starthttppollers |1| |
 | StartIPMIPollers | zabbix_proxy_startipmipollers |0| |
-| StartJavaPollers | zabbix_proxy_startjavapollers || |
+| StartJavaPollers | zabbix_proxy_startjavapollers |0 | |
 | StartODBCPollers | zabbix_proxy_startodbcpollers |1| |
 | StartPingers | zabbix_proxy_startpingers |1| |
 | StartPollers | zabbix_proxy_startpollers |5| |
 | StartPollersUnreachable | zabbix_proxy_startpollersunreachable |1| |
 | StartPreprocessors | zabbix_proxy_startpreprocessors |3| |
-| StartSNMPPollers | zabbix_proxy_startsnmppollers | | Version 7.0 or Greater |
-| StartSNMPTrapper | zabbix_proxy_startsnmptrapper || |
+| StartSNMPPollers | zabbix_proxy_startsnmppollers | 1 | Version 7.0 or Greater |
+| StartSNMPTrapper | zabbix_proxy_startsnmptrapper | 0 | |
 | StartTrappers | zabbix_proxy_starttrappers |5| |
-| StartVMwareCollectors | zabbix_proxy_startvmwarecollectors || |
+| StartVMwareCollectors | zabbix_proxy_startvmwarecollectors | 0 | |
 | StatsAllowedIP | zabbix_proxy_statsallowedip | "127.0.0.1"| |
 | Timeout | zabbix_proxy_timeout |3| |
 | TLSAccept | zabbix_proxy_tlsaccept || |
@@ -391,10 +394,10 @@ The following table lists all variables that are exposed to modify the configura
 | TLSServerCertSubject | zabbix_proxy_tlsservercertsubject || |
 | TmpDir | zabbix_proxy_tmpdir | /tmp| |
 | TrapperTimeout | zabbix_proxy_trappertimeout |300| |
-| UnavailableDelay | zabbix_proxy_unavailabledelay || |
-| UnreachableDelay | zabbix_proxy_unreachabledelay || |
-| UnreachablePeriod | zabbix_proxy_unreachableperiod |45| |
-| User | zabbix_proxy_user || |
+| UnavailableDelay | zabbix_proxy_unavailabledelay | 60| |
+| UnreachableDelay | zabbix_proxy_unreachabledelay | 15 | |
+| UnreachablePeriod | zabbix_proxy_unreachableperiod | 45| |
+| User | zabbix_proxy_user | zabbix | |
 | Vault | zabbix_proxy_vault || Version 6.2 or Greater |
 | VaultDBPath | zabbix_proxy_vaultdbpath || |
 | VaultPrefix | zabbix_proxy_vaultprefix || Version 7.0 or Greater |
@@ -404,8 +407,8 @@ The following table lists all variables that are exposed to modify the configura
 | VaultURL | zabbix_proxy_vaulturl |https://127.0.0.1:8200| |
 | VMwareCacheSize | zabbix_proxy_vmwarecachesize | 8M| |
 | VMwareFrequency | zabbix_proxy_vmwarefrequency |60| |
-| VMwarePerfFrequency | zabbix_proxy_vmwareperffrequency | | |
-| VMwareTimeout | zabbix_proxy_vmwaretimeout | | |
+| VMwarePerfFrequency | zabbix_proxy_vmwareperffrequency | 60 | |
+| VMwareTimeout | zabbix_proxy_vmwaretimeout | 10 | |
 | WebDriverURL | zabbix_proxy_webdriverurl | | Version 7.0 or Greater |
 
 ## Tags
