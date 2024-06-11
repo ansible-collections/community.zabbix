@@ -10,12 +10,7 @@ testinfra_hosts = testinfra.utils.ansible_runner.AnsibleRunner(
 
 @pytest.fixture
 def zabbix_agent_conf(host):
-    if host.system_info.distribution in ["opensuse"]:
-        conf_file = host.file("/etc/zabbix/zabbix-agentd.conf")
-    else:
-        conf_file = host.file("/etc/zabbix/zabbix_agentd.conf")
-
-    return conf_file
+    return host.file("/etc/zabbix/zabbix_agentd.conf")
 
 
 @pytest.fixture
