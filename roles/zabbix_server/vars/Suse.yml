@@ -12,6 +12,7 @@ _zabbix_server_pgsql_dependencies:
 
 _zabbix_server_mysql_dependencies:
   - "{{ zabbix_server_install_database_client | ternary('mysql', '') }}"
+  - gzip
   - python3-PyMySQL
 
 _zabbix_server_fping6location: null
