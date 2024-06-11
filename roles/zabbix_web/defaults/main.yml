@@ -43,15 +43,16 @@ zabbix_server_dbhost: localhost
 zabbix_server_dbname: zabbix-server
 zabbix_server_dbuser: zabbix-server
 zabbix_server_dbpassword: zabbix-server
-zabbix_server_dbport: 5432
+_zabbix_server_database_default_port:
+  mysql: 3306
+  pgsql: 5432
+zabbix_server_dbport: "{{ _zabbix_server_database_default_port[zabbix_server_database] }}"
 zabbix_server_dbencryption: false
 zabbix_server_dbverifyhost: false
 zabbix_server_dbschema:
 
 # Yum/APT Variables
 zabbix_web_version_minor: "*"
-zabbix_web_disable_repo:
-  - epel
 
 # Elasticsearch
 # zabbix_server_history_url:
@@ -68,7 +69,6 @@ zabbix_server_history_types:
   - "dbl"
 
 # SELinux specific
-zabbix_web_selinux: false
 selinux_allow_httpd_can_connect_ldap: false
 selinux_allow_httpd_can_network_connect_db: false
 selinux_allow_httpd_can_connect_zabbix: false

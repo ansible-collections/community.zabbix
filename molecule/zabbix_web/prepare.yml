@@ -56,25 +56,13 @@
       when:
         - ansible_os_family == 'RedHat'
 
-    - name: "Installing MySQL on CentOS"
-      ansible.builtin.yum:
-        name:
-          - mysql
-        state: present
-      register: installation_dependencies
-      until: installation_dependencies is succeeded
-      when:
-        - ansible_os_family == 'RedHat'
-        - inventory_hostname in groups['mysql']
-
     - name: "Apt update"
       ansible.builtin.shell: "apt-get update"
       register: installation_dependencies
       until: installation_dependencies is succeeded
-      when:
-        - ansible_os_family != 'RedHat'
+      when: ansible_facts['os_family'] == 'Debian'
 
-    - name: "Installing packages on NON-CentOS"
+    - name: "Installing packages on Debian family"
       ansible.builtin.apt:
         name:
           - net-tools
@@ -87,8 +75,7 @@
         state: present
       register: installation_dependencies
       until: installation_dependencies is succeeded
-      when:
-        - ansible_os_family != 'RedHat'
+      when: ansible_facts['os_family'] == 'Debian'
 
     - name: "Configure SUDO."
       ansible.builtin.lineinfile:
@@ -96,37 +83,9 @@
         line: "Defaults    !requiretty"
         state: present
 
-    - name: "Make sure the docs are installed."
-      ansible.builtin.lineinfile:
-        dest: /etc/yum.conf
-        line: "tsflags=nodocs"
-        state: absent
-      when:
-        - ansible_os_family == 'RedHat'
-
-    - name: PyMySQL
-      ansible.builtin.pip:
-        name: PyMySQL
-      register: installation_dependencies
-      until: installation_dependencies is succeeded
-      when:
-        - inventory_hostname in groups['mysql']
-
-    - name: Enabeling PHP 8.0
-      block:
-        - name: Add epel
-          ansible.builtin.include_role:
-            name: geerlingguy.repo-epel
-
-        - name: Add remi
-          ansible.builtin.include_role:
-            name: geerlingguy.repo-remi
-
-        - name: Reset dnf library
-          ansible.builtin.shell: dnf module reset php
-
-        - name: Set php Version
-          ansible.builtin.shell: dnf module enable -y php:remi-8.0
+    - name: Enabling PHP 8.0
+      ansible.builtin.dnf:
+        name: "@php:8.0/common"
       when:
         - ansible_os_family == 'RedHat'
         - ansible_distribution_major_version == "8"
@@ -148,43 +107,34 @@
           - php-pecl-apcu
           - php-xml
       when:
-        - ansible_distribution_major_version >= '8'
         - ansible_os_family == "RedHat"
 
-    - name: Set PHP Version (Ubuntu 2204)
-      ansible.builtin.set_fact:
-        __php_default_version_debian: "8.1"
+    - name: Workaround for geerlingguy.php missing ubuntu-24.04 support
       when:
-        - ansible_distribution_major_version >= '22'
-        - ansible_os_family == "Debian"
+        - ansible_facts['distribution'] == "Ubuntu"
+        - ansible_facts['distribution_major_version'] >= '24'
+      block:
+        - name: Set PHP Version
+          ansible.builtin.set_fact:
+            __php_default_version_debian: "8.3"
 
-    - name: Set PHP Version (Ubuntu 2404)
-      ansible.builtin.set_fact:
-        __php_default_version_debian: "8.3"
-      when:
-        - ansible_distribution_major_version >= '24'
-        - ansible_os_family == "Debian"
-
-    - name: Set PHP packages (Ubuntu 2204 & 2404)
-      ansible.builtin.set_fact:
-        __php_packages:
-          - php{{ __php_default_version_debian }}-common
-          - php{{ __php_default_version_debian }}-cli
-          - php{{ __php_default_version_debian }}-dev
-          - php{{ __php_default_version_debian }}-fpm
-          - libpcre3-dev
-          - php{{ __php_default_version_debian }}-gd
-          - php{{ __php_default_version_debian }}-curl
-          - php{{ __php_default_version_debian }}-imap
-          - php-json
-          - php{{ __php_default_version_debian }}-opcache
-          - php{{ __php_default_version_debian }}-xml
-          - php{{ __php_default_version_debian }}-mbstring
-          - php{{ __php_default_version_debian }}-apcu
-          - php{{ __php_default_version_debian }}-sqlite3
-      when:
-        - ansible_distribution_major_version >= '22'
-        - ansible_os_family == "Debian"
+        - name: Set PHP packages
+          ansible.builtin.set_fact:
+            __php_packages:
+              - php{{ __php_default_version_debian }}-common
+              - php{{ __php_default_version_debian }}-cli
+              - php{{ __php_default_version_debian }}-dev
+              - php{{ __php_default_version_debian }}-fpm
+              - libpcre3-dev
+              - php{{ __php_default_version_debian }}-gd
+              - php{{ __php_default_version_debian }}-curl
+              - php{{ __php_default_version_debian }}-imap
+              - php-json
+              - php{{ __php_default_version_debian }}-opcache
+              - php{{ __php_default_version_debian }}-xml
+              - php{{ __php_default_version_debian }}-mbstring
+              - php{{ __php_default_version_debian }}-apcu
+              - php{{ __php_default_version_debian }}-sqlite3
 
   roles:
     - role: geerlingguy.apache
