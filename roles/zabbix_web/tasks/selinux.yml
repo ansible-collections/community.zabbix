@@ -1,53 +1,29 @@
 ---
-- name: "SELinux | RedHat | Install related SELinux package on RHEL9 and RHEL8"
-  ansible.builtin.yum:
+- name: "SELinux | Install related SELinux package"
+  ansible.builtin.package:
     name:
       - python3-libsemanage
-    state: present
   environment:
     http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
     https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   register: zabbix_web_dependencies_installed
   until: zabbix_web_dependencies_installed is succeeded
   become: true
-  when:
-    - ansible_os_family == "RedHat"
-    - ansible_selinux.status == "enabled"
   tags:
     - install
 
-- name: "SELinux | Allow httpd to connect to db (SELinux)"
+- name: "SELinux | Set booleans"
   ansible.posix.seboolean:
-    name: httpd_can_network_connect_db
+    name: "{{ item.name }}"
+    state: "{{ item.state }}"
     persistent: true
-    state: true
   become: true
-  when:
-    - ansible_selinux.status == "enabled"
-    - selinux_allow_httpd_can_network_connect_db | bool
   tags:
     - config
-
-- name: "SELinux | Allow httpd to connect to zabbix (SELinux)"
-  ansible.posix.seboolean:
-    name: httpd_can_connect_zabbix
-    persistent: true
-    state: true
-  become: true
-  when:
-    - ansible_selinux.status == "enabled"
-    - selinux_allow_httpd_can_connect_zabbix | bool
-  tags:
-    - config
-
-- name: "SELinux | Allow httpd to connect to ldap (SELinux)"
-  ansible.posix.seboolean:
-    name: httpd_can_connect_ldap
-    persistent: true
-    state: true
-  become: true
-  when:
-    - ansible_selinux.status == "enabled"
-    - selinux_allow_httpd_can_connect_ldap | bool
-  tags:
-    - config
+  loop:
+    - name: httpd_can_network_connect_db
+      state: "{{ selinux_allow_httpd_can_network_connect_db | bool }}"
+    - name: httpd_can_connect_zabbix
+      state: "{{ selinux_allow_httpd_can_connect_zabbix | bool }}"
+    - name: httpd_can_connect_ldap
+      state: "{{ selinux_allow_httpd_can_connect_ldap | bool }}"

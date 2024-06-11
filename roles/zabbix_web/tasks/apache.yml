@@ -8,37 +8,21 @@
     - always
 
 - name: "Apache | Installing Zabbix Apache Conf"
-  block:
-    - name: "Debian | Install zabbix-apache-conf"
-      ansible.builtin.apt:
-        pkg: "zabbix-apache-conf"
-        state: "{{ zabbix_web_package_state }}"
-        update_cache: true
-        cache_valid_time: 0
-      environment:
-        http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
-        https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
-      register: zabbix_apache_conf_install
-      until: zabbix_apache_conf_install is succeeded
-      become: true
-      when: ansible_os_family == "Debian"
-
-    - name: "RedHat | Install zabbix-apache-conf"
-      ansible.builtin.yum:
-        name:
-          - "zabbix-apache-conf-{{ zabbix_web_version }}.{{ zabbix_web_version_minor | default ('*')}}"
-        state: "{{ zabbix_web_package_state }}"
-        update_cache: true
-        disablerepo: "{{ zabbix_agent_disable_repo | default(omit) }}"
-      environment:
-        http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
-        https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
-      register: zabbix_apache_conf_install
-      until: zabbix_apache_conf_install is succeeded
-      become: true
-      when: ansible_os_family == "RedHat"
+  package:
+    name: "{{ _zabbix_web_apache_packages + _zabbix_web_apache_php_dependencies | default([]) }}"
+    state: "{{ zabbix_web_package_state }}"
+    update_cache: true
+    disablerepo: "{{ zabbix_web_disable_repo | default(_zabbix_web_disable_repo | default(omit)) }}"
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
+  register: zabbix_apache_conf_install
+  until: zabbix_apache_conf_install is succeeded
+  become: true
   tags:
     - install
+    - dependencies
+    - database
 
 - name: "Apache | Get Apache version"
   ansible.builtin.shell: |

@@ -46,7 +46,6 @@ provisioner:
         zabbix_web_version: 6.0
       mysql:
         zabbix_server_database: mysql
-        zabbix_server_dbport: 3306
         zabbix_server_dbhost: "{{ inventory_hostname }}-db"
         zabbix_server_dbhost_run_install: false
         zabbix_server_privileged_host: "%"
@@ -56,7 +55,6 @@ provisioner:
         zabbix_server_mysql_login_port: 3306
       pgsql:
         zabbix_server_database: pgsql
-        zabbix_server_dbport: 5432
         zabbix_server_dbhost: "{{ inventory_hostname }}-db"
         zabbix_server_dbhost_run_install: false
         zabbix_server_pgsql_login_host: "{{ inventory_hostname }}-db"

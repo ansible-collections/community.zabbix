@@ -62,6 +62,31 @@
 - name: Include OS Specific Tasks
   ansible.builtin.include_tasks: "{{ ansible_os_family }}.yml"
 
+- name: "Install zabbix-web package"
+  ansible.builtin.package:
+    name: "{{ _zabbix_web_package }}"
+    state: "{{ zabbix_web_package_state }}"
+    update_cache: true
+    disablerepo: "{{ zabbix_web_disable_repo | default(_zabbix_web_disable_repo | default(omit)) }}"
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
+  register: _zabbix_web_package_installed
+  until: _zabbix_web_package_installed is succeeded
+  become: true
+  tags:
+    - install
+
+- name: "Debian | Link graphfont.ttf (workaround ZBX-10467)"
+  when: ansible_facts['os_family'] == 'Debian'
+  ansible.builtin.file:
+    src: "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
+    path: "/usr/share/zabbix/fonts/graphfont.ttf"
+    state: link
+  become: true
+  tags:
+    - install
+
 - name: "Install the web server specific tasks"
   ansible.builtin.include_tasks: "{{ zabbix_web_http_server }}.yml"
 
@@ -85,8 +110,6 @@
     group: "{{ zabbix_web_group }}"
     mode: "{{ zabbix_web_conf_mode }}"
   become: true
-  notify:
-    - "restart {{ zabbix_web_http_server }}"
   tags:
     - config
 

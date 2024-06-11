@@ -14,8 +14,18 @@
     - database
     - dependencies
 
+# NOTE: Upgrading system-packages with pip is generally a bad idea, but
+# these packaged older versions seems to have a problem with mysql 8 and above
+- name: Upgrade pymysql
+  when:
+    - ansible_facts['distribution'] in ['Debian', 'Ubuntu']
+    - ansible_facts['distribution_release'] in ['bullseye', 'focal']
+  ansible.builtin.pip:
+    name: "pymysql>=0.10.0,<0.11.0"
+    state: latest
+
 - name: "MySQL Database prep"
-  when: zabbix_server_database_creation
+  when: zabbix_server_database_creation | bool
   become: "{{ zabbix_server_dbhost_run_install }}"
   delegate_to: "{{ zabbix_server_real_dbhost | default(zabbix_server_dbhost_run_install | ternary(delegated_dbhost, inventory_hostname)) }}"
   vars:
