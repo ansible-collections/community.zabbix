@@ -28,16 +28,10 @@ zabbix_valid_web_versions:
     - 6.4
     - 6.0
 
-zabbix_web_php_dependencies:
-  - "php-gd"
-  - "php-bcmath"
-  - "php-xml"
-  - "php-mbstring"
-  - "php-ldap"
-  - "php-{{ 'pgsql' if zabbix_server_database == 'pgsql' else 'mysqlnd' }}"
-
-zabbix_selinux_dependencies:
-  "9":
-    - python3-libsemanage
-  "8":
-    - python3-libsemanage
+_zabbix_web_package: "zabbix-web-{{ zabbix_server_database }}-{{ zabbix_web_version }}.{{ zabbix_web_version_minor }}"
+_zabbix_web_apache_packages:
+  - "zabbix-apache-conf-{{ zabbix_web_version }}.{{ zabbix_web_version_minor }}"
+_zabbix_web_nginx_packages:
+  - "zabbix-nginx-conf-{{ zabbix_web_version }}.{{ zabbix_web_version_minor }}"
+_zabbix_web_disable_repo:
+  - epel
