@@ -111,14 +111,7 @@ The following is an overview of all available configuration default for this rol
 
 * `zabbix_agent_version`: This is the version of zabbix. Default: The highest supported version for the operating system. Can be overridden to 6.4 or 6.0
 * `zabbix_agent_version_minor`: When you want to specify a minor version to be installed. Is also used for `zabbix_sender` and `zabbix_get`. RedHat only. Default set to: `*` (latest available)
-* `zabbix_repo_yum`: A list with Yum repository configuration.
-* `zabbix_repo_yum_gpgcheck`: If Yum should check GPG keys on installation
-* `zabbix_repo_yum_schema`: Default: `https`. Option to change the web schema for the yum repository(http/https)
 * `zabbix_agent_disable_repo`: A list of repos to disable during install.  Default `epel`.
-* `zabbix_repo_deb_url`: The URL to the Zabbix repository.  Default `http://repo.zabbix.com/zabbix/{{ zabbix_agent_version }}/{{ ansible_distribution.lower() }}`
-* `zabbix_repo_deb_component`: The repository component for Debian installs. Default `main`.
-* `zabbix_repo_deb_gpg_key_url`: The URL to download the Zabbix GPG key from. Default `http://repo.zabbix.com/zabbix-official-repo.key.
-* `zabbix_repo_deb_include_deb_src`: True, if deb-src should be included in the zabbix.sources entry. Default `true`.
 * `zabbix_manage_repo`: Have the collection install and configure the Zabbix repo Default `true`.
 
 ### SElinux
@@ -130,7 +123,6 @@ Selinux changes will be installed based on the status of selinux running on the 
 ### Zabbix Agent
 
 * `zabbix_agent2`: Default: `False`. When you want to install the `Zabbix Agent2` instead of the "old" `Zabbix Agent`.zabbix_agent_version
-* `zabbix_agent_apt_priority`: Add a weight (`Pin-Priority`) for the APT repository.
 * `zabbix_agent_chassis`: Default: `false`. When set to `true`, it will give Zabbix Agent access to the Linux DMI table allowing system.hw.chassis info to populate.
 * `zabbix_agent_conf_mode`: Default: `0644`. The "mode" for the Zabbix configuration file.
 * `zabbix_agent_dont_detect_ip`: Default `false`. When set to `true`, it won't detect available ip addresses on the host and no need for the Python module `netaddr` to be installed.
@@ -287,45 +279,46 @@ The following table lists all variables that are exposed to modify the configura
 |-----------|------------------|--------|--------|
 | Alias | zabbix_agent_aliases |  | Can be a string or list |
 | AllowKey | zabbix_agent_allowkeys |  |  |
-| AllowRoot | zabbix_agent_allowroot |  | Linux Systems Only |
+| AllowRoot | zabbix_agent_allowroot | `False` | `True`/`False` Agent Linux Systems Only |
 | BufferSend | zabbix_agent_buffersend | 5 |  |
 | BufferSize | zabbix_agent_buffersize | 100 |  |
 | ControlSocket | zabbix_agent_controlsocket | /tmp/agent.sock | Agent 2 Only |
 | DebugLevel | zabbix_agent_debuglevel | 3 |  |
 | DenyKey | zabbix_agent_denykeys |  | Can be a string or a list |
-| EnableRemoteCommands | zabbix_agent_enableremotecommands | 0 | Agent Only |
-| ForceActiveChecksOnStart | zabbix_agent_forceactivechecksonstart |  | Agent 2 Only |
-| HeartbeatFrequency | zabbix_agent_heartbeatfrequency | 60 | Version >= 6.2 |
+| EnablePersistentBuffer | zabbix_agent_enablepersistentbuffer | `False` | `True`/`False` Agent 2 Only |
+| EnableRemoteCommands | zabbix_agent_enableremotecommands | `False` | `True`/`False` Agent Only |
+| ForceActiveChecksOnStart | zabbix_agent_forceactivechecksonstart | `False` | `True`/`False` Agent 2 Only |
+| HeartbeatFrequency | zabbix_agent_heartbeatfrequency | 60 | Version >= 6.4 |
 | HostInterface | zabbix_agent_hostinterface |  |  |
 | HostInterfaceItem | zabbix_agent_hostinterfaceitem |  |  |
 | HostMetadata | zabbix_agent_hostmetadata |  |  |
 | HostMetadataItem | zabbix_agent_hostmetadataitem |  |  |
 | Hostname | zabbix_agent_hostname |  | `{{ inventory_hostname }}` |
 | HostnameItem | zabbix_agent_hostnameitem |  |  |
-| Include | zabbix_agent_include | /etc/zabbix/`{ agent version specific }`.d |  |
+| Include | zabbix_agent_include | /etc/zabbix/`{ agent version specific }`.d/*.conf |  |
 | ListenBacklog | zabbix_agent_listenbacklog |  | Agent Only |
-| ListenIP | zabbix_agent_listenip |  | list of IPs |
+| ListenIP | zabbix_agent_listenip | 0.0.0.0  |  |
 | ListenPort | zabbix_agent_listenport | 10050 |  |
 | LoadModule | zabbix_agent_loadmodule |  | Agent On Linux Only |
 | LoadModulePath | zabbix_agent_loadmodulepath |  | Agent On Linux Only |
 | LogFile | zabbix_agent_logfile | /var/log/zabbix/`{ agent version specific }`.log |  |
 | LogFileSize | zabbix_agent_logfilesize | 100 |  |
-| LogRemoteCommands | zabbix_agent_logremotecommands |  | Agent Only |
+| LogRemoteCommands | zabbix_agent_logremotecommands | `False` | `True`/`False` Agent Only |
 | LogType | zabbix_agent_logtype | file |  |
-| MaxLinesPerSecond | zabbix_agent_maxlinespersecond |  | Agent Only |
+| MaxLinesPerSecond | zabbix_agent_maxlinespersecond | 20 | Agent Only |
 | PerfCounter | zabbix_agent_perfcounter |  | Agent Only |
 | PerfCounterEn | zabbix_agent_perfcounteren |  | Agent Only |
 | PersistentBufferFile | zabbix_agent_persistentbufferfile |  | Agent 2 Only |
 | PersistentBufferPeriod | zabbix_agent_persistentbufferperiod | 1h | Agent 2 Only |
 | PidFile | zabbix_agent_pidfile | /var/run/zabbix/`{ agent version specific }`.pid | Linux Systems Only |
 | Plugin | zabbix_agent_plugins |  |  |
-| PluginSocket | zabbix_agent_pluginsocket |  |  |
-| PluginTimeout | zabbix_agent_plugintimeout |  |  |
-| RefreshActiveChecks | zabbix_agent_refreshactivechecks | 120 |  |
+| PluginSocket | zabbix_agent_pluginsocket | /tmp/agent.plugin.sock | Agent 2 Only  |
+| PluginTimeout | zabbix_agent_plugintimeout | 3 | Agent 2 Only |
+| RefreshActiveChecks | zabbix_agent_refreshactivechecks |  |  |
 | Server | zabbix_agent_server |  |  |
 | ServerActive | zabbix_agent_serveractive |  |  |
 | SourceIP | zabbix_agent_sourceip |  |  |
-| StartAgents | zabbix_agent_startagents |  | Agent Only |
+| StartAgents | zabbix_agent_startagents | 3 | Agent Only |
 | StatusPort | zabbix_agent_statusport | 9999 | Agent 2 Only |
 | Timeout | zabbix_agent_timeout | 3 |  |
 | TLSAccept | zabbix_agent_tlsconnect |  |  |
@@ -344,9 +337,10 @@ The following table lists all variables that are exposed to modify the configura
 | TLSPSKIdentity | zabbix_agent_tlspskidentity |  |  |
 | TLSServerCertIssuer | zabbix_agent_tlsservercertissuer |  |  |
 | TLSServerCertSubject | zabbix_agent_tlsservercertsubject |  |  |
-| UnsafeUserParameters | zabbix_agent_unsafeuserparameters |  |  |
-| User | zabbix_agent_runas_user |  | Agent on Linux Only |
-| UserParameter | zabbix_agent_userparamater | 0 |  |
+| UnsafeUserParameters | zabbix_agent_unsafeuserparameters | `False` | `True`/`False`  |
+| User | zabbix_agent_runas_user | zabbix | Agent on Linux Only |
+| UserParameter | zabbix_agent_userparamater | | |
+| UserParameterDir | zabbix_agent_userparamaterdir |  |  |
 
 
 ## proxy
