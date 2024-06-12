@@ -39,6 +39,9 @@ zabbix_agent_tlspsk_auto: false
 zabbix_agent_tlspskfile: /etc/zabbix/tls_psk_auto.secret
 zabbix_agent_unsafeuserparameters: false
 zabbix_agent_runas_user: zabbix
+zabbix_agent_loadmodulepath: ${libdir}/modules
+zabbix_agent_logremotecommands: false
+zabbix_agent_startagents: 3
 
 zabbix_agent_tlspskidentity_file: "/etc/zabbix/tls_psk_auto.identity"
 # Selinux related vars
@@ -86,7 +89,6 @@ zabbix_agent_interfaces:
     dns: "{{ ansible_fqdn }}"
     port: "{{ zabbix_agent_listenport }}"
 
-
 # statusportzabbix_agent_zabbix_alias: # Deprecate after 3.0
 zabbix_agent_userparameters_templates_src: "userparameters"
 zabbix_agent_userparameters_scripts_src: "scripts"
@@ -102,11 +104,6 @@ zabbix_agent_ipmi_authtype: -1
 zabbix_agent_ipmi_privilege: 2
 
 ####### Agent 1 Stuff Only
-
-zabbix_agent_loadmodulepath: ${libdir}/modules
-zabbix_agent_logremotecommands: 0
-zabbix_agent_maxlinespersecond: 100
-zabbix_agent_startagents: 3
 
 # Windows/macOS Related
 zabbix_version_long: 5.2.4
