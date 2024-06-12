@@ -1,0 +1,21 @@
+- name: test restart zabbix-agent
+  block:
+    - name: "test Make sure the zabbix-agent service is running"
+      ansible.builtin.service:
+        name: "{{ zabbix_agent_service }}"
+        state: started
+        enabled: true
+      become: true
+      when:
+        - not (zabbix_agent_docker | bool)
+      tags:
+        - service
+  rescue:
+    - name: get results
+      shell:
+        cmd: journalctl -xe
+      register: _res
+
+    - debug:
+        var: _res.content | b64decode
+    - fail:
