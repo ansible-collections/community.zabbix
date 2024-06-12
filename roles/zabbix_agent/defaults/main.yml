@@ -12,6 +12,7 @@ zabbix_agent_selinux: false
 zabbix_agent_conf_mode: "0644"
 zabbix_agent_dont_detect_ip: false
 
+zabbix_agent_listeninterface:
 zabbix_agent_allowroot: false
 zabbix_agent_buffersend: 5
 zabbix_agent_buffersize: 100
