@@ -6,8 +6,8 @@
 # are removed. The full documentation for your Zabbix Proxy can be found here:
 # https://www.zabbix.com/documentation/{{ zabbix_proxy_version }}/en/manual/appendix/config/zabbix_proxy
 
-{{ (zabbix_proxy_allowroot is defined and zabbix_proxy_allowroot is not none) | ternary('','# ') }}AllowRoot={{ zabbix_proxy_allowroot | default('') }}
-{{ (zabbix_proxy_allowunsupporteddbversions is defined and zabbix_proxy_allowunsupporteddbversions is not none) | ternary('','# ') }}AllowUnsupportedDBVersions={{ zabbix_proxy_allowunsupporteddbversions | default('') }}
+{{ (zabbix_proxy_allowroot is defined and zabbix_proxy_allowroot is not none) | ternary('','# ') }}AllowRoot={{ zabbix_proxy_allowroot | default (false) | ternary('1', '0') }}
+{{ (zabbix_proxy_allowunsupporteddbversions is defined and zabbix_proxy_allowunsupporteddbversions is not none) | ternary('','# ') }}AllowUnsupportedDBVersions={{ zabbix_proxy_allowunsupporteddbversions | default (false) | ternary('1', '0') }}
 {{ (zabbix_proxy_cachesize is defined and zabbix_proxy_cachesize is not none) | ternary('','# ') }}CacheSize={{ zabbix_proxy_cachesize | default('') }}
 {{ (zabbix_proxy_configfrequency is defined and zabbix_proxy_configfrequency is not none) | ternary('','# ') }}ConfigFrequency={{ zabbix_proxy_configfrequency | default('') }}
 {{ (zabbix_proxy_datasenderfrequency is defined and zabbix_proxy_datasenderfrequency is not none) | ternary('','# ') }}DataSenderFrequency={{ zabbix_proxy_datasenderfrequency | default('') }}
@@ -24,7 +24,7 @@
 {{ (zabbix_proxy_dbtlskeyfile is defined and zabbix_proxy_dbtlskeyfile is not none) | ternary('','# ') }}DBTLSKeyFile={{ zabbix_proxy_dbtlskeyfile | default('') }}
 {{ (zabbix_proxy_dbuser is defined and zabbix_proxy_dbuser is not none) | ternary('','# ') }}DBUser={{ zabbix_proxy_dbuser | default('') }}
 {{ (zabbix_proxy_debuglevel is defined and zabbix_proxy_debuglevel is not none) | ternary('','# ') }}DebugLevel={{ zabbix_proxy_debuglevel | default('') }}
-{{ (zabbix_proxy_enableremotecommands is defined and zabbix_proxy_enableremotecommands is not none) | ternary('','# ') }}EnableRemoteCommands={{ zabbix_proxy_enableremotecommands | default('') }}
+{{ (zabbix_proxy_enableremotecommands is defined and zabbix_proxy_enableremotecommands is not none) | ternary('','# ') }}EnableRemoteCommands={{ zabbix_proxy_enableremotecommands | default (false) | ternary('1', '0') }}
 {{ (zabbix_proxy_externalscripts is defined and zabbix_proxy_externalscripts is not none) | ternary('','# ') }}ExternalScripts={{ zabbix_proxy_externalscripts | default('') }}
 {{ (zabbix_proxy_fping6location is defined and zabbix_proxy_fping6location is not none) | ternary('','# ') }}Fping6Location={{ zabbix_proxy_fping6location | default('') }}
 {{ (zabbix_proxy_fpinglocation is defined and zabbix_proxy_fpinglocation is not none) | ternary('','# ') }}FpingLocation={{ zabbix_proxy_fpinglocation | default('') }}
@@ -46,7 +46,7 @@
 {{ (zabbix_proxy_loadmodulepath is defined and zabbix_proxy_loadmodulepath is not none) | ternary('','# ') }}LoadModulePath={{ zabbix_proxy_loadmodulepath | default('') }}
 {{ (zabbix_proxy_logfile is defined and zabbix_proxy_logfile is not none) | ternary('','# ') }}LogFile={{ zabbix_proxy_logfile | default('') }}
 {{ (zabbix_proxy_logfilesize is defined and zabbix_proxy_logfilesize is not none) | ternary('','# ') }}LogFileSize={{ zabbix_proxy_logfilesize | default('') }}
-{{ (zabbix_proxy_logremotecommands is defined and zabbix_proxy_logremotecommands is not none) | ternary('','# ') }}LogRemoteCommands={{ zabbix_proxy_logremotecommands | default('') }}
+{{ (zabbix_proxy_logremotecommands is defined and zabbix_proxy_logremotecommands is not none) | ternary('','# ') }}LogRemoteCommands={{ zabbix_proxy_logremotecommands | default (false) | ternary('1', '0') }}
 {{ (zabbix_proxy_logslowqueries is defined and zabbix_proxy_logslowqueries is not none) | ternary('','# ') }}LogSlowQueries={{ zabbix_proxy_logslowqueries | default('') }}
 {{ (zabbix_proxy_logtype is defined and zabbix_proxy_logtype is not none) | ternary('','# ') }}LogType={{ zabbix_proxy_logtype | default('') }}
 {% if zabbix_proxy_version is version('7.0', '>=') %}
@@ -56,6 +56,12 @@
 {% if zabbix_proxy_version is version('7.0', '>=') %}
 {{ (zabbix_proxy_proxybuffermode is defined and zabbix_proxy_proxybuffermode is not none) | ternary('','# ') }}ProxyBufferMode={{ zabbix_proxy_proxybuffermode | default('') }}
 {% endif %}
+
+{% if zabbix_proxy_version is version('6.4', '<=') %}
+{{ (zabbix_proxy_proxyconfigfrequency is defined and zabbix_proxy_proxyconfigfrequency is not none) | ternary('','# ') }}ProxyConfigFrequency={{ zabbix_proxy_proxyconfigfrequency | default('') }}
+{% endif %}
+
+
 {{ (zabbix_proxy_proxylocalbuffer is defined and zabbix_proxy_proxylocalbuffer is not none) | ternary('','# ') }}ProxyLocalBuffer={{ zabbix_proxy_proxylocalbuffer | default('') }}
 {% if zabbix_proxy_version is version('7.0', '>=') %}
 {{ (zabbix_proxy_proxymemorybufferage is defined and zabbix_proxy_proxymemorybufferage is not none) | ternary('','# ') }}ProxyMemoryBufferAge={{ zabbix_proxy_proxymemorybufferage | default('') }}
@@ -77,12 +83,13 @@
 {% endif %}
 {{ (zabbix_proxy_startdbsyncers is defined and zabbix_proxy_startdbsyncers is not none) | ternary('','# ') }}StartDBSyncers={{ zabbix_proxy_startdbsyncers | default('') }}
 {{ (zabbix_proxy_startdiscoverers is defined and zabbix_proxy_startdiscoverers is not none) | ternary('','# ') }}StartDiscoverers={{ zabbix_proxy_startdiscoverers | default('') }}
+{% if zabbix_proxy_version is version('6.0', '==') %}
+{{ (zabbix_proxy_starthistorypollers is defined and zabbix_proxy_starthistorypollers is not none) | ternary('','# ') }}StartHistoryPollers={{ zabbix_proxy_starthistorypollers | default('') }}
+{% endif %}
 {% if zabbix_proxy_version is version('7.0', '>=') %}
 {{ (zabbix_proxy_starthttpagentpollers is defined and zabbix_proxy_starthttpagentpollers is not none) | ternary('','# ') }}StartHTTPAgentPollers={{ zabbix_proxy_starthttpagentpollers | default('') }}
 {% endif %}
-{% if zabbix_proxy_version is version('6.0', '==') %}
-{{ (zabbix_proxy_starthistorypollers is defined and zabbix_proxy_starthistorypollers is not none) | ternary('','# ') }}={{ zabbix_proxy_starthistorypollers | default('') }}
-{% endif %}
+
 {{ (zabbix_proxy_starthttppollers is defined and zabbix_proxy_starthttppollers is not none) | ternary('','# ') }}StartHTTPPollers={{ zabbix_proxy_starthttppollers | default('') }}
 {{ (zabbix_proxy_startipmipollers is defined and zabbix_proxy_startipmipollers is not none) | ternary('','# ') }}StartIPMIPollers={{ zabbix_proxy_startipmipollers | default('') }}
 {{ (zabbix_proxy_startjavapollers is defined and zabbix_proxy_startjavapollers is not none) | ternary('','# ') }}StartJavaPollers={{ zabbix_proxy_startjavapollers | default('') }}

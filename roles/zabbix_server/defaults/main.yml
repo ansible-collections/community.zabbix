@@ -6,23 +6,22 @@ zabbix_service_enabled: true
 zabbix_server_manage_service: true
 
 # Database
-zabbix_server_database_sqlload: true
-zabbix_server_database_timescaledb: false
-#zabbix_server_real_dbhost:
 zabbix_server_dbhost: localhost
 zabbix_server_dbname: zabbix-server
-zabbix_server_privileged_host: localhost
-zabbix_server_dbencoding: utf8
-zabbix_server_dbcollation: utf8_bin
-#zabbix_server_dbschema:
-zabbix_server_dbuser: zabbix-server
 zabbix_server_dbpassword: zabbix-server
-zabbix_server_dbpassword_hash_method: md5
-#zabbix_server_dbsocket:
 _zabbix_server_database_default_port:
   mysql: 3306
   pgsql: 5432
 zabbix_server_dbport: "{{ _zabbix_server_database_default_port[zabbix_server_database] }}"
+zabbix_server_dbuser: zabbix-server
+
+zabbix_server_database_sqlload: true
+zabbix_server_database_timescaledb: false
+zabbix_server_privileged_host: localhost
+zabbix_server_dbencoding: utf8
+zabbix_server_dbcollation: utf8_bin
+zabbix_server_dbpassword_hash_method: md5
+
 zabbix_server_dbhost_run_install: true
 zabbix_server_database: pgsql
 zabbix_server_database_creation: true
@@ -44,40 +43,59 @@ zabbix_server_conf_mode: 0640
 
 # Server Configuration Variables (Only ones with role provided defaults)
 zabbix_server_alertscriptspath: /usr/lib/zabbix/alertscripts
-zabbix_server_allowroot: 0
-zabbix_server_allowunsupporteddbversions: 0
+zabbix_server_allowroot: false
+zabbix_server_allowsoftwareupdatecheck: true
+zabbix_server_allowunsupporteddbversions: flase
+zabbix_server_cachesize: 32M
 zabbix_server_debuglevel: 3
+zabbix_server_enableglobalscripts: false
 zabbix_server_exportfilesize: 1G
 zabbix_server_externalscriptspath: /usr/lib/zabbix/externalscripts
-zabbix_server_historystoragedateindex: 0
+zabbix_server_historycachesize: 16M
+zabbix_server_historyindexcachesize: 4M
+zabbix_server_historystoragedateindex: false
 zabbix_server_historystoragetypes: uint,dbl,str,log,text
 zabbix_server_housekeepingfrequency: 1
-zabbix_server_include: /etc/zabbix/zabbix_server.conf.d
+zabbix_server_include: /etc/zabbix/zabbix_server.conf.d/*.conf
 zabbix_server_javagatewayport: 10052
+zabbix_server_listenip: 0.0.0.0
 zabbix_server_listenport: 10051
 zabbix_server_loadmodulepath: ${libdir}/modules
 zabbix_server_logfile: /var/log/zabbix/zabbix_server.log
 zabbix_server_logfilesize: 10
 zabbix_server_logslowqueries: 0
 zabbix_server_logtype: file
-zabbix_server_maxhousekeeperdelete: 500
+zabbix_server_maxconcurrentchecksperpoller: 1000
+zabbix_server_maxhousekeeperdelete: 5000
 zabbix_server_pidfile: /var/run/zabbix/zabbix_server.pid
+zabbix_server_proxyconfigfrequency: 10
 zabbix_server_proxydatafrequency: 1
+zabbix_server_servicemanagersyncfrequency: 60
 zabbix_server_snmptrapperfile: /tmp/zabbix_traps.tmp
 zabbix_server_socketdir: /var/run/zabbix
 zabbix_server_sslcertlocation: ${datadir}/zabbix/ssl/certs
 zabbix_server_sslkeylocation: ${datadir}/zabbix/ssl/keys
+zabbix_server_startagentpollers: 1
+zabbix_server_startalerters: 3
+zabbix_server_startbrowserpollers: 1
+zabbix_server_connectors: 0
 zabbix_server_startdbsyncers: 4
 zabbix_server_startdiscoverers: 1
 zabbix_server_startescalators: 1
+zabbix_server_starthistorypollers: 5
+zabbix_server_starthttpagentpollers: 1
 zabbix_server_starthttppollers: 1
 zabbix_server_startipmipollers: 0
 zabbix_server_startjavapollers: 0
+zabbix_server_startlldprocessors: 2
+zabbix_server_startodbcpollers: 1
 zabbix_server_startpingers: 1
 zabbix_server_startpollers: 5
 zabbix_server_startpollersunreachable: 1
+zabbix_server_startpreprocessors: 3
 zabbix_server_startproxypollers: 1
 zabbix_server_startreportwriters: 0
+zabbix_server_startsnmppollers: 1
 zabbix_server_startsnmptrapper: 0
 zabbix_server_starttimers: 1
 zabbix_server_starttrappers: 5
@@ -85,10 +103,13 @@ zabbix_server_startvmwarecollectors: 0
 zabbix_server_timeout: 3
 zabbix_server_tmpdir: /tmp
 zabbix_server_trappertimeout: 300
+zabbix_server_trendcachesize: 4M
+zabbix_server_trendfunctioncachesize: 4M
 zabbix_server_unavailabledelay: 60
 zabbix_server_unreachabledelay: 15
 zabbix_server_unreachableperiod: 45
 zabbix_server_user: zabbix
+zabbix_server_valuecachesize: 8M
 zabbix_server_vaulturl: https://127.0.0.1:8200
 zabbix_server_vmwarefrequency: 60
 zabbix_server_vmwareperffrequency: 60
