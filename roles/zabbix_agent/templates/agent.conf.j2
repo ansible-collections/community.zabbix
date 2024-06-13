@@ -139,7 +139,7 @@ Plugins.{{ my_name }}.{{ param }}={{ value }}
 {{ (zabbix_agent_tlspskidentity is defined and zabbix_agent_tlspskidentity is not none) | ternary('', '# ') }}TLSPSKIdentity={{ zabbix_agent_tlspskidentity | default('') }}
 {{ (zabbix_agent_tlsservercertissuer is defined and zabbix_agent_tlsservercertissuer is not none) | ternary('', '# ') }}TLSServerCertIssuer={{ zabbix_agent_tlsservercertissuer | default('') }}
 {{ (zabbix_agent_tlsservercertsubject is defined and zabbix_agent_tlsservercertsubject is not none) | ternary('', '# ') }}TLSServerCertSubject={{ zabbix_agent_tlsservercertsubject | default('') }}
-{{ (zabbix_agent_unsafeuserparameters is defined and zabbix_agent_unsafeuserparameters is not none) | ternary('', '# ') }}UnsafeUserParameters={{ zabbix_agent_unsafeuserparameters | default('') }}
+{{ (zabbix_agent_unsafeuserparameters is defined and zabbix_agent_unsafeuserparameters is not none) | ternary('', '# ') }}UnsafeUserParameters={{ zabbix_agent_unsafeuserparameters | default (false) | ternary('1', '0') }}
 {% if not zabbix_agent2 and ansible_os_family != "Windows" %}
 {{ (zabbix_agent_runas_user is defined and zabbix_agent_runas_user is not none) | ternary('', '# ') }}User={{ zabbix_agent_runas_user | default('') }}
 {% endif %}
