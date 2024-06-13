@@ -167,7 +167,6 @@
       shell:
         cmd: journalctl -xe
       register: _res
-
     - debug:
         var: _res.content | b64decode
     - fail:
