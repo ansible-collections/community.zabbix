@@ -28,10 +28,19 @@
     state: restarted
     enabled: true
   become: true
+  when: ansible_facts['os_family'] == 'Debian'
+
+- name: restart php-fpm
+  ansible.builtin.service:
+    name: php-fpm
+    state: restarted
+    enabled: true
+  become: true
+  when: ansible_facts['os_family'] == 'Suse'
 
 - name: "clean repo files from proxy creds"
   ansible.builtin.shell: ls /etc/yum.repos.d/zabbix* && sed -i 's/^proxy =.*//' /etc/yum.repos.d/zabbix* || true
   become: true
   when:
-    - ansible_os_family == 'RedHat'
+    - ansible_facts['os_family'] == 'RedHat'
     - zabbix_http_proxy is defined or zabbix_https_proxy is defined

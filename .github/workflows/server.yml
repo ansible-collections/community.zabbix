@@ -33,6 +33,7 @@ jobs:
           - ubuntu2004
           - debian12
           - debian11
+          - opensuseleap15
         collection_role:
           - zabbix_server
         database:

@@ -16,4 +16,6 @@ def test_zabbix_manage_repo_installed(host):
         result = host.ansible("command", "yum update -y", check=False, become=True)["rc"]
     elif os in ["debian", "ubuntu"]:
         result = host.ansible("command", "apt update", check=False, become=True)["rc"]
+    elif os in ["opensuse-leap"]:
+        result = host.ansible("command", "zypper refresh", check=False, become=True)["rc"]
     assert result == 0

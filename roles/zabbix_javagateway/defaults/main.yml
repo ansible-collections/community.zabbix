@@ -8,6 +8,8 @@ zabbix_java_gateway_conf_mode: "0644"
 zabbix_javagateway_disable_repo:
   - epel
 
+zabbix_javagateway_openjdk_version: 17
+
 zabbix_javagateway_pidfile: /run/zabbix/zabbix_java_gateway.pid
 zabbix_javagateway_listenip: 0.0.0.0
 zabbix_javagateway_listenport: 10052

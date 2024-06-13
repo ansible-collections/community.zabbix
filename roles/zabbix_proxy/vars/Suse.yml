@@ -1,0 +1,26 @@
+---
+zabbix_valid_proxy_versions:
+  "15":
+    - 7.0
+    - 6.4
+    - 6.0
+
+_zabbix_proxy_pgsql_dependencies:
+  - "{{ zabbix_proxy_install_database_client | ternary('postgresql', '') }}"
+  - gzip
+  - python3-psycopg2
+
+_zabbix_proxy_mysql_dependencies:
+  "15":
+    - "{{ zabbix_proxy_install_database_client | ternary('mysql', '') }}"
+    - python3-PyMySQL
+
+_zabbix_proxy_sqlite3_dependencies:
+  - sqlite
+
+_zabbix_proxy_fping6location: null
+_zabbix_proxy_fpinglocation: /usr/sbin/fping
+
+_zabbix_proxy_packages:
+  - "zabbix-proxy-{{ zabbix_proxy_database }}"
+  - "zabbix-sql-scripts"
