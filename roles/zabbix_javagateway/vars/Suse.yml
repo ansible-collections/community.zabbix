@@ -1,0 +1,6 @@
+---
+zabbix_valid_javagateway_versions:
+  "15":
+    - 7.0
+    - 6.4
+    - 6.0

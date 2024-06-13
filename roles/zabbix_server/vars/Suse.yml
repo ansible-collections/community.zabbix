@@ -1,0 +1,23 @@
+---
+zabbix_valid_server_versions:
+  "15":
+    - 7.0
+    - 6.4
+    - 6.0
+
+_zabbix_server_pgsql_dependencies:
+  - "{{ zabbix_server_install_database_client | ternary('postgresql', '') }}"
+  - gzip
+  - python3-psycopg2
+
+_zabbix_server_mysql_dependencies:
+  - "{{ zabbix_server_install_database_client | ternary('mysql', '') }}"
+  - gzip
+  - python3-PyMySQL
+
+_zabbix_server_fping6location: null
+_zabbix_server_fpinglocation: /usr/sbin/fping
+
+_zabbix_server_packages:
+  - "zabbix-server-{{ zabbix_server_database }}"
+  - "zabbix-sql-scripts"

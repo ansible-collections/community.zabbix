@@ -53,8 +53,7 @@
         state: present
       register: installation_dependencies
       until: installation_dependencies is succeeded
-      when:
-        - ansible_os_family == 'RedHat'
+      when: ansible_facts['os_family'] == 'RedHat'
 
     - name: "Apt update"
       ansible.builtin.shell: "apt-get update && echo exit 0 > /usr/sbin/policy-rc.d"
@@ -75,6 +74,18 @@
       register: installation_dependencies
       until: installation_dependencies is succeeded
       when: ansible_facts['os_family'] == 'Debian'
+
+    - name: "Installing packages on Suse"
+      community.general.zypper:
+        name:
+          - iproute2
+          - python3-pip
+          - sudo
+        update_cache: true
+        state: present
+      register: installation_dependencies
+      until: installation_dependencies is succeeded
+      when: ansible_facts['os_family'] == 'Suse'
 
     - name: "Configure SUDO."
       ansible.builtin.lineinfile:

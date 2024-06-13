@@ -1,0 +1,17 @@
+---
+# Tasks specific for Suse systems
+
+- name: "Suse | Install repos"
+  community.general.zypper_repository:
+    name: "{{ item.name }}"
+    description: "{{ item.description }}"
+    repo: "{{ item.repo }}"
+    disable_gpg_check: "{{ item.disable_gpg_check | default(false) }}"
+    auto_import_keys: "{{ item.auto_import_keys | default('true') }}"
+    priority: "{{ item.priority | default('99') }}"
+    runrefresh: "{{ item.runrefresh | default(false) }}"
+    state: "{{ item.state | default('present') }}"
+  with_items: "{{ zabbix_repo_zypper }}"
+  become: true
+  tags:
+    - install

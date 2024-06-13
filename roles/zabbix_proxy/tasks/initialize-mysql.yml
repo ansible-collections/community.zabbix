@@ -18,12 +18,17 @@
 # NOTE: Upgrading system-packages with pip is generally a bad idea, but
 # these packaged older versions seems to have a problem with mysql 8 and above
 - name: Upgrade pymysql
-  when:
-    - ansible_facts['distribution'] in ['CentOS', 'Debian', 'Ubuntu']
-    - ansible_facts['distribution_release'] in ['Core', 'buster', 'bullseye', 'bionic', 'focal']
+  when: _upgrade_debian_pymysql or _upgrade_suse_pymysql
   ansible.builtin.pip:
     name: "pymysql>=0.10.0,<0.11.0"
     state: latest
+  vars:
+    _upgrade_debian_pymysql: "{{ (ansible_facts['distribution'] in ['Debian', 'Ubuntu'] and ansible_facts['distribution_release'] in ['bullseye', 'focal']) }}"
+    _upgrade_suse_pymysql: "{{ ansible_facts['os_family'] in ['Suse'] }}"
+  tags:
+    - install
+    - database
+    - dependencies
 
 - name: "MySQL Database prep"
   when: zabbix_proxy_database_creation | bool

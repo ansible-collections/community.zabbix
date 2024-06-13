@@ -35,15 +35,16 @@ Please send Pull Requests or suggestions when you want to use this role for othe
 
 See the following list of supported Operating systems with the Zabbix releases:
 
-| Zabbix              | 6.4 | 6.0 |
-|---------------------|-----|-----|
-| Red Hat Fam 9       |  V  |  V  |
-| Red Hat Fam 8       |  V  |  V  |
-| Ubuntu 24.04 noble  |  V  |  V  |
-| Ubuntu 22.04 jammy  |  V  |  V  |
-| Ubuntu 20.04 focal  |  V  |  V  |
-| Debian 12 bookworm  |  V  |  V  |
-| Debian 11 bullseye  |  V  |  V  |
+| Zabbix              | 7.0 | 6.4 | 6.0 |
+|---------------------|-----|-----|-----|
+| Red Hat Fam 9       |  V  |  V  |  V  |
+| Red Hat Fam 8       |  V  |  V  |  V  |
+| Ubuntu 24.04 noble  |  V  |  V  |  V  |
+| Ubuntu 22.04 jammy  |  V  |  V  |  V  |
+| Ubuntu 20.04 focal  |  V  |  V  |  V  |
+| Debian 12 bookworm  |  V  |  V  |  V  |
+| Debian 11 bullseye  |  V  |  V  |  V  |
+| Suse Fam 15         |  V  |  V  |  V  |
 
 # Installation
 
@@ -68,6 +69,10 @@ Please be aware that this role only installs the repo itself.  It is generally u
 * `zabbix_repo_yum_gpg_check`: Optional.  Yum should check GPG keys.  Default: 0
 * `zabbix_repo_yum_gpg_key_url`: The URL to download the Zabbix GPG key from. Default: `http://repo.zabbix.com/RPM-GPG-KEY-ZABBIX-08EFA7DD`
 * `zabbix_repo_yum_schema`: Default: `https`. Option to change the web schema for the yum repository(http/https)
+* `zabbix_repo_zypper`: A list with zypper repository configuration.
+* `zabbix_repo_zypper_auto_import_keys`: Optional. Zypper should import GPG keys automatically. Default: true
+* `zabbix_repo_zypper_disable_gpg_check`: Optional. Zypper shouldn't check GPG keys.  Default: false
+* `zabbix_repo_zypper_schema`: Default: `https`. Option to change the web schema for the zypper repository(http/https)
 
 # Example Playbook
 

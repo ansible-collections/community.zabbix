@@ -20,7 +20,7 @@
         state: absent
         regexp: "path-exclude=/usr/share/doc/*"
       when:
-        - ansible_os_family != 'RedHat'
+        - ansible_os_family == 'Debian'
 
     # https://github.com/geerlingguy/ansible-role-java/issues/64
     - name: "Apt update"
@@ -28,7 +28,7 @@
       register: installation_dependencies
       until: installation_dependencies is succeeded
       when:
-        - ansible_os_family != 'RedHat'
+        - ansible_os_family == 'Debian'
 
     - name: "Installing packages on NON-CentOS"
       ansible.builtin.apt:
@@ -46,4 +46,15 @@
       register: installation_dependencies
       until: installation_dependencies is succeeded
       when:
-        - ansible_os_family != 'RedHat'
+        - ansible_os_family == 'Debian'
+
+    - name: "Installing packages on Suse"
+      community.general.zypper:
+        name:
+          - iproute2
+          - which
+        state: present
+      register: installation_dependencies
+      until: installation_dependencies is succeeded
+      when:
+        - ansible_os_family == 'Suse'

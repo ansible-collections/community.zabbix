@@ -1,0 +1,18 @@
+---
+# vars file for zabbix_agent (SLES)
+
+zabbix_agent: zabbix-agent
+zabbix_agent_service: "{{ zabbix_agent2 | ternary('zabbix-agent2', 'zabbix-agent') }}"
+zabbix_agent_conf: zabbix_agentd.conf
+zabbix_agent2_conf: zabbix_agent2.conf
+
+zabbix_valid_agent_versions:
+  # SLES
+  "12":
+    - 7.0
+    - 6.4
+    - 6.0
+  "15":
+    - 7.0
+    - 6.4
+    - 6.0

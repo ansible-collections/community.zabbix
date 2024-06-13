@@ -9,7 +9,7 @@
       register: installation_dependencies
       until: installation_dependencies is succeeded
       when:
-        - ansible_os_family != 'RedHat'
+        - ansible_os_family == 'Debian'
 
     - name: "Configure SUDO."
       ansible.builtin.lineinfile:

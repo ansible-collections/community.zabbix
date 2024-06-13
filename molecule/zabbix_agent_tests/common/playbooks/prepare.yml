@@ -36,10 +36,18 @@
         - ansible_os_family == 'Debian'
 
     - name: "Installing packages on Suse family"
-      ansible.builtin.shell: zypper install -y python-xml python-libxml2 net-tools which
+      community.general.zypper:
+        name:
+          - python3-xml
+          - python3-libxml2
+          - net-tools
+          - iproute2
+          - which
+        state: present
       register: zabbix_agent_prepare_packages_install
       until: zabbix_agent_prepare_packages_install is succeeded
-      when: ansible_os_family == 'Suse'
+      when:
+        - ansible_os_family == 'Suse'
       tags:
         - skip_ansible_lint
 

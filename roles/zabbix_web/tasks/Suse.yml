@@ -1,0 +1,6 @@
+---
+# - name: "Suse | Setting Short PHP Version"
+#   ansible.builtin.set_fact:
+#     zabbix_web_php_installed_version: "{{ zabbix_web_php_installed_version | regex_replace('\\.', '') }}"
+#   tags:
+#     - always

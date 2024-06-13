@@ -77,6 +77,19 @@
       until: installation_dependencies is succeeded
       when: ansible_facts['os_family'] == 'Debian'
 
+    - name: "Installing packages on Suse"
+      community.general.zypper:
+        name:
+          - iproute2
+          - python3-pip
+          - sudo
+          - curl
+        update_cache: true
+        state: present
+      register: installation_dependencies
+      until: installation_dependencies is succeeded
+      when: ansible_facts['os_family'] == 'Suse'
+
     - name: "Configure SUDO."
       ansible.builtin.lineinfile:
         dest: /etc/sudoers
@@ -87,7 +100,7 @@
       ansible.builtin.dnf:
         name: "@php:8.0/common"
       when:
-        - ansible_os_family == 'RedHat'
+        - ansible_facts['os_family'] == 'RedHat'
         - ansible_distribution_major_version == "8"
 
     - name: Set PHP packages (Centos 8+)
@@ -106,8 +119,7 @@
           - php-pear
           - php-pecl-apcu
           - php-xml
-      when:
-        - ansible_os_family == "RedHat"
+      when: ansible_facts['os_family'] == 'RedHat'
 
     - name: Workaround for geerlingguy.php missing ubuntu-24.04 support
       when:
@@ -136,6 +148,11 @@
               - php{{ __php_default_version_debian }}-apcu
               - php{{ __php_default_version_debian }}-sqlite3
 
+    - name: Set PHP Version (Suse)
+      ansible.builtin.set_fact:
+        __php_default_version_suse: "8"
+      when: ansible_facts['os_family'] == 'Suse'
+
   roles:
     - role: geerlingguy.apache
       when:
@@ -147,6 +164,13 @@
     - role: zabbix_server
 
   post_tasks:
+    - name: Suse | Create default php-fpm config
+      ansible.builtin.copy:
+        remote_src: true
+        src: "/etc/php{{ __php_default_version_suse }}/fpm/php-fpm.conf.default"
+        dest: "/etc/php{{ __php_default_version_suse }}/fpm/php-fpm.conf"
+      when: ansible_facts['os_family'] == 'Suse'
+
     - name: "Remove file"
       ansible.builtin.file:
         path: "{{ item }}"

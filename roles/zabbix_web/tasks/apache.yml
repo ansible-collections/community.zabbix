@@ -66,6 +66,6 @@
     group: "{{ zabbix_web_group }}"
     mode: 0644
   become: true
-  when: ansible_os_family == "Debian" and zabbix_web_create_vhost
+  when: ansible_facts['os_family'] == 'Debian' and zabbix_web_create_vhost
   tags:
     - config
