@@ -25,8 +25,8 @@
 - name: "Suse | Installing zabbix-{sender,get}"
   ansible.builtin.package:
     pkg:
-      - "{{ zabbix_sender_package }}"
-      - "{{ zabbix_get_package }}"
+      - "{{ zabbix_agent_sender_package }}"
+      - "{{ zabbox_agent_get_package }}"
     state: "{{ zabbix_agent_package_state }}"
   environment:
     http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
