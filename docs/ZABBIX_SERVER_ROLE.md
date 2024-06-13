@@ -286,15 +286,15 @@ The following table lists all variables that are exposed to modify the configura
 | Zabbix Name | Variable Name | Default Value |Notes |
 |-----------|------------------|--------|--------|
 |AlertScriptsPath | zabbix_server_alertscriptspath | /usr/lib/zabbix/alertscripts |  |
-|AllowRoot | zabbix_server_allowroot | 0 |  |
-|AllowSoftwareUpdateCheck | zabbix_server_allowsoftwareupdatecheck |  | Version 7.0 or later |
-|AllowUnsupportedDBVersions | zabbix_server_allowunsupporteddbversions |0  |  |
-|CacheSize | zabbix_server_cachesize | |  |
-|CacheUpdateFrequency | zabbix_server_cacheupdatefrequency | |  |
+|AllowRoot | zabbix_server_allowroot | `False` | `True`/`False` |
+|AllowSoftwareUpdateCheck | zabbix_server_allowsoftwareupdatecheck | `True` | `True`/`False` Version 7.0 or later |
+|AllowUnsupportedDBVersions | zabbix_server_allowunsupporteddbversions | `False` | `True`/`False` |
+|CacheSize | zabbix_server_cachesize | 32M |  |
+|CacheUpdateFrequency | zabbix_server_cacheupdatefrequency | varies by version |  |
 |DBHost | zabbix_server_dbhost | localhost |  |
 |DBName | zabbix_server_dbname | zabbix-server |  |
 |DBPassword | zabbix_server_dbpassword | zabbix-server |  |
-|DBPort | zabbix_server_dbport | 5432 |  |
+|DBPort | zabbix_server_dbport | varies by database |  |
 |DBSchema | zabbix_server_dbschema | |  |
 |DBSocket | zabbix_server_dbsocket | |  |
 |DBTLSCAFile | zabbix_server_dbtlscafile | |  |
@@ -305,7 +305,7 @@ The following table lists all variables that are exposed to modify the configura
 |DBTLSKeyFile | zabbix_server_dbtlskeyfile | |  |
 |DBUser | zabbix_server_dbuser | zabbix-server |  |
 |DebugLevel | zabbix_server_debuglevel | 3 |  |
-|EnableGlobalScripts | zabbix_server_enableglobalscripts |  | Version 7.0 or later |
+|EnableGlobalScripts | zabbix_server_enableglobalscripts | `False` | `True`/`False` Version 7.0 or later |
 |ExportDir | zabbix_server_exportdir | |  |
 |ExportFileSize | zabbix_server_exportfilesize | 1G |  |
 |ExportType | zabbix_server_exporttype | |  |
@@ -313,17 +313,17 @@ The following table lists all variables that are exposed to modify the configura
 |Fping6Location | zabbix_server_fping6location | OS Specific Value |  |
 |FpingLocation | zabbix_server_fpinglocation | OS Specific Value |  |
 |HANodeName | zabbix_server_hanodename | |  |
-|HistoryCacheSize | zabbix_server_historycachesize | |  |
-|HistoryIndexCacheSize | zabbix_server_historyindexcachesize | |  |
-|HistoryStorageDateIndex | zabbix_server_historystoragedateindex | 0 |  |
+|HistoryCacheSize | zabbix_server_historycachesize | 16M |  |
+|HistoryIndexCacheSize | zabbix_server_historyindexcachesize | 4M |  |
+|HistoryStorageDateIndex | zabbix_server_historystoragedateindex | `False` | `True`/`False` |
 |HistoryStorageTypes | zabbix_server_historystoragetypes |  uint,dbl,str,log,text |  |
 |HistoryStorageURL | zabbix_server_historystorageurl | |  |
 |HousekeepingFrequency | zabbix_server_housekeepingfrequency | 1 |  |
-|Include | zabbix_server_include | /etc/zabbix/zabbix_server.conf.d |  |
+|Include | zabbix_server_include | /etc/zabbix/zabbix_server.conf.d/*.conf |  |
 |JavaGateway | zabbix_server_javagateway | |  |
 |JavaGatewayPort | zabbix_server_javagatewayport | 10052 |  |
 |ListenBacklog | zabbix_server_listenbacklog | |  |
-|ListenIP | zabbix_server_listenip | |  |
+|ListenIP | zabbix_server_listenip | 0.0.0.0 |  |
 |ListenPort | zabbix_server_listenport | 10051 |  |
 |LoadModule | zabbix_server_loadmodule | |  |
 |LoadModulePath | zabbix_server_loadmodulepath | ${libdir}/modules |  |
@@ -331,40 +331,42 @@ The following table lists all variables that are exposed to modify the configura
 |LogFileSize | zabbix_server_logfilesize | 10 |  |
 |LogSlowQueries | zabbix_server_logslowqueries | 0 |  |
 |LogType | zabbix_server_logtype | file |  |
-|MaxConcurrentChecksPerPoller | zabbix_server_maxconcurrentchecksperpoller |  | Version 7.0 or later |
-|MaxHousekeeperDelete | zabbix_server_maxhousekeeperdelete | 500 |  |
+|MaxConcurrentChecksPerPoller | zabbix_server_maxconcurrentchecksperpoller | 1000 | Version 7.0 or later |
+|MaxHousekeeperDelete | zabbix_server_maxhousekeeperdelete | 5000 |  |
 |NodeAddress | zabbix_server_nodeaddress | |  |
 |PidFile | zabbix_server_pidfile | /var/run/zabbix/zabbix_server.pid |  |
-|ProxyConfigFrequency | zabbix_server_proxyconfigfrequency | |  |
+|ProblemHousekeepingFrequency | zabbix_server_problemhousekeepingfrequency |  |  |
+|ProxyConfigFrequency | zabbix_server_proxyconfigfrequency | 10 |  |
 |ProxyDataFrequency | zabbix_server_proxydatafrequency | 1 |  |
-|SNMPTrapperFile | zabbix_server_snmptrapperfile | |  |
+|ServiceManagerSyncFrequency | zabbix_server_servicemanagersyncfrequency | 60 |  |
+|SNMPTrapperFile | zabbix_server_snmptrapperfile | /tmp/zabbix_traps.tmp |  |
 |SocketDir | zabbix_server_socketdir | /var/run/zabbix |  |
 |SourceIP | zabbix_server_sourceip | |  |
 |SSHKeyLocation | zabbix_server_sshkeylocation | |  |
 |SSLCALocation | zabbix_server_sslcalocation | |  |
 |SSLCertLocation | zabbix_server_sslcertlocation | ${datadir}/zabbix/ssl/certs |  |
 |SSLKeyLocation | zabbix_server_sslkeylocation | ${datadir}/zabbix/ssl/keys |  |
-|StartAgentPollers | zabbix_server_startagentpollers | | Version 7.0 or later |
-|StartAlerters | zabbix_server_startalerters | |  |
-|StartBrowserPollers | zabbix_server_startbrowserpollers | | Version 7.0 or later |
-|StartConnectors | zabbix_server_connectors | | Version 6.4 or later |
+|StartAgentPollers | zabbix_server_startagentpollers | 1 | Version 7.0 or later |
+|StartAlerters | zabbix_server_startalerters | 3 |  |
+|StartBrowserPollers | zabbix_server_startbrowserpollers | 1 | Version 7.0 or later |
+|StartConnectors | zabbix_server_connectors | 0 | Version 6.4 or later |
 |StartDBSyncers | zabbix_server_startdbsyncers | 4 |  |
 |StartDiscoverers | zabbix_server_startdiscoverers | 1 |  |
 |StartEscalators | zabbix_server_startescalators | 1 |  |
-|StartHistoryPollers | zabbix_server_starthistorypollers | |  |
-|StartHTTPAgentPollers | zabbix_server_starthttpagentpollers | | Version 7.0 or later |
+|StartHistoryPollers | zabbix_server_starthistorypollers | 5 |  |
+|StartHTTPAgentPollers | zabbix_server_starthttpagentpollers | 1 | Version 7.0 or later |
 |StartHTTPPollers | zabbix_server_starthttppollers | 1 |  |
 |StartIPMIPollers | zabbix_server_startipmipollers | 0 |  |
 |StartJavaPollers | zabbix_server_startjavapollers | 0 |  |
-|StartLLDProcessors | zabbix_server_startlldprocessors | |  |
-|StartODBCPollers | zabbix_server_startodbcpollers | |  |
+|StartLLDProcessors | zabbix_server_startlldprocessors | 2 |  |
+|StartODBCPollers | zabbix_server_startodbcpollers | 1 |  |
 |StartPingers | zabbix_server_startpingers | 1 |  |
 |StartPollers | zabbix_server_startpollers | 5 |  |
 |StartPollersUnreachable | zabbix_server_startpollersunreachable | 1 |  |
-|StartPreprocessors | zabbix_server_startpreprocessors | |  |
-|StartProxyPollers | zabbix_server_startproxypollers | |  |
+|StartPreprocessors | zabbix_server_startpreprocessors | 3 |  |
+|StartProxyPollers | zabbix_server_startproxypollers | 1 |  |
 |StartReportWriters | zabbix_server_startreportwriters | 0 |  |
-|StartSNMPPollers | zabbix_server_startsnmppollers |  | Version 7.0 or later |
+|StartSNMPPollers | zabbix_server_startsnmppollers | 1  | Version 7.0 or later |
 |StartSNMPTrapper | zabbix_server_startsnmptrapper | 0 |  |
 |StartTimers | zabbix_server_starttimers | 1 |  |
 |StartTrappers | zabbix_server_starttrappers | 5 |  |
@@ -383,18 +385,18 @@ The following table lists all variables that are exposed to modify the configura
 |TLSKeyFile | zabbix_server_tlskeyfile | |  |
 |TmpDir | zabbix_server_tmpdir | /tmp |  |
 |TrapperTimeout | zabbix_server_trappertimeout | 300 |  |
-|TrendCacheSize | zabbix_server_trendcachesize | |  |
-|TrendFunctionCacheSize | zabbix_server_trendfunctioncachesize | |  |
+|TrendCacheSize | zabbix_server_trendcachesize | 4M |  |
+|TrendFunctionCacheSize | zabbix_server_trendfunctioncachesize | 4M |  |
 |UnavailableDelay | zabbix_server_unavailabledelay | 60 |  |
 |UnreachableDelay | zabbix_server_unreachabledelay | 15 |  |
 |UnreachablePeriod | zabbix_server_unreachableperiod | 45 |  |
 |User | zabbix_server_user | zabbix |  |
-|ValueCacheSize | zabbix_server_valuecachesize | |  |
+|ValueCacheSize | zabbix_server_valuecachesize | 8M |  |
 |Vault | zabbix_server_vault | | Version 6.2 or later  |
 |VaultDBPath | zabbix_server_vaultdbpath | |  |
 |VaultPrefix | zabbix_server_vaultdbprefix | | Version 7.0 or later |
-|VaultTLSKeyFile | zabbix_server_vaulttlskeyfile | | Version 6.4 or later |
 |VaultTLSCertFile | zabbix_server_vaulttlscertfile | | Version 6.4 or later |
+|VaultTLSKeyFile | zabbix_server_vaulttlskeyfile | | Version 6.4 or later |
 |VaultToken | zabbix_server_vaulttoken | |  |
 |VaultURL | zabbix_server_vaulturl | https://127.0.0.1:8200 |  |
 |VMwareCacheSize | zabbix_server_vmwarecachesize | |  |
