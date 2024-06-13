@@ -12,16 +12,20 @@ zabbix_useuip: 1
 
 # Database
 zabbix_proxy_database: mysql
+zabbix_proxy_dbhost: localhost
+zabbix_proxy_dbname: zabbix_proxy
+zabbix_proxy_dbpassword: zabbix_proxy
+_zabbix_proxy_database_default_port:
+  mysql: 3306
+  pgsql: 5432
+zabbix_proxy_dbport: "{{ _zabbix_proxy_database_default_port[zabbix_proxy_database] }}"
+zabbix_proxy_dbuser: zabbix_proxy
 zabbix_proxy_database_creation: true
 zabbix_proxy_database_sqlload: true
 zabbix_proxy_dbhost_run_install: true
 zabbix_proxy_dbcollation: utf8_bin
 zabbix_proxy_dbencoding: utf8
-zabbix_proxy_dbhost: localhost
-zabbix_proxy_dbname: zabbix_proxy
-zabbix_proxy_dbpassword: zabbix_proxy
 zabbix_proxy_dbpassword_hash_method: md5
-zabbix_proxy_dbuser: zabbix_proxy
 zabbix_proxy_install_database_client: true
 
 # Misc.
@@ -31,7 +35,6 @@ zabbix_proxy_config: /etc/zabbix/zabbix_proxy.conf
 zabbix_proxy_include_mode: "0755"
 zabbix_proxy_manage_service: true
 zabbix_proxy_privileged_host: localhost
-zabbix_proxy_server: 192.168.1.1
 zabbix_proxy_tls_config:
   no_encryption: "no_encryption"
   psk: "PSK"
@@ -42,56 +45,77 @@ zabbix_proxy_version_minor: "*"
 zabbix_proxy_package_state: present
 
 # Proxy Configuration Variables (Only ones with role provided defaults)
-zabbix_proxy_allowroot: 0
-zabbix_proxy_allowunsupporteddbversions: 0
-zabbix_proxy_cachesize: 8M
+zabbix_proxy_allowroot: false
+zabbix_proxy_allowunsupporteddbversions: false
+zabbix_proxy_cachesize: 32M
 zabbix_proxy_configfrequency: 3600
 zabbix_proxy_datasenderfrequency: 1
-zabbix_proxy_dbport: 5432
 zabbix_proxy_debuglevel: 3
-zabbix_proxy_enableremotecommands: 0
+zabbix_proxy_enableremotecommands: false
 zabbix_proxy_externalscripts: /usr/lib/zabbix/externalscripts
 zabbix_proxy_heartbeatfrequency: 60
-zabbix_proxy_historycachesize: 8M
+zabbix_proxy_historycachesize: 16M
 zabbix_proxy_historyindexcachesize: 4M
 zabbix_proxy_hostname: "{{ inventory_hostname }}"
 zabbix_proxy_housekeepingfrequency: 1
-zabbix_proxy_include: /etc/zabbix/zabbix_proxy.conf.d
+zabbix_proxy_include: /etc/zabbix/zabbix_proxy.conf.d/*.conf
 zabbix_proxy_javagatewayport: 10052
+zabbix_proxy_listenip: 0.0.0.0
 zabbix_proxy_libdir: /usr/lib/zabbix
 zabbix_proxy_listenport: 10051
 zabbix_proxy_loadmodulepath: "{{ zabbix_proxy_libdir }}/modules"
 zabbix_proxy_logfile: /var/log/zabbix/zabbix_proxy.log
 zabbix_proxy_logfilesize: 10
+zabbix_proxy_logremotecommands: false
+zabbix_proxy_logslowqueries: 0
 zabbix_proxy_logtype: file
+zabbix_proxy_maxconcurrentchecksperpoller: 1000
 zabbix_proxy_pidfile: /var/run/zabbix/zabbix_proxy.pid
+zabbix_proxy_proxybuffermode: disk
+ProxyConfigFrequency: 10
 zabbix_proxy_proxylocalbuffer: 0
+zabbix_proxy_proxymemorybufferage: 0
+zabbix_proxy_proxymemorybuffersize: 0
+zabbix_proxy_proxymode: 0
 zabbix_proxy_proxyofflinebuffer: 1
+zabbix_proxy_server: 192.168.1.1
 zabbix_proxy_snmptrapperfile: /tmp/zabbix_traps.tmp
 zabbix_proxy_socketdir: /var/run/zabbix
+zabbix_proxy_startagentpollers: 1
+zabbix_proxy_startbrowserpollers: 1
 zabbix_proxy_startdbsyncers: 4
 zabbix_proxy_startdiscoverers: 1
+zabbix_proxy_starthistorypollers: 1
+zabbix_proxy_starthttpagentpollers: 1
 zabbix_proxy_starthttppollers: 1
 zabbix_proxy_startipmipollers: 0
+zabbix_proxy_startjavapollers: 0
 zabbix_proxy_startodbcpollers: 1
 zabbix_proxy_startpingers: 1
 zabbix_proxy_startpollers: 5
 zabbix_proxy_startpollersunreachable: 1
 zabbix_proxy_startpreprocessors: 3
+zabbix_proxy_startsnmppollers: 1
+zabbix_proxy_startsnmptrapper: 0
 zabbix_proxy_starttrappers: 5
+zabbix_proxy_startvmwarecollectors: 0
 zabbix_proxy_statsallowedip: "127.0.0.1"
 zabbix_proxy_timeout: 3
 zabbix_proxy_tmpdir: /tmp
 zabbix_proxy_trappertimeout: 300
+zabbix_proxy_unavailabledelay: 60
+zabbix_proxy_unreachabledelay: 15
 zabbix_proxy_unreachableperiod: 45
+zabbix_proxy_user: zabbix
 zabbix_proxy_vaulturl: https://127.0.0.1:8200
 zabbix_proxy_vmwarecachesize: 8M
 zabbix_proxy_vmwarefrequency: 60
+zabbix_proxy_vmwareperffrequency: 60
+zabbix_proxy_vmwaretimeout: 10
 
 # Zabbix API stuff
 zabbix_api_server_host: localhost
 zabbix_api_use_ssl: false
-# zabbix_api_server_port: 80
 zabbix_api_login_user: Admin
 zabbix_api_login_pass: !unsafe zabbix
 zabbix_api_validate_certs: false
@@ -102,7 +126,3 @@ zabbix_api_timeout: 30
 zabbix_api_create_proxy: false
 zabbix_proxy_state: present
 zabbix_proxy_status: active # or passive
-
-# TLS setttings
-zabbix_proxy_tlsaccept:
-zabbix_proxy_tlsconnect:
