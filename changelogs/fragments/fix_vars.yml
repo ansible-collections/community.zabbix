@@ -1,0 +1,9 @@
+breaking_changes:
+  - Agent Role - Remove support for `zabbix_sender_package` variable.
+  - Agent Role - Remove support for `zabbix_get_package` variable.
+  - Agent Role - Remove support for `zabbix_agent_zabbix_alias`.
+  - Agent Role - Remove support for all `zabbix_agent2_*` variables.
+minor_changes:
+  - Agent Role - Updated defaults to be inline with Zabbix defaults.
+  - All Roles - Updated include option to include all *.conf files.
+  - All Roles - Updated all Zabbix configuration bool variables to be `true`/`false`.
