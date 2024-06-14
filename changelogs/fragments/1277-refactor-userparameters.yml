@@ -1,2 +1,0 @@
-minor_changes:
-  - zabbix_agent role - refactored userparameter tasks to be more efficient.

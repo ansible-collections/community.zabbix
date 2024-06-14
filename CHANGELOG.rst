@@ -4,11 +4,61 @@ community.zabbix Release Notes
 
 .. contents:: Topics
 
+v3.0.0
+======
+
+Major Changes
+-------------
+
+- All Roles - Add support for openSUSE Leap 15 and SLES 15.
+- All Roles - Separate installation of Zabbix repo from all other roles and link them together.
+
+Minor Changes
+-------------
+
+- Agent Role - Updated defaults to be inline with Zabbix defaults.
+- All Roles - Add support for yum authentication on RHEL based operating systems.
+- All Roles - Add the `zabbix_manage_repo` variable.
+- All Roles - Changed logic for installing selinux related changes based the status of selinux on the target system.
+- All Roles - Include installation of GPG key for RHEL based operating systems.
+- All Roles - Updated all Zabbix configuration bool variables to be `true`/`false`.
+- All Roles - Updated include option to include all .conf files.
+- added new module zabbix_proxy_group (Zabbix 7.0)
+- zabbix_agent - added 10 retries to agent API calls to workaround connection problems on macOS
+- zabbix_agent role - refactored userparameter tasks to be more efficient.
+- zabbix_discovery_rule, zabbix_group_events_info, zabbix_host, zabbix_host_events_info, zabbix_proxy, zabbix_proxy_info modules updated to work wih Zabbix 7.0
+- zabbix_host_events_info - add tag support
+
+Breaking Changes / Porting Guide
+--------------------------------
+
+- Agent Role - Remove support for `zabbix_agent_zabbix_alias`.
+- Agent Role - Remove support for `zabbix_get_package` variable.
+- Agent Role - Remove support for `zabbix_sender_package` variable.
+- Agent Role - Remove support for all `zabbix_agent2_*` variables.
+- All Roles - Remove support for Centos 7
+- All Roles - Remove support for Python2
+- All Roles - Removed support for Debian 10.
+- All Roles - Removed support for Ubuntu 18.08 (Bionic)
+- Remove support for Ansible < 2.15 and Python < 3.9
+- Remove support for Zabbix 6.2
+- Removed support for Zabbix 6.2
+
+Bugfixes
+--------
+
+- Agent Role - Fixed missing setting for `zabbix_agent_persistentbuffer`
+- remove references to tags in LLD rules
+- zabbix-agent - fix name of Zabbix Agent 2 config filename
+- zabbix_agent - fix error when ``zabbix_agent_tlsaccept`` is not set
+- zabbix_agent - fix error when ``zabbix_agent_tlsconnect`` is not set
+- zabbix_agent - in ``zabbix_agent_interfaces`` directly use ``zabbix_agent_listenport``, which does already contains the agent2 value if needed
+
 v2.5.1
 ======
 
 Bugfixes
--------------
+--------
 
 - zabbix_agent - Fix reading existing psk
 - zabbix_agent - Fix role when zabbix_agent_listenip is undefined

@@ -48,7 +48,7 @@ plugins:
       namespace: ''
       version_added: null
     zabbix_discoveryrule:
-      description: Create/delete Zabbix discovery rules
+      description: Create/delete Zabbix low-level discovery (LLD) rules
       name: zabbix_discoveryrule
       namespace: ''
       version_added: null
@@ -130,6 +130,11 @@ plugins:
     zabbix_proxy:
       description: Create/delete/get/update Zabbix proxies
       name: zabbix_proxy
+      namespace: ''
+      version_added: null
+    zabbix_proxy_group:
+      description: Create/update/delete Zabbix proxy group
+      name: zabbix_proxy_group
       namespace: ''
       version_added: null
     zabbix_proxy_info:
@@ -226,4 +231,4 @@ plugins:
   shell: {}
   strategy: {}
   vars: {}
-version: 2.5.1
+version: 3.0.0
