@@ -1,2 +1,0 @@
-bugfixes:
-  - Agent Role - Fixed missing setting for `zabbix_agent_persistentbuffer`
