@@ -27,6 +27,7 @@ jobs:
           # https://docs.ansible.com/ansible/latest/reference_appendices/release_and_maintenance.html#ansible-core-changelogs
           - stable-2.15
           - stable-2.16
+          - stable-2.17
           - devel
         python:
           - '3.9'
@@ -37,6 +38,8 @@ jobs:
           - ansible: stable-2.15
             python: '3.12'
           - ansible: stable-2.16
+            python: '3.9'
+          - ansible: stable-2.17
             python: '3.9'
           - ansible: devel
             python: '3.9'
