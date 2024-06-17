@@ -33,6 +33,7 @@ provisioner:
   inventory:
     group_vars:
       all:
+        ansible_connection: community.docker.docker
         zabbix_api_server_url: zabbix-web-${MY_MOLECULE_VERSION:-v64}-${MY_MOLECULE_DATABASE:-mysql}-${MY_MOLECULE_CONTAINER:-rockylinux8}
         zabbix_repo_apt_priority: 1
         zabbix_repo_yum_gpg_check: 1
