@@ -3,14 +3,6 @@
   hosts: all
 
   pre_tasks:
-    - name: "Create group for imaginary host"
-      add_host:
-        name: imaginary-host
-        groups:
-          - mysql
-          - postgresql
-      changed_when: false
-
     - name: "Installing packages on CentOS"
       ansible.builtin.yum:
         name:
