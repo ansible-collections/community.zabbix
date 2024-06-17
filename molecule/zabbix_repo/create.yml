@@ -1,0 +1,19 @@
+---
+- name: Create
+  hosts: localhost
+  connection: local
+
+  gather_facts: false
+
+  tasks:
+    - name: "Create OS container"
+      community.docker.docker_container:
+        state: started
+        recreate: true
+        name: "{{ item.name }}"
+        image: "{{ item.image }}"
+        privileged: "{{ item.privileged | default(omit) }}"
+        networks: "{{ item.networks | default(omit) }}"
+        volumes: "{{ item.volumes | default(omit) }}"
+        cgroupns_mode: "{{ item.cgroupns_mode | default(omit) }}"
+      loop: "{{ molecule_yml.platforms }}"
