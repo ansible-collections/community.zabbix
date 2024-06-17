@@ -1,38 +1,7 @@
 ---
 - name: Prepare
-  hosts: localhost
-  connection: local
-  pre_tasks:
-    - name: "Create MySQL Container"
-      docker_container:
-        name: "{{ item.name }}-db"
-        image: mysql:8.0
-        state: started
-        recreate: true
-        networks:
-          - name: zabbix
-        env:
-          MYSQL_ROOT_PASSWORD: changeme
-      loop: "{{ molecule_yml.platforms }}"
-      when:
-        - '"mysql" in item.groups'
-
-    - name: "Create postgresql Container"
-      docker_container:
-        name: "{{ item.name }}-db"
-        image: postgres:13
-        state: started
-        recreate: true
-        networks:
-          - name: zabbix
-        env:
-          POSTGRES_PASSWORD: changeme
-      loop: "{{ molecule_yml.platforms }}"
-      when:
-        - '"pgsql" in item.groups'
-
-- name: Prepare
   hosts: all
+
   pre_tasks:
     - name: "Create group for imaginary host"
       add_host:
