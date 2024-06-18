@@ -6,6 +6,10 @@
   gather_facts: false
 
   tasks:
+    - name: "Create network"
+      community.docker.docker_network:
+        name: zabbix
+
     - name: "Create OS container"
       community.docker.docker_container:
         state: started

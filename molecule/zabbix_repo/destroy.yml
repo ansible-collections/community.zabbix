@@ -19,3 +19,8 @@
         state: absent
         force_kill: true
       loop: "{{ molecule_yml.platforms }}"
+
+    - name: "Destroy network"
+      community.docker.docker_network:
+        name: zabbix
+        state: absent

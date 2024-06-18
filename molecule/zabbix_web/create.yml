@@ -6,6 +6,10 @@
   gather_facts: false
 
   pre_tasks:
+    - name: "Create network"
+      community.docker.docker_network:
+        name: zabbix
+
     - name: "Create MySQL Container"
       docker_container:
         name: "{{ item.name }}-db"
