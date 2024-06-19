@@ -1,0 +1,2 @@
+bugfixes:
+  - Agent Role - Fixed logic problem that would break if anything other than PSK was used.

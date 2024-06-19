@@ -52,17 +52,27 @@
   when:
     - not (zabbix_agent_docker | bool)
 
-- name: Gather PSK Secret Info
-  ansible.builtin.include_tasks: psk_secret.yml
-
-- name: Gather PSK Identity Info
-  ansible.builtin.include_tasks: psk_identity.yml
-
 - name: AutoPSK | Default tlsaccept and tlsconnect to enforce PSK
   ansible.builtin.set_fact:
     zabbix_agent_tlsaccept: psk
     zabbix_agent_tlsconnect: psk
   when: zabbix_agent_tlspsk_auto | bool
+  tags:
+    - config
+
+- name: Configure PSK
+  when: "zabbix_agent_tlsaccept == 'psk' or zabbix_agent_tlsconnect == 'psk'"
+  block:
+    - name: Gather PSK Secret Info
+      ansible.builtin.include_tasks: psk_secret.yml
+
+    - name: Gather PSK Identity Info
+      ansible.builtin.include_tasks: psk_identity.yml
+
+    - name: "Configure Agent"
+      ansible.builtin.include_tasks: Windows_conf.yml
+      when:
+        - ansible_os_family == "Windows"
   tags:
     - config
 
