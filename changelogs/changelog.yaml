@@ -1207,7 +1207,6 @@ releases:
       - zabbix_agent - fix error when ``zabbix_agent_tlsconnect`` is not set
       - zabbix_agent - in ``zabbix_agent_interfaces`` directly use ``zabbix_agent_listenport``,
         which does already contains the agent2 value if needed
-      - zabbix-agent - fix execution of Windows Agent #1300
       major_changes:
       - All Roles - Add support for openSUSE Leap 15 and SLES 15.
       - All Roles - Separate installation of Zabbix repo from all other roles and
