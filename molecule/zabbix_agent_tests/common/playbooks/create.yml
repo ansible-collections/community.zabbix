@@ -5,6 +5,11 @@
 
   gather_facts: false
 
+  pre_tasks:
+    - name: Create network
+      community.docker.docker_network:
+        name: zabbix
+
   tasks:
     - name: "Create OS container"
       community.docker.docker_container:

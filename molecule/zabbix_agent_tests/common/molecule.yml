@@ -29,6 +29,7 @@ provisioner:
     create: ../../common/playbooks/create.yml
     prepare: ../../common/playbooks/prepare.yml
     converge: ../../common/playbooks/converge.yml
+    destroy: ../../common/playbooks/destroy.yml
   env:
     ANSIBLE_REMOTE_TMP: /tmp/
     # https://github.com/ansible/molecule/issues/4015#issuecomment-1680859724
