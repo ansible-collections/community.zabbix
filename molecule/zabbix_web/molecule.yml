@@ -3,7 +3,7 @@ dependency:
   name: galaxy
   enabled: true
   options:
-    requirements-file: molecule/zabbix_web/collections.yml
+    requirements-file: molecule/default/collections.yml
     role-file: molecule/zabbix_web/requirements.yml
 
 driver:
