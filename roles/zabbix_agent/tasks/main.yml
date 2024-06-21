@@ -68,13 +68,13 @@
 
     - name: Gather PSK Identity Info
       ansible.builtin.include_tasks: psk_identity.yml
-
-    - name: "Configure Agent"
-      ansible.builtin.include_tasks: Windows_conf.yml
-      when:
-        - ansible_os_family == "Windows"
   tags:
     - config
+
+- name: "Configure Agent"
+  ansible.builtin.include_tasks: Windows_conf.yml
+  when:
+    - ansible_os_family == "Windows"
 
 - name: "Configure Agent"
   ansible.builtin.include_tasks: Windows_conf.yml

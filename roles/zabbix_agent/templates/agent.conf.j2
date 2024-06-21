@@ -135,8 +135,10 @@ Plugins.{{ my_name }}.{{ param }}={{ value }}
 {{ (zabbix_agent_tlsconnect is defined and zabbix_agent_tlsconnect is not none) | ternary('', '# ') }}TLSConnect={{ zabbix_agent_tlsconnect | default('') }}
 {{ (zabbix_agent_tlscrlfile is defined and zabbix_agent_tlscrlfile is not none) | ternary('', '# ') }}TLSCRLFile={{ zabbix_agent_tlscrlfile | default('') }}
 {{ (zabbix_agent_tlskeyfile is defined and zabbix_agent_tlskeyfile is not none) | ternary('', '# ') }}TLSKeyFile={{ zabbix_agent_tlskeyfile | default('') }}
+{% if zabbix_agent_tlsaccept == 'psk' or zabbix_agent_tlsconnect == 'psk' %}
 {{ (zabbix_agent_tlspskfile is defined and zabbix_agent_tlspskfile is not none) | ternary('', '# ') }}TLSPSKFile={{ zabbix_agent_tlspskfile | default('') }}
 {{ (zabbix_agent_tlspskidentity is defined and zabbix_agent_tlspskidentity is not none) | ternary('', '# ') }}TLSPSKIdentity={{ zabbix_agent_tlspskidentity | default('') }}
+{% endif %}
 {{ (zabbix_agent_tlsservercertissuer is defined and zabbix_agent_tlsservercertissuer is not none) | ternary('', '# ') }}TLSServerCertIssuer={{ zabbix_agent_tlsservercertissuer | default('') }}
 {{ (zabbix_agent_tlsservercertsubject is defined and zabbix_agent_tlsservercertsubject is not none) | ternary('', '# ') }}TLSServerCertSubject={{ zabbix_agent_tlsservercertsubject | default('') }}
 {{ (zabbix_agent_unsafeuserparameters is defined and zabbix_agent_unsafeuserparameters is not none) | ternary('', '# ') }}UnsafeUserParameters={{ zabbix_agent_unsafeuserparameters | default (false) | ternary('1', '0') }}
