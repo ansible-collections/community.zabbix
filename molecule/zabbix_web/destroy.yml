@@ -11,7 +11,7 @@
         name: "{{ item.name }}"
         state: absent
         force_kill: "{{ item.force_kill | default(True) }}"
-      with_items: "{{ molecule_yml.platforms }}"
+      loop: "{{ molecule_yml.platforms }}"
 
     - name: Destroy 3rd party instance(s)
       docker_container:

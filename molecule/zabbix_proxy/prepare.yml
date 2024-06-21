@@ -13,7 +13,7 @@
           - name: zabbix
         env:
           MYSQL_ROOT_PASSWORD: changeme
-      with_items: "{{ molecule_yml.platforms }}"
+      loop: "{{ molecule_yml.platforms }}"
       when:
         - '"mysql" in item.groups'
 
@@ -27,7 +27,7 @@
           - name: zabbix
         env:
           POSTGRES_PASSWORD: changeme
-      with_items: "{{ molecule_yml.platforms }}"
+      loop: "{{ molecule_yml.platforms }}"
       when:
         - '"pgsql" in item.groups'
 
