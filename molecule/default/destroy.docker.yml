@@ -6,21 +6,22 @@
   gather_facts: false
 
   tasks:
-    - name: Destroy molecule instance(s)
+    - name: Destroy OS container(s)
       community.docker.docker_container:
         name: "{{ item.name }}"
         state: absent
         force_kill: "{{ item.force_kill | default(True) }}"
       loop: "{{ molecule_yml.platforms }}"
 
-    - name: Destroy 3rd party instance(s)
+    - name: Destroy database container(s)
       community.docker.docker_container:
         name: "{{ item.name }}-db"
         state: absent
         force_kill: true
       loop: "{{ molecule_yml.platforms }}"
 
-    - name: "Destroy network"
+  post_tasks:
+    - name: Destroy network
       community.docker.docker_network:
         name: zabbix
         state: absent
