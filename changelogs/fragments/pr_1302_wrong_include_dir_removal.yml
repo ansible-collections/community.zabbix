@@ -1,0 +1,2 @@
+bugfixes:
+  - Fix for removal of wrong agent include directory (https://github.com/ansible-collections/community.zabbix/issues/1236)
