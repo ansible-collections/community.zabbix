@@ -1,2 +1,2 @@
 bugfixes:
-  - Fix windows agent installation issue #1300
+  - zabbix-agent - Fix windows agent installation issue #1300
