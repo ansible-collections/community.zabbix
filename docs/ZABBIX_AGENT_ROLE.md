@@ -330,7 +330,7 @@ The following table lists all variables that are exposed to modify the configura
 | StartAgents | zabbix_agent_startagents | 3 | Agent Only |
 | StatusPort | zabbix_agent_statusport | 9999 | Agent 2 Only |
 | Timeout | zabbix_agent_timeout | 3 |  |
-| TLSAccept | zabbix_agent_tlsconnect |  |  |
+| TLSAccept | zabbix_agent_tlsconnect | unencrypted | Is overridden with `zabbix_agent_tlspsk_auto` == True |
 | TLSCAFile | zabbix_agent_tlscafile | /etc/zabbix/tls_psk_auto.secret |  |
 | TLSCertFile | zabbix_agent_tlscertfile |  |  |
 | TLSCipherAll | zabbix_agent_tlscipherall |  | Agent on Linux Only |
@@ -339,7 +339,7 @@ The following table lists all variables that are exposed to modify the configura
 | TLSCipherCert13 | zabbix_agent_tlsciphercert13 |  | Agent on Linux Only |
 | TLSCipherPSK | zabbix_agent_tlscipherpsk |  | Agent on Linux Only |
 | TLSCipherPSK13 | zabbix_agent_tlscipherpsk13 |  | Agent on Linux Only |
-| TLSConnect | zabbix_agent_tlsconnect |  |  |
+| TLSConnect | zabbix_agent_tlsconnect | unencrypted | Is overridden with `zabbix_agent_tlspsk_auto` == True |
 | TLSCRLFile | zabbix_agent_tlscrlfile |  |  |
 | TLSKeyFile | zabbix_agent_tlskeyfile |  |  |
 | TLSPSKFile | zabbix_agent_tlspskfile |  |  |
