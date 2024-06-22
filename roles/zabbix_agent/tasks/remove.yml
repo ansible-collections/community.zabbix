@@ -2,12 +2,9 @@
 - name: Pull service facts
   ansible.builtin.service_facts:
 
-- name: Load Agent Defaults
-  ansible.builtin.include_vars: "agent_vars.yml"
-
 - name: 'Remove | Make sure the "old" zabbix-agent service stopped'
   ansible.builtin.service:
-    name: "{{ _agent_service }}"
+    name: "{{ zabbix_agent_service | replace('agent2', 'agent') }}"
     state: stopped
     enabled: false
   become: true
@@ -17,12 +14,12 @@
 
 - name: "Remove | Package removal"
   ansible.builtin.package:
-    name: "{{ _agent_package }}"
+    name: "{{ zabbix_agent_package | replace('agent2', 'agent') }}"
     state: absent
   become: true
 
 - name: "Remove | Remove the agent-include-dir"
   ansible.builtin.file:
-    path: "{{ _include }}"
+    path: "{{ zabbix_agent_include | replace('agent2', 'agent') }}"
     state: absent
   become: true
