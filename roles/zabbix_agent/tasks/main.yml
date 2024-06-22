@@ -32,6 +32,8 @@
     zabbix_agent_pidfile: "{{ zabbix_agent_pidfile is defined | ternary(zabbix_agent_pidfile, _pidfile) }}"
     zabbix_agent_service: "{{ zabbix_agent_service is defined | ternary(zabbix_agent_service, _agent_service) }}"
     zabbix_agent_tls_subject: "{{ zabbix_agent_tls_subject is defined | ternary(zabbix_agent_tls_subject, _tls_subject) }}"
+    zabbix_agent_tlsaccept: "{{ zabbix_agent_tlsaccept is defined | ternary(zabbix_agent_tlsaccept, 'unencrypted')}}"
+    zabbix_agent_tlsconnect: "{{ zabbix_agent_tlsconnect is defined | ternary(zabbix_agent_tlsconnect, 'unencrypted')}}"
 
 - name: Setting Zabbix API Server Port
   ansible.builtin.set_fact:
@@ -54,12 +56,6 @@
   when:
     - not (zabbix_agent_docker | bool)
 
-- name: Gather PSK Secret Info
-  ansible.builtin.include_tasks: psk_secret.yml
-
-- name: Gather PSK Identity Info
-  ansible.builtin.include_tasks: psk_identity.yml
-
 - name: AutoPSK | Default tlsaccept and tlsconnect to enforce PSK
   ansible.builtin.set_fact:
     zabbix_agent_tlsaccept: psk
@@ -67,6 +63,22 @@
   when: zabbix_agent_tlspsk_auto | bool
   tags:
     - config
+
+- name: Configure PSK
+  when: "( zabbix_agent_tlsaccept == 'psk' ) or (zabbix_agent_tlsconnect  == 'psk')"
+  block:
+    - name: Gather PSK Secret Info
+      ansible.builtin.include_tasks: psk_secret.yml
+
+    - name: Gather PSK Identity Info
+      ansible.builtin.include_tasks: psk_identity.yml
+  tags:
+    - config
+
+- name: "Configure Agent"
+  ansible.builtin.include_tasks: Windows_conf.yml
+  when:
+    - ansible_os_family == "Windows"
 
 - name: "Configure Agent"
   ansible.builtin.include_tasks: Windows_conf.yml
