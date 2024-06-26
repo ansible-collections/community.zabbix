@@ -1,10 +1,10 @@
 {{ ansible_managed | comment }}
-# This is a configuration file for Zabbix Server process
+# This is a configuration file for Zabbix Agent 2
 # To get more information about Zabbix, visit http://www.zabbix.com
 
 # This configuration file is "minimalized", which means all the original comments 
-# are removed. The full documentation for your Zabbix Server can be found here:
-# https://www.zabbix.com/documentation/{{ zabbix_agent_version }}/en/manual/appendix/config/
+# are removed. The full documentation for your Zabbix Agent 2 can be found here:
+# https://www.zabbix.com/documentation/{{ zabbix_agent_version }}/en/manual/appendix/config/zabbix_agent2
 
 {% if zabbix_agent_aliases is defined and zabbix_agent_aliases %}
 {% if zabbix_agent_aliases is string %}
