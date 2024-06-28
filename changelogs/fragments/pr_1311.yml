@@ -1,2 +1,2 @@
 bugfixes:
-- zabbix-agent Fix Configure zabbix-agent #1310
+  - zabbix-agent Fix Configure zabbix-agent #1310
