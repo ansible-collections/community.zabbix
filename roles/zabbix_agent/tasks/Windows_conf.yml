@@ -15,7 +15,7 @@
 
 - name: "Windows | Configure zabbix-agent"
   ansible.windows.win_template:
-    src: "{{ zabbix_win_config_name }}.j2"
+    src: agent.conf.j2
     dest: "{{ zabbix_win_install_dir_conf }}\\{{ zabbix_win_config_name }}"
   notify: restart win zabbix agent
   tags:
