@@ -1,6 +1,12 @@
 ---
+dependency:
+  name: galaxy
+  enabled: true
+  options:
+    requirements-file: common/collections.yml
+
 driver:
-  name: docker
+  name: default
 
 platforms:
   - name: zabbix-agent-${MY_MOLECULE_CONTAINER:-centos}
@@ -20,15 +26,18 @@ platforms:
 provisioner:
   name: ansible
   playbooks:
+    create: ../../common/playbooks/create.yml
     prepare: ../../common/playbooks/prepare.yml
     converge: ../../common/playbooks/converge.yml
+    destroy: ../../common/playbooks/destroy.yml
   env:
     ANSIBLE_REMOTE_TMP: /tmp/
-    ANSIBLE_COLLECTIONS_PATHS: $HOME/.ansible/collections/ansible_collections/community/zabbix
-    ANSIBLE_ROLES_PATH: $HOME/.ansible/collections/ansible_collections/community/zabbix/roles
+    # https://github.com/ansible/molecule/issues/4015#issuecomment-1680859724
+    ANSIBLE_ROLES_PATH: ../../../../roles
   inventory:
     group_vars:
       all:
+        ansible_connection: community.docker.docker
         zabbix_agent_server: 192.168.3.33
         zabbix_agent_serveractive: 192.168.3.33
         zabbix_agent_listenip: 0.0.0.0
@@ -42,6 +51,7 @@ provisioner:
         zabbix_agent_version: 6.4
       v60:
         zabbix_agent_version: 6.0
+
 scenario:
   test_sequence:
     - dependency
@@ -56,5 +66,6 @@ scenario:
     - verify
     - cleanup
     - destroy
+
 verifier:
   name: testinfra

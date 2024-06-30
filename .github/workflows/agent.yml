@@ -58,9 +58,6 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r molecule/requirements.txt
 
-      - name: Install ansible.netcommon collection
-        run: ansible-galaxy collection install ansible.netcommon
-
       - name: Build the collection
         run: |
           # Pin versions to speed up CI
