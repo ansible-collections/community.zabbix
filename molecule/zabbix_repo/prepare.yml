@@ -1,6 +1,7 @@
 ---
 - name: Prepare
   hosts: all
+
   tasks:
     - name: "Apt update"
       ansible.builtin.shell: "apt-get update && echo exit 0 > /usr/sbin/policy-rc.d"

@@ -1,0 +1,20 @@
+---
+- name: Destroy
+  hosts: localhost
+  connection: local
+
+  gather_facts: false
+
+  tasks:
+    - name: Destroy OS container(s)
+      community.docker.docker_container:
+        name: "{{ item.name }}"
+        state: absent
+        force_kill: "{{ item.force_kill | default(True) }}"
+      loop: "{{ molecule_yml.platforms }}"
+
+  post_tasks:
+    - name: Destroy network
+      community.docker.docker_network:
+        name: zabbix
+        state: absent
