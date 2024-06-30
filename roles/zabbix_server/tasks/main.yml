@@ -74,7 +74,7 @@
 
 - name: "Create include dir zabbix-server"
   ansible.builtin.file:
-    path: "{{ zabbix_server_include }}"
+    path: "{{ zabbix_server_include_dir }}"
     owner: "{{ zabbix_os_user }}"
     group: "{{ zabbix_os_user }}"
     state: directory
