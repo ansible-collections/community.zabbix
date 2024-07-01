@@ -85,7 +85,7 @@
     mode: "{{ item.mode | default('0755') }}"
   become: true
   loop:
-    - path: "{{ zabbix_proxy_include }}"
+    - path: "{{ zabbix_proxy_include_dir }}"
       mode: "{{ zabbix_proxy_include_mode }}"
     - path: "{{ zabbix_proxy_loadmodulepath }}"
     - required: "{{ zabbix_proxy_tlspskfile is defined }}"
