@@ -1,2 +1,2 @@
 bugfixes:
-  - zabbix_agent and zabbix_server roles - Fixed problem with include file
+  - zabbix_agent, zabbix_proxy, and zabbix_server roles - Fixed problem with include file
