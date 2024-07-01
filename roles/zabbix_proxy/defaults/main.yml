@@ -58,7 +58,8 @@ zabbix_proxy_historycachesize: 16M
 zabbix_proxy_historyindexcachesize: 4M
 zabbix_proxy_hostname: "{{ inventory_hostname }}"
 zabbix_proxy_housekeepingfrequency: 1
-zabbix_proxy_include: /etc/zabbix/zabbix_proxy.conf.d/*.conf
+zabbix_proxy_include_dir: /etc/zabbix/zabbix_proxy.conf.d
+zabbix_proxy_include: "{{ zabbix_proxy_include_dir + '/*.conf' }}"
 zabbix_proxy_javagatewayport: 10052
 zabbix_proxy_listenip: 0.0.0.0
 zabbix_proxy_libdir: /usr/lib/zabbix

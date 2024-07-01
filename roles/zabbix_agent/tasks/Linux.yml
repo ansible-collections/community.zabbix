@@ -130,7 +130,7 @@
 
 - name: "Create include dir zabbix-agent"
   ansible.builtin.file:
-    path: "{{ zabbix_agent_include }}"
+    path: "{{ zabbix_agent_include_dir }}"
     owner: root
     group: zabbix
     mode: "{{ zabbix_agent_include_mode }}"
