@@ -53,7 +53,8 @@
     zabbix_repo_apt_priority: "{{ zabbix_agent_apt_priority | default (omit) }}"
   when:
     - zabbix_manage_repo | default(true)
-    - not (zabbix_agent_docker | bool) or ansible_os_family == "Windows"
+    - not (zabbix_agent_docker | bool)
+    - ansible_os_family != "Windows"
 
 - name: "Install the correct repository"
   ansible.builtin.include_tasks: "{{ ansible_os_family }}.yml"
