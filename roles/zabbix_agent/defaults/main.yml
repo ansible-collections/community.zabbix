@@ -24,6 +24,7 @@ zabbix_agent_forceactivechecksonstart: false
 zabbix_agent_heartbeatfrequency: 60
 zabbix_agent_hostname: "{{ inventory_hostname }}"
 zabbix_agent_include_mode: "0750"
+zabbix_agent_additional_includes: []
 zabbix_agent_listenip: 0.0.0.0
 zabbix_agent_listenport: 10050
 zabbix_agent_logfilesize: 100
