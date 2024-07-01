@@ -67,6 +67,11 @@ DenyKey={{ item }}
 {{ (zabbix_agent_hostname is defined and zabbix_agent_hostname is not none) | ternary('', '# ') }}Hostname={{ zabbix_agent_hostname | default('') }}
 {{ (zabbix_agent_hostnameitem is defined and zabbix_agent_hostnameitem is not none) | ternary('', '# ') }}HostnameItem={{ zabbix_agent_hostnameitem | default('') }}
 {{ (zabbix_agent_include is defined and zabbix_agent_include is not none) | ternary('', '# ') }}Include={{ zabbix_agent_include | default('') }}
+{% if zabbix_agent_additional_include is defined and zabbix_agent_additional_include is iterable and zabbix_agent_additional_include is not string %}
+{% for include in zabbix_agent_additional_include %}
+Include={{ include }}
+{% endfor %}
+{% endif %}
 {% if not zabbix_agent2 %}
 {{ (zabbix_agent_listenbacklog is defined and zabbix_agent_listenbacklog is not none) | ternary('', '# ') }}ListenBacklog={{ zabbix_agent_listenbacklog | default('') }}
 {% endif %}
