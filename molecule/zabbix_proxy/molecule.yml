@@ -1,6 +1,13 @@
 ---
+dependency:
+  name: galaxy
+  enabled: true
+  options:
+    requirements-file: molecule/default/collections.yml
+
 driver:
-  name: docker
+  name: default
+
 platforms:
   - name: zabbix-proxy-${MY_MOLECULE_VERSION:-v70}-${MY_MOLECULE_DATABASE:-mysql}-${MY_MOLECULE_CONTAINER:-rockylinux8}
     image: geerlingguy/docker-${MY_MOLECULE_IMAGE:-rockylinux8}-ansible:latest
@@ -18,12 +25,16 @@ platforms:
 
 provisioner:
   name: ansible
+  playbooks:
+    create: ../default/create.docker.yml
+    destroy: ../default/destroy.docker.yml
   env:
-    ANSIBLE_COLLECTIONS_PATHS: $HOME/.ansible/collections/ansible_collections/community/zabbix
-    ANSIBLE_ROLES_PATH: $HOME/.ansible/collections/ansible_collections/community/zabbix/roles
+    # https://github.com/ansible/molecule/issues/4015#issuecomment-1680859724
+    ANSIBLE_ROLES_PATH: ../../roles
   inventory:
     group_vars:
       all:
+        ansible_connection: community.docker.docker
         zabbix_repo_apt_priority: 1
         zabbix_repo_yum_gpg_check: 1
       v70:

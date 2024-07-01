@@ -1,6 +1,7 @@
 ---
 - name: Prepare
   hosts: all
+
   pre_tasks:
     - name: "Installing packages on CentOS"
       ansible.builtin.yum:
