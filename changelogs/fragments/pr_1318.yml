@@ -1,0 +1,2 @@
+bugfixes:
+  - zabbix-agent - Fix set correct variable zabbix_agent_logfile
