@@ -26,7 +26,7 @@
 
 - name: Set Variables
   ansible.builtin.set_fact:
-    zabbix_agent_include: "{{ zabbix_agent_include is defined | ternary(zabbix_agent_include, _include) }}"
+    zabbix_agent_include_dir: "{{ zabbix_agent_include_dir is defined | ternary(zabbix_agent_include_dir, _include) }}"
     zabbix_agent_logfile: "{{ zabbix_agent_logfile is defined | ternary(zabbix_agent_logfile, _logfile) }}"
     zabbix_agent_package: "{{ zabbix_agent_package is defined | ternary(zabbix_agent_package, _agent_package) }}"
     zabbix_agent_pidfile: "{{ zabbix_agent_pidfile is defined | ternary(zabbix_agent_pidfile, _pidfile) }}"
