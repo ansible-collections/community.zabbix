@@ -1,2 +1,2 @@
 bugfixes:
-  - zabbix-agent Fix zabbix_agent_logfile if condition #1314
+  - zabbix-agent - Fix zabbix_agent_logfile if condition
