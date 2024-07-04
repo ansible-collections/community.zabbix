@@ -58,7 +58,7 @@
       Components: {{ zabbix_repo_deb_component }}
       Architectures: {{ 'amd64' if ansible_machine != 'aarch64' else 'arm64'}}
       Signed-By: {{ zabbix_repo_gpg_key }}
-  register: zabbix_repo
+  register: zabbix_repo_apt_file
   become: true
   tags:
     - install
@@ -94,6 +94,7 @@
     - install
 
 - name: "Debian | Update apt cache if repo was added"
-  ansible.builtin.apt: update_cache=yes
-  when: zabbix_repo is changed
+  ansible.builtin.apt:
+    update_cache: true
+  when: zabbix_repo_apt_file.changed
   become: true
