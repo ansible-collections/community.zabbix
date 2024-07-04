@@ -4,6 +4,19 @@ community.zabbix Release Notes
 
 .. contents:: Topics
 
+v3.0.2
+======
+
+Bugfixes
+--------
+
+- zabbix_agent Role - Fix Configure zabbix_agent
+- zabbix_agent Role - Fixes a mispelling of the `zabbix_agent_logfile` variable
+- zabbix_agent Role - Fixes error in the double assignment of values for the `zabbix_agent_tlspskidentity_check` and `zabbix_agent_tlspskcheck` variables.
+- zabbix_agent Role - Fixes multiple errors related to the Windows install
+- zabbix_agent, zabbix_proxy, and zabbix_server roles - Fixed problem with include file
+- zabbix_repo Role - Fixes error that attempts to use the repo name as a variable.
+
 v3.0.1
 ======
 
