@@ -2,7 +2,14 @@
 - name: "Set Log File Info"
   ansible.builtin.set_fact:
     zabbix_agent_logfile: "{{ zabbix_agent_win_logfile is defined | ternary(zabbix_agent_win_logfile, zabbix_agent2_win_logfile) | default(_win_logfile) }}"
-  when: zabbix_agent_logfile is undefined
+
+- name: "Set Include Path Info"
+  ansible.builtin.set_fact:
+    zabbix_agent_include: "{{ zabbix_agent_win_include is defined | ternary(zabbix_agent_win_include, zabbix_agent2_win_include) | default(_win_include) }}"
+
+- name: "Set Control Socket"
+  ansible.builtin.set_fact:
+    zabbix_agent_controlsocket: "\\\\.\\pipe\\agent.sock"
 
 - name: "Set default ip address for zabbix_agent_ip"
   ansible.builtin.set_fact:
