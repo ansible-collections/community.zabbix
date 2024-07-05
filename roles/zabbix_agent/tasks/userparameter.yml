@@ -29,7 +29,7 @@
         - name: Install user-defined userparameters
           ansible.builtin.template:
             src: "{{ zabbix_agent_userparameters_templates_src }}/{{ item.name }}.j2"
-            dest: "{{ zabbix_agent_include }}/userparameter_{{ item.name }}.conf"
+            dest: "{{ zabbix_agent_include_dir }}/userparameter_{{ item.name }}.conf"
             owner: zabbix
             group: zabbix
             mode: "0644"
