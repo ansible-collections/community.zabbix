@@ -4,6 +4,14 @@ community.zabbix Release Notes
 
 .. contents:: Topics
 
+v3.0.3
+======
+
+Bugfixes
+--------
+
+- zabbix_agent Role - Fixed several issues related to `zabbix_agent_include_dir` and `zabbix_agent_include`
+
 v3.0.2
 ======
 

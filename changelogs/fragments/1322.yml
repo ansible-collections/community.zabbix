@@ -1,2 +1,0 @@
-bugfixes:
-  - zabbix_agent Role - Fixed several issues related to `zabbix_agent_include_dir` and `zabbix_agent_include`
