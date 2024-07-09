@@ -33,7 +33,7 @@
             owner: zabbix
             group: zabbix
             mode: "0644"
-          loop: "{{ zabbix_agent_userparameters | rejectattr('scripts_dir', 'defined') }}"
+          loop: "{{ zabbix_agent_userparameters }}"
 
         - name: Install user-defined scripts
           ansible.builtin.copy:
