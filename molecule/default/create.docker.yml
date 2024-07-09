@@ -43,5 +43,5 @@
             image: "mysql:8.0"
             env: { MYSQL_ROOT_PASSWORD: changeme }
           pgsql:
-            image: "postgres:13"
+            image: "timescale/timescaledb:latest-pg13"
             env: { POSTGRES_PASSWORD: changeme }
