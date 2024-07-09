@@ -16,7 +16,7 @@
   when: enable_version_check | default(true) | bool
   ansible.builtin.assert:
     that:
-      - "{{ zabbix_agent_version|float in zabbix_valid_agent_versions[ansible_distribution_major_version] }}"
+      - zabbix_agent_version | float in zabbix_valid_agent_versions[ansible_distribution_major_version]
     fail_msg: Zabbix version {{ zabbix_agent_version }} is not supported on {{ ansible_distribution }} {{ ansible_distribution_major_version }}
   tags:
     - always
