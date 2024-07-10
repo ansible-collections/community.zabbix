@@ -68,10 +68,10 @@ DenyKey={{ item }}
 {{ (zabbix_agent_hostnameitem is defined and zabbix_agent_hostnameitem is not none) | ternary('', '# ') }}HostnameItem={{ zabbix_agent_hostnameitem | default('') }}
 {% if zabbix_agent_include is defined and zabbix_agent_include %}
 {% if zabbix_agent_include is string %}
-Include={{ zabbix_agent_include }}
+Include={{ zabbix_agent_include }}/*.conf
 {% else %}
 {% for item in zabbix_agent_include %}
-Include={{ item }}
+Include={{ item }}/*.conf
 {% endfor %}
 {% endif %}
 {% else %}
