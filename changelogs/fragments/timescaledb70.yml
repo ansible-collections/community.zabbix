@@ -1,0 +1,3 @@
+---
+bugfixes:
+  - zabbix_server role - fixed creating TimescaleDB hypertables for Zabbix 7.0
