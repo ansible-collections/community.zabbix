@@ -298,6 +298,11 @@ server_url: https://zabbix.com
 auth_token: 3bc3dc85e13e2431812e7a32fa8341cbcf378e5101356c015fdf2e35fd511b06
 validate_certs: false
 
+#Using ansible-vault for auth token instead of username/password
+plugin: community.zabbix.zabbix_inventory
+server_url: https://zabbix.com
+auth_token: "{{ (lookup('ansible.builtin.vault','vault.yml') | ansible.builtin.from_yaml).zabbix_api_key }}"
+validate_certs: false
 """
 
 from ansible.plugins.inventory import BaseInventoryPlugin, Constructable, Cacheable, to_safe_group_name
@@ -378,7 +383,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         )
 
     def login_zabbix(self):
-        auth_token = self.get_option('auth_token')
+        auth_token = self._template_option('auth_token')
         if auth_token:
             self.auth = auth_token
             return
@@ -463,3 +468,8 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                         group_name = to_safe_group_name(group['name'])
                         self.inventory.add_group(group_name)
                         self.inventory.add_child(group_name, host_name)
+
+    def _template_option(self, option):
+        value = self.get_option(option)
+        self.templar.available_variables = {}
+        return self.templar.template(value)
