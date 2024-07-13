@@ -52,15 +52,23 @@
         - skip_ansible_lint
 
     - block:
-      - name: 'Create /etc/zabbix folder'
-        ansible.builtin.file:
-          path: /etc/zabbix
-          state: directory
+      - name: 'Create zabbix group'
+        ansible.builtin.group:
+          name: zabbix
 
       - name: 'Create zabbix user'
         ansible.builtin.user:
           create_home: False
           name: zabbix
+          group: zabbix
+
+      - name: 'Create /etc/zabbix folder'
+        ansible.builtin.file:
+          path: /etc/zabbix
+          state: directory
+          owner: zabbix
+          group: zabbix
+
 
       - name: "Create certificate file"
         ansible.builtin.copy:
