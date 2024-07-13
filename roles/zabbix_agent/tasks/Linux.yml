@@ -147,7 +147,7 @@
     group: zabbix
     mode: "{{ zabbix_agent_include_mode }}"
     state: directory
-  loop: "{{ zabbix_agent_include_dir }}"
+  loop: "{{ zabbix_agent_include_dir | list }}"  # To prevent errors, filter a string value as a list
   loop_control:
     loop_var: 'include_dir'
   when: zabbix_agent_include_dir is iterable
