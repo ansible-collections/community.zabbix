@@ -42,7 +42,10 @@ provisioner:
         zabbix_agent_serveractive: 192.168.3.33
         zabbix_agent_listenip: 0.0.0.0
         zabbix_agent_tlsconnect: psk
-        zabbix_agent_tlsaccept: psk
+        zabbix_agent_tlsaccept: psk,cert
+        zabbix_agent_tlscertfile: /etc/zabbix/cert
+        zabbix_agent_tlskeyfile: /etc/zabbix/key
+        zabbix_agent_tlscafile: /etc/zabbix/ca
         zabbix_repo_apt_priority: 1
         zabbix_repo_yum_gpg_check: 1
       v70:
