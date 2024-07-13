@@ -22,6 +22,12 @@ def test_zabbix_agent_dot_conf(zabbix_agent_conf):
     assert zabbix_agent_conf.contains("ServerActive=192.168.3.33")
     assert zabbix_agent_conf.contains("DebugLevel=3")
 
+    assert zabbix_agent_conf.contains("TLSConnect=psk")
+    assert zabbix_agent_conf.contains("TLSAccept=psk,cert")
+    assert zabbix_agent_conf.contains("TLSCertFile=/etc/zabbix/cert")
+    assert zabbix_agent_conf.contains("TLSKeyFile=/etc/zabbix/key")
+    assert zabbix_agent_conf.contains("TLSCAFile=/etc/zabbix/ca")
+
 
 def test_zabbix_include_dir(zabbix_agent_include_dir):
     assert zabbix_agent_include_dir.is_directory
