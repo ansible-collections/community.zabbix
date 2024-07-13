@@ -1,0 +1,3 @@
+---
+bugfixes:
+  - zabbix_agent role - fix TLSAccept parameter provisioning in zabbix_agentd.conf
