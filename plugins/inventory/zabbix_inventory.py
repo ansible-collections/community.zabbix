@@ -298,10 +298,10 @@ server_url: https://zabbix.com
 auth_token: 3bc3dc85e13e2431812e7a32fa8341cbcf378e5101356c015fdf2e35fd511b06
 validate_certs: false
 
-#Using ansible-vault for auth token instead of username/password
+#Using jinga2 template for auth token instead of username/password.
 plugin: community.zabbix.zabbix_inventory
 server_url: https://zabbix.com
-auth_token: "{{ (lookup('ansible.builtin.vault','vault.yml') | ansible.builtin.from_yaml).zabbix_api_key }}"
+auth_token: "{{ lookup('ansible.builtin.env', 'ZABBIX_API_KEY') }}"
 validate_certs: false
 """
 
