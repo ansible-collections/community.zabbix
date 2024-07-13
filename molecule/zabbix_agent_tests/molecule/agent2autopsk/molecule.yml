@@ -7,8 +7,6 @@ provisioner:
     group_vars:
       all:
         zabbix_agent2: true
-        zabbix_agent_tlsconnect: psk
-        zabbix_agent_tlsaccept: psk
         zabbix_agent_tlspsk_auto: True
         zabbix_agent_plugins:
           - name: SystemRun

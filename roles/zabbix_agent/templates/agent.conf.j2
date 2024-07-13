@@ -121,7 +121,7 @@ Plugins.{{ my_name }}.{{ param }}={{ value }}
 {{ (zabbix_agent_statusport is defined and zabbix_agent_statusport is not none) | ternary('', '# ') }}StatusPort={{ zabbix_agent_statusport | default('') }}
 {% endif %}
 {{ (zabbix_agent_timeout is defined and zabbix_agent_timeout is not none) | ternary('', '# ') }}Timeout={{ zabbix_agent_timeout | default('') }}
-{{ (zabbix_agent_tlsconnect is defined and zabbix_agent_tlsconnect is not none) | ternary('', '# ') }}TLSAccept={{ zabbix_agent_tlsconnect | default('') }}
+{{ (zabbix_agent_tlsconnect is defined and zabbix_agent_tlsaccept is not none) | ternary('', '# ') }}TLSAccept={{ zabbix_agent_tlsaccept | default('') }}
 {{ (zabbix_agent_tlscafile is defined and zabbix_agent_tlscafile is not none) | ternary('', '# ') }}TLSCAFile={{ zabbix_agent_tlscafile | default('') }}
 {{ (zabbix_agent_tlscertfile is defined and zabbix_agent_tlscertfile is not none) | ternary('', '# ') }}TLSCertFile={{ zabbix_agent_tlscertfile | default('') }}
 {% if not zabbix_agent2 and ansible_os_family != "Windows" %}
