@@ -70,7 +70,7 @@
     - config
 
 - name: Configure PSK
-  when: "( zabbix_agent_tlsaccept == 'psk' ) or (zabbix_agent_tlsconnect  == 'psk')"
+  when: "( 'psk' in zabbix_agent_tlsaccept ) or (zabbix_agent_tlsconnect  == 'psk')"
   block:
     - name: Gather PSK Secret Info
       ansible.builtin.include_tasks: psk_secret.yml
