@@ -61,16 +61,29 @@
   when:
     - not (zabbix_agent_docker | bool)
 
-- name: AutoPSK | Default tlsaccept and tlsconnect to enforce PSK
-  ansible.builtin.set_fact:
-    zabbix_agent_tlsaccept: psk
-    zabbix_agent_tlsconnect: psk
+- block:
+    - name: AutoPSK | Default tlsconnect to enforce PSK
+      ansible.builtin.set_fact:
+        zabbix_agent_tlsconnect: psk
+
+    - name: AutoPSK | Default tlsaccept to enforce PSK when zabbix_agent_tlsaccept is not defined
+      ansible.builtin.set_fact:
+        zabbix_agent_tlsaccept: psk
+      when: not zabbix_agent_tlsaccept is defined
+
+    - name: AutoPSK | Default tlsaccept to enforce PSK when zabbix_agent_tlsaccept is defined
+      ansible.builtin.set_fact:
+        zabbix_agent_tlsaccept: "{{ 'psk,' + zabbix_agent_tlsaccept }}"
+      when:
+        - zabbix_agent_tlsaccept is defined
+        - not 'psk' in zabbix_agent_tlsaccept
+
   when: zabbix_agent_tlspsk_auto | bool
   tags:
     - config
 
 - name: Configure PSK
-  when: "( zabbix_agent_tlsaccept == 'psk' ) or (zabbix_agent_tlsconnect  == 'psk')"
+  when: "( 'psk' in zabbix_agent_tlsaccept ) or (zabbix_agent_tlsconnect  == 'psk')"
   block:
     - name: Gather PSK Secret Info
       ansible.builtin.include_tasks: psk_secret.yml
@@ -79,11 +92,6 @@
       ansible.builtin.include_tasks: psk_identity.yml
   tags:
     - config
-
-- name: "Configure Agent"
-  ansible.builtin.include_tasks: Windows_conf.yml
-  when:
-    - ansible_os_family == "Windows"
 
 - name: "Configure Agent"
   ansible.builtin.include_tasks: Windows_conf.yml
