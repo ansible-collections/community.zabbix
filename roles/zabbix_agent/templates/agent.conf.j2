@@ -66,11 +66,11 @@ DenyKey={{ item }}
 {{ (zabbix_agent_hostmetadataitem is defined and zabbix_agent_hostmetadataitem is not none) | ternary('', '# ') }}HostMetadataItem={{ zabbix_agent_hostmetadataitem | default('') }}
 {{ (zabbix_agent_hostname is defined and zabbix_agent_hostname is not none) | ternary('', '# ') }}Hostname={{ zabbix_agent_hostname | default('') }}
 {{ (zabbix_agent_hostnameitem is defined and zabbix_agent_hostnameitem is not none) | ternary('', '# ') }}HostnameItem={{ zabbix_agent_hostnameitem | default('') }}
-{% if zabbix_agent_include is defined and zabbix_agent_include %}
-{% if zabbix_agent_include is string %}
-Include={{ zabbix_agent_include }}/*.conf
+{% if zabbix_agent_include_dir is defined and zabbix_agent_include_dir %}
+{% if zabbix_agent_include_dir is string %}
+Include={{ zabbix_agent_include_dir }}/*.conf
 {% else %}
-{% for item in zabbix_agent_include %}
+{% for item in zabbix_agent_include_dir %}
 Include={{ item }}/*.conf
 {% endfor %}
 {% endif %}
