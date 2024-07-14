@@ -4,6 +4,21 @@ community.zabbix Release Notes
 
 .. contents:: Topics
 
+v3.0.4
+======
+
+Minor Changes
+-------------
+
+- zabbix_agent Role - Fixes assert warning 'conditional statements should not include jinja2 templating delimiters such as..'
+- zabbix_agent Role - Set `no_log` parameter to hostmacro API call.
+
+Bugfixes
+--------
+
+- zabbix_agent Role - fix TLSAccept parameter provisioning in zabbix_agentd.conf
+- zabbix_server Role - fixed creating TimescaleDB hypertables for Zabbix 7.0
+
 v3.0.3
 ======
 
