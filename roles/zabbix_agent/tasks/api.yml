@@ -57,6 +57,7 @@
   register: zabbix_api_hostmarcro_created
   until: zabbix_api_hostmarcro_created is succeeded
   retries: 10
+  no_log: "{{ ansible_verbosity < 3 }}"
   delegate_to: "{{ zabbix_api_server_host }}"
   tags:
     - api
