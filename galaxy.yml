@@ -1,7 +1,7 @@
 ---
 namespace: community
 name: zabbix
-version: 3.0.3
+version: 3.0.4
 readme: README.md
 authors:
   - Dusan Matejka (@D3DeFi)
