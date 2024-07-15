@@ -1,0 +1,2 @@
+minor_changes:
+  - zabbix_inventory Plugin - Add support for jinja2 templating for auth_token in zabbix_inventory.yml
