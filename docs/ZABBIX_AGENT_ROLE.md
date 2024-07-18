@@ -141,7 +141,7 @@ Selinux changes will be installed based on the status of selinux running on the 
 * `zabbix_agent_listeninterface`: Interface zabbix-agent listens on. Leave blank for all.
 * `zabbix_agent_package_remove`: If `zabbix_agent2: True` and you want to remove the old installation. Default: `False`.
 * `zabbix_agent_package_state`: If Zabbix-agent needs to be `present` (default) or `latest`.
-* `zabbix_agent_package`: The name of the zabbix-agent package. Default: `zabbix-agent` if `zabbix_agent2` is fale and `zabbix-agent2` if `true`.
+* `zabbix_agent_package`: The name of the zabbix-agent package. Default: `zabbix-agent` if `zabbix_agent2` is false and `zabbix-agent2` if `true`.
 * `zabbix_agent_sender_package`: The name of the zabbix-sender package. Default: `zabbix-sender`.
 * `zabbix_agent_userparameters`: Default: `[]]`. List of userparameter names and scripts (if any). Detailed description is given in the [Deploying Userparameters](#deploying-userparameters) section.
   * `name`: Userparameter name (should be the same with userparameter template file name)
