@@ -136,7 +136,7 @@ zabbix_agent_docker_ports:
 zabbix_agent_docker_security_opts:
   - apparmor:unconfined
 zabbix_agent_docker_volumes:
-  - /etc/zabbix/zabbix_agentd.d:{{ zabbix_agent_include_dir }}
+  - /etc/zabbix/zabbix_agentd.d:{{ zabbix_agent_docker_include_dir }}
   - /:/hostfs:ro
   - /etc:/hostfs/etc:ro
   - /proc:/hostfs/proc:ro
