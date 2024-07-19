@@ -138,6 +138,22 @@
   become: true
   tags:
     - config
+  when: zabbix_agent_include_dir is string
+
+- name: "Create include dirs zabbix-agent"
+  ansible.builtin.file:
+    path: "{{ include_dir }}"
+    owner: root
+    group: zabbix
+    mode: "{{ zabbix_agent_include_mode }}"
+    state: directory
+  loop: "{{ zabbix_agent_include_dir | list }}"  # To prevent errors, filter a string value as a list
+  loop_control:
+    loop_var: 'include_dir'
+  when: zabbix_agent_include_dir is iterable
+  become: true
+  tags:
+    - config
 
 - name: "Install the Docker container"
   ansible.builtin.include_tasks: Docker.yml

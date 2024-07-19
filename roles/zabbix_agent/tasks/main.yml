@@ -35,10 +35,6 @@
     zabbix_agent_tlsaccept: "{{ zabbix_agent_tlsaccept is defined | ternary(zabbix_agent_tlsaccept, 'unencrypted')}}"
     zabbix_agent_tlsconnect: "{{ zabbix_agent_tlsconnect is defined | ternary(zabbix_agent_tlsconnect, 'unencrypted')}}"
 
-- name: Set Include Files
-  ansible.builtin.set_fact:
-    zabbix_agent_include: "{{ zabbix_agent_include is defined | ternary(zabbix_agent_include, zabbix_agent_include_dir + '/*.conf') }}"
-
 - name: Setting Zabbix API Server Port
   ansible.builtin.set_fact:
     zabbix_api_server_port: "{{ '443' if zabbix_api_use_ssl|bool else '80' }}"
