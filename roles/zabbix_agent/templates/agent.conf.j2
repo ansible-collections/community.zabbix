@@ -54,7 +54,7 @@ DenyKey={{ item }}
 {% if not zabbix_agent2 %}
 {{ (zabbix_agent_enableremotecommands is defined and zabbix_agent_enableremotecommands is not none) | ternary('', '# ') }}EnableRemoteCommands={{ zabbix_agent_enableremotecommands | default (false) | ternary('1', '0') }}
 {% endif %}
-{% if zabbix_agent2 %}
+{% if zabbix_agent2 and zabbix_agent_version is version_compare('6.2', '>=') %}
 {{ (zabbix_agent_forceactivechecksonstart is defined and zabbix_agent_forceactivechecksonstart is not none) | ternary('', '# ') }}ForceActiveChecksOnStart={{ zabbix_agent_forceactivechecksonstart | default (false) | ternary('1', '0') }}
 {% endif %}
 {% if zabbix_agent_version is version_compare('6.2', '>=') %}
@@ -106,7 +106,7 @@ Plugins.{{ my_name }}.{{ param }}={{ value }}
 {% endfor %}
 {% endfor %}
 {% endif %}
-{% if zabbix_agent2 %}
+{% if zabbix_agent2 and zabbix_agent_version is version_compare('6.2', '>=') %}
 {{ (zabbix_agent_pluginsocket is defined and zabbix_agent_pluginsocket is not none) | ternary('', '# ') }}PluginSocket={{ zabbix_agent_pluginsocket | default('') }}
 {{ (zabbix_agent_plugintimeout is defined and zabbix_agent_plugintimeout is not none) | ternary('', '# ') }}PluginTimeout={{ zabbix_agent_plugintimeout | default('') }}
 {% endif %}
