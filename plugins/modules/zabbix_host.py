@@ -944,7 +944,7 @@ class Host(ZabbixBase):
 
 
 # Add all default values to all missing parameters for existing interfaces
-def update_exist_interfaces_with_defaults(exist_interfaces, zabbix_version):
+def update_exist_interfaces_with_defaults(exist_interfaces):
 
     new_exist_interfaces = []
     default_interface = {
@@ -981,11 +981,10 @@ def update_exist_interfaces_with_defaults(exist_interfaces, zabbix_version):
     ]
     for interface in exist_interfaces:
         normalized_interface = interface
-        if LooseVersion("7.0") <= LooseVersion(zabbix_version):
-            denied_fields = list(set(interface.keys()) - set(allowed_fields))
-            normalized_interface = zabbix_utils.helper_normalize_data(
-                interface, del_keys=denied_fields
-            )[0]
+        denied_fields = list(set(interface.keys()) - set(allowed_fields))
+        normalized_interface = zabbix_utils.helper_normalize_data(
+            interface, del_keys=denied_fields
+        )[0]
 
         new_interface = default_interface.copy()
         new_interface.update(normalized_interface)
@@ -1215,7 +1214,7 @@ def main():
             # get existing host's interfaces
             exist_interfaces = host._zapi.hostinterface.get({"output": "extend", "hostids": host_id})
             exist_interfaces.sort(key=lambda x: int(x["interfaceid"]))
-            exist_interfaces = update_exist_interfaces_with_defaults(exist_interfaces, host._zbx_api_version)
+            exist_interfaces = update_exist_interfaces_with_defaults(exist_interfaces)
 
             # Convert integer parameters from strings to ints
             for idx, interface in enumerate(copy.deepcopy(exist_interfaces)):
