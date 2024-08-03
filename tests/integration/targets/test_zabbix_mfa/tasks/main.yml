@@ -1,0 +1,82 @@
+---
+- name: test - do not run tests with < Zabbix 7.0
+  meta: end_play
+  when: zabbix_version is version('7.0', '<')
+
+- name: test - try to create a TOTP MFA method
+  community.zabbix.zabbix_mfa:
+    name: Zabbix TOTP
+    method_type: totp
+    hash_function: sha-1
+    code_length: 6
+  register: zbxmfa_create
+
+- name: assert that the TOTP MFA method was created
+  ansible.builtin.assert:
+    that:
+      - zbxmfa_create.changed is sameas True
+
+- name: test - try to update the TOTP MFA method (present)
+  community.zabbix.zabbix_mfa:
+    name: Zabbix TOTP
+    method_type: totp
+    hash_function: sha-1
+    code_length: 6
+  register: zbxmfa_update
+
+- name: assert that the TOTP MFA method was NOT updated
+  ansible.builtin.assert:
+    that:
+      - zbxmfa_update.changed is sameas False
+
+- name: test - try to delete TOTP MFA method
+  community.zabbix.zabbix_mfa:
+    name: Zabbix TOTP
+    state: absent
+  register: zbxmfa_delete
+
+- name: assert that the TOTP MFA method was deleted
+  ansible.builtin.assert:
+    that:
+      - zbxmfa_delete.changed is sameas True
+      - zbxmfa_delete.msg == "Successfully deleted MFA method."
+
+- name: test - try to create a Duo MFA method
+  community.zabbix.zabbix_mfa:
+    name: Duo authentication service prompt
+    method_type: duo_universal_prompt
+    api_hostname: api_hostname
+    clientid: clientid
+    client_secret: client_secret
+  register: zbxmfa_create
+
+- name: assert that the Duo MFA method was created
+  ansible.builtin.assert:
+    that:
+      - zbxmfa_create.changed is sameas True
+
+- name: test - try to update the Duo MFA method (present)
+  community.zabbix.zabbix_mfa:
+    name: Duo authentication service prompt
+    method_type: duo_universal_prompt
+    api_hostname: api_hostname
+    clientid: clientid
+    client_secret: client_secret
+  register: zbxmfa_update
+
+- name: assert that the Duo MFA method was updated (without changes)
+  ansible.builtin.assert:
+    that:
+      - zbxmfa_update.changed is sameas True
+
+- name: test - try to delete the Duo MFA methid
+  community.zabbix.zabbix_mfa:
+    name: Duo authentication service prompt
+    state: absent
+  register: zbxmfa_delete
+
+- name: assert that the Duo MFA method was deleted
+  ansible.builtin.assert:
+    that:
+      - zbxmfa_delete.changed is sameas True
+      - zbxmfa_delete.msg == "Successfully deleted MFA method."
