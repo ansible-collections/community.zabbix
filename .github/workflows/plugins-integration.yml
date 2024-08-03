@@ -68,7 +68,7 @@ jobs:
       # the Zabbix server. To do this we spin up a Docker container using the `matrix`
       # of version and ports specified earlier.
       - name: Zabbix container server provisioning
-        uses: isbang/compose-action@v1.5.0
+        uses: hoverkraft-tech/compose-action@v2.0.1
         with:
           compose-file: "./ansible_collections/community/zabbix/docker-compose.yml"
         env:
