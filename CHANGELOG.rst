@@ -4,6 +4,26 @@ community.zabbix Release Notes
 
 .. contents:: Topics
 
+v3.1.0
+======
+
+Minor Changes
+-------------
+
+- zabbix_agent Role - Reworked Include logic based on Alias logic
+- zabbix_inventory Plugin - Add support for jinja2 templating for auth_token in zabbix_inventory.yml
+- zabbix_mfa module added
+
+Bugfixes
+--------
+
+- zabbix_host - delete denied parameter from interfaces
+
+New Modules
+-----------
+
+- community.zabbix.zabbix_mfa - Create/update/delete Zabbix MFA method
+
 v3.0.4
 ======
 
