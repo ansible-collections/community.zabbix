@@ -1,3 +1,0 @@
----
-minor_changes:
-  - zabbix_agent Role - Reworked Include logic based on Alias logic
