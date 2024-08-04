@@ -1,2 +1,0 @@
-bugfixes:
-  - zabbix_host - delete denied parameter from interfaces
