@@ -114,13 +114,13 @@ The following is an overview of all available configuration default for this rol
 * `zabbix_agent_version_minor`: When you want to specify a minor version to be installed. Is also used for `zabbix_sender` and `zabbix_get`. RedHat only. Default set to: `*` (latest available)
 * `zabbix_repo_yum`: A list with Yum repository configuration.
 * `zabbix_repo_yum_gpgcheck`: If Yum should check GPG keys on installation
-* `zabbix_repo_yum_schema`: Default: `https`. Option to change the web schema for the yum repository(http/https)
+* `zabbix_repo_yum_schema`: Default: `https`. Option to change the web schema for the yum repository (http/https)
 * `zabbix_agent_disable_repo`: A list of repos to disable during install.  Default `epel`.
 * `zabbix_repo_deb_url`: The URL to the Zabbix repository.  Default `http://repo.zabbix.com/zabbix/{{ zabbix_agent_version }}/{{ ansible_distribution.lower() }}`
 * `zabbix_repo_deb_component`: The repository component for Debian installs. Default `main`.
-* `zabbix_repo_deb_gpg_key_url`: The URL to download the Zabbix GPG key from. Default `http://repo.zabbix.com/zabbix-official-repo.key.
+* `zabbix_repo_deb_gpg_key_url`: The URL to download the Zabbix GPG key from. Default http://repo.zabbix.com/zabbix-official-repo.key.
 * `zabbix_repo_deb_include_deb_src`: True, if deb-src should be included in the zabbix.sources entry. Default `true`.
-* `zabbix_manage_repo`: Have the collection install and configure the Zabbix repo Default `true`.
+* `zabbix_manage_repo`: Have the collection install and configure the Zabbix repo. Default `true`.
 
 ### SElinux
 
@@ -130,7 +130,7 @@ Selinux changes will be installed based on the status of selinux running on the 
 
 ### Zabbix Agent
 
-* `zabbix_agent2`: Default: `False`. When you want to install the `Zabbix Agent2` instead of the "old" `Zabbix Agent`.zabbix_agent_version
+* `zabbix_agent2`: Default: `False`. When you want to install the `Zabbix Agent2` instead of the "old" `Zabbix Agent`.
 * `zabbix_agent_apt_priority`: Add a weight (`Pin-Priority`) for the APT repository.
 * `zabbix_agent_chassis`: Default: `false`. When set to `true`, it will give Zabbix Agent access to the Linux DMI table allowing system.hw.chassis info to populate.
 * `zabbix_agent_conf_mode`: Default: `0644`. The "mode" for the Zabbix configuration file.
@@ -143,7 +143,7 @@ Selinux changes will be installed based on the status of selinux running on the 
 * `zabbix_agent_package_state`: If Zabbix-agent needs to be `present` (default) or `latest`.
 * `zabbix_agent_package`: The name of the zabbix-agent package. Default: `zabbix-agent` if `zabbix_agent2` is false and `zabbix-agent2` if `true`.
 * `zabbix_agent_sender_package`: The name of the zabbix-sender package. Default: `zabbix-sender`.
-* `zabbix_agent_userparameters`: Default: `[]]`. List of userparameter names and scripts (if any). Detailed description is given in the [Deploying Userparameters](#deploying-userparameters) section.
+* `zabbix_agent_userparameters`: Default: `[]`. List of userparameter names and scripts (if any). Detailed description is given in the [Deploying Userparameters](#deploying-userparameters) section.
   * `name`: Userparameter name (should be the same with userparameter template file name)
   * `scripts_dir`: Directory name of the custom scripts needed for userparameters
 * `zabbix_agent_userparameters_scripts_src`: indicates the relative path (from `files/`) where userparameter scripts are searched
@@ -185,7 +185,7 @@ These variables need to be overridden when you want to make use of the Zabbix AP
 Host encryption configuration will be set to match agent configuration.
 
 * `zabbix_agent_description`: Description of the host in Zabbix.
-* `zabbix_agent_host_state`: present (Default) if the host needs to be created or absent is you want to delete it. This only works when `zabbix_api_create_hosts` is set to `True`.
+* `zabbix_agent_host_state`: present (Default) if the host needs to be created or absent if you want to delete it. This only works when `zabbix_api_create_hosts` is set to `True`.
 * `zabbix_agent_host_update`: yes (Default) if the host should be updated if already present. This only works when `zabbix_api_create_hosts` is set to `True`.
 * `zabbix_agent_interfaces`: A list of interfaces and their configurations you can use when configuring via API.
 * `zabbix_agent_inventory_mode`: Configure Zabbix inventory mode. Needed for building inventory data, manually when configuring a host or automatically by using some automatic population options. This has to be set to `automatic` if you want to make automatically building inventory data.  Default `disabled`
@@ -213,7 +213,7 @@ Host encryption configuration will be set to match agent configuration.
 
 **NOTE**
 
-Supporting Windows is a best effort (We don't have the possibility to either test/verify changes on the various amount of available Windows instances). PRs specific to Windows will almost immediately be merged, unless someone is able to provide a Windows test mechanism via Travis for Pull Requests._
+Supporting Windows is a best effort (We don't have the possibility to either test/verify changes on the various amount of available Windows instances). PRs specific to Windows will almost immediately be merged, unless someone is able to provide a Windows test mechanism via Travis for Pull Requests.
 When `` is used in the name of the property, like `zabbix_agent_win_logfile`, it will show that you can configure `zabbix_agent_win_logfile` for the Zabbix Agent configuration file and `zabbix_agent2_win_logfile` for the Zabbix Agent 2 configuration file.
 
 Otherwise it just for the Zabbix Agent or for the Zabbix Agent 2.
@@ -232,7 +232,7 @@ Otherwise it just for the Zabbix Agent or for the Zabbix Agent 2.
 
 **NOTE**
 
-_Supporting Windows is a best effort (We don't have the possibility to either test/verify changes on the various amount of available Windows instances). PRs specific to Windows will almost immediately be merged, unless someone is able to provide a Windows test mechanism via Travis for Pull Requests._
+_Supporting macOS is a best effort (We don't have the possibility to either test/verify changes on the various amount of available macOS instances). PRs specific to macOS will almost immediately be merged, unless someone is able to provide a macOS test mechanism via Travis for Pull Requests._
 
 * `zabbix_mac_download_link`: The download url to the `pkg` file.
 * `zabbix_mac_download_url`: The download url.  Default `https://cdn.zabbix.com/zabbix/binaries/stable`
@@ -304,13 +304,13 @@ The following table lists all variables that are exposed to modify the configura
 | HostMetadataItem | zabbix_agent_hostmetadataitem |  |  |
 | Hostname | zabbix_agent_hostname |  | `{{ inventory_hostname }}` |
 | HostnameItem | zabbix_agent_hostnameitem |  |  |
-| Include | zabbix_agent_include | /etc/zabbix/`{ agent version specific }`.d/*.conf |  |
+| Include | zabbix_agent_include | /etc/zabbix/`{{ agent version specific }}`.d/*.conf |  |
 | ListenBacklog | zabbix_agent_listenbacklog |  | Agent Only |
 | ListenIP | zabbix_agent_listenip | 0.0.0.0  |  |
 | ListenPort | zabbix_agent_listenport | 10050 |  |
 | LoadModule | zabbix_agent_loadmodule |  | Agent On Linux Only |
 | LoadModulePath | zabbix_agent_loadmodulepath |  | Agent On Linux Only |
-| LogFile | zabbix_agent_logfile | /var/log/zabbix/`{ agent version specific }`.log |  |
+| LogFile | zabbix_agent_logfile | /var/log/zabbix/`{{ agent version specific }}`.log |  |
 | LogFileSize | zabbix_agent_logfilesize | 100 |  |
 | LogRemoteCommands | zabbix_agent_logremotecommands | `False` | `True`/`False` Agent Only |
 | LogType | zabbix_agent_logtype | file |  |
@@ -319,7 +319,7 @@ The following table lists all variables that are exposed to modify the configura
 | PerfCounterEn | zabbix_agent_perfcounteren |  | Agent Only |
 | PersistentBufferFile | zabbix_agent_persistentbufferfile |  | Agent 2 Only |
 | PersistentBufferPeriod | zabbix_agent_persistentbufferperiod | 1h | Agent 2 Only |
-| PidFile | zabbix_agent_pidfile | /var/run/zabbix/`{ agent version specific }`.pid | Linux Systems Only |
+| PidFile | zabbix_agent_pidfile | /var/run/zabbix/`{{ agent version specific }}`.pid | Linux Systems Only |
 | Plugin | zabbix_agent_plugins |  |  |
 | PluginSocket | zabbix_agent_pluginsocket | /tmp/agent.plugin.sock | Agent 2 Only  |
 | PluginTimeout | zabbix_agent_plugintimeout | 3 | Agent 2 Only |
@@ -352,7 +352,7 @@ The following table lists all variables that are exposed to modify the configura
 | UserParameterDir | zabbix_agent_userparamaterdir |  |  |
 
 
-## proxy
+## Proxy
 
 When the target host does not have access to the internet, but you do have a proxy available then the following properties needs to be set to download the packages via the proxy:
 
