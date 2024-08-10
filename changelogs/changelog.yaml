@@ -1324,3 +1324,11 @@ releases:
       name: zabbix_mfa
       namespace: ''
     release_date: '2024-08-04'
+  3.1.1:
+    changes:
+      bugfixes:
+      - zabbix_agent Role - Fix for userparameter because include_dir is list
+      - zabbix_agent Role - Fix include_dir directory creation logic
+    fragments:
+    - 1361_userparameters_fix.yml
+    release_date: '2024-08-09'

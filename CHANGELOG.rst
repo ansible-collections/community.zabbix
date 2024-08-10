@@ -4,6 +4,15 @@ community.zabbix Release Notes
 
 .. contents:: Topics
 
+v3.1.1
+======
+
+Bugfixes
+--------
+
+- zabbix_agent Role - Fix for userparameter because include_dir is list
+- zabbix_agent Role - Fix include_dir directory creation logic
+
 v3.1.0
 ======
 
