@@ -81,4 +81,4 @@ jobs:
           MY_MOLECULE_IMAGE=${{ matrix.container }}
           MY_MOLECULE_VERSION=${{ matrix.version }}
           MY_MOLECULE_DOCKER_COMMAND=${{ matrix.command }}
-          molecule -c common/molecule.yml test -s ${{ matrix.scenario_name }}
+          molecule -vv -c common/molecule.yml test -s ${{ matrix.scenario_name }}
