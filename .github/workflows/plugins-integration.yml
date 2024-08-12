@@ -87,6 +87,6 @@ jobs:
         working-directory: ./ansible_collections/community/zabbix
 
       # See the repots at https://codecov.io/gh/ansible-collections/community.zabbix
-      - uses: codecov/codecov-action@v3
+      - uses: codecov/codecov-action@v4
         with:
           fail_ci_if_error: false
