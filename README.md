@@ -12,6 +12,7 @@ Roles:
 
 - [Zabbix collection for Ansible](#zabbix-collection-for-ansible)
   * [Introduction](#introduction)
+  * [Communication](#communication)
   * [Included content](#included-content)
   * [Installation](#installation)
     + [Requirements](#requirements)
