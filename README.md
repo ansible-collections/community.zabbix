@@ -12,6 +12,7 @@ Roles:
 
 - [Zabbix collection for Ansible](#zabbix-collection-for-ansible)
   * [Introduction](#introduction)
+  * [Communication](#communication)
   * [Included content](#included-content)
   * [Installation](#installation)
     + [Requirements](#requirements)
@@ -28,6 +29,18 @@ Roles:
 This repo hosts the `community.zabbix` Ansible Collection.
 
 The collection includes a variety of Ansible content to help automate the management of resources in Zabbix.
+
+## Communication
+
+* Join the Ansible forum:
+  * [Get Help](https://forum.ansible.com/c/help/6): get help or help others.
+  * [Posts tagged with 'zabbix'](https://forum.ansible.com/tag/zabbix): subscribe to participate in collection-related conversations.
+  * [Social Spaces](https://forum.ansible.com/c/chat/4): gather and interact with fellow enthusiasts.
+  * [News & Announcements](https://forum.ansible.com/c/news/5): track project-wide announcements including social events.
+
+* The Ansible [Bullhorn newsletter](https://docs.ansible.com/ansible/devel/community/communication.html#the-bullhorn): used to announce releases and important changes.
+
+For more information about communication, see the [Ansible communication guide](https://docs.ansible.com/ansible/devel/community/communication.html).
 
 ## Included content
 
