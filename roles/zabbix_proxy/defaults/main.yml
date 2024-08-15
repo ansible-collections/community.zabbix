@@ -127,3 +127,7 @@ zabbix_api_timeout: 30
 zabbix_api_create_proxy: false
 zabbix_proxy_state: present
 zabbix_proxy_status: active # or passive
+
+# TLS setttings
+zabbix_proxy_tlsaccept:
+zabbix_proxy_tlsconnect:
