@@ -5,7 +5,7 @@
 
 - name: "Set Include Path Info"
   ansible.builtin.set_fact:
-    zabbix_agent_include: "{{ zabbix_agent_win_include is defined | ternary(zabbix_agent_win_include, zabbix_agent2_win_include) | default(_win_include) }}"
+    zabbix_agent_include_dir: "{{ zabbix_agent_win_include is defined | ternary(zabbix_agent_win_include, zabbix_agent2_win_include) | default(_win_include) }}"
 
 - name: "Set Control Socket"
   ansible.builtin.set_fact:

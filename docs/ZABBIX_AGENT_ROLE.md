@@ -304,7 +304,7 @@ The following table lists all variables that are exposed to modify the configura
 | HostMetadataItem | zabbix_agent_hostmetadataitem |  |  |
 | Hostname | zabbix_agent_hostname |  | `{{ inventory_hostname }}` |
 | HostnameItem | zabbix_agent_hostnameitem |  |  |
-| Include | zabbix_agent_include | /etc/zabbix/`{{ agent version specific }}`.d/*.conf |  |
+| Include | zabbix_agent_include_dir | /etc/zabbix/`{{ agent version specific }}`.d/*.conf |  |
 | ListenBacklog | zabbix_agent_listenbacklog |  | Agent Only |
 | ListenIP | zabbix_agent_listenip | 0.0.0.0  |  |
 | ListenPort | zabbix_agent_listenport | 10050 |  |
