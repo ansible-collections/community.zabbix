@@ -1,4 +1,6 @@
 ---
+- import_tasks: change_api_user_pass.yml
+
 # New user create test from here
 - name: test - Create a new Zabbix user with check_mode and diff
   community.zabbix.zabbix_user:

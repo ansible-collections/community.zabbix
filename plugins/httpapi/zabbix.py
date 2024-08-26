@@ -99,8 +99,15 @@ class HttpApi(HttpApiBase):
             code, response = self.send_request(data=payload)
         except ConnectionError:
             # Zabbix >= 6.4
-            payload = self.payload_builder("user.login", username=username, password=password)
-            code, response = self.send_request(data=payload)
+            try:
+                payload = self.payload_builder("user.login", username=username, password=password)
+                code, response = self.send_request(data=payload)
+            except ConnectionError:
+                # If this task fails to login, we mark the connection as disconnected so that
+                # future tasks can try to reauth
+                self.connection._connected = False
+                raise
+
 
         if code == 200 and response != '':
             # Replace auth with real api_key we got from Zabbix after successful login
@@ -194,6 +201,20 @@ class HttpApi(HttpApiBase):
                 return 404, "Object not found"
         except Exception as e:
             raise e
+
+    def password_changed_for_user(self, username: str, password: str):
+        '''
+        A handler for when a Zabbix user's password has been changed.
+        We can then check to see if the API user's password has been changed.
+        If so, we re-login so that the next modules are authenticated with the new password.
+
+        :param str username: Username of the user whose password was changed
+        :param str password: The new password
+        '''
+        changed_current_user_pass = self.connection.get_option('remote_user') == username
+        if changed_current_user_pass:
+            self.login(username, password)
+        return
 
     def _display_request(self, request_method, path):
         self.connection.queue_message(

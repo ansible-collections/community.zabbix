@@ -1,0 +1,72 @@
+- name: set new pass
+  set_fact:
+    old_pass: "{{ zabbix_api_login_pass }}"
+    new_pass: "MyNewPassw0rd1"
+
+
+- name: Zabbix password modification block
+  block:
+  # The Zabbix docker images do not allow you to change Zabbix admin user/pass and 
+  # suggest doing so in configuration management, i.e. Ansible.
+  #
+  # To make our playbook idempotent, we want to check to see if we have changed the
+  # admin password yet by doing a test connect with the zabbix_user_info module.
+  #
+  # We set failed_when to false because we expect the call to fail if we are using
+  # the old password after it already being changed
+  # 
+  # Register user_info so we can check if we are logged in or not in later tasks
+  #
+  # This pattern is why the changes to community.zabbix/plugins/httpapi/zabbix.py:login()
+  # are required to force the connection to be disconnected on a failed login.
+  - name: Has the admin password been changed check
+    vars:
+      ansible_httpapi_pass: "{{ new_pass }}" 
+    community.zabbix.zabbix_user_info:
+      username: "{{ zabbix_api_login_user }}"
+    register: user_info
+    failed_when: false
+
+  # Here is where we update the password of the user that is connecting to the API.
+  # With the modifications:
+  # * Module tells connection a password changed for a user. 
+  # * Connection check if the user is our api user 
+  #   * If api user's password is changed, re-login
+  - name: Update the admin's email and password
+    vars:
+      ansible_httpapi_pass: "{{ old_pass }}" 
+    community.zabbix.zabbix_user:
+      username: "{{ zabbix_api_login_user }}"
+      current_passwd: "{{ old_pass }}"
+      passwd: "{{ new_pass }}"
+      override_passwd: "true"
+      user_medias:
+      usrgrps:
+        - Internal
+        - Zabbix administrators
+    when: "user_info.exception is not defined "
+
+
+  # Thanks to the modifications we no longer receive the following error on this task:
+  # '{'code': -32602, 'message': 'Invalid params.', 'data': 'Session terminated, re-login, please.'}'
+  - name: Get zabbix user info
+    vars:
+      ansible_httpapi_pass: "{{ new_pass }}" 
+    community.zabbix.zabbix_user_info:
+      username: "{{ zabbix_api_login_user }}"
+  
+  always:
+    - name: Reset Zabbix API user password back to default
+      vars:
+        ansible_httpapi_pass: "{{ new_pass }}" 
+      community.zabbix.zabbix_user:
+        username: "{{ zabbix_api_login_user }}"
+        current_passwd: "{{ new_pass }}"
+        passwd: "{{ old_pass }}"
+        override_passwd: "true"
+        user_medias:
+        usrgrps:
+          - Internal
+          - Zabbix administrators
+      when: "user_info.exception is not defined"
+

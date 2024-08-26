@@ -52,6 +52,19 @@ class ZabbixApiRequest(object):
     def api_version(self):
         return self.connection.api_version()
 
+    def password_changed_for_user(self, username: str, password: str):
+        '''
+        Call to the Zabbix HTTPAPI handler for when a Zabbix user's password has been changed.
+
+        This info is used to determine if the API user's password was changed and re-login
+        if so.
+
+        :param str username: Username of the user whose password was changed
+        :param str password: The new password
+        '''
+        # module_utils.connection.Connection will use JSONRPC to call back to Zabbix HTTPAPI
+        return self.connection.password_changed_for_user(username, password)
+
     @staticmethod
     def payload_builder(method_, params, jsonrpc_version='2.0', reqid=str(uuid4()), **kwargs):
         req = {'jsonrpc': jsonrpc_version, 'method': method_, 'id': reqid}

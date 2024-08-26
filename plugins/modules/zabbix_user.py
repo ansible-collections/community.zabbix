@@ -663,6 +663,10 @@ class User(ZabbixBase):
                     msg="Failed to update user %s: %s" % (username, e)
                 )
 
+        successfully_changed_password = user_ids and override_passwd
+        if successfully_changed_password:
+            self._zapi.password_changed_for_user(username=username, password=passwd)
+
         return user_ids
 
     def delete_user(self, zbx_user, username):
