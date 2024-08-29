@@ -328,7 +328,7 @@ The following table lists all variables that are exposed to modify the configura
 | ServerActive | zabbix_agent_serveractive |  |  |
 | SourceIP | zabbix_agent_sourceip |  |  |
 | StartAgents | zabbix_agent_startagents | 3 | Agent Only |
-| StatusPort | zabbix_agent_statusport | 9999 | Agent 2 Only |
+| StatusPort | zabbix_agent_statusport |  | Agent 2 Only |
 | Timeout | zabbix_agent_timeout | 3 |  |
 | TLSAccept | zabbix_agent_tlsconnect | unencrypted | Is overridden with `zabbix_agent_tlspsk_auto` == True |
 | TLSCAFile | zabbix_agent_tlscafile | /etc/zabbix/tls_psk_auto.secret |  |
