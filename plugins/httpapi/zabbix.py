@@ -108,7 +108,6 @@ class HttpApi(HttpApiBase):
                 self.connection._connected = False
                 raise
 
-
         if code == 200 and response != '':
             # Replace auth with real api_key we got from Zabbix after successful login
             self.connection._auth = {'auth': response}
