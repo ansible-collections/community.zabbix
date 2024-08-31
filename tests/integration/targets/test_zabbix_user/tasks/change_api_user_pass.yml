@@ -42,10 +42,15 @@
       override_passwd: "true"
       user_medias:
       usrgrps:
-        - Internal
         - Zabbix administrators
     when: "user_info.exception is not defined "
 
+  # Originally I setup an "Always:" block to reset the password back to default but
+  # because the password must be at least 8 char's long and the default pass 'zabbix' is not,
+  # this causes issues!
+  - name: Update the zabbix password var
+    set_fact:
+      zabbix_api_login_pass: "{{ new_pass }}"
 
   # Thanks to the modifications we no longer receive the following error on this task:
   # '{'code': -32602, 'message': 'Invalid params.', 'data': 'Session terminated, re-login, please.'}'
@@ -54,19 +59,3 @@
       ansible_httpapi_pass: "{{ new_pass }}" 
     community.zabbix.zabbix_user_info:
       username: "{{ zabbix_api_login_user }}"
-  
-  always:
-    - name: Reset Zabbix API user password back to default
-      vars:
-        ansible_httpapi_pass: "{{ new_pass }}" 
-      community.zabbix.zabbix_user:
-        username: "{{ zabbix_api_login_user }}"
-        current_passwd: "{{ new_pass }}"
-        passwd: "{{ old_pass }}"
-        override_passwd: "true"
-        user_medias:
-        usrgrps:
-          - Internal
-          - Zabbix administrators
-      when: "user_info.exception is not defined"
-
