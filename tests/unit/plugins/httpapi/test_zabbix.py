@@ -1,6 +1,7 @@
 from unittest.mock import MagicMock
 from plugins.httpapi.zabbix import HttpApi
 
+
 def test_password_changed_for_user_should_login_for_api_user():
     # Given a Zabbix httpapi
     connection = MagicMock()
@@ -17,6 +18,7 @@ def test_password_changed_for_user_should_login_for_api_user():
 
     # Then the login method should be called
     httpapi.login.assert_called_once_with(api_username, new_pass)
+
 
 def test_password_changed_for_user_should_not_login_for_non_api_user():
     # Given a Zabbix httpapi
