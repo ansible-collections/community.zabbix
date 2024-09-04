@@ -75,10 +75,6 @@ class HttpApi(HttpApiBase):
         return None
 
     def login(self, username, password):
-        # Store username/password in class variables (to be used in "username switch" scenario
-        self.username = username
-        self.password = password
-
         self.auth_key = self.get_option('zabbix_auth_key')
         if self.auth_key:
             self.connection._auth = {'auth': self.auth_key}
@@ -181,7 +177,7 @@ class HttpApi(HttpApiBase):
                         # Provide "fake" auth so netcommon.connection does not replace our headers
                         self.connection._auth = {'auth': 'fake'}
                     # Need to login with new username/password
-                    self.login(self.username, self.password)
+                    self.login(self.connection.get_option('remote_user'), self.connection.get_option('password'))
                     # Replace 'auth' field in payload with new one (we got from login process)
                     data = json.loads(data)
                     data['auth'] = self.connection._auth['auth']
