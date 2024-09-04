@@ -171,6 +171,47 @@ class HttpApi(HttpApiBase):
                 raise ConnectionError("Invalid JSON response: %s" % value)
 
             if "error" in json_data:
+                if "re-login" in json_data["error"]["data"]:
+                    # Get this response from Zabbix when we switch username to execute REST API
+                    if not self.auth_key:
+                        # Provide "fake" auth so netcommon.connection does not replace our headers
+                        self.connection._auth = {'auth': 'fake'}
+                    # Need to login with new username/password
+                    self.login(self.connection.get_option('remote_user'), self.connection.get_option('password'))
+                    # Replace 'auth' field in payload with new one (we got from login process)
+                    data = json.loads(data)
+                    data['auth'] = self.connection._auth['auth']
+                    data = json.dumps(data)
+                    # Re-send the request we initially were trying to execute
+                    response, response_data = self.connection.send(
+                        path,
+                        data,
+                        method=request_method,
+                        headers=hdrs
+                    )
+                    value = to_text(response_data.getvalue())
+
+                    try:
+                        json_data = json.loads(value) if value else {}
+                    # JSONDecodeError only available on Python 3.5+
+                    except ValueError:
+                        raise ConnectionError("Invalid JSON response: %s" % value)
+
+                    if "error" in json_data:
+                        raise ConnectionError("REST API returned %s when sending %s" % (json_data["error"], data))
+
+                    if "result" in json_data:
+                        json_data = json_data["result"]
+
+                    try:
+                        # Some methods return bool not a dict in "result"
+                        iter(json_data)
+                    except TypeError:
+                        # Do not try to find "error" if it is not a dict
+                        return response.getcode(), json_data
+
+                    return response.getcode(), json_data
+
                 raise ConnectionError("REST API returned %s when sending %s" % (json_data["error"], data))
 
             if "result" in json_data:
