@@ -615,7 +615,7 @@ class Authentication(ZabbixBase):
                 else:
                     params["passwd_min_length"] = str(passwd_min_length)
 
-            if passwd_check_rules:
+            if passwd_check_rules is not None:
                 passwd_check_rules_values = [
                     "contain_uppercase_and_lowercase_letters",
                     "contain_digits",
@@ -644,11 +644,11 @@ class Authentication(ZabbixBase):
                                 msg="%s is invalid value for passwd_check_rules."
                                 % _passwd_check_rules_value
                             )
-                            params[
-                                "passwd_check_rules"
-                            ] += 2 ** zabbix_utils.helper_to_numeric_value(
-                                passwd_check_rules_values, _passwd_check_rules_value
-                            )
+                        params[
+                            "passwd_check_rules"
+                        ] += 2 ** zabbix_utils.helper_to_numeric_value(
+                            passwd_check_rules_values, _passwd_check_rules_value
+                        )
 
                 params["passwd_check_rules"] = str(params["passwd_check_rules"])
 
