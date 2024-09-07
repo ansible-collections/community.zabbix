@@ -1,6 +1,7 @@
 ---
 - block:
     - include_tasks: zabbix_authentication_tests.yml
+    - include_tasks: zabbix_authentication_test_passwd_check_rules.yml
 
   always:
     - name: Cleanup

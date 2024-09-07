@@ -1,0 +1,52 @@
+---
+- name: Start with a known state with one rule enabled
+  community.zabbix.zabbix_authentication:
+    passwd_check_rules: "avoid_easy_to_guess"
+
+- name: Set the login result based on current zabbix version
+  set_fact:
+    login_result: "{{ check_login_under64_result if zabbix_version is version('6.4', '<') else check_login_result }}"
+
+- name: Get the authentication rules
+  ansible.builtin.uri:
+    url: "{{ zabbix_api_server_url }}/api_jsonrpc.php"
+    method: POST
+    body:
+      jsonrpc: "2.0"
+      method: "authentication.get"
+      params:  {}
+      id: "1"
+      auth: "{{ login_result.json.result }}"
+    body_format: json
+    status_code: 200
+  register: get_auth_result
+
+# Internally the value of 8 represents an "avoid_easy_to_guess" rule
+- name: Assert that the passwd_check_rules is 8 (avoid_easy_to_guess)
+  ansible.builtin.assert:
+    that:
+      - get_auth_result.json.result.passwd_check_rules == "8"
+
+- name: Disable all password check rules
+  community.zabbix.zabbix_authentication:
+    passwd_check_rules: []
+
+- name: Get the authentication rules
+  ansible.builtin.uri:
+    url: "{{ zabbix_api_server_url }}/api_jsonrpc.php"
+    method: POST
+    body:
+      jsonrpc: "2.0"
+      method: "authentication.get"
+      params:  {}
+      id: "1"
+      auth: "{{ login_result.json.result }}"
+    body_format: json
+    status_code: 200
+  register: get_auth_result
+
+# Internally the value of 0 represents an empty password check rule set
+- name: Assert that the passwd_check_rules is empty
+  ansible.builtin.assert:
+    that:
+      - get_auth_result.json.result.passwd_check_rules == "0"
