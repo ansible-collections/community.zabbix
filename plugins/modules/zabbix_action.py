@@ -1013,9 +1013,13 @@ class Zapi(ZabbixBase):
 
         """
         try:
+            if LooseVersion(self._zbx_api_version) >= LooseVersion('7.0'):
+                filter = {'name': [proxy_name]}
+            else:
+                filter = {'host': [proxy_name]}
             proxy_list = self._zapi.proxy.get({
                 "output": "extend",
-                "filter": {"host": [proxy_name]}
+                "filter": filter,
             })
             if len(proxy_list) < 1:
                 self._module.fail_json(msg="Proxy not found: %s" % proxy_name)
