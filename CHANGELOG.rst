@@ -4,6 +4,23 @@ community.zabbix Release Notes
 
 .. contents:: Topics
 
+v3.1.2
+======
+
+Minor Changes
+-------------
+
+- httpapi - added ability to switch username/password during playbook execution.
+
+Bugfixes
+--------
+
+- zabbix_actions - fix proxy get compatibility for zabbix 7.0
+- zabbix_agent Role - fixed problem with Windows include dir.
+- zabbix_authentication - fix inability to set passwd_check_rules to empty list
+- zabbix_authentication - fix inability to update passwd_check_rules
+- zabbix_proxy Role - Fixed TLS configuration
+
 v3.1.1
 ======
 
