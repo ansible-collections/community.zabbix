@@ -1,0 +1,2 @@
+bugfixes:
+  - zabbix_agent Role - Added ability to set the monitored_by and proxy_group values.

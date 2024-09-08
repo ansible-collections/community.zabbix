@@ -193,7 +193,9 @@ Host encryption configuration will be set to match agent configuration.
 * `zabbix_agent_ip`: The IP address of the host. When not provided, it will be determined via the `ansible_default_ipv4` fact.
 * `zabbix_agent_link_templates`: A list of templates which needs to be link to this host. The templates should exist.  Default:  "Templated Linux by Zabbix agent"
 * `zabbix_agent_macros`: A list with macro_key and macro_value for creating hostmacro's.
+* `zabbix_agent_monitored_by`: How the agent is monitored.  Choices are 'zabbix_server', 'proxy', and 'proxy_group'.  (Zabbix 7.0 or greater)
 * `zabbix_agent_proxy`:  The name of the Zabbix proxy (if used).  Default `null`
+* `zabbix_agent_proxy_group`:  The name of the Zabbix proxy group (if used) (Zabbix 7.0 or later).
 * `zabbix_agent_tags`: A list with tag and (optionally) value for creating host tags.
 * `zabbix_api_create_hostgroup`: When you want to enable the Zabbix API to create/delete the hostgroups. Default: `False`
 * `zabbix_api_create_hosts`: Default: `False`. When you want to enable the Zabbix API to create/delete the host. This has to be set to `True` if you want to make use of `zabbix_agent_host_state`.
