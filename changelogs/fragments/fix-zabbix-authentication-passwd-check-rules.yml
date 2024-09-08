@@ -1,3 +1,0 @@
-bugfixes:
-  - zabbix_authentication - fix inability to update passwd_check_rules
-  - zabbix_authentication - fix inability to set passwd_check_rules to empty list
