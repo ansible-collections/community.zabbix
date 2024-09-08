@@ -1,2 +1,0 @@
-minor_changes:
-  - httpapi - added ability to switch username/password during playbook execution.
