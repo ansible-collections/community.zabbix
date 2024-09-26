@@ -33,7 +33,6 @@
         port: "{{ zabbix_proxy_dbport }}"
         login_unix_socket: "{{ zabbix_proxy_pgsql_login_unix_socket | default(omit) }}"
         name: "{{ zabbix_proxy_dbname }}"
-        state: present
 
     - name: "PostgreSQL | Create database user"
       community.postgresql.postgresql_user:
@@ -41,12 +40,22 @@
         login_password: "{{ zabbix_proxy_pgsql_login_password | default(omit) }}"
         login_host: "{{ zabbix_proxy_pgsql_login_host | default(omit) }}"
         port: "{{ zabbix_proxy_dbport }}"
+        login_unix_socket: "{{ zabbix_proxy_login_unix_socket | default(omit) }}"
         name: "{{ zabbix_proxy_dbuser }}"
         password: "{{ ('md5' + (zabbix_proxy_dbpassword + zabbix_proxy_dbuser)|hash('md5')) if zabbix_proxy_dbpassword_hash_method == 'md5' else zabbix_proxy_dbpassword }}"
+
+    - name: "PostgreSQL | Set database/user permissions"
+      community.postgresql.postgresql_privs:
+        login_user: "{{ zabbix_proxy_pgsql_login_user | default(omit) }}"
+        login_password: "{{ zabbix_proxy_pgsql_login_password | default(omit) }}"
+        login_host: "{{ zabbix_proxy_pgsql_login_host | default(omit) }}"
+        port: "{{ zabbix_proxy_dbport }}"
+        login_unix_socket: "{{ zabbix_proxy_login_unix_socket | default(omit) }}"
         db: "{{ zabbix_proxy_dbname }}"
-        priv: ALL
-        state: present
-        encrypted: true
+        privs: ALL
+        type: schema
+        objs: public
+        role: "{{ zabbix_proxy_dbuser }}"
 
 - name: "PostgreSQL verify or create schema"
   when: zabbix_proxy_database_sqlload | bool
