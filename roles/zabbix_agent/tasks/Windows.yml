@@ -5,34 +5,11 @@
     zabbix_agent_win_logfile: "{{ zabbix_agent_win_logfile is defined | ternary(zabbix_agent_win_logfile, zabbix_agent2_win_logfile) | default(_win_logfile) }}"
     zabbix_agent_win_package: "{{ zabbix_agent_win_package is defined | ternary(zabbix_agent_win_package, zabbix_agent2_win_package) | default(_win_package) }}"
     zabbix_agent_win_include: "{{ zabbix_agent_win_include is defined | ternary(zabbix_agent_win_include, zabbix_agent2_win_include) | default(_win_include) }}"
-
-- name: "Windows | Set default architecture"
-  ansible.builtin.set_fact:
-    windows_arch: 32
-  tags:
-    - always
-
-- name: "Windows | Override architecture if 64-bit"
-  ansible.builtin.set_fact:
-    windows_arch: 64
-  when:
-    - '"64" in ansible_architecture'
-  tags:
-    - always
-
-- name: "Windows | Set path to zabbix.exe"
-  ansible.builtin.set_fact:
-    zabbix_win_exe_path: '{{ zabbix_win_install_dir }}\bin\win{{ windows_arch }}\zabbix_agentd.exe'
-  tags:
-    - always
-
-- name: "Windows | Set variables specific to Zabbix"
-  ansible.builtin.set_fact:
     zabbix_win_svc_name: Zabbix Agent
-    zabbix_win_exe_path: '{{ zabbix_win_install_dir }}\bin\zabbix_agentd.exe'
+    zabbix_win_exe_path: '{{ zabbix_win_install_dir_bin }}\zabbix_agentd.exe'
     zabbix_win_config_name: "zabbix_agentd.conf"
     zabbix2_win_svc_name: Zabbix Agent 2
-    zabbix2_win_exe_path: '{{ zabbix_win_install_dir }}\bin\zabbix_agent2.exe'
+    zabbix2_win_exe_path: '{{ zabbix_win_install_dir_bin }}\zabbix_agent2.exe'
     zabbix2_win_config_name: "zabbix_agent2.conf"
   tags:
     - always
@@ -60,7 +37,7 @@
 - name: "Windows | Set facts current zabbix agent installation"
   ansible.builtin.set_fact:
     zabbix_agent_1_binary_exist: true
-    zabbix_agent_1_version: zabbix_win_exe_info.results[0].win_file_version.product_version
+    zabbix_agent_1_version: "{{ zabbix_win_exe_info.results[0].win_file_version.product_version }}"
   when:
     - zabbix_win_exe_info.results[0] is defined
     - zabbix_win_exe_info.results[0].item.stat.exists
@@ -72,7 +49,7 @@
 - name: "Windows | Set facts current zabbix agent installation (agent 2)"
   ansible.builtin.set_fact:
     zabbix_agent_2_binary_exist: true
-    zabbix_agent_2_version: zabbix_win_exe_info.results[1].win_file_version.product_version
+    zabbix_agent_2_version: "{{ zabbix_win_exe_info.results[1].win_file_version.product_version }}"
   when:
     - zabbix_win_exe_info.results[1] is defined
     - zabbix_win_exe_info.results[1].item.stat.exists
@@ -83,7 +60,7 @@
 
 - name: "Windows | Check Zabbix service"
   ansible.windows.win_service:
-    name: "{{ (item.item.stat.path == zabbix_win_exe_path ) | ternary(zabbix_win_svc_name,zabbix2_win_svc_name) }}"
+    name: "{{ (item.item.stat.path == zabbix_win_exe_path) | ternary(zabbix_win_svc_name, zabbix2_win_svc_name) }}"
   register: zabbix_service_info
   when: item.item.stat.exists
   with_items: "{{ zabbix_win_exe_info.results }}"
@@ -176,6 +153,8 @@
     state: directory
   with_items:
     - "{{ zabbix_win_install_dir }}"
+    - "{{ zabbix_win_install_dir_conf }}"
+    - "{{ zabbix_win_install_dir_bin }}"
   tags:
     - install
 
