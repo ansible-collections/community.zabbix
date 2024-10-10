@@ -32,7 +32,6 @@
   ansible.windows.win_service:
     name: "{{ zabbix_win_svc_name }}"
     start_mode: auto
-    state: started
     failure_actions:
       - type: restart
         delay_ms: 5000
@@ -41,6 +40,7 @@
       - type: restart
         delay_ms: 20000
     failure_reset_period_sec: 86400
+  notify: restart win zabbix agent
   tags:
     - config
 
