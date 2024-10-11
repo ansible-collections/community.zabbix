@@ -222,6 +222,8 @@ Otherwise it just for the Zabbix Agent or for the Zabbix Agent 2.
 
 * `zabbix_agent_win_include`: The directory in which the Zabbix Agent specific configuration files are stored.
 * `zabbix_agent_win_logfile`: The full path to the logfile for the Zabbix Agent.
+* `zabbix_agent_win_controlsocket`: Windows specific value for `zabbix_agent_controlsocket`. Default: `\\.\pipe\agent.sock`
+* `zabbix_agent_win_pluginsocket`: Windows specific value for `zabbix_agent_pluginsocket`. Default: `\\.\pipe\agent.plugin.sock`
 * `zabbix_version_long`: The long (major.minor.patch) version of the Zabbix Agent. This will be used to generate the `zabbix_win_package` and `zabbix_win_download_link` variables. This takes precedence over `zabbix_agent_version`.
 * `zabbix_win_download_link`: The download url to the `win.zip` file.
 * `zabbix_win_firewall_management`: Enable Windows firewall management (add service and port to allow rules). Default: `True`
