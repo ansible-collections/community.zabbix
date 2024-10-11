@@ -24,6 +24,27 @@
 - name: Load Appropriate Defaults
   ansible.builtin.include_vars: "agent{{ '2' if zabbix_agent2 is defined and zabbix_agent2|bool }}_vars.yml"
 
+- block:
+    - name: AutoPSK | Default tlsconnect to enforce PSK
+      ansible.builtin.set_fact:
+        zabbix_agent_tlsconnect: psk
+
+    - name: AutoPSK | Default tlsaccept to enforce PSK when zabbix_agent_tlsaccept is not defined
+      ansible.builtin.set_fact:
+        zabbix_agent_tlsaccept: psk
+      when: not zabbix_agent_tlsaccept is defined
+
+    - name: AutoPSK | Default tlsaccept to enforce PSK when zabbix_agent_tlsaccept is defined
+      ansible.builtin.set_fact:
+        zabbix_agent_tlsaccept: "{{ 'psk,' + zabbix_agent_tlsaccept }}"
+      when:
+        - zabbix_agent_tlsaccept is defined
+        - not 'psk' in zabbix_agent_tlsaccept
+
+  when: zabbix_agent_tlspsk_auto | bool
+  tags:
+    - config
+
 - name: Set Variables
   ansible.builtin.set_fact:
     zabbix_agent_include_dir: "{{ zabbix_agent_include_dir is defined | ternary(zabbix_agent_include_dir, _include) }}"
@@ -56,27 +77,6 @@
   ansible.builtin.include_tasks: "{{ ansible_os_family }}.yml"
   when:
     - not (zabbix_agent_docker | bool)
-
-- block:
-    - name: AutoPSK | Default tlsconnect to enforce PSK
-      ansible.builtin.set_fact:
-        zabbix_agent_tlsconnect: psk
-
-    - name: AutoPSK | Default tlsaccept to enforce PSK when zabbix_agent_tlsaccept is not defined
-      ansible.builtin.set_fact:
-        zabbix_agent_tlsaccept: psk
-      when: not zabbix_agent_tlsaccept is defined
-
-    - name: AutoPSK | Default tlsaccept to enforce PSK when zabbix_agent_tlsaccept is defined
-      ansible.builtin.set_fact:
-        zabbix_agent_tlsaccept: "{{ 'psk,' + zabbix_agent_tlsaccept }}"
-      when:
-        - zabbix_agent_tlsaccept is defined
-        - not 'psk' in zabbix_agent_tlsaccept
-
-  when: zabbix_agent_tlspsk_auto | bool
-  tags:
-    - config
 
 - name: Configure PSK
   when: "( 'psk' in zabbix_agent_tlsaccept ) or (zabbix_agent_tlsconnect  == 'psk')"
