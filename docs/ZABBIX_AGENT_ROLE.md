@@ -229,6 +229,7 @@ Otherwise it just for the Zabbix Agent or for the Zabbix Agent 2.
 * `zabbix_win_install_dir_conf`: The directory where Zabbix configuration file needs to be installed.
 * `zabbix_win_install_dir_bin`: The directory where Zabbix binary file needs to be installed.
 * `zabbix_win_package`: file name pattern (zip only). This will be used to generate the `zabbix_win_download_link` variable.
+* `zabbix_win_config_remove`: Remove all existing configuration on update. Default `True`
 
 ## macOS Variables
 

@@ -14,7 +14,6 @@
     zabbix2_win_exe_name: 'zabbix_agent2.exe'
     zabbix2_win_exe_path: '{{ zabbix_win_install_dir_bin }}\zabbix_agent2.exe'
     zabbix2_win_config_name: "zabbix_agent2.conf"
-
   tags:
     - always
 
@@ -137,9 +136,9 @@
     - zabbix_agent_version_change | default(false) or not zabbix_agent2
     - zabbix_agent_2_service_exist | default(false)
 
-- name: "Windows | Removing Zabbix Directory"
+- name: "Windows | Removing Zabbix bin Directory"
   ansible.windows.win_file:
-    path: "{{ zabbix_win_install_dir }}"
+    path: "{{ zabbix_win_install_dir_bin }}"
     state: absent
   register: zabbix_agent_dir_remove_result
   until: zabbix_agent_dir_remove_result is succeeded
@@ -148,6 +147,20 @@
   when:
     ((zabbix_agent_version_change | default(false) or zabbix_agent2) and zabbix_agent_1_binary_exist | default(false)) or
     ((zabbix_agent_version_change | default(false) or not zabbix_agent2) and zabbix_agent_2_binary_exist | default(false))
+
+- name: "Windows | Removing Zabbix conf Directory"
+  ansible.windows.win_file:
+    path: "{{ zabbix_win_install_dir_conf }}"
+    state: absent
+  register: zabbix_agent_dir_remove_result
+  until: zabbix_agent_dir_remove_result is succeeded
+  retries: 5
+  delay: 15
+  when:
+    - zabbix_win_config_remove
+    - >
+      ((zabbix_agent_version_change | default(false) or zabbix_agent2) and zabbix_agent_1_binary_exist | default(false)) or
+      ((zabbix_agent_version_change | default(false) or not zabbix_agent2) and zabbix_agent_2_binary_exist | default(false))
 
 ###################
 # install section #
