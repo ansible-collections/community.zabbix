@@ -116,6 +116,8 @@ zabbix_win_install_dir_conf: '{{ zabbix_win_install_dir }}\conf'
 zabbix_win_install_dir_bin: '{{ zabbix_win_install_dir }}\bin'
 zabbix_win_firewall_management: true
 zabbix_win_config_remove: true
+zabbix_agent_win_controlsocket: '\\.\pipe\agent.sock'
+zabbix_agent_win_pluginsocket: '\\.\pipe\agent.plugin.sock'
 
 # macOS Related
 zabbix_mac_package: zabbix_agent-{{ zabbix_version_long }}-macos-amd64-openssl.pkg
