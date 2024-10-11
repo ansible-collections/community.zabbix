@@ -250,13 +250,9 @@
 
 - name: "Windows | Copy binary files to expected location"
   ansible.windows.win_copy:
-    src: "{{ zabbix_win_install_dir_setup }}\\bin\\{{ item }}"
-    dest: "{{ zabbix_win_install_dir_bin }}\\{{ item }}"
+    src: "{{ zabbix_win_install_dir_setup }}\\bin\\"
+    dest: "{{ zabbix_win_install_dir_bin }}\\"
     remote_src: true
-  loop:
-    - "{{ zabbix_win_exe_name }}"
-    - zabbix_sender.exe
-    - zabbix_get.exe
   when:
     - zabbix_agent_version_change | default(false) or not zabbix_windows_binaries.stat.exists
     - zabbix_agent_win_download_zip is changed or file_info.stat.exists
@@ -265,8 +261,8 @@
 
 - name: "Windows | Copy initial configuration to expected location"
   ansible.windows.win_copy:
-    src: "{{ zabbix_win_install_dir_setup }}\\conf\\{{ zabbix_win_config_name }}"
-    dest: "{{ zabbix_win_install_dir_conf }}\\{{ zabbix_win_config_name }}"
+    src: "{{ zabbix_win_install_dir_setup }}\\conf\\"
+    dest: "{{ zabbix_win_install_dir_conf }}\\"
     force: false
     remote_src: true
   when:
