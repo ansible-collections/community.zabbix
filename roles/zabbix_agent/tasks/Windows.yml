@@ -20,7 +20,7 @@
 - name: "Windows | Check if Zabbix agent is present"
   ansible.windows.win_stat:
     path: "{{ item }}"
-  with_items:
+  loop:
     - "{{ zabbix_win_exe_path }}"
     - "{{ zabbix2_win_exe_path }}"
   register: agent_file_info
@@ -33,7 +33,9 @@
   register: zabbix_win_exe_info
   when:
     - item.stat.exists | bool
-  with_items: "{{ agent_file_info.results }}"
+  loop: "{{ agent_file_info.results }}"
+  loop_control:
+    label: "{{ item.item }}"
   tags:
     - always
 
@@ -66,7 +68,9 @@
     name: "{{ (item.item.stat.path == zabbix_win_exe_path) | ternary(zabbix_win_svc_name, zabbix2_win_svc_name) }}"
   register: zabbix_service_info
   when: item.item.stat.exists
-  with_items: "{{ zabbix_win_exe_info.results }}"
+  loop: "{{ zabbix_win_exe_info.results }}"
+  loop_control:
+    label: "{{ item.item.item }}"
   tags:
     - always
 
@@ -187,7 +191,7 @@
   ansible.windows.win_file:
     path: "{{ item }}"
     state: directory
-  with_items:
+  loop:
     - "{{ zabbix_win_install_dir }}"
     - "{{ zabbix_win_install_dir_conf }}"
     - "{{ zabbix_win_install_dir_bin }}"
@@ -198,10 +202,8 @@
 
 - name: "Windows | Create directory structure, includes"
   ansible.windows.win_file:
-    path: "{{ item }}"
+    path: "{{ zabbix_agent_win_include }}"
     state: directory
-  with_items:
-    - "{{ zabbix_agent_win_include }}"
   when:
     - ('.conf' not in zabbix_agent_win_include)
   tags:
