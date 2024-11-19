@@ -4,6 +4,16 @@ community.zabbix Release Notes
 
 .. contents:: Topics
 
+v3.2.0
+======
+
+Bugfixes
+--------
+
+- zabbix_agent Role - Add Zabbix 7.0 LTS in supported versions for windows.
+- zabbix_agent Role - Added ability to set the monitored_by and proxy_group values.
+- zabbix_agent Role - Set become parameter explicitly to false for API tasks to run without sudo on the local computer.
+
 v3.1.2
 ======
 

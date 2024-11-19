@@ -1347,3 +1347,16 @@ releases:
     - fix-zabbix-authentication-passwd-check-rules.yml
     - relogin-when-username-changes.yml
     release_date: '2024-09-07'
+  3.2.0:
+    changes:
+      bugfixes:
+      - zabbix_agent Role - Add Zabbix 7.0 LTS in supported versions for windows.
+      - zabbix_agent Role - Added ability to set the monitored_by and proxy_group
+        values.
+      - zabbix_agent Role - Set become parameter explicitly to false for API tasks
+        to run without sudo on the local computer.
+    fragments:
+    - 1393-fix-api-tasks-in-zabbix-agent-role-to-run-without-sudo.yml
+    - 1395-fix-zabbix-agent-install-in-windows.yml
+    - monitored_by.yml
+    release_date: '2024-11-18'

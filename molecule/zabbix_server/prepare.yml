@@ -4,7 +4,7 @@
 
   tasks:
     - name: "Installing packages on CentOS"
-      ansible.builtin.yum:
+      ansible.builtin.dnf:
         name:
           - net-tools
           - which
