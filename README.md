@@ -122,7 +122,7 @@ You can also include it in a `requirements.yml` file along with other required c
 ---
 collections:
   - name: community.zabbix
-    version: 3.1.2
+    version: 3.2.0
   - name: ansible.posix
     version: 1.3.0
   - name: community.general

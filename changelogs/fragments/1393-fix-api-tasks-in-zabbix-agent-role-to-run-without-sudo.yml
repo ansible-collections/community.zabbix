@@ -1,2 +1,0 @@
-bugfixes:
-  - zabbix_agent Role - Set become parameter explicitly to false for API tasks to run without sudo on the local computer.
