@@ -295,6 +295,77 @@ options:
             - A text of iframe sandboxing exceptions.
         required: false
         type: str
+
+    timeout_zabbix_agent:
+        description:
+            - A time of zabbix agent timeout.
+            - This parameter is available since Zabbix 7.0
+        required: false
+        type: str
+
+    timeout_simple_check:
+        description:
+            - A time of simple check timeout.
+            - This parameter is available since Zabbix 7.0
+        required: false
+        type: str
+
+    timeout_snmp_agent:
+        description:
+            - A time of SNMP agent timeout.
+            - This parameter is available since Zabbix 7.0
+        required: false
+        type: str
+
+    timeout_external_check:
+        description:
+            - A time of external check timeout.
+            - This parameter is available since Zabbix 7.0
+        required: false
+        type: str
+
+    timeout_db_monitor:
+        description:
+            - A time of db monitor timeout.
+            - This parameter is available since Zabbix 7.0
+        required: false
+        type: str
+
+    timeout_http_agent:
+        description:
+            - A time of HTTP agent timeout.
+            - This parameter is available since Zabbix 7.0
+        required: false
+        type: str
+
+    timeout_ssh_agent:
+        description:
+            - A time of SSH agent timeout.
+            - This parameter is available since Zabbix 7.0
+        required: false
+        type: str
+
+    timeout_telnet_agent:
+        description:
+            - A time of telnet agent timeout.
+            - This parameter is available since Zabbix 7.0
+        required: false
+        type: str
+
+    timeout_script:
+        description:
+            - A time of script timeout.
+            - This parameter is available since Zabbix 7.0
+        required: false
+        type: str
+
+    timeout_browser:
+        description:
+            - A time of browser timeout.
+            - This parameter is available since Zabbix 7.0
+        required: false
+        type: str
+
     connect_timeout:
         description:
             - A time of connection timeout with Zabbix server.
@@ -403,6 +474,7 @@ EXAMPLES = """
     alert_usrgrp: "0"
     auditlog_enabled: false
     blink_period: "10m"
+    timeout_zabbix_agent" "30s"
     connect_timeout: "30s"
     custom_color: false
     default_inventory_mode: automatic

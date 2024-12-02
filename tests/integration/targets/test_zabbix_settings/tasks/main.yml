@@ -344,11 +344,13 @@
     timeout_script: 3s
     timeout_browser: 60s
   register: zbx_settings
+  when: zabbix_version is version('7.0', '>=')
 
 - name: assert that settings was NOT updated
   ansible.builtin.assert:
     that:
       - zbx_settings.changed is sameas False
+  when: zabbix_version is version('7.0', '>=')
 
 - name: test - Update zabbix timeout settings
   community.zabbix.zabbix_settings:
@@ -363,11 +365,13 @@
     timeout_script: 30s
     timeout_browser: 70s
   register: zbx_settings
+  when: zabbix_version is version('7.0', '>=')
 
 - name: assert that settings were updated
   ansible.builtin.assert:
     that:
       - zbx_settings.changed is sameas True
+  when: zabbix_version is version('7.0', '>=')
 
 - name: test - Update zabbix timeout settings (same as default)
   community.zabbix.zabbix_settings:
@@ -382,3 +386,4 @@
     timeout_script: 3s
     timeout_browser: 60s
   register: zbx_settings
+  when: zabbix_version is version('7.0', '>=')
