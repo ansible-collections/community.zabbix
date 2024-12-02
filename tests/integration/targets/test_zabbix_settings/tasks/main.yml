@@ -330,3 +330,55 @@
     work_period: "1-5,09:00-18:00"
     x_frame_options: "SAMEORIGIN"
   register: zbx_settings
+
+- name: test - Update zabbix timeout settings (same as default)
+  community.zabbix.zabbix_settings:
+    timeout_zabbix_agent: 3s
+    timeout_simple_check: 3s
+    timeout_snmp_agent: 3s
+    timeout_external_check: 3s
+    timeout_db_monitor: 3s
+    timeout_http_agent: 3s
+    timeout_ssh_agent: 3s
+    timeout_telnet_agent: 3s
+    timeout_script: 3s
+    timeout_browser: 60s
+  register: zbx_settings
+
+- name: assert that settings was NOT updated
+  ansible.builtin.assert:
+    that:
+      - zbx_settings.changed is sameas False
+
+- name: test - Update zabbix timeout settings
+  community.zabbix.zabbix_settings:
+    timeout_zabbix_agent: 30s
+    timeout_simple_check: 30s
+    timeout_snmp_agent: 30s
+    timeout_external_check: 30s
+    timeout_db_monitor: 30s
+    timeout_http_agent: 30s
+    timeout_ssh_agent: 30s
+    timeout_telnet_agent: 30s
+    timeout_script: 30s
+    timeout_browser: 70s
+  register: zbx_settings
+
+- name: assert that settings were updated
+  ansible.builtin.assert:
+    that:
+      - zbx_settings.changed is sameas True
+
+- name: test - Update zabbix timeout settings (same as default)
+  community.zabbix.zabbix_settings:
+    timeout_zabbix_agent: 3s
+    timeout_simple_check: 3s
+    timeout_snmp_agent: 3s
+    timeout_external_check: 3s
+    timeout_db_monitor: 3s
+    timeout_http_agent: 3s
+    timeout_ssh_agent: 3s
+    timeout_telnet_agent: 3s
+    timeout_script: 3s
+    timeout_browser: 60s
+  register: zbx_settings

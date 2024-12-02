@@ -509,6 +509,16 @@ class Settings(ZabbixBase):
         x_frame_options,
         iframe_sandboxing_enabled,
         iframe_sandboxing_exceptions,
+        timeout_zabbix_agent,
+        timeout_simple_check,
+        timeout_snmp_agent,
+        timeout_external_check,
+        timeout_db_monitor,
+        timeout_http_agent,
+        timeout_ssh_agent,
+        timeout_telnet_agent,
+        timeout_script,
+        timeout_browser,
         connect_timeout,
         socket_timeout,
         media_type_test_timeout,
@@ -800,6 +810,56 @@ class Settings(ZabbixBase):
                         "iframe_sandboxing_exceptions"
                     ] = iframe_sandboxing_exceptions
 
+            if isinstance(timeout_zabbix_agent, str):
+                if self._is_time(timeout_zabbix_agent):
+                    if timeout_zabbix_agent != current_settings["timeout_zabbix_agent"]:
+                        params["timeout_zabbix_agent"] = timeout_zabbix_agent
+
+            if isinstance(timeout_simple_check, str):
+                if self._is_time(timeout_simple_check):
+                    if timeout_simple_check != current_settings["timeout_simple_check"]:
+                        params["timeout_simple_check"] = timeout_simple_check
+
+            if isinstance(timeout_snmp_agent, str):
+                if self._is_time(timeout_snmp_agent):
+                    if timeout_snmp_agent != current_settings["timeout_snmp_agent"]:
+                        params["timeout_snmp_agent"] = timeout_snmp_agent
+
+            if isinstance(timeout_external_check, str):
+                if self._is_time(timeout_external_check):
+                    if timeout_external_check != current_settings["timeout_external_check"]:
+                        params["timeout_external_check"] = timeout_external_check
+
+            if isinstance(timeout_db_monitor, str):
+                if self._is_time(timeout_db_monitor):
+                    if timeout_db_monitor != current_settings["timeout_db_monitor"]:
+                        params["timeout_db_monitor"] = timeout_db_monitor
+
+            if isinstance(timeout_http_agent, str):
+                if self._is_time(timeout_http_agent):
+                    if timeout_http_agent != current_settings["timeout_http_agent"]:
+                        params["timeout_http_agent"] = timeout_http_agent
+
+            if isinstance(timeout_ssh_agent, str):
+                if self._is_time(timeout_ssh_agent):
+                    if timeout_ssh_agent != current_settings["timeout_ssh_agent"]:
+                        params["timeout_ssh_agent"] = timeout_ssh_agent
+
+            if isinstance(timeout_telnet_agent, str):
+                if self._is_time(timeout_telnet_agent):
+                    if timeout_telnet_agent != current_settings["timeout_telnet_agent"]:
+                        params["timeout_telnet_agent"] = timeout_telnet_agent
+
+            if isinstance(timeout_script, str):
+                if self._is_time(timeout_script):
+                    if timeout_script != current_settings["timeout_script"]:
+                        params["timeout_script"] = timeout_script
+
+            if isinstance(timeout_browser, str):
+                if self._is_time(timeout_browser):
+                    if timeout_browser != current_settings["timeout_browser"]:
+                        params["timeout_browser"] = timeout_browser
+
             if isinstance(connect_timeout, str):
                 if self._is_time(connect_timeout):
                     if connect_timeout != current_settings["connect_timeout"]:
@@ -942,6 +1002,16 @@ def main():
             x_frame_options=dict(type="str"),
             iframe_sandboxing_enabled=dict(type="bool"),
             iframe_sandboxing_exceptions=dict(type="str"),
+            timeout_zabbix_agent=dict(type="str"),
+            timeout_simple_check=dict(type="str"),
+            timeout_snmp_agent=dict(type="str"),
+            timeout_external_check=dict(type="str"),
+            timeout_db_monitor=dict(type="str"),
+            timeout_http_agent=dict(type="str"),
+            timeout_ssh_agent=dict(type="str"),
+            timeout_telnet_agent=dict(type="str"),
+            timeout_script=dict(type="str"),
+            timeout_browser=dict(type="str"),
             connect_timeout=dict(type="str"),
             socket_timeout=dict(type="str"),
             media_type_test_timeout=dict(type="str"),
@@ -1028,6 +1098,16 @@ def main():
     x_frame_options = module.params["x_frame_options"]
     iframe_sandboxing_enabled = module.params["iframe_sandboxing_enabled"]
     iframe_sandboxing_exceptions = module.params["iframe_sandboxing_exceptions"]
+    timeout_zabbix_agent = module.params["timeout_zabbix_agent"]
+    timeout_simple_check = module.params["timeout_simple_check"]
+    timeout_snmp_agent = module.params["timeout_snmp_agent"]
+    timeout_external_check = module.params["timeout_external_check"]
+    timeout_db_monitor = module.params["timeout_db_monitor"]
+    timeout_http_agent = module.params["timeout_http_agent"]
+    timeout_ssh_agent = module.params["timeout_ssh_agent"]
+    timeout_telnet_agent = module.params["timeout_telnet_agent"]
+    timeout_script = module.params["timeout_script"]
+    timeout_browser = module.params["timeout_browser"]
     connect_timeout = module.params["connect_timeout"]
     socket_timeout = module.params["socket_timeout"]
     media_type_test_timeout = module.params["media_type_test_timeout"]
@@ -1093,6 +1173,16 @@ def main():
         x_frame_options,
         iframe_sandboxing_enabled,
         iframe_sandboxing_exceptions,
+        timeout_zabbix_agent,
+        timeout_simple_check,
+        timeout_snmp_agent,
+        timeout_external_check,
+        timeout_db_monitor,
+        timeout_http_agent,
+        timeout_ssh_agent,
+        timeout_telnet_agent,
+        timeout_script,
+        timeout_browser,
         connect_timeout,
         socket_timeout,
         media_type_test_timeout,
