@@ -474,7 +474,7 @@ EXAMPLES = """
     alert_usrgrp: "0"
     auditlog_enabled: false
     blink_period: "10m"
-    timeout_zabbix_agent" "30s"
+    timeout_zabbix_agent: "30s"
     connect_timeout: "30s"
     custom_color: false
     default_inventory_mode: automatic
