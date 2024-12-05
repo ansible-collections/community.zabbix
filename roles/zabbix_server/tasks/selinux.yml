@@ -38,3 +38,35 @@
   become: true
   tags:
     - config
+
+- when: ansible_facts['os_family'] == "RedHat"
+  block:
+    - name: Transfer zabbix selinux type enforcement file
+      copy:
+        src: files/zabbix_server_add.te
+        dest: "{{ ara_api_root_dir }}/ara-gunicorn.te"
+        mode: 0444
+      register: ara_selinux_module_file
+
+    - name: Compile ara-gunicorn selinux module
+      command: "checkmodule -M -m -o {{ ara_api_root_dir }}/ara-gunicorn.mod {{ ara_api_root_dir }}/ara-gunicorn.te"
+      when: ara_selinux_module_file['changed']
+
+    - name: Compile ara-gunicorn selinux policy package
+      command: "semodule_package -o {{ ara_api_root_dir }}/ara-gunicorn.pp -m {{ ara_api_root_dir }}/ara-gunicorn.mod"
+      when: ara_selinux_module_file['changed']
+
+- become: true
+  block:
+    - name: Gather loaded SELinux modules
+      command: semodule -l
+      register: ara_selinux_modules_loaded
+      when: ansible_facts['os_family'] == "RedHat"
+      changed_when: false
+
+    - name: Install selinux policy package
+      command: "semodule -i {{ ara_api_root_dir }}/ara-gunicorn.pp"
+      when:
+        - ansible_facts['os_family'] == "RedHat"
+        - ('ara-gunicorn' not in ara_selinux_modules_loaded['stdout_lines'] or ara_selinux_module_file['changed'])
+
