@@ -26,7 +26,7 @@ author:
 requirements:
     - "python >= 3.9"
 
-version_added: 3.2.0
+version_added: 3.3.0
 
 options:
     name:
