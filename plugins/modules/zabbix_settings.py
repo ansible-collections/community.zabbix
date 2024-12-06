@@ -882,55 +882,87 @@ class Settings(ZabbixBase):
                         "iframe_sandboxing_exceptions"
                     ] = iframe_sandboxing_exceptions
 
-            if isinstance(timeout_zabbix_agent, str):
-                if self._is_time(timeout_zabbix_agent):
-                    if timeout_zabbix_agent != current_settings["timeout_zabbix_agent"]:
-                        params["timeout_zabbix_agent"] = timeout_zabbix_agent
+            if LooseVersion(self._zbx_api_version) >= LooseVersion("7.0"):
+                if isinstance(timeout_zabbix_agent, str):
+                    if self._is_time(timeout_zabbix_agent):
+                        if timeout_zabbix_agent != current_settings["timeout_zabbix_agent"]:
+                            params["timeout_zabbix_agent"] = timeout_zabbix_agent
 
-            if isinstance(timeout_simple_check, str):
-                if self._is_time(timeout_simple_check):
-                    if timeout_simple_check != current_settings["timeout_simple_check"]:
-                        params["timeout_simple_check"] = timeout_simple_check
+                if isinstance(timeout_simple_check, str):
+                    if self._is_time(timeout_simple_check):
+                        if timeout_simple_check != current_settings["timeout_simple_check"]:
+                            params["timeout_simple_check"] = timeout_simple_check
 
-            if isinstance(timeout_snmp_agent, str):
-                if self._is_time(timeout_snmp_agent):
-                    if timeout_snmp_agent != current_settings["timeout_snmp_agent"]:
-                        params["timeout_snmp_agent"] = timeout_snmp_agent
+                if isinstance(timeout_snmp_agent, str):
+                    if self._is_time(timeout_snmp_agent):
+                        if timeout_snmp_agent != current_settings["timeout_snmp_agent"]:
+                            params["timeout_snmp_agent"] = timeout_snmp_agent
 
-            if isinstance(timeout_external_check, str):
-                if self._is_time(timeout_external_check):
-                    if timeout_external_check != current_settings["timeout_external_check"]:
-                        params["timeout_external_check"] = timeout_external_check
+                if isinstance(timeout_external_check, str):
+                    if self._is_time(timeout_external_check):
+                        if timeout_external_check != current_settings["timeout_external_check"]:
+                            params["timeout_external_check"] = timeout_external_check
 
-            if isinstance(timeout_db_monitor, str):
-                if self._is_time(timeout_db_monitor):
-                    if timeout_db_monitor != current_settings["timeout_db_monitor"]:
-                        params["timeout_db_monitor"] = timeout_db_monitor
+                if isinstance(timeout_db_monitor, str):
+                    if self._is_time(timeout_db_monitor):
+                        if timeout_db_monitor != current_settings["timeout_db_monitor"]:
+                            params["timeout_db_monitor"] = timeout_db_monitor
 
-            if isinstance(timeout_http_agent, str):
-                if self._is_time(timeout_http_agent):
-                    if timeout_http_agent != current_settings["timeout_http_agent"]:
-                        params["timeout_http_agent"] = timeout_http_agent
+                if isinstance(timeout_http_agent, str):
+                    if self._is_time(timeout_http_agent):
+                        if timeout_http_agent != current_settings["timeout_http_agent"]:
+                            params["timeout_http_agent"] = timeout_http_agent
 
-            if isinstance(timeout_ssh_agent, str):
-                if self._is_time(timeout_ssh_agent):
-                    if timeout_ssh_agent != current_settings["timeout_ssh_agent"]:
-                        params["timeout_ssh_agent"] = timeout_ssh_agent
+                if isinstance(timeout_ssh_agent, str):
+                    if self._is_time(timeout_ssh_agent):
+                        if timeout_ssh_agent != current_settings["timeout_ssh_agent"]:
+                            params["timeout_ssh_agent"] = timeout_ssh_agent
 
-            if isinstance(timeout_telnet_agent, str):
-                if self._is_time(timeout_telnet_agent):
-                    if timeout_telnet_agent != current_settings["timeout_telnet_agent"]:
-                        params["timeout_telnet_agent"] = timeout_telnet_agent
+                if isinstance(timeout_telnet_agent, str):
+                    if self._is_time(timeout_telnet_agent):
+                        if timeout_telnet_agent != current_settings["timeout_telnet_agent"]:
+                            params["timeout_telnet_agent"] = timeout_telnet_agent
 
-            if isinstance(timeout_script, str):
-                if self._is_time(timeout_script):
-                    if timeout_script != current_settings["timeout_script"]:
-                        params["timeout_script"] = timeout_script
+                if isinstance(timeout_script, str):
+                    if self._is_time(timeout_script):
+                        if timeout_script != current_settings["timeout_script"]:
+                            params["timeout_script"] = timeout_script
 
-            if isinstance(timeout_browser, str):
-                if self._is_time(timeout_browser):
-                    if timeout_browser != current_settings["timeout_browser"]:
-                        params["timeout_browser"] = timeout_browser
+                if isinstance(timeout_browser, str):
+                    if self._is_time(timeout_browser):
+                        if timeout_browser != current_settings["timeout_browser"]:
+                            params["timeout_browser"] = timeout_browser
+
+            else:
+                if isinstance(timeout_zabbix_agent, str):
+                   self._module.fail_json(msg="'timeout_zabbix_agent' unsupported in Zabbix server versions prior to 7.0")
+
+                if isinstance(timeout_simple_check, str):
+                   self._module.fail_json(msg="'timeout_simple_check' unsupported in Zabbix server versions prior to 7.0")
+
+                if isinstance(timeout_snmp_agent, str):
+                   self._module.fail_json(msg="'timeout_snmp_agent' unsupported in Zabbix server versions prior to 7.0")
+
+                if isinstance(timeout_external_check, str):
+                   self._module.fail_json(msg="'timeout_external_check' unsupported in Zabbix server versions prior to 7.0")
+
+                if isinstance(timeout_db_monitor, str):
+                   self._module.fail_json(msg="'timeout_db_monitor' unsupported in Zabbix server versions prior to 7.0")
+
+                if isinstance(timeout_http_agent, str):
+                   self._module.fail_json(msg="'timeout_http_agent' unsupported in Zabbix server versions prior to 7.0")
+
+                if isinstance(timeout_ssh_agent, str):
+                   self._module.fail_json(msg="'timeout_ssh_agent' unsupported in Zabbix server versions prior to 7.0")
+
+                if isinstance(timeout_telnet_agent, str):
+                   self._module.fail_json(msg="'timeout_telnet_agent' unsupported in Zabbix server versions prior to 7.0")
+
+                if isinstance(timeout_script, str):
+                   self._module.fail_json(msg="'timeout_script' unsupported in Zabbix server versions prior to 7.0")
+
+                if isinstance(timeout_browser, str):
+                   self._module.fail_json(msg="'timeout_browser' unsupported in Zabbix server versions prior to 7.0")
 
             if isinstance(connect_timeout, str):
                 if self._is_time(connect_timeout):
