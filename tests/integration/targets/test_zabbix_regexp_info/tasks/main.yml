@@ -1,0 +1,19 @@
+---
+- name: test - try to retrieve regexp
+  community.zabbix.zabbix_regexp_info:
+    name: File systems for discovery
+  register: zbxregexp_get
+
+- name: assert that regular expression data was converted correctly
+  ansible.builtin.assert:
+    that:
+      - zbxregexp_get.changed is sameas False
+      - zbxregexp_get.regexp | ansible.utils.fact_diff(expected_regexp) | from_json | list | length == 0
+  vars:
+    expected_regexp:
+      name: "File systems for discovery"
+      test_string: ext3
+      expressions:
+        - expression: "^(btrfs|ext2|ext3|ext4|reiser|xfs|ffs|ufs|jfs|jfs2|vxfs|hfs|apfs|refs|ntfs|fat32|zfs)$"
+          expression_type: result_is_true
+          case_sensitive: false
