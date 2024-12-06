@@ -935,34 +935,34 @@ class Settings(ZabbixBase):
 
             else:
                 if isinstance(timeout_zabbix_agent, str):
-                   self._module.fail_json(msg="'timeout_zabbix_agent' unsupported in Zabbix server versions prior to 7.0")
+                    self._module.fail_json(msg="'timeout_zabbix_agent' unsupported in Zabbix server versions prior to 7.0")
 
                 if isinstance(timeout_simple_check, str):
-                   self._module.fail_json(msg="'timeout_simple_check' unsupported in Zabbix server versions prior to 7.0")
+                    self._module.fail_json(msg="'timeout_simple_check' unsupported in Zabbix server versions prior to 7.0")
 
                 if isinstance(timeout_snmp_agent, str):
-                   self._module.fail_json(msg="'timeout_snmp_agent' unsupported in Zabbix server versions prior to 7.0")
+                    self._module.fail_json(msg="'timeout_snmp_agent' unsupported in Zabbix server versions prior to 7.0")
 
                 if isinstance(timeout_external_check, str):
-                   self._module.fail_json(msg="'timeout_external_check' unsupported in Zabbix server versions prior to 7.0")
+                    self._module.fail_json(msg="'timeout_external_check' unsupported in Zabbix server versions prior to 7.0")
 
                 if isinstance(timeout_db_monitor, str):
-                   self._module.fail_json(msg="'timeout_db_monitor' unsupported in Zabbix server versions prior to 7.0")
+                    self._module.fail_json(msg="'timeout_db_monitor' unsupported in Zabbix server versions prior to 7.0")
 
                 if isinstance(timeout_http_agent, str):
-                   self._module.fail_json(msg="'timeout_http_agent' unsupported in Zabbix server versions prior to 7.0")
+                    self._module.fail_json(msg="'timeout_http_agent' unsupported in Zabbix server versions prior to 7.0")
 
                 if isinstance(timeout_ssh_agent, str):
-                   self._module.fail_json(msg="'timeout_ssh_agent' unsupported in Zabbix server versions prior to 7.0")
+                    self._module.fail_json(msg="'timeout_ssh_agent' unsupported in Zabbix server versions prior to 7.0")
 
                 if isinstance(timeout_telnet_agent, str):
-                   self._module.fail_json(msg="'timeout_telnet_agent' unsupported in Zabbix server versions prior to 7.0")
+                    self._module.fail_json(msg="'timeout_telnet_agent' unsupported in Zabbix server versions prior to 7.0")
 
                 if isinstance(timeout_script, str):
-                   self._module.fail_json(msg="'timeout_script' unsupported in Zabbix server versions prior to 7.0")
+                    self._module.fail_json(msg="'timeout_script' unsupported in Zabbix server versions prior to 7.0")
 
                 if isinstance(timeout_browser, str):
-                   self._module.fail_json(msg="'timeout_browser' unsupported in Zabbix server versions prior to 7.0")
+                    self._module.fail_json(msg="'timeout_browser' unsupported in Zabbix server versions prior to 7.0")
 
             if isinstance(connect_timeout, str):
                 if self._is_time(connect_timeout):
