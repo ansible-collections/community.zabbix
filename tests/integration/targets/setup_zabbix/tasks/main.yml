@@ -31,6 +31,7 @@
     ansible_httpapi_port: 8080
     ansible_httpapi_use_ssl: false
     ansible_httpapi_validate_certs: false
+    ansible_command_timeout: 60
     ansible_user: Admin
     ansible_httpapi_pass: zabbix
 
