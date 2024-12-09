@@ -44,7 +44,7 @@
     - name: Transfer zabbix selinux type enforcement file
       copy:
         src: files/zabbix_server_add.te
-        dest: "{{ zabbix_zabbix_dir }}/zabbix_server_add.te"
+        dest: "{{ zabbix_root_dir }}/zabbix_server_add.te"
         mode: 0444
       register: zabbix_selinux_module_file
 
