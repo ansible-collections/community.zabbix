@@ -334,6 +334,15 @@
 - name: test - timeout parameters fail for older version of Zabbix
   community.zabbix.zabbix_settings:
     timeout_zabbix_agent: 3s
+    timeout_simple_check: 30s
+    timeout_snmp_agent: 30s
+    timeout_external_check: 30s
+    timeout_db_monitor: 30s
+    timeout_http_agent: 30s
+    timeout_ssh_agent: 30s
+    timeout_telnet_agent: 30s
+    timeout_script: 30s
+    timeout_browser: 70s
   ignore_errors: yes
   when: zabbix_version is version('7.0', '<')
   register: zbx_settings_failed
