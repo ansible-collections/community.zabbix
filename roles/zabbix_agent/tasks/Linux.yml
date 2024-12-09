@@ -75,7 +75,7 @@
 
 - name: "Fail invalid specified agent_listenip"
   ansible.builtin.fail:
-    msg: "{{ item }} The agent_listenip does not exist"
+    msg: "The {{ item }} (agent_listenip) does not exist"
   when:
     - item != '0.0.0.0'
     - item != '127.0.0.1'
