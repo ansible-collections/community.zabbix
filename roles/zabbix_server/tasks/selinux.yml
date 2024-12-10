@@ -13,6 +13,8 @@
   register: zabbix_server_dependencies_installed
   until: zabbix_server_dependencies_installed is succeeded
   become: true
+  vars:
+    zabbix_etc_dir: /etc/zabbix
   tags:
     - install
 
@@ -44,16 +46,16 @@
     - name: Transfer zabbix selinux type enforcement file
       copy:
         src: files/zabbix_server_add.te
-        dest: "{{ zabbix_root_dir }}/zabbix_server_add.te"
+        dest: "{{ zabbix_etc_dir }}/zabbix_server_add.te"
         mode: 0444
       register: zabbix_selinux_module_file
 
     - name: Compile zabbix selinux module
-      command: "checkmodule -M -m -o {{ zabbix_root_dir }}//zabbix_server_add.mod {{ zabbix_root_dir }}/zabbix_server_add.te"
+      command: "checkmodule -M -m -o {{ zabbix_etc_dir }}/zabbix_server_add.mod {{ zabbix_etc_dir }}/zabbix_server_add.te"
       when: zabbix_selinux_module_file['changed']
 
     - name: Compile zabbix selinux policy package
-      command: "semodule_package -o {{ zabbix_root_dir }}/zabbix_server_add.pp -m {{ zabbix_root_dir }}/zabbix_server_add.mod"
+      command: "semodule_package -o {{ zabbix_etc_dir }}/zabbix_server_add.pp -m {{ zabbix_etc_dir }}/zabbix_server_add.mod"
       when: zabbix_selinux_module_file['changed']
 
 - become: true
@@ -65,7 +67,7 @@
       changed_when: false
 
     - name: Install selinux policy package
-      command: "semodule -i {{ zabbix_root_dir }}/zabbix_server_add.pp"
+      command: "semodule -i {{ zabbix_etc_dir }}/zabbix_server_add.pp"
       when:
         - ansible_facts['os_family'] == "RedHat"
         - ('ara-gunicorn' not in zabbix_selinux_modules_loaded['stdout_lines'] or zabbix_selinux_module_file['changed'])
