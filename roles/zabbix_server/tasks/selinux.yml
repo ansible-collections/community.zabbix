@@ -32,15 +32,6 @@
     - name: zabbix_can_network
       state: "{{ selinux_allow_zabbix_can_network }}"
 
-#- name: "SELinux | RedHat | Add SEmodule to fix SELinux issue: zabbix_server_alerter.sock"
-# ansible.builtin.script:
-#    cmd: files/install_semodule.bsx
-#  args:
-#    creates: /etc/selinux/targeted/active/modules/400/zabbix_server_add/cil
-#  become: true
-#  tags:
-#    - config
-
 - when: ansible_facts['os_family'] == "RedHat"
   block:
     - name: Transfer zabbix selinux type enforcement file
@@ -70,4 +61,4 @@
       command: "semodule -i {{ zabbix_etc_dir }}/zabbix_server_add.pp"
       when:
         - ansible_facts['os_family'] == "RedHat"
-        - ('ara-gunicorn' not in zabbix_selinux_modules_loaded['stdout_lines'] or zabbix_selinux_module_file['changed'])
+        - ('zabbix_server_add' not in zabbix_selinux_modules_loaded['stdout_lines'] or zabbix_selinux_module_file['changed'])
