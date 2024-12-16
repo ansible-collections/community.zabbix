@@ -28,20 +28,20 @@ _zabbix_proxy_pgsql_dependencies:
 _zabbix_proxy_mysql_dependencies:
   # Debian
   "12":
-    - default-mysql-client
+    - "{{ zabbix_proxy_install_database_client | ternary('default-mysql-client', '') }}"
     - python3-pymysql
   "11":
-    - default-mysql-client
+    - "{{ zabbix_proxy_install_database_client | ternary('default-mysql-client', '') }}"
     - python3-pymysql
   # Ubuntu
   "24":
-    - default-mysql-client
+    - "{{ zabbix_proxy_install_database_client | ternary('default-mysql-client', '') }}"
     - python3-mysqldb
   "22":
-    - default-mysql-client
+    - "{{ zabbix_proxy_install_database_client | ternary('default-mysql-client', '') }}"
     - python3-pymysql
   "20":
-    - default-mysql-client
+    - "{{ zabbix_proxy_install_database_client | ternary('default-mysql-client', '') }}"
     - python3-pymysql
 
 _zabbix_proxy_sqlite3_dependencies:
