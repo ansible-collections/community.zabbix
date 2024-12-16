@@ -36,16 +36,16 @@
     - name: Transfer zabbix selinux type enforcement file
       copy:
         src: files/zabbix_server_add.te
-        dest: "{{ zabbix_config_dir }}/zabbix_server_add.te"
+        dest: "{{ zabbix_server_config_dir }}/zabbix_server_add.te"
         mode: '0444'
       register: zabbix_selinux_module_file
 
     - name: Compile zabbix selinux module
-      command: "checkmodule -M -m -o {{ zabbix_config_dir }}/zabbix_server_add.mod {{ zabbix_config_dir }}/zabbix_server_add.te"
+      command: "checkmodule -M -m -o {{ zabbix_server_config_dir }}/zabbix_server_add.mod {{ zabbix_server_config_dir }}/zabbix_server_add.te"
       when: zabbix_selinux_module_file['changed']
 
     - name: Compile zabbix selinux policy package
-      command: "semodule_package -o {{ zabbix_config_dir }}/zabbix_server_add.pp -m {{ zabbix_config_dir }}/zabbix_server_add.mod"
+      command: "semodule_package -o {{ zabbix_server_config_dir }}/zabbix_server_add.pp -m {{ zabbix_server_config_dir }}/zabbix_server_add.mod"
       when: zabbix_selinux_module_file['changed']
 
     - name: Gather loaded SELinux modules
@@ -54,7 +54,7 @@
       changed_when: false
 
     - name: Install selinux policy package
-      command: "semodule -i {{ zabbix_config_dir }}/zabbix_server_add.pp"
+      command: "semodule -i {{ zabbix_server_config_dir }}/zabbix_server_add.pp"
       when:
         - ansible_facts['ansible_selinux']['status'] == "enabled"
         - ('zabbix_server_add' not in zabbix_selinux_modules_loaded['stdout_lines'] or zabbix_selinux_module_file['changed'])
