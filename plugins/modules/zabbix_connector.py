@@ -64,7 +64,11 @@ class Connector(ZabbixBase):
 
     def get_connector(self, name):
         try:
-            result = self._zapi.connector.get({"filter": {"name": name}})
+            result = self._zapi.connector.get({
+                "filter": {"name": name},
+                "output": "extend",
+                "selectTags": ["tag", "operator", "value"]
+            })
             if len(result) > 0 and "connectorid" in result[0]:
                 self.existing_data = result[0]
                 return result[0]["connectorid"]
@@ -76,47 +80,40 @@ class Connector(ZabbixBase):
     def add_connector(self, params):
         try:
             result = self._zapi.connector.create(params)
-            self._module.exit_json(changed=True, result=result)
+            self._module.exit_json(changed=True, msg="Successfully created connector %s" % params["name"], result=result)
         except Exception as e:
-            self._module.fail_json(msg="Failed to create connector: %s" % e)
+            self._module.fail_json(msg="Failed to create connector %s: %s" % (params["name"], e))
 
     def update_connector(self, connector_id, params):
         diff = {
             k: v for k, v in params.items() if self.existing_data.get(k) != v
         }
         if diff == {}:
-            self._module.exit_json(changed=False)
+            self._module.exit_json(changed=False, msg="Connector %s (%s) already up to date" % (params["name"], connector_id))
         else:
             try:
                 diff["connectorid"] = connector_id
                 result = self._zapi.connector.update(diff)
                 self._module.exit_json(
-                    changed=True,
-                    # TODO: better handle API results
-                    result="Successfully updated connector %s (%s)" %
-                           (params["name"], connector_id)
-                )
+                    changed=True, msg="Successfully updated connector %s (%s)" % (params["name"], connector_id), result=result)
             except Exception as e:
-                self._module.fail_json(msg="Failed to update connector %s: %s" %
-                                           (params["name"], e))
-
-
+                self._module.fail_json(msg="Failed to update connector %s: %s" % (params["name"], e))
 
     def delete_connector(self, connector_id, name):
         try:
-            self._zapi.connector.delete([connector_id])
-            self._module.exit_json(changed=True, result="Successfully deleted connector %s" % name)
+            result = self._zapi.connector.delete([connector_id])
+            self._module.exit_json(changed=True, msg="Successfully deleted connector %s (%s)" % (name, connector_id), result=result)
         except Exception as e:
-            self._module.fail_json(msg="Failed to delete connector %s: %s" % (name, str(e)))
+            self._module.fail_json(msg="Failed to delete connector %s: %s" % (name, e))
 
     def sanitize_params(self, params):
         sanitized = {
             "name": params["name"],
             "url": params["url"],
             "data_type": Connector.DATA_TYPES.get(params["data_type"]),
-            "max_records": str(params["max_records"]),
-            "max_senders": str(params["max_senders"]),
-            "max_attempts": str(params["max_attempts"]),
+            "max_records": str(params["max_records"]) if params["max_records"] is not None else None,
+            "max_senders": str(params["max_senders"]) if params["max_senders"] is not None else None,
+            "max_attempts": str(params["max_attempts"]) if params["max_attempts"] is not None else None,
             "attempt_interval": params["attempt_interval"],
             "timeout": params["timeout"],
             "http_proxy": params["http_proxy"],
@@ -124,6 +121,9 @@ class Connector(ZabbixBase):
             "username": params["username"],
             "password": params["password"],
             "token": params["token"],
+            "verify_peer": str(int(params["verify_peer"])) if params["verify_peer"] is not None else None,
+            "verify_host": str(int(params["verify_host"])) if params["verify_host"] is not None else None,
+            "status": str(int(params["enabled"])) if params["enabled"] is not None else None,
             "ssl_cert_file": params["ssl_cert_file"],
             "ssl_key_file": params["ssl_key_file"],
             "ssl_key_password": params["ssl_key_password"],
@@ -147,22 +147,14 @@ class Connector(ZabbixBase):
                     sum_value += value
                 sanitized["item_value_type"] = str(sum_value)
 
-        if params["verify_peer"] is not None:
-            sanitized["verify_peer"] = str(int(params["verify_peer"])) # bool to '1' or '0'
-        if params["verify_host"] is not None:
-            sanitized["verify_host"] = str(int(params["verify_host"]))
-        if params["enabled"] is not None:
-            sanitized["status"] = str(int(params["enabled"]))
         if params["tags"] is not None:
             tags = []
             for tag_def in params["tags"]:
                 tag = {
-                    "tag": tag_def["tag"]
+                    "tag": tag_def["tag"],
+                    "operator": Connector.OPERATORS.get(tag_def["operator"], 0),
+                    "value": tag_def.get("value") or ""
                 }
-                if "operator" in tag_def:
-                    tag["operator"] = Connector.OPERATORS[tag_def["operator"]]
-                if "value" in tag_def:
-                    tag["value"] = tag_def["value"]
                 tags.append(tag)
             sanitized["tags"] = tags
 
@@ -184,13 +176,13 @@ def main():
         http_proxy=dict(type="str"),
         auth_type=dict(type="str", choices=Connector.AUTH_TYPES.keys()),
         username=dict(type="str"),
-        password=dict(type="str"),
-        token=dict(type="str", ),
+        password=dict(type="str", no_log=True),
+        token=dict(type="str", no_log=True),
         verify_peer=dict(type="bool"),
         verify_host=dict(type="bool"),
         ssl_cert_file=dict(type="str"),
         ssl_key_file=dict(type="str"),
-        ssl_key_password=dict(type="str"),
+        ssl_key_password=dict(type="str", no_log=True),
         description=dict(type="str"),
         enabled=dict(type="bool"), # "status" in API
         tags_eval_type=dict(type="str", choices=Connector.EVAL_TYPES.keys()),
@@ -231,7 +223,7 @@ def main():
         if connector_id:
             connector.delete_connector(connector_id, name)
         else:
-            module.exit_json(changed=False)
+            module.exit_json(changed=False, msg="Connector %s already absent" % name)
     elif state == "present":
         params = connector.sanitize_params(module.params)
 
