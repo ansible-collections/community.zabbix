@@ -1,0 +1,28 @@
+module zabbix_server_add 1.1;
+
+require {
+    type zabbix_var_run_t;
+    type tmp_t;
+    type zabbix_t;
+    class sock_file { create unlink write };
+    class unix_stream_socket connectto;
+    class process setrlimit;
+    class capability dac_override;
+}
+
+#============== zabbix_t =============
+
+#!!!! This avc is allowed in the current policy
+allow zabbix_t self:process setrlimit;
+
+#!!!! This avc is allowed in the current policy
+allow zabbix_t self:unix_stream_socket connectto;
+
+#!!!! This avc is allowed in the current policy
+allow zabbix_t tmp_t:sock_file { create unlink write };
+
+#!!!! This avc is allowed in the current policy
+allow zabbix_t zabbix_var_run_t:sock_file { create unlink write };
+
+#!!!! This avc is allowed in the current policy
+allow zabbix_t self:capability dac_override;
