@@ -1,0 +1,105 @@
+---
+- name: Skip test for versions < 6.4 # Connectors available only since Zabbix 6.4
+  when: zabbix_version is version('6.4', '<')
+  ansible.builtin.meta: end_play
+
+- block:
+    - name: test - create new Zabbix connector
+      community.zabbix.zabbix_connector:
+        name: ExampleConnector1
+        description: Example connector
+        state: present
+        enabled: true
+        url: https://127.0.0.1/api/zabbix_stream
+        data_type: item_values
+        auth_type: bearer
+        token: dummybearertoken
+        tags_eval_type: and/or
+        tags:
+          - tag: connector_stream
+            operator: exists
+      register: connector_new
+
+    - name: assert that connector is created
+      ansible.builtin.assert:
+        that: connector_new is changed
+
+    - name: test - create the same new Zabbix connector
+      community.zabbix.zabbix_connector:
+        name: ExampleConnector1
+        description: Example connector
+        state: present
+        enabled: true
+        url: https://127.0.0.1/api/zabbix_stream
+        data_type: item_values
+        auth_type: bearer
+        token: dummybearertoken
+        tags_eval_type: and/or
+        tags:
+          - tag: connector_stream
+            operator: exists
+      register: connector_existing
+
+    - name: assert that nothing has changed
+      ansible.builtin.assert:
+        that: not connector_existing is changed
+
+    - name: test - update Zabbix connector auth
+      community.zabbix.zabbix_connector:
+        name: ExampleConnector1
+        url: https://127.0.0.1/api/zabbix_stream
+        data_type: item_values
+        auth_type: basic
+        username: username
+        password: password
+      register: connector_auth_update
+
+    - name: assert that auth has changed
+      ansible.builtin.assert:
+        that: connector_auth_update is changed
+
+    - name: test - update Zabbix connector tags
+      community.zabbix.zabbix_connector:
+        name: ExampleConnector1
+        url: https://127.0.0.1/api/zabbix_stream
+        data_type: item_values
+        tags:
+          - tag: to_stream
+            operator: equals
+            value: connector
+          - tag: privacy
+            operator: does not equal
+            value: hidden
+      register: connector_tags_update
+
+    - name: assert that auth has changed
+      ansible.builtin.assert:
+        that: connector_tags_update is changed
+
+    - name: test - update Zabbix connector auth and tags (again)
+      community.zabbix.zabbix_connector:
+        name: ExampleConnector1
+        url: https://127.0.0.1/api/zabbix_stream
+        data_type: item_values
+        auth_type: basic
+        username: username
+        password: password
+        tags:
+          - tag: to_stream
+            operator: equals
+            value: connector
+          - tag: privacy
+            operator: does not equal
+            value: hidden
+      register: connector_auth_tags_update
+
+    - name: assert that auth has changed
+      ansible.builtin.assert:
+        that: not connector_auth_tags_update is changed
+
+  always:
+    - name: Cleanup connector
+      community.zabbix.zabbix_connector:
+        name: ExampleConnector1
+        state: absent
+      ignore_errors: true

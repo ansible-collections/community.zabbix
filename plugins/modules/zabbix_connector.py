@@ -35,6 +35,7 @@ options:
         default: item_values
     item_value_types:
         description:
+            - Parameter introduced in Zabbix 7.0
             - List of value types to stream.
             - Each element should be one of C(all), C(all+bin), C(numeric_float), C(character), C(log), C(numeric_unsigned), C(text) or C(binary).
             - C(all) represents all types except binary I((default)).
@@ -56,6 +57,7 @@ options:
         type: int
     attempt_interval:
         description:
+            - Parameter introduced in Zabbix 7.0
             - Interval between attempts in seconds (value between 0 and 10).
         type: int
     timeout:
@@ -221,12 +223,12 @@ msg:
     description: Text result of the operation.
     returned: always
     type: str
-    sample: Successfully updated connector 'My app connector' (id: 2)
+    sample: "Successfully updated connector 'My app connector' (id: 2)"
 result:
     description: JSON result of the Zabbix API call
     returned: success
     type: dict
-    sample: {"connectorids": ["2"]}
+    sample: '{"connectorids": ["2"]}'
 """
 
 from ansible.module_utils.basic import AnsibleModule
@@ -355,18 +357,18 @@ class Connector(ZabbixBase):
             "attempt_interval": str(params["attempt_interval"]) if params["attempt_interval"] is not None else None,
             "timeout": str(params["timeout"]) if params["timeout"] is not None else None,
             "http_proxy": params["http_proxy"],
-            "auth_type": Connector.AUTH_TYPES.get(params["auth_type"]),
+            "authtype": Connector.AUTH_TYPES.get(params["auth_type"]),
             "username": params["username"],
             "password": params["password"],
             "token": params["token"],
             "verify_peer": str(int(params["verify_peer"])) if params["verify_peer"] is not None else None,
             "verify_host": str(int(params["verify_host"])) if params["verify_host"] is not None else None,
-            "status": str(int(params["enabled"])) if params["enabled"] is not None else None,
             "ssl_cert_file": params["ssl_cert_file"],
             "ssl_key_file": params["ssl_key_file"],
             "ssl_key_password": params["ssl_key_password"],
             "description": params["description"],
-            "tags_eval_type": Connector.EVAL_TYPES.get(params["tags_eval_type"]),
+            "status": str(int(params["enabled"])) if params["enabled"] is not None else None,
+            "tags_evaltype": Connector.EVAL_TYPES.get(params["tags_eval_type"]),
         }
 
         if params["item_value_types"] is not None:
