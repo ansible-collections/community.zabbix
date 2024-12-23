@@ -32,7 +32,6 @@ options:
             - Type of data being streamed.
         type: str
         choices: ["item_values", "events"]
-        default: item_values
     item_value_types:
         description:
             - Parameter introduced in Zabbix 7.0
@@ -42,7 +41,6 @@ options:
             - C(all+bin) represents all types, binary included.
         type: list
         elements: str
-        default: ["all"]
     max_records:
         description:
             - Maximum number of records sent in one message.
@@ -73,7 +71,6 @@ options:
             - HTTP authentication method used by the connector.
         type: str
         choices: ["none", "basic", "ntlm", "kerberos", "digest", "bearer"]
-        default: none
     username:
         description:
             - Username to authenticate the connector with the receiver.
@@ -123,7 +120,6 @@ options:
             - Tag filter evaluation method.
         type: str
         choices: ["and/or", "or"]
-        default: and/or
     tags:
         description:
             - List of tags to filter streamed data.
@@ -140,7 +136,6 @@ options:
                     - Conditional operator used to filter .
                 type: str
                 choices: ["equals", "does not equal", "contains", "does not contain", "exists", "does not exist"]
-                default: equals
             value:
                 description:
                     - Value of the tag compared.
@@ -202,7 +197,7 @@ EXAMPLES = r"""
       - tag: privacy
         operator: does not equal
         value: hidden
-        
+
 - name: Delete a connector
   # set task level variables as we change ansible_connection plugin here
   vars:
@@ -235,6 +230,7 @@ from ansible.module_utils.basic import AnsibleModule
 
 from ansible_collections.community.zabbix.plugins.module_utils.base import ZabbixBase
 import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabbix_utils
+
 
 class Connector(ZabbixBase):
 
@@ -376,7 +372,7 @@ class Connector(ZabbixBase):
             if "all" in value_types:
                 sanitized["item_value_type"] = "31"
             elif "all+bin" in value_types:
-                sanitized["item_value_type"] = "51" # 31 + 20
+                sanitized["item_value_type"] = "51"  # 31 + 20
             else:
                 sum_value = 0
                 for value_type in value_types:
@@ -409,7 +405,7 @@ def main():
     argument_spec.update(dict(
         name=dict(type="str", required=True),
         url=dict(type="str"),
-        data_type=dict(type="str", choices=Connector.DATA_TYPES.keys()),
+        data_type=dict(type="str", choices=list(Connector.DATA_TYPES.keys())),
         item_value_types=dict(type="list", elements="str"),
         max_records=dict(type="int"),
         max_senders=dict(type="int"),
@@ -417,7 +413,7 @@ def main():
         attempt_interval=dict(type="int"),
         timeout=dict(type="int"),
         http_proxy=dict(type="str"),
-        auth_type=dict(type="str", choices=Connector.AUTH_TYPES.keys()),
+        auth_type=dict(type="str", choices=list(Connector.AUTH_TYPES.keys())),
         username=dict(type="str"),
         password=dict(type="str", no_log=True),
         token=dict(type="str", no_log=True),
@@ -427,14 +423,14 @@ def main():
         ssl_key_file=dict(type="str"),
         ssl_key_password=dict(type="str", no_log=True),
         description=dict(type="str"),
-        enabled=dict(type="bool"), # "status" in API
-        tags_eval_type=dict(type="str", choices=Connector.EVAL_TYPES.keys()),
+        enabled=dict(type="bool"),  # "status" in API
+        tags_eval_type=dict(type="str", choices=list(Connector.EVAL_TYPES.keys())),
         tags=dict(
             type="list",
             elements="dict",
             options=dict(
                 tag=dict(type="str", required=True),
-                operator=dict(type="str", choices=Connector.OPERATORS.keys()),
+                operator=dict(type="str", choices=list(Connector.OPERATORS.keys())),
                 value=dict(type="str")
             )
         ),
@@ -474,6 +470,7 @@ def main():
             connector.update_connector(connector_id, params)
         else:
             connector.add_connector(params)
+
 
 if __name__ == "__main__":
     main()
