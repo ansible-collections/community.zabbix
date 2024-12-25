@@ -1,0 +1,2 @@
+minor_changes:
+  - zabbix_settings - add support for additional timeout settings
