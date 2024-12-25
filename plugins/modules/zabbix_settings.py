@@ -295,6 +295,77 @@ options:
             - A text of iframe sandboxing exceptions.
         required: false
         type: str
+
+    timeout_zabbix_agent:
+        description:
+            - A time of zabbix agent timeout.
+            - This parameter is available since Zabbix 7.0
+        required: false
+        type: str
+
+    timeout_simple_check:
+        description:
+            - A time of simple check timeout.
+            - This parameter is available since Zabbix 7.0
+        required: false
+        type: str
+
+    timeout_snmp_agent:
+        description:
+            - A time of SNMP agent timeout.
+            - This parameter is available since Zabbix 7.0
+        required: false
+        type: str
+
+    timeout_external_check:
+        description:
+            - A time of external check timeout.
+            - This parameter is available since Zabbix 7.0
+        required: false
+        type: str
+
+    timeout_db_monitor:
+        description:
+            - A time of db monitor timeout.
+            - This parameter is available since Zabbix 7.0
+        required: false
+        type: str
+
+    timeout_http_agent:
+        description:
+            - A time of HTTP agent timeout.
+            - This parameter is available since Zabbix 7.0
+        required: false
+        type: str
+
+    timeout_ssh_agent:
+        description:
+            - A time of SSH agent timeout.
+            - This parameter is available since Zabbix 7.0
+        required: false
+        type: str
+
+    timeout_telnet_agent:
+        description:
+            - A time of telnet agent timeout.
+            - This parameter is available since Zabbix 7.0
+        required: false
+        type: str
+
+    timeout_script:
+        description:
+            - A time of script timeout.
+            - This parameter is available since Zabbix 7.0
+        required: false
+        type: str
+
+    timeout_browser:
+        description:
+            - A time of browser timeout.
+            - This parameter is available since Zabbix 7.0
+        required: false
+        type: str
+
     connect_timeout:
         description:
             - A time of connection timeout with Zabbix server.
@@ -403,6 +474,7 @@ EXAMPLES = """
     alert_usrgrp: "0"
     auditlog_enabled: false
     blink_period: "10m"
+    timeout_zabbix_agent: "30s"
     connect_timeout: "30s"
     custom_color: false
     default_inventory_mode: automatic
@@ -509,6 +581,16 @@ class Settings(ZabbixBase):
         x_frame_options,
         iframe_sandboxing_enabled,
         iframe_sandboxing_exceptions,
+        timeout_zabbix_agent,
+        timeout_simple_check,
+        timeout_snmp_agent,
+        timeout_external_check,
+        timeout_db_monitor,
+        timeout_http_agent,
+        timeout_ssh_agent,
+        timeout_telnet_agent,
+        timeout_script,
+        timeout_browser,
         connect_timeout,
         socket_timeout,
         media_type_test_timeout,
@@ -800,6 +882,88 @@ class Settings(ZabbixBase):
                         "iframe_sandboxing_exceptions"
                     ] = iframe_sandboxing_exceptions
 
+            if LooseVersion(self._zbx_api_version) >= LooseVersion("7.0"):
+                if isinstance(timeout_zabbix_agent, str):
+                    if self._is_time(timeout_zabbix_agent):
+                        if timeout_zabbix_agent != current_settings["timeout_zabbix_agent"]:
+                            params["timeout_zabbix_agent"] = timeout_zabbix_agent
+
+                if isinstance(timeout_simple_check, str):
+                    if self._is_time(timeout_simple_check):
+                        if timeout_simple_check != current_settings["timeout_simple_check"]:
+                            params["timeout_simple_check"] = timeout_simple_check
+
+                if isinstance(timeout_snmp_agent, str):
+                    if self._is_time(timeout_snmp_agent):
+                        if timeout_snmp_agent != current_settings["timeout_snmp_agent"]:
+                            params["timeout_snmp_agent"] = timeout_snmp_agent
+
+                if isinstance(timeout_external_check, str):
+                    if self._is_time(timeout_external_check):
+                        if timeout_external_check != current_settings["timeout_external_check"]:
+                            params["timeout_external_check"] = timeout_external_check
+
+                if isinstance(timeout_db_monitor, str):
+                    if self._is_time(timeout_db_monitor):
+                        if timeout_db_monitor != current_settings["timeout_db_monitor"]:
+                            params["timeout_db_monitor"] = timeout_db_monitor
+
+                if isinstance(timeout_http_agent, str):
+                    if self._is_time(timeout_http_agent):
+                        if timeout_http_agent != current_settings["timeout_http_agent"]:
+                            params["timeout_http_agent"] = timeout_http_agent
+
+                if isinstance(timeout_ssh_agent, str):
+                    if self._is_time(timeout_ssh_agent):
+                        if timeout_ssh_agent != current_settings["timeout_ssh_agent"]:
+                            params["timeout_ssh_agent"] = timeout_ssh_agent
+
+                if isinstance(timeout_telnet_agent, str):
+                    if self._is_time(timeout_telnet_agent):
+                        if timeout_telnet_agent != current_settings["timeout_telnet_agent"]:
+                            params["timeout_telnet_agent"] = timeout_telnet_agent
+
+                if isinstance(timeout_script, str):
+                    if self._is_time(timeout_script):
+                        if timeout_script != current_settings["timeout_script"]:
+                            params["timeout_script"] = timeout_script
+
+                if isinstance(timeout_browser, str):
+                    if self._is_time(timeout_browser):
+                        if timeout_browser != current_settings["timeout_browser"]:
+                            params["timeout_browser"] = timeout_browser
+
+            else:
+                if isinstance(timeout_zabbix_agent, str):
+                    self._module.fail_json(msg="'timeout_zabbix_agent' unsupported in Zabbix server versions prior to 7.0")
+
+                if isinstance(timeout_simple_check, str):
+                    self._module.fail_json(msg="'timeout_simple_check' unsupported in Zabbix server versions prior to 7.0")
+
+                if isinstance(timeout_snmp_agent, str):
+                    self._module.fail_json(msg="'timeout_snmp_agent' unsupported in Zabbix server versions prior to 7.0")
+
+                if isinstance(timeout_external_check, str):
+                    self._module.fail_json(msg="'timeout_external_check' unsupported in Zabbix server versions prior to 7.0")
+
+                if isinstance(timeout_db_monitor, str):
+                    self._module.fail_json(msg="'timeout_db_monitor' unsupported in Zabbix server versions prior to 7.0")
+
+                if isinstance(timeout_http_agent, str):
+                    self._module.fail_json(msg="'timeout_http_agent' unsupported in Zabbix server versions prior to 7.0")
+
+                if isinstance(timeout_ssh_agent, str):
+                    self._module.fail_json(msg="'timeout_ssh_agent' unsupported in Zabbix server versions prior to 7.0")
+
+                if isinstance(timeout_telnet_agent, str):
+                    self._module.fail_json(msg="'timeout_telnet_agent' unsupported in Zabbix server versions prior to 7.0")
+
+                if isinstance(timeout_script, str):
+                    self._module.fail_json(msg="'timeout_script' unsupported in Zabbix server versions prior to 7.0")
+
+                if isinstance(timeout_browser, str):
+                    self._module.fail_json(msg="'timeout_browser' unsupported in Zabbix server versions prior to 7.0")
+
             if isinstance(connect_timeout, str):
                 if self._is_time(connect_timeout):
                     if connect_timeout != current_settings["connect_timeout"]:
@@ -942,6 +1106,16 @@ def main():
             x_frame_options=dict(type="str"),
             iframe_sandboxing_enabled=dict(type="bool"),
             iframe_sandboxing_exceptions=dict(type="str"),
+            timeout_zabbix_agent=dict(type="str"),
+            timeout_simple_check=dict(type="str"),
+            timeout_snmp_agent=dict(type="str"),
+            timeout_external_check=dict(type="str"),
+            timeout_db_monitor=dict(type="str"),
+            timeout_http_agent=dict(type="str"),
+            timeout_ssh_agent=dict(type="str"),
+            timeout_telnet_agent=dict(type="str"),
+            timeout_script=dict(type="str"),
+            timeout_browser=dict(type="str"),
             connect_timeout=dict(type="str"),
             socket_timeout=dict(type="str"),
             media_type_test_timeout=dict(type="str"),
@@ -1028,6 +1202,16 @@ def main():
     x_frame_options = module.params["x_frame_options"]
     iframe_sandboxing_enabled = module.params["iframe_sandboxing_enabled"]
     iframe_sandboxing_exceptions = module.params["iframe_sandboxing_exceptions"]
+    timeout_zabbix_agent = module.params["timeout_zabbix_agent"]
+    timeout_simple_check = module.params["timeout_simple_check"]
+    timeout_snmp_agent = module.params["timeout_snmp_agent"]
+    timeout_external_check = module.params["timeout_external_check"]
+    timeout_db_monitor = module.params["timeout_db_monitor"]
+    timeout_http_agent = module.params["timeout_http_agent"]
+    timeout_ssh_agent = module.params["timeout_ssh_agent"]
+    timeout_telnet_agent = module.params["timeout_telnet_agent"]
+    timeout_script = module.params["timeout_script"]
+    timeout_browser = module.params["timeout_browser"]
     connect_timeout = module.params["connect_timeout"]
     socket_timeout = module.params["socket_timeout"]
     media_type_test_timeout = module.params["media_type_test_timeout"]
@@ -1093,6 +1277,16 @@ def main():
         x_frame_options,
         iframe_sandboxing_enabled,
         iframe_sandboxing_exceptions,
+        timeout_zabbix_agent,
+        timeout_simple_check,
+        timeout_snmp_agent,
+        timeout_external_check,
+        timeout_db_monitor,
+        timeout_http_agent,
+        timeout_ssh_agent,
+        timeout_telnet_agent,
+        timeout_script,
+        timeout_browser,
         connect_timeout,
         socket_timeout,
         media_type_test_timeout,
