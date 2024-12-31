@@ -38,6 +38,11 @@ options:
         aliases: [ "host_group" ]
         type: list
         elements: str
+    append:
+        description:
+            - Whether to append hosts and host groups to the existing maintenance.
+        type: bool
+        default: false
     minutes:
         description:
             - Length of maintenance window in minutes.
@@ -370,6 +375,7 @@ def main():
         minutes=dict(type="int", required=False, default=10),
         host_groups=dict(type="list", required=False,
                          default=None, aliases=["host_group"], elements="str"),
+        append=dict(type="bool", required=False, default=False),
         name=dict(type="str", required=True),
         desc=dict(type="str", required=False, default="Created by Ansible"),
         collect_data=dict(type="bool", required=False, default=True),
@@ -396,6 +402,7 @@ def main():
 
     host_names = module.params["host_names"]
     host_groups = module.params["host_groups"]
+    append = module.params["append"]
     state = module.params["state"]
     minutes = module.params["minutes"]
     name = module.params["name"]
@@ -448,18 +455,23 @@ def main():
             module.fail_json(
                 msg="Failed to check maintenance %s existence: %s" % (name, error))
 
-        if maintenance and maint.check_maint_properties(maintenance, group_ids, host_ids, maintenance_type,
-                                                        start_time, period, desc, tags):
-            if module.check_mode:
-                changed = True
-            else:
-                (rc, data, error) = maint.update_maintenance(
-                    maintenance["maintenanceid"], group_ids, host_ids, start_time, maintenance_type, period, desc, tags)
-                if rc == 0:
+        if maintenance:
+            if append:
+                group_ids = list(set(group_ids + maintenance["groupids"]))
+                host_ids = list(set(host_ids + maintenance["hostids"]))
+
+            if maint.check_maint_properties(maintenance, group_ids, host_ids, maintenance_type,
+                                            start_time, period, desc, tags):
+                if module.check_mode:
                     changed = True
                 else:
-                    module.fail_json(
-                        msg="Failed to update maintenance: %s" % error)
+                    (rc, data, error) = maint.update_maintenance(
+                        maintenance["maintenanceid"], group_ids, host_ids, start_time, maintenance_type, period, desc, tags)
+                    if rc == 0:
+                        changed = True
+                    else:
+                        module.fail_json(
+                            msg="Failed to update maintenance: %s" % error)
 
         if not maintenance:
             if module.check_mode:

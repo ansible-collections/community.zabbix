@@ -323,6 +323,40 @@
     that:
       - create_maintenance_active_till_again_result.changed is sameas false
 
+- name: "test - Create maintenance with an append param"
+  community.zabbix.zabbix_maintenance:
+    name: maintenance
+    host_names:
+      - Zabbix server
+    host_groups:
+      - Linux servers
+    append: true
+    active_since: "1979-09-19 00:00"
+    active_till: "1979-09-19 23:59"
+    state: present
+  register: create_maintenance_append_result
+
+- ansible.builtin.assert:
+    that:
+      - create_maintenance_append_result.changed is sameas true
+
+- name: "test - Create maintenance with an append param(again - expectations: no change will occur)"
+  community.zabbix.zabbix_maintenance:
+    name: maintenance
+    host_names:
+      - Zabbix server
+    host_groups:
+      - Linux servers
+    append: true
+    active_since: "1979-09-19 00:00"
+    active_till: "1979-09-19 23:59"
+    state: present
+  register: create_maintenance_append_again_result
+
+- ansible.builtin.assert:
+    that:
+      - create_maintenance_append_again_result.changed is sameas false
+
 - name: "test - Delete maintenance"
   community.zabbix.zabbix_maintenance:
     name: maintenance
