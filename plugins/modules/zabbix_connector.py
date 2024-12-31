@@ -242,12 +242,12 @@ class Connector(ZabbixBase):
     }
 
     VALUE_TYPES = {
-        "numeric_float": "1",
-        "character": "2",
-        "log": "4",
-        "numeric_unsigned": "8",
-        "text": "10",
-        "binary": "20",
+        "numeric_float": 1,
+        "character": 2,
+        "log": 4,
+        "numeric_unsigned": 8,
+        "text": 10,
+        "binary": 20,
     }
 
     AUTH_TYPES = {
