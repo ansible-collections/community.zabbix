@@ -1,0 +1,152 @@
+---
+- name: Skip test for versions < 6.4 # Connectors available only since Zabbix 6.4
+  when: zabbix_version is version('6.4', '<')
+  ansible.builtin.meta: end_play
+
+- block:
+    - name: test - create new Zabbix connector
+      community.zabbix.zabbix_connector:
+        name: ExampleConnector1
+        description: Example connector
+        state: present
+        enabled: true
+        url: https://127.0.0.1/api/zabbix_stream
+        data_type: item_values
+        auth_type: bearer
+        token: dummybearertoken
+        tags_eval_type: and/or
+        tags:
+          - tag: connector_stream
+            operator: exists
+      register: connector_new
+
+    - name: assert that connector is created
+      ansible.builtin.assert:
+        that: connector_new is changed
+
+    - name: test - create the same new Zabbix connector
+      community.zabbix.zabbix_connector:
+        name: ExampleConnector1
+        description: Example connector
+        state: present
+        enabled: true
+        url: https://127.0.0.1/api/zabbix_stream
+        data_type: item_values
+        auth_type: bearer
+        token: dummybearertoken
+        tags_eval_type: and/or
+        tags:
+          - tag: connector_stream
+            operator: exists
+      register: connector_existing
+
+    - name: assert that nothing has changed
+      ansible.builtin.assert:
+        that: not connector_existing is changed
+
+    - name: test - update Zabbix connector auth
+      community.zabbix.zabbix_connector:
+        name: ExampleConnector1
+        url: https://127.0.0.1/api/zabbix_stream
+        data_type: item_values
+        auth_type: basic
+        username: username
+        password: password
+      register: connector_auth_update
+
+    - name: assert that auth has changed
+      ansible.builtin.assert:
+        that: connector_auth_update is changed
+
+    - name: test - update Zabbix connector tags
+      community.zabbix.zabbix_connector:
+        name: ExampleConnector1
+        url: https://127.0.0.1/api/zabbix_stream
+        data_type: item_values
+        tags:
+          - tag: to_stream
+            operator: equals
+            value: connector
+          - tag: privacy
+            operator: does not equal
+            value: hidden
+      register: connector_tags_update
+
+    - name: assert that auth has changed
+      ansible.builtin.assert:
+        that: connector_tags_update is changed
+
+    - name: test - update Zabbix connector auth and tags (again)
+      community.zabbix.zabbix_connector:
+        name: ExampleConnector1
+        url: https://127.0.0.1/api/zabbix_stream
+        data_type: item_values
+        auth_type: basic
+        username: username
+        password: password
+        tags:
+          - tag: to_stream
+            operator: equals
+            value: connector
+          - tag: privacy
+            operator: does not equal
+            value: hidden
+      register: connector_auth_tags_update
+
+    - name: assert that auth has not changed
+      ansible.builtin.assert:
+        that: not connector_auth_tags_update is changed
+
+    - name: test - set item value type (version >= 7.0)
+      community.zabbix.zabbix_connector:
+        name: ExampleConnector1
+        url: https://127.0.0.1/api/zabbix_stream
+        data_type: item_values
+        item_value_types: "{{ item }}"
+      loop:
+        - ["numeric_float"]
+        - ["numeric_float", "numeric_unsigned", "character", "text"]
+        - ["all+bin"]
+        - ["all"]
+      when: zabbix_version is version('7.0', '>=')
+      register: connector_value_type
+
+    - name: assert that all item value type updates lead to changed
+      ansible.builtin.assert:
+        that:
+          - connector_value_type.results | map(attribute='changed') is all
+      when: zabbix_version is version('7.0', '>=')
+
+    - name: test - set non existent item value type (version >= 7.0)
+      community.zabbix.zabbix_connector:
+        name: ExampleConnector1
+        url: https://127.0.0.1/api/zabbix_stream
+        data_type: item_values
+        item_value_types:
+          - not_a_real_value_type
+      when: zabbix_version is version('7.0', '>=')
+      register: connector_wrong_value_type
+      ignore_errors: true
+
+    - name: assert that the module failed
+      ansible.builtin.assert:
+        that: connector_wrong_value_type is failed and "is not a known value type" in connector_wrong_value_type.msg
+      when: zabbix_version is version('7.0', '>=')
+
+  always:
+    - name: Cleanup connector
+      community.zabbix.zabbix_connector:
+        name: ExampleConnector1
+        state: absent
+      ignore_errors: true
+
+    - name: test - cleanup connector (again)
+      community.zabbix.zabbix_connector:
+        name: ExampleConnector1
+        state: absent
+      ignore_errors: true
+      register: connector_delete
+
+    - name: assert that nothing has changed
+      ansible.builtin.assert:
+        that: not connector_delete is changed or connector_delete is failed
