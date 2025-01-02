@@ -1,15 +1,10 @@
 ---
-- name: "Set Log File Info"
+- name: "Set Windows specific configuration facts"
   ansible.builtin.set_fact:
     zabbix_agent_logfile: "{{ zabbix_agent_win_logfile is defined | ternary(zabbix_agent_win_logfile, zabbix_agent2_win_logfile) | default(_win_logfile) }}"
-
-- name: "Set Include Path Info"
-  ansible.builtin.set_fact:
     zabbix_agent_include_dir: "{{ zabbix_agent_win_include is defined | ternary(zabbix_agent_win_include, zabbix_agent2_win_include) | default(_win_include) }}"
-
-- name: "Set Control Socket"
-  ansible.builtin.set_fact:
-    zabbix_agent_controlsocket: "\\\\.\\pipe\\agent.sock"
+    zabbix_agent_controlsocket: "{{ zabbix_agent_win_controlsocket }}"
+    zabbix_agent_pluginsocket: "{{ zabbix_agent_win_pluginsocket }}"
 
 - name: "Set default ip address for zabbix_agent_ip"
   ansible.builtin.set_fact:
@@ -32,7 +27,6 @@
   ansible.windows.win_service:
     name: "{{ zabbix_win_svc_name }}"
     start_mode: auto
-    state: started
     failure_actions:
       - type: restart
         delay_ms: 5000
@@ -41,6 +35,7 @@
       - type: restart
         delay_ms: 20000
     failure_reset_period_sec: 86400
+  notify: restart win zabbix agent
   tags:
     - config
 

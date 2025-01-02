@@ -22,6 +22,8 @@
   win_service:
     name: "{{ zabbix_win_svc_name }}"
     state: restarted
+  register: zabbix_win_restart_result
+  until: zabbix_win_restart_result is succeeded
   when:
     - ansible_os_family == "Windows"
 

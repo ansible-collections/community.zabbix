@@ -1,38 +1,18 @@
 ---
-- name: "Windows | Set some variables"
+- name: "Windows | Set base variables"
   ansible.builtin.set_fact:
-    zabbix_agent_win_download_link: "{{ zabbix_agent_win_download_link is defined | ternary(zabbix_agent_win_download_link, zabbix_agent2_win_download_link) | default(_win_download_link) }}"
     zabbix_agent_win_logfile: "{{ zabbix_agent_win_logfile is defined | ternary(zabbix_agent_win_logfile, zabbix_agent2_win_logfile) | default(_win_logfile) }}"
     zabbix_agent_win_package: "{{ zabbix_agent_win_package is defined | ternary(zabbix_agent_win_package, zabbix_agent2_win_package) | default(_win_package) }}"
     zabbix_agent_win_include: "{{ zabbix_agent_win_include is defined | ternary(zabbix_agent_win_include, zabbix_agent2_win_include) | default(_win_include) }}"
-
-- name: "Windows | Set default architecture"
-  ansible.builtin.set_fact:
-    windows_arch: 32
-  tags:
-    - always
-
-- name: "Windows | Override architecture if 64-bit"
-  ansible.builtin.set_fact:
-    windows_arch: 64
-  when:
-    - '"64" in ansible_architecture'
-  tags:
-    - always
-
-- name: "Windows | Set path to zabbix.exe"
-  ansible.builtin.set_fact:
-    zabbix_win_exe_path: '{{ zabbix_win_install_dir }}\bin\win{{ windows_arch }}\zabbix_agentd.exe'
-  tags:
-    - always
-
-- name: "Windows | Set variables specific to Zabbix"
-  ansible.builtin.set_fact:
+    zabbix_win_install_dir_setup: '{{ zabbix_win_install_dir }}\setup'
+    zabbix_win_package: "{{ zabbix_win_package | default(_win_package) }}"
     zabbix_win_svc_name: Zabbix Agent
-    zabbix_win_exe_path: '{{ zabbix_win_install_dir }}\bin\zabbix_agentd.exe'
+    zabbix_win_exe_name: 'zabbix_agentd.exe'
+    zabbix_win_exe_path: '{{ zabbix_win_install_dir_bin }}\zabbix_agentd.exe'
     zabbix_win_config_name: "zabbix_agentd.conf"
     zabbix2_win_svc_name: Zabbix Agent 2
-    zabbix2_win_exe_path: '{{ zabbix_win_install_dir }}\bin\zabbix_agent2.exe'
+    zabbix2_win_exe_name: 'zabbix_agent2.exe'
+    zabbix2_win_exe_path: '{{ zabbix_win_install_dir_bin }}\zabbix_agent2.exe'
     zabbix2_win_config_name: "zabbix_agent2.conf"
   tags:
     - always
@@ -40,7 +20,7 @@
 - name: "Windows | Check if Zabbix agent is present"
   ansible.windows.win_stat:
     path: "{{ item }}"
-  with_items:
+  loop:
     - "{{ zabbix_win_exe_path }}"
     - "{{ zabbix2_win_exe_path }}"
   register: agent_file_info
@@ -53,14 +33,16 @@
   register: zabbix_win_exe_info
   when:
     - item.stat.exists | bool
-  with_items: "{{ agent_file_info.results }}"
+  loop: "{{ agent_file_info.results }}"
+  loop_control:
+    label: "{{ item.item }}"
   tags:
     - always
 
 - name: "Windows | Set facts current zabbix agent installation"
   ansible.builtin.set_fact:
     zabbix_agent_1_binary_exist: true
-    zabbix_agent_1_version: zabbix_win_exe_info.results[0].win_file_version.product_version
+    zabbix_agent_1_version: "{{ zabbix_win_exe_info.results[0].win_file_version.product_version }}"
   when:
     - zabbix_win_exe_info.results[0] is defined
     - zabbix_win_exe_info.results[0].item.stat.exists
@@ -72,7 +54,7 @@
 - name: "Windows | Set facts current zabbix agent installation (agent 2)"
   ansible.builtin.set_fact:
     zabbix_agent_2_binary_exist: true
-    zabbix_agent_2_version: zabbix_win_exe_info.results[1].win_file_version.product_version
+    zabbix_agent_2_version: "{{ zabbix_win_exe_info.results[1].win_file_version.product_version }}"
   when:
     - zabbix_win_exe_info.results[1] is defined
     - zabbix_win_exe_info.results[1].item.stat.exists
@@ -83,10 +65,12 @@
 
 - name: "Windows | Check Zabbix service"
   ansible.windows.win_service:
-    name: "{{ (item.item.stat.path == zabbix_win_exe_path ) | ternary(zabbix_win_svc_name,zabbix2_win_svc_name) }}"
+    name: "{{ (item.item.stat.path == zabbix_win_exe_path) | ternary(zabbix_win_svc_name, zabbix2_win_svc_name) }}"
   register: zabbix_service_info
   when: item.item.stat.exists
-  with_items: "{{ zabbix_win_exe_info.results }}"
+  loop: "{{ zabbix_win_exe_info.results }}"
+  loop_control:
+    label: "{{ item.item.item }}"
   tags:
     - always
 
@@ -131,7 +115,6 @@
 - name: "Windows | Stop Zabbix agent v1"
   ansible.windows.win_service:
     name: "{{ zabbix_win_svc_name }}"
-    start_mode: auto
     state: stopped
   when:
     - zabbix_agent_version_change | default(false) or zabbix_agent2
@@ -140,7 +123,6 @@
 - name: "Windows | Stop Zabbix agent v2"
   ansible.windows.win_service:
     name: "{{ zabbix2_win_svc_name }}"
-    start_mode: auto
     state: stopped
   when:
     - zabbix_agent_version_change | default(false) or not zabbix_agent2
@@ -158,53 +140,43 @@
     - zabbix_agent_version_change | default(false) or not zabbix_agent2
     - zabbix_agent_2_service_exist | default(false)
 
-- name: "Windows | Removing Zabbix Directory"
+- name: "Windows | Removing Zabbix bin Directory"
   ansible.windows.win_file:
-    path: "{{ zabbix_win_install_dir }}"
+    path: "{{ zabbix_win_install_dir_bin }}"
     state: absent
+  register: zabbix_agent_dir_remove_result
+  until: zabbix_agent_dir_remove_result is succeeded
+  retries: 5
+  delay: 15
   when:
     ((zabbix_agent_version_change | default(false) or zabbix_agent2) and zabbix_agent_1_binary_exist | default(false)) or
     ((zabbix_agent_version_change | default(false) or not zabbix_agent2) and zabbix_agent_2_binary_exist | default(false))
+
+- name: "Windows | Removing Zabbix conf Directory"
+  ansible.windows.win_file:
+    path: "{{ zabbix_win_install_dir_conf }}"
+    state: absent
+  register: zabbix_agent_dir_remove_result
+  until: zabbix_agent_dir_remove_result is succeeded
+  retries: 5
+  delay: 15
+  when:
+    - zabbix_win_config_remove
+    - >
+      ((zabbix_agent_version_change | default(false) or zabbix_agent2) and zabbix_agent_1_binary_exist | default(false)) or
+      ((zabbix_agent_version_change | default(false) or not zabbix_agent2) and zabbix_agent_2_binary_exist | default(false))
 
 ###################
 # install section #
 ###################
 
-- name: "Windows | Create directory structure"
-  ansible.windows.win_file:
-    path: "{{ item }}"
-    state: directory
-  with_items:
-    - "{{ zabbix_win_install_dir }}"
-  tags:
-    - install
-
-- name: "Windows | Create directory structure, includes"
-  ansible.windows.win_file:
-    path: "{{ item }}"
-    state: directory
-  with_items:
-    - "{{ zabbix_agent_win_include }}"
-  when:
-    - ('.conf' not in zabbix_agent_win_include)
-  tags:
-    - install
-
 - name: "Windows | Set installation settings (agent 2)"
   ansible.builtin.set_fact:
-    zabbix_win_package: "{{ zabbix_win_package | default(_win_package) }}"
-    zabbix_win_download_link: "{{ zabbix_win_download_link | default(_win_download_link) }}"
     zabbix_win_exe_path: "{{ zabbix2_win_exe_path }}"
+    zabbix_win_exe_name: "{{ zabbix2_win_exe_name }}"
     zabbix_win_config_name: "{{ zabbix2_win_config_name }}"
     zabbix_win_svc_name: "{{ zabbix2_win_svc_name }}"
   when: zabbix_agent2 | bool
-  tags:
-    - install
-
-- name: "Windows | Check if agent file is already downloaded"
-  ansible.windows.win_stat:
-    path: '{{ zabbix_win_install_dir }}\{{ zabbix_win_package }}'
-  register: file_info
   tags:
     - install
 
@@ -215,10 +187,41 @@
   tags:
     - install
 
+- name: "Windows | Create directory structure"
+  ansible.windows.win_file:
+    path: "{{ item }}"
+    state: directory
+  loop:
+    - "{{ zabbix_win_install_dir }}"
+    - "{{ zabbix_win_install_dir_conf }}"
+    - "{{ zabbix_win_install_dir_bin }}"
+    - "{{ zabbix_win_install_dir_setup }}"
+  when: zabbix_agent_version_change | default(false) or not zabbix_windows_binaries.stat.exists
+  tags:
+    - install
+
+- name: "Windows | Create directory structure, includes"
+  ansible.windows.win_file:
+    path: "{{ zabbix_agent_win_include }}"
+    state: directory
+  when:
+    - ('.conf' not in zabbix_agent_win_include)
+  tags:
+    - install
+
+- name: "Windows | Check if agent file is already downloaded"
+  ansible.windows.win_stat:
+    path: '{{ zabbix_win_install_dir_setup }}\{{ zabbix_win_package }}'
+  when:
+    - zabbix_agent_version_change | default(false) or not zabbix_windows_binaries.stat.exists
+  register: file_info
+  tags:
+    - install
+
 - name: "Windows | Download Zabbix Agent Zip file"
   ansible.windows.win_get_url:
     url: "{{ zabbix_win_download_link }}"
-    dest: '{{ zabbix_win_install_dir }}\{{ zabbix_win_package }}'
+    dest: '{{ zabbix_win_install_dir_setup }}\{{ zabbix_win_package }}'
     url_username: "{{ zabbix_download_user | default(omit) }}"
     url_password: "{{ zabbix_download_pass | default(omit) }}"
     force: false
@@ -227,8 +230,8 @@
     validate_certs: "{{ zabbix_download_validate_certs | default(False) | bool }}"
     timeout: "{{ zabbix_download_timeout | default(120) | int }}"
   when:
+    - zabbix_agent_version_change | default(false) or not zabbix_windows_binaries.stat.exists
     - not file_info.stat.exists
-    - not zabbix_windows_binaries.stat.exists
   register: zabbix_agent_win_download_zip
   until: zabbix_agent_win_download_zip is succeeded
   throttle: "{{ zabbix_download_throttle | default(5) | int }}"
@@ -237,61 +240,52 @@
 
 - name: "Windows | Unzip file"
   community.windows.win_unzip:
-    src: '{{ zabbix_win_install_dir }}\{{ zabbix_win_package }}'
-    dest: "{{ zabbix_win_install_dir }}"
-    creates: "{{ zabbix_win_exe_path }}"
-  tags:
-    - install
-
-- name: "Windows | Cleanup downloaded Zabbix Agent Zip file"
-  ansible.windows.win_file:
-    path: '{{ zabbix_win_install_dir }}\{{ zabbix_win_package }}'
-    state: absent
+    src: '{{ zabbix_win_install_dir_setup }}\{{ zabbix_win_package }}'
+    dest: "{{ zabbix_win_install_dir_setup }}"
   when:
-    - zabbix_agent_win_download_zip.changed
+    - zabbix_agent_version_change | default(false) or not zabbix_windows_binaries.stat.exists
+    - zabbix_agent_win_download_zip is changed or file_info.stat.exists
   tags:
     - install
 
 - name: "Windows | Copy binary files to expected location"
   ansible.windows.win_copy:
-    src: "{{ zabbix_win_install_dir }}\\bin\\{{ item }}"
-    dest: "{{ zabbix_win_install_dir_bin }}\\{{ item }}"
-    remote_src: yes
-  loop:
-    - zabbix_agentd.exe
-    - zabbix_sender.exe
+    src: "{{ zabbix_win_install_dir_setup }}\\bin\\"
+    dest: "{{ zabbix_win_install_dir_bin }}\\"
+    remote_src: true
   when:
-    - zabbix_win_install_dir_bin is defined
-    - not (zabbix_agent2 | bool)
+    - zabbix_agent_version_change | default(false) or not zabbix_windows_binaries.stat.exists
+    - zabbix_agent_win_download_zip is changed or file_info.stat.exists
   tags:
     - install
 
-- name: "Windows | Copy binary files to expected location (zabbix-agent2)"
+- name: "Windows | Copy initial configuration to expected location"
   ansible.windows.win_copy:
-    src: "{{ zabbix_win_install_dir }}\\bin\\{{ item }}"
-    dest: "{{ zabbix_win_install_dir_bin }}\\{{ item }}"
-    remote_src: yes
-  loop:
-    - zabbix_agent2.exe
+    src: "{{ zabbix_win_install_dir_setup }}\\conf\\"
+    dest: "{{ zabbix_win_install_dir_conf }}\\"
+    force: false
+    remote_src: true
   when:
-    - zabbix_win_install_dir_bin is defined
-    - zabbix_agent2 | bool
+    - zabbix_agent_win_download_zip is changed or file_info.stat.exists | default(false)
   tags:
     - install
 
-- set_fact:
-    zabbix_win_exe_path: "{{ zabbix_win_install_dir_bin }}\\zabbix_agentd.exe"
+- name: "Windows | Copy plugin configuration to expected location on Agent 2"
+  ansible.windows.win_copy:
+    src: "{{ zabbix_win_install_dir_setup }}\\conf\\zabbix_agent2.d\\plugins.d"
+    dest: "{{ zabbix_win_install_dir_conf }}\\zabbix_agent2.d\\plugins.d"
+    force: false
+    remote_src: true
   when:
-    - zabbix_win_install_dir_bin is defined
-    - not (zabbix_agent2 | bool)
+    - zabbix_agent2
+    - zabbix_agent_win_download_zip is changed or file_info.stat.exists | default(false)
   tags:
     - install
 
-- set_fact:
-    zabbix_win_exe_path: "{{ zabbix_win_install_dir_bin }}\\zabbix_agent2.exe"
-  when:
-    - zabbix_win_install_dir_bin is defined
-    - zabbix_agent2 | bool
+- name: "Windows | Cleanup temporary setup directory"
+  ansible.windows.win_file:
+    path: '{{ zabbix_win_install_dir_setup }}'
+    state: absent
   tags:
     - install
 
