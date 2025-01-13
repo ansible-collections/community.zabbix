@@ -272,7 +272,7 @@ from ansible.module_utils.basic import AnsibleModule
 
 from ansible_collections.community.zabbix.plugins.module_utils.base import ZabbixBase
 import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabbix_utils
-
+from ansible.module_utils.compat.version import LooseVersion
 
 class Host(ZabbixBase):
     def get_host(self, host_identifier, host_inventory, search_key):
@@ -299,9 +299,12 @@ class Host(ZabbixBase):
     def get_last_event_by_trigger_id(self, triggers_id):
         """ Get the last event from triggerid"""
         output = ["eventid", "clock", "acknowledged", "value"]
-        event = self._zapi.event.get({"output": output, "objectids": triggers_id,
-                                      "select_acknowledges": "extend", "selectTags": "extend", "limit": 1, "sortfield": "clock",
-                                      "sortorder": "DESC"})
+        parameters = {"output": output, "objectids": triggers_id, "selectAcknowledges": "extend",
+                            "selectTags": "extend", "limit": 1, "sortfield": "clock", "sortorder": "DESC"}
+        if LooseVersion(self._zbx_api_version) <= LooseVersion("6.4"):
+            parameters["select_acknowledges"] = parameters["selectAcknowledges"]
+            del parameters["selectAcknowledges"]
+        event = self._zapi.event.get(parameters)
         return event[0]
 
 

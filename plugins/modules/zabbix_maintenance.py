@@ -233,6 +233,7 @@ from ansible.module_utils.basic import AnsibleModule
 
 from ansible_collections.community.zabbix.plugins.module_utils.base import ZabbixBase
 import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabbix_utils
+from ansible.module_utils.compat.version import LooseVersion
 
 
 class MaintenanceModule(ZabbixBase):
@@ -240,8 +241,8 @@ class MaintenanceModule(ZabbixBase):
                            maintenance_type, period, name, desc, tags):
         end_time = start_time + period
         parameters = {
-            "groupids": group_ids,
-            "hostids": host_ids,
+            "groups": [{"groupid": groupid} for groupid in group_ids],
+            "hosts": [{"hostid": hostid} for hostid in host_ids],
             "name": name,
             "maintenance_type": maintenance_type,
             "active_since": str(start_time),
@@ -253,6 +254,11 @@ class MaintenanceModule(ZabbixBase):
                 "period": str(period),
             }]
         }
+        if LooseVersion(self._zbx_api_version) <= LooseVersion("6.0"):
+            parameters["groupids"] = group_ids
+            parameters["hostids"] = host_ids
+            del parameters["groups"]
+            del parameters["hosts"]
         if tags is not None:
             parameters["tags"] = tags
         self._zapi.maintenance.create(parameters)
@@ -263,8 +269,8 @@ class MaintenanceModule(ZabbixBase):
         end_time = start_time + period
         parameters = {
             "maintenanceid": maintenance_id,
-            "groupids": group_ids,
-            "hostids": host_ids,
+            "groups": [{"groupid": groupid} for groupid in group_ids],
+            "hosts": [{"hostid": hostid} for hostid in host_ids],
             "maintenance_type": maintenance_type,
             "active_since": str(start_time),
             "active_till": str(end_time),
@@ -275,27 +281,34 @@ class MaintenanceModule(ZabbixBase):
                 "period": str(period),
             }]
         }
+        if LooseVersion(self._zbx_api_version) <= LooseVersion("6.0"):
+            parameters["groupids"] = group_ids
+            parameters["hostids"] = host_ids
+            del parameters["groups"]
+            del parameters["hosts"]
         if tags is not None:
             parameters["tags"] = tags
         self._zapi.maintenance.update(parameters)
         return 0, None, None
 
     def get_maintenance(self, name):
-        maintenances = self._zapi.maintenance.get(
-            {
-                "filter":
-                {
-                    "name": name,
-                },
-                "selectGroups": "extend",
-                "selectHosts": "extend",
-                "selectTags": "extend"
-            }
-        )
+        parameters = {
+            "filter": {"name": name},
+            "selectHostGroups": "extend",
+            "selectHosts": "extend",
+            "selectTags": "extend",
+        }
+        if LooseVersion(self._zbx_api_version) <= LooseVersion("6.0"):
+            parameters["selectGroups"] = parameters["selectHostGroups"]
+            del parameters["selectHostGroups"]
+        maintenances = self._zapi.maintenance.get(parameters)
 
         for maintenance in maintenances:
             maintenance["groupids"] = [group["groupid"] for group
-                                       in maintenance["groups"]] if "groups" in maintenance else []
+                                       in maintenance["hostgroups"]] if "hostgroups" in maintenance else []
+            if LooseVersion(self._zbx_api_version) <= LooseVersion("6.0"):
+                maintenance["groupids"] = [group["groupid"] for group
+                                           in maintenance["groups"]] if "groups" in maintenance else []
             maintenance["hostids"] = [host["hostid"] for host
                                       in maintenance["hosts"]] if "hosts" in maintenance else []
             return 0, maintenance, None
