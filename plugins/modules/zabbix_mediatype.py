@@ -538,7 +538,7 @@ class MediaTypeModule(ZabbixBase):
                 username=self._module.params["username"],
                 passwd=self._module.params["password"]
             ))
-            if LooseVersion(self._zbx_api_version) <= LooseVersion("6.4"):
+            if LooseVersion(self._zbx_api_version) < LooseVersion("7.0"):
                 parameters["content_type"] = parameters["message_format"]
                 del parameters["message_format"]
             if parameters["smtp_authentication"] == "0":

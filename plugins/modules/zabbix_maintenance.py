@@ -254,7 +254,7 @@ class MaintenanceModule(ZabbixBase):
                 "period": str(period),
             }]
         }
-        if LooseVersion(self._zbx_api_version) <= LooseVersion("6.0"):
+        if LooseVersion(self._zbx_api_version) < LooseVersion("6.2"):
             parameters["groupids"] = group_ids
             parameters["hostids"] = host_ids
             del parameters["groups"]
@@ -281,7 +281,7 @@ class MaintenanceModule(ZabbixBase):
                 "period": str(period),
             }]
         }
-        if LooseVersion(self._zbx_api_version) <= LooseVersion("6.0"):
+        if LooseVersion(self._zbx_api_version) < LooseVersion("6.2"):
             parameters["groupids"] = group_ids
             parameters["hostids"] = host_ids
             del parameters["groups"]
@@ -298,7 +298,7 @@ class MaintenanceModule(ZabbixBase):
             "selectHosts": "extend",
             "selectTags": "extend",
         }
-        if LooseVersion(self._zbx_api_version) <= LooseVersion("6.0"):
+        if LooseVersion(self._zbx_api_version) < LooseVersion("6.2"):
             parameters["selectGroups"] = parameters["selectHostGroups"]
             del parameters["selectHostGroups"]
         maintenances = self._zapi.maintenance.get(parameters)
@@ -306,7 +306,7 @@ class MaintenanceModule(ZabbixBase):
         for maintenance in maintenances:
             maintenance["groupids"] = [group["groupid"] for group
                                        in maintenance["hostgroups"]] if "hostgroups" in maintenance else []
-            if LooseVersion(self._zbx_api_version) <= LooseVersion("6.0"):
+            if LooseVersion(self._zbx_api_version) < LooseVersion("6.2"):
                 maintenance["groupids"] = [group["groupid"] for group
                                            in maintenance["groups"]] if "groups" in maintenance else []
             maintenance["hostids"] = [host["hostid"] for host

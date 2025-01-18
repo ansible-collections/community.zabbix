@@ -301,8 +301,8 @@ class Host(ZabbixBase):
         """ Get the last event from triggerid"""
         output = ["eventid", "clock", "acknowledged", "value"]
         parameters = {"output": output, "objectids": triggers_id, "selectAcknowledges": "extend",
-                            "selectTags": "extend", "limit": 1, "sortfield": "clock", "sortorder": "DESC"}
-        if LooseVersion(self._zbx_api_version) <= LooseVersion("6.4"):
+                      "selectTags": "extend", "limit": 1, "sortfield": "clock", "sortorder": "DESC"}
+        if LooseVersion(self._zbx_api_version) < LooseVersion("7.0"):
             parameters["select_acknowledges"] = parameters["selectAcknowledges"]
             del parameters["selectAcknowledges"]
         event = self._zapi.event.get(parameters)
