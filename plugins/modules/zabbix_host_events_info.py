@@ -274,6 +274,7 @@ from ansible_collections.community.zabbix.plugins.module_utils.base import Zabbi
 import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabbix_utils
 from ansible.module_utils.compat.version import LooseVersion
 
+
 class Host(ZabbixBase):
     def get_host(self, host_identifier, host_inventory, search_key):
         """ Get host by hostname|visible_name|hostid """

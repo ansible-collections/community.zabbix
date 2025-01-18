@@ -50,7 +50,6 @@ options:
       - name: http_login_password
 """
 
-import inspect
 import json
 import base64
 
@@ -127,7 +126,7 @@ class HttpApi(HttpApiBase):
                 headers['Authorization'] = 'Bearer ' + self.auth
             else:
                 data['auth'] = self.auth
-        
+
         http_login_user = self.get_option('http_login_user')
         http_login_password = self.get_option('http_login_password')
         if http_login_user and http_login_user != '-42':
