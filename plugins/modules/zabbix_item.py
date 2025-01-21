@@ -32,6 +32,11 @@ options:
             - Name of item to create or delete.
         required: true
         type: str
+    new_name:
+        description:
+            - New name for item
+        required: false
+        type: str
     host_name:
         description:
             - Name of host to add item to.
@@ -327,6 +332,23 @@ EXAMPLES = r'''
     name: agent_ping
     template_name: example_template
     state: absent
+
+- name: Rename Zabbix item
+  # set task level variables as we change ansible_connection plugin here
+  vars:
+    ansible_network_os: community.zabbix.zabbix
+    ansible_connection: httpapi
+    ansible_httpapi_port: 443
+    ansible_httpapi_use_ssl: true
+    ansible_httpapi_validate_certs: false
+    ansible_zabbix_url_path: "zabbixeu"  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
+    ansible_host: zabbix-example-fqdn.org
+  community.zabbix.zabbix_item:
+    name: agent_ping
+    new_name: new_agent_ping
+    template_name: example_template
+    params: {}
+    state: present
 '''
 
 from ansible.module_utils.basic import AnsibleModule
@@ -511,6 +533,7 @@ def main():
     argument_spec = zabbix_utils.zabbix_common_argument_spec()
     argument_spec.update(dict(
         name=dict(type='str', required=True),
+        new_name=dict(type='str', required=False),
         host_name=dict(type='str', required=False),
         template_name=dict(type='str', required=False),
         params=dict(type='dict', required=False),
@@ -531,6 +554,7 @@ def main():
     )
 
     name = module.params['name']
+    new_name = module.params['new_name']
     host_name = module.params['host_name']
     template_name = module.params['template_name']
     params = module.params['params']
@@ -554,6 +578,8 @@ def main():
         items = item.get_items(name, host_name, template_name)
         results = []
         if len(items) == 0:
+            if new_name is not None:
+                module.fail_json('Cannot rename item:  %s is not found' % name)
             hosts_templates = item.get_hosts_templates(host_name, template_name)
             for host_template in hosts_templates:
                 if 'hostid' in host_template:
@@ -568,6 +594,8 @@ def main():
             changed = False
             for i in items:
                 params['itemid'] = i['itemid']
+                if new_name is not None:
+                    params['name'] = new_name
                 results.append(item.update_item(params))
                 changed_item = item.check_item_changed(i)
                 if changed_item:

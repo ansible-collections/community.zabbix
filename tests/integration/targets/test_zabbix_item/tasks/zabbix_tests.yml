@@ -223,9 +223,36 @@
   ansible.builtin.assert:
     that: zbxtempitem_changed is changed
 
-- name: test - attempt to delete previously created zabbix item
+- name: test - rename existing zabbix item
   community.zabbix.zabbix_item:
     name: TestItem
+    new_name: NewTestItem
+    template_name: ExampleTemplate
+    params: {}
+    state: present
+  register: zbxnameitem_changed
+
+- name: expect to succeed and that things changed
+  ansible.builtin.assert:
+    that: zbxnameitem_changed is changed
+
+- name: test - rename non-existing zabbix item
+  community.zabbix.zabbix_item:
+    name: TestItem
+    new_name: NewTestItem
+    template_name: ExampleTemplate
+    params: {}
+    state: present
+  ignore_errors: yes
+  register: zbxnameitem_failed
+
+- name: expect to fail
+  ansible.builtin.assert:
+    that: zbxnameitem_failed is failed
+
+- name: test - attempt to delete previously created zabbix item
+  community.zabbix.zabbix_item:
+    name: NewTestItem
     template_name: ExampleTemplate
     state: absent
   register: zbxtempitem_existing_delete
@@ -236,7 +263,7 @@
 
 - name: test - attempt to delete non-existing zabbix item
   community.zabbix.zabbix_item:
-    name: TestItem
+    name: NewTestItem
     template_name: ExampleTemplate
     state: absent
   register: zbxtempitem_missing_delete
