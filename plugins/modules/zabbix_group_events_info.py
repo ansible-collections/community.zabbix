@@ -276,10 +276,10 @@ class Host(ZabbixBase):
         output = "extend"
         if tags:
             triggers_list = self._zapi.trigger.get({"output": output, "groupids": group_id,
-                                                "min_severity": trigger_severity, "tags": tags})
+                                                    "min_severity": trigger_severity, "tags": tags})
         else:
             triggers_list = self._zapi.trigger.get({"output": output, "groupids": group_id,
-                                                "min_severity": trigger_severity})
+                                                    "min_severity": trigger_severity})
         return triggers_list
 
     def get_last_event_by_trigger_id(self, triggers_id):
