@@ -32,11 +32,6 @@ options:
             - Name of item to create or delete.
         required: true
         type: str
-    new_name:
-        description:
-            - New name for item
-        required: false
-        type: str
     host_name:
         description:
             - Name of host to add item to.
@@ -121,6 +116,11 @@ options:
                     - log
                     - numeric_unsigned
                     - text
+            new_name:
+                description:
+                    - New name for item
+                required: false
+                type: str
             master_item:
                 description:
                     - item that is the master of the current one
@@ -345,9 +345,9 @@ EXAMPLES = r'''
     ansible_host: zabbix-example-fqdn.org
   community.zabbix.zabbix_item:
     name: agent_ping
-    new_name: new_agent_ping
     template_name: example_template
-    params: {}
+    params:
+      new_name: new_agent_ping
     state: present
 '''
 
@@ -533,7 +533,6 @@ def main():
     argument_spec = zabbix_utils.zabbix_common_argument_spec()
     argument_spec.update(dict(
         name=dict(type='str', required=True),
-        new_name=dict(type='str', required=False),
         host_name=dict(type='str', required=False),
         template_name=dict(type='str', required=False),
         params=dict(type='dict', required=False),
@@ -554,7 +553,6 @@ def main():
     )
 
     name = module.params['name']
-    new_name = module.params['new_name']
     host_name = module.params['host_name']
     template_name = module.params['template_name']
     params = module.params['params']
@@ -578,7 +576,7 @@ def main():
         items = item.get_items(name, host_name, template_name)
         results = []
         if len(items) == 0:
-            if new_name is not None:
+            if 'new_name' in params:
                 module.fail_json('Cannot rename item:  %s is not found' % name)
             hosts_templates = item.get_hosts_templates(host_name, template_name)
             for host_template in hosts_templates:
@@ -594,8 +592,9 @@ def main():
             changed = False
             for i in items:
                 params['itemid'] = i['itemid']
-                if new_name is not None:
-                    params['name'] = new_name
+                if 'new_name' in params:
+                    params['name'] = params['new_name']
+                    params.pop("new_name")
                 results.append(item.update_item(params))
                 changed_item = item.check_item_changed(i)
                 if changed_item:

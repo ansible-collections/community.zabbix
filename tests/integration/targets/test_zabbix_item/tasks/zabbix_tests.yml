@@ -226,9 +226,9 @@
 - name: test - rename existing zabbix item
   community.zabbix.zabbix_item:
     name: TestItem
-    new_name: NewTestItem
     template_name: ExampleTemplate
-    params: {}
+    params:
+      new_name: NewTestItem
     state: present
   register: zbxnameitem_changed
 
@@ -239,9 +239,9 @@
 - name: test - rename non-existing zabbix item
   community.zabbix.zabbix_item:
     name: TestItem
-    new_name: NewTestItem
     template_name: ExampleTemplate
-    params: {}
+    params:
+      new_name: NewTestItem
     state: present
   ignore_errors: yes
   register: zbxnameitem_failed
