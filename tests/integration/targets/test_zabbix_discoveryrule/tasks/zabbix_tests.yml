@@ -112,9 +112,36 @@
   ansible.builtin.assert:
     that: zbxtemprule_changed is changed
 
-- name: test - attempt to delete previously created zabbix discoveryrule
+- name: test - rename existing zabbix discoveryrule
   community.zabbix.zabbix_discoveryrule:
     name: TestRule
+    template_name: ExampleTemplate
+    params:
+      new_name: NewTestRule
+    state: present
+  register: zbxnamerule_changed
+
+- name: expect to succeed and that things changed
+  ansible.builtin.assert:
+    that: zbxnamerule_changed is changed
+
+- name: test - rename non-existing zabbix discoveryrule
+  community.zabbix.zabbix_discoveryrule:
+    name: TestRule
+    template_name: ExampleTemplate
+    params:
+      new_name: NewTestRule
+    state: present
+  ignore_errors: yes
+  register: zbxnamerule_failed
+
+- name: expect to fail
+  ansible.builtin.assert:
+    that: zbxnamerule_failed is failed
+
+- name: test - attempt to delete previously created zabbix discoveryrule
+  community.zabbix.zabbix_discoveryrule:
+    name: NewTestRule
     template_name: ExampleTemplate
     state: absent
   register: zbxtemprule_existing_delete
@@ -125,7 +152,7 @@
 
 - name: test - attempt to delete non-existing zabbix discoveryrule
   community.zabbix.zabbix_discoveryrule:
-    name: TestRule
+    name: NewTestRule
     template_name: ExampleTemplate
     state: absent
   register: zbxtemprule_missing_delete

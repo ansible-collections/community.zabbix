@@ -157,9 +157,36 @@
   ansible.builtin.assert:
     that: zbxtemptrigger_changed is changed
 
-- name: test - attempt to delete previously created zabbix trigger
+- name: test - rename existing zabbix trigger prototype
   community.zabbix.zabbix_triggerprototype:
     name: '{% raw %}Free disk space is less than 20% on volume {#FSNAME}{% endraw %}'
+    template_name: ExampleTemplate
+    params:
+      new_name: '{% raw %}New Free disk space is less than 20% on volume {#FSNAME}{% endraw %}'
+    state: present
+  register: zbxnametrigger_changed
+
+- name: expect to succeed and that things changed
+  ansible.builtin.assert:
+    that: zbxnametrigger_changed is changed
+
+- name: test - rename non-existing zabbix trigger prototype
+  community.zabbix.zabbix_triggerprototype:
+    name: '{% raw %}Free disk space is less than 20% on volume {#FSNAME}{% endraw %}'
+    template_name: ExampleTemplate
+    params:
+      new_name: '{% raw %}New Free disk space is less than 20% on volume {#FSNAME}{% endraw %}'
+    state: present
+  ignore_errors: yes
+  register: zbxnametrigger_failed
+
+- name: expect to fail
+  ansible.builtin.assert:
+    that: zbxnametrigger_failed is failed
+
+- name: test - attempt to delete previously created zabbix trigger
+  community.zabbix.zabbix_triggerprototype:
+    name: '{% raw %}New Free disk space is less than 20% on volume {#FSNAME}{% endraw %}'
     template_name: ExampleTemplate
     state: absent
   register: zbxtemptrigger_existing_delete
@@ -170,7 +197,7 @@
 
 - name: test - attempt to delete non-existing zabbix trigger
   community.zabbix.zabbix_triggerprototype:
-    name: '{% raw %}Free disk space is less than 20% on volume {#FSNAME}{% endraw %}'
+    name: '{% raw %}New Free disk space is less than 20% on volume {#FSNAME}{% endraw %}'
     template_name: ExampleTemplate
     state: absent
   register: zbxtemptrigger_missing_delete
