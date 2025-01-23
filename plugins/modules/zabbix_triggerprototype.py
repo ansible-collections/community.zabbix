@@ -269,7 +269,7 @@ EXAMPLES = r'''
     name: '{% raw %}Free disk space is less than 20% on volume {#FSNAME}{% endraw %}'
     template_name: example_template
     params:
-      new_name: name: '{% raw %}New Free disk space is less than 20% on volume {#FSNAME}{% endraw %}'
+      new_name: '{% raw %}New Free disk space is less than 20% on volume {#FSNAME}{% endraw %}'
     state: present
 '''
 

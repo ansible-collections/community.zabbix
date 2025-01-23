@@ -607,7 +607,7 @@ def main():
         results = []
         if len(itemprototypes) == 0:
             if 'new_name' in params:
-                module.fail_json('Cannot rename item prototype:  %s is not found' % name) 
+                module.fail_json('Cannot rename item prototype:  %s is not found' % name)
             hosts_templates = itemprototype.get_hosts_templates(host_name, template_name)
             for host_template in hosts_templates:
                 if 'hostid' in host_template:
