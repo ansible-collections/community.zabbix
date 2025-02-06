@@ -155,15 +155,15 @@ options:
             - SSL verify peer for SMTP.
             - Can be specified when I(smtp_security=STARTTLS) or I(smtp_security=SSL/TLS)
         default: false
-    content_type:
+    message_format:
         type: "str"
         description:
             - Can be used when I(type=email).
-            - Message format.
         choices:
             - plaintext
             - html
         default: html
+        aliases: ["content_type"]
     message_text_limit:
         type: "str"
         description:
@@ -534,10 +534,13 @@ class MediaTypeModule(ZabbixBase):
                 smtp_authentication=truths.get(str(self._module.params["smtp_authentication"])),
                 smtp_verify_host=truths.get(str(self._module.params["smtp_verify_host"])),
                 smtp_verify_peer=truths.get(str(self._module.params["smtp_verify_peer"])),
-                content_type={"plaintext": "0", "html": "1"}.get(str(self._module.params["content_type"])),
+                message_format={"plaintext": "0", "html": "1"}.get(str(self._module.params["message_format"])),
                 username=self._module.params["username"],
                 passwd=self._module.params["password"]
             ))
+            if LooseVersion(self._zbx_api_version) < LooseVersion("7.0"):
+                parameters["content_type"] = parameters["message_format"]
+                del parameters["message_format"]
             if parameters["smtp_authentication"] == "0":
                 parameters.pop("username")
                 parameters.pop("passwd")
@@ -703,7 +706,7 @@ def main():
         smtp_authentication=dict(type="bool", default=False, required=False),
         smtp_verify_host=dict(type="bool", default=False, required=False),
         smtp_verify_peer=dict(type="bool", default=False, required=False),
-        content_type=dict(type="str", choices=["plaintext", "html"], default="html", required=False),
+        message_format=dict(type="str", choices=["plaintext", "html"], default="html", required=False, aliases=["content_type"]),
         # EZ Text
         message_text_limit=dict(type="str", required=False, choices=["USA", "Canada"]),
         # Webhook

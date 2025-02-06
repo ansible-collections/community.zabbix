@@ -3,20 +3,33 @@
   community.zabbix.zabbix_authentication:
     passwd_check_rules: "avoid_easy_to_guess"
 
-- name: Set the login result based on current zabbix version
-  set_fact:
-    login_result: "{{ check_login_under64_result if zabbix_version is version('6.4', '<') else check_login_result }}"
+- name: Set request parameters based on Zabbix version (Zabbix < 6.4)
+  ansible.builtin.set_fact:
+    authentication_get_body:
+      jsonrpc: "2.0"
+      method: "authentication.get"
+      params: {}
+      id: 1
+      auth: "{{ check_login_under64_result.json.result }}"
+  when: zabbix_version is version("6.4", "<")
+
+- name: Set request parameters based on Zabbix version (Zabbix >= 6.4)
+  ansible.builtin.set_fact:
+    authentication_get_body:
+      jsonrpc: "2.0"
+      method: "authentication.get"
+      params: {}
+      id: 1
+    authentication_get_headers:
+      Authorization: "Bearer {{ check_login_result.json.result }}"
+  when: zabbix_version is version("6.4", ">=")
 
 - name: Get the authentication rules
   ansible.builtin.uri:
     url: "{{ zabbix_api_server_url }}/api_jsonrpc.php"
     method: POST
-    body:
-      jsonrpc: "2.0"
-      method: "authentication.get"
-      params:  {}
-      id: "1"
-      auth: "{{ login_result.json.result }}"
+    body: "{{ authentication_get_body }}"
+    headers: "{{ authentication_get_headers | default(omit) }}"
     body_format: json
     status_code: 200
   register: get_auth_result
@@ -35,12 +48,8 @@
   ansible.builtin.uri:
     url: "{{ zabbix_api_server_url }}/api_jsonrpc.php"
     method: POST
-    body:
-      jsonrpc: "2.0"
-      method: "authentication.get"
-      params:  {}
-      id: "1"
-      auth: "{{ login_result.json.result }}"
+    body: "{{ authentication_get_body }}"
+    headers: "{{ authentication_get_headers | default(omit) }}"
     body_format: json
     status_code: 200
   register: get_auth_result
