@@ -124,6 +124,7 @@ from ansible.module_utils.basic import AnsibleModule
 
 from ansible_collections.community.zabbix.plugins.module_utils.base import ZabbixBase
 import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabbix_utils
+from ansible.module_utils.compat.version import LooseVersion
 
 
 class Host(ZabbixBase):
@@ -132,15 +133,19 @@ class Host(ZabbixBase):
         search_key = "search"
         if exact_match:
             search_key = "filter"
-        host_list = self._zapi.host.get({
+        parameters = {
             "output": "extend",
             "selectParentTemplates": ["name"],
             search_key: {"host": [host_name]},
             "selectInventory": host_inventory,
-            "selectGroups": "extend",
+            "selectHostGroups": "extend",
             "selectTags": "extend",
             "selectMacros": "extend"
-        })
+        }
+        if LooseVersion(self._zbx_api_version) < LooseVersion("6.2"):
+            parameters["selectGroups"] = parameters["selectHostGroups"]
+            del parameters["selectHostGroups"]
+        host_list = self._zapi.host.get(parameters)
         if len(host_list) < 1:
             self._module.fail_json(msg="Host not found: %s" % host_name)
         else:
@@ -158,15 +163,19 @@ class Host(ZabbixBase):
             self._module.fail_json(msg="Host not found: %s" % host_ips)
         host_list = []
         for hostinterface in hostinterfaces:
-            host = self._zapi.host.get({
+            host_get_params = {
                 "output": "extend",
-                "selectGroups": "extend",
+                "selectHostGroups": "extend",
                 "selectParentTemplates": ["name"],
                 "hostids": hostinterface["hostid"],
                 "selectInventory": host_inventory,
                 "selectTags": "extend",
                 "selectMacros": "extend"
-            })
+            }
+            if LooseVersion(self._zbx_api_version) < LooseVersion("6.2"):
+                host_get_params["selectGroups"] = host_get_params["selectHostGroups"]
+                del host_get_params["selectHostGroups"]
+            host = self._zapi.host.get(host_get_params)
             host[0]["hostinterfaces"] = hostinterface
             host_list.append(host[0])
         return host_list
