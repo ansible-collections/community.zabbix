@@ -56,12 +56,20 @@
         type: schema
         objs: public
         role: "{{ zabbix_proxy_dbuser }}"
+        
+
 
 - name: "PostgreSQL verify or create schema"
   when: zabbix_proxy_database_sqlload | bool
   tags:
     - database
   block:
+    - name: "PostgreSQL | Restart PostgreSQL service
+      ansible.builtin.systemd:
+        name: postgresql.service
+        state: restarted
+        become: true
+        
     - name: "PostgreSQL | Get current database version"
       community.postgresql.postgresql_query:
         login_user: "{{ zabbix_proxy_dbuser }}"
