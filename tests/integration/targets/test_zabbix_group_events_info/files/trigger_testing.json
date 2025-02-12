@@ -37,7 +37,13 @@
                                 "uuid": "f17f4b4f7fe444dfb856bc9d6366d0fe",
                                 "expression": "last(/Trigger testing/test)=1",
                                 "name": "Problem Trigger",
-                                "priority": "AVERAGE"
+                                "priority": "AVERAGE",
+                                 "tags": [
+                                     {
+                                         "tag": "ExampleTag",
+                                         "value": "ExampleValue"
+                                     }
+                                 ]
                             }
                         ]
                     }
