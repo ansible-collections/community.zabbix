@@ -633,11 +633,11 @@ class MediaTypeModule(ZabbixBase):
 
         existing_mediatype = self._zapi.mediatype.get(get_params)[0]
 
-        if (LooseVersion(self._zbx_api_version) >= LooseVersion("7.0.9") and
-            LooseVersion(self._zbx_api_version) < LooseVersion("7.2")):
+        if (LooseVersion(self._zbx_api_version) >= LooseVersion("7.0.9")
+                and LooseVersion(self._zbx_api_version) < LooseVersion("7.2")):
             # A bug starting with 7.0.9. mediatype.get does not return "message_fomat"
-            if not "message_format" in existing_mediatype:
-                existing_mediatype["message_format"] = "" # Assume it always changes -(
+            if "message_format" not in existing_mediatype:
+                existing_mediatype["message_format"] = ""  # Assume it always changes https://support.zabbix.com/browse/ZBX-26057 -(
 
         if existing_mediatype["type"] != kwargs["type"]:
             return kwargs, diff(existing_mediatype, kwargs)
