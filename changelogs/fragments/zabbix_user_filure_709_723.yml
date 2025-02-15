@@ -1,2 +1,2 @@
 minor_changes:
-  - zabbix_user module - fix failure that started to happen since Zabbix 7.0.9 and 7.2.3
+  - zabbix_mediatype module - fix failure that started to happen since Zabbix 7.0.9
