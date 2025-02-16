@@ -984,6 +984,12 @@ class Zapi(ZabbixBase):
                 "HTTPS": "14",
                 "Telnet": "15"
             }
+
+            if dcheck_type.startswith('SNMP'):
+                # Extract type correctly from Discovery rule name
+                # <Discovery name>: SNMPv2 agent "<IOD>"
+                dcheck_type = dcheck_type.split(" \"")[0]
+
             if dcheck_type not in dcheck_type_to_number:
                 self._module.fail_json(msg="Discovery check type: %s does not exist" % dcheck_type)
 
