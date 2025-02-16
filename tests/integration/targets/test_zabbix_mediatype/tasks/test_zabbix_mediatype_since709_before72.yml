@@ -1,0 +1,398 @@
+---
+- name: test - email mediatypes
+  module_defaults:
+    community.zabbix.zabbix_mediatype:
+      state: present
+      name: Example email
+      type: email
+      smtp_email: zabbix@example.com
+
+  block:
+    - name: test - create new email mediatype without authentication
+      community.zabbix.zabbix_mediatype:
+      register: zbxmediatype_new
+
+    - ansible.builtin.assert:
+        that: zbxmediatype_new.changed is sameas True
+
+    - name: test - update email mediatype smtp information
+      community.zabbix.zabbix_mediatype:
+        smtp_helo: example.com
+        smtp_server: mail.example.com
+        smtp_server_port: 465
+      register: zbxmediatype_smtp
+
+    - ansible.builtin.assert:
+        that: zbxmediatype_smtp.changed is sameas True
+
+
+    - name: test - reset email mediatype smtp information to default
+      community.zabbix.zabbix_mediatype:
+      register: zbxmediatype_reset
+
+    - ansible.builtin.assert:
+        that: zbxmediatype_reset.changed is sameas True
+
+    - name: test - update email mediatype with authentication without credentials (fail)
+      community.zabbix.zabbix_mediatype:
+        smtp_authentication: true
+        smtp_security: STARTTLS
+      register: zbxmediatype_auth_fail
+      ignore_errors: true
+
+    - ansible.builtin.assert:
+        that: zbxmediatype_auth_fail.failed is sameas True
+
+    - name: test - update email mediatype with authentication
+      community.zabbix.zabbix_mediatype:
+        smtp_authentication: true
+        smtp_security: STARTTLS
+        username: zabbix
+        password: Ex4mP!3
+      register: zbxmediatype_auth
+
+    - ansible.builtin.assert:
+        that: zbxmediatype_auth.changed is sameas True
+
+    - name: test - update email mediatype with SSL/TLS and host/peer verification
+      community.zabbix.zabbix_mediatype:
+        smtp_authentication: true
+        smtp_security: SSL/TLS
+        smtp_verify_host: true
+        smtp_verify_peer: true
+        username: zabbix
+        password: Ex4mP!3
+      register: zbxmediatype_verif
+
+    - ansible.builtin.assert:
+        that: zbxmediatype_verif.changed is sameas True
+
+    - name: test - reset email mediatype smtp information to default
+      community.zabbix.zabbix_mediatype:
+      register: zbxmediatype_reset
+
+    - ansible.builtin.assert:
+        that: zbxmediatype_reset.changed is sameas True
+
+    - name: test - check email mediatype content_type for html default
+      community.zabbix.zabbix_mediatype:
+        content_type: "html"
+      register: zbxmediatype_verif
+
+    - ansible.builtin.assert:
+        that: zbxmediatype_verif.changed is sameas True
+
+    - name: test - update email mediatype content_type to plaintext
+      community.zabbix.zabbix_mediatype:
+        content_type: "plaintext"
+      register: zbxmediatype_verif
+
+    - ansible.builtin.assert:
+        that: zbxmediatype_verif.changed is sameas True
+
+    - name: test - reset email mediatype content_type to default
+      community.zabbix.zabbix_mediatype:
+      register: zbxmediatype_reset
+
+    - ansible.builtin.assert:
+        that: zbxmediatype_reset.changed is sameas True
+
+    - name: test - update email mediatype concurrent settings
+      community.zabbix.zabbix_mediatype:
+        max_sessions: 99
+        max_attempts: 10
+        attempt_interval: 30s
+      register: zbxmediatype_concur
+
+    - ansible.builtin.assert:
+        that: zbxmediatype_concur.changed is sameas True
+
+    - name: test - update email mediatype concurrent settings above range (fail)
+      community.zabbix.zabbix_mediatype:
+        max_sessions: 102
+        max_attempts: 101
+        attempt_interval: 61m
+      register: zbxmediatype_concur_fail
+      ignore_errors: true
+
+    - ansible.builtin.assert:
+        that: zbxmediatype_concur_fail.failed is sameas True
+
+    - name: test - reset email mediatype smtp information to default
+      community.zabbix.zabbix_mediatype:
+      register: zbxmediatype_reset
+
+    - ansible.builtin.assert:
+        that: zbxmediatype_reset.changed is sameas True
+
+    - name: test - update email mediatype with message templates
+      community.zabbix.zabbix_mediatype:
+        message_templates:
+          - eventsource: triggers
+            recovery: operations
+            subject: "Problem: {EVENT.NAME}"
+            body: "Problem started at {EVENT.TIME} on {EVENT.DATE}\r\nProblem name: {EVENT.NAME}\r\n"
+          - eventsource: discovery
+            recovery: operations
+            subject: "Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}"
+            body: "Discovery rule: {DISCOVERY.RULE.NAME}\r\n\r\nDevice IP: {DISCOVERY.DEVICE.IPADDRESS}"
+          - eventsource: autoregistration
+            recovery: operations
+            subject: "Autoregistration: {HOST.HOST}"
+            body: "Host name: {HOST.HOST}\r\nHost IP: {HOST.IP}\r\nAgent port: {HOST.PORT}"
+          - eventsource: internal
+            recovery: operations
+            subject: "Internal: {EVENT.NAME}"
+            body: "Internal event started at {EVEN.TIME} on {EVENT.DATE}\r\nEvent name: {EVENT.NAME}\r\n"
+      register: zbxmediatype_msg_templates
+
+    - ansible.builtin.assert:
+        that: zbxmediatype_msg_templates.changed is sameas True
+
+    - name: test - update subject of message template in email mediatype
+      community.zabbix.zabbix_mediatype:
+        message_templates:
+          - eventsource: triggers
+            recovery: operations
+            subject: "Problem: {EVENT.NAME} - test change"
+            body: "Problem started at {EVENT.TIME} on {EVENT.DATE}\r\nProblem name: {EVENT.NAME}\r\n"
+          - eventsource: discovery
+            recovery: operations
+            subject: "Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}"
+            body: "Discovery rule: {DISCOVERY.RULE.NAME}\r\n\r\nDevice IP: {DISCOVERY.DEVICE.IPADDRESS}"
+          - eventsource: autoregistration
+            recovery: operations
+            subject: "Autoregistration: {HOST.HOST}"
+            body: "Host name: {HOST.HOST}\r\nHost IP: {HOST.IP}\r\nAgent port: {HOST.PORT}"
+          - eventsource: internal
+            recovery: operations
+            subject: "Internal: {EVENT.NAME}"
+            body: "Internal event started at {EVEN.TIME} on {EVENT.DATE}\r\nEvent name: {EVENT.NAME}\r\n"
+      register: zbxmediatype_msg_templates
+
+    - ansible.builtin.assert:
+        that: zbxmediatype_msg_templates.changed is sameas True
+
+    - name: test - update message of message template in email mediatype
+      community.zabbix.zabbix_mediatype:
+        message_templates:
+          - eventsource: triggers
+            recovery: operations
+            subject: "Problem: {EVENT.NAME} - test change"
+            body: "Problem started at {EVENT.TIME} on {EVENT.DATE}\r\nProblem name: {EVENT.NAME}\r\n"
+          - eventsource: discovery
+            recovery: operations
+            subject: "Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}"
+            body: "Discovery rule: {DISCOVERY.RULE.NAME}\r\n\r\nDevice IP: {DISCOVERY.DEVICE.IPADDRESS} - test"
+          - eventsource: autoregistration
+            recovery: operations
+            subject: "Autoregistration: {HOST.HOST}"
+            body: "Host name: {HOST.HOST}\r\nHost IP: {HOST.IP}\r\nAgent port: {HOST.PORT}"
+          - eventsource: internal
+            recovery: operations
+            subject: "Internal: {EVENT.NAME}"
+            body: "Internal event started at {EVEN.TIME} on {EVENT.DATE}\r\nEvent name: {EVENT.NAME}\r\n"
+      register: zbxmediatype_msg_templates
+
+    - ansible.builtin.assert:
+        that: zbxmediatype_msg_templates.changed is sameas True
+
+    - name: test - disable email mediatype
+      community.zabbix.zabbix_mediatype:
+        status: disabled
+      register: zbxmediatype_disable
+
+    - ansible.builtin.assert:
+        that: zbxmediatype_disable.changed is sameas True
+
+    - name: test - delete email mediatype
+      community.zabbix.zabbix_mediatype:
+        state: absent
+      register: zbxmediatype_delete
+
+    - ansible.builtin.assert:
+        that: zbxmediatype_delete.changed is sameas True
+
+- name: test - script mediatypes
+  module_defaults:
+    community.zabbix.zabbix_mediatype:
+      state: present
+      name: Example script
+      type: script
+
+  block:
+    - name: test - create new script mediatype
+      community.zabbix.zabbix_mediatype:
+        script_name: /usr/local/bin/script.sh
+      register: zbxmediatype_script_new
+
+    - ansible.builtin.assert:
+        that: zbxmediatype_script_new.changed is sameas True
+
+    - name: test - update script mediatype with script parameters
+      community.zabbix.zabbix_mediatype:
+        script_name: /usr/local/bin/script.sh
+        script_params:
+          - "-p test"
+          - "-q"
+      register: zbxmediatype_script_params
+
+    - ansible.builtin.assert:
+        that: zbxmediatype_script_params.changed is sameas True
+
+    - name: test - remove script mediatype parameters
+      community.zabbix.zabbix_mediatype:
+        script_name: /usr/local/bin/script.sh
+      register: zbxmediatype_script_params_rev
+
+    - ansible.builtin.assert:
+        that: zbxmediatype_script_params_rev.changed is sameas True
+
+    - name: test - delete script mediatype
+      community.zabbix.zabbix_mediatype:
+        state: absent
+      register: zbxmediatype_delete
+
+    - ansible.builtin.assert:
+        that: zbxmediatype_delete.changed is sameas True
+
+- name: test - sms mediatypes
+  module_defaults:
+    community.zabbix.zabbix_mediatype:
+      state: present
+      name: Example sms
+      type: sms
+
+  block:
+    - name: test - create new sms mediatype
+      community.zabbix.zabbix_mediatype:
+        gsm_modem: /dev/ttyS0
+      register: zbxmediatype_sms_new
+
+    - ansible.builtin.assert:
+        that: zbxmediatype_sms_new.changed is sameas True
+
+    - name: test - update sms mediatype with concurrent settings
+      community.zabbix.zabbix_mediatype:
+        gsm_modem: /dev/ttyS0
+        max_sessions: 1
+        max_attempts: 3
+        attempt_interval: 30
+      register: zbxmediatype_sms_concur
+
+    - ansible.builtin.assert:
+        that: zbxmediatype_sms_concur.changed is sameas True
+
+    - name: test - update sms mediatype with invalid max sessions (fail)
+      community.zabbix.zabbix_mediatype:
+        gsm_modem: /dev/ttyS0
+        max_sessions: 2
+      register: zbxmediatype_sms_fail
+      ignore_errors: true
+
+    - ansible.builtin.assert:
+        that: zbxmediatype_sms_fail.failed is sameas True
+
+    - name: test - delete sms mediatype
+      community.zabbix.zabbix_mediatype:
+        state: absent
+      register: zbxmediatype_delete
+
+    - ansible.builtin.assert:
+        that: zbxmediatype_delete.changed is sameas True
+
+- name: test - email mediatypes
+  module_defaults:
+    community.zabbix.zabbix_mediatype:
+      state: present
+      name: Example webhook
+      type: webhook
+      webhook_script: "return 'Hello, world!';"
+
+  block:
+    - name: test - create new webhook mediatype
+      community.zabbix.zabbix_mediatype:
+      register: zbxmediatype_webhook_new
+
+    - ansible.builtin.assert:
+        that: zbxmediatype_webhook_new.changed is sameas True
+
+    - name: test - update webhook mediatype with process_tags
+      community.zabbix.zabbix_mediatype:
+        process_tags: true
+      register: zbxmediatype_webhook_tags
+
+    - ansible.builtin.assert:
+        that: zbxmediatype_webhook_tags.changed is sameas True
+
+    - name: test - update webhook mediatype with description
+      community.zabbix.zabbix_mediatype:
+        process_tags: true
+        description: My custom webhook mediatype
+      register: zbxmediatype_webhook_desc
+
+    - ansible.builtin.assert:
+        that: zbxmediatype_webhook_desc.changed is sameas True
+
+    - name: test - update webhook mediatype with event_menu without name and url (fail)
+      community.zabbix.zabbix_mediatype:
+        process_tags: true
+        description: My custom webhook mediatype
+        event_menu: true
+      register: zbxmediatype_webhook_eventmenu
+      ignore_errors: true
+
+    - ansible.builtin.assert:
+        that: zbxmediatype_webhook_eventmenu.failed is sameas True
+
+    - name: test - update webhook mediatype with event_menu
+      community.zabbix.zabbix_mediatype:
+        process_tags: true
+        description: My custom webhook mediatype
+        event_menu: true
+        event_menu_name: Example entry name
+        event_menu_url: "{EVENT.TAGS.__message_link}"
+      register: zbxmediatype_webhook_eventmenu
+
+    - ansible.builtin.assert:
+        that: zbxmediatype_webhook_eventmenu.changed is sameas True
+
+    - name: test - reset webhook mediatype to default
+      community.zabbix.zabbix_mediatype:
+      register: zbxmediatype_reset
+
+    - ansible.builtin.assert:
+        that: zbxmediatype_reset.changed is sameas True
+
+    - name: test - update webhook mediatype with webhook_params
+      community.zabbix.zabbix_mediatype:
+        webhook_params:
+          - name: param1
+            value: value1
+      register: zbxmediatype_webhook_params
+
+    - ansible.builtin.assert:
+        that: zbxmediatype_webhook_params.changed is sameas True
+
+    - name: test - update webhook mediatype with webhook_params (reorder)
+      community.zabbix.zabbix_mediatype:
+        webhook_params:
+          - name: z.param2
+            value: xyz
+          - name: param1
+            value: value1
+          - name: b.param3
+          - name: a.param4
+            value: abc
+      register: zbxmediatype_webhook_params
+
+    - ansible.builtin.assert:
+        that: zbxmediatype_webhook_params.changed is sameas True
+
+    - name: test - delete webhook mediatype
+      community.zabbix.zabbix_mediatype:
+        state: absent
+      register: zbxmediatype_delete
+
+    - ansible.builtin.assert:
+        that: zbxmediatype_delete.changed is sameas True

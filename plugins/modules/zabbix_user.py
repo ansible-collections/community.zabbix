@@ -475,7 +475,8 @@ class User(ZabbixBase):
         if "user_medias" in existing_data and existing_data["user_medias"]:
             for user_media in existing_data["user_medias"]:
                 for del_key in ["mediaid", "userid"]:
-                    del user_media[del_key]
+                    if del_key in user_media:
+                        del user_media[del_key]
 
         # request data
         request_data = {
