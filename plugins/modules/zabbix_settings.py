@@ -401,6 +401,12 @@ options:
             - Enable audit logging if C(true).
         required: false
         type: bool
+    auditlog_mode:
+        description:
+            - Enable logging of system actions (changes by low-level discovery, network discovery and autoregistration) if C(true).
+            - This parameter is available since Zabbix 7.0
+        required: false
+        type: bool
     geomaps_tile_provider:
         description:
             - A provider of Geomap tile.
@@ -473,6 +479,7 @@ EXAMPLES = """
   community.zabbix.zabbix_settings:
     alert_usrgrp: "0"
     auditlog_enabled: false
+    auditlog_mode: false
     blink_period: "10m"
     timeout_zabbix_agent: "30s"
     connect_timeout: "30s"
@@ -598,6 +605,7 @@ class Settings(ZabbixBase):
         script_timeout,
         report_test_timeout,
         auditlog_enabled,
+        auditlog_mode,
         geomaps_tile_provider,
         geomaps_tile_url,
         geomaps_max_zoom,
@@ -933,6 +941,14 @@ class Settings(ZabbixBase):
                         if timeout_browser != current_settings["timeout_browser"]:
                             params["timeout_browser"] = timeout_browser
 
+                if isinstance(auditlog_mode, bool):
+                    if auditlog_mode:
+                        if current_settings["auditlog_mode"] != "1":
+                            params["auditlog_mode"] = "1"
+                    else:
+                        if current_settings["auditlog_mode"] != "0":
+                            params["auditlog_mode"] = "0"
+
             else:
                 if isinstance(timeout_zabbix_agent, str):
                     self._module.fail_json(msg="'timeout_zabbix_agent' unsupported in Zabbix server versions prior to 7.0")
@@ -963,6 +979,9 @@ class Settings(ZabbixBase):
 
                 if isinstance(timeout_browser, str):
                     self._module.fail_json(msg="'timeout_browser' unsupported in Zabbix server versions prior to 7.0")
+
+                if isinstance(auditlog_mode, bool):
+                    self._module.fail_json(msg="'auditlog_mode' is unsupported in Zabbix server versions prior to 7.0")
 
             if isinstance(connect_timeout, str):
                 if self._is_time(connect_timeout):
@@ -1123,6 +1142,7 @@ def main():
             script_timeout=dict(type="str"),
             report_test_timeout=dict(type="str"),
             auditlog_enabled=dict(type="bool"),
+            auditlog_mode=dict(type="bool"),
             geomaps_tile_provider=dict(
                 type="str",
                 choices=[
@@ -1219,6 +1239,7 @@ def main():
     script_timeout = module.params["script_timeout"]
     report_test_timeout = module.params["report_test_timeout"]
     auditlog_enabled = module.params["auditlog_enabled"]
+    auditlog_mode = module.params["auditlog_mode"]
     geomaps_tile_provider = module.params["geomaps_tile_provider"]
     geomaps_tile_url = module.params["geomaps_tile_url"]
     geomaps_max_zoom = module.params["geomaps_max_zoom"]
@@ -1294,6 +1315,7 @@ def main():
         script_timeout,
         report_test_timeout,
         auditlog_enabled,
+        auditlog_mode,
         geomaps_tile_provider,
         geomaps_tile_url,
         geomaps_max_zoom,
