@@ -19,9 +19,13 @@ platforms:
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:rw
     cgroupns_mode: host
+    zabbix_proxy_version: ${MY_MOLECULE_VERSION:-v70}
     groups:
       - ${MY_MOLECULE_DATABASE:-mysql}
       - ${MY_MOLECULE_VERSION:-v70}
+      - zabbix_server_pgsql
+      - zabbix_server
+      - zabbix_server_web
 
 provisioner:
   name: ansible
@@ -37,6 +41,10 @@ provisioner:
         ansible_connection: community.docker.docker
         zabbix_repo_apt_priority: 1
         zabbix_repo_yum_gpg_check: 1
+        zabbix_api_create_proxy: true
+        zabbix_proxy_name: proxy1
+        ansible_httpapi_port: 8080
+        ansible_zabbix_url_path: ""
       v70:
         zabbix_proxy_version: 7.0
       v64:
@@ -64,6 +72,9 @@ provisioner:
         zabbix_proxy_pgsql_login_user: postgres
         zabbix_proxy_pgsql_login_password: changeme
         zabbix_proxy_pgsql_login_port: 5432
+      zabbix_server_pgsql:
+      zabbix_server:
+      zabbix_server_web:
       sqlite3:
         zabbix_proxy_database: sqlite3
         zabbix_proxy_database_long: sqlite3

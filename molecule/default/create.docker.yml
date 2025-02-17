@@ -45,3 +45,68 @@
           pgsql:
             image: "timescale/timescaledb:latest-pg13"
             env: { POSTGRES_PASSWORD: changeme }
+
+    - name: Create proxy to server version matches
+      set_fact:
+        p_to_s:
+          v60: 6.0
+          v64: 6.4
+          v70: 7.0
+
+    - name: Create database container for Zabbix server
+      community.docker.docker_container:
+        name: "{{ item.name }}-zserver-db"
+        image: postgres:13
+        state: started
+        recreate: true
+        networks:
+          - name: zabbix
+        env:
+          POSTGRES_DB: zabbix
+          POSTGRES_USER: "zabbix"
+          POSTGRES_PASSWORD: "zabbix"
+        links:
+          - "{{ item.name }}-zserver-db"
+      loop: "{{ molecule_yml.platforms }}"
+      when: "'zabbix_server_pgsql' in item.groups"
+
+    - name: Create container for Zabbix server
+      community.docker.docker_container:
+        name: "{{ item.name }}-zserver"
+        image: "zabbix/zabbix-server-pgsql:ubuntu-{{ p_to_s[item.zabbix_proxy_version] }}-latest"
+        state: started
+        recreate: true
+        networks:
+          - name: zabbix
+        env:
+          DB_SERVER_HOST: "{{ item.name }}-zserver-db"
+          POSTGRES_USER: "zabbix"
+          POSTGRES_PASSWORD: "zabbix"
+          POSTGRES_DB: "zabbix"
+        links:
+          - "{{ item.name }}-zserver-db"
+      loop: "{{ molecule_yml.platforms }}"
+      when: "'zabbix_server' in item.groups"
+
+    - name: Create container for Zabbix Web server
+      community.docker.docker_container:
+        name: "{{ item.name }}-zweb"
+        image: "zabbix/zabbix-web-nginx-pgsql:ubuntu-{{ p_to_s[item.zabbix_proxy_version] }}-latest"
+        state: started
+        recreate: true
+        published_ports:
+          - 8080:8080
+        networks:
+          - name: zabbix
+        env:
+          DB_SERVER_HOST: "{{ item.name }}-zserver-db"
+          POSTGRES_USER: "zabbix"
+          POSTGRES_PASSWORD: "zabbix"
+          POSTGRES_DB: "zabbix"
+          ZBX_SERVER_HOST: "{{ item.name }}-zserver"
+          PHP_TZ: "America/Toronto"
+        links:
+          - "{{ item.name }}-zserver-db"
+          - "{{ item.name }}-zserver"
+      loop: "{{ molecule_yml.platforms }}"
+      when: "'zabbix_server_web' in item.groups"
