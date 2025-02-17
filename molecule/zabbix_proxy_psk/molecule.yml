@@ -1,0 +1,88 @@
+---
+dependency:
+  name: galaxy
+  enabled: true
+  options:
+    requirements-file: molecule/default/collections.yml
+
+driver:
+  name: default
+
+platforms:
+  - name: zabbix-proxy-psk-${MY_MOLECULE_VERSION:-v70}-${MY_MOLECULE_DATABASE:-mysql}-${MY_MOLECULE_CONTAINER:-rockylinux8}
+    image: geerlingguy/docker-${MY_MOLECULE_IMAGE:-rockylinux8}-ansible:latest
+    privileged: true
+    pre_build_image: true
+    command: ${MOLECULE_DOCKER_COMMAND:-""}
+    networks:
+      - name: zabbix
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
+    cgroupns_mode: host
+    zabbix_proxy_version: ${MY_MOLECULE_VERSION:-v70}
+    groups:
+      - ${MY_MOLECULE_DATABASE:-mysql}
+      - ${MY_MOLECULE_VERSION:-v70}
+      - zabbix_server_pgsql
+      - zabbix_server
+      - zabbix_server_web
+
+provisioner:
+  name: ansible
+  playbooks:
+    create: ../default/create.docker.yml
+    destroy: ../default/destroy.docker.yml
+  env:
+    # https://github.com/ansible/molecule/issues/4015#issuecomment-1680859724
+    ANSIBLE_ROLES_PATH: ../../roles
+  inventory:
+    group_vars:
+      all:
+        ansible_connection: community.docker.docker
+        zabbix_repo_apt_priority: 1
+        zabbix_repo_yum_gpg_check: 1
+        zabbix_api_create_proxy: true
+        zabbix_proxy_name: proxy1
+        ansible_httpapi_port: 8080
+        ansible_zabbix_url_path: ""
+        zabbix_proxy_status: passive
+        zabbix_proxy_tlsconnect: psk
+        zabbix_proxy_tlspskfile: "/home/zabbix/proxy_psk"
+        zabbix_proxy_tlspskidentity: "PSK {{ inventory_hostname }}"
+        zabbix_proxy_tlspsk_secret: 'f1447b20c0243f3304062d3641fe7e341eb0106bd1adb4273f21659a7717ae6f'
+      v70:
+        zabbix_proxy_version: 7.0
+      v64:
+        zabbix_proxy_version: 6.4
+      v60:
+        zabbix_proxy_version: 6.0
+      mysql:
+        zabbix_proxy_dbname: zabbix
+        zabbix_proxy_dbuser: zabbix-dbuser
+        zabbix_proxy_database: mysql
+        zabbix_proxy_dbport: 3306
+        zabbix_proxy_dbhost: "{{ inventory_hostname }}-db"
+        zabbix_proxy_dbhost_run_install: false
+        zabbix_proxy_privileged_host: "%"
+        zabbix_proxy_mysql_login_host: "{{ inventory_hostname }}-db"
+        zabbix_proxy_mysql_login_user: root
+        zabbix_proxy_mysql_login_password: changeme
+        zabbix_proxy_mysql_login_port: 3306
+      pgsql:
+        zabbix_proxy_database: pgsql
+        zabbix_proxy_dbport: 5432
+        zabbix_proxy_dbhost: "{{ inventory_hostname }}-db"
+        zabbix_proxy_dbhost_run_install: false
+        zabbix_proxy_pgsql_login_host: "{{ inventory_hostname }}-db"
+        zabbix_proxy_pgsql_login_user: postgres
+        zabbix_proxy_pgsql_login_password: changeme
+        zabbix_proxy_pgsql_login_port: 5432
+      zabbix_server_pgsql:
+      zabbix_server:
+      zabbix_server_web:
+      sqlite3:
+        zabbix_proxy_database: sqlite3
+        zabbix_proxy_database_long: sqlite3
+        zabbix_proxy_dbname: /path/to/sqlite3.db
+verifier:
+  name: testinfra
