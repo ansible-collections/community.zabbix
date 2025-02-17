@@ -837,7 +837,7 @@
       - ansible.builtin.assert:
           that: zbxaction_discovery_update_remote_tags_again.changed is sameas False
 
-      when: zabbix_version is version('6.4', '>=')
+      when: zabbix_version is version('7.0', '>=')
 
     - name: test - delete action
       community.zabbix.zabbix_action:
