@@ -730,6 +730,54 @@
     - ansible.builtin.assert:
         that: zbxaction_discovery_create_snmp_condition.changed is sameas True
 
+    - name: test - update discovery action with wrong discovery check type
+      community.zabbix.zabbix_action:
+        conditions:
+          - type: discovery_check
+            operator: '='
+            value: 'Test discovery rule: fake check type'
+        operations:
+          - type: add_to_host_group
+            host_groups:
+              - Zabbix servers
+      register: zbxaction_discovery_update_wrong_dcheck_type
+      ignore_errors: true
+
+    - ansible.builtin.assert:
+        that: zbxaction_discovery_update_wrong_dcheck_type.failed is sameas True
+
+    - name: test - update discovery action with wrong discovery check
+      community.zabbix.zabbix_action:
+        conditions:
+          - type: discovery_check
+            operator: '='
+            value: 'Test discovery rule: SNMPv2 agent ".1"'
+        operations:
+          - type: add_to_host_group
+            host_groups:
+              - Zabbix servers
+      register: zbxaction_discovery_update_wrong_dcheck
+      ignore_errors: true
+
+    - ansible.builtin.assert:
+        that: zbxaction_discovery_update_wrong_dcheck.failed is sameas True
+
+    - name: test - update discovery action with wrong discovery rule
+      community.zabbix.zabbix_action:
+        conditions:
+          - type: discovery_check
+            operator: '='
+            value: 'Test discovery rule fake: SNMPv2 agent ".1.3.6.1.2.1.1.1.0"'
+        operations:
+          - type: add_to_host_group
+            host_groups:
+              - Zabbix servers
+      register: zbxaction_discovery_update_wrong_drule
+      ignore_errors: true
+
+    - ansible.builtin.assert:
+        that: zbxaction_discovery_update_wrong_drule.failed is sameas True
+
     - name: test - delete action
       community.zabbix.zabbix_action:
         state: absent
