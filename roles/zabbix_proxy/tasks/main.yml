@@ -147,8 +147,8 @@
     tls_connect: "{{ zabbix_proxy_tls_config[zabbix_proxy_tlsconnect | default('no_encryption')] }}"
   when:
     - zabbix_api_create_proxy | bool
+    - zabbix_proxy_version is version('7.0', '<')
   delegate_to: "{{ zabbix_api_server_host }}"
-  when: zabbix_proxy_version is version('7.0', '<')
   tags:
     - api
 
@@ -190,8 +190,8 @@
     tls_subject: "{{ zabbix_proxy_tls_subject | default(omit) }}"
   when:
     - zabbix_api_create_proxy | bool
+    - zabbix_proxy_version is version('7.0', '>=')
   delegate_to: "{{ zabbix_api_server_host }}"
-  when: zabbix_proxy_version is version('7.0', '>=')
   tags:
     - api
 
