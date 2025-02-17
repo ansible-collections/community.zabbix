@@ -373,7 +373,7 @@ EXAMPLES = r"""
   community.zabbix.zabbix_proxy:
     proxy_name: ExampleProxy
     description: ExampleProxy
-    operating_mode: operating_mode
+    operating_mode: active
     state: present
     allowed_addresses: ExampleProxy.local
 
