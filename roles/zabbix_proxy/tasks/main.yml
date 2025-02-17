@@ -143,8 +143,8 @@
     tls_psk: "{{ zabbix_proxy_tlspsk_secret | default(omit) }}"
     tls_psk_identity: "{{ zabbix_proxy_tlspskidentity | default(omit) }}"
     tls_subject: "{{ zabbix_proxy_tls_subject | default(omit) }}"
-    tls_connect: "{{ zabbix_proxy_tls_config[zabbix_proxy_tlsaccept | default('no_encryption')] }}"
-    tls_accept: "{{ zabbix_proxy_tls_config[zabbix_proxy_tlsconnect | default('no_encryption')] }}"
+    tls_accept: "{{ zabbix_proxy_tls_config[zabbix_proxy_tlsaccept | default('no_encryption')] }}"
+    tls_connect: "{{ zabbix_proxy_tls_config[zabbix_proxy_tlsconnect | default('no_encryption')] }}"
   when:
     - zabbix_api_create_proxy | bool
   delegate_to: "{{ zabbix_api_server_host }}"
