@@ -984,6 +984,12 @@ class Zapi(ZabbixBase):
                 "HTTPS": "14",
                 "Telnet": "15"
             }
+
+            if dcheck_type.startswith('SNMP'):
+                # Extract type correctly from Discovery rule name
+                # <Discovery name>: SNMPv2 agent "<IOD>"
+                dcheck_type = dcheck_type.split(" \"")[0]
+
             if dcheck_type not in dcheck_type_to_number:
                 self._module.fail_json(msg="Discovery check type: %s does not exist" % dcheck_type)
 
@@ -996,7 +1002,11 @@ class Zapi(ZabbixBase):
                 self._module.fail_json(msg="Discovery check not found: %s" % discovery_check_name)
 
             for dcheck in discovery_rule_list[0]["dchecks"]:
-                if dcheck_type_to_number[dcheck_type] == dcheck["type"]:
+                if dcheck_type.startswith('SNMP'):
+                    if (dcheck_type_to_number[dcheck_type] == dcheck["type"]
+                            and discovery_check_name.split("\"")[1] == dcheck["key_"]):
+                        return dcheck
+                elif dcheck_type_to_number[dcheck_type] == dcheck["type"]:
                     return dcheck
             self._module.fail_json(msg="Discovery check not found: %s" % discovery_check_name)
         except Exception as e:
