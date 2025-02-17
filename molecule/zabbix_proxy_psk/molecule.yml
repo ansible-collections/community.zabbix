@@ -86,3 +86,12 @@ provisioner:
         zabbix_proxy_dbname: /path/to/sqlite3.db
 verifier:
   name: testinfra
+scenario:
+  test_sequence:
+    - dependency
+    - destroy
+    - syntax
+    - create
+    - prepare
+    - converge
+    - destroy
