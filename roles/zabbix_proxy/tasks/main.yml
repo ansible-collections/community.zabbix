@@ -24,7 +24,7 @@
   when: enable_version_check | default(true) | bool
   ansible.builtin.assert:
     that:
-      - "{{ zabbix_proxy_version|float in zabbix_valid_proxy_versions[ ansible_facts['distribution_major_version'] ] }}"
+      - zabbix_proxy_version|float in zabbix_valid_proxy_versions[ ansible_facts['distribution_major_version'] ]
     fail_msg: Zabbix version {{ zabbix_proxy_version }} is not supported on {{ ansible_facts['distribution'] }} {{ ansible_facts['distribution_major_version'] }}
   tags:
     - always
