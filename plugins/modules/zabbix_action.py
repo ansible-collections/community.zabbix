@@ -219,6 +219,7 @@ options:
                     - " - C(remote_command)"
                     - " - C(notify_all_involved)"
                     - Choice C(notify_all_involved) only supported in I(recovery_operations) and I(acknowledge_operations).
+                    - C(add_host_tags) and C(remove_host_tags) available since Zabbix 7.0.
                 choices:
                     - send_message
                     - remote_command
@@ -1519,9 +1520,10 @@ class Operations(Zapi):
             if constructed_operation["operationtype"] in (4, 5):
                 constructed_operation["opgroup"] = self._construct_opgroup(op)
 
-            # Add/Remove tags
-            if constructed_operation["operationtype"] in (13, 14):
-                constructed_operation["optag"] = op["tags"]
+            if LooseVersion(self._zbx_api_version) >= LooseVersion("7.0"):
+                # Add/Remove tags
+                if constructed_operation["operationtype"] in (13, 14):
+                    constructed_operation["optag"] = op["tags"]
 
             # Link/Unlink template
             if constructed_operation["operationtype"] in (6, 7):

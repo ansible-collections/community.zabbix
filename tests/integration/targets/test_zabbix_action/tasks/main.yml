@@ -778,62 +778,66 @@
     - ansible.builtin.assert:
         that: zbxaction_discovery_update_wrong_drule.failed is sameas True
 
-    - name: test - add Add host tags operation to discovery action
-      community.zabbix.zabbix_action:
-        operations:
-          - type: add_to_host_group
-            host_groups:
-              - Zabbix servers
-          - type: add_host_tags
-            tags:
-              - tag: tag1
-                value: val1
-      register: zbxaction_discovery_update_add_tags
+    - name: Test tag operations for Zabbix >= 7.0
+      block:
+      - name: test - add Add host tags operation to discovery action
+        community.zabbix.zabbix_action:
+          operations:
+            - type: add_to_host_group
+              host_groups:
+                - Zabbix servers
+            - type: add_host_tags
+              tags:
+                - tag: tag1
+                  value: val1
+        register: zbxaction_discovery_update_add_tags
 
-    - ansible.builtin.assert:
-        that: zbxaction_discovery_update_add_tags.changed is sameas True
+      - ansible.builtin.assert:
+          that: zbxaction_discovery_update_add_tags.changed is sameas True
 
-    - name: test - add Add host tags operation to discovery action (again)
-      community.zabbix.zabbix_action:
-        operations:
-          - type: add_to_host_group
-            host_groups:
-              - Zabbix servers
-          - type: add_host_tags
-            tags:
-              - tag: tag1
-                value: val1
-      register: zbxaction_discovery_update_add_tags_again
+      - name: test - add Add host tags operation to discovery action (again)
+        community.zabbix.zabbix_action:
+          operations:
+            - type: add_to_host_group
+              host_groups:
+                - Zabbix servers
+            - type: add_host_tags
+              tags:
+                - tag: tag1
+                  value: val1
+        register: zbxaction_discovery_update_add_tags_again
 
-    - ansible.builtin.assert:
-        that: zbxaction_discovery_update_add_tags_again.changed is sameas False
+      - ansible.builtin.assert:
+          that: zbxaction_discovery_update_add_tags_again.changed is sameas False
 
-    - name: test - add Remove host tags operation to discovery action
-      community.zabbix.zabbix_action:
-        operations:
-          - type: add_to_host_group
-            host_groups:
-              - Zabbix servers
-          - type: remove_host_tags
-            tags:
-              - tag: tag2
-                value: val2
-      register: zbxaction_discovery_update_remote_tags
+      - name: test - add Remove host tags operation to discovery action
+        community.zabbix.zabbix_action:
+          operations:
+            - type: add_to_host_group
+              host_groups:
+                - Zabbix servers
+            - type: remove_host_tags
+              tags:
+                - tag: tag2
+                  value: val2
+        register: zbxaction_discovery_update_remote_tags
 
-    - name: test - add Remove host tags operation to discovery action (again)
-      community.zabbix.zabbix_action:
-        operations:
-          - type: add_to_host_group
-            host_groups:
-              - Zabbix servers
-          - type: remove_host_tags
-            tags:
-              - tag: tag2
-                value: val2
-      register: zbxaction_discovery_update_remote_tags_again
+      - name: test - add Remove host tags operation to discovery action (again)
+        community.zabbix.zabbix_action:
+          operations:
+            - type: add_to_host_group
+              host_groups:
+                - Zabbix servers
+            - type: remove_host_tags
+              tags:
+                - tag: tag2
+                  value: val2
+        register: zbxaction_discovery_update_remote_tags_again
 
-    - ansible.builtin.assert:
-        that: zbxaction_discovery_update_remote_tags_again.changed is sameas False
+      - ansible.builtin.assert:
+          that: zbxaction_discovery_update_remote_tags_again.changed is sameas False
+
+      when: zabbix_version is version('6.4', '>=')
 
     - name: test - delete action
       community.zabbix.zabbix_action:
