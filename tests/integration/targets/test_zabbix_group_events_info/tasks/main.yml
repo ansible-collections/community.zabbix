@@ -41,6 +41,22 @@
       # - hostgroup_events_results.triggers_problem[0].last_event.acknowledged == "0"
       # - hostgroup_events_results.triggers_problem[0].last_event.value == "1"
 
+- name: Get hostgroup events with tags
+  zabbix_group_events_info:
+    hostgroup_name: Example group
+    trigger_severity: not_classified
+    tags:
+      - tag: ExampleTag
+        value: ExampleValue
+        operator: equal
+  register: hostgroup_events_tags_results
+
+- name: Assert that trigger results are as expected
+  ansible.builtin.assert:
+    that:
+      - hostgroup_events_tags_results.triggers_ok | length == 0
+      - hostgroup_events_tags_results.triggers_problem | length == 1
+
 - name: Clean up host
   zabbix_host:
     host_name: Example host

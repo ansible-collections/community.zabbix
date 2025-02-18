@@ -1,0 +1,2 @@
+minor_changes:
+  - zabbix_action module - added Add host tags and Remove host tags operations
