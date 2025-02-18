@@ -449,6 +449,10 @@ def main():
     elif state == "present":
         discoveryrule.sanitize_params(name, params)
         discoveryrules = discoveryrule.get_discoveryrules(name, host_name, template_name)
+        if 'new_name' in params:
+            new_name_discoveryrule = discoveryrule.get_discoveryrules(params['new_name'], host_name, template_name)
+            if len(new_name_discoveryrule) > 0:
+                module.exit_json(changed=False, result=[{'itemids': [new_name_discoveryrule[0]['itemid']]}])
         results = []
         if len(discoveryrules) == 0:
             if 'new_name' in params:

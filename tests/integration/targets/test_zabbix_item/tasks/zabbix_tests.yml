@@ -236,12 +236,25 @@
   ansible.builtin.assert:
     that: zbxnameitem_changed is changed
 
-- name: test - rename non-existing zabbix item
+- name: test - rename existing zabbix item again
   community.zabbix.zabbix_item:
     name: TestItem
     template_name: ExampleTemplate
     params:
       new_name: NewTestItem
+    state: present
+  register: zbxnameitem_existing
+
+- name: assert that nothing has been changed
+  ansible.builtin.assert:
+    that: not zbxnameitem_existing is changed
+
+- name: test - rename non-existing zabbix item
+  community.zabbix.zabbix_item:
+    name: TestItem
+    template_name: ExampleTemplate
+    params:
+      new_name: NewTestItem2
     state: present
   ignore_errors: yes
   register: zbxnameitem_failed

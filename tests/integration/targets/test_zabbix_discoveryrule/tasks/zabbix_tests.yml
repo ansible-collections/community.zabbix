@@ -125,12 +125,25 @@
   ansible.builtin.assert:
     that: zbxnamerule_changed is changed
 
-- name: test - rename non-existing zabbix discoveryrule
+- name: test - rename existing zabbix discoveryrule again
   community.zabbix.zabbix_discoveryrule:
     name: TestRule
     template_name: ExampleTemplate
     params:
       new_name: NewTestRule
+    state: present
+  register: zbxnamerule_existing
+
+- name: assert that nothing has been changed
+  ansible.builtin.assert:
+    that: not zbxnamerule_existing is changed
+
+- name: test - rename non-existing zabbix discoveryrule
+  community.zabbix.zabbix_discoveryrule:
+    name: TestRule
+    template_name: ExampleTemplate
+    params:
+      new_name: NewTestRule2
     state: present
   ignore_errors: yes
   register: zbxnamerule_failed

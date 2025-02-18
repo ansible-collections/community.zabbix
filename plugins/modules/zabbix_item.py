@@ -574,6 +574,10 @@ def main():
     elif state == "present":
         item.sanitize_params(name, params)
         items = item.get_items(name, host_name, template_name)
+        if 'new_name' in params:
+            new_name_item = item.get_items(params['new_name'], host_name, template_name)
+            if len(new_name_item) > 0:
+                module.exit_json(changed=False, result=[{'itemids': [new_name_item[0]['itemid']]}])
         results = []
         if len(items) == 0:
             if 'new_name' in params:

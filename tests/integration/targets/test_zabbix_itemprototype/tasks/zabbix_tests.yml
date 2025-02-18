@@ -237,13 +237,27 @@
   ansible.builtin.assert:
     that: zbxnameitem_changed is changed
 
-- name: test - rename non-existing zabbix item prototype
+- name: test - rename existing zabbix item prototype again
   community.zabbix.zabbix_itemprototype:
     name: '{% raw %}{#FSNAME}:TestItemPrototype{% endraw %}'
     discoveryrule_name: ExampleTemplateRule
     template_name: ExampleTemplate
     params:
       new_name: '{% raw %}{#FSNAME}:NewTestItemPrototype{% endraw %}'
+    state: present
+  register: zbxnameitem_existing
+
+- name: assert that nothing has been changed
+  ansible.builtin.assert:
+    that: not zbxnameitem_existing is changed
+
+- name: test - rename non-existing zabbix item prototype
+  community.zabbix.zabbix_itemprototype:
+    name: '{% raw %}{#FSNAME}:TestItemPrototype{% endraw %}'
+    discoveryrule_name: ExampleTemplateRule
+    template_name: ExampleTemplate
+    params:
+      new_name: '{% raw %}{#FSNAME}:NewTestItemPrototype2{% endraw %}'
     state: present
   ignore_errors: yes
   register: zbxnameitem_failed

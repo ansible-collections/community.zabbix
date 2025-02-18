@@ -446,6 +446,10 @@ def main():
     elif state == "present":
         trigger.sanitize_params(name, params, desc, dependencies)
         triggers = trigger.get_triggers(name, host_name, template_name)
+        if 'new_name' in params:
+            new_name_trigger = trigger.get_triggers(params['new_name'], host_name, template_name)
+            if len(new_name_trigger) > 0:
+                module.exit_json(changed=False, result=[{'triggerids': [new_name_trigger[0]['triggerid']]}])
         if len(triggers) == 0:
             if 'new_name' in params:
                 module.fail_json('Cannot rename trigger:  %s is not found' % name)

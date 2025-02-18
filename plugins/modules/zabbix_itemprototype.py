@@ -604,6 +604,10 @@ def main():
     elif state == "present":
         itemprototype.sanitize_params(name, discoveryrule_name, params, host_name, template_name)
         itemprototypes = itemprototype.get_itemprototypes(name, discoveryrule_name, host_name, template_name)
+        if 'new_name' in params:
+            new_name_itemprototype = itemprototype.get_itemprototypes(params['new_name'], discoveryrule_name, host_name, template_name)
+            if len(new_name_itemprototype) > 0:
+                module.exit_json(changed=False, result=[{'itemids': [new_name_itemprototype[0]['itemid']]}])
         results = []
         if len(itemprototypes) == 0:
             if 'new_name' in params:

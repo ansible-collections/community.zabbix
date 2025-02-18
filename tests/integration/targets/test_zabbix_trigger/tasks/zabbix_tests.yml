@@ -149,12 +149,25 @@
   ansible.builtin.assert:
     that: zbxnametrigger_changed is changed
 
-- name: test - rename non-existing zabbix trigger
+- name: test - rename existing zabbix trigger again
   community.zabbix.zabbix_trigger:
     name: TestTrigger
     template_name: ExampleTemplate
     params:
       new_name: NewTestTrigger
+    state: present
+  register: zbxnametrigger_existing
+
+- name: assert that nothing has been changed
+  ansible.builtin.assert:
+    that: not zbxnametrigger_existing is changed
+
+- name: test - rename non-existing zabbix trigger
+  community.zabbix.zabbix_trigger:
+    name: TestTrigger
+    template_name: ExampleTemplate
+    params:
+      new_name: NewTestTrigger2
     state: present
   ignore_errors: yes
   register: zbxnametrigger_failed

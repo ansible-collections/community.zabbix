@@ -450,6 +450,10 @@ def main():
     elif state == "present":
         triggerprototype.sanitize_params(name, params, desc, dependencies)
         triggerprototypes = triggerprototype.get_triggerprototypes(name, host_name, template_name)
+        if 'new_name' in params:
+            new_name_triggerprototype = triggerprototype.get_triggerprototypes(params['new_name'], host_name, template_name)
+            if len(new_name_triggerprototype) > 0:
+                module.exit_json(changed=False, result=[{'triggerids': [new_name_triggerprototype[0]['triggerid']]}])
         if len(triggerprototypes) == 0:
             if 'new_name' in params:
                 module.fail_json('Cannot rename trigger prototype:  %s is not found' % name)
