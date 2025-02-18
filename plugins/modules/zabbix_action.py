@@ -6,7 +6,7 @@
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
-
+import re
 
 DOCUMENTATION = """
 ---
@@ -982,7 +982,15 @@ class Zapi(ZabbixBase):
 
         """
         try:
-            discovery_rule_name, dcheck_type = discovery_check_name.split(": ")
+            dcheck_pattern = r'([^:]+):\s*([^"s()]+(?:s+[^"s()]+)*)s*["(]?([^")]*)[")]?'
+            match = re.match(dcheck_pattern, discovery_check_name)
+            if match:
+                discovery_rule_name = match.group(1).strip()  # Discovery name
+                dcheck_type = match.group(2).strip()  # Discovery type
+                dcheck_key = match.group(3).strip() # Discovery check key
+            else:
+                self._module.fail_json(msg="Discovery check name: %s does not set" % discovery_check_name)
+                
             dcheck_type_to_number = {
                 "SSH": "0",
                 "LDAP": "1",
@@ -1002,11 +1010,6 @@ class Zapi(ZabbixBase):
                 "Telnet": "15"
             }
 
-            if dcheck_type.startswith('SNMP'):
-                # Extract type correctly from Discovery rule name
-                # <Discovery name>: SNMPv2 agent "<IOD>"
-                dcheck_type = dcheck_type.split(" \"")[0]
-
             if dcheck_type not in dcheck_type_to_number:
                 self._module.fail_json(msg="Discovery check type: %s does not exist" % dcheck_type)
 
@@ -1019,9 +1022,8 @@ class Zapi(ZabbixBase):
                 self._module.fail_json(msg="Discovery check not found: %s" % discovery_check_name)
 
             for dcheck in discovery_rule_list[0]["dchecks"]:
-                if dcheck_type.startswith('SNMP'):
-                    if (dcheck_type_to_number[dcheck_type] == dcheck["type"]
-                            and discovery_check_name.split("\"")[1] == dcheck["key_"]):
+                if dcheck_key != '':
+                    if dcheck_type_to_number[dcheck_type] == dcheck["type"] and dcheck_key == dcheck["key_"]:
                         return dcheck
                 elif dcheck_type_to_number[dcheck_type] == dcheck["type"]:
                     return dcheck
