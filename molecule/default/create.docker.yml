@@ -73,7 +73,7 @@
     - name: Create container for Zabbix server
       community.docker.docker_container:
         name: "{{ item.name }}-zserver"
-        image: "zabbix/zabbix-server-pgsql:ubuntu-{{ p_to_s[item.zabbix_proxy_version] }}-latest"
+        image: "zabbix/zabbix-server-pgsql:alpine-{{ p_to_s[item.zabbix_proxy_version] }}-latest"
         state: started
         recreate: true
         networks:
@@ -91,7 +91,7 @@
     - name: Create container for Zabbix Web server
       community.docker.docker_container:
         name: "{{ item.name }}-zweb"
-        image: "zabbix/zabbix-web-nginx-pgsql:ubuntu-{{ p_to_s[item.zabbix_proxy_version] }}-latest"
+        image: "zabbix/zabbix-web-nginx-pgsql:alpine-{{ p_to_s[item.zabbix_proxy_version] }}-latest"
         state: started
         recreate: true
         published_ports:
