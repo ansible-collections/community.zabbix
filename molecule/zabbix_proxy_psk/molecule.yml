@@ -27,6 +27,7 @@ platforms:
 provisioner:
   name: ansible
   playbooks:
+    prepare: ../zabbix_proxy/prepare.yml
     create: ../zabbix_proxy/create.docker.yml
     converge: ../zabbix_proxy/converge.yml
     destroy: ../zabbix_proxy/destroy.docker.yml
