@@ -373,7 +373,7 @@ EXAMPLES = r"""
   community.zabbix.zabbix_proxy:
     proxy_name: ExampleProxy
     description: ExampleProxy
-    operating_mode: operating_mode
+    operating_mode: active
     state: present
     allowed_addresses: ExampleProxy.local
 
@@ -674,7 +674,7 @@ def main():
     else:
         allowed_addresses = module.params["allowed_addresses"]
         operating_mode = 1 if module.params["operating_mode"] == "passive" else 0
-        address = module.params["address"]
+        address = '127.0.0.1' if operating_mode == 0 else module.params["address"]
         port = module.params["port"]
         proxy_group = module.params["proxy_group"]
         local_address = module.params["local_address"]
