@@ -9,7 +9,7 @@ driver:
   name: default
 
 platforms:
-  - name: zabbix-proxy-${MY_MOLECULE_VERSION:-v70}-${MY_MOLECULE_DATABASE:-mysql}-${MY_MOLECULE_CONTAINER:-rockylinux8}
+  - name: zabbix-proxy-psk-${MY_MOLECULE_VERSION:-v70}-${MY_MOLECULE_DATABASE:-mysql}-${MY_MOLECULE_CONTAINER:-rockylinux8}
     image: geerlingguy/docker-${MY_MOLECULE_IMAGE:-rockylinux8}-ansible:latest
     privileged: true
     pre_build_image: true
@@ -27,8 +27,10 @@ platforms:
 provisioner:
   name: ansible
   playbooks:
-    create: create.docker.yml
-    destroy: destroy.docker.yml
+    prepare: ../zabbix_proxy/prepare.yml
+    create: ../zabbix_proxy/create.docker.yml
+    converge: ../zabbix_proxy/converge.yml
+    destroy: ../zabbix_proxy/destroy.docker.yml
   env:
     # https://github.com/ansible/molecule/issues/4015#issuecomment-1680859724
     ANSIBLE_ROLES_PATH: ../../roles
@@ -42,6 +44,11 @@ provisioner:
         zabbix_proxy_name: proxy1
         ansible_httpapi_port: 8080
         ansible_zabbix_url_path: ""
+        zabbix_proxy_status: passive
+        zabbix_proxy_tlsconnect: psk
+        zabbix_proxy_tlspskfile: "/home/zabbix/proxy_psk"
+        zabbix_proxy_tlspskidentity: "PSK {{ inventory_hostname }}"
+        zabbix_proxy_tlspsk_secret: 'f1447b20c0243f3304062d3641fe7e341eb0106bd1adb4273f21659a7717ae6f'
       v70:
         zabbix_proxy_version: 7.0
       v64:
@@ -75,3 +82,12 @@ provisioner:
         zabbix_proxy_dbname: /path/to/sqlite3.db
 verifier:
   name: testinfra
+scenario:
+  test_sequence:
+    - dependency
+    - destroy
+    - syntax
+    - create
+    - prepare
+    - converge
+    - destroy
