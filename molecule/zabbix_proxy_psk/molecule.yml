@@ -28,6 +28,7 @@ provisioner:
   name: ansible
   playbooks:
     create: ../zabbix_proxy/create.docker.yml
+    converge: ../zabbix_proxy/converge.yml
     destroy: ../zabbix_proxy/destroy.docker.yml
   env:
     # https://github.com/ansible/molecule/issues/4015#issuecomment-1680859724
