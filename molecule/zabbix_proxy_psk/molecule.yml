@@ -23,15 +23,12 @@ platforms:
     groups:
       - ${MY_MOLECULE_DATABASE:-mysql}
       - ${MY_MOLECULE_VERSION:-v70}
-      - zabbix_server_pgsql
-      - zabbix_server
-      - zabbix_server_web
 
 provisioner:
   name: ansible
   playbooks:
-    create: ../default/create.docker.yml
-    destroy: ../default/destroy.docker.yml
+    create: ../zabbix_proxy/create.docker.yml
+    destroy: ../zabbix_proxy/destroy.docker.yml
   env:
     # https://github.com/ansible/molecule/issues/4015#issuecomment-1680859724
     ANSIBLE_ROLES_PATH: ../../roles
@@ -77,9 +74,6 @@ provisioner:
         zabbix_proxy_pgsql_login_user: postgres
         zabbix_proxy_pgsql_login_password: changeme
         zabbix_proxy_pgsql_login_port: 5432
-      zabbix_server_pgsql:
-      zabbix_server:
-      zabbix_server_web:
       sqlite3:
         zabbix_proxy_database: sqlite3
         zabbix_proxy_database_long: sqlite3
