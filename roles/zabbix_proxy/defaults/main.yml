@@ -28,6 +28,10 @@ zabbix_proxy_dbencoding: utf8
 zabbix_proxy_dbpassword_hash_method: md5
 zabbix_proxy_install_database_client: true
 
+# SELinux specific
+selinux_allow_zabbix_can_network: false
+selinux_allow_daemons_enable_cluster_mode: false
+
 # Misc.
 zabbix_proxy_cat_cmd: cat
 zabbix_proxy_conf_mode: "0644"

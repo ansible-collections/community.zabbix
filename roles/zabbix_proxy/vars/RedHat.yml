@@ -23,20 +23,6 @@ _zabbix_proxy_mysql_dependencies:
 _zabbix_proxy_sqlite3_dependencies:
   - sqlite
 
-selinux_pkgs:
-  "9":
-    - policycoreutils
-    - checkpolicy
-    - python3-libsemanage
-  "8":
-    - policycoreutils
-    - checkpolicy
-    - python3-libsemanage
-  "7":
-    - policycoreutils-python
-    - libsemanage-python
-    - checkpolicy
-
 _zabbix_proxy_fping6location: /usr/sbin/fping6
 _zabbix_proxy_fpinglocation: /usr/sbin/fping
 

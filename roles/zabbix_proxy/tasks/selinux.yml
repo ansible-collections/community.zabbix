@@ -1,8 +1,10 @@
 ---
-- name: "SELinux | RedHat | Install related SELinux package to fix issues"
-  ansible.builtin.yum:
-    name: "{{ selinux_pkgs[ansible_distribution_major_version] }}"
-    state: present
+- name: "SELinux | Install related SELinux packages"
+  ansible.builtin.package:
+    name:
+      - python3-libsemanage
+      - python3-policycoreutils
+      - zabbix-selinux-policy
   environment:
     http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
     https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
@@ -10,31 +12,18 @@
   until: zabbix_proxy_dependencies_installed is succeeded
   become: true
   tags:
-    - zabbix-proxy
+    - install
 
-- name: "SELinux | RedHat | Add SEmodule to fix SELinux issue: zabbix_proxy_alerter.sock"
-  ansible.builtin.script:
-    cmd: files/install_semodule.bsx
-  args:
-    creates: /etc/selinux/targeted/active/modules/400/zabbix_proxy_add/cil
+- name: "SELinux | Set booleans"
+  ansible.posix.seboolean:
+    name: "{{ item.name }}"
+    state: "{{ item.state }}"
+    persistent: true
   become: true
   tags:
-    - zabbix-proxy
-
-- name: "Allow zabbix-proxy to open connections (SELinux)"
-  ansible.posix.seboolean:
-    name: zabbix_can_network
-    persistent: true
-    state: true
-  become: true
-  when: ansible_selinux.status == "enabled"
-  tags: selinux
-
-- name: "Allow zabbix-proxy to connect to zabbix_proxy_preprocessing.sock (SELinux)"
-  ansible.posix.seboolean:
-    name: daemons_enable_cluster_mode
-    persistent: true
-    state: true
-  become: true
-  when: ansible_selinux.status == "enabled"
-  tags: selinux
+    - config
+  loop:
+    - name: zabbix_can_network
+      state: "{{ selinux_allow_zabbix_can_network }}"
+    - name: daemons_enable_cluster_mode
+      state: "{{ selinux_allow_daemons_enable_cluster_mode }}"
