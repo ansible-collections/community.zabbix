@@ -24,7 +24,7 @@
   when: enable_version_check | default(true) | bool
   ansible.builtin.assert:
     that:
-      - "{{ zabbix_proxy_version|float in zabbix_valid_proxy_versions[ ansible_facts['distribution_major_version'] ] }}"
+      - zabbix_proxy_version|float in zabbix_valid_proxy_versions[ ansible_facts['distribution_major_version'] ]
     fail_msg: Zabbix version {{ zabbix_proxy_version }} is not supported on {{ ansible_facts['distribution'] }} {{ ansible_facts['distribution_major_version'] }}
   tags:
     - always
@@ -125,7 +125,7 @@
   tags:
     - config
 
-- name: Ensure proxy definition is up-to-date (added/updated/removed)
+- name: Ensure proxy definition is up-to-date (added/updated/removed) for Zabbix < 7.0
   vars:
     gather_facts: false
     ansible_user: "{{ zabbix_api_login_user }}"
@@ -143,10 +143,54 @@
     tls_psk: "{{ zabbix_proxy_tlspsk_secret | default(omit) }}"
     tls_psk_identity: "{{ zabbix_proxy_tlspskidentity | default(omit) }}"
     tls_subject: "{{ zabbix_proxy_tls_subject | default(omit) }}"
-    tls_connect: "{{ zabbix_proxy_tls_config[zabbix_proxy_tlsaccept | default('no_encryption')] }}"
-    tls_accept: "{{ zabbix_proxy_tls_config[zabbix_proxy_tlsconnect | default('no_encryption')] }}"
+    tls_accept: "{{ zabbix_proxy_tls_config[zabbix_proxy_tlsaccept | default('no_encryption')] }}"
+    tls_connect: "{{ zabbix_proxy_tls_config[zabbix_proxy_tlsconnect | default('no_encryption')] }}"
   when:
     - zabbix_api_create_proxy | bool
+    - zabbix_proxy_version is version('7.0', '<')
+  delegate_to: "{{ zabbix_api_server_host }}"
+  tags:
+    - api
+
+- name: Ensure proxy definition is up-to-date (added/updated/removed) for Zabbix >= 7.0
+  vars:
+    gather_facts: false
+    ansible_user: "{{ zabbix_api_login_user }}"
+    ansible_network_os: community.zabbix.zabbix
+    ansible_connection: httpapi
+    ansible_httpapi_use_ssl: "{{ zabbix_api_use_ssl }}"
+    http_login_user: "{{ zabbix_api_http_user | default(-42) }}"
+    http_login_password: "{{ zabbix_api_http_password | default(-42) }}"
+  community.zabbix.zabbix_proxy:
+    state: "{{ zabbix_proxy_state }}"
+    operating_mode: "{{ zabbix_proxy_status }}"
+    proxy_name: "{{ zabbix_proxy_name }}"
+    description: "{{ zabbix_proxy_description | default(omit) }}"
+    address: "{{ zabbix_proxy_interface['ip'] }}"
+    port: "{{ zabbix_proxy_interface['port'] }}"
+    local_address: "{{ zabbix_proxy_local_address | default(omit) }}"
+    local_port: "{{ zabbix_proxy_local_port | default(omit) }}"
+    allowed_addresses: "{{ zabbix_proxy_allowed_addresses | default(omit) }}"
+    custom_timeouts: "{{ zabbix_proxy_custom_timeouts | default(omit) }}"
+    timeout_zabbix_agent: "{{ zabbix_proxy_timeout_zabbix_agent | default(omit) }}"
+    timeout_simple_check: "{{ zabbix_proxy_timeout_simple_check | default(omit) }}"
+    timeout_snmp_agent: "{{ zabbix_proxy_timeout_snmp_agent | default(omit) }}"
+    timeout_external_check: "{{ zabbix_proxy_timeout_external_check | default(omit) }}"
+    timeout_db_monitor: "{{ zabbix_proxy_timeout_db_monitor | default(omit) }}"
+    timeout_http_agent: "{{ zabbix_proxy_timeout_http_agent | default(omit) }}"
+    timeout_ssh_agent: "{{ zabbix_proxy_timeout_ssh_agent | default(omit) }}"
+    timeout_telnet_agent: "{{ zabbix_proxy_timeout_telnet_agent | default(omit) }}"
+    timeout_script: "{{ zabbix_proxy_timeout_script | default(omit) }}"
+    timeout_browser: "{{ zabbix_proxy_timeout_browser | default(omit) }}"
+    tls_accept: "{{ zabbix_proxy_tls_config[zabbix_proxy_tlsaccept | default('no_encryption')] }}"
+    tls_connect: "{{ zabbix_proxy_tls_config[zabbix_proxy_tlsconnect | default('no_encryption')] }}"
+    tls_psk: "{{ zabbix_proxy_tlspsk_secret | default(omit) }}"
+    tls_psk_identity: "{{ zabbix_proxy_tlspskidentity | default(omit) }}"
+    ca_cert: "{{ zabbix_proxy_ca_cert | default(omit) }}"
+    tls_subject: "{{ zabbix_proxy_tls_subject | default(omit) }}"
+  when:
+    - zabbix_api_create_proxy | bool
+    - zabbix_proxy_version is version('7.0', '>=')
   delegate_to: "{{ zabbix_api_server_host }}"
   tags:
     - api

@@ -36,6 +36,7 @@ jobs:
           - opensuseleap15
         collection_role:
           - zabbix_proxy
+          - zabbix_proxy_psk
         database:
           - mysql
           - pgsql
