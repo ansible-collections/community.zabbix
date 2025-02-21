@@ -56,11 +56,6 @@
     zabbix_agent_tlsaccept: "{{ zabbix_agent_tlsaccept is defined | ternary(zabbix_agent_tlsaccept, 'unencrypted')}}"
     zabbix_agent_tlsconnect: "{{ zabbix_agent_tlsconnect is defined | ternary(zabbix_agent_tlsconnect, 'unencrypted')}}"
 
-- name: Setting Zabbix API Server Port
-  ansible.builtin.set_fact:
-    zabbix_api_server_port: "{{ '443' if zabbix_api_use_ssl|bool else '80' }}"
-  when: zabbix_api_server_port is undefined
-
 - name: Install Repository
   ansible.builtin.include_role:
     name: community.zabbix.zabbix_repo

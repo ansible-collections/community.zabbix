@@ -29,11 +29,6 @@
   tags:
     - always
 
-- name: Setting Zabbix API Server Port
-  ansible.builtin.set_fact:
-    zabbix_api_server_port: "{{ '443' if zabbix_api_use_ssl|bool else '80' }}"
-  when: zabbix_api_server_port is undefined
-
 - name: "Set default ip address for zabbix_proxy_ip"
   ansible.builtin.set_fact:
     zabbix_proxy_ip: "{{ hostvars[inventory_hostname]['ansible_default_ipv4'].address }}"
