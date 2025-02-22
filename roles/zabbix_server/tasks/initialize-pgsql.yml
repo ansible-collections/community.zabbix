@@ -89,7 +89,7 @@
         port: "{{ zabbix_server_dbport }}"
         db: "{{ zabbix_server_dbname }}"
         state: restore
-        target: /usr/share/zabbix-sql-scripts/postgresql/server.sql.gz
+        target: "{{ '/usr/share/zabbix/sql-scripts/postgresql/server.sql.gz' if zabbix_server_version is version('7.0', '>') else '/usr/share/zabbix-sql-scripts/postgresql/server.sql.gz' }}"
 
 - name: "Configure Timescale"
   when: zabbix_server_database_timescaledb
