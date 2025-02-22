@@ -131,4 +131,4 @@
       vars:
         is_legacy_version: "{{ zabbix_server_version is version('7.0', '<') }}"
         legacy_path: /usr/share/zabbix-sql-scripts/postgresql/timescaledb.sql
-        modern_path: /usr/share/zabbix-sql-scripts/postgresql/timescaledb/schema.sql
+        modern_path: "{{ '/usr/share/zabbix/sql-scripts/postgresql/timescaledb/schema.sql' if zabbix_server_version is version('7.0', '>') else '/usr/share/zabbix-sql-scripts/postgresql/timescaledb/schema.sql' }}"
