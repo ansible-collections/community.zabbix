@@ -3,14 +3,15 @@
 zabbix_repo_version: "7.0"
 zabbix_repo_yum_gpgcheck: 0
 zabbix_repo_yum_schema: https
-zabbix_repo_deb_url: "http://repo.zabbix.com/zabbix/{{ zabbix_repo_version }}/{{ ansible_facts.lsb.id | default(ansible_facts['distribution']) | lower }}{% if ansible_facts['architecture'] == 'aarch64' and ansible_facts.lsb.id | default(ansible_facts['distribution']) in ['Debian', 'Ubuntu'] %}-arm64{% endif %}"
+_pre_72_deb_repo: "http://repo.zabbix.com/zabbix/{{ zabbix_repo_version }}/{{ ansible_facts.lsb.id | default(ansible_facts['distribution']) | lower }}{% if ansible_facts['architecture'] == 'aarch64' and ansible_facts.lsb.id | default(ansible_facts['distribution']) in ['Debian', 'Ubuntu'] %}-arm64{% endif %}"
+_post_72_deb_repo: "http://repo.zabbix.com/zabbix/{{ zabbix_repo_version }}/stable/{{ ansible_facts.lsb.id | default(ansible_facts['distribution']) | lower }}{% if ansible_facts['architecture'] == 'aarch64' and ansible_facts.lsb.id | default(ansible_facts['distribution']) in ['Debian', 'Ubuntu'] %}-arm64{% endif %}"
 zabbix_repo_deb_component: main
 _pre_72_yum_repo: "{{ zabbix_repo_yum_schema }}://repo.zabbix.com/zabbix/{{ zabbix_repo_version | regex_search('^[0-9]+.[0-9]+') }}/rhel/{{ ansible_distribution_major_version }}/$basearch/"
-_post_72_yum_repo: "{{ zabbix_repo_yum_schema }}://repo.zabbix.com/zabbix/{{ zabbix_repo_version | regex_search('^[0-9]+.[0-9]+') }}/release/rhel/{{ ansible_distribution_major_version }}/noarch/"
+_post_72_yum_repo: "{{ zabbix_repo_yum_schema }}://repo.zabbix.com/zabbix/{{ zabbix_repo_version | regex_search('^[0-9]+.[0-9]+') }}/stable/rhel/{{ ansible_distribution_major_version }}/$basearch/"
 zabbix_repo_yum:
   - name: zabbix
     description: Zabbix Official Repository - $basearch
-    baseurl: "{{ _zabbix_repo_yum_url }}"
+    baseurl: "{{ _post_72_yum_repo if zabbix_repo_version is version('7.0', '>') else _pre_72_yum_repo }}"
     gpgcheck: "{{ zabbix_repo_yum_gpgcheck }}"
     mode: "0644"
     gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-ZABBIX
@@ -30,10 +31,12 @@ zabbix_repo_rpm_gpg_key_url: http://repo.zabbix.com/RPM-GPG-KEY-ZABBIX-08EFA7DD
 zabbix_repo_zypper_auto_import_keys: true
 zabbix_repo_zypper_disable_gpg_check: false
 zabbix_repo_zypper_schema: https
+_pre_72_suse_repo: "{{ zabbix_repo_zypper_schema }}://repo.zabbix.com/zabbix/{{ zabbix_repo_version | regex_search('^[0-9]+.[0-9]+') }}/sles/{{ ansible_distribution_major_version }}/$basearch/"
+_post_72_suse_repo: "{{ zabbix_repo_zypper_schema }}://repo.zabbix.com/zabbix/{{ zabbix_repo_version | regex_search('^[0-9]+.[0-9]+') }}/stable/sles/{{ ansible_distribution_major_version }}/$basearch/"
 zabbix_repo_zypper:
   - name: zabbix
     description: Zabbix Official Repository
-    repo: "{{ zabbix_repo_zypper_schema }}://repo.zabbix.com/zabbix/{{ zabbix_repo_version | regex_search('^[0-9]+.[0-9]+') }}/sles/{{ ansible_distribution_major_version }}/$basearch/"
+    repo: "{{ _post_72_suse_repo if zabbix_repo_version is version('7.0', '>') else _pre_72_suse_repo }}"
     disable_gpg_check: "{{ zabbix_repo_zypper_disable_gpg_check }}"
     auto_import_keys: "{{ zabbix_repo_zypper_auto_import_keys }}"
     state: present

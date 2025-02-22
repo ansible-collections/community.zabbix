@@ -17,10 +17,6 @@
   tags:
     - install
 
-- name: "Set Base Architecture for Repo"
-  ansible.builtin.set_fact:
-    _zabbix_repo_yum_url: "{{ _post_72_yum_repo if zabbix_repo_version is version('7.0', '>') else _pre_72_yum_repo }}"
-
 - name: "RedHat | Install basic repo file"
   ansible.builtin.yum_repository:
     name: "{{ item.name }}"

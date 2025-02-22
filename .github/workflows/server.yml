@@ -40,12 +40,19 @@ jobs:
           - mysql
           - pgsql
         version:
+          - v72
           - v70
           - v64
           - v60
         exclude:
           - container: ubuntu2004
+            version: v72
+          - container: ubuntu2004
             version: v70
+          - container: ubuntu2004
+            version: v70
+          - container: debian11
+            version: v72
           - container: debian11
             version: v70
     steps:

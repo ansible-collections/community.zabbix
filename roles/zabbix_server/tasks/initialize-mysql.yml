@@ -141,7 +141,7 @@
         encoding: "{{ zabbix_server_dbencoding }}"
         collation: "{{ zabbix_server_dbcollation }}"
         state: import
-        target: /usr/share/zabbix-sql-scripts/mysql/server.sql.gz
+        target: "{{ '/usr/share/zabbix/sql-scripts/mysql/server.sql.gz' if zabbix_server_version is version('7.0', '>') else '/usr/share/zabbix-sql-scripts/mysql/server.sql.gz' }}" 
 
   always:
     - name: "MySQL | Revert variable overrides for schema import"
