@@ -31,6 +31,7 @@ jobs:
         collection_role:
           - zabbix_repo
         version:
+          - v72
           - v70
           - v64
           - v60
