@@ -9,6 +9,7 @@
   until: zabbix_api_hostgroup_created is succeeded
   retries: 10
   delegate_to: "{{ zabbix_api_server_host }}"
+  become: false
   tags:
     - api
 
@@ -43,6 +44,7 @@
   until: zabbix_api_host_created is succeeded
   retries: 10
   delegate_to: "{{ zabbix_api_server_host }}"
+  become: false
   changed_when: false
   tags:
     - api
@@ -61,5 +63,6 @@
   retries: 10
   no_log: "{{ ansible_verbosity < 3 }}"
   delegate_to: "{{ zabbix_api_server_host }}"
+  become: false
   tags:
     - api

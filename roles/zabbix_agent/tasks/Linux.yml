@@ -75,11 +75,13 @@
 
 - name: "Fail invalid specified agent_listenip"
   ansible.builtin.fail:
-    msg: "The agent_listenip does not exist"
+    msg: "The {{ item }} (agent_listenip) does not exist"
   when:
-    - zabbix_agent_listenip != '0.0.0.0'
-    - zabbix_agent_listenip != '127.0.0.1'
-    - (zabbix_agent_listenip not in ansible_all_ipv4_addresses)
+    - item != '0.0.0.0'
+    - item != '127.0.0.1'
+    - item not in ansible_all_ipv4_addresses
+  with_items:
+    "{{ zabbix_agent_listenip | split(',') }}"
   tags:
     - config
 

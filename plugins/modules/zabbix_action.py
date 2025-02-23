@@ -219,6 +219,7 @@ options:
                     - " - C(remote_command)"
                     - " - C(notify_all_involved)"
                     - Choice C(notify_all_involved) only supported in I(recovery_operations) and I(acknowledge_operations).
+                    - C(add_host_tags) and C(remove_host_tags) available since Zabbix 7.0.
                 choices:
                     - send_message
                     - remote_command
@@ -232,6 +233,8 @@ options:
                     - disable_host
                     - set_host_inventory_mode
                     - notify_all_involved
+                    - add_host_tags
+                    - remove_host_tags
                 required: true
             esc_period:
                 type: str
@@ -387,6 +390,20 @@ options:
                     - The name of script used for global script commands.
                     - Required when I(command_type=global_script).
                     - Can be used when I(type=remote_command).
+            tags:
+                type: list
+                elements: dict
+                description:
+                    - Host tags to adt have tag property defined.
+                    - The value property is optional. or remove.
+                    - upported if operationtype is set to C(add host tags) or C(remove host tags).
+                suboptions:
+                    tag:
+                      type: str
+                      description: Tag name
+                    value:
+                      type: str
+                      description: Tag value (optional)
     recovery_operations:
         type: list
         elements: dict
@@ -984,6 +1001,12 @@ class Zapi(ZabbixBase):
                 "HTTPS": "14",
                 "Telnet": "15"
             }
+
+            if dcheck_type.startswith('SNMP'):
+                # Extract type correctly from Discovery rule name
+                # <Discovery name>: SNMPv2 agent "<IOD>"
+                dcheck_type = dcheck_type.split(" \"")[0]
+
             if dcheck_type not in dcheck_type_to_number:
                 self._module.fail_json(msg="Discovery check type: %s does not exist" % dcheck_type)
 
@@ -996,7 +1019,11 @@ class Zapi(ZabbixBase):
                 self._module.fail_json(msg="Discovery check not found: %s" % discovery_check_name)
 
             for dcheck in discovery_rule_list[0]["dchecks"]:
-                if dcheck_type_to_number[dcheck_type] == dcheck["type"]:
+                if dcheck_type.startswith('SNMP'):
+                    if (dcheck_type_to_number[dcheck_type] == dcheck["type"]
+                            and discovery_check_name.split("\"")[1] == dcheck["key_"]):
+                        return dcheck
+                elif dcheck_type_to_number[dcheck_type] == dcheck["type"]:
                     return dcheck
             self._module.fail_json(msg="Discovery check not found: %s" % discovery_check_name)
         except Exception as e:
@@ -1277,7 +1304,11 @@ class Operations(Zapi):
                 "unlink_from_template",
                 "enable_host",
                 "disable_host",
-                "set_host_inventory_mode"],
+                "set_host_inventory_mode",
+                "none",
+                "none",
+                "add_host_tags",
+                "remove_host_tags"],
                 operation["type"]
             )
         except Exception:
@@ -1488,6 +1519,11 @@ class Operations(Zapi):
             # Add to/Remove from host group
             if constructed_operation["operationtype"] in (4, 5):
                 constructed_operation["opgroup"] = self._construct_opgroup(op)
+
+            if LooseVersion(self._zbx_api_version) >= LooseVersion("7.0"):
+                # Add/Remove tags
+                if constructed_operation["operationtype"] in (13, 14):
+                    constructed_operation["optag"] = op["tags"]
 
             # Link/Unlink template
             if constructed_operation["operationtype"] in (6, 7):
@@ -1983,7 +2019,9 @@ def main():
                         "enable_host",
                         "disable_host",
                         "set_host_inventory_mode",
-                        "notify_all_involved"
+                        "notify_all_involved",
+                        "add_host_tags",
+                        "remove_host_tags"
                     ]
                 ),
                 esc_period=dict(type="str", required=False, default="0s"),
@@ -2033,7 +2071,8 @@ def main():
                 # when type is set_host_inventory_mode
                 inventory=dict(type="str", required=False, choices=["manual", "automatic"]),
                 # when type is link_to_template or unlink_from_template
-                templates=dict(type="list", required=False, elements="str")
+                templates=dict(type="list", required=False, elements="str"),
+                tags=dict(type="list", required=False, elements="dict")
             ),
             required_if=[
                 ["type", "remote_command", ["command_type"]],
@@ -2050,7 +2089,9 @@ def main():
                 ["type", "link_to_template", ["templates"]],
                 ["type", "unlink_from_template", ["templates"]],
                 ["type", "set_host_inventory_mode", ["inventory"]],
-                ["type", "send_message", ["send_to_users", "send_to_groups"], True]
+                ["type", "send_message", ["send_to_users", "send_to_groups"], True],
+                ["type", "add_host_tags", ["tags"], True],
+                ["type", "remove_host_tags", ["tags"], True]
             ]
         ),
         recovery_operations=dict(

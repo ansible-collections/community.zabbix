@@ -19,6 +19,7 @@ platforms:
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:rw
     cgroupns_mode: host
+    zabbix_proxy_version: ${MY_MOLECULE_VERSION:-v70}
     groups:
       - ${MY_MOLECULE_DATABASE:-mysql}
       - ${MY_MOLECULE_VERSION:-v72}
@@ -26,8 +27,8 @@ platforms:
 provisioner:
   name: ansible
   playbooks:
-    create: ../default/create.docker.yml
-    destroy: ../default/destroy.docker.yml
+    create: create.docker.yml
+    destroy: destroy.docker.yml
   env:
     # https://github.com/ansible/molecule/issues/4015#issuecomment-1680859724
     ANSIBLE_ROLES_PATH: ../../roles
@@ -37,6 +38,10 @@ provisioner:
         ansible_connection: community.docker.docker
         zabbix_repo_apt_priority: 1
         zabbix_repo_yum_gpg_check: 1
+        zabbix_api_create_proxy: true
+        zabbix_proxy_name: proxy1
+        ansible_httpapi_port: 8080
+        ansible_zabbix_url_path: ""
       v72:
         zabbix_proxy_version: 7.2
       v70:

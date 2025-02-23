@@ -17,7 +17,6 @@ Roles:
   * [Installation](#installation)
     + [Requirements](#requirements)
     + [Installing the Collection from Ansible Galaxy](#installing-the-collection-from-ansible-galaxy)
-    + [Upgrading collection](#upgrading-collection)
   * [Usage](#usage)
   * [Supported Zabbix versions](#supported-zabbix-versions)
   * [Collection life cycle and support](#collection-life-cycle-and-support)
@@ -123,16 +122,12 @@ You can also include it in a `requirements.yml` file along with other required c
 ---
 collections:
   - name: community.zabbix
-    version: 3.1.2
+    version: 3.2.0
   - name: ansible.posix
     version: 1.3.0
   - name: community.general
     version: 3.7.0
 ```
-
-### Upgrading collection
-
-Make sure to read [UPGRADE](docs/UPGRADE.md) document before installing newer version of this collection.
 
 ## Usage
 

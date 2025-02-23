@@ -190,14 +190,12 @@ options:
         description:
             - Zabbix user name.
         type: str
-        required: true
         env:
           - name: ZABBIX_USERNAME
     login_password:
         description:
             - Zabbix user password.
         type: str
-        required: true
         env:
           - name: ZABBIX_PASSWORD
     auth_token:
@@ -205,7 +203,6 @@ options:
             - Zabbix authentication token (see https://www.zabbix.com/documentation/current/en/manual/web_interface/frontend_sections/users/api_tokens)
             - If provided then C(login_user) and C(login_password) are ignored
         type: str
-        required: false
     http_login_user:
         description:
             - Basic Auth login
