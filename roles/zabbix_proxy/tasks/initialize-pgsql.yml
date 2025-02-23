@@ -71,3 +71,4 @@
         db: "{{ zabbix_proxy_dbname }}"
         state: restore
         target: /usr/share/zabbix-sql-scripts/postgresql/proxy.sql
+        target: "{{ '/usr/share/zabbix/sql-scripts/postgresql/proxy.sql' if zabbix_proxy_version is version('7.0', '>') else '/usr/share/zabbix-sql-scripts/postgresql/proxy.sql' }}"
