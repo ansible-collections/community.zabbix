@@ -6,16 +6,16 @@ on:
       - "roles/zabbix_repo/**"
       - "molecule/zabbix_repo/**"
       - "molecule/requirements.txt"
-      - ".github/workflows/server.yml"
+      - ".github/workflows/repo.yml"
   pull_request:
     paths:
       - "roles/zabbix_repo/**"
       - "molecule/zabbix_repo/**"
       - "molecule/requirements.txt"
-      - ".github/workflows/server.yml"
+      - ".github/workflows/repo.yml"
 jobs:
   molecule:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     strategy:
       fail-fast: false
       matrix:
