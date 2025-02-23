@@ -80,7 +80,7 @@ zabbix_useuip: 1
 zabbix_host_groups:
   - Linux servers
 zabbix_agent_link_templates:
-  - Template Linux by Zabbix agent
+  - Linux by Zabbix agent
 
 zabbix_agent_interfaces:
   - type: 1
