@@ -137,7 +137,7 @@
   community.zabbix.zabbix_proxy:
     state: "{{ zabbix_proxy_state }}"
     status: "{{ zabbix_proxy_status }}"
-    proxy_name: "{{ zabbix_proxy_name }}"
+    proxy_name: "{{ zabbix_proxy_hostname }}"
     description: "{{ zabbix_proxy_description | default(omit) }}"
     interface: "{{ zabbix_proxy_interface }}"
     tls_psk: "{{ zabbix_proxy_tlspsk_secret | default(omit) }}"
@@ -169,7 +169,7 @@
   community.zabbix.zabbix_proxy:
     state: "{{ zabbix_proxy_state }}"
     operating_mode: "{{ zabbix_proxy_status }}"
-    proxy_name: "{{ zabbix_proxy_name }}"
+    proxy_name: "{{ zabbix_proxy_hostname }}"
     description: "{{ zabbix_proxy_description | default(omit) }}"
     address: "{{ zabbix_proxy_interface['ip'] }}"
     port: "{{ zabbix_proxy_interface['port'] }}"
