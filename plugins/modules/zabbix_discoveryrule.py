@@ -104,6 +104,11 @@ options:
                     - http_agent
                     - snmp_agent
                     - script
+            new_name:
+                description:
+                    - New name for LLD rule.
+                required: false
+                type: str
             preprocessing:
                 description:
                     - discovery rules preprocessing options.
@@ -239,6 +244,23 @@ EXAMPLES = r'''
     name: mounted_filesystem_discovery
     template_name: example_template
     state: absent
+
+- name: Rename Zabbix LLD rule
+  # set task level variables as we change ansible_connection plugin here
+  vars:
+    ansible_network_os: community.zabbix.zabbix
+    ansible_connection: httpapi
+    ansible_httpapi_port: 443
+    ansible_httpapi_use_ssl: true
+    ansible_httpapi_validate_certs: false
+    ansible_zabbix_url_path: "zabbixeu"  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
+    ansible_host: zabbix-example-fqdn.org
+  community.zabbix.zabbix_discoveryrule:
+    name: mounted_filesystem_discovery
+    template_name: example_template
+    params:
+      new_name: new_mounted_filesystem_discovery
+    state: present
 '''
 
 from ansible.module_utils.basic import AnsibleModule
@@ -427,8 +449,14 @@ def main():
     elif state == "present":
         discoveryrule.sanitize_params(name, params)
         discoveryrules = discoveryrule.get_discoveryrules(name, host_name, template_name)
+        if 'new_name' in params:
+            new_name_discoveryrule = discoveryrule.get_discoveryrules(params['new_name'], host_name, template_name)
+            if len(new_name_discoveryrule) > 0:
+                module.exit_json(changed=False, result=[{'itemids': [new_name_discoveryrule[0]['itemid']]}])
         results = []
         if len(discoveryrules) == 0:
+            if 'new_name' in params:
+                module.fail_json('Cannot rename discoveryrule:  %s is not found' % name)
             hosts_templates = discoveryrule.get_hosts_templates(host_name, template_name)
             for host_template in hosts_templates:
                 if 'hostid' in host_template:
@@ -443,6 +471,9 @@ def main():
             changed = False
             for d in discoveryrules:
                 params['itemid'] = d['itemid']
+                if 'new_name' in params:
+                    params['name'] = params['new_name']
+                    params.pop("new_name")
                 results.append(discoveryrule.update_discoveryrule(params))
                 changed_rule = discoveryrule.check_discoveryrule_changed(d)
                 if changed_rule:
