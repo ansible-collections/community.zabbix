@@ -121,6 +121,11 @@ options:
                     - log
                     - numeric_unsigned
                     - text
+            new_name:
+                description:
+                    - New name for item
+                required: false
+                type: str
             master_item:
                 description:
                     - item that is the master of the current one
@@ -344,6 +349,24 @@ EXAMPLES = r'''
     discoveryrule_name: example_rule
     template_name: example_template
     state: absent
+
+- name: Rename Zabbix item prototype
+  # set task level variables as we change ansible_connection plugin here
+  vars:
+    ansible_network_os: community.zabbix.zabbix
+    ansible_connection: httpapi
+    ansible_httpapi_port: 443
+    ansible_httpapi_use_ssl: true
+    ansible_httpapi_validate_certs: false
+    ansible_zabbix_url_path: "zabbixeu"  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
+    ansible_host: zabbix-example-fqdn.org
+  community.zabbix.zabbix_itemprototype:
+    name: '{% raw %}{#FSNAME}:Used space{% endraw %}'
+    discoveryrule_name: example_rule
+    template_name: example_template
+    params:
+      new_name: '{% raw %}{#FSNAME}:New Used space{% endraw %}'
+    state: present
 '''
 
 from ansible.module_utils.basic import AnsibleModule
@@ -581,8 +604,14 @@ def main():
     elif state == "present":
         itemprototype.sanitize_params(name, discoveryrule_name, params, host_name, template_name)
         itemprototypes = itemprototype.get_itemprototypes(name, discoveryrule_name, host_name, template_name)
+        if 'new_name' in params:
+            new_name_itemprototype = itemprototype.get_itemprototypes(params['new_name'], discoveryrule_name, host_name, template_name)
+            if len(new_name_itemprototype) > 0:
+                module.exit_json(changed=False, result=[{'itemids': [new_name_itemprototype[0]['itemid']]}])
         results = []
         if len(itemprototypes) == 0:
+            if 'new_name' in params:
+                module.fail_json('Cannot rename item prototype:  %s is not found' % name)
             hosts_templates = itemprototype.get_hosts_templates(host_name, template_name)
             for host_template in hosts_templates:
                 if 'hostid' in host_template:
@@ -598,6 +627,9 @@ def main():
             params.pop('ruleid')
             for i in itemprototypes:
                 params['itemid'] = i['itemid']
+                if 'new_name' in params:
+                    params['name'] = params['new_name']
+                    params.pop("new_name")
                 results.append(itemprototype.update_itemprototype(params))
                 changed_item = itemprototype.check_itemprototype_changed(i)
                 if changed_item:

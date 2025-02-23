@@ -223,9 +223,52 @@
   ansible.builtin.assert:
     that: zbxtempitem_changed is changed
 
-- name: test - attempt to delete previously created zabbix item
+- name: test - rename existing zabbix item prototype
   community.zabbix.zabbix_itemprototype:
     name: '{% raw %}{#FSNAME}:TestItemPrototype{% endraw %}'
+    discoveryrule_name: ExampleTemplateRule
+    template_name: ExampleTemplate
+    params:
+      new_name: '{% raw %}{#FSNAME}:NewTestItemPrototype{% endraw %}'
+    state: present
+  register: zbxnameitem_changed
+
+- name: expect to succeed and that things changed
+  ansible.builtin.assert:
+    that: zbxnameitem_changed is changed
+
+- name: test - rename existing zabbix item prototype again
+  community.zabbix.zabbix_itemprototype:
+    name: '{% raw %}{#FSNAME}:TestItemPrototype{% endraw %}'
+    discoveryrule_name: ExampleTemplateRule
+    template_name: ExampleTemplate
+    params:
+      new_name: '{% raw %}{#FSNAME}:NewTestItemPrototype{% endraw %}'
+    state: present
+  register: zbxnameitem_existing
+
+- name: assert that nothing has been changed
+  ansible.builtin.assert:
+    that: not zbxnameitem_existing is changed
+
+- name: test - rename non-existing zabbix item prototype
+  community.zabbix.zabbix_itemprototype:
+    name: '{% raw %}{#FSNAME}:TestItemPrototype{% endraw %}'
+    discoveryrule_name: ExampleTemplateRule
+    template_name: ExampleTemplate
+    params:
+      new_name: '{% raw %}{#FSNAME}:NewTestItemPrototype2{% endraw %}'
+    state: present
+  ignore_errors: yes
+  register: zbxnameitem_failed
+
+- name: expect to fail
+  ansible.builtin.assert:
+    that: zbxnameitem_failed is failed
+
+- name: test - attempt to delete previously created zabbix item
+  community.zabbix.zabbix_itemprototype:
+    name: '{% raw %}{#FSNAME}:NewTestItemPrototype{% endraw %}'
     discoveryrule_name: ExampleTemplateRule
     template_name: ExampleTemplate
     state: absent
@@ -237,7 +280,7 @@
 
 - name: test - attempt to delete non-existing zabbix item
   community.zabbix.zabbix_itemprototype:
-    name: '{% raw %}{#FSNAME}:TestItemPrototype{% endraw %}'
+    name: '{% raw %}{#FSNAME}:NewTestItemPrototype{% endraw %}'
     discoveryrule_name: ExampleTemplateRule
     template_name: ExampleTemplate
     state: absent

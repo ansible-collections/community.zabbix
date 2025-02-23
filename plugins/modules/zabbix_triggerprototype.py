@@ -117,6 +117,11 @@ options:
                     - Overrides "status" in API docs.
                 required: false
                 type: bool
+            new_name:
+                description:
+                    - New name for trigger prototype
+                required: false
+                type: str
             generate_multiple_events:
                 description:
                     - Whether the trigger prototype can generate multiple problem events.
@@ -249,6 +254,23 @@ EXAMPLES = r'''
     name: '{% raw %}Free disk space is less than 20% on volume {#FSNAME}{% endraw %}'
     template_name: example_template
     state: absent
+
+- name: Rename Zabbix trigger prototype
+  # set task level variables as we change ansible_connection plugin here
+  vars:
+    ansible_network_os: community.zabbix.zabbix
+    ansible_connection: httpapi
+    ansible_httpapi_port: 443
+    ansible_httpapi_use_ssl: true
+    ansible_httpapi_validate_certs: false
+    ansible_zabbix_url_path: "zabbixeu"  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
+    ansible_host: zabbix-example-fqdn.org
+  community.zabbix.zabbix_triggerprototype:
+    name: '{% raw %}Free disk space is less than 20% on volume {#FSNAME}{% endraw %}'
+    template_name: example_template
+    params:
+      new_name: '{% raw %}New Free disk space is less than 20% on volume {#FSNAME}{% endraw %}'
+    state: present
 '''
 
 from ansible.module_utils.basic import AnsibleModule
@@ -428,7 +450,13 @@ def main():
     elif state == "present":
         triggerprototype.sanitize_params(name, params, desc, dependencies)
         triggerprototypes = triggerprototype.get_triggerprototypes(name, host_name, template_name)
+        if 'new_name' in params:
+            new_name_triggerprototype = triggerprototype.get_triggerprototypes(params['new_name'], host_name, template_name)
+            if len(new_name_triggerprototype) > 0:
+                module.exit_json(changed=False, result=[{'triggerids': [new_name_triggerprototype[0]['triggerid']]}])
         if len(triggerprototypes) == 0:
+            if 'new_name' in params:
+                module.fail_json('Cannot rename trigger prototype:  %s is not found' % name)
             results = triggerprototype.add_triggerprototype(params)
             module.exit_json(changed=True, result=results)
         else:
@@ -437,6 +465,9 @@ def main():
             for t in triggerprototypes:
                 params['triggerid'] = t['triggerid']
                 params.pop('description')
+                if 'new_name' in params:
+                    params['description'] = params['new_name']
+                    params.pop("new_name")
                 results.append(triggerprototype.update_triggerprototype(params))
                 changed_trigger = triggerprototype.check_triggerprototype_changed(t)
                 if changed_trigger:

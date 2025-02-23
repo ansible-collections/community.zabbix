@@ -116,6 +116,11 @@ options:
                     - Overrides "status" in API docs.
                 required: false
                 type: bool
+            new_name:
+                description:
+                    - New name for trigger
+                required: false
+                type: str
             generate_multiple_events:
                 description:
                     - Whether the trigger can generate multiple problem events.
@@ -245,6 +250,23 @@ EXAMPLES = r'''
     name: agent_ping
     host_name: example_template
     state: absent
+
+- name: Rename Zabbix trigger
+  # set task level variables as we change ansible_connection plugin here
+  vars:
+    ansible_network_os: community.zabbix.zabbix
+    ansible_connection: httpapi
+    ansible_httpapi_port: 443
+    ansible_httpapi_use_ssl: true
+    ansible_httpapi_validate_certs: false
+    ansible_zabbix_url_path: "zabbixeu"  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
+    ansible_host: zabbix-example-fqdn.org
+  community.zabbix.zabbix_trigger:
+    name: agent_ping
+    template_name: example_template
+    params:
+      new_name: new_agent_ping
+    state: present
 '''
 
 from ansible.module_utils.basic import AnsibleModule
@@ -424,7 +446,13 @@ def main():
     elif state == "present":
         trigger.sanitize_params(name, params, desc, dependencies)
         triggers = trigger.get_triggers(name, host_name, template_name)
+        if 'new_name' in params:
+            new_name_trigger = trigger.get_triggers(params['new_name'], host_name, template_name)
+            if len(new_name_trigger) > 0:
+                module.exit_json(changed=False, result=[{'triggerids': [new_name_trigger[0]['triggerid']]}])
         if len(triggers) == 0:
+            if 'new_name' in params:
+                module.fail_json('Cannot rename trigger:  %s is not found' % name)
             results = trigger.add_trigger(params)
             module.exit_json(changed=True, result=results)
         else:
@@ -433,6 +461,9 @@ def main():
             for t in triggers:
                 params['triggerid'] = t['triggerid']
                 params.pop('description')
+                if 'new_name' in params:
+                    params['description'] = params['new_name']
+                    params.pop("new_name")
                 results.append(trigger.update_trigger(params))
                 changed_trigger = trigger.check_trigger_changed(t)
                 if changed_trigger:
