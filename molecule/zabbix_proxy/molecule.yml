@@ -40,7 +40,7 @@ provisioner:
         zabbix_repo_yum_gpg_check: 1
         zabbix_api_create_proxy: true
         zabbix_proxy_name: proxy1
-        ansible_httpapi_port: 8080
+        zabbix_api_server_port: 8080
         ansible_zabbix_url_path: ""
       v70:
         zabbix_proxy_version: 7.0
