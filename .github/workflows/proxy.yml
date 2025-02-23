@@ -41,6 +41,7 @@ jobs:
           - pgsql
           - sqlite3
         version:
+          - v72
           - v70
           - v64
           - v60
