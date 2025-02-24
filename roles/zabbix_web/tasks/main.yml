@@ -84,6 +84,7 @@
     path: "/usr/share/zabbix/fonts/graphfont.ttf"
     state: link
   become: true
+  when: zabbix_web_version is version ('7.2', '<')
   tags:
     - install
 
