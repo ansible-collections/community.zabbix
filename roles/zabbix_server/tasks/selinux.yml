@@ -25,7 +25,5 @@
   tags:
     - config
   loop:
-    - name: httpd_can_connect_zabbix
-      state: "{{ selinux_allow_zabbix_can_http }}"
     - name: zabbix_can_network
       state: "{{ selinux_allow_zabbix_can_network }}"
