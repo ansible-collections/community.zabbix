@@ -78,13 +78,14 @@
     - install
 
 - name: "Debian | Link graphfont.ttf (workaround ZBX-10467)"
-  when: ansible_facts['os_family'] == 'Debian'
+  when: 
+    - ansible_facts['os_family'] == 'Debian'
+    - zabbix_web_version is version ('7.2', '<')
   ansible.builtin.file:
     src: "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
     path: "/usr/share/zabbix/fonts/graphfont.ttf"
     state: link
   become: true
-  when: zabbix_web_version is version ('7.2', '<')
   tags:
     - install
 
