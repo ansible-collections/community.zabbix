@@ -713,6 +713,16 @@
             ports: 161
             key: '.1.3.6.1.2.1.1.1.0'
             snmp_community: public
+          - type: HTTP
+            ports: "80"
+          - type: HTTP
+            ports: "81"
+          - type: Zabbix
+            key: "system.uname"
+            ports: "10050"
+          - type: Zabbix
+            key: "system.uname"
+            ports: "10051"
         delay: 24h
 
     - name: test - create discovery action with SNMP discovery check
@@ -777,6 +787,31 @@
 
     - ansible.builtin.assert:
         that: zbxaction_discovery_update_wrong_drule.failed is sameas True
+
+    - name: test - create discovery action with some discovery checks
+      community.zabbix.zabbix_action:
+        conditions:
+          - type: "discovery_check"
+            operator: "equals"
+            value: 'Test discovery rule: HTTP'
+          - type: "discovery_check"
+            operator: "equals"
+            value: 'Test discovery rule: HTTP (81)'
+          - type: "discovery_check"
+            operator: "equals"
+            value: 'Test discovery rule: Zabbix agent "system.uname"'
+          - type: "discovery_check"
+            operator: "equals"
+            value: 'Test discovery rule: Zabbix agent (10051) "system.uname"'
+        operations:
+          - type: add_to_host_group
+            host_groups:
+              - Zabbix servers
+      register: zbxaction_create_valid_conditions
+      ignore_errors: true
+
+    - ansible.builtin.assert:
+        that: zbxaction_create_valid_conditions.changed is sameas True
 
     - name: Test tag operations for Zabbix >= 7.0
       block:
