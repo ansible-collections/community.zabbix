@@ -8,7 +8,12 @@ server {
     {% if zabbix_web_redirect|default(false) and zabbix_web_tls|default(false) %}
     return 301 https://{{ zabbix_api_server_url }}$request_uri;
     {% else %}
+
+    {% if zabbix_web_version is version('7.0', '<=') %}
     root    /usr/share/zabbix;
+    {% else %}
+    root    /usr/share/zabbix/ui"
+    {% endif %}
 
     index   index.php;
 
