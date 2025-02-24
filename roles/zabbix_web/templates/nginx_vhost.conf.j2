@@ -12,7 +12,7 @@ server {
     {% if zabbix_web_version is version('7.0', '<=') %}
     root    /usr/share/zabbix;
     {% else %}
-    root    /usr/share/zabbix/ui"
+    root    /usr/share/zabbix/ui;
     {% endif %}
 
     index   index.php;
@@ -78,7 +78,12 @@ server {
     {{ (zabbix_web_ssl_cipher_suite is defined and zabbix_web_ssl_cipher_suite is not none) | ternary('', '# ') }}ssl_ciphers {{ zabbix_web_ssl_cipher_suite | default('') }};
     {{ (zabbix_web_SSLSessionCache is defined and zabbix_web_SSLSessionCache is not none) | ternary('', '# ') }}ssl_session_cache  {{ zabbix_web_SSLSessionCache | default('') }};
     {{ (zabbix_web_SSLSessionCacheTimeout is defined and zabbix_web_SSLSessionCacheTimeout is not none) | ternary('', '# ') }}ssl_session_timeout {{ zabbix_web_SSLSessionCacheTimeout | default('') }};
+
+    {% if zabbix_web_version is version('7.0', '<=') %}
     root    /usr/share/zabbix;
+    {% else %}
+    root    /usr/share/zabbix/ui;
+    {% endif %}
 
     index   index.php;
 

@@ -19,6 +19,7 @@ platforms:
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:rw
     cgroupns_mode: host
+    zabbix_proxy_version: ${MY_MOLECULE_VERSION:-v70}
     groups:
       - ${MY_MOLECULE_DATABASE:-mysql}
       - ${MY_MOLECULE_VERSION:-v72}
