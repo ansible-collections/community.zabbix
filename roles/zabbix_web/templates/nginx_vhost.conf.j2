@@ -44,9 +44,15 @@ server {
         fastcgi_split_path_info ^(.+\.php)(/.+)$;
         fastcgi_index   index.php;
 
+        {% if zabbix_web_version is version('7.0', '<=') %}
         fastcgi_param   DOCUMENT_ROOT   /usr/share/zabbix;
         fastcgi_param   SCRIPT_FILENAME /usr/share/zabbix$fastcgi_script_name;
         fastcgi_param   PATH_TRANSLATED /usr/share/zabbix$fastcgi_script_name;
+        {% else %}
+        fastcgi_param   DOCUMENT_ROOT   /usr/share/zabbix/ui;
+        fastcgi_param   SCRIPT_FILENAME /usr/share/zabbix/ui$fastcgi_script_name;
+        fastcgi_param   PATH_TRANSLATED /usr/share/zabbix/ui$fastcgi_script_name;
+        {% endif %}
 
         include fastcgi_params;
         fastcgi_param   QUERY_STRING    $query_string;
@@ -114,9 +120,15 @@ server {
         fastcgi_split_path_info ^(.+\.php)(/.+)$;
         fastcgi_index   index.php;
 
+        {% if zabbix_web_version is version('7.0', '<=') %}
         fastcgi_param   DOCUMENT_ROOT   /usr/share/zabbix;
         fastcgi_param   SCRIPT_FILENAME /usr/share/zabbix$fastcgi_script_name;
         fastcgi_param   PATH_TRANSLATED /usr/share/zabbix$fastcgi_script_name;
+        {% else %}
+        fastcgi_param   DOCUMENT_ROOT   /usr/share/zabbix/ui;
+        fastcgi_param   SCRIPT_FILENAME /usr/share/zabbix/ui$fastcgi_script_name;
+        fastcgi_param   PATH_TRANSLATED /usr/share/zabbix/ui$fastcgi_script_name;
+        {% endif %}
 
         include fastcgi_params;
         fastcgi_param   QUERY_STRING    $query_string;
