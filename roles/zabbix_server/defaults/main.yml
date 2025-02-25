@@ -29,7 +29,6 @@ zabbix_server_install_database_client: true
 
 # SELinux specific
 selinux_allow_zabbix_can_network: false
-selinux_allow_zabbix_can_http: false
 
 #Misc.
 zabbix_server_include_mode: "0755"
