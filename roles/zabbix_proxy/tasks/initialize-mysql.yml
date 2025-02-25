@@ -128,7 +128,7 @@
         encoding: "{{ zabbix_proxy_dbencoding }}"
         collation: "{{ zabbix_proxy_dbcollation }}"
         state: import
-        target: "{{ '/usr/share/zabbix/sql-scripts/mysql/proxy.sql' if zabbix_proxy_version is version('7.0', '>') else '/usr/share/zabbix-sql-scripts/mysql/proxy.sql' }}"
+        target: "{{ zabbix_proxy_database_file_dir + 'mysql/proxy.sql' }}"
 
   always:
     - name: "MySQL | Revert variable overrides for schema import"
