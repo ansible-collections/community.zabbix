@@ -6,7 +6,6 @@
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
-import re
 
 DOCUMENTATION = """
 ---
@@ -808,7 +807,7 @@ from ansible_collections.community.zabbix.plugins.module_utils.base import Zabbi
 from ansible.module_utils.compat.version import LooseVersion
 
 import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabbix_utils
-
+import re
 
 class Zapi(ZabbixBase):
     def __init__(self, module, zbx=None):
@@ -1020,15 +1019,14 @@ class Zapi(ZabbixBase):
             })
             if len(discovery_rule_list) < 1:
                 self._module.fail_json(msg="Discovery check not found: %s" % discovery_check_name)
-            
             for dcheck in discovery_rule_list[0]["dchecks"]:
-                if dcheck_key != None and dcheck_ports != None:
+                if dcheck_key is not None and dcheck_ports is not None:
                     if dcheck_type_to_number[dcheck_type] == dcheck["type"] and dcheck_key == dcheck["key_"] and dcheck_ports == dcheck["ports"]:
                         return dcheck
-                elif dcheck_key != None and dcheck_ports == None:
+                elif dcheck_key is not None and dcheck_ports is None:
                     if dcheck_type_to_number[dcheck_type] == dcheck["type"] and dcheck_key == dcheck["key_"]:
                         return dcheck
-                elif dcheck_key == None and dcheck_ports != None:
+                elif dcheck_key is None and dcheck_ports is not None:
                     if dcheck_type_to_number[dcheck_type] == dcheck["type"] and dcheck_ports == dcheck["ports"]:
                         return dcheck
                 elif dcheck_type_to_number[dcheck_type] == dcheck["type"]:
