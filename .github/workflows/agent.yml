@@ -21,7 +21,7 @@ on:
       - ".github/workflows/repo.yml"
 jobs:
   molecule:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     strategy:
       fail-fast: false
       matrix:
@@ -35,6 +35,7 @@ jobs:
           - debian11
           - opensuseleap15
         version:
+          - v72
           - v70
           - v64
           - v60

@@ -21,3 +21,6 @@ venv.bak/
 .devcontainer
 local_play.yml
 antsibull-env
+
+# Ignore Dependency Roles that may get downloaded
+geerlingguy*

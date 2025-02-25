@@ -8,7 +8,12 @@ server {
     {% if zabbix_web_redirect|default(false) and zabbix_web_tls|default(false) %}
     return 301 https://{{ zabbix_api_server_url }}$request_uri;
     {% else %}
+
+    {% if zabbix_web_version is version('7.0', '<=') %}
     root    /usr/share/zabbix;
+    {% else %}
+    root    /usr/share/zabbix/ui;
+    {% endif %}
 
     index   index.php;
 
@@ -39,9 +44,15 @@ server {
         fastcgi_split_path_info ^(.+\.php)(/.+)$;
         fastcgi_index   index.php;
 
+        {% if zabbix_web_version is version('7.0', '<=') %}
         fastcgi_param   DOCUMENT_ROOT   /usr/share/zabbix;
         fastcgi_param   SCRIPT_FILENAME /usr/share/zabbix$fastcgi_script_name;
         fastcgi_param   PATH_TRANSLATED /usr/share/zabbix$fastcgi_script_name;
+        {% else %}
+        fastcgi_param   DOCUMENT_ROOT   /usr/share/zabbix/ui;
+        fastcgi_param   SCRIPT_FILENAME /usr/share/zabbix/ui$fastcgi_script_name;
+        fastcgi_param   PATH_TRANSLATED /usr/share/zabbix/ui$fastcgi_script_name;
+        {% endif %}
 
         include fastcgi_params;
         fastcgi_param   QUERY_STRING    $query_string;
@@ -73,7 +84,12 @@ server {
     {{ (zabbix_web_ssl_cipher_suite is defined and zabbix_web_ssl_cipher_suite is not none) | ternary('', '# ') }}ssl_ciphers {{ zabbix_web_ssl_cipher_suite | default('') }};
     {{ (zabbix_web_SSLSessionCache is defined and zabbix_web_SSLSessionCache is not none) | ternary('', '# ') }}ssl_session_cache  {{ zabbix_web_SSLSessionCache | default('') }};
     {{ (zabbix_web_SSLSessionCacheTimeout is defined and zabbix_web_SSLSessionCacheTimeout is not none) | ternary('', '# ') }}ssl_session_timeout {{ zabbix_web_SSLSessionCacheTimeout | default('') }};
+
+    {% if zabbix_web_version is version('7.0', '<=') %}
     root    /usr/share/zabbix;
+    {% else %}
+    root    /usr/share/zabbix/ui;
+    {% endif %}
 
     index   index.php;
 
@@ -104,9 +120,15 @@ server {
         fastcgi_split_path_info ^(.+\.php)(/.+)$;
         fastcgi_index   index.php;
 
+        {% if zabbix_web_version is version('7.0', '<=') %}
         fastcgi_param   DOCUMENT_ROOT   /usr/share/zabbix;
         fastcgi_param   SCRIPT_FILENAME /usr/share/zabbix$fastcgi_script_name;
         fastcgi_param   PATH_TRANSLATED /usr/share/zabbix$fastcgi_script_name;
+        {% else %}
+        fastcgi_param   DOCUMENT_ROOT   /usr/share/zabbix/ui;
+        fastcgi_param   SCRIPT_FILENAME /usr/share/zabbix/ui$fastcgi_script_name;
+        fastcgi_param   PATH_TRANSLATED /usr/share/zabbix/ui$fastcgi_script_name;
+        {% endif %}
 
         include fastcgi_params;
         fastcgi_param   QUERY_STRING    $query_string;

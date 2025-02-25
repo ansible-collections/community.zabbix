@@ -53,7 +53,7 @@
     content: |
       Types: deb{{ ' deb-src' if zabbix_repo_deb_include_deb_src }}
       Enabled: yes
-      URIs: {{ zabbix_repo_deb_url }}
+      URIs: {{ zabbix_repo_deb_url | default ( _post_72_deb_repo if zabbix_repo_version is version('7.0', '>') else _pre_72_deb_repo )}}
       Suites: {{ ansible_distribution_release }}
       Components: {{ zabbix_repo_deb_component }}
       Architectures: {{ 'amd64' if ansible_machine != 'aarch64' else 'arm64'}}
