@@ -33,7 +33,6 @@ zabbix_server_database_file_dir:  "{{ zabbix_server_version is version('7.0', '>
 
 # SELinux specific
 selinux_allow_zabbix_can_network: false
-selinux_allow_zabbix_can_http: false
 
 #Misc.
 zabbix_server_include_mode: "0755"
