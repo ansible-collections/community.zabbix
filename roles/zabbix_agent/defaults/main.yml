@@ -58,14 +58,12 @@ zabbix_agent_disable_repo:
   - epel
 
 # Zabbix API stuff
-zabbix_api_server_host: localhost
-zabbix_api_login_user: Admin
 zabbix_api_use_ssl: false
+zabbix_api_login_user: Admin
 zabbix_api_login_pass: !unsafe zabbix
+zabbix_api_server_host: localhost
+zabbix_api_server_port: "{{ zabbix_api_use_ssl | ternary('443', '80') }}"
 zabbix_api_validate_certs: false
-ansible_httpapi_pass: "{{ zabbix_api_login_pass }}"
-ansible_httpapi_port: "{{ zabbix_api_server_port }}"
-ansible_httpapi_validate_certs: "{{ zabbix_api_validate_certs }}"
 
 # API Related Variables
 zabbix_api_create_hostgroup: false
@@ -79,7 +77,7 @@ zabbix_useuip: 1
 zabbix_host_groups:
   - Linux servers
 zabbix_agent_link_templates:
-  - Template Linux by Zabbix agent
+  - Linux by Zabbix agent
 
 zabbix_agent_interfaces:
   - type: 1

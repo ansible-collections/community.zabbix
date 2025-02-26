@@ -3,6 +3,7 @@
   ansible.builtin.package:
     name:
       - python3-libsemanage
+      - python3-policycoreutils
   environment:
     http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
     https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
