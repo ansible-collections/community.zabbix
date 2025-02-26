@@ -11,7 +11,7 @@ _post_72_yum_repo: "{{ zabbix_repo_yum_schema }}://repo.zabbix.com/zabbix/{{ zab
 zabbix_repo_yum:
   - name: zabbix
     description: Zabbix Official Repository - $basearch
-    baseurl: "{{ _post_72_yum_repo if zabbix_repo_version is version('7.0', '>') else _pre_72_yum_repo }}"
+    baseurl: "{{ zabbix_repo_version is version('7.0', '>') | ternary( _post_72_yum_repo, _pre_72_yum_repo ) }}"
     gpgcheck: "{{ zabbix_repo_yum_gpgcheck }}"
     mode: "0644"
     gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-ZABBIX
