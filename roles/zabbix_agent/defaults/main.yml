@@ -7,11 +7,15 @@ zabbix_version_patch: 0
 zabbix_agent_package_remove: false
 zabbix_agent_sender_package: zabbix-sender
 zabbox_agent_get_package: zabbix-get
+zabbix_agent_package: "{{ _agent_package }}"
 zabbix_agent_package_state: present
 zabbix_agent_selinux: false
 zabbix_agent_conf_mode: "0644"
 # Retaining backwards compatability by using the awkwardly named old variable
 zabbix_agent_detect_ip: "{{ not zabbix_agent_dont_detect_ip | default(false) }}" # True
+
+zabbix_agent_pidfile: "{{ _pidfile }}"
+zabbix_agent_service: "{{ _agent_service }}"
 
 zabbix_agent_listeninterface:
 zabbix_agent_allowroot: false
@@ -24,9 +28,11 @@ zabbix_agent_enableremotecommands: false
 zabbix_agent_forceactivechecksonstart: false
 zabbix_agent_heartbeatfrequency: 60
 zabbix_agent_hostname: "{{ inventory_hostname }}"
+zabbix_agent_include_dir: "{{ _include }}"
 zabbix_agent_include_mode: "0755"
 zabbix_agent_listenip: 0.0.0.0
 zabbix_agent_listenport: 10050
+zabbix_agent_logfile: "{{ _logfile }}"
 zabbix_agent_logfilesize: 100
 zabbix_agent_logtype: file
 zabbix_agent_maxlinespersecond: 20
@@ -36,15 +42,20 @@ zabbix_agent_plugintimeout: 3
 zabbix_agent_refreshactivechecks: 120
 zabbix_agent_statusport: 9999
 zabbix_agent_timeout: 3
+
+zabbix_agent_tlsaccept: "unencrypted"
+zabbix_agent_tlsconnect: "unencrypted"
 zabbix_agent_tlspsk_auto: false
 zabbix_agent_tlspskfile: /etc/zabbix/tls_psk_auto.secret
+zabbix_agent_tlspskidentity_file: "/etc/zabbix/tls_psk_auto.identity"
+zabbix_agent_tls_subject: "{{ _tls_subject }}"
+
 zabbix_agent_unsafeuserparameters: false
 zabbix_agent_runas_user: zabbix
 zabbix_agent_loadmodulepath: ${libdir}/modules
 zabbix_agent_logremotecommands: false
 zabbix_agent_startagents: 3
 
-zabbix_agent_tlspskidentity_file: "/etc/zabbix/tls_psk_auto.identity"
 # Selinux related vars
 selinux_allow_zabbix_run_sudo: false
 
