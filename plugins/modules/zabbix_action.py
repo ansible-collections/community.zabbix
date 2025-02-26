@@ -809,6 +809,7 @@ from ansible.module_utils.compat.version import LooseVersion
 import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabbix_utils
 import re
 
+
 class Zapi(ZabbixBase):
     def __init__(self, module, zbx=None):
         super(Zapi, self).__init__(module, zbx)
