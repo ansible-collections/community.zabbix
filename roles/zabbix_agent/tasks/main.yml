@@ -24,7 +24,10 @@
 - name: Load Appropriate Defaults
   ansible.builtin.include_vars: "agent{{ '2' if zabbix_agent2 is defined and zabbix_agent2|bool }}_vars.yml"
 
-- block:
+- when: zabbix_agent_tlspsk_auto | bool
+  tags:
+    - config
+  block:
     - name: AutoPSK | Default tlsconnect to enforce PSK
       ansible.builtin.set_fact:
         zabbix_agent_tlsconnect: psk
@@ -40,10 +43,6 @@
       when:
         - zabbix_agent_tlsaccept is defined
         - not 'psk' in zabbix_agent_tlsaccept
-
-  when: zabbix_agent_tlspsk_auto | bool
-  tags:
-    - config
 
 - name: Set Variables
   ansible.builtin.set_fact:
