@@ -79,4 +79,4 @@
         port: "{{ zabbix_proxy_dbport }}"
         db: "{{ zabbix_proxy_dbname }}"
         state: restore
-        target: "{{ zabbix_proxy_database_file_dir + 'postgresql/proxy.sql' }}"
+        target: "{{ zabbix_proxy_database_file_dir }}postgresql/proxy.sql"
