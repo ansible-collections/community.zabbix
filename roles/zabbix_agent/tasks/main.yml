@@ -56,11 +56,6 @@
     zabbix_agent_tlsaccept: "{{ zabbix_agent_tlsaccept is defined | ternary(zabbix_agent_tlsaccept, 'unencrypted')}}"
     zabbix_agent_tlsconnect: "{{ zabbix_agent_tlsconnect is defined | ternary(zabbix_agent_tlsconnect, 'unencrypted')}}"
 
-- name: Setting Zabbix API Server Port
-  ansible.builtin.set_fact:
-    zabbix_api_server_port: "{{ '443' if zabbix_api_use_ssl|bool else '80' }}"
-  when: zabbix_api_server_port is undefined
-
 - name: Install Repository
   ansible.builtin.include_role:
     name: community.zabbix.zabbix_repo
@@ -102,13 +97,17 @@
 - name: "Run the API calls to Zabbix Server"
   vars:
     gather_facts: false
-    ansible_user: "{{ zabbix_api_login_user }}"
-    ansible_httpapi_use_ssl: "{{ zabbix_api_use_ssl }}"
     ansible_network_os: community.zabbix.zabbix
     ansible_connection: httpapi
-    # Can't think of a way to make http_login_* vars be undefined -(
+    ansible_httpapi_use_ssl: "{{ zabbix_api_use_ssl }}"
+    # --- Basic Auth (Begin) ---
     http_login_user: "{{ zabbix_api_http_user | default(-42) }}"
     http_login_password: "{{ zabbix_api_http_password | default(-42) }}"
+    # --- Basic Auth (End) ---
+    ansible_user: "{{ zabbix_api_login_user }}"
+    ansible_httpapi_pass: "{{ zabbix_api_login_pass }}"
+    ansible_httpapi_port: "{{ zabbix_api_server_port }}"
+    ansible_httpapi_validate_certs: "{{ zabbix_api_validate_certs }}"
   ansible.builtin.include_tasks: api.yml
   when:
     - (zabbix_api_create_hostgroup | bool) or (zabbix_api_create_hosts | bool)
