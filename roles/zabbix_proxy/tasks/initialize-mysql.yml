@@ -3,7 +3,7 @@
 - name: "Install MySQL dependencies"
   when: zabbix_proxy_database_creation or zabbix_proxy_database_sqlload
   ansible.builtin.package:
-    name: "{{ _zabbix_proxy_mysql_dependencies[ ansible_facts['distribution_major_version'] ] | select | list }}"
+    name: "{{ _zabbix_proxy_mysql_dependencies }}"
   environment:
     http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
     https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
@@ -128,7 +128,7 @@
         encoding: "{{ zabbix_proxy_dbencoding }}"
         collation: "{{ zabbix_proxy_dbcollation }}"
         state: import
-        target: /usr/share/zabbix-sql-scripts/mysql/proxy.sql
+        target: "{{ zabbix_proxy_database_file_dir }}mysql/proxy.sql"
 
   always:
     - name: "MySQL | Revert variable overrides for schema import"

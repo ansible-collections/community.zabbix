@@ -29,11 +29,6 @@
   tags:
     - always
 
-- name: Setting Zabbix API Server Port
-  ansible.builtin.set_fact:
-    zabbix_api_server_port: "{{ '443' if zabbix_api_use_ssl|bool else '80' }}"
-  when: zabbix_api_server_port is undefined
-
 - name: "Set default ip address for zabbix_proxy_ip"
   ansible.builtin.set_fact:
     zabbix_proxy_ip: "{{ hostvars[inventory_hostname]['ansible_default_ipv4'].address }}"
@@ -128,16 +123,21 @@
 - name: Ensure proxy definition is up-to-date (added/updated/removed) for Zabbix < 7.0
   vars:
     gather_facts: false
-    ansible_user: "{{ zabbix_api_login_user }}"
     ansible_network_os: community.zabbix.zabbix
     ansible_connection: httpapi
     ansible_httpapi_use_ssl: "{{ zabbix_api_use_ssl }}"
+    # --- Basic Auth (Begin) ---
     http_login_user: "{{ zabbix_api_http_user | default(-42) }}"
     http_login_password: "{{ zabbix_api_http_password | default(-42) }}"
+    # --- Basic Auth (End) ---
+    ansible_user: "{{ zabbix_api_login_user }}"
+    ansible_httpapi_pass: "{{ zabbix_api_login_pass }}"
+    ansible_httpapi_port: "{{ zabbix_api_server_port }}"
+    ansible_httpapi_validate_certs: "{{ zabbix_api_validate_certs }}"
   community.zabbix.zabbix_proxy:
     state: "{{ zabbix_proxy_state }}"
     status: "{{ zabbix_proxy_status }}"
-    proxy_name: "{{ zabbix_proxy_name }}"
+    proxy_name: "{{ zabbix_proxy_hostname }}"
     description: "{{ zabbix_proxy_description | default(omit) }}"
     interface: "{{ zabbix_proxy_interface }}"
     tls_psk: "{{ zabbix_proxy_tlspsk_secret | default(omit) }}"
@@ -155,16 +155,21 @@
 - name: Ensure proxy definition is up-to-date (added/updated/removed) for Zabbix >= 7.0
   vars:
     gather_facts: false
-    ansible_user: "{{ zabbix_api_login_user }}"
     ansible_network_os: community.zabbix.zabbix
     ansible_connection: httpapi
     ansible_httpapi_use_ssl: "{{ zabbix_api_use_ssl }}"
+    # --- Basic Auth (Begin) ---
     http_login_user: "{{ zabbix_api_http_user | default(-42) }}"
     http_login_password: "{{ zabbix_api_http_password | default(-42) }}"
+    # --- Basic Auth (End) ---
+    ansible_user: "{{ zabbix_api_login_user }}"
+    ansible_httpapi_pass: "{{ zabbix_api_login_pass }}"
+    ansible_httpapi_port: "{{ zabbix_api_server_port }}"
+    ansible_httpapi_validate_certs: "{{ zabbix_api_validate_certs }}"
   community.zabbix.zabbix_proxy:
     state: "{{ zabbix_proxy_state }}"
     operating_mode: "{{ zabbix_proxy_status }}"
-    proxy_name: "{{ zabbix_proxy_name }}"
+    proxy_name: "{{ zabbix_proxy_hostname }}"
     description: "{{ zabbix_proxy_description | default(omit) }}"
     address: "{{ zabbix_proxy_interface['ip'] }}"
     port: "{{ zabbix_proxy_interface['port'] }}"

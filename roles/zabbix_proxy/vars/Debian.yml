@@ -1,22 +1,27 @@
 zabbix_valid_proxy_versions:
   # Debian
   "12":
+    - 7.2
     - 7.0
     - 6.4
     - 6.0
   "11":
+    - 7.2
     - 7.0
     - 6.4
     - 6.0
   "24":
+    - 7.2
     - 7.0
     - 6.4
     - 6.0
   "22":
+    - 7.2
     - 7.0
     - 6.4
     - 6.0
   "20":
+    - 7.2
     - 7.0
     - 6.4
     - 6.0
@@ -26,23 +31,8 @@ _zabbix_proxy_pgsql_dependencies:
   - python3-psycopg2
 
 _zabbix_proxy_mysql_dependencies:
-  # Debian
-  "12":
-    - "{{ zabbix_proxy_install_database_client | ternary('default-mysql-client', '') }}"
-    - python3-pymysql
-  "11":
-    - "{{ zabbix_proxy_install_database_client | ternary('default-mysql-client', '') }}"
-    - python3-pymysql
-  # Ubuntu
-  "24":
-    - "{{ zabbix_proxy_install_database_client | ternary('default-mysql-client', '') }}"
-    - python3-mysqldb
-  "22":
-    - "{{ zabbix_proxy_install_database_client | ternary('default-mysql-client', '') }}"
-    - python3-pymysql
-  "20":
-    - "{{ zabbix_proxy_install_database_client | ternary('default-mysql-client', '') }}"
-    - python3-pymysql
+  - "{{ zabbix_proxy_install_database_client | ternary('default-mysql-client', '') }}"
+  - python3-pymysql
 
 _zabbix_proxy_sqlite3_dependencies:
   - sqlite3

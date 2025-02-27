@@ -75,16 +75,16 @@ ansible-galaxy collection install community.postgresql
 
 See the following list of supported Operating systems with the Zabbix releases:
 
-| Zabbix              | 7.0 | 6.4 | 6.0 |
-|---------------------|-----|-----|-----|
-| Red Hat Fam 9       |  V  |  V  |  V  |
-| Red Hat Fam 8       |  V  |  V  |  V  |
-| Ubuntu 24.04 noble  |  V  |  V  |  V  |
-| Ubuntu 22.04 jammy  |  V  |  V  |  V  |
-| Ubuntu 20.04 focal  |     |  V  |  V  |
-| Debian 12 bookworm  |  V  |  V  |  V  |
-| Debian 11 bullseye  |     |  V  |  V  |
-| Suse Fam 15         |  V  |  V  |  V  |
+| Zabbix              | 7.2 | 7.0 | 6.4 | 6.0 |
+|---------------------|-----|-----|-----|-----|
+| Red Hat Fam 9       |  V  |  V  |  V  |  V  |
+| Red Hat Fam 8       |  V  |  V  |  V  |  V  |
+| Ubuntu 24.04 noble  |  V  |  V  |  V  |  V  |
+| Ubuntu 22.04 jammy  |  V  |  V  |  V  |  V  |
+| Ubuntu 20.04 focal  |     |     |  V  |  V  |
+| Debian 12 bookworm  |  V  |  V  |  V  |  V  |
+| Debian 11 bullseye  |     |     |  V  |  V  |
+| Suse Fam 15         |  V  |  V  |  V  |  V  |
 
 You can bypass this matrix by setting `enable_version_check: false`
 
@@ -115,7 +115,6 @@ The following is an overview of all available configuration default for this rol
 Selinux changes will be installed based on the status of selinux running on the target system.
 
 * `selinux_allow_zabbix_can_network`: Default: `False`. 
-* `selinux_allow_zabbix_can_http`: Default: `False`. 
 
 ### Zabbix Server
 

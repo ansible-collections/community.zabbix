@@ -27,6 +27,13 @@ zabbix_proxy_dbcollation: utf8_bin
 zabbix_proxy_dbencoding: utf8
 zabbix_proxy_dbpassword_hash_method: md5
 zabbix_proxy_install_database_client: true
+_zabbix_proxy_post72_database:  /usr/share/zabbix/sql-scripts/
+_zabbix_proxy_pre72_database:  /usr/share/zabbix-sql-scripts/
+zabbix_proxy_database_file_dir:  "{{ zabbix_proxy_version is version('7.0', '>') | ternary( _zabbix_proxy_post72_database, _zabbix_proxy_pre72_database ) }}"
+
+# SELinux specific
+selinux_allow_zabbix_can_network: false
+selinux_allow_daemons_enable_cluster_mode: false
 
 # Misc.
 zabbix_proxy_cat_cmd: cat
@@ -115,14 +122,13 @@ zabbix_proxy_vmwareperffrequency: 60
 zabbix_proxy_vmwaretimeout: 10
 
 # Zabbix API stuff
-zabbix_api_server_host: localhost
 zabbix_api_use_ssl: false
 zabbix_api_login_user: Admin
 zabbix_api_login_pass: !unsafe zabbix
+zabbix_api_server_host: localhost
+zabbix_api_server_port: "{{ zabbix_api_use_ssl | ternary('443', '80') }}"
 zabbix_api_validate_certs: false
-ansible_httpapi_pass: "{{ zabbix_api_login_pass }}"
-ansible_httpapi_port: "{{ zabbix_api_server_port }}"
-ansible_httpapi_validate_certs: "{{ zabbix_api_validate_certs }}"
+
 zabbix_api_timeout: 30
 zabbix_api_create_proxy: false
 zabbix_proxy_state: present
