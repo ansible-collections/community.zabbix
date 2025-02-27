@@ -21,7 +21,7 @@ platforms:
     cgroupns_mode: host
     groups:
       - agent
-      - ${MY_MOLECULE_VERSION:-v70}
+      - ${MY_MOLECULE_VERSION:-v72}
 
 provisioner:
   name: ansible
@@ -48,6 +48,8 @@ provisioner:
         zabbix_agent_tlscafile: /etc/zabbix/ca
         zabbix_repo_apt_priority: 1
         zabbix_repo_yum_gpg_check: 1
+      v72:
+        zabbix_agent_version: 7.2
       v70:
         zabbix_agent_version: 7.0
       v64:

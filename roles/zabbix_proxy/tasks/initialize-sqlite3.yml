@@ -44,7 +44,7 @@
       become_user: "{{ zabbix_os_user }}"
       ansible.builtin.shell: |
         set -euxo pipefail
-        sqlite3 {{ zabbix_proxy_dbname }} < /usr/share/zabbix-sql-scripts/sqlite3/proxy.sql
+        sqlite3 {{ zabbix_proxy_dbname }} < {{ '/usr/share/zabbix/sql-scripts/sqlite3/proxy.sql' if zabbix_proxy_version is version('7.0', '>') else '/usr/share/zabbix-sql-scripts/sqlite3/proxy.sql' }}
       args:
         creates: "{{ zabbix_proxy_dbname }}"
         executable: /bin/bash
