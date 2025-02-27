@@ -27,6 +27,9 @@ zabbix_proxy_dbcollation: utf8_bin
 zabbix_proxy_dbencoding: utf8
 zabbix_proxy_dbpassword_hash_method: md5
 zabbix_proxy_install_database_client: true
+_zabbix_proxy_post72_database:  /usr/share/zabbix/sql-scripts/
+_zabbix_proxy_pre72_database:  /usr/share/zabbix-sql-scripts/
+zabbix_proxy_database_file_dir:  "{{ zabbix_proxy_version is version('7.0', '>') | ternary( _zabbix_proxy_post72_database, _zabbix_proxy_pre72_database ) }}"
 
 # SELinux specific
 selinux_allow_zabbix_can_network: false

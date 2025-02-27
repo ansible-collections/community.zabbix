@@ -9,7 +9,7 @@ driver:
   name: default
 
 platforms:
-  - name: zabbix-proxy-${MY_MOLECULE_VERSION:-v70}-${MY_MOLECULE_DATABASE:-mysql}-${MY_MOLECULE_CONTAINER:-rockylinux8}
+  - name: zabbix-proxy-${MY_MOLECULE_VERSION:-v72}-${MY_MOLECULE_DATABASE:-mysql}-${MY_MOLECULE_CONTAINER:-rockylinux8}
     image: geerlingguy/docker-${MY_MOLECULE_IMAGE:-rockylinux8}-ansible:latest
     privileged: true
     pre_build_image: true
@@ -22,7 +22,7 @@ platforms:
     zabbix_proxy_version: ${MY_MOLECULE_VERSION:-v70}
     groups:
       - ${MY_MOLECULE_DATABASE:-mysql}
-      - ${MY_MOLECULE_VERSION:-v70}
+      - ${MY_MOLECULE_VERSION:-v72}
 
 provisioner:
   name: ansible
@@ -42,6 +42,8 @@ provisioner:
         zabbix_proxy_hostname: proxy1
         zabbix_api_server_port: 8080
         ansible_zabbix_url_path: ""
+      v72:
+        zabbix_proxy_version: 7.2
       v70:
         zabbix_proxy_version: 7.0
       v64:

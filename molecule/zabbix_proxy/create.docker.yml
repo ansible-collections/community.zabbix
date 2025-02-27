@@ -52,6 +52,7 @@
           v60: 6.0
           v64: 6.4
           v70: 7.0
+          v72: 7.2
 
     - name: Create database container for Zabbix server
       community.docker.docker_container:
