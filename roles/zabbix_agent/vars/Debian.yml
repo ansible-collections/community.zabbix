@@ -1,4 +1,2 @@
 ---
-zabbix_agent: zabbix-agent
-
 _zabbix_agent_install_recommends: false
