@@ -134,7 +134,7 @@
   ansible.builtin.file:
     path: "{{ include_dir }}"
     owner: root
-    group: zabbix
+    group: root
     mode: "{{ zabbix_agent_include_mode }}"
     state: directory
   loop: "{{ [zabbix_agent_include_dir] if zabbix_agent_include_dir is string else zabbix_agent_include_dir }}"
