@@ -32,7 +32,8 @@ def test_zabbix_agent_dot_conf(zabbix_agent_conf):
 def test_zabbix_include_dir(zabbix_agent_include_dir):
     assert zabbix_agent_include_dir.is_directory
     assert zabbix_agent_include_dir.user == "root"
-    assert zabbix_agent_include_dir.group == "zabbix"
+    assert zabbix_agent_include_dir.group == "root"
+    assert zabbix_agent_include_dir.mode == 0o755
 
 
 def test_socket(host):
