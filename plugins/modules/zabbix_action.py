@@ -7,7 +7,6 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-
 DOCUMENTATION = """
 ---
 module: zabbix_action
@@ -808,6 +807,7 @@ from ansible_collections.community.zabbix.plugins.module_utils.base import Zabbi
 from ansible.module_utils.compat.version import LooseVersion
 
 import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabbix_utils
+import re
 
 
 class Zapi(ZabbixBase):
@@ -982,7 +982,15 @@ class Zapi(ZabbixBase):
 
         """
         try:
-            discovery_rule_name, dcheck_type = discovery_check_name.split(": ")
+            dcheck_pattern = r'^([^:]+)\:\s([\w\s]+)(\s\(([\d,-]+)\))?(\s\"(.+)\")?$'
+            match = re.match(dcheck_pattern, discovery_check_name)
+            if match:
+                discovery_rule_name = match.group(1)
+                dcheck_type = match.group(2)
+                dcheck_ports = match.group(4)
+                dcheck_key = match.group(6)
+            else:
+                self._module.fail_json(msg="Discovery check name: %s does not set" % discovery_check_name)
             dcheck_type_to_number = {
                 "SSH": "0",
                 "LDAP": "1",
@@ -1002,11 +1010,6 @@ class Zapi(ZabbixBase):
                 "Telnet": "15"
             }
 
-            if dcheck_type.startswith('SNMP'):
-                # Extract type correctly from Discovery rule name
-                # <Discovery name>: SNMPv2 agent "<IOD>"
-                dcheck_type = dcheck_type.split(" \"")[0]
-
             if dcheck_type not in dcheck_type_to_number:
                 self._module.fail_json(msg="Discovery check type: %s does not exist" % dcheck_type)
 
@@ -1017,15 +1020,19 @@ class Zapi(ZabbixBase):
             })
             if len(discovery_rule_list) < 1:
                 self._module.fail_json(msg="Discovery check not found: %s" % discovery_check_name)
-
             for dcheck in discovery_rule_list[0]["dchecks"]:
-                if dcheck_type.startswith('SNMP'):
-                    if (dcheck_type_to_number[dcheck_type] == dcheck["type"]
-                            and discovery_check_name.split("\"")[1] == dcheck["key_"]):
+                if dcheck_key is not None and dcheck_ports is not None:
+                    if dcheck_type_to_number[dcheck_type] == dcheck["type"] and dcheck_key == dcheck["key_"] and dcheck_ports == dcheck["ports"]:
+                        return dcheck
+                elif dcheck_key is not None and dcheck_ports is None:
+                    if dcheck_type_to_number[dcheck_type] == dcheck["type"] and dcheck_key == dcheck["key_"]:
+                        return dcheck
+                elif dcheck_key is None and dcheck_ports is not None:
+                    if dcheck_type_to_number[dcheck_type] == dcheck["type"] and dcheck_ports == dcheck["ports"]:
                         return dcheck
                 elif dcheck_type_to_number[dcheck_type] == dcheck["type"]:
                     return dcheck
-            self._module.fail_json(msg="Discovery check not found: %s" % discovery_check_name)
+            self._module.fail_json(msg="Discovery check not found in condition: %s" % discovery_check_name)
         except Exception as e:
             self._module.fail_json(msg="Failed to get discovery check '%s': %s" % (discovery_check_name, e))
 
