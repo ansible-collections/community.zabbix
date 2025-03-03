@@ -4,6 +4,48 @@ community.zabbix Release Notes
 
 .. contents:: Topics
 
+v3.3.0
+======
+
+Major Changes
+-------------
+
+- All Roles - Updated to support version 7.2
+
+Minor Changes
+-------------
+
+- added support for Zabbix 7.2 for all modules
+- zabbix_action module - added Add host tags and Remove host tags operations
+- zabbix_action module fixed SNMP discovery check condition in discovery rule.
+- zabbix_agent role - accept several IPs in `zabbix_agent_listenip` variable.
+- zabbix_connector module added
+- zabbix_discoveryrule - add support for renaming discoveryrules
+- zabbix_group_events_info - add tag support
+- zabbix_item - add support for renaming items
+- zabbix_itemprototype - add support for renaming itemprototypes
+- zabbix_maintenance - Added ability to append host or host groups to existing maintenance.
+- zabbix_mediatype module - fix failure that started to happen since Zabbix 7.0.9
+- zabbix_proxy role - fix Zabbix proxy creation/update at Zabbix >= 7.0
+- zabbix_proxy role - fix Zabbix proxy creation/update at Zabbix server when PSK used
+- zabbix_regexp_info module added
+- zabbix_settings - add support for additional timeout settings
+- zabbix_settings - allow setting ``auditlog_mode`` on Zabbix 7.0 or higher. With this setting you can enable or disable audit logging of system actions.
+- zabbix_trigger - add support for renaming triggers
+- zabbix_triggerprototype - add support for renaming triggerprototypes
+
+Bugfixes
+--------
+
+- Java Gateway Role - Temporary work around to solve failure on RHEL9.
+- zabbix inventory plugin - do not require ``login_user`` and ``login_password`` to be present when ``auth_token`` is provided (https://github.com/ansible-collections/community.zabbix/pull/1439).
+
+New Modules
+-----------
+
+- community.zabbix.zabbix_connector - Create/Delete/Update Zabbix connectors
+- community.zabbix.zabbix_regexp_info - Retrieve Zabbix regular expression
+
 v3.2.0
 ======
 

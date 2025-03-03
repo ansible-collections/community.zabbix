@@ -1,2 +1,0 @@
-minor_changes:
-  - zabbix_agent role - accept several IPs in `zabbix_agent_listenip` variable.

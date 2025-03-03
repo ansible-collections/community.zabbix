@@ -1,3 +1,0 @@
-minor_changes:
-  - zabbix_proxy role - fix Zabbix proxy creation/update at Zabbix server when PSK used
-  - zabbix_proxy role - fix Zabbix proxy creation/update at Zabbix >= 7.0
