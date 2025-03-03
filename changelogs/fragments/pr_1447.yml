@@ -1,6 +1,0 @@
-minor_changes:
-- zabbix_item - add support for renaming items
-- zabbix_trigger - add support for renaming triggers
-- zabbix_discoveryrule - add support for renaming discoveryrules
-- zabbix_itemprototype - add support for renaming itemprototypes
-- zabbix_triggerprototype - add support for renaming triggerprototypes

@@ -1,2 +1,0 @@
-minor_changes:
-  - zabbix_mediatype module - fix failure that started to happen since Zabbix 7.0.9

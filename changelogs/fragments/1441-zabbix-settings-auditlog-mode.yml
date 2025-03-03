@@ -1,2 +1,0 @@
-minor_changes:
-  - zabbix_settings - allow setting ``auditlog_mode`` on Zabbix 7.0 or higher. With this setting you can enable or disable audit logging of system actions.
