@@ -134,7 +134,7 @@ Selinux changes will be installed based on the status of selinux running on the 
 * `zabbix_agent_apt_priority`: Add a weight (`Pin-Priority`) for the APT repository.
 * `zabbix_agent_chassis`: Default: `false`. When set to `true`, it will give Zabbix Agent access to the Linux DMI table allowing system.hw.chassis info to populate.
 * `zabbix_agent_conf_mode`: Default: `0644`. The "mode" for the Zabbix configuration file.
-* `zabbix_agent_dont_detect_ip`: Default `false`. When set to `true`, it won't detect available ip addresses on the host and no need for the Python module `netaddr` to be installed.
+* `zabbix_agent_detect_ip`: Default `true`. When set to `false`, it won't detect available ip addresses on the host and no need for the Python module `netaddr` to be installed.
 * `zabbix_agent_get_package`: The name of the zabbix-get package. Default: `zabbix-get`.
 * `zabbix_agent_include_mode`: The mode for the directory mentioned above.
 * `zabbix_agent_install_agent_only`: Only install the Zabbix Agent and not the `zabbix-sender` and `zabbix-get` packages. Default: `False`

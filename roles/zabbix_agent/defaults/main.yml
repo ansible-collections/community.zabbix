@@ -10,7 +10,8 @@ zabbox_agent_get_package: zabbix-get
 zabbix_agent_package_state: present
 zabbix_agent_selinux: false
 zabbix_agent_conf_mode: "0644"
-zabbix_agent_dont_detect_ip: false
+# Retaining backwards compatability by using the awkwardly named old variable
+zabbix_agent_detect_ip: "{{ not zabbix_agent_dont_detect_ip | default(false) }}" # True
 
 zabbix_agent_listeninterface:
 zabbix_agent_allowroot: false
