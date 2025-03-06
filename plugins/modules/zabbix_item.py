@@ -377,6 +377,12 @@ class Item(ZabbixBase):
                   'snmp_agent': 20,
                   'script': 21}
 
+    ITEM_TYPES_REQUIRING_INTERFACE_IF_HOST = {ITEM_TYPES['zabbix_agent']: 1,
+                                              ITEM_TYPES['snmp_trap']: 2,
+                                              ITEM_TYPES['snmp_agent']: 2,
+                                              ITEM_TYPES['ipmi_agent']: 3,
+                                              ITEM_TYPES['jmx_agent']: 4}
+
     VALUE_TYPES = {'numeric_float': 0,
                    'character': 1,
                    'log': 2,
@@ -528,6 +534,11 @@ class Item(ZabbixBase):
             self._module.fail_json(msg="Failed to delete item: %s" % e)
         return results
 
+    def get_host_main_interfaces_for_type(self, host_id, type_id):
+        try:
+            return self._zapi.hostinterface.get({"hostids": host_id, "filter": {"type": type_id, "main": "1"}})
+        except Exception as e:
+            self._module.fail_json(msg="Failed to get interfaces for host: %s" % e)
 
 def main():
     argument_spec = zabbix_utils.zabbix_common_argument_spec()
@@ -586,6 +597,12 @@ def main():
             for host_template in hosts_templates:
                 if 'hostid' in host_template:
                     params['hostid'] = host_template['hostid']
+                    if params['type'] in item.ITEM_TYPES_REQUIRING_INTERFACE_IF_HOST:
+                        host_interfaces = item.get_host_main_interfaces_for_type(host_template['hostid'], item.ITEM_TYPES_REQUIRING_INTERFACE_IF_HOST[params['type']])
+                        if(len(host_interfaces) > 0):
+                            params['interfaceid'] = host_interfaces[0]['interfaceid']
+                        else:
+                            module.fail_json(msg="interface not found on host")
                 elif 'templateid' in host_template:
                     params['hostid'] = host_template['templateid']
                 else:

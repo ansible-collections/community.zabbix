@@ -284,3 +284,19 @@
 - name: assert that nothing has been changed
   ansible.builtin.assert:
     that: not zbxtempitem_missing_delete is changed
+
+- name: test - create new Zabbix item on host using type zabbix_agent
+  community.zabbix.zabbix_item:
+    name: TestItem
+    host_name: ExampleHost
+    params:
+      type: zabbix_agent
+      key: agent.version
+      value_type: text
+      interval: 1m
+    state: present
+  register: zbxhostitemagent_new
+
+- name: assert that item was created
+  ansible.builtin.assert:
+    that: zbxhostitemagent_new is changed
