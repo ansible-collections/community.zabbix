@@ -44,8 +44,10 @@ provisioner:
         zabbix_proxy_hostname: proxy1
         zabbix_api_server_port: 8080
         ansible_zabbix_url_path: ""
+        zabbix_proxy_server: 0.0.0.0/0
+        zabbix_proxy_proxymode: 1
         zabbix_proxy_status: passive
-        zabbix_proxy_tlsconnect: psk
+        zabbix_proxy_tlsaccept: psk
         zabbix_proxy_tlspskfile: "/home/zabbix/proxy_psk"
         zabbix_proxy_tlspskidentity: "PSK {{ inventory_hostname }}"
         zabbix_proxy_tlspsk_secret: 'f1447b20c0243f3304062d3641fe7e341eb0106bd1adb4273f21659a7717ae6f'
@@ -92,4 +94,5 @@ scenario:
     - create
     - prepare
     - converge
+    - verify
     - destroy

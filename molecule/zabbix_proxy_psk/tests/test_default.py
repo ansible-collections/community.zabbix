@@ -52,3 +52,4 @@ def test_zabbix_proxy_logfile(host):
     assert not zabbix_logfile.contains("Both are missing in the system.")  # Missing fping
     assert zabbix_logfile.contains("current database version")
     assert zabbix_logfile.contains(r"proxy #0 started \[main process\]")
+    assert zabbix_logfile.contains(r"received configuration data from server")
