@@ -47,6 +47,7 @@ provisioner:
         zabbix_proxy_server: zabbix-proxy-psk-active-${MY_MOLECULE_VERSION:-v72}-${MY_MOLECULE_DATABASE:-mysql}-${MY_MOLECULE_CONTAINER:-rockylinux8}-zserver
         zabbix_proxy_proxymode: 0
         zabbix_proxy_status: active
+        zabbix_proxy_configfrequency: 10
         zabbix_proxy_tlsconnect: psk
         zabbix_proxy_tlspskfile: "/home/zabbix/proxy_psk"
         zabbix_proxy_tlspskidentity: "PSK {{ inventory_hostname }}"
