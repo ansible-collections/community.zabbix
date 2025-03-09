@@ -20,7 +20,6 @@
           owner: zabbix
           group: zabbix
 
-
       - name: "Create certificate file"
         ansible.builtin.copy:
           dest: "{{ zabbix_agent_tlscertfile }}"
@@ -119,8 +118,6 @@
           group: zabbix
           mode: 0444
         become: true
-
-      when: zabbix_agent_tlscertfile is defined
 
 - name: Prepare
   hosts: docker
