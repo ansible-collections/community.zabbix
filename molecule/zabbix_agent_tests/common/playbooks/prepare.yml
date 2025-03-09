@@ -13,17 +13,6 @@
       when:
         - ansible_os_family == 'RedHat'
 
-    - name: "Installing packages on CentOS (Sangoma) family"
-      ansible.builtin.package:
-        pkg:
-          - net-tools
-          - which
-        state: present
-      register: zabbix_agent_prepare_packages_install
-      until: zabbix_agent_prepare_packages_install is succeeded
-      when:
-        - ansible_os_family == 'Sangoma'
-
     - name: "Installing packages on Debian family"
       ansible.builtin.apt:
         name:
