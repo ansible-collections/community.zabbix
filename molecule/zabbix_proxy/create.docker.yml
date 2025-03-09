@@ -83,6 +83,7 @@
           POSTGRES_USER: "zabbix"
           POSTGRES_PASSWORD: "zabbix"
           POSTGRES_DB: "zabbix"
+          ZBX_PROXYCONFIGFREQUENCY: "10"
         links:
           - "{{ item.name }}-zserver-db"
       loop: "{{ molecule_yml.platforms }}"

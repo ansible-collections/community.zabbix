@@ -37,6 +37,7 @@ jobs:
         collection_role:
           - zabbix_proxy
           - zabbix_proxy_psk
+          - zabbix_proxy_psk_active
         database:
           - mysql
           - pgsql

@@ -9,7 +9,7 @@ driver:
   name: default
 
 platforms:
-  - name: zabbix-proxy-psk-${MY_MOLECULE_VERSION:-v72}-${MY_MOLECULE_DATABASE:-mysql}-${MY_MOLECULE_CONTAINER:-rockylinux8}
+  - name: zabbix-proxy-psk-active-${MY_MOLECULE_VERSION:-v72}-${MY_MOLECULE_DATABASE:-mysql}-${MY_MOLECULE_CONTAINER:-rockylinux8}
     image: geerlingguy/docker-${MY_MOLECULE_IMAGE:-rockylinux8}-ansible:latest
     privileged: true
     pre_build_image: true
@@ -44,10 +44,11 @@ provisioner:
         zabbix_proxy_hostname: proxy1
         zabbix_api_server_port: 8080
         ansible_zabbix_url_path: ""
-        zabbix_proxy_server: 0.0.0.0/0
-        zabbix_proxy_proxymode: 1
-        zabbix_proxy_status: passive
-        zabbix_proxy_tlsaccept: psk
+        zabbix_proxy_server: zabbix-proxy-psk-active-${MY_MOLECULE_VERSION:-v72}-${MY_MOLECULE_DATABASE:-mysql}-${MY_MOLECULE_CONTAINER:-rockylinux8}-zserver
+        zabbix_proxy_proxymode: 0
+        zabbix_proxy_status: active
+        zabbix_proxy_configfrequency: 10
+        zabbix_proxy_tlsconnect: psk
         zabbix_proxy_tlspskfile: "/home/zabbix/proxy_psk"
         zabbix_proxy_tlspskidentity: "PSK {{ inventory_hostname }}"
         zabbix_proxy_tlspsk_secret: 'f1447b20c0243f3304062d3641fe7e341eb0106bd1adb4273f21659a7717ae6f'

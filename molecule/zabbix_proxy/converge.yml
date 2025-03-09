@@ -2,3 +2,7 @@
 - hosts: all
   roles:
     - role: zabbix_proxy
+  tasks:
+    - name: Pause before verify action to wait for connection between Proxy and Server
+      ansible.builtin.pause:
+        minutes: 1
