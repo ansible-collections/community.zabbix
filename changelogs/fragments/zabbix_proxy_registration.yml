@@ -1,0 +1,3 @@
+---
+bugfixes::
+  - zabbix_proxy role - fix Zabbix proxy with encryptuion registration
