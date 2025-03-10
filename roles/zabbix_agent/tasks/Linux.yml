@@ -25,51 +25,16 @@
         zabbix_agent_ip: "{{ ansible_facts['all_ipv4_addresses'] | ansible.utils.ipaddr('public') | first }}"
       when: ansible_facts['all_ipv4_addresses'] | ansible.utils.ipaddr('public') | length > 0
 
-- name: "Fail invalid specified agent_listeninterface"
-  ansible.builtin.fail:
-    msg: "The specified network interface does not exist"
+- name: "Validate zabbix_agent_listenip"
+  ansible.builtin.assert:
+    that:
+      - _listen_ip in ansible_facts['all_ipv4_addresses']
+    fail_msg: "listenip: {{ _listenip }} is not an address available on {{ inventory_hostname }}"
   when:
-    - (zabbix_agent_listeninterface)
-    - (zabbix_agent_listeninterface not in ansible_interfaces)
-  tags:
-    - config
-
-- name: "Set network interface"
-  ansible.builtin.set_fact:
-    network_interface: ansible_{{ zabbix_agent_listeninterface }}
-  when:
-    - (zabbix_agent_listeninterface)
-    - zabbix_agent_listenip is undefined
-  tags:
-    - config
-
-- name: "Get IP of agent_listeninterface when no agent_listenip specified"
-  ansible.builtin.set_fact:
-    zabbix_agent_listenip: "{{ hostvars[inventory_hostname][network_interface]['ipv4'].address | default('0.0.0.0') }}"
-  when:
-    - (zabbix_agent_listeninterface)
-    - zabbix_agent_listenip is undefined
-  tags:
-    - config
-    - api
-
-- name: "Default agent_listenip to all when not specified"
-  ansible.builtin.set_fact:
-    zabbix_agent_listenip: "0.0.0.0"
-  when:
-    - zabbix_agent_listenip is undefined
-  tags:
-    - config
-
-- name: "Fail invalid specified agent_listenip"
-  ansible.builtin.fail:
-    msg: "The {{ item }} (agent_listenip) does not exist"
-  when:
-    - item != '0.0.0.0'
-    - item != '127.0.0.1'
-    - item not in ansible_all_ipv4_addresses
-  with_items:
-    "{{ zabbix_agent_listenip | split(',') }}"
+    - _listenip not in ['127.0.0.1', '0.0.0.0']
+  loop: "{{ zabbix_agent_listenip | split(',') }}"
+  loop_control:
+    loop_var: _listenip
   tags:
     - config
 

@@ -138,7 +138,6 @@ Selinux changes will be installed based on the status of selinux running on the 
 * `zabbix_agent_get_package`: The name of the zabbix-get package. Default: `zabbix-get`.
 * `zabbix_agent_include_mode`: The mode for the directory mentioned above.
 * `zabbix_agent_install_agent_only`: Only install the Zabbix Agent and not the `zabbix-sender` and `zabbix-get` packages. Default: `False`
-* `zabbix_agent_listeninterface`: Interface zabbix-agent listens on. Leave blank for all.
 * `zabbix_agent_package_remove`: If `zabbix_agent2: True` and you want to remove the old installation. Default: `False`.
 * `zabbix_agent_package_state`: If Zabbix-agent needs to be `present` (default) or `latest`.
 * `zabbix_agent_package`: The name of the zabbix-agent package. Default: `zabbix-agent` if `zabbix_agent2` is false and `zabbix-agent2` if `true`.

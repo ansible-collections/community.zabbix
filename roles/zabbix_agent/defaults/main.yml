@@ -17,7 +17,6 @@ zabbix_agent_detect_ip: "{{ not zabbix_agent_dont_detect_ip | default(false) }}"
 zabbix_agent_pidfile: "{{ _pidfile }}"
 zabbix_agent_service: "{{ _agent_service }}"
 
-zabbix_agent_listeninterface:
 zabbix_agent_allowroot: false
 zabbix_agent_buffersend: 5
 zabbix_agent_buffersize: 100
