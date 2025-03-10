@@ -77,32 +77,6 @@
   ansible.builtin.include_tasks: selinux.yml
   when: ansible_facts.selinux.status | default('disabled') == 'enabled'
 
-- name: "Adding zabbix group"
-  ansible.builtin.group:
-    name: zabbix
-    state: present
-    gid: "{{ zabbix_agent_docker_user_gid | default(omit) }}"
-  become: true
-  when:
-    - zabbix_agent_docker | bool
-  tags:
-    - config
-
-- name: "Adding zabbix user"
-  ansible.builtin.user:
-    name: zabbix
-    group: zabbix
-    state: present
-    create_home: false
-    home: /etc/zabbix
-    uid: "{{ zabbix_agent_docker_user_uid | default(omit) }}"
-    system: true
-  become: true
-  when:
-    - zabbix_agent_docker | bool
-  tags:
-    - config
-
 - name: "Configure zabbix-agent"
   ansible.builtin.template:
     src: agent.conf.j2
