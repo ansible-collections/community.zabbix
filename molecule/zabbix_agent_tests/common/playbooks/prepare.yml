@@ -2,55 +2,6 @@
 - name: Prepare
   hosts: all
   tasks:
-    - name: "Installing packages on CentOS family"
-      ansible.builtin.package:
-        pkg:
-          - net-tools
-          - which
-        state: present
-      register: zabbix_agent_prepare_packages_install
-      until: zabbix_agent_prepare_packages_install is succeeded
-      when:
-        - ansible_os_family == 'RedHat'
-
-    - name: "Installing packages on CentOS (Sangoma) family"
-      ansible.builtin.package:
-        pkg:
-          - net-tools
-          - which
-        state: present
-      register: zabbix_agent_prepare_packages_install
-      until: zabbix_agent_prepare_packages_install is succeeded
-      when:
-        - ansible_os_family == 'Sangoma'
-
-    - name: "Installing packages on Debian family"
-      ansible.builtin.apt:
-        name:
-          - "{{ 'net-tools' if ansible_distribution_major_version not in ['20'] else 'iproute2' }}"
-        state: present
-        update_cache: true
-      register: zabbix_agent_prepare_packages_install
-      until: zabbix_agent_prepare_packages_install is succeeded
-      when:
-        - ansible_os_family == 'Debian'
-
-    - name: "Installing packages on Suse family"
-      community.general.zypper:
-        name:
-          - python3-xml
-          - python3-libxml2
-          - net-tools
-          - iproute2
-          - which
-        state: present
-      register: zabbix_agent_prepare_packages_install
-      until: zabbix_agent_prepare_packages_install is succeeded
-      when:
-        - ansible_os_family == 'Suse'
-      tags:
-        - skip_ansible_lint
-
     - block:
       - name: 'Create zabbix group'
         ansible.builtin.group:
@@ -68,7 +19,6 @@
           state: directory
           owner: zabbix
           group: zabbix
-
 
       - name: "Create certificate file"
         ansible.builtin.copy:
@@ -168,48 +118,3 @@
           group: zabbix
           mode: 0444
         become: true
-
-      when: zabbix_agent_tlscertfile is defined
-
-- name: Prepare
-  hosts: docker
-  tasks:
-    - name: "Download Docker CE repo file"
-      when: not ansible_check_mode # Because get_url always has changed status in check_mode.
-      ansible.builtin.get_url:
-        url: https://download.docker.com/linux/centos/docker-ce.repo
-        dest: /etc/yum.repos.d/docker-ce.repo
-        mode: 0644
-      register: zabbix_agent_prepare_docker_repo
-      until: zabbix_agent_prepare_docker_repo is succeeded
-
-    - name: "Installing Epel"
-      ansible.builtin.package:
-        pkg:
-          - epel-release
-        state: present
-      register: zabbix_agent_prepare_docker_install
-      until: zabbix_agent_prepare_docker_install is succeeded
-
-    - name: "Installing Docker"
-      ansible.builtin.package:
-        pkg:
-          - docker-ce
-          - python-pip
-          - python-setuptools
-        state: present
-      register: zabbix_agent_prepare_docker_install
-      until: zabbix_agent_prepare_docker_install is succeeded
-
-    - name: "Installing Docker Python"
-      ansible.builtin.pip:
-        name:
-          - docker
-        state: present
-      register: zabbix_agent_prepare_docker_install
-      until: zabbix_agent_prepare_docker_install is succeeded
-
-    - name: "Starting Docker service"
-      ansible.builtin.service:
-        name: docker
-        state: started
