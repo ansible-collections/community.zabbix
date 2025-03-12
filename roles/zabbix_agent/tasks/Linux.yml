@@ -28,7 +28,7 @@
 - name: "Validate zabbix_agent_listenip"
   ansible.builtin.assert:
     that:
-      - _listen_ip in ansible_facts['all_ipv4_addresses']
+      - _listenip in ansible_facts['all_ipv4_addresses']
     fail_msg: "listenip: {{ _listenip }} is not an address available on {{ inventory_hostname }}"
   when:
     - _listenip not in ['127.0.0.1', '0.0.0.0']
