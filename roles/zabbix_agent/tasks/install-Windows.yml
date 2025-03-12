@@ -1,11 +1,4 @@
 ---
-- name: "Windows | Set some variables"
-  ansible.builtin.set_fact:
-    zabbix_agent_win_download_link: "{{ zabbix_agent_win_download_link is defined | ternary(zabbix_agent_win_download_link, zabbix_agent2_win_download_link) | default(_win_download_link) }}"
-    zabbix_agent_win_logfile: "{{ zabbix_agent_win_logfile is defined | ternary(zabbix_agent_win_logfile, zabbix_agent2_win_logfile) | default(_win_logfile) }}"
-    zabbix_agent_win_package: "{{ zabbix_agent_win_package is defined | ternary(zabbix_agent_win_package, zabbix_agent2_win_package) | default(_win_package) }}"
-    zabbix_agent_win_include: "{{ zabbix_agent_win_include is defined | ternary(zabbix_agent_win_include, zabbix_agent2_win_include) | default(_win_include) }}"
-
 - name: "Windows | Set default architecture"
   ansible.builtin.set_fact:
     windows_arch: 32
@@ -192,8 +185,6 @@
 
 - name: "Windows | Set installation settings (agent 2)"
   ansible.builtin.set_fact:
-    zabbix_win_package: "{{ zabbix_win_package | default(_win_package) }}"
-    zabbix_win_download_link: "{{ zabbix_win_download_link | default(_win_download_link) }}"
     zabbix_win_exe_path: "{{ zabbix2_win_exe_path }}"
     zabbix_win_config_name: "{{ zabbix2_win_config_name }}"
     zabbix_win_svc_name: "{{ zabbix2_win_svc_name }}"
@@ -203,7 +194,7 @@
 
 - name: "Windows | Check if agent file is already downloaded"
   ansible.windows.win_stat:
-    path: '{{ zabbix_win_install_dir }}\{{ zabbix_win_package }}'
+    path: '{{ zabbix_win_install_dir }}\{{ zabbix_agent_win_package }}'
   register: file_info
   tags:
     - install
@@ -217,8 +208,8 @@
 
 - name: "Windows | Download Zabbix Agent Zip file"
   ansible.windows.win_get_url:
-    url: "{{ zabbix_win_download_link }}"
-    dest: '{{ zabbix_win_install_dir }}\{{ zabbix_win_package }}'
+    url: "{{ zabbix_agent_win_download_link }}"
+    dest: '{{ zabbix_win_install_dir }}\{{ zabbix_agent_win_package }}'
     url_username: "{{ zabbix_download_user | default(omit) }}"
     url_password: "{{ zabbix_download_pass | default(omit) }}"
     force: false
@@ -237,7 +228,7 @@
 
 - name: "Windows | Unzip file"
   community.windows.win_unzip:
-    src: '{{ zabbix_win_install_dir }}\{{ zabbix_win_package }}'
+    src: '{{ zabbix_win_install_dir }}\{{ zabbix_agent_win_package }}'
     dest: "{{ zabbix_win_install_dir }}"
     creates: "{{ zabbix_win_exe_path }}"
   tags:
@@ -245,7 +236,7 @@
 
 - name: "Windows | Cleanup downloaded Zabbix Agent Zip file"
   ansible.windows.win_file:
-    path: '{{ zabbix_win_install_dir }}\{{ zabbix_win_package }}'
+    path: '{{ zabbix_win_install_dir }}\{{ zabbix_agent_win_package }}'
     state: absent
   when:
     - zabbix_agent_win_download_zip.changed
