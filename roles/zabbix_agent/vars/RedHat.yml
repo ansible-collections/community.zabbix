@@ -7,6 +7,9 @@ _zabbix_agent_package: "{{ zabbix_agent2 | ternary('zabbix-agent2', 'zabbix-agen
 _zabbix_agent_get_package: "zabbix-get-{{ zabbix_agent_version }}.{{ zabbix_agent_version_minor }}"
 _zabbix_agent_sender_package: "zabbix-sender-{{ zabbix_agent_version }}.{{ zabbix_agent_version_minor }}"
 
+_zabbix_agent_disable_repo:
+  - epel
+
 zabbix_valid_agent_versions:
   "9":
     - 7.2

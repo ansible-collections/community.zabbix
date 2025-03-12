@@ -57,8 +57,13 @@
     - ansible_facts['os_family'] not in ['Windows', 'Darwin']
 
 - name: "Install the agent"
-  ansible.builtin.include_tasks: "install-{{ ansible_facts['os_family'] }}.yml"
   when: not (zabbix_agent_docker | bool)
+  ansible.builtin.include_tasks: "{{ _install_tasks_file }}"
+  with_first_found:
+    - "install-{{ ansible_facts['os_family'] }}.yml"
+    - "install.yml"
+  loop_control:
+    loop_var: _install_tasks_file
 
 - name: Configure PSK
   when: "( 'psk' in zabbix_agent_tlsaccept ) or (zabbix_agent_tlsconnect  == 'psk')"

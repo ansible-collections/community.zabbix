@@ -60,14 +60,6 @@ selinux_allow_zabbix_run_sudo: false
 
 zabbix_agent_install_agent_only: false
 
-# Zabbix role related vars
-zabbix_apt_force_apt_get: true
-zabbix_apt_install_recommends: false
-
-# Override Ansible specific facts
-zabbix_agent_disable_repo:
-  - epel
-
 # Zabbix API stuff
 zabbix_api_use_ssl: false
 zabbix_api_login_user: Admin
