@@ -5,10 +5,10 @@ zabbix_agent2: false
 zabbix_agent_version_minor: "*"
 zabbix_version_patch: 0
 zabbix_agent_package_remove: false
-zabbix_agent_sender_package: zabbix-sender
-zabbox_agent_get_package: zabbix-get
 zabbix_agent_package: "{{ _zabbix_agent_package | default(zabbix_agent2 | ternary('zabbix-agent2', 'zabbix-agent')) }}"
 zabbix_agent_package_state: present
+zabbix_agent_get_package: "{{ _zabbix_agent_get_package | default('zabbix-get') }}"
+zabbix_agent_sender_package: "{{ _zabbix_agent_sender_package | default('zabbix-sender') }}"
 zabbix_agent_selinux: false
 zabbix_agent_conf_mode: "0644"
 # Retaining backwards compatability by using the awkwardly named old variable
