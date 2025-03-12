@@ -4,7 +4,7 @@
 - name: "RedHat | Installing zabbix-agent"
   ansible.builtin.package:
     pkg:
-      - "{{ zabbix_agent_package }}-{{ zabbix_agent_version }}.{{ zabbix_agent_version_minor }}"
+      - "{{ zabbix_agent_package }}"
     disablerepo: "{{ zabbix_agent_disable_repo | default(omit) }}"
     state: "{{ zabbix_agent_package_state }}"
   environment:
