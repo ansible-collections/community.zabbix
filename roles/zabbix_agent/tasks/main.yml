@@ -22,7 +22,7 @@
     - always
 
 - name: Load Appropriate Defaults
-  ansible.builtin.include_vars: "agent{{ '2' if zabbix_agent2 is defined and zabbix_agent2|bool }}_vars.yml"
+  ansible.builtin.include_vars: "{{ zabbix_agent2 | ternary('agent2', 'agent') }}_vars.yml"
 
 - when: zabbix_agent_tlspsk_auto | bool
   tags:
