@@ -1,119 +1,46 @@
 ---
 - name: "Set default ip address for zabbix_agent_ip"
   ansible.builtin.set_fact:
-    zabbix_agent_ip: "{{ hostvars[inventory_hostname]['ansible_default_ipv4'].address }}"
+    zabbix_agent_ip: "{{ ansible_facts['default_ipv4'].address }}"
   when:
     - zabbix_agent_ip is not defined
-    - "'ansible_default_ipv4' in hostvars[inventory_hostname]"
+    - ansible_facts['default_ipv4'].address is defined
   tags:
     - config
 
-- name: "Get Total Private IP Addresses"
-  ansible.builtin.set_fact:
-    total_private_ip_addresses: "{{ ansible_all_ipv4_addresses | ansible.utils.ipaddr('private') | length }}"
-  when:
-    - ansible_all_ipv4_addresses is defined
-    - not (zabbix_agent_dont_detect_ip)
-  tags:
-    - config
-
-- name: "Set first public ip address for zabbix_agent_ip"
-  ansible.builtin.set_fact:
-    zabbix_agent_ip: "{{ ansible_all_ipv4_addresses | ansible.netcommon.ipaddr('public') | first }}"
+# Fun fact, the first set_fact that successfully defines zabbix_agent_ip
+# breaks the block, so no further tasks are run within the block.
+- name: "Detect IPv4 address"
   when:
     - zabbix_agent_ip is not defined
-    - total_private_ip_addresses is defined
-    - total_private_ip_addresses == '0'
-  tags:
-    - config
+    - zabbix_agent_detect_ip
+  block:
+    - name: "Set first private ip address for zabbix_agent_ip"
+      ansible.builtin.set_fact:
+        zabbix_agent_ip: "{{ ansible_facts['all_ipv4_addresses'] | ansible.utils.ipaddr('private') | first }}"
+      when: ansible_facts['all_ipv4_addresses'] | ansible.utils.ipaddr('private') | length > 0
 
-- name: "Set first private ip address for zabbix_agent_ip"
-  ansible.builtin.set_fact:
-    zabbix_agent_ip: "{{ ansible_all_ipv4_addresses | ansible.netcommon.ipaddr('private') | first }}"
-  when:
-    - zabbix_agent_ip is not defined
-    - total_private_ip_addresses is defined
-    - total_private_ip_addresses != '0'
-  tags:
-    - config
+    - name: "Set first public ip address for zabbix_agent_ip"
+      ansible.builtin.set_fact:
+        zabbix_agent_ip: "{{ ansible_facts['all_ipv4_addresses'] | ansible.utils.ipaddr('public') | first }}"
+      when: ansible_facts['all_ipv4_addresses'] | ansible.utils.ipaddr('public') | length > 0
 
-- name: "Fail invalid specified agent_listeninterface"
-  ansible.builtin.fail:
-    msg: "The specified network interface does not exist"
+- name: "Validate zabbix_agent_listenip"
+  ansible.builtin.assert:
+    that:
+      - _listen_ip in ansible_facts['all_ipv4_addresses']
+    fail_msg: "listenip: {{ _listenip }} is not an address available on {{ inventory_hostname }}"
   when:
-    - (zabbix_agent_listeninterface)
-    - (zabbix_agent_listeninterface not in ansible_interfaces)
-  tags:
-    - config
-
-- name: "Set network interface"
-  ansible.builtin.set_fact:
-    network_interface: ansible_{{ zabbix_agent_listeninterface }}
-  when:
-    - (zabbix_agent_listeninterface)
-    - zabbix_agent_listenip is undefined
-  tags:
-    - config
-
-- name: "Get IP of agent_listeninterface when no agent_listenip specified"
-  ansible.builtin.set_fact:
-    zabbix_agent_listenip: "{{ hostvars[inventory_hostname][network_interface]['ipv4'].address | default('0.0.0.0') }}"
-  when:
-    - (zabbix_agent_listeninterface)
-    - zabbix_agent_listenip is undefined
-  tags:
-    - config
-    - api
-
-- name: "Default agent_listenip to all when not specified"
-  ansible.builtin.set_fact:
-    zabbix_agent_listenip: "0.0.0.0"
-  when:
-    - zabbix_agent_listenip is undefined
-  tags:
-    - config
-
-- name: "Fail invalid specified agent_listenip"
-  ansible.builtin.fail:
-    msg: "The {{ item }} (agent_listenip) does not exist"
-  when:
-    - item != '0.0.0.0'
-    - item != '127.0.0.1'
-    - item not in ansible_all_ipv4_addresses
-  with_items:
-    "{{ zabbix_agent_listenip | split(',') }}"
+    - _listenip not in ['127.0.0.1', '0.0.0.0']
+  loop: "{{ zabbix_agent_listenip | split(',') }}"
+  loop_control:
+    loop_var: _listenip
   tags:
     - config
 
 - name: "Configure SELinux when enabled"
   ansible.builtin.include_tasks: selinux.yml
   when: ansible_facts.selinux.status | default('disabled') == 'enabled'
-
-- name: "Adding zabbix group"
-  ansible.builtin.group:
-    name: zabbix
-    state: present
-    gid: "{{ zabbix_agent_docker_user_gid | default(omit) }}"
-  become: true
-  when:
-    - zabbix_agent_docker | bool
-  tags:
-    - config
-
-- name: "Adding zabbix user"
-  ansible.builtin.user:
-    name: zabbix
-    group: zabbix
-    state: present
-    create_home: false
-    home: /etc/zabbix
-    uid: "{{ zabbix_agent_docker_user_uid | default(omit) }}"
-    system: true
-  become: true
-  when:
-    - zabbix_agent_docker | bool
-  tags:
-    - config
 
 - name: "Configure zabbix-agent"
   ansible.builtin.template:

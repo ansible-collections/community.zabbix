@@ -1,4 +1,26 @@
 ---
+- name: "Adding zabbix group"
+  ansible.builtin.group:
+    name: zabbix
+    state: present
+    gid: "{{ zabbix_agent_docker_user_gid | default(omit) }}"
+  become: true
+  tags:
+    - config
+
+- name: "Adding zabbix user"
+  ansible.builtin.user:
+    name: zabbix
+    group: zabbix
+    state: present
+    create_home: false
+    home: /etc/zabbix
+    uid: "{{ zabbix_agent_docker_user_uid | default(omit) }}"
+    system: true
+  become: true
+  tags:
+    - config
+
 - name: "Create volume mount string"
   ansible.builtin.set_fact:
     zabbix_agent_docker_include_dir: "{{ (zabbix_agent_include_dir is iterable) | ternary(zabbix_agent_include_dir[0], zabbix_agent_include_dir) }}"
