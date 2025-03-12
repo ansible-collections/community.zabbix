@@ -24,7 +24,10 @@
 - name: Load Appropriate Defaults
   ansible.builtin.include_vars: "agent{{ '2' if zabbix_agent2 is defined and zabbix_agent2|bool }}_vars.yml"
 
-- block:
+- when: zabbix_agent_tlspsk_auto | bool
+  tags:
+    - config
+  block:
     - name: AutoPSK | Default tlsconnect to enforce PSK
       ansible.builtin.set_fact:
         zabbix_agent_tlsconnect: psk
@@ -41,21 +44,6 @@
         - zabbix_agent_tlsaccept is defined
         - not 'psk' in zabbix_agent_tlsaccept
 
-  when: zabbix_agent_tlspsk_auto | bool
-  tags:
-    - config
-
-- name: Set Variables
-  ansible.builtin.set_fact:
-    zabbix_agent_include_dir: "{{ zabbix_agent_include_dir is defined | ternary(zabbix_agent_include_dir, _include) }}"
-    zabbix_agent_logfile: "{{ zabbix_agent_logfile is defined | ternary(zabbix_agent_logfile, _logfile) }}"
-    zabbix_agent_package: "{{ zabbix_agent_package is defined | ternary(zabbix_agent_package, _agent_package) }}"
-    zabbix_agent_pidfile: "{{ zabbix_agent_pidfile is defined | ternary(zabbix_agent_pidfile, _pidfile) }}"
-    zabbix_agent_service: "{{ zabbix_agent_service is defined | ternary(zabbix_agent_service, _agent_service) }}"
-    zabbix_agent_tls_subject: "{{ zabbix_agent_tls_subject is defined | ternary(zabbix_agent_tls_subject, _tls_subject) }}"
-    zabbix_agent_tlsaccept: "{{ zabbix_agent_tlsaccept is defined | ternary(zabbix_agent_tlsaccept, 'unencrypted')}}"
-    zabbix_agent_tlsconnect: "{{ zabbix_agent_tlsconnect is defined | ternary(zabbix_agent_tlsconnect, 'unencrypted')}}"
-
 - name: Install Repository
   ansible.builtin.include_role:
     name: community.zabbix.zabbix_repo
@@ -66,7 +54,7 @@
   when:
     - zabbix_manage_repo | default(true)
     - not (zabbix_agent_docker | bool)
-    - ansible_os_family != "Windows"
+    - ansible_facts['os_family'] not in ['Windows', 'Darwin']
 
 - name: "Install the correct repository"
   ansible.builtin.include_tasks: "{{ ansible_os_family }}.yml"
@@ -93,6 +81,18 @@
   ansible.builtin.include_tasks: Linux.yml
   when:
     - (ansible_os_family != "Windows" and ansible_os_family != "Darwin") or (zabbix_agent_docker | bool)
+
+- meta: flush_handlers
+
+- name: "Ensure zabbix-agent is enabled and running"
+  when: ansible_facts['os_family'] not in ['Windows']
+  ansible.builtin.service:
+    name: "{{ zabbix_agent_service }}"
+    state: started
+    enabled: true
+  become: true
+  tags:
+    - service
 
 - name: "Run the API calls to Zabbix Server"
   vars:

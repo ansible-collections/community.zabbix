@@ -12,14 +12,11 @@ zabbix_useuip: 1
 
 # Database
 zabbix_proxy_database: mysql
-zabbix_proxy_dbhost: localhost
-zabbix_proxy_dbname: zabbix_proxy
-zabbix_proxy_dbpassword: zabbix_proxy
-_zabbix_proxy_database_default_port:
-  mysql: 3306
-  pgsql: 5432
-zabbix_proxy_dbport: "{{ _zabbix_proxy_database_default_port[zabbix_proxy_database] }}"
 zabbix_proxy_dbuser: zabbix_proxy
+zabbix_proxy_dbpassword: zabbix_proxy
+zabbix_proxy_dbhost: localhost
+zabbix_proxy_dbport: "{{ _zabbix_proxy_database_default_port[zabbix_proxy_database] }}"
+zabbix_proxy_dbname: zabbix_proxy
 zabbix_proxy_database_creation: true
 zabbix_proxy_database_sqlload: true
 zabbix_proxy_dbhost_run_install: true

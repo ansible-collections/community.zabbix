@@ -38,12 +38,3 @@
   become: true
   tags:
     - install
-
-- name: "Suse | Enable the service"
-  ansible.builtin.service:
-    name: "{{ zabbix_agent_service }}"
-    enabled: true
-    use: service
-  become: true
-  tags:
-    - service

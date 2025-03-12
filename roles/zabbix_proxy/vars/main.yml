@@ -1,0 +1,4 @@
+---
+_zabbix_proxy_database_default_port:
+  mysql: 3306
+  pgsql: 5432
