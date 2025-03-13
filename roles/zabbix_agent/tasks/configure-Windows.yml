@@ -4,6 +4,16 @@
   tags:
     - config
   block:
+    - name: AutoPSK | Set Path Variables for Windows
+      ansible.builtin.set_fact:
+        zabbix_agent_tlspskfile: "{{ zabbix_win_install_dir }}\\tls_psk_auto.secret.txt"
+        zabbix_agent_tlspskidentity_file: "{{ zabbix_win_install_dir }}\\tls_psk_auto.identity.txt"
+
+    - name: AutoPSK | Check for existing TLS PSK file
+      ansible.windows.win_stat:
+        path: "{{ zabbix_agent_tlspskfile }}"
+      register: zabbix_agent_tlspskcheck
+
     - name: Gather PSK Secret Info
       ansible.builtin.include_tasks: psk_secret.yml
 
