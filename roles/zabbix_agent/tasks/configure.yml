@@ -46,6 +46,21 @@
     - name: Gather PSK Identity Info
       ansible.builtin.include_tasks: psk_identity.yml
 
+    - name: AutoPSK | Template PSK Identity
+      ansible.builtin.copy:
+        dest: "{{ zabbix_agent_tlspskidentity_file }}"
+        content: "{{ zabbix_agent_tlspskidentity }}"
+        owner: zabbix
+        group: zabbix
+        mode: 0400
+      become: true
+      when:
+        - zabbix_agent_tlspskidentity_file is defined
+        - zabbix_agent_tlspskidentity is defined
+      notify:
+        - restart zabbix-agent
+        - restart mac zabbix agent
+
 - name: "Set default ip address for zabbix_agent_ip"
   ansible.builtin.set_fact:
     zabbix_agent_ip: "{{ ansible_facts['default_ipv4'].address }}"

@@ -42,6 +42,16 @@
     - name: Gather PSK Identity Info
       ansible.builtin.include_tasks: psk_identity.yml
 
+    - name: AutoPSK | Template PSK Identity
+      ansible.windows.win_copy:
+        dest: "{{ zabbix_agent_tlspskidentity_file }}"
+        content: "{{ zabbix_agent_tlspskidentity }}"
+      when:
+        - zabbix_agent_tlspskidentity_file is defined
+        - zabbix_agent_tlspskidentity is defined
+      notify:
+        - restart win zabbix agent
+
 - name: "Set Log File Info"
   ansible.builtin.set_fact:
     zabbix_agent_logfile: "{{ zabbix_agent_win_logfile }}"
