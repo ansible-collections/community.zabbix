@@ -1,10 +1,8 @@
 _pidfile: /var/run/zabbix/zabbix_agentd.pid
-_logfile: /var/log/zabbix/zabbix_agentd.log
 _include: /etc/zabbix/zabbix_agentd.d
 _tls_subject: "{{ zabbix_agent_tlsservercertsubject | default(omit) }}" # FIXME this is not correct and should be removed with 2.0.0, here only to prevent regression
 _win_package: zabbix_agent-{{ zabbix_version_long }}-windows-amd64-openssl.zip
 _win_download_link: "{{ zabbix_win_download_url }}/{{ zabbix_version_long | regex_search('^\\d+\\.\\d+') }}/{{ zabbix_version_long }}/{{ zabbix_agent_win_package }}"
-_win_logfile: '{{ zabbix_win_install_dir }}\zabbix_agentd.log'
 _win_include: '{{ zabbix_win_install_dir_conf }}\zabbix_agent.d'
 _agent_service: zabbix-agent
 _sender_package: zabbix-sender

@@ -1,5 +1,7 @@
 ---
-# vars file for zabbix_agent (Windows)
+
+_zabbix_agent_logfile: "{{ zabbix_win_install_dir }}\\{{ zabbix_agent2 | ternary('zabbix_agent2.log', 'zabbix_agentd.log') }}"
+
 zabbix_valid_agent_versions:
   "10":
     - 7.0

@@ -31,7 +31,7 @@ zabbix_agent_include_dir: "{{ _include }}"
 zabbix_agent_include_mode: "0755"
 zabbix_agent_listenip: 0.0.0.0
 zabbix_agent_listenport: 10050
-zabbix_agent_logfile: "{{ _logfile }}"
+zabbix_agent_logfile: "{{ _zabbix_agent_logfile | default('/var/log/zabbix/' ~ zabbix_agent2 | ternary('zabbix_agent2.log', 'zabbix_agentd.log')) }}"
 zabbix_agent_logfilesize: 100
 zabbix_agent_logtype: file
 zabbix_agent_maxlinespersecond: 20
@@ -115,7 +115,6 @@ zabbix_agent_win_download_link: "{{ _win_download_link }}"
 zabbix_win_install_dir: 'C:\Zabbix'
 zabbix_win_install_dir_conf: '{{ zabbix_win_install_dir }}\conf'
 zabbix_win_install_dir_bin: '{{ zabbix_win_install_dir }}\bin'
-zabbix_agent_win_logfile: "{{ _win_logfile }}"
 zabbix_agent_win_package: "{{ _win_package }}"
 zabbix_agent_win_include: "{{ _win_include }}"
 zabbix_win_firewall_management: true
