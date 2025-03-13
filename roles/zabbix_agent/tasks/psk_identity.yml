@@ -1,26 +1,4 @@
-- name: AutoPSK | Check for existing TLS PSK identity
-  block:
-    - name: AutoPSK | Check for existing TLS PSK identity | Windows
-      ansible.windows.win_stat:
-        path: "{{ zabbix_agent_tlspskidentity_file }}"
-      register: zabbix_agent_tlspskidentity_check_windows
-      when:
-        - ansible_os_family == "Windows"
-
-    - name: AutoPSK | Check for existing TLS PSK identity | Linux
-      ansible.builtin.stat:
-        path: "{{ zabbix_agent_tlspskidentity_file }}"
-      register: zabbix_agent_tlspskidentity_check_linux
-      become: true
-      when:
-        - ansible_os_family != "Windows"
-
-    - name: Set zabbix_agent_tlspskidentity_check
-      ansible.builtin.set_fact:
-        zabbix_agent_tlspskidentity_check: "{{ zabbix_agent_tlspskidentity_check_windows if ansible_os_family == 'Windows' else zabbix_agent_tlspskidentity_check_linux }}"
-  tags:
-    - config
-
+---
 - name: AutoPSK | Read existing TLS PSK identity file
   ansible.builtin.slurp:
     src: "{{ zabbix_agent_tlspskidentity_file }}"

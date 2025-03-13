@@ -34,6 +34,11 @@
           notify:
             - restart win zabbix agent
 
+    - name: AutoPSK | Check for existing TLS PSK identity
+      ansible.windows.win_stat:
+        path: "{{ zabbix_agent_tlspskidentity_file }}"
+      register: zabbix_agent_tlspskidentity_check
+
     - name: Gather PSK Identity Info
       ansible.builtin.include_tasks: psk_identity.yml
 

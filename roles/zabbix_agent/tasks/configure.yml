@@ -37,6 +37,12 @@
             - restart zabbix-agent
             - restart mac zabbix agent
 
+    - name: AutoPSK | Check for existing TLS PSK identity
+      ansible.builtin.stat:
+        path: "{{ zabbix_agent_tlspskidentity_file }}"
+      register: zabbix_agent_tlspskidentity_check
+      become: true
+
     - name: Gather PSK Identity Info
       ansible.builtin.include_tasks: psk_identity.yml
 
