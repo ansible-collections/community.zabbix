@@ -176,10 +176,7 @@
   ansible.windows.win_file:
     path: "{{ item }}"
     state: directory
-  with_items:
-    - "{{ zabbix_agent_win_include }}"
-  when:
-    - ('.conf' not in zabbix_agent_win_include)
+  loop: "{{ zabbix_agent_include_dirs }}"
   tags:
     - install
 

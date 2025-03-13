@@ -10,7 +10,7 @@
         - name: Windows | Install user-defined userparameters
           ansible.windows.win_template:
             src: "{{ zabbix_agent_userparameters_templates_src }}/{{ item.name }}.j2"
-            dest: '{{ zabbix_agent_win_include }}\{{ item.name }}.conf'
+            dest: '{{ zabbix_agent_include_dirs | first }}\{{ item.name }}.conf'
           loop: "{{ zabbix_agent_userparameters | rejectattr('scripts_dir', 'defined') }}"
 
         - name: Windows | Install user-defined scripts
@@ -29,7 +29,7 @@
         - name: Install user-defined userparameters
           ansible.builtin.template:
             src: "{{ zabbix_agent_userparameters_templates_src }}/{{ item.name }}.j2"
-            dest: "{{ zabbix_agent_include_dir if zabbix_agent_include_dir is string else zabbix_agent_include_dir | first }}/userparameter_{{ item.name }}.conf"
+            dest: "{{ zabbix_agent_include_dirs | first }}/userparameter_{{ item.name }}.conf"
             owner: zabbix
             group: zabbix
             mode: "0644"

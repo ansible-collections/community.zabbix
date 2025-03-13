@@ -1,6 +1,8 @@
 ---
 
 _zabbix_agent_logfile: "{{ zabbix_win_install_dir }}\\{{ zabbix_agent2 | ternary('zabbix_agent2.log', 'zabbix_agentd.log') }}"
+_zabbix_agent_include_dirs:
+  - "{{ zabbix_win_install_dir_conf }}\\{{ zabbix_agent2 | ternary('zabbix_agent2.d', 'zabbix_agent.d') }}"
 
 zabbix_valid_agent_versions:
   "10":

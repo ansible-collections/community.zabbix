@@ -52,10 +52,6 @@
       notify:
         - restart win zabbix agent
 
-- name: "Set Include Path Info"
-  ansible.builtin.set_fact:
-    zabbix_agent_include_dir: "{{ zabbix_agent_win_include }}"
-
 - name: "Set Control Socket"
   ansible.builtin.set_fact:
     zabbix_agent_controlsocket: "\\\\.\\pipe\\agent.sock"

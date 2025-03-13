@@ -126,7 +126,7 @@
     group: root
     mode: "{{ zabbix_agent_include_mode }}"
     state: directory
-  loop: "{{ [zabbix_agent_include_dir] if zabbix_agent_include_dir is string else zabbix_agent_include_dir }}"
+  loop: "{{ zabbix_agent_include_dirs }}"
   loop_control:
     loop_var: 'include_dir'
   become: true

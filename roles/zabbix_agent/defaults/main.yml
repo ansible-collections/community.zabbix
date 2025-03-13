@@ -27,7 +27,7 @@ zabbix_agent_enableremotecommands: false
 zabbix_agent_forceactivechecksonstart: false
 zabbix_agent_heartbeatfrequency: 60
 zabbix_agent_hostname: "{{ inventory_hostname }}"
-zabbix_agent_include_dir: "{{ _include }}"
+zabbix_agent_include_dirs: "{{ _zabbix_agent_include_dirs | default(_includes) }}"
 zabbix_agent_include_mode: "0755"
 zabbix_agent_listenip: 0.0.0.0
 zabbix_agent_listenport: 10050
@@ -116,7 +116,6 @@ zabbix_win_install_dir: 'C:\Zabbix'
 zabbix_win_install_dir_conf: '{{ zabbix_win_install_dir }}\conf'
 zabbix_win_install_dir_bin: '{{ zabbix_win_install_dir }}\bin'
 zabbix_agent_win_package: "{{ _win_package }}"
-zabbix_agent_win_include: "{{ _win_include }}"
 zabbix_win_firewall_management: true
 
 # macOS Related
