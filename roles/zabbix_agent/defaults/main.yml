@@ -20,7 +20,7 @@ zabbix_agent_service: "{{ _agent_service }}"
 zabbix_agent_allowroot: false
 zabbix_agent_buffersend: 5
 zabbix_agent_buffersize: 100
-zabbix_agent_controlsocket: /tmp/agent.sock
+zabbix_agent_controlsocket: "{{ _zabbix_agent_controlsocket | default('/tmp/agent.sock') }}"
 zabbix_agent_debuglevel: 3
 zabbix_agent_enablepersistentbuffer: false
 zabbix_agent_enableremotecommands: false

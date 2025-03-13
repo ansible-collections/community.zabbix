@@ -52,10 +52,6 @@
       notify:
         - restart win zabbix agent
 
-- name: "Set Control Socket"
-  ansible.builtin.set_fact:
-    zabbix_agent_controlsocket: "\\\\.\\pipe\\agent.sock"
-
 - name: "Set default ip address for zabbix_agent_ip"
   ansible.builtin.set_fact:
     zabbix_agent_ip: "{{ hostvars[inventory_hostname]['ansible_ip_addresses'] | ansible.utils.ipv4 | first }}"
