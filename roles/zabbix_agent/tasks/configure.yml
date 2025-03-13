@@ -13,6 +13,30 @@
     - name: Gather PSK Secret Info
       ansible.builtin.include_tasks: psk_secret.yml
 
+    - name: AutoPSK | Template PSK Secret
+      when:
+        - zabbix_agent_tlspskfile is defined
+        - zabbix_agent_tlspsk_secret is defined
+      block:
+        - name: Create Directory for PSK File
+          ansible.builtin.file:
+            path: "{{ zabbix_agent_tlspskfile | dirname }}"
+            mode: 0755
+            state: directory
+          become: true
+
+        - name: AutoPSK | Template PSK Secret
+          ansible.builtin.copy:
+            dest: "{{ zabbix_agent_tlspskfile }}"
+            content: "{{ zabbix_agent_tlspsk_secret }}"
+            owner: zabbix
+            group: zabbix
+            mode: 0400
+          become: true
+          notify:
+            - restart zabbix-agent
+            - restart mac zabbix agent
+
     - name: Gather PSK Identity Info
       ansible.builtin.include_tasks: psk_identity.yml
 

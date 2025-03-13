@@ -17,6 +17,23 @@
     - name: Gather PSK Secret Info
       ansible.builtin.include_tasks: psk_secret.yml
 
+    - name: AutoPSK | Template PSK Secret
+      when:
+        - zabbix_agent_tlspskfile is defined
+        - zabbix_agent_tlspsk_secret is defined
+      block:
+        - name: Create Directory for PSK File
+          ansible.windows.win_file:
+            path: "{{ zabbix_agent_tlspskfile | win_dirname }}"
+            state: directory
+
+        - name: AutoPSK | Template PSK Secret
+          ansible.windows.win_copy:
+            dest: "{{ zabbix_agent_tlspskfile }}"
+            content: "{{ zabbix_agent_tlspsk_secret }}"
+          notify:
+            - restart win zabbix agent
+
     - name: Gather PSK Identity Info
       ansible.builtin.include_tasks: psk_identity.yml
 
