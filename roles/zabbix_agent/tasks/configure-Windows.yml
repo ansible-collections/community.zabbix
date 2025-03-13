@@ -1,4 +1,15 @@
 ---
+- name: Configure PSK
+  when: "( 'psk' in zabbix_agent_tlsaccept ) or (zabbix_agent_tlsconnect  == 'psk')"
+  tags:
+    - config
+  block:
+    - name: Gather PSK Secret Info
+      ansible.builtin.include_tasks: psk_secret.yml
+
+    - name: Gather PSK Identity Info
+      ansible.builtin.include_tasks: psk_identity.yml
+
 - name: "Set Log File Info"
   ansible.builtin.set_fact:
     zabbix_agent_logfile: "{{ zabbix_agent_win_logfile }}"

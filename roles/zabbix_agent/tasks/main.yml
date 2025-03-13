@@ -65,17 +65,6 @@
   loop_control:
     loop_var: _install_tasks_file
 
-- name: Configure PSK
-  when: "( 'psk' in zabbix_agent_tlsaccept ) or (zabbix_agent_tlsconnect  == 'psk')"
-  block:
-    - name: Gather PSK Secret Info
-      ansible.builtin.include_tasks: psk_secret.yml
-
-    - name: Gather PSK Identity Info
-      ansible.builtin.include_tasks: psk_identity.yml
-  tags:
-    - config
-
 - name: "Configure Agent"
   when: ansible_facts['os_family'] not in ['Darwin']
   ansible.builtin.include_tasks: "{{ _configure_tasks_file }}"
