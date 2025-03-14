@@ -127,8 +127,8 @@ zabbix_mac_download_link: "{{ zabbix_mac_download_url }}/{{ zabbix_agent_version
 zabbix_agent_docker: false
 zabbix_agent_docker_state: started
 zabbix_agent_docker_name: zabbix-agent
-zabbix_agent_docker_image: "zabbix/zabbix-agent"
-zabbix_agent_docker_image_tag: "ubuntu-{{ zabbix_agent_version }}.{{ zabbix_version_patch }}"
+zabbix_agent_docker_image: "zabbix/{{ zabbix_agent2 | ternary('zabbix-agent2', 'zabbix-agent') }}"
+zabbix_agent_docker_image_tag: "latest"
 zabbix_agent_docker_user_gid: 101
 zabbix_agent_docker_user_uid: 101
 zabbix_agent_docker_network_mode: host
