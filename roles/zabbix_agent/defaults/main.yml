@@ -131,6 +131,7 @@ zabbix_agent_docker_image: "zabbix/{{ zabbix_agent2 | ternary('zabbix-agent2', '
 zabbix_agent_docker_image_tag: "latest"
 zabbix_agent_docker_user_gid: 101
 zabbix_agent_docker_user_uid: 101
+zabbix_agent_docker_include_dir: "{{ zabbix_agent_include_dirs | first }}"
 zabbix_agent_docker_network_mode: host
 zabbix_agent_docker_restart_policy: unless-stopped
 zabbix_agent_docker_privileged: false
@@ -139,9 +140,9 @@ zabbix_agent_docker_ports:
 zabbix_agent_docker_security_opts:
   - apparmor:unconfined
 zabbix_agent_docker_volumes:
-  - /etc/zabbix/zabbix_agentd.d:{{ zabbix_agent_docker_include_dir }}
-  - /:/hostfs:ro
-  - /var/run:/var/run
+  - "{{ zabbix_agent_docker_include_dir }}:/etc/zabbix/zabbix_agentd.d"
+  - "/:/hostfs:ro"
+  - "/var/run:/var/run"
 zabbix_agent_docker_env:
   ZBX_HOSTNAME: "{{ zabbix_agent_hostname }}"
   ZBX_SERVER_HOST: "{{ zabbix_agent_server }}"
