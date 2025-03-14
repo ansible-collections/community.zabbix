@@ -118,17 +118,6 @@
     - zabbix_agent2 | bool
     - zabbix_agent_package_remove
 
-- name: "Make sure the zabbix-agent service is running"
-  ansible.builtin.service:
-    name: "{{ zabbix_agent_service }}"
-    state: started
-    enabled: true
-  become: true
-  when:
-    - not (zabbix_agent_docker | bool)
-  tags:
-    - service
-
 - name: "Give zabbix-agent access to system.hw.chassis info"
   ansible.builtin.file:
     path: /sys/firmware/dmi/tables/DMI
@@ -140,3 +129,16 @@
     - zabbix_agent_chassis | bool
   tags:
     - config
+
+- meta: flush_handlers
+
+- name: "Ensure zabbix-agent is enabled and running"
+  ansible.builtin.service:
+    name: "{{ zabbix_agent_service }}"
+    state: started
+    enabled: true
+  become: true
+  when:
+    - not (zabbix_agent_docker | bool)
+  tags:
+    - service
