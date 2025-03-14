@@ -52,15 +52,6 @@
       notify:
         - restart win zabbix agent
 
-- name: "Set default ip address for zabbix_agent_ip"
-  ansible.builtin.set_fact:
-    zabbix_agent_ip: "{{ hostvars[inventory_hostname]['ansible_ip_addresses'] | ansible.utils.ipv4 | first }}"
-  when:
-    - zabbix_agent_ip is not defined
-    - "'ansible_ip_addresses' in hostvars[inventory_hostname]"
-  tags:
-    - config
-
 - name: "Windows | Configure zabbix-agent"
   ansible.windows.win_template:
     src: agent.conf.j2

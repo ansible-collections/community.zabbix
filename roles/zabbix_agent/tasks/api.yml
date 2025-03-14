@@ -1,4 +1,38 @@
 ---
+- name: "Set default ip address for zabbix_agent_ip | Windows"
+  ansible.builtin.set_fact:
+    zabbix_agent_ip: "{{ ansible_facts['ip_addresses'] | ansible.utils.ipaddr('private') | first }}"
+  when:
+    - zabbix_agent_ip is not defined
+    - ansible_facts['os_family'] == 'Windows'
+
+- name: "Set default ip address for zabbix_agent_ip | {{ ansible_facts['os_family'] }}"
+  ansible.builtin.set_fact:
+    zabbix_agent_ip: "{{ ansible_facts['default_ipv4'].address }}"
+  when:
+    - zabbix_agent_ip is not defined
+    - ansible_facts['default_ipv4'].address is defined
+    - ansible_facts['os_family'] != 'Windows'
+
+# Fun fact, the first set_fact that successfully defines zabbix_agent_ip
+# breaks the block, so no further tasks are run within the block.
+- name: "Detect IPv4 address"
+  when:
+    - zabbix_agent_ip is not defined
+    - zabbix_agent_detect_ip
+    - ansible_facts['os_family'] != 'Windows"
+  block:
+    - name: "Set first private ip address for zabbix_agent_ip"
+      ansible.builtin.set_fact:
+        zabbix_agent_ip: "{{ ansible_facts['all_ipv4_addresses'] | ansible.utils.ipaddr('private') | first }}"
+      when: ansible_facts['all_ipv4_addresses'] | ansible.utils.ipaddr('private') | length > 0
+
+    - name: "Set first public ip address for zabbix_agent_ip"
+      ansible.builtin.set_fact:
+        zabbix_agent_ip: "{{ ansible_facts['all_ipv4_addresses'] | ansible.utils.ipaddr('public') | first }}"
+      when: ansible_facts['all_ipv4_addresses'] | ansible.utils.ipaddr('public') | length > 0
+
+
 - name: "API | Create host groups"
   community.zabbix.zabbix_group:
     host_groups: "{{ zabbix_host_groups }}"

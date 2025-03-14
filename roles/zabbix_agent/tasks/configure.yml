@@ -61,32 +61,6 @@
         - restart zabbix-agent
         - restart mac zabbix agent
 
-- name: "Set default ip address for zabbix_agent_ip"
-  ansible.builtin.set_fact:
-    zabbix_agent_ip: "{{ ansible_facts['default_ipv4'].address }}"
-  when:
-    - zabbix_agent_ip is not defined
-    - ansible_facts['default_ipv4'].address is defined
-  tags:
-    - config
-
-# Fun fact, the first set_fact that successfully defines zabbix_agent_ip
-# breaks the block, so no further tasks are run within the block.
-- name: "Detect IPv4 address"
-  when:
-    - zabbix_agent_ip is not defined
-    - zabbix_agent_detect_ip
-  block:
-    - name: "Set first private ip address for zabbix_agent_ip"
-      ansible.builtin.set_fact:
-        zabbix_agent_ip: "{{ ansible_facts['all_ipv4_addresses'] | ansible.utils.ipaddr('private') | first }}"
-      when: ansible_facts['all_ipv4_addresses'] | ansible.utils.ipaddr('private') | length > 0
-
-    - name: "Set first public ip address for zabbix_agent_ip"
-      ansible.builtin.set_fact:
-        zabbix_agent_ip: "{{ ansible_facts['all_ipv4_addresses'] | ansible.utils.ipaddr('public') | first }}"
-      when: ansible_facts['all_ipv4_addresses'] | ansible.utils.ipaddr('public') | length > 0
-
 - name: "Validate zabbix_agent_listenip"
   ansible.builtin.assert:
     that:
