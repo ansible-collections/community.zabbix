@@ -70,7 +70,7 @@
   ansible.builtin.include_tasks: "{{ _configure_tasks_file }}"
   with_first_found:
     - "configure-{{ ansible_facts['os_family'] }}.yml"
-    - "configure.yml"
+    - "configure{% if zabbix_agent_docker %}-Docker{% endif %}.yml"
   loop_control:
     loop_var: _configure_tasks_file
 

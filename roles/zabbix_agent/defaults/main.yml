@@ -129,8 +129,8 @@ zabbix_agent_docker_state: started
 zabbix_agent_docker_name: zabbix-agent
 zabbix_agent_docker_image: "zabbix/{{ zabbix_agent2 | ternary('zabbix-agent2', 'zabbix-agent') }}"
 zabbix_agent_docker_image_tag: "latest"
-zabbix_agent_docker_user_gid: 101
-zabbix_agent_docker_user_uid: 101
+zabbix_agent_docker_create_home: true
+zabbix_agent_docker_home: /var/lib/zabbix
 zabbix_agent_docker_include_dir: "{{ zabbix_agent_include_dirs | first }}"
 zabbix_agent_docker_network_mode: host
 zabbix_agent_docker_restart_policy: unless-stopped
@@ -150,11 +150,11 @@ zabbix_agent_docker_env:
   ZBX_PASSIVESERVERS: "{{ zabbix_agent_serverpassive | default(omit) }}"
   ZBX_ACTIVE_ALLOW: "{{ zabbix_agent_serveractive_allow | default(omit) }}"
   ZBX_LOADMODULE: "{{ zabbix_agent_loadmodule | default(omit) }}"
-  ZBX_DEBUGLEVEL: "{{ zabbix_agent_debuglevel }}"
-  ZBX_TIMEOUT: "{{ zabbix_agent_timeout }}"
+  ZBX_DEBUGLEVEL: "{{ zabbix_agent_debuglevel | quote }}"
+  ZBX_TIMEOUT: "{{ zabbix_agent_timeout | quote }}"
   ZBX_SOURCEIP: "{{ zabbix_agent_sourceip | default(omit) }}"
-  ZBX_ENABLEREMOTECOMMANDS: "{{ zabbix_agent_enableremotecommands | default(omit) }}"
-  ZBX_LOGREMOTECOMMANDS: "{{ zabbix_agent_logremotecommands | default(omit) }}"
+  ZBX_ENABLEREMOTECOMMANDS: "{{ zabbix_agent_enableremotecommands | default(omit) | int }}"
+  ZBX_LOGREMOTECOMMANDS: "{{ zabbix_agent_logremotecommands | default(omit) | int }}"
   ZBX_STARTAGENTS: "{{ zabbix_agent_startagents | default(omit) }}"
   ZBX_HOSTNAMEITEM: "{{ zabbix_agent_hostnameitem | default(omit) }}"
   ZBX_METADATA: "{{ zabbix_agent_hostmetadata | default(omit) }}"
@@ -164,7 +164,7 @@ zabbix_agent_docker_env:
   ZBX_BUFFERSIZE: "{{ zabbix_agent_buffersize | default(omit) }}"
   ZBX_MAXLINESPERSECOND: "{{ zabbix_agent_maxlinespersecond | default(omit) }}"
   ZBX_LISTENIP: "{{ zabbix_agent_listenip }}"
-  ZBX_UNSAFEUSERPARAMETERS: "{{ zabbix_agent_unsafeuserparameters | default(omit) }}"
+  ZBX_UNSAFEUSERPARAMETERS: "{{ zabbix_agent_unsafeuserparameters | default(omit) | int }}"
   ZBX_TLSCONNECT: "{{ zabbix_agent_tlsconnect | default(omit) }}"
   ZBX_TLSACCEPT: "{{ zabbix_agent_tlsaccept | default(omit) }}"
   ZBX_TLSCAFILE: "{{ zabbix_agent_tlscafile | default(omit) }}"

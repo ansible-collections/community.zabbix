@@ -2,24 +2,19 @@
 - name: "Adding zabbix group"
   ansible.builtin.group:
     name: zabbix
-    state: present
     gid: "{{ zabbix_agent_docker_user_gid | default(omit) }}"
+    system: true
   become: true
-  tags:
-    - config
 
 - name: "Adding zabbix user"
   ansible.builtin.user:
     name: zabbix
-    group: zabbix
-    state: present
-    create_home: false
-    home: /etc/zabbix
     uid: "{{ zabbix_agent_docker_user_uid | default(omit) }}"
     system: true
+    create_home: "{{ zabbix_agent_docker_create_home }}"
+    home: "{{ zabbix_agent_docker_create_home | ternary(zabbix_agent_docker_home, omit) }}"
+    group: zabbix
   become: true
-  tags:
-    - config
 
 - name: "Create volume mount string"
   ansible.builtin.set_fact:
@@ -27,14 +22,16 @@
     tls_key:
       ZBX_TLSPSKFILE: tlspskfile
   when:
-    - zabbix_agent_tlspskfile is defined
+    - zabbix_agent_tlsaccept is search('psk') or
+      zabbix_agent_tlsconnect is search('psk')
 
 - name: "Add zabbix_agent_tlspskfile to volume mount"
   ansible.builtin.set_fact:
     zabbix_agent_docker_volumes: "{{ zabbix_agent_docker_volumes + [ volume_mount ] }}"
     zabbix_agent_docker_env: "{{ zabbix_agent_docker_env | combine(tls_key) }}"
   when:
-    - zabbix_agent_tlspskfile is defined
+    - zabbix_agent_tlsaccept is search('psk') or
+      zabbix_agent_tlsconnect is search('psk')
 
 - name: "Ensure Zabbix Docker container is running"
   community.docker.docker_container:

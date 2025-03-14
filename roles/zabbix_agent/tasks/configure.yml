@@ -88,8 +88,6 @@
   notify:
     - restart zabbix-agent
   become: true
-  when:
-    - not (zabbix_agent_docker | bool)
   tags:
     - config
 
@@ -106,11 +104,6 @@
   become: true
   tags:
     - config
-
-- name: "Install the Docker container"
-  ansible.builtin.include_tasks: Docker.yml
-  when:
-    - zabbix_agent_docker | bool
 
 - name: "Remove zabbix-agent installation when zabbix-agent2 is used."
   ansible.builtin.include_tasks: remove.yml
@@ -138,7 +131,5 @@
     state: started
     enabled: true
   become: true
-  when:
-    - not (zabbix_agent_docker | bool)
   tags:
     - service
