@@ -45,8 +45,8 @@ zabbix_agent_timeout: 3
 zabbix_agent_tlsaccept: "unencrypted"
 zabbix_agent_tlsconnect: "unencrypted"
 zabbix_agent_tlspsk_auto: false
-zabbix_agent_tlspskfile: /etc/zabbix/tls_psk_auto.secret
-zabbix_agent_tlspskidentity_file: "/etc/zabbix/tls_psk_auto.identity"
+zabbix_agent_tlspskfile: "{{ _zabbix_agent_tlspskfile | default('/etc/zabbix/tls_psk_auto.secret') }}"
+zabbix_agent_tlspskidentity_file: "{{ _zabbix_agent_tlspskidentity_file | default('/etc/zabbix/tls_psk_auto.identity') }}"
 zabbix_agent_tls_subject: "{{ _tls_subject }}"
 
 zabbix_agent_unsafeuserparameters: false
