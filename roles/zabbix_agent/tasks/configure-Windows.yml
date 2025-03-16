@@ -50,46 +50,33 @@
 - name: "Windows | Configure zabbix-agent"
   ansible.windows.win_template:
     src: agent.conf.j2
-    dest: "{{ zabbix_win_install_dir_conf }}\\{{ zabbix_win_config_name }}"
+    dest: "{{ zabbix_agent_win_install_dir }}/{{ zabbix_agent_conf }}"
   notify: restart win zabbix agent
-  tags:
-    - config
 
-- name: "Windows | Set service startup mode to auto, ensure it is started and set auto-recovery"
-  ansible.windows.win_service:
-    name: "{{ zabbix_win_svc_name }}"
-    start_mode: auto
-    state: started
-    failure_actions:
-      - type: restart
-        delay_ms: 5000
-      - type: restart
-        delay_ms: 10000
-      - type: restart
-        delay_ms: 20000
-    failure_reset_period_sec: 86400
-  tags:
-    - config
-
-- name: "Windows | Check firewall service"
-  ansible.windows.win_service_info:
-    name: MpsSvc
-  register: firewall_info
+- name: Toggle firewall
   when: zabbix_win_firewall_management
-  tags:
-    - config
+  block:
+    - name: "Check firewall service"
+      ansible.windows.win_service_info:
+        name: MpsSvc
+      register: _win_service_info
 
-- name: "Windows | Firewall rule"
-  community.windows.win_firewall_rule:
-    name: "{{ zabbix_win_svc_name }}"
-    localport: "{{ zabbix_agent_listenport }}"
-    action: allow
-    direction: in
-    protocol: tcp
-    state: present
-    enabled: true
-  when:
-    - zabbix_win_firewall_management
-    - firewall_info.services[0].state == 'started' or firewall_info.services[0].start_mode == 'auto'
-  tags:
-    - config
+    - name: "Apply Firewall rule"
+      community.windows.win_firewall_rule:
+        name: "{{ zabbix_agent_win_service }}"
+        localport: "{{ zabbix_agent_listenport }}"
+        action: allow
+        direction: in
+        protocol: tcp
+        state: present
+        enabled: true
+      when:
+        - _firewall_service.state == 'started' or _firewall_service.start_mode == 'auto'
+      vars:
+        _firewall_service: "{{ _win_service_info.services | first }}"
+
+- name: "Ensure zabbix-agent is enabled and running"
+  ansible.windows.win_service:
+    name: "{{ zabbix_agent_win_service }}"
+    state: started
+    start_mode: delayed

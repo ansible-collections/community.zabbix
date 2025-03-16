@@ -7,8 +7,19 @@ _zabbix_agent_controlsocket: "\\\\.\\pipe\\agent.sock"
 _zabbix_agent_tlspskfile: "{{ zabbix_win_install_dir }}\\tls_psk_auto.secret.txt"
 _zabbix_agent_tlspskidentity_file: "{{ zabbix_win_install_dir }}\\tls_psk_auto.identity.txt"
 
+# Maps from ansible_facts['architecture']
+_zabbix_agent_win_arch:
+  "64-bit": amd64
+  "32-bit": i386
+
+# For application install/removal, might not be as reliable
+_zabbix_agent_win_product_code:
+  zabbix_agent: D9FE94CE-3904-4A53-9854-A887DB887CE6
+  zabbix_agent2: EF9B1DBF-C592-4350-8795-EF09D72A7C94
+
 zabbix_valid_agent_versions:
   "10":
+    - 7.2
     - 7.0
     - 6.4
     - 6.0
