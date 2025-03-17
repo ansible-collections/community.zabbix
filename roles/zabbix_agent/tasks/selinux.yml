@@ -4,7 +4,7 @@
     name:
       - policycoreutils-python-utils
     update_cache: true
-    install_recommends: "{{ zabbix_apt_install_recommends }}"
+    install_recommends: "{{ zabbix_apt_install_recommends | default(_zabbix_agent_install_recommends | default(omit)) }}"
   environment:
     http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
     https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"

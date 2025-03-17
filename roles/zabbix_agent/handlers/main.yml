@@ -19,11 +19,11 @@
     - ansible_facts.services["firewalld"].state == "running"
 
 - name: restart win zabbix agent
-  win_service:
-    name: "{{ zabbix_win_svc_name }}"
+  ansible.windows.win_service:
+    name: "{{ zabbix_win_service }}"
     state: restarted
   when:
-    - ansible_os_family == "Windows"
+    - ansible_facts['os_family'] == "Windows"
 
 - name: restart mac zabbix agent
   ansible.builtin.command: "launchctl kickstart -k system/{{ zabbix_agent_service }}"

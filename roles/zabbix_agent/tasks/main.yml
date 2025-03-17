@@ -22,7 +22,7 @@
     - always
 
 - name: Load Appropriate Defaults
-  ansible.builtin.include_vars: "agent{{ '2' if zabbix_agent2 is defined and zabbix_agent2|bool }}_vars.yml"
+  ansible.builtin.include_vars: "{{ zabbix_agent2 | ternary('agent2', 'agent') }}_vars.yml"
 
 - when: zabbix_agent_tlspsk_auto | bool
   tags:
@@ -56,43 +56,23 @@
     - not (zabbix_agent_docker | bool)
     - ansible_facts['os_family'] not in ['Windows', 'Darwin']
 
-- name: "Install the correct repository"
-  ansible.builtin.include_tasks: "{{ ansible_os_family }}.yml"
-  when:
-    - not (zabbix_agent_docker | bool)
-
-- name: Configure PSK
-  when: "( 'psk' in zabbix_agent_tlsaccept ) or (zabbix_agent_tlsconnect  == 'psk')"
-  block:
-    - name: Gather PSK Secret Info
-      ansible.builtin.include_tasks: psk_secret.yml
-
-    - name: Gather PSK Identity Info
-      ansible.builtin.include_tasks: psk_identity.yml
-  tags:
-    - config
+- name: "Install the agent"
+  when: not (zabbix_agent_docker | bool)
+  ansible.builtin.include_tasks: "{{ _install_tasks_file }}"
+  with_first_found:
+    - "install-{{ ansible_facts['os_family'] }}.yml"
+    - "install.yml"
+  loop_control:
+    loop_var: _install_tasks_file
 
 - name: "Configure Agent"
-  ansible.builtin.include_tasks: Windows_conf.yml
-  when:
-    - ansible_os_family == "Windows"
-
-- name: "Configure Agent"
-  ansible.builtin.include_tasks: Linux.yml
-  when:
-    - (ansible_os_family != "Windows" and ansible_os_family != "Darwin") or (zabbix_agent_docker | bool)
-
-- meta: flush_handlers
-
-- name: "Ensure zabbix-agent is enabled and running"
-  when: ansible_facts['os_family'] not in ['Windows']
-  ansible.builtin.service:
-    name: "{{ zabbix_agent_service }}"
-    state: started
-    enabled: true
-  become: true
-  tags:
-    - service
+  when: ansible_facts['os_family'] not in ['Darwin']
+  ansible.builtin.include_tasks: "{{ _configure_tasks_file }}"
+  with_first_found:
+    - "configure-{{ ansible_facts['os_family'] }}.yml"
+    - "configure{% if zabbix_agent_docker %}-Docker{% endif %}.yml"
+  loop_control:
+    loop_var: _configure_tasks_file
 
 - name: "Run the API calls to Zabbix Server"
   vars:
