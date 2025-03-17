@@ -1,0 +1,92 @@
+---
+- name: Get latest zabbix releases
+  delegate_to: localhost
+  uri:
+    url: https://services.zabbix.com/updates/v1
+    return_content: true
+  register: _zabbix_versions
+
+- name: Set zabbix_version_long
+  set_fact:
+    zabbix_agent_version_long: "{{ _zabbix_versions.json | json_query(_latest_release) }}"
+  vars:
+    _latest_release: "versions[?version=='{{ zabbix_agent_version }}'].latest_release.release | [0]"
+  when: zabbix_agent_version_long is undefined
+
+- name: Check for and uninstall old agent
+  when: work_not_in_progress_anymore | default(false)
+  block:
+    # Work in progress
+    - name: Get product_id for Zabbix Agent
+      ansible.windows.win_powershell:
+        script: |
+          Get-ItemProperty HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\* |
+          Where-Object {$_.DisplayName -Like 'Zabbix Agent*'} |
+          Select-Object -ExpandProperty PSChildName
+      #DisplayName, DisplayVersion, Publisher, InstallDate, PSChildName
+      register: _res
+    - debug:
+        var: _res
+
+    - name: "Remove package"
+      ansible.windows.win_package:
+        state: absent
+        product_id: "{{ _res.output | first }}"
+      register: _res
+    - debug:
+        var: _res
+
+    - fail:
+
+# TODO: Proper discovery of installed agents from the powershell above
+#       can replace these checks
+- name: "Check if Zabbix agent is present"
+  ansible.windows.win_stat:
+    path: "{{ zabbix_agent_win_exe_path }}"
+  register: _zabbix_agent_exe
+
+- name: "Get Installed Zabbix Agent Version"
+  community.windows.win_file_version:
+    path: "{{ zabbix_agent_win_exe_path }}"
+  when: _zabbix_agent_exe.stat.exists
+  register: _zabbix_agent_exe_version
+
+- name: Download and install Zabbix Agent
+  when: not _zabbix_agent_exe.stat.exists or
+    _install_latest and zabbix_agent_version_long is version('>', _zabbix_agent_exe_version.win_file_version.product_version)
+  vars:
+    _install_latest: "{{ zabbix_agent_package_state == 'latest' }}"
+  block:
+    - name: Download Zabbix Agent
+      ansible.windows.win_get_url:
+        url: "{{ zabbix_agent_win_download_url }}"
+        dest: "C:/Users/{{ ansible_user }}/Downloads/{{ zabbix_agent_win_package }}"
+        url_username: "{{ zabbix_download_user | default(omit) }}"
+        url_password: "{{ zabbix_download_pass | default(omit) }}"
+        force: false
+        follow_redirects: all
+        proxy_url: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
+        validate_certs: "{{ zabbix_download_validate_certs | default(false) | bool }}"
+        timeout: "{{ zabbix_download_timeout | default(120) | int }}"
+      register: _zabbix_agent_win_download
+      until: _zabbix_agent_win_download is succeeded
+      throttle: "{{ zabbix_download_throttle | default(5) | int }}"
+
+    # Would be sweet if this worked.
+    #- name: Install Zabbix Agent
+    #  ansible.windows.win_package:
+    #    path: "C:/Users/{{ ansible_user }}/Downloads/{{ zabbix_agent_win_download_package }}"
+    #    arguments: "/l*v zabbix.log /i /qn SERVER={{ zabbix_agent_server }}"
+    #  register: _res
+
+    # https://www.zabbix.com/documentation/current/en/manual/installation/install_from_packages/win_msi
+    - name: Install Zabbix Agent
+      ansible.windows.win_command:
+        chdir: "C:/Users/{{ ansible_user }}/Downloads"
+        argv:
+          - msiexec
+          - /i
+          #- "/l*v zabbix-install.log"
+          - "{{ zabbix_agent_win_package }}"
+          - /qn
+          - "SERVER={{ zabbix_agent_server }}"

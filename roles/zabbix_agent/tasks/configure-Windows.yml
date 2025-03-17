@@ -1,0 +1,82 @@
+---
+- name: Configure PSK
+  when: "( 'psk' in zabbix_agent_tlsaccept ) or (zabbix_agent_tlsconnect  == 'psk')"
+  tags:
+    - config
+  block:
+    - name: AutoPSK | Check for existing TLS PSK file
+      ansible.windows.win_stat:
+        path: "{{ zabbix_agent_tlspskfile }}"
+      register: zabbix_agent_tlspskcheck
+
+    - name: Gather PSK Secret Info
+      ansible.builtin.include_tasks: psk_secret.yml
+
+    - name: AutoPSK | Template PSK Secret
+      when:
+        - zabbix_agent_tlspskfile is defined
+        - zabbix_agent_tlspsk_secret is defined
+      block:
+        - name: Create Directory for PSK File
+          ansible.windows.win_file:
+            path: "{{ zabbix_agent_tlspskfile | win_dirname }}"
+            state: directory
+
+        - name: AutoPSK | Template PSK Secret
+          ansible.windows.win_copy:
+            dest: "{{ zabbix_agent_tlspskfile }}"
+            content: "{{ zabbix_agent_tlspsk_secret }}"
+          notify:
+            - restart win zabbix agent
+
+    - name: AutoPSK | Check for existing TLS PSK identity
+      ansible.windows.win_stat:
+        path: "{{ zabbix_agent_tlspskidentity_file }}"
+      register: zabbix_agent_tlspskidentity_check
+
+    - name: Gather PSK Identity Info
+      ansible.builtin.include_tasks: psk_identity.yml
+
+    - name: AutoPSK | Template PSK Identity
+      ansible.windows.win_copy:
+        dest: "{{ zabbix_agent_tlspskidentity_file }}"
+        content: "{{ zabbix_agent_tlspskidentity }}"
+      when:
+        - zabbix_agent_tlspskidentity_file is defined
+        - zabbix_agent_tlspskidentity is defined
+      notify:
+        - restart win zabbix agent
+
+- name: "Windows | Configure zabbix-agent"
+  ansible.windows.win_template:
+    src: agent.conf.j2
+    dest: "{{ zabbix_agent_win_install_dir }}/{{ zabbix_agent_conf }}"
+  notify: restart win zabbix agent
+
+- name: Toggle firewall
+  when: zabbix_win_firewall_management
+  block:
+    - name: "Check firewall service"
+      ansible.windows.win_service_info:
+        name: MpsSvc
+      register: _win_service_info
+
+    - name: "Apply Firewall rule"
+      community.windows.win_firewall_rule:
+        name: "{{ zabbix_agent_win_service }}"
+        localport: "{{ zabbix_agent_listenport }}"
+        action: allow
+        direction: in
+        protocol: tcp
+        state: present
+        enabled: true
+      when:
+        - _firewall_service.state == 'started' or _firewall_service.start_mode == 'auto'
+      vars:
+        _firewall_service: "{{ _win_service_info.services | first }}"
+
+- name: "Ensure zabbix-agent is enabled and running"
+  ansible.windows.win_service:
+    name: "{{ zabbix_agent_win_service }}"
+    state: started
+    start_mode: delayed

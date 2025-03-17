@@ -1,0 +1,23 @@
+---
+- name: "Installing zabbix-{agent,get,sender}"
+  ansible.builtin.package:
+    name: "{{ item.name }}"
+    state: "{{ item.state }}"
+    update_cache: true
+    disablerepo: "{{ zabbix_agent_disable_repo | default(_zabbix_agent_disable_repo | default(omit)) }}"
+    install_recommends: "{{ zabbix_apt_install_recommends | default(_zabbix_agent_install_recommends | default(omit)) }}"
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
+  register: _zabbix_agent_packages_installed
+  until: _zabbix_agent_packages_installed is succeeded
+  become: true
+  tags:
+    - install
+  loop:
+    - name: "{{ zabbix_agent_package }}"
+      state: "{{ zabbix_agent_package_state }}"
+    - name: "{{ zabbix_agent_get_package }}"
+      state: "{{ zabbix_agent_install_agent_only | ternary('absent', zabbix_agent_package_state) }}"
+    - name: "{{ zabbix_agent_sender_package }}"
+      state: "{{ zabbix_agent_install_agent_only | ternary('absent', zabbix_agent_package_state) }}"

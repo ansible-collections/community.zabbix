@@ -3,6 +3,8 @@
 
 zabbix_agent: zabbix-agent
 
+_zabbix_agent_install_recommends: false
+
 zabbix_valid_agent_versions:
   # Debian
   "12":

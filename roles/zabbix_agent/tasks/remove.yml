@@ -20,6 +20,7 @@
 
 - name: "Remove | Remove the agent-include-dir"
   ansible.builtin.file:
-    path: "{{ zabbix_agent_include_dir | replace('agent2', 'agent') }}"
+    path: "{{ item | replace('agent2', 'agent') }}"
     state: absent
+  loop: "{{ zabbix_agent_include_dirs }}"
   become: true
