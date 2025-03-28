@@ -6,7 +6,7 @@ zabbix_web_version_check: true
 # zabbix_web_version:
 zabbix_web_package_state: present
 zabbix_web_doubleprecision: false
-zabbix_web_conf_mode: "0644"
+zabbix_web_conf_mode: "0640"
 zabbix_web_connect_ha_backend: false
 zabbix_api_server_url: zabbix.example.com
 zabbix_web_http_server: apache
