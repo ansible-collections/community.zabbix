@@ -3,4 +3,3 @@ _includes:
   - /etc/zabbix/zabbix_agent2.d
   - /etc/zabbix/zabbix_agent2.d/plugins.d
 _tls_subject: "{{ zabbix_agent_tlsservercertsubject | default(omit) }}" # FIXME this is not correct and should be removed with 2.0.0, here only to prevent regression
-_agent_service: zabbix-agent2

@@ -2,5 +2,4 @@ _pidfile: /var/run/zabbix/zabbix_agentd.pid
 _includes:
   - /etc/zabbix/zabbix_agentd.d
 _tls_subject: "{{ zabbix_agent_tlsservercertsubject | default(omit) }}" # FIXME this is not correct and should be removed with 2.0.0, here only to prevent regression
-_agent_service: zabbix-agent
 _sender_package: zabbix-sender

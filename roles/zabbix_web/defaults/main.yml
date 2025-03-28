@@ -1,6 +1,8 @@
 ---
 # defaults file for zabbix-web
 
+zabbix_web_version_check: true
+
 # zabbix_web_version: 6.4
 zabbix_web_package_state: present
 zabbix_web_doubleprecision: false

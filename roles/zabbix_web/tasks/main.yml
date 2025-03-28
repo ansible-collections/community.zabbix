@@ -18,7 +18,7 @@
     - always
 
 - name: Check that version is supported
-  when: enable_version_check | default(true) | bool
+  when: zabbix_web_version_check | bool
   ansible.builtin.assert:
     that:
       - "{{ zabbix_web_version|float in zabbix_valid_web_versions[ ansible_facts['distribution_major_version'] ] }}"

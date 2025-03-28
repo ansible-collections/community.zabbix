@@ -1,6 +1,8 @@
 ---
 # defaults file for zabbix_agent
 
+zabbix_agent_version_check: true
+
 zabbix_agent2: false
 zabbix_agent_version_minor: "*"
 zabbix_version_patch: 0
@@ -16,7 +18,7 @@ zabbix_agent_conf_mode: "0644"
 zabbix_agent_detect_ip: "{{ not zabbix_agent_dont_detect_ip | default(false) }}" # True
 
 zabbix_agent_pidfile: "{{ _pidfile }}"
-zabbix_agent_service: "{{ _agent_service }}"
+zabbix_agent_service: "{{ _zabbix_agent_service | default(zabbix_agent2 | ternary('zabbix-agent2', 'zabbix-agent')) }}"
 
 zabbix_agent_allowroot: false
 zabbix_agent_buffersend: 5

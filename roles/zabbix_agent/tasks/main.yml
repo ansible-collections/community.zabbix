@@ -13,7 +13,7 @@
     - always
 
 - name: Check that version is supported
-  when: enable_version_check | default(true) | bool
+  when: zabbix_agent_version_check | bool
   ansible.builtin.assert:
     that:
       - zabbix_agent_version | float in zabbix_valid_agent_versions[ansible_distribution_major_version]
@@ -54,7 +54,7 @@
   when:
     - zabbix_manage_repo | default(true)
     - not (zabbix_agent_docker | bool)
-    - ansible_facts['os_family'] not in ['Windows', 'Darwin']
+    - ansible_facts['os_family'] not in ['Alpine', 'Darwin', 'Windows']
 
 - name: "Install the agent"
   when: not (zabbix_agent_docker | bool)
