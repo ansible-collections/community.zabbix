@@ -14,7 +14,7 @@
     - always
 
 - name: Check that version is supported
-  when: enable_version_check | default(true) | bool
+  when: zabbix_javagateway_version_check | bool
   ansible.builtin.assert:
     that:
       - "{{ zabbix_javagateway_version|float in zabbix_valid_javagateway_versions[ansible_distribution_major_version] }}"

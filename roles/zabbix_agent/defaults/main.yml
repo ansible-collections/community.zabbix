@@ -1,6 +1,8 @@
 ---
 # defaults file for zabbix_agent
 
+zabbix_agent_version_check: true
+
 zabbix_agent2: false
 zabbix_agent_version_minor: "*"
 zabbix_version_patch: 0
