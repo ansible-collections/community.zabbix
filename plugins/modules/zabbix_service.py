@@ -294,7 +294,7 @@ class Service(ZabbixBase):
     def delete_service(self, service_ids):
         if self._module.check_mode:
             self._module.exit_json(changed=True)
-        self._zapi.service.delete(service_ids)
+        self._zapi.service.delete([service_ids])
 
     def dump_services(self, service_ids):
         services = self._zapi.service.get({"output": "extend", "filter": {"serviceid": service_ids}, "selectParents": "extend",
