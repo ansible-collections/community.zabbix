@@ -410,7 +410,7 @@ class Service(ZabbixBase):
             return True
         if tags and tags != service_exist['tags']:
             return True
-        if problem_tags and problem_tags != service_exist['problem_tags']:
+        if problem_tags != service_exist['problem_tags']:
             return True
         if parents and parents != service_exist['parents']:
             return True
@@ -567,6 +567,8 @@ def main():
 
     if problem_tags:
         problem_tags = service.construct_problem_tags(problem_tags)
+    else:
+        problem_tags = []
 
     if parents:
         p_service_ids = []
