@@ -39,7 +39,7 @@ zabbix_agent_logfilesize: 100
 zabbix_agent_logtype: file
 zabbix_agent_maxlinespersecond: 20
 zabbix_agent_persistentbufferperiod: 1h
-zabbix_agent_pluginsocket: /tmp/agent.plugin.sock
+zabbix_agent_pluginsocket: "{{ _zabbix_agent_pluginsocket | default('/tmp/agent.plugin.sock') }}"
 zabbix_agent_plugintimeout: 3
 zabbix_agent_refreshactivechecks: 120
 zabbix_agent_statusport: 9999
