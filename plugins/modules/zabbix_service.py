@@ -288,7 +288,7 @@ import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabb
 
 class Service(ZabbixBase):
     def get_service(self, service_name):
-        services = self._zapi.service.get({"selectParents": "extend", "selectChildren": "extend", "selectTags": "extend", "selectProblemTags": "extend", "selectStatusRules": "extend", "filter": {"name": service_name}})
+        services = self._zapi.service.get({"selectParents": ["serviceid"], "selectChildren": ["serviceid"], "selectTags": "extend", "selectProblemTags": "extend", "selectStatusRules": "extend", "sortfield": "serviceid","sortorder": "ASC", "filter": {"name": service_name}})
         return services
        
     def delete_service(self, service_ids):
@@ -572,14 +572,14 @@ def main():
 
     if parents:
         p_service_ids = []
-        p_services = service._zapi.service.get({"filter": {"name": parents}})
+        p_services = service._zapi.service.get({"output": ["serviceid"], "filter": {"name": parents}})
         for p_service in p_services:
             p_service_ids.append({"serviceid": p_service["serviceid"]})
         parents = p_service_ids
 
     if children:
         c_service_ids = []
-        c_services = service._zapi.service.get({"filter": {"name": children}})
+        c_services = service._zapi.service.get({"output": ["serviceid"], "filter": {"name": children}})
         for c_service in c_services:
             c_service_ids.append({"serviceid": c_service["serviceid"]})
         children = c_service_ids
