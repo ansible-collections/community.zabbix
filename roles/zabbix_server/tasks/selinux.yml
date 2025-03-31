@@ -2,8 +2,6 @@
 - name: "SELinux | Install related SELinux packages"
   ansible.builtin.package:
     name:
-      - checkpolicy
-      - policycoreutils
       - python3-libsemanage
       - python3-policycoreutils
       - zabbix-selinux-policy
@@ -25,16 +23,5 @@
   tags:
     - config
   loop:
-    - name: httpd_can_connect_zabbix
-      state: "{{ selinux_allow_zabbix_can_http }}"
     - name: zabbix_can_network
       state: "{{ selinux_allow_zabbix_can_network }}"
-
-- name: "SELinux | RedHat | Add SEmodule to fix SELinux issue: zabbix_server_alerter.sock"
-  ansible.builtin.script:
-    cmd: files/install_semodule.bsx
-  args:
-    creates: /etc/selinux/targeted/active/modules/400/zabbix_server_add/cil
-  become: true
-  tags:
-    - config

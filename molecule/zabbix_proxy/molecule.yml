@@ -9,7 +9,7 @@ driver:
   name: default
 
 platforms:
-  - name: zabbix-proxy-${MY_MOLECULE_VERSION:-v70}-${MY_MOLECULE_DATABASE:-mysql}-${MY_MOLECULE_CONTAINER:-rockylinux8}
+  - name: zabbix-proxy-${MY_MOLECULE_VERSION:-v72}-${MY_MOLECULE_DATABASE:-mysql}-${MY_MOLECULE_CONTAINER:-rockylinux8}
     image: geerlingguy/docker-${MY_MOLECULE_IMAGE:-rockylinux8}-ansible:latest
     privileged: true
     pre_build_image: true
@@ -19,15 +19,16 @@ platforms:
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:rw
     cgroupns_mode: host
+    zabbix_proxy_version: ${MY_MOLECULE_VERSION:-v70}
     groups:
       - ${MY_MOLECULE_DATABASE:-mysql}
-      - ${MY_MOLECULE_VERSION:-v70}
+      - ${MY_MOLECULE_VERSION:-v72}
 
 provisioner:
   name: ansible
   playbooks:
-    create: ../default/create.docker.yml
-    destroy: ../default/destroy.docker.yml
+    create: create.docker.yml
+    destroy: destroy.docker.yml
   env:
     # https://github.com/ansible/molecule/issues/4015#issuecomment-1680859724
     ANSIBLE_ROLES_PATH: ../../roles
@@ -37,6 +38,13 @@ provisioner:
         ansible_connection: community.docker.docker
         zabbix_repo_apt_priority: 1
         zabbix_repo_yum_gpg_check: 1
+        zabbix_api_create_proxy: true
+        zabbix_proxy_hostname: proxy1
+        zabbix_api_server_port: 8080
+        ansible_zabbix_url_path: ""
+        zabbix_proxy_configfrequency: 10
+      v72:
+        zabbix_proxy_version: 7.2
       v70:
         zabbix_proxy_version: 7.0
       v64:

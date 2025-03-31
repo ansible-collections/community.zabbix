@@ -13,7 +13,7 @@
     - always
 
 - name: Check that version is supported
-  when: enable_version_check | default(true) | bool
+  when: zabbix_agent_version_check | bool
   ansible.builtin.assert:
     that:
       - zabbix_agent_version | float in zabbix_valid_agent_versions[ansible_distribution_major_version]
@@ -22,9 +22,12 @@
     - always
 
 - name: Load Appropriate Defaults
-  ansible.builtin.include_vars: "agent{{ '2' if zabbix_agent2 is defined and zabbix_agent2|bool }}_vars.yml"
+  ansible.builtin.include_vars: "{{ zabbix_agent2 | ternary('agent2', 'agent') }}_vars.yml"
 
-- block:
+- when: zabbix_agent_tlspsk_auto | bool
+  tags:
+    - config
+  block:
     - name: AutoPSK | Default tlsconnect to enforce PSK
       ansible.builtin.set_fact:
         zabbix_agent_tlsconnect: psk
@@ -41,26 +44,6 @@
         - zabbix_agent_tlsaccept is defined
         - not 'psk' in zabbix_agent_tlsaccept
 
-  when: zabbix_agent_tlspsk_auto | bool
-  tags:
-    - config
-
-- name: Set Variables
-  ansible.builtin.set_fact:
-    zabbix_agent_include_dir: "{{ zabbix_agent_include_dir is defined | ternary(zabbix_agent_include_dir, _include) }}"
-    zabbix_agent_logfile: "{{ zabbix_agent_logfile is defined | ternary(zabbix_agent_logfile, _logfile) }}"
-    zabbix_agent_package: "{{ zabbix_agent_package is defined | ternary(zabbix_agent_package, _agent_package) }}"
-    zabbix_agent_pidfile: "{{ zabbix_agent_pidfile is defined | ternary(zabbix_agent_pidfile, _pidfile) }}"
-    zabbix_agent_service: "{{ zabbix_agent_service is defined | ternary(zabbix_agent_service, _agent_service) }}"
-    zabbix_agent_tls_subject: "{{ zabbix_agent_tls_subject is defined | ternary(zabbix_agent_tls_subject, _tls_subject) }}"
-    zabbix_agent_tlsaccept: "{{ zabbix_agent_tlsaccept is defined | ternary(zabbix_agent_tlsaccept, 'unencrypted')}}"
-    zabbix_agent_tlsconnect: "{{ zabbix_agent_tlsconnect is defined | ternary(zabbix_agent_tlsconnect, 'unencrypted')}}"
-
-- name: Setting Zabbix API Server Port
-  ansible.builtin.set_fact:
-    zabbix_api_server_port: "{{ '443' if zabbix_api_use_ssl|bool else '80' }}"
-  when: zabbix_api_server_port is undefined
-
 - name: Install Repository
   ansible.builtin.include_role:
     name: community.zabbix.zabbix_repo
@@ -71,44 +54,40 @@
   when:
     - zabbix_manage_repo | default(true)
     - not (zabbix_agent_docker | bool)
-    - ansible_os_family != "Windows"
+    - ansible_facts['os_family'] not in ['Alpine', 'Darwin', 'Windows']
 
-- name: "Install the correct repository"
-  ansible.builtin.include_tasks: "{{ ansible_os_family }}.yml"
-  when:
-    - not (zabbix_agent_docker | bool)
-
-- name: Configure PSK
-  when: "( 'psk' in zabbix_agent_tlsaccept ) or (zabbix_agent_tlsconnect  == 'psk')"
-  block:
-    - name: Gather PSK Secret Info
-      ansible.builtin.include_tasks: psk_secret.yml
-
-    - name: Gather PSK Identity Info
-      ansible.builtin.include_tasks: psk_identity.yml
-  tags:
-    - config
+- name: "Install the agent"
+  when: not (zabbix_agent_docker | bool)
+  ansible.builtin.include_tasks: "{{ _install_tasks_file }}"
+  with_first_found:
+    - "install-{{ ansible_facts['os_family'] }}.yml"
+    - "install.yml"
+  loop_control:
+    loop_var: _install_tasks_file
 
 - name: "Configure Agent"
-  ansible.builtin.include_tasks: Windows_conf.yml
-  when:
-    - ansible_os_family == "Windows"
-
-- name: "Configure Agent"
-  ansible.builtin.include_tasks: Linux.yml
-  when:
-    - (ansible_os_family != "Windows" and ansible_os_family != "Darwin") or (zabbix_agent_docker | bool)
+  when: ansible_facts['os_family'] not in ['Darwin']
+  ansible.builtin.include_tasks: "{{ _configure_tasks_file }}"
+  with_first_found:
+    - "configure-{{ ansible_facts['os_family'] }}.yml"
+    - "configure{% if zabbix_agent_docker %}-Docker{% endif %}.yml"
+  loop_control:
+    loop_var: _configure_tasks_file
 
 - name: "Run the API calls to Zabbix Server"
   vars:
     gather_facts: false
-    ansible_user: "{{ zabbix_api_login_user }}"
-    ansible_httpapi_use_ssl: "{{ zabbix_api_use_ssl }}"
     ansible_network_os: community.zabbix.zabbix
     ansible_connection: httpapi
-    # Can't think of a way to make http_login_* vars be undefined -(
+    ansible_httpapi_use_ssl: "{{ zabbix_api_use_ssl }}"
+    # --- Basic Auth (Begin) ---
     http_login_user: "{{ zabbix_api_http_user | default(-42) }}"
     http_login_password: "{{ zabbix_api_http_password | default(-42) }}"
+    # --- Basic Auth (End) ---
+    ansible_user: "{{ zabbix_api_login_user }}"
+    ansible_httpapi_pass: "{{ zabbix_api_login_pass }}"
+    ansible_httpapi_port: "{{ zabbix_api_server_port }}"
+    ansible_httpapi_validate_certs: "{{ zabbix_api_validate_certs }}"
   ansible.builtin.include_tasks: api.yml
   when:
     - (zabbix_api_create_hostgroup | bool) or (zabbix_api_create_hosts | bool)

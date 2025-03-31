@@ -1,71 +1,75 @@
 ---
 # defaults file for zabbix_agent
 
+zabbix_agent_version_check: true
+
 zabbix_agent2: false
 zabbix_agent_version_minor: "*"
 zabbix_version_patch: 0
 zabbix_agent_package_remove: false
-zabbix_agent_sender_package: zabbix-sender
-zabbox_agent_get_package: zabbix-get
+zabbix_agent_package: "{{ _zabbix_agent_package | default(zabbix_agent2 | ternary('zabbix-agent2', 'zabbix-agent')) }}"
 zabbix_agent_package_state: present
+zabbix_agent_get_package: "{{ _zabbix_agent_get_package | default('zabbix-get') }}"
+zabbix_agent_sender_package: "{{ _zabbix_agent_sender_package | default('zabbix-sender') }}"
 zabbix_agent_selinux: false
+zabbix_agent_conf: "{{ zabbix_agent2 | ternary('zabbix_agent2.conf', 'zabbix_agentd.conf') }}"
 zabbix_agent_conf_mode: "0644"
-zabbix_agent_dont_detect_ip: false
+# Retaining backwards compatability by using the awkwardly named old variable
+zabbix_agent_detect_ip: "{{ not zabbix_agent_dont_detect_ip | default(false) }}" # True
 
-zabbix_agent_listeninterface:
+zabbix_agent_pidfile: "{{ _pidfile }}"
+zabbix_agent_service: "{{ _zabbix_agent_service | default(zabbix_agent2 | ternary('zabbix-agent2', 'zabbix-agent')) }}"
+
 zabbix_agent_allowroot: false
 zabbix_agent_buffersend: 5
 zabbix_agent_buffersize: 100
-zabbix_agent_controlsocket: /tmp/agent.sock
+zabbix_agent_controlsocket: "{{ _zabbix_agent_controlsocket | default('/tmp/agent.sock') }}"
 zabbix_agent_debuglevel: 3
 zabbix_agent_enablepersistentbuffer: false
 zabbix_agent_enableremotecommands: false
 zabbix_agent_forceactivechecksonstart: false
 zabbix_agent_heartbeatfrequency: 60
 zabbix_agent_hostname: "{{ inventory_hostname }}"
-zabbix_agent_include_mode: "0750"
+zabbix_agent_include_dirs: "{{ _zabbix_agent_include_dirs | default(_includes) }}"
+zabbix_agent_include_mode: "0755"
 zabbix_agent_listenip: 0.0.0.0
 zabbix_agent_listenport: 10050
+zabbix_agent_logfile: "{{ _zabbix_agent_logfile | default('/var/log/zabbix/' ~ zabbix_agent2 | ternary('zabbix_agent2.log', 'zabbix_agentd.log')) }}"
 zabbix_agent_logfilesize: 100
 zabbix_agent_logtype: file
 zabbix_agent_maxlinespersecond: 20
 zabbix_agent_persistentbufferperiod: 1h
-zabbix_agent_pluginsocket: /tmp/agent.plugin.sock
+zabbix_agent_pluginsocket: "{{ _zabbix_agent_pluginsocket | default('/tmp/agent.plugin.sock') }}"
 zabbix_agent_plugintimeout: 3
 zabbix_agent_refreshactivechecks: 120
 zabbix_agent_statusport: 9999
 zabbix_agent_timeout: 3
+
+zabbix_agent_tlsaccept: "unencrypted"
+zabbix_agent_tlsconnect: "unencrypted"
 zabbix_agent_tlspsk_auto: false
-zabbix_agent_tlspskfile: /etc/zabbix/tls_psk_auto.secret
+zabbix_agent_tlspskfile: "{{ _zabbix_agent_tlspskfile | default('/etc/zabbix/tls_psk_auto.secret') }}"
+zabbix_agent_tlspskidentity_file: "{{ _zabbix_agent_tlspskidentity_file | default('/etc/zabbix/tls_psk_auto.identity') }}"
+zabbix_agent_tls_subject: "{{ _tls_subject }}"
+
 zabbix_agent_unsafeuserparameters: false
 zabbix_agent_runas_user: zabbix
 zabbix_agent_loadmodulepath: ${libdir}/modules
 zabbix_agent_logremotecommands: false
 zabbix_agent_startagents: 3
 
-zabbix_agent_tlspskidentity_file: "/etc/zabbix/tls_psk_auto.identity"
 # Selinux related vars
 selinux_allow_zabbix_run_sudo: false
 
 zabbix_agent_install_agent_only: false
 
-# Zabbix role related vars
-zabbix_apt_force_apt_get: true
-zabbix_apt_install_recommends: false
-
-# Override Ansible specific facts
-zabbix_agent_disable_repo:
-  - epel
-
 # Zabbix API stuff
-zabbix_api_server_host: localhost
-zabbix_api_login_user: Admin
 zabbix_api_use_ssl: false
+zabbix_api_login_user: Admin
 zabbix_api_login_pass: !unsafe zabbix
+zabbix_api_server_host: localhost
+zabbix_api_server_port: "{{ zabbix_api_use_ssl | ternary('443', '80') }}"
 zabbix_api_validate_certs: false
-ansible_httpapi_pass: "{{ zabbix_api_login_pass }}"
-ansible_httpapi_port: "{{ zabbix_api_server_port }}"
-ansible_httpapi_validate_certs: "{{ zabbix_api_validate_certs }}"
 
 # API Related Variables
 zabbix_api_create_hostgroup: false
@@ -79,7 +83,7 @@ zabbix_useuip: 1
 zabbix_host_groups:
   - Linux servers
 zabbix_agent_link_templates:
-  - Template Linux by Zabbix agent
+  - Linux by Zabbix agent
 
 zabbix_agent_interfaces:
   - type: 1
@@ -103,31 +107,32 @@ zabbix_agent_tls_config:
 zabbix_agent_ipmi_authtype: -1
 zabbix_agent_ipmi_privilege: 2
 
-####### Agent 1 Stuff Only
-
-# Windows/macOS Related
-zabbix_version_long: 5.2.4
+zabbix_agent_download_base_url: https://cdn.zabbix.com/zabbix/binaries/stable
 
 # Windows Related
-zabbix_win_download_url: https://cdn.zabbix.com/zabbix/binaries/stable
-zabbix_win_install_dir: 'C:\Zabbix'
-zabbix_win_install_dir_conf: '{{ zabbix_win_install_dir }}\conf'
-zabbix_win_install_dir_bin: '{{ zabbix_win_install_dir }}\bin'
+zabbix_agent_win_package: "{{ zabbix_agent2 | ternary('zabbix_agent2', 'zabbix_agent') }}-{{ zabbix_agent_version_long }}-windows-{{  _zabbix_agent_win_arch[ansible_facts.architecture] }}-openssl.msi"
+zabbix_agent_win_download_url: "{{ zabbix_agent_download_base_url }}/{{ zabbix_agent_version }}/{{ zabbix_agent_version_long }}/{{ zabbix_agent_win_package }}"
+
+zabbix_agent_win_install_dir: "C:/Program Files/{{ zabbix_agent2 | ternary('Zabbix Agent 2', 'Zabbix Agent') }}"
+zabbix_agent_win_exe_path: "{{ zabbix_agent_win_install_dir }}/{{ zabbix_agent2 | ternary('zabbix_agent2.exe', 'zabbix_agentd.exe') }}"
+zabbix_agent_win_service: "{{ zabbix_agent2 | ternary('Zabbix Agent 2', 'Zabbix Agent') }}"
+
 zabbix_win_firewall_management: true
 
 # macOS Related
+zabbix_version_long: 5.2.4
 zabbix_mac_package: zabbix_agent-{{ zabbix_version_long }}-macos-amd64-openssl.pkg
-zabbix_mac_download_url: https://cdn.zabbix.com/zabbix/binaries/stable
-zabbix_mac_download_link: "{{ zabbix_mac_download_url }}/{{ zabbix_agent_version }}/{{ zabbix_version_long }}/{{ zabbix_mac_package }}"
+zabbix_mac_download_link: "{{ zabbix_agent_download_base_url }}/{{ zabbix_agent_version }}/{{ zabbix_version_long }}/{{ zabbix_mac_package }}"
 
 # Zabbix Agent Docker facts
 zabbix_agent_docker: false
 zabbix_agent_docker_state: started
 zabbix_agent_docker_name: zabbix-agent
-zabbix_agent_docker_image: "zabbix/zabbix-agent"
-zabbix_agent_docker_image_tag: "ubuntu-{{ zabbix_agent_version }}.{{ zabbix_version_patch }}"
-zabbix_agent_docker_user_gid: 101
-zabbix_agent_docker_user_uid: 101
+zabbix_agent_docker_image: "zabbix/{{ zabbix_agent2 | ternary('zabbix-agent2', 'zabbix-agent') }}"
+zabbix_agent_docker_image_tag: "latest"
+zabbix_agent_docker_create_home: true
+zabbix_agent_docker_home: /var/lib/zabbix
+zabbix_agent_docker_include_dir: "{{ zabbix_agent_include_dirs | first }}"
 zabbix_agent_docker_network_mode: host
 zabbix_agent_docker_restart_policy: unless-stopped
 zabbix_agent_docker_privileged: false
@@ -136,12 +141,9 @@ zabbix_agent_docker_ports:
 zabbix_agent_docker_security_opts:
   - apparmor:unconfined
 zabbix_agent_docker_volumes:
-  - /etc/zabbix/zabbix_agentd.d:{{ zabbix_agent_docker_include_dir }}
-  - /:/hostfs:ro
-  - /etc:/hostfs/etc:ro
-  - /proc:/hostfs/proc:ro
-  - /sys:/hostfs/sys:ro
-  - /var/run:/var/run
+  - "{{ zabbix_agent_docker_include_dir }}:/etc/zabbix/zabbix_agentd.d"
+  - "/:/hostfs:ro"
+  - "/var/run:/var/run"
 zabbix_agent_docker_env:
   ZBX_HOSTNAME: "{{ zabbix_agent_hostname }}"
   ZBX_SERVER_HOST: "{{ zabbix_agent_server }}"
@@ -149,11 +151,11 @@ zabbix_agent_docker_env:
   ZBX_PASSIVESERVERS: "{{ zabbix_agent_serverpassive | default(omit) }}"
   ZBX_ACTIVE_ALLOW: "{{ zabbix_agent_serveractive_allow | default(omit) }}"
   ZBX_LOADMODULE: "{{ zabbix_agent_loadmodule | default(omit) }}"
-  ZBX_DEBUGLEVEL: "{{ zabbix_agent_debuglevel }}"
-  ZBX_TIMEOUT: "{{ zabbix_agent_timeout }}"
+  ZBX_DEBUGLEVEL: "{{ zabbix_agent_debuglevel | quote }}"
+  ZBX_TIMEOUT: "{{ zabbix_agent_timeout | quote }}"
   ZBX_SOURCEIP: "{{ zabbix_agent_sourceip | default(omit) }}"
-  ZBX_ENABLEREMOTECOMMANDS: "{{ zabbix_agent_enableremotecommands | default(omit) }}"
-  ZBX_LOGREMOTECOMMANDS: "{{ zabbix_agent_logremotecommands | default(omit) }}"
+  ZBX_ENABLEREMOTECOMMANDS: "{{ zabbix_agent_enableremotecommands | default(omit) | int }}"
+  ZBX_LOGREMOTECOMMANDS: "{{ zabbix_agent_logremotecommands | default(omit) | int }}"
   ZBX_STARTAGENTS: "{{ zabbix_agent_startagents | default(omit) }}"
   ZBX_HOSTNAMEITEM: "{{ zabbix_agent_hostnameitem | default(omit) }}"
   ZBX_METADATA: "{{ zabbix_agent_hostmetadata | default(omit) }}"
@@ -163,7 +165,7 @@ zabbix_agent_docker_env:
   ZBX_BUFFERSIZE: "{{ zabbix_agent_buffersize | default(omit) }}"
   ZBX_MAXLINESPERSECOND: "{{ zabbix_agent_maxlinespersecond | default(omit) }}"
   ZBX_LISTENIP: "{{ zabbix_agent_listenip }}"
-  ZBX_UNSAFEUSERPARAMETERS: "{{ zabbix_agent_unsafeuserparameters | default(omit) }}"
+  ZBX_UNSAFEUSERPARAMETERS: "{{ zabbix_agent_unsafeuserparameters | default(omit) | int }}"
   ZBX_TLSCONNECT: "{{ zabbix_agent_tlsconnect | default(omit) }}"
   ZBX_TLSACCEPT: "{{ zabbix_agent_tlsaccept | default(omit) }}"
   ZBX_TLSCAFILE: "{{ zabbix_agent_tlscafile | default(omit) }}"

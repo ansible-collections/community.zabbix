@@ -136,9 +136,49 @@
   ansible.builtin.assert:
     that: zbxtemptrigger_changed is changed
 
-- name: test - attempt to delete previously created zabbix trigger
+- name: test - rename existing zabbix trigger
   community.zabbix.zabbix_trigger:
     name: TestTrigger
+    template_name: ExampleTemplate
+    params:
+      new_name: NewTestTrigger
+    state: present
+  register: zbxnametrigger_changed
+
+- name: expect to succeed and that things changed
+  ansible.builtin.assert:
+    that: zbxnametrigger_changed is changed
+
+- name: test - rename existing zabbix trigger again
+  community.zabbix.zabbix_trigger:
+    name: TestTrigger
+    template_name: ExampleTemplate
+    params:
+      new_name: NewTestTrigger
+    state: present
+  register: zbxnametrigger_existing
+
+- name: assert that nothing has been changed
+  ansible.builtin.assert:
+    that: not zbxnametrigger_existing is changed
+
+- name: test - rename non-existing zabbix trigger
+  community.zabbix.zabbix_trigger:
+    name: TestTrigger
+    template_name: ExampleTemplate
+    params:
+      new_name: NewTestTrigger2
+    state: present
+  ignore_errors: yes
+  register: zbxnametrigger_failed
+
+- name: expect to fail
+  ansible.builtin.assert:
+    that: zbxnametrigger_failed is failed
+
+- name: test - attempt to delete previously created zabbix trigger
+  community.zabbix.zabbix_trigger:
+    name: NewTestTrigger
     template_name: ExampleTemplate
     state: absent
   register: zbxtemptrigger_existing_delete
@@ -149,7 +189,7 @@
 
 - name: test - attempt to delete non-existing zabbix trigger
   community.zabbix.zabbix_trigger:
-    name: TestTrigger
+    name: NewTestTrigger
     template_name: ExampleTemplate
     state: absent
   register: zbxtemptrigger_missing_delete

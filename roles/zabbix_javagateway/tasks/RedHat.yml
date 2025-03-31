@@ -14,3 +14,18 @@
   become: true
   tags:
     - install
+
+- name: "RedHat | Looking for Enviroment Files (See Issue 1474)"
+  ansible.builtin.find:
+    path: /etc/zabbix/
+    patterns: '*.env'
+  register: _env_files
+
+- name: "RedHat | Create Enviroment File (See Issue 1474)"
+  ansible.builtin.file:
+    path: /etc/zabbix/zabbix_java_gateway.env
+    state: touch
+    owner: root
+    group: root
+    mode: 644
+  when: _env_files['matched'] == 0

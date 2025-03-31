@@ -89,16 +89,16 @@ To successfully complete the install the role requires `python-netaddr` on the c
 
 See the following list of supported Operating systems with the Zabbix releases:
 
-| Zabbix              | 7.0 | 6.4 | 6.0 |
-|---------------------|-----|-----|-----|
-| Red Hat Fam 9       |  V  |  V  |  V  |
-| Red Hat Fam 8       |  V  |  V  |  V  |
-| Ubuntu 24.04 noble  |  V  |  V  |  V  |
-| Ubuntu 22.04 jammy  |  V  |  V  |  V  |
-| Ubuntu 20.04 focal  |  V  |  V  |  V  |
-| Debian 12 bookworm  |  V  |  V  |  V  |
-| Debian 11 bullseye  |  V  |  V  |  V  |
-| Suse Fam 15         |  V  |  V  |  V  |
+| Zabbix              | 7.2 | 7.0 | 6.4 | 6.0 |
+|---------------------|-----|-----|-----|-----|
+| Red Hat Fam 9       |  V  |  V  |  V  |  V  |
+| Red Hat Fam 8       |  V  |  V  |  V  |  V  |
+| Ubuntu 24.04 noble  |  V  |  V  |  V  |  V  |
+| Ubuntu 22.04 jammy  |  V  |  V  |  V  |  V  |
+| Ubuntu 20.04 focal  |  V  |  V  |  V  |  V  |
+| Debian 12 bookworm  |  V  |  V  |  V  |  V  |
+| Debian 11 bullseye  |  V  |  V  |  V  |  V  |
+| Suse Fam 15         |  V  |  V  |  V  |  V  |
 
 You can bypass this matrix by setting `enable_version_check: false`
 
@@ -134,11 +134,10 @@ Selinux changes will be installed based on the status of selinux running on the 
 * `zabbix_agent_apt_priority`: Add a weight (`Pin-Priority`) for the APT repository.
 * `zabbix_agent_chassis`: Default: `false`. When set to `true`, it will give Zabbix Agent access to the Linux DMI table allowing system.hw.chassis info to populate.
 * `zabbix_agent_conf_mode`: Default: `0644`. The "mode" for the Zabbix configuration file.
-* `zabbix_agent_dont_detect_ip`: Default `false`. When set to `true`, it won't detect available ip addresses on the host and no need for the Python module `netaddr` to be installed.
+* `zabbix_agent_detect_ip`: Default `true`. When set to `false`, it won't detect available ip addresses on the host and no need for the Python module `netaddr` to be installed.
 * `zabbix_agent_get_package`: The name of the zabbix-get package. Default: `zabbix-get`.
 * `zabbix_agent_include_mode`: The mode for the directory mentioned above.
 * `zabbix_agent_install_agent_only`: Only install the Zabbix Agent and not the `zabbix-sender` and `zabbix-get` packages. Default: `False`
-* `zabbix_agent_listeninterface`: Interface zabbix-agent listens on. Leave blank for all.
 * `zabbix_agent_package_remove`: If `zabbix_agent2: True` and you want to remove the old installation. Default: `False`.
 * `zabbix_agent_package_state`: If Zabbix-agent needs to be `present` (default) or `latest`.
 * `zabbix_agent_package`: The name of the zabbix-agent package. Default: `zabbix-agent` if `zabbix_agent2` is false and `zabbix-agent2` if `true`.

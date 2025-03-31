@@ -1,0 +1,135 @@
+---
+- name: Configure PSK
+  when: "( 'psk' in zabbix_agent_tlsaccept ) or (zabbix_agent_tlsconnect  == 'psk')"
+  tags:
+    - config
+  block:
+    - name: AutoPSK | Check for existing TLS PSK file
+      ansible.builtin.stat:
+        path: "{{ zabbix_agent_tlspskfile }}"
+      register: zabbix_agent_tlspskcheck
+      become: true
+
+    - name: Gather PSK Secret Info
+      ansible.builtin.include_tasks: psk_secret.yml
+
+    - name: AutoPSK | Template PSK Secret
+      when:
+        - zabbix_agent_tlspskfile is defined
+        - zabbix_agent_tlspsk_secret is defined
+      block:
+        - name: Create Directory for PSK File
+          ansible.builtin.file:
+            path: "{{ zabbix_agent_tlspskfile | dirname }}"
+            mode: 0755
+            state: directory
+          become: true
+
+        - name: AutoPSK | Template PSK Secret
+          ansible.builtin.copy:
+            dest: "{{ zabbix_agent_tlspskfile }}"
+            content: "{{ zabbix_agent_tlspsk_secret }}"
+            owner: zabbix
+            group: zabbix
+            mode: 0400
+          become: true
+          notify:
+            - restart zabbix-agent
+            - restart mac zabbix agent
+
+    - name: AutoPSK | Check for existing TLS PSK identity
+      ansible.builtin.stat:
+        path: "{{ zabbix_agent_tlspskidentity_file }}"
+      register: zabbix_agent_tlspskidentity_check
+      become: true
+
+    - name: Gather PSK Identity Info
+      ansible.builtin.include_tasks: psk_identity.yml
+
+    - name: AutoPSK | Template PSK Identity
+      ansible.builtin.copy:
+        dest: "{{ zabbix_agent_tlspskidentity_file }}"
+        content: "{{ zabbix_agent_tlspskidentity }}"
+        owner: zabbix
+        group: zabbix
+        mode: 0400
+      become: true
+      when:
+        - zabbix_agent_tlspskidentity_file is defined
+        - zabbix_agent_tlspskidentity is defined
+      notify:
+        - restart zabbix-agent
+        - restart mac zabbix agent
+
+- name: "Validate zabbix_agent_listenip"
+  ansible.builtin.assert:
+    that:
+      - _listenip in ansible_facts['all_ipv4_addresses']
+    fail_msg: "listenip: {{ _listenip }} is not an address available on {{ inventory_hostname }}"
+  when:
+    - _listenip not in ['127.0.0.1', '0.0.0.0']
+  loop: "{{ zabbix_agent_listenip | split(',') }}"
+  loop_control:
+    loop_var: _listenip
+  tags:
+    - config
+
+- name: "Configure SELinux when enabled"
+  ansible.builtin.include_tasks: selinux.yml
+  when: ansible_facts.selinux.status | default('disabled') == 'enabled'
+
+- name: "Configure zabbix-agent"
+  ansible.builtin.template:
+    src: agent.conf.j2
+    dest: "/etc/zabbix/zabbix_agent{{ (zabbix_agent2 | bool) | ternary('2', 'd') }}.conf"
+    owner: root
+    group: root
+    mode: "{{ zabbix_agent_conf_mode }}"
+  notify:
+    - restart zabbix-agent
+  become: true
+  tags:
+    - config
+
+- name: "Create include dirs zabbix-agent"
+  ansible.builtin.file:
+    path: "{{ include_dir }}"
+    owner: root
+    group: root
+    mode: "{{ zabbix_agent_include_mode }}"
+    state: directory
+  loop: "{{ zabbix_agent_include_dirs }}"
+  loop_control:
+    loop_var: 'include_dir'
+  become: true
+  tags:
+    - config
+
+- name: "Remove zabbix-agent installation when zabbix-agent2 is used."
+  ansible.builtin.include_tasks: remove.yml
+  when:
+    - zabbix_agent2 | bool
+    - zabbix_agent_package_remove
+
+- name: "Give zabbix-agent access to system.hw.chassis info"
+  ansible.builtin.file:
+    path: /sys/firmware/dmi/tables/DMI
+    owner: root
+    group: zabbix
+  become: true
+  when:
+    - zabbix_agent_chassis is defined
+    - zabbix_agent_chassis | bool
+  tags:
+    - config
+
+- meta: flush_handlers
+
+- name: "Ensure zabbix-agent is enabled and running"
+  ansible.builtin.service:
+    name: "{{ zabbix_agent_service }}"
+    state: started
+    enabled: true
+  become: true
+  tags:
+    - service

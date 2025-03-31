@@ -38,6 +38,11 @@ options:
         aliases: [ "host_group" ]
         type: list
         elements: str
+    append:
+        description:
+            - Whether to append hosts and host groups to the existing maintenance.
+        type: bool
+        default: false
     minutes:
         description:
             - Length of maintenance window in minutes.
@@ -228,6 +233,7 @@ from ansible.module_utils.basic import AnsibleModule
 
 from ansible_collections.community.zabbix.plugins.module_utils.base import ZabbixBase
 import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabbix_utils
+from ansible.module_utils.compat.version import LooseVersion
 
 
 class MaintenanceModule(ZabbixBase):
@@ -235,8 +241,8 @@ class MaintenanceModule(ZabbixBase):
                            maintenance_type, period, name, desc, tags):
         end_time = start_time + period
         parameters = {
-            "groupids": group_ids,
-            "hostids": host_ids,
+            "groups": [{"groupid": groupid} for groupid in group_ids],
+            "hosts": [{"hostid": hostid} for hostid in host_ids],
             "name": name,
             "maintenance_type": maintenance_type,
             "active_since": str(start_time),
@@ -248,6 +254,11 @@ class MaintenanceModule(ZabbixBase):
                 "period": str(period),
             }]
         }
+        if LooseVersion(self._zbx_api_version) < LooseVersion("6.2"):
+            parameters["groupids"] = group_ids
+            parameters["hostids"] = host_ids
+            del parameters["groups"]
+            del parameters["hosts"]
         if tags is not None:
             parameters["tags"] = tags
         self._zapi.maintenance.create(parameters)
@@ -258,8 +269,8 @@ class MaintenanceModule(ZabbixBase):
         end_time = start_time + period
         parameters = {
             "maintenanceid": maintenance_id,
-            "groupids": group_ids,
-            "hostids": host_ids,
+            "groups": [{"groupid": groupid} for groupid in group_ids],
+            "hosts": [{"hostid": hostid} for hostid in host_ids],
             "maintenance_type": maintenance_type,
             "active_since": str(start_time),
             "active_till": str(end_time),
@@ -270,27 +281,34 @@ class MaintenanceModule(ZabbixBase):
                 "period": str(period),
             }]
         }
+        if LooseVersion(self._zbx_api_version) < LooseVersion("6.2"):
+            parameters["groupids"] = group_ids
+            parameters["hostids"] = host_ids
+            del parameters["groups"]
+            del parameters["hosts"]
         if tags is not None:
             parameters["tags"] = tags
         self._zapi.maintenance.update(parameters)
         return 0, None, None
 
     def get_maintenance(self, name):
-        maintenances = self._zapi.maintenance.get(
-            {
-                "filter":
-                {
-                    "name": name,
-                },
-                "selectGroups": "extend",
-                "selectHosts": "extend",
-                "selectTags": "extend"
-            }
-        )
+        parameters = {
+            "filter": {"name": name},
+            "selectHostGroups": "extend",
+            "selectHosts": "extend",
+            "selectTags": "extend",
+        }
+        if LooseVersion(self._zbx_api_version) < LooseVersion("6.2"):
+            parameters["selectGroups"] = parameters["selectHostGroups"]
+            del parameters["selectHostGroups"]
+        maintenances = self._zapi.maintenance.get(parameters)
 
         for maintenance in maintenances:
             maintenance["groupids"] = [group["groupid"] for group
-                                       in maintenance["groups"]] if "groups" in maintenance else []
+                                       in maintenance["hostgroups"]] if "hostgroups" in maintenance else []
+            if LooseVersion(self._zbx_api_version) < LooseVersion("6.2"):
+                maintenance["groupids"] = [group["groupid"] for group
+                                           in maintenance["groups"]] if "groups" in maintenance else []
             maintenance["hostids"] = [host["hostid"] for host
                                       in maintenance["hosts"]] if "hosts" in maintenance else []
             return 0, maintenance, None
@@ -370,6 +388,7 @@ def main():
         minutes=dict(type="int", required=False, default=10),
         host_groups=dict(type="list", required=False,
                          default=None, aliases=["host_group"], elements="str"),
+        append=dict(type="bool", required=False, default=False),
         name=dict(type="str", required=True),
         desc=dict(type="str", required=False, default="Created by Ansible"),
         collect_data=dict(type="bool", required=False, default=True),
@@ -396,6 +415,7 @@ def main():
 
     host_names = module.params["host_names"]
     host_groups = module.params["host_groups"]
+    append = module.params["append"]
     state = module.params["state"]
     minutes = module.params["minutes"]
     name = module.params["name"]
@@ -448,18 +468,23 @@ def main():
             module.fail_json(
                 msg="Failed to check maintenance %s existence: %s" % (name, error))
 
-        if maintenance and maint.check_maint_properties(maintenance, group_ids, host_ids, maintenance_type,
-                                                        start_time, period, desc, tags):
-            if module.check_mode:
-                changed = True
-            else:
-                (rc, data, error) = maint.update_maintenance(
-                    maintenance["maintenanceid"], group_ids, host_ids, start_time, maintenance_type, period, desc, tags)
-                if rc == 0:
+        if maintenance:
+            if append:
+                group_ids = list(set(group_ids + maintenance["groupids"]))
+                host_ids = list(set(host_ids + maintenance["hostids"]))
+
+            if maint.check_maint_properties(maintenance, group_ids, host_ids, maintenance_type,
+                                            start_time, period, desc, tags):
+                if module.check_mode:
                     changed = True
                 else:
-                    module.fail_json(
-                        msg="Failed to update maintenance: %s" % error)
+                    (rc, data, error) = maint.update_maintenance(
+                        maintenance["maintenanceid"], group_ids, host_ids, start_time, maintenance_type, period, desc, tags)
+                    if rc == 0:
+                        changed = True
+                    else:
+                        module.fail_json(
+                            msg="Failed to update maintenance: %s" % error)
 
         if not maintenance:
             if module.check_mode:

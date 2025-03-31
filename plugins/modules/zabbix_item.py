@@ -116,6 +116,11 @@ options:
                     - log
                     - numeric_unsigned
                     - text
+            new_name:
+                description:
+                    - New name for item
+                required: false
+                type: str
             master_item:
                 description:
                     - item that is the master of the current one
@@ -327,6 +332,23 @@ EXAMPLES = r'''
     name: agent_ping
     template_name: example_template
     state: absent
+
+- name: Rename Zabbix item
+  # set task level variables as we change ansible_connection plugin here
+  vars:
+    ansible_network_os: community.zabbix.zabbix
+    ansible_connection: httpapi
+    ansible_httpapi_port: 443
+    ansible_httpapi_use_ssl: true
+    ansible_httpapi_validate_certs: false
+    ansible_zabbix_url_path: "zabbixeu"  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
+    ansible_host: zabbix-example-fqdn.org
+  community.zabbix.zabbix_item:
+    name: agent_ping
+    template_name: example_template
+    params:
+      new_name: new_agent_ping
+    state: present
 '''
 
 from ansible.module_utils.basic import AnsibleModule
@@ -552,8 +574,14 @@ def main():
     elif state == "present":
         item.sanitize_params(name, params)
         items = item.get_items(name, host_name, template_name)
+        if 'new_name' in params:
+            new_name_item = item.get_items(params['new_name'], host_name, template_name)
+            if len(new_name_item) > 0:
+                module.exit_json(changed=False, result=[{'itemids': [new_name_item[0]['itemid']]}])
         results = []
         if len(items) == 0:
+            if 'new_name' in params:
+                module.fail_json('Cannot rename item:  %s is not found' % name)
             hosts_templates = item.get_hosts_templates(host_name, template_name)
             for host_template in hosts_templates:
                 if 'hostid' in host_template:
@@ -568,6 +596,9 @@ def main():
             changed = False
             for i in items:
                 params['itemid'] = i['itemid']
+                if 'new_name' in params:
+                    params['name'] = params['new_name']
+                    params.pop("new_name")
                 results.append(item.update_item(params))
                 changed_item = item.check_item_changed(i)
                 if changed_item:

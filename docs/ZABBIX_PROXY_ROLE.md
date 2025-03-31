@@ -77,16 +77,16 @@ ansible-galaxy collection install community.postgresql
 
 See the following list of supported Operating systems with the Zabbix releases.
 
-| Zabbix              | 7.0 | 6.4 | 6.0 |
-|---------------------|-----|-----|-----|
-| Red Hat Fam 9       |  V  |  V  |  V  |
-| Red Hat Fam 8       |  V  |  V  |  V  |
-| Ubuntu 24.04 noble  |  V  |  V  |  V  |
-| Ubuntu 22.04 jammy  |  V  |  V  |  V  |
-| Ubuntu 20.04 focal  |  V  |  V  |  V  |
-| Debian 12 bookworm  |  V  |  V  |  V  |
-| Debian 11 bullseye  |  V  |  V  |  V  |
-| Suse Fam 15         |  V  |  V  |  V  |
+| Zabbix              | 7.2 | 7.0 | 6.4 | 6.0 |
+|---------------------|-----|-----|-----|-----|
+| Red Hat Fam 9       |  V  |  V  |  V  |  V  |
+| Red Hat Fam 8       |  V  |  V  |  V  |  V  |
+| Ubuntu 24.04 noble  |  V  |  V  |  V  |  V  |
+| Ubuntu 22.04 jammy  |  V  |  V  |  V  |  V  |
+| Ubuntu 20.04 focal  |  V  |  V  |  V  |  V  |
+| Debian 12 bookworm  |  V  |  V  |  V  |  V  |
+| Debian 11 bullseye  |  V  |  V  |  V  |  V  |
+| Suse Fam 15         |  V  |  V  |  V  |  V  |
 
 You can bypass this matrix by setting `enable_version_check: false`
 
@@ -132,7 +132,7 @@ The following is an overview of all available configuration default for this rol
 * `zabbix_repo_yum_gpgcheck`: Default: `0`.  Should yum perform a GPG check on the repository
 * `zabbix_proxy_disable_repo`: A list of repos to disable during install.  Default `epel`.
 * `zabbix_proxy_apt_priority`: APT priority for the zabbix repository
-* `*zabbix_proxy_package_state`: Default: `present`. Can be overridden to `latest` to update packages
+* `zabbix_proxy_package_state`: Default: `present`. Can be overridden to `latest` to update packages
 * `zabbix_repo_deb_url`: The URL to the Zabbix repository.  Default `http://repo.zabbix.com/zabbix/{{ zabbix_proxy_version }}/{{ ansible_distribution.lower() }}`
 * `zabbix_repo_deb_component`: The repository component for Debian installs. Default `main`.
 * `zabbix_repo_deb_gpg_key_url`: The URL to download the Zabbix GPG key from. Default `http://repo.zabbix.com/zabbix-official-repo.key`.

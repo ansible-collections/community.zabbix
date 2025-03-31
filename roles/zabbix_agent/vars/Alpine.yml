@@ -1,0 +1,5 @@
+---
+zabbix_agent_version_check: false
+zabbix_agent_install_agent_only: true
+
+_zabbix_agent_service: "{{ zabbix_agent2 | ternary('zabbix-agent2', 'zabbix-agentd') }}"
