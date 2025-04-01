@@ -194,11 +194,11 @@ class Token(ZabbixBase):
 
             if isinstance(status, bool):
                 if status:
-                    if token["status"] != "0":
-                        params["status"] = "0"
-                else:
                     if token["status"] != "1":
                         params["status"] = "1"
+                else:
+                    if token["status"] != "0":
+                        params["status"] = "0"
 
             if isinstance(expires_at, int) and str(expires_at) != token["expires_at"]:
                 params["expires_at"] = str(expires_at)
