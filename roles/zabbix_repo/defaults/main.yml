@@ -3,6 +3,7 @@
 zabbix_repo_version: "7.2"
 zabbix_repo_yum_gpgcheck: 0
 zabbix_repo_yum_schema: https
+zabbix_repo_deb_url: "{{ zabbix_repo_version is version('7.0', '>') | ternary(_post_72_deb_repo, _pre_72_deb_repo) }}"
 _pre_72_deb_repo: "http://repo.zabbix.com/zabbix/{{ zabbix_repo_version }}/{{ ansible_facts.lsb.id | default(ansible_facts['distribution']) | lower }}{% if ansible_facts['architecture'] == 'aarch64' and ansible_facts.lsb.id | default(ansible_facts['distribution']) in ['Debian', 'Ubuntu'] %}-arm64{% endif %}"
 _post_72_deb_repo: "http://repo.zabbix.com/zabbix/{{ zabbix_repo_version }}/stable/{{ ansible_facts.lsb.id | default(ansible_facts['distribution']) | lower }}"
 zabbix_repo_deb_component: main
