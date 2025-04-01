@@ -10,7 +10,7 @@
       register: installation_dependencies
       until: installation_dependencies is succeeded
       when:
-        - ansible_os_family == 'Debian'
+        - ansible_facts['os_family'] == 'Debian'
 
     - name: "Configure SUDO."
       ansible.builtin.lineinfile:
@@ -24,4 +24,4 @@
         line: "tsflags=nodocs"
         state: absent
       when:
-        - ansible_os_family == 'RedHat'
+        - ansible_facts['os_family'] == 'RedHat'
