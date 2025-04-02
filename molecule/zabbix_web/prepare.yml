@@ -3,50 +3,15 @@
   hosts: all
 
   pre_tasks:
-    - name: "Installing packages on CentOS"
-      ansible.builtin.yum:
+    # issues on redhat with curl, so install curl-minimal.
+    - name: "Installing packages"
+      ansible.builtin.package:
         name:
-          - net-tools
-          - which
+          - "curl{% if ansible_facts['os_family'] == 'RedHat' and ansible_facts['distribution_major_version'] | int > 8 %}-minimal{% endif %}"
           - sudo
-        state: present
+        update_cache: "{{ (ansible_facts['os_family'] in ['Debian', 'Suse']) | ternary(true, omit) }}"
       register: installation_dependencies
       until: installation_dependencies is succeeded
-      when: ansible_facts['os_family'] == 'RedHat'
-
-    - name: "Apt update"
-      ansible.builtin.shell: "apt-get update"
-      register: installation_dependencies
-      until: installation_dependencies is succeeded
-      when: ansible_facts['os_family'] == 'Debian'
-
-    - name: "Installing packages on Debian family"
-      ansible.builtin.apt:
-        name:
-          - net-tools
-          - apt-utils
-          - python3-pip
-          - gpg-agent
-          - sudo
-          - curl
-        update_cache: true
-        state: present
-      register: installation_dependencies
-      until: installation_dependencies is succeeded
-      when: ansible_facts['os_family'] == 'Debian'
-
-    - name: "Installing packages on Suse"
-      community.general.zypper:
-        name:
-          - iproute2
-          - python3-pip
-          - sudo
-          - curl
-        update_cache: true
-        state: present
-      register: installation_dependencies
-      until: installation_dependencies is succeeded
-      when: ansible_facts['os_family'] == 'Suse'
 
     - name: "Configure SUDO."
       ansible.builtin.lineinfile:
