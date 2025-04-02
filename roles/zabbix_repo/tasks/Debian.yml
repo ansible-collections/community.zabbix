@@ -56,7 +56,7 @@
       URIs: {{ zabbix_repo_deb_url }}
       Suites: {{ ansible_distribution_release }}
       Components: {{ zabbix_repo_deb_component }}
-      Architectures: {{ 'amd64' if ansible_machine != 'aarch64' else 'arm64'}}
+      Architectures: {{ zabbix_repo_deb_arch }}
       Signed-By: {{ zabbix_repo_gpg_key }}
   register: zabbix_repo_apt_file
   become: true

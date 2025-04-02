@@ -4,6 +4,7 @@ zabbix_repo_version: "7.2"
 zabbix_repo_yum_gpgcheck: 0
 zabbix_repo_yum_schema: https
 zabbix_repo_deb_url: "{{ zabbix_repo_version is version('7.0', '>') | ternary(_post_72_deb_repo, _pre_72_deb_repo) }}"
+zabbix_repo_deb_arch: "{{ _zabbix_repo_deb_arch_map[ansible_facts['architecture']] }}"
 zabbix_repo_deb_component: main
 zabbix_repo_yum:
   - name: zabbix
