@@ -9,7 +9,7 @@ zabbix_proxy_selinux: false
 zabbix_proxy_interface:
   useip: "{{ zabbix_useuip }}"
   ip: "{{ zabbix_proxy_ip }}"
-  dns: "{{ ansible_fqdn }}"
+  dns: "{{ ansible_facts['fqdn'] }}"
   port: "{{ zabbix_proxy_listenport }}"
 zabbix_useuip: 1
 

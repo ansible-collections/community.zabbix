@@ -1,13 +1,13 @@
 ---
 # tasks file for zabbix_proxy
 - name: "Include OS-specific variables"
-  ansible.builtin.include_vars: "{{ ansible_os_family }}.yml"
+  ansible.builtin.include_vars: "{{ ansible_facts['os_family'] }}.yml"
   tags:
     - always
 
 - name: Determine Latest Supported Zabbix Version
   ansible.builtin.set_fact:
-    zabbix_proxy_version: "{{ zabbix_valid_proxy_versions[ansible_distribution_major_version][0] | default(7.2) }}"
+    zabbix_proxy_version: "{{ zabbix_valid_proxy_versions[ansible_facts['distribution_major_version']][0] | default(7.2) }}"
   when: zabbix_proxy_version is not defined or zabbix_proxy_version is none
   tags:
     - always
@@ -31,10 +31,10 @@
 
 - name: "Set default ip address for zabbix_proxy_ip"
   ansible.builtin.set_fact:
-    zabbix_proxy_ip: "{{ hostvars[inventory_hostname]['ansible_default_ipv4'].address }}"
+    zabbix_proxy_ip: "{{ ansible_facts['default_ipv4'].address }}"
   when:
     - zabbix_proxy_ip is not defined
-    - "'ansible_default_ipv4' in hostvars[inventory_hostname]"
+    - "'default_ipv4' in ansible_facts"
   tags:
     - install
     - config

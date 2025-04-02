@@ -32,6 +32,7 @@ provisioner:
   env:
     # https://github.com/ansible/molecule/issues/4015#issuecomment-1680859724
     ANSIBLE_ROLES_PATH: ../../roles
+    ANSIBLE_INJECT_FACT_VARS: "False"
   inventory:
     group_vars:
       all:

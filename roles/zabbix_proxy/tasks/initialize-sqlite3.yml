@@ -50,7 +50,7 @@
         executable: /bin/bash
 
     - name: "Sqlite3 | Fix zabbix db file permission (SELinux)"
-      when: ansible_selinux.status == "enabled"
+      when: ansible_facts.selinux.status == "enabled"
       ansible.builtin.file:
         state: file
         path: "{{ zabbix_proxy_dbname }}"
