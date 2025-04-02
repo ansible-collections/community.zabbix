@@ -54,6 +54,8 @@ zabbix_server_debuglevel: 3
 zabbix_server_enableglobalscripts: false
 zabbix_server_exportfilesize: 1G
 zabbix_server_externalscriptspath: /usr/lib/zabbix/externalscripts
+zabbix_server_fpinglocation: "{{ _zabbix_server_fpinglocation }}"
+zabbix_server_fping6location: "{{ _zabbix_server_fping6location }}"
 zabbix_server_historycachesize: 16M
 zabbix_server_historyindexcachesize: 4M
 zabbix_server_historystoragedateindex: false
