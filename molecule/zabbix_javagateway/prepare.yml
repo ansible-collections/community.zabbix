@@ -12,24 +12,21 @@
         state: present
       register: installation_dependencies
       until: installation_dependencies is succeeded
-      when:
-        - ansible_os_family == 'RedHat'
+      when: ansible_facts['os_family'] == 'RedHat'
 
     - name: "Make sure the docs can be installed. (Debian)"
       ansible.builtin.lineinfile:
         path: /etc/dpkg/dpkg.cfg.d/excludes
         state: absent
         regexp: "path-exclude=/usr/share/doc/*"
-      when:
-        - ansible_os_family == 'Debian'
+      when: ansible_facts['os_family'] == 'Debian'
 
     # https://github.com/geerlingguy/ansible-role-java/issues/64
     - name: "Apt update"
       ansible.builtin.shell: "apt-get update && mkdir -p /usr/share/man/man1"
       register: installation_dependencies
       until: installation_dependencies is succeeded
-      when:
-        - ansible_os_family == 'Debian'
+      when: ansible_facts['os_family'] == 'Debian'
 
     - name: "Installing packages on NON-CentOS"
       ansible.builtin.apt:
@@ -46,8 +43,7 @@
         state: present
       register: installation_dependencies
       until: installation_dependencies is succeeded
-      when:
-        - ansible_os_family == 'Debian'
+      when: ansible_facts['os_family'] == 'Debian'
 
     - name: "Installing packages on Suse"
       community.general.zypper:
@@ -57,5 +53,4 @@
         state: present
       register: installation_dependencies
       until: installation_dependencies is succeeded
-      when:
-        - ansible_os_family == 'Suse'
+      when: ansible_facts['os_family'] == 'Suse'
