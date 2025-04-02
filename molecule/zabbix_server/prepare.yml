@@ -3,47 +3,19 @@
   hosts: all
 
   tasks:
-    - name: "Installing packages on CentOS"
-      ansible.builtin.dnf:
-        name:
-          - net-tools
-          - which
-          - sudo
-        state: present
-      register: installation_dependencies
-      until: installation_dependencies is succeeded
-      when: ansible_facts['os_family'] == 'RedHat'
-
     - name: "Apt update"
       ansible.builtin.shell: "apt-get update && echo exit 0 > /usr/sbin/policy-rc.d"
       register: installation_dependencies
       until: installation_dependencies is succeeded
       when: ansible_facts['os_family'] == 'Debian'
 
-    - name: "Installing packages on Debian family"
-      ansible.builtin.apt:
+    - name: "Installing sudo"
+      ansible.builtin.package:
         name:
-          - net-tools
-          - apt-utils
-          - python3-pip
-          - gpg-agent
           - sudo
-        update_cache: true
-        state: present
+        update_cache: "{{ (ansible_facts['os_family'] in ['Debian', 'Suse']) | ternary(true, omit) }}"
       register: installation_dependencies
       until: installation_dependencies is succeeded
-      when: ansible_facts['os_family'] == 'Debian'
-
-    - name: "Installing packages on Suse"
-      community.general.zypper:
-        name:
-          - iproute2
-          - sudo
-        state: present
-        update_cache: true
-      register: installation_dependencies
-      until: installation_dependencies is succeeded
-      when: ansible_facts['os_family'] == 'Suse'
 
     - name: "Configure SUDO."
       ansible.builtin.lineinfile:
