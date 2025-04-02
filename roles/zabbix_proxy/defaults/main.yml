@@ -3,7 +3,7 @@
 
 zabbix_proxy_version_check: true
 
-# zabbix_proxy_version: 6.4
+# zabbix_proxy_version:
 zabbix_os_user: zabbix
 zabbix_proxy_selinux: false
 zabbix_proxy_interface:

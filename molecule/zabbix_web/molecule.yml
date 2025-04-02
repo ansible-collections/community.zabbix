@@ -46,9 +46,6 @@ provisioner:
       v70:
         zabbix_server_version: 7.0
         zabbix_web_version: 7.0
-      v64:
-        zabbix_server_version: 6.4
-        zabbix_web_version: 6.4
       v60:
         zabbix_server_version: 6.0
         zabbix_web_version: 6.0

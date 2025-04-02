@@ -21,7 +21,6 @@ jobs:
       matrix:
         zabbix_container:
           - version: "6.0"
-          - version: "6.4"
           - version: "7.0"
           - version: "7.2"
         ansible:

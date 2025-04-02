@@ -3,7 +3,7 @@
 
 zabbix_javagateway_version_check: true
 
-#zabbix_javagateway_version:6.4
+# zabbix_javagateway_version:
 zabbix_javagateway_package_state: present
 zabbix_java_gateway_conf_mode: "0644"
 
