@@ -3,10 +3,13 @@
   hosts: all
 
   tasks:
-    - name: "Apt update"
-      ansible.builtin.shell: "apt-get update && echo exit 0 > /usr/sbin/policy-rc.d"
-      register: installation_dependencies
-      until: installation_dependencies is succeeded
+    # To prevent services from starting during package installations on a docker build,
+    # images normally come with this set to exit 101.
+    - name: "Allow services to start on install"
+      ansible.builtin.copy:
+        content: |
+          exit 0
+        dest: /usr/sbin/policy-rc.d
       when: ansible_facts['os_family'] == 'Debian'
 
     - name: "Installing sudo"
