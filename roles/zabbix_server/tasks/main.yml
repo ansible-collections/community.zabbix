@@ -1,12 +1,12 @@
 ---
 - name: Include OS-specific variables
-  ansible.builtin.include_vars: "{{ ansible_os_family }}.yml"
+  ansible.builtin.include_vars: "{{ ansible_facts['os_family'] }}.yml"
   tags:
     - always
 
 - name: Determine Latest Supported Zabbix Version
   ansible.builtin.set_fact:
-    zabbix_server_version: "{{ zabbix_valid_server_versions[ansible_distribution_major_version][0] | default(7.2) }}"
+    zabbix_server_version: "{{ zabbix_valid_server_versions[ansible_facts['distribution_major_version']][0] | default(7.2) }}"
   when: zabbix_server_version is not defined
   tags:
     - always
