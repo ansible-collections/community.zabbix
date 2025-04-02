@@ -1,12 +1,12 @@
 ---
 - name: "Include OS-specific variables"
-  ansible.builtin.include_vars: "{{ ansible_os_family }}.yml"
+  ansible.builtin.include_vars: "{{ ansible_facts['os_family'] }}.yml"
   tags:
     - always
 
 - name: Determine Latest Supported Zabbix Version
   ansible.builtin.set_fact:
-    zabbix_web_version: "{{ zabbix_valid_web_versions[ansible_distribution_major_version][0] | default(7.2) }}"
+    zabbix_web_version: "{{ zabbix_valid_web_versions[ansible_facts['distribution_major_version']][0] | default(7.2) }}"
   when: zabbix_web_version is not defined
   tags:
     - always
@@ -60,7 +60,7 @@
   when: zabbix_manage_repo | default(true)
 
 - name: Include OS Specific Tasks
-  ansible.builtin.include_tasks: "{{ ansible_os_family }}.yml"
+  ansible.builtin.include_tasks: "{{ ansible_facts['os_family'] }}.yml"
 
 - name: "Install zabbix-web package"
   ansible.builtin.package:
@@ -125,7 +125,7 @@
   become: true
   when:
     - zabbix_web_create_php_fpm
-    - ansible_os_family in ["Debian", "Suse"]
+    - ansible_facts['os_family'] in ["Debian", "Suse"]
   notify:
     - restart php-fpm-version
     - restart php-fpm

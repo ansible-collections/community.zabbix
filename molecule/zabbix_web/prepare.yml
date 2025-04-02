@@ -12,8 +12,7 @@
         state: present
       register: installation_dependencies
       until: installation_dependencies is succeeded
-      when:
-        - ansible_os_family == 'RedHat'
+      when: ansible_facts['os_family'] == 'RedHat'
 
     - name: "Apt update"
       ansible.builtin.shell: "apt-get update"
@@ -60,7 +59,7 @@
         name: "@php:8.0/common"
       when:
         - ansible_facts['os_family'] == 'RedHat'
-        - ansible_distribution_major_version == "8"
+        - ansible_facts['distribution_major_version'] == "8"
 
     - name: Set PHP packages (Centos 8+)
       ansible.builtin.set_fact:
