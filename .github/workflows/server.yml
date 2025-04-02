@@ -49,8 +49,6 @@ jobs:
             version: v72
           - container: ubuntu2004
             version: v70
-          - container: ubuntu2004
-            version: v70
           - container: debian11
             version: v72
           - container: debian11
