@@ -7,8 +7,8 @@ zabbix_javagateway_version_check: true
 zabbix_javagateway_package_state: present
 zabbix_java_gateway_conf_mode: "0644"
 
-zabbix_javagateway_disable_repo:
-  - epel
+# zabbix_javagateway_disable_repo: (list)
+# zabbix_javagateway_install_recommends: (boolean)
 
 zabbix_javagateway_openjdk_version: 17
 
