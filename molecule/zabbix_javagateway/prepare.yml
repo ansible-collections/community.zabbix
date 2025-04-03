@@ -3,16 +3,13 @@
   hosts: all
 
   pre_tasks:
-    - name: "Installing packages on CentOS"
-      ansible.builtin.yum:
+    - name: "Installing packages"
+      ansible.builtin.package:
         name:
-          - net-tools
-          - which
           - sudo
         state: present
       register: installation_dependencies
       until: installation_dependencies is succeeded
-      when: ansible_facts['os_family'] == 'RedHat'
 
     # https://github.com/geerlingguy/ansible-role-java/issues/64
     - name: "Workaround Java issue for Debian"
@@ -20,30 +17,3 @@
         path: /usr/share/man/man1
         state: directory
       when: ansible_facts['os_family'] == 'Debian'
-
-    - name: "Installing packages on NON-CentOS"
-      ansible.builtin.apt:
-        name:
-          - net-tools
-          - apt-utils
-          - procps
-          - python3-pip
-          - gpg-agent
-          - python3-apt
-          - sudo
-          - software-properties-common
-        update_cache: true
-        state: present
-      register: installation_dependencies
-      until: installation_dependencies is succeeded
-      when: ansible_facts['os_family'] == 'Debian'
-
-    - name: "Installing packages on Suse"
-      community.general.zypper:
-        name:
-          - iproute2
-          - which
-        state: present
-      register: installation_dependencies
-      until: installation_dependencies is succeeded
-      when: ansible_facts['os_family'] == 'Suse'
