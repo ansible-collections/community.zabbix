@@ -15,10 +15,10 @@
       when: ansible_facts['os_family'] == 'RedHat'
 
     # https://github.com/geerlingguy/ansible-role-java/issues/64
-    - name: "Apt update"
-      ansible.builtin.shell: "apt-get update && mkdir -p /usr/share/man/man1"
-      register: installation_dependencies
-      until: installation_dependencies is succeeded
+    - name: "Workaround Java issue for Debian"
+      ansible.builtin.file:
+        path: /usr/share/man/man1
+        state: directory
       when: ansible_facts['os_family'] == 'Debian'
 
     - name: "Installing packages on NON-CentOS"
