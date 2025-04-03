@@ -14,15 +14,3 @@
   become: true
   tags:
     - install
-
-- name: "Debian | Make sure Zabbix Java Gateway is not yet running"
-  ansible.builtin.systemd:
-    name: zabbix-java-gateway
-    state: stopped
-    enabled: true
-    daemon_reload: true
-  become: true
-  when:
-    - zabbix_java_gateway_install.changed
-  tags:
-    - service
