@@ -1,3 +1,10 @@
 ---
+_zabbix_repo_deb_arch_map:
+  aarch64: "arm64"
+  arm6l: "armhf"
+  arm7l: "armhf"
+  i386: "i386"
+  x86_64: "amd64"
+
 zabbix_repo_keyring_path: /etc/apt/keyrings/
 zabbix_repo_gpg_key: "{{ zabbix_repo_keyring_path }}zabbix-repo.asc"
