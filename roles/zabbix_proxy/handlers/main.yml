@@ -1,6 +1,4 @@
 ---
-# handlers file for zabbix-proxy
-
 - name: restart zabbix-proxy
   ansible.builtin.service:
     name: zabbix-proxy
@@ -9,10 +7,3 @@
   become: true
   when:
     - zabbix_proxy_manage_service | bool
-
-- name: "clean repo files from proxy creds"
-  ansible.builtin.shell: ls /etc/yum.repos.d/zabbix* && sed -i 's/^proxy =.*//' /etc/yum.repos.d/zabbix* || true
-  become: true
-  when:
-    - ansible_os_family == 'RedHat'
-    - zabbix_http_proxy is defined or zabbix_https_proxy is defined

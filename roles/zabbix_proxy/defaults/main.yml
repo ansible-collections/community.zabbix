@@ -3,13 +3,13 @@
 
 zabbix_proxy_version_check: true
 
-# zabbix_proxy_version: 6.4
+# zabbix_proxy_version:
 zabbix_os_user: zabbix
 zabbix_proxy_selinux: false
 zabbix_proxy_interface:
   useip: "{{ zabbix_useuip }}"
   ip: "{{ zabbix_proxy_ip }}"
-  dns: "{{ ansible_fqdn }}"
+  dns: "{{ ansible_facts['fqdn'] }}"
   port: "{{ zabbix_proxy_listenport }}"
 zabbix_useuip: 1
 
@@ -27,9 +27,7 @@ zabbix_proxy_dbcollation: utf8_bin
 zabbix_proxy_dbencoding: utf8
 zabbix_proxy_dbpassword_hash_method: md5
 zabbix_proxy_install_database_client: true
-_zabbix_proxy_post72_database:  /usr/share/zabbix/sql-scripts/
-_zabbix_proxy_pre72_database:  /usr/share/zabbix-sql-scripts/
-zabbix_proxy_database_file_dir:  "{{ zabbix_proxy_version is version('7.0', '>') | ternary( _zabbix_proxy_post72_database, _zabbix_proxy_pre72_database ) }}"
+zabbix_proxy_database_file_dir: "{{ zabbix_proxy_version is version('7.0', '>') | ternary(_zabbix_proxy_database_file_dir_post72, _zabbix_proxy_database_file_dir_pre72 ) }}"
 
 # SELinux specific
 selinux_allow_zabbix_can_network: false

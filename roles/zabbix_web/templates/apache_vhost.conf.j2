@@ -40,7 +40,7 @@
         DirectoryIndex index.php
     </IfModule>
 
-{% if ansible_os_family in ["RedHat", "Suse"] %}
+{% if ansible_facts['os_family'] in ["RedHat", "Suse"] %}
     <FilesMatch \.(php|phar)$>
         SetHandler "proxy:unix:{{ zabbix_php_fpm_listen }}|fcgi://localhost"
     </FilesMatch>
@@ -122,7 +122,7 @@ SSLRandomSeed connect builtin
         DirectoryIndex index.php
     </IfModule>
 
-{% if ansible_os_family in ["RedHat", "Suse"] %}
+{% if ansible_facts['os_family'] in ["RedHat", "Suse"] %}
     <FilesMatch \.(php|phar)$>
         SetHandler "proxy:unix:{{ zabbix_php_fpm_listen }}|fcgi://localhost"
     </FilesMatch>

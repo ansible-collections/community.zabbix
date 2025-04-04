@@ -32,6 +32,7 @@ provisioner:
   env:
     # https://github.com/ansible/molecule/issues/4015#issuecomment-1680859724
     ANSIBLE_ROLES_PATH: ../../roles
+    ANSIBLE_INJECT_FACT_VARS: "False"
   inventory:
     group_vars:
       all:
@@ -47,8 +48,6 @@ provisioner:
         zabbix_proxy_version: 7.2
       v70:
         zabbix_proxy_version: 7.0
-      v64:
-        zabbix_proxy_version: 6.4
       v60:
         zabbix_proxy_version: 6.0
       mysql:

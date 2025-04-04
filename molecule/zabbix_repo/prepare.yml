@@ -3,25 +3,8 @@
   hosts: all
 
   tasks:
-    - name: "Apt update"
-      ansible.builtin.shell: "apt-get update && echo exit 0 > /usr/sbin/policy-rc.d"
-      args:
-        warn: "{{ produce_warn | default(omit) }}"
-      register: installation_dependencies
-      until: installation_dependencies is succeeded
-      when:
-        - ansible_os_family == 'Debian'
-
     - name: "Configure SUDO."
       ansible.builtin.lineinfile:
         dest: /etc/sudoers
         line: "Defaults    !requiretty"
         state: present
-
-    - name: "Make sure the docs are installed."
-      ansible.builtin.lineinfile:
-        dest: /etc/yum.conf
-        line: "tsflags=nodocs"
-        state: absent
-      when:
-        - ansible_os_family == 'RedHat'

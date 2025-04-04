@@ -27,9 +27,7 @@ zabbix_server_database: pgsql
 zabbix_server_database_creation: true
 zabbix_server_install_database_client: true
 
-_zabbix_server_post72_database:  /usr/share/zabbix/sql-scripts/
-_zabbix_server_pre72_database:  /usr/share/zabbix-sql-scripts/
-zabbix_server_database_file_dir:  "{{ zabbix_server_version is version('7.0', '>') | ternary( _zabbix_server_post72_database, _zabbix_server_pre72_database ) }}"
+zabbix_server_database_file_dir: "{{ zabbix_server_version is version('7.0', '>') | ternary(_zabbix_server_database_file_dir_post72, _zabbix_server_database_file_dir_pre72) }}"
 
 # SELinux specific
 selinux_allow_zabbix_can_network: false
@@ -54,6 +52,8 @@ zabbix_server_debuglevel: 3
 zabbix_server_enableglobalscripts: false
 zabbix_server_exportfilesize: 1G
 zabbix_server_externalscriptspath: /usr/lib/zabbix/externalscripts
+zabbix_server_fpinglocation: "{{ _zabbix_server_fpinglocation }}"
+zabbix_server_fping6location: "{{ _zabbix_server_fping6location }}"
 zabbix_server_historycachesize: 16M
 zabbix_server_historyindexcachesize: 4M
 zabbix_server_historystoragedateindex: false

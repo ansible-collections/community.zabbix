@@ -1,14 +1,12 @@
 ---
-# tasks file for zabbix_javagateway
-
 - name: Include OS-specific variables
-  ansible.builtin.include_vars: "{{ ansible_os_family }}.yml"
+  ansible.builtin.include_vars: "{{ ansible_facts['os_family'] }}.yml"
   tags:
     - always
 
 - name: Determine Latest Supported Zabbix Version
   ansible.builtin.set_fact:
-    zabbix_javagateway_version: "{{ zabbix_valid_javagateway_versions[ansible_distribution_major_version][0] | default(6.4) }}"
+    zabbix_javagateway_version: "{{ zabbix_valid_javagateway_versions[ansible_facts['distribution_major_version']][0] | default(7.2) }}"
   when: zabbix_javagateway_version is not defined
   tags:
     - always
@@ -17,8 +15,8 @@
   when: zabbix_javagateway_version_check | bool
   ansible.builtin.assert:
     that:
-      - "{{ zabbix_javagateway_version|float in zabbix_valid_javagateway_versions[ansible_distribution_major_version] }}"
-    fail_msg: Zabbix version {{ zabbix_javagateway_version }} is not supported on {{ ansible_distribution }} {{ ansible_distribution_major_version }}
+      - "{{ zabbix_javagateway_version|float in zabbix_valid_javagateway_versions[ansible_facts['distribution_major_version']] }}"
+    fail_msg: Zabbix version {{ zabbix_javagateway_version }} is not supported on {{ ansible_facts['distribution'] }} {{ ansible_facts['distribution_major_version'] }}
   tags:
     - always
 
@@ -31,8 +29,57 @@
     zabbix_repo_package: "zabbix-java-gateway"
   when: zabbix_manage_repo | default(true)
 
-- name: "Install the correct repository"
-  ansible.builtin.include_tasks: "{{ ansible_os_family }}.yml"
+# SLES 15 comes with openjdk-11 by default.
+# In order for the zabbix-java-gateway to work, we need to install openjdk-17.
+- name: "Suse | Install openjdk-{{ zabbix_javagateway_openjdk_version }}"
+  when: ansible_facts['os_family'] == 'Suse'
+  ansible.builtin.package:
+    name:
+      - java-{{ zabbix_javagateway_openjdk_version }}-openjdk-headless
+      - java-{{ zabbix_javagateway_openjdk_version }}-openjdk
+    state: "{{ zabbix_javagateway_package_state }}"
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
+  register: _zabbix_javagateway_openjdk
+  until: _zabbix_javagateway_openjdk is succeeded
+  become: true
+  tags:
+    - install
+
+- name: Install zabbix-java-gateway
+  ansible.builtin.package:
+    name: zabbix-java-gateway
+    state: "{{ zabbix_javagateway_package_state }}"
+    update_cache: true
+    disablerepo: "{{ zabbix_javagateway_disable_repo | default(_zabbix_javagateway_disable_repo | default(omit)) }}"
+    install_recommends: "{{ zabbix_javagateway_install_recommends | default(_zabbix_javagateway_install_recommends | default(omit)) }}"
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
+  register: _zabbix_javagateway_install
+  until: _zabbix_javagateway_install is succeeded
+  become: true
+  tags:
+    - install
+
+- name: "Workaround for RedHat"
+  when: ansible_facts['os_family'] == 'RedHat'
+  block:
+    - name: "RedHat | Looking for Enviroment Files (See Issue 1474)"
+      ansible.builtin.find:
+        path: /etc/zabbix/
+        patterns: '*.env'
+      register: _env_files
+
+    - name: "RedHat | Create Enviroment File (See Issue 1474)"
+      ansible.builtin.file:
+        path: /etc/zabbix/zabbix_java_gateway.env
+        state: touch
+        owner: root
+        group: root
+        mode: 644
+      when: _env_files['matched'] == 0
 
 - name: "Configure zabbix-proxy"
   ansible.builtin.template:
