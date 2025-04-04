@@ -2,3 +2,6 @@
 _zabbix_server_database_default_port:
   mysql: 3306
   pgsql: 5432
+
+_zabbix_server_database_file_dir_post72: /usr/share/zabbix/sql-scripts
+_zabbix_server_database_file_dir_pre72: /usr/share/zabbix-sql-scripts

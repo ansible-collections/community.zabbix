@@ -26,24 +26,19 @@ zabbix_valid_web_versions:
   "12":
     - 7.2
     - 7.0
-    - 6.4
     - 6.0
   "11":
-    - 6.4
     - 6.0
   # Ubuntu
   "24":
     - 7.2
     - 7.0
-    - 6.4
     - 6.0
   "22":
     - 7.2
     - 7.0
-    - 6.4
     - 6.0
   "20":
-    - 6.4
     - 6.0
 
 _zabbix_web_package: zabbix-frontend-php

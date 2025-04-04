@@ -89,7 +89,7 @@
         port: "{{ zabbix_server_dbport }}"
         db: "{{ zabbix_server_dbname }}"
         state: restore
-        target: "{{ zabbix_server_database_file_dir }}postgresql/server.sql.gz"
+        target: "{{ zabbix_server_database_file_dir }}/postgresql/server.sql.gz"
 
 - name: "Configure Timescale"
   when: zabbix_server_database_timescaledb
@@ -127,8 +127,8 @@
         port: "{{ zabbix_server_dbport }}"
         db: "{{ zabbix_server_dbname }}"
         state: restore
-        target: "{{ is_legacy_version | ternary(legacy_path, modern_path) }}"
+        target: "{{ zabbix_server_database_file_dir }}/{{ _is_pre70 | ternary(legacy_path, modern_path) }}"
       vars:
-        is_legacy_version: "{{ zabbix_server_version is version('7.0', '<') }}"
-        legacy_path: /usr/share/zabbix-sql-scripts/postgresql/timescaledb.sql
-        modern_path: "{{ zabbix_server_database_file_dir }}postgresql/timescaledb/schema.sql" 
+        _is_pre70: "{{ zabbix_server_version is version('7.0', '<') }}"
+        legacy_path: postgresql/timescaledb.sql
+        modern_path: postgresql/timescaledb/schema.sql

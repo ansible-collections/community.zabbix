@@ -44,13 +44,13 @@
       become_user: "{{ zabbix_os_user }}"
       ansible.builtin.shell: |
         set -euxo pipefail
-        sqlite3 {{ zabbix_proxy_dbname }} < {{ '/usr/share/zabbix/sql-scripts/sqlite3/proxy.sql' if zabbix_proxy_version is version('7.0', '>') else '/usr/share/zabbix-sql-scripts/sqlite3/proxy.sql' }}
+        sqlite3 {{ zabbix_proxy_dbname }} < {{ zabbix_proxy_database_file_dir }}/sqlite3/proxy.sql
       args:
         creates: "{{ zabbix_proxy_dbname }}"
         executable: /bin/bash
 
     - name: "Sqlite3 | Fix zabbix db file permission (SELinux)"
-      when: ansible_selinux.status == "enabled"
+      when: ansible_facts.selinux.status == "enabled"
       ansible.builtin.file:
         state: file
         path: "{{ zabbix_proxy_dbname }}"
