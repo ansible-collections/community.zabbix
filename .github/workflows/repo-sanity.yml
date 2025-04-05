@@ -2,6 +2,9 @@
 name: repo-sanity
 on:
   push:
+    branches:
+      - dev
+      - main
   pull_request:
 
 jobs:
