@@ -1,12 +1,7 @@
 ---
 - block:
-  - name: Run tests for Zabbix < 7.0 or >= 7.2
-    when: zabbix_version is version('7.0', '<') or zabbix_version is version('7.2', '>=')
-    include_tasks: test_zabbix_mediatype_before709_since72.yml
-
-  - name: Run tests for Zabbix >= 7.0 and < 7.2
-    when: zabbix_version is version('7.0', '>=') and zabbix_version is version('7.2', '<')
-    include_tasks: test_zabbix_mediatype_since709_before72.yml
+  - name: Run tests
+    include_tasks: test_zabbix_mediatype.yml
 
   always:
     - name: Cleanup mediatype
