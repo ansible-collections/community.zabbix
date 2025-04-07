@@ -1,0 +1,3 @@
+bugfix:
+  - roles/zabbix_agent - UserParameterDir get wrong value if var zabbix_agent_userparamaterdir is set
+  
