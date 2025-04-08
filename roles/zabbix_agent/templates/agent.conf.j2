@@ -152,4 +152,4 @@ Plugins.{{ my_name }}.{{ param }}={{ value }}
 {{ (zabbix_agent_runas_user is defined and zabbix_agent_runas_user is not none) | ternary('', '# ') }}User={{ zabbix_agent_runas_user | default('') }}
 {% endif %}
 {{ (zabbix_agent_userparamater is defined and zabbix_agent_userparamater is not none) | ternary('', '# ') }}UserParameter={{ zabbix_agent_userparamater | default('') }}
-{{ (zabbix_agent_userparamaterdir is defined and zabbix_agent_userparamaterdir is not none) | ternary('', '# ') }}UserParameterDir={{ zabbix_agent_userparamaterdir | default (false) | ternary('1', '0') }}
+{{ (zabbix_agent_userparamaterdir is defined and zabbix_agent_userparamaterdir is not none) | ternary('', '# ') }}UserParameterDir={{ zabbix_agent_userparamaterdir | default('') }}
