@@ -427,27 +427,28 @@ Including an example of how to use your role (for instance, with variables passe
 ```yaml
     - hosts: all
       roles:
-         - role: community.zabbix.zabbix_agent
-           zabbix_agent_server: 192.168.33.30
-           zabbix_agent_serveractive: 192.168.33.30
-           zabbix_api_server_host: zabbix.example.com
-           zabbix_api_login_user: Admin
-           zabbix_api_login_pass: zabbix
-           zabbix_api_create_hostgroup: true
-           zabbix_api_create_hosts: true
-           zabbix_agent_host_state: present
-           zabbix_host_groups:
-             - Linux Servers
-           zabbix_agent_link_templates:
-             - Template OS Linux
-             - Apache APP Template
-           zabbix_agent_macros:
-             - macro_key: apache_type
-               macro_value: reverse_proxy
-               macro_type: text
-           zabbix_agent_tags:
-             - tag: environment
-               value: production
+        - role: community.zabbix.zabbix_agent
+          vars:
+            zabbix_agent_server: 192.168.33.30
+            zabbix_agent_serveractive: 192.168.33.30
+            zabbix_api_server_host: zabbix.example.com
+            zabbix_api_login_user: Admin
+            zabbix_api_login_pass: zabbix
+            zabbix_api_create_hostgroup: true
+            zabbix_api_create_hosts: true
+            zabbix_agent_host_state: present
+            zabbix_host_groups:
+              - Linux Servers
+            zabbix_agent_link_templates:
+              - Template OS Linux
+              - Apache APP Template
+            zabbix_agent_macros:
+              - macro_key: apache_type
+                macro_value: reverse_proxy
+                macro_type: text
+            zabbix_agent_tags:
+              - tag: environment
+                value: production
 ```
 
 ## Combination of group_vars and playbook
