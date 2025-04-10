@@ -284,3 +284,151 @@
 - name: assert that nothing has been changed
   ansible.builtin.assert:
     that: not zbxtempitem_missing_delete is changed
+
+- name: test - create new Zabbix item on host using type zabbix_agent without specifying interface gives error
+  community.zabbix.zabbix_item:
+    name: TestItem
+    host_name: ExampleHost
+    params:
+      type: zabbix_agent
+      key: agent.version
+      value_type: text
+      interval: 1m
+    state: present
+  register: zbxhostitemagent_new
+  ignore_errors: true
+
+- name: assert that step failed
+  ansible.builtin.assert:
+    that: zbxhostitemagent_new is failed and "'interface' is mandatory if host is set and type is one of zabbix_agent, snmp_trap, snmp_agent, ipmi_agent, jmx_agent" in zbxhostitemagent_new.msg
+
+- name: test - create new Zabbix item on host using type zabbix_agent without interface being None gives error
+  community.zabbix.zabbix_item:
+    name: TestItem
+    host_name: ExampleHost
+    params:
+      type: zabbix_agent
+      key: agent.version
+      value_type: text
+      interval: 1m
+      interface:
+    state: present
+  register: zbxhostitemagent_new
+  ignore_errors: true
+
+- name: assert that step failed
+  ansible.builtin.assert:
+    that: zbxhostitemagent_new is failed and "'interface' is mandatory if host is set and type is one of zabbix_agent, snmp_trap, snmp_agent, ipmi_agent, jmx_agent" in zbxhostitemagent_new.msg
+
+- name: test - create new Zabbix item on host using type zabbix_agent gives error when interface.main is 0 and ip or dns is not set
+  community.zabbix.zabbix_item:
+    name: TestItem
+    host_name: ExampleHost
+    params:
+      type: zabbix_agent
+      key: agent.version
+      value_type: text
+      interval: 1m
+      interface:
+        main: false
+    state: present
+  register: zbxhostitemagent_new
+  ignore_errors: true
+
+- name: assert that step failed
+  ansible.builtin.assert:
+    that: zbxhostitemagent_new is failed and "Set main = 1 if you want to use the default interface of the host, otherwise you must either specify ip or dns" in zbxhostitemagent_new.msg
+
+- name: test - create new Zabbix item on host using type zabbix_agent gives error when no matching interface is found
+  community.zabbix.zabbix_item:
+    name: TestItem
+    host_name: ExampleHost
+    params:
+      type: zabbix_agent
+      key: agent.version
+      value_type: text
+      interval: 1m
+      interface:
+        main: false
+        ip: 10.1.1.254
+    state: present
+  register: zbxhostitemagent_new
+  ignore_errors: true
+
+- name: assert that step failed
+  ansible.builtin.assert:
+    that: zbxhostitemagent_new is failed and "interface not found on host" in zbxhostitemagent_new.msg
+
+- name: test - create new Zabbix item on host using type zabbix_agent using main interface
+  community.zabbix.zabbix_item:
+    name: TestItemMain
+    host_name: ExampleHost
+    params:
+      type: zabbix_agent
+      key: agent.version.main
+      value_type: text
+      interval: 1m
+      interface:
+        main: true
+    state: present
+  register: zbxhostitemagent_new
+
+- name: assert that item was created
+  ansible.builtin.assert:
+    that: zbxhostitemagent_new is changed
+
+- name: test - create new Zabbix item on host using type zabbix_agent using ip
+  community.zabbix.zabbix_item:
+    name: TestItemIp
+    host_name: ExampleHost
+    params:
+      type: zabbix_agent
+      key: agent.version.ip
+      value_type: text
+      interval: 1m
+      interface:
+        main: false
+        ip: 10.1.1.1
+    state: present
+  register: zbxhostitemagent_new
+
+- name: assert that item was created
+  ansible.builtin.assert:
+    that: zbxhostitemagent_new is changed
+
+- name: test - create new Zabbix item on host using type zabbix_agent using dns
+  community.zabbix.zabbix_item:
+    name: TestItemDns
+    host_name: ExampleHost
+    params:
+      type: zabbix_agent
+      key: agent.version.dns
+      value_type: text
+      interval: 1m
+      interface:
+        main: false
+        dns: "community.zabbix.ansible"
+    state: present
+  register: zbxhostitemagent_new
+
+- name: assert that item was created
+  ansible.builtin.assert:
+    that: zbxhostitemagent_new is changed
+
+- name: test - alter Zabbix item on host using type zabbix_agent using dns to use main interface
+  community.zabbix.zabbix_item:
+    name: TestItemDns
+    host_name: ExampleHost
+    params:
+      type: zabbix_agent
+      key: agent.version.dns
+      value_type: text
+      interval: 1m
+      interface:
+        main: true
+    state: present
+  register: zbxhostitemagent_new
+
+- name: assert that item was created
+  ansible.builtin.assert:
+    that: zbxhostitemagent_new is changed
