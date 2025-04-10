@@ -23,3 +23,9 @@
         ip: 10.1.1.1
         dns: ""
         port: "10050"
+      - type: 1
+        main: 0
+        useip: 0
+        ip: ""
+        dns: "community.zabbix.ansible"
+        port: "10050"

@@ -204,6 +204,32 @@ options:
                             - discard
                             - set_custom_value
                             - set_custom_error_message
+            interface:
+                description:
+                    - configuration of the item's host interface
+                    - required if item belongs to host and type is set to "Zabbix agent", "IPMI agent", "JMX agent", "SNMP trap", or "SNMP agent"
+                required: false
+                type: list
+                elements: dict
+                suboptions:
+                    main:
+                        description:
+                            - Whether the default interface of the host of this type is used
+                        required: false
+                        type: bool
+                        default: false
+                    ip:
+                        description:
+                            - IP address used by the interface
+                            - Either ip or dns is required when main is false
+                        required: false
+                        type: str
+                    dns:
+                        description:
+                            - DNS name used by the interface
+                            - Either ip or dns is required when main is false
+                        required: false
+                        type: str
 
 extends_documentation_fragment:
 - community.zabbix.zabbix
@@ -242,6 +268,8 @@ EXAMPLES = r'''
         key: agent.ping
         value_type: numeric_unsigned
         interval: 1m
+        interface:
+            main: true
     state: present
 
 # Create ping item on example_template
@@ -377,6 +405,12 @@ class Item(ZabbixBase):
                   'snmp_agent': 20,
                   'script': 21}
 
+    ITEM_TYPES_REQUIRING_INTERFACE_IF_HOST = {ITEM_TYPES['zabbix_agent']: 1,
+                                              ITEM_TYPES['snmp_trap']: 2,
+                                              ITEM_TYPES['snmp_agent']: 2,
+                                              ITEM_TYPES['ipmi_agent']: 3,
+                                              ITEM_TYPES['jmx_agent']: 4}
+
     VALUE_TYPES = {'numeric_float': 0,
                    'character': 1,
                    'log': 2,
@@ -493,6 +527,13 @@ class Item(ZabbixBase):
                 if 'error_handler' in param:
                     error_handler_int = self.PREPROCESSING_ERROR_HANDLERS[param['error_handler']]
                     param['error_handler'] = error_handler_int
+        if 'interface' in params and params['interface'] is not None:
+            if 'main' not in params['interface'] or params['interface']['main'] is not True:
+                params['interface']['main'] = False
+            if 'ip' not in params['interface']:
+                params['interface']['ip'] = ''
+            if 'dns' not in params['interface']:
+                params['interface']['dns'] = ''
 
     def add_item(self, params):
         if self._module.check_mode:
@@ -527,6 +568,27 @@ class Item(ZabbixBase):
         except Exception as e:
             self._module.fail_json(msg="Failed to delete item: %s" % e)
         return results
+
+    def get_interfaceid_by_params(self, host_id, params):
+        if 'interface' not in params or params['interface'] is None:
+            self._module.fail_json(msg="'interface' is mandatory if host is set and type is one of zabbix_agent, snmp_trap, snmp_agent, ipmi_agent, jmx_agent")
+        if params['interface']['main'] is not True and "".__eq__(params['interface']['ip']) and "".__eq__(params['interface']['dns']):
+            self._module.fail_json(msg="Set main = 1 if you want to use the default interface of the host, otherwise you must either specify ip or dns")
+        filter = {"type": self.ITEM_TYPES_REQUIRING_INTERFACE_IF_HOST[params['type']]}
+        if params['interface']['main'] is True:
+            filter['main'] = "1"
+        elif not "".__eq__(params['interface']['ip']):
+            filter['ip'] = params['interface']['ip']
+        elif not "".__eq__(params['interface']['dns']):
+            filter['dns'] = params['interface']['dns']
+        try:
+            host_interfaces = self._zapi.hostinterface.get({"hostids": host_id, "filter": filter})
+            if (len(host_interfaces) > 0):
+                return host_interfaces[0]['interfaceid']
+            else:
+                self._module.fail_json(msg="interface not found on host")
+        except Exception as e:
+            self._module.fail_json(msg="Failed to get interfaces for host: %s" % e)
 
 
 def main():
@@ -586,10 +648,14 @@ def main():
             for host_template in hosts_templates:
                 if 'hostid' in host_template:
                     params['hostid'] = host_template['hostid']
+                    if params['type'] in item.ITEM_TYPES_REQUIRING_INTERFACE_IF_HOST:
+                        params['interfaceid'] = item.get_interfaceid_by_params(host_template['hostid'], params)
                 elif 'templateid' in host_template:
                     params['hostid'] = host_template['templateid']
                 else:
                     module.fail_json(msg="host/template did not return id")
+                if 'interface' in params:
+                    del params['interface']
                 results.append(item.add_item(params))
             module.exit_json(changed=True, result=results)
         else:
@@ -599,6 +665,12 @@ def main():
                 if 'new_name' in params:
                     params['name'] = params['new_name']
                     params.pop("new_name")
+                if host_name is not None and 'type' in params and params['type'] in item.ITEM_TYPES_REQUIRING_INTERFACE_IF_HOST:
+                    hosts_templates = item.get_hosts_templates(host_name, template_name)
+                    for host_template in hosts_templates:
+                        params['interfaceid'] = item.get_interfaceid_by_params(host_template['hostid'], params)
+                if 'interface' in params:
+                    del params['interface']
                 results.append(item.update_item(params))
                 changed_item = item.check_item_changed(i)
                 if changed_item:
