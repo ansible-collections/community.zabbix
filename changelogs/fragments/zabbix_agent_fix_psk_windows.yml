@@ -1,0 +1,3 @@
+---
+bugfixes:
+  - roles/zabbix_agent - Reading existing PSK files failed on Windows
