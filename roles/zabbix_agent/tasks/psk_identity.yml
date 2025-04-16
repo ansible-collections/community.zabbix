@@ -5,7 +5,7 @@
   when: zabbix_agent_tlspskidentity_check.stat.exists
   no_log: "{{ ansible_verbosity < 3 }}"
   register: zabbix_agent_tlspskidentity_base64
-  become: true
+  become: "{{ ansible_facts['os_family'] != 'Windows' }}"
 
 - name: AutoPSK | Use existing TLS PSK identity
   ansible.builtin.set_fact:
