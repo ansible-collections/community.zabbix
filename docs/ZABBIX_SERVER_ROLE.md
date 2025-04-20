@@ -118,6 +118,7 @@ Selinux changes will be installed based on the status of selinux running on the 
 
 ### Zabbix Server
 
+* `zabbix_server_packages`: List of packages to install, can be overridden for a non-supported/custom setup.
 * `zabbix_server_package_state`: Default: `present`. Can be overridden to `latest` to update packages when needed.
 * `zabbix_server_install_recommends`: Default: `True`. `False` does not install the recommended packages that come with the zabbix-server install.
 * `zabbix_server_manage_service`: Default: `True`. When you run multiple Zabbix servers in a High Available cluster setup (e.g. pacemaker), you don't want Ansible to manage the zabbix-server service, because Pacemaker is in control of zabbix-server service and in this case, it needs to be set to `False`.
