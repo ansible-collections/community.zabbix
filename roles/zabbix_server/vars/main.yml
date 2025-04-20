@@ -3,11 +3,12 @@ _zabbix_server_database_default_port:
   mysql: 3306
   pgsql: 5432
 
-_zabbix_server_database_file_dir_post72: /usr/share/zabbix/sql-scripts
-_zabbix_server_database_file_dir_pre72: /usr/share/zabbix-sql-scripts
+_zabbix_server_database_scripts_dir: "{{ zabbix_server_version is version('7.0', '>') | ternary(_zabbix_server_database_scripts_dir_post72, _zabbix_server_database_scripts_dir_pre72) }}"
+_zabbix_server_database_scripts_dir_post72: /usr/share/zabbix/sql-scripts
+_zabbix_server_database_scripts_dir_pre72: /usr/share/zabbix-sql-scripts
 
 _zabbix_server_database_schemas:
   mysql:
-    - "{{ zabbix_server_database_file_dir }}/mysql/server.sql.gz"
+    - "{{ _zabbix_server_database_scripts_dir }}/mysql/server.sql.gz"
   pgsql:
-    - "{{ zabbix_server_database_file_dir }}/postgresql/server.sql.gz"
+    - "{{ _zabbix_server_database_scripts_dir }}/postgresql/server.sql.gz"

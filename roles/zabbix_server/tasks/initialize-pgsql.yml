@@ -128,7 +128,7 @@
         port: "{{ zabbix_server_dbport }}"
         db: "{{ zabbix_server_dbname }}"
         state: restore
-        target: "{{ zabbix_server_database_file_dir }}/{{ _is_pre70 | ternary(legacy_path, modern_path) }}"
+        target: "{{ _zabbix_server_database_scripts_dir }}/{{ _is_pre70 | ternary(legacy_path, modern_path) }}"
       vars:
         _is_pre70: "{{ zabbix_server_version is version('7.0', '<') }}"
         legacy_path: postgresql/timescaledb.sql
