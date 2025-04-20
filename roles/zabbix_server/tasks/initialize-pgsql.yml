@@ -89,7 +89,8 @@
         port: "{{ zabbix_server_dbport }}"
         db: "{{ zabbix_server_dbname }}"
         state: restore
-        target: "{{ zabbix_server_database_file_dir }}/postgresql/server.sql.gz"
+        target: "{{ item }}"
+      loop: "{{ zabbix_server_database_schemas }}"
 
 - name: "Configure Timescale"
   when: zabbix_server_database_timescaledb

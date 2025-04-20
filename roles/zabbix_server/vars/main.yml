@@ -5,3 +5,9 @@ _zabbix_server_database_default_port:
 
 _zabbix_server_database_file_dir_post72: /usr/share/zabbix/sql-scripts
 _zabbix_server_database_file_dir_pre72: /usr/share/zabbix-sql-scripts
+
+_zabbix_server_database_schemas:
+  mysql:
+    - "{{ zabbix_server_database_file_dir }}/mysql/server.sql.gz"
+  pgsql:
+    - "{{ zabbix_server_database_file_dir }}/postgresql/server.sql.gz"
