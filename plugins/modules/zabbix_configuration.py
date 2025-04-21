@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2022, ONODERA Masaru <masaru-onodera@ieee.org>
+# Copyright: (c) 2025, ONODERA Masaru <masaru-onodera@ieee.org>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
@@ -15,6 +15,7 @@ module: zabbix_configuration
 short_description: Import Zabbix configuration
 description:
     - This module allows you to import Zabbix configuration data.
+    - If the Zabix configuration.importcompare API returns non-empty list, this module returns changed is true.
 
 author:
     - ONODERA Masaru(@masa-orca)
@@ -22,20 +23,24 @@ requirements:
     - "python >= 3.11"
 version_added: 3.4.0
 options:
-    content:
+    content_json:
         description:
-            - The content of the file to be imported.
-        required: true
-        type: str
-    format:
+            - The content of the JSON file to be imported.
+            - Mutually exclusive with I(content_xml) and I(content_yaml).
+        required: false
+        type: json
+    content_xml:
         description:
-            - The format of the file.
-        required: true
+            - The content of the XML file to be imported.
+            - Mutually exclusive with I(content_json) and I(content_yaml).
+        required: false
         type: str
-        choices:
-            - xml
-            - json
-            - yaml
+    content_yaml:
+        description:
+            - The content of the YAML file to be imported.
+            - Mutually exclusive with I(content_json) and I(content_xml).
+        required: false
+        type: str
     rules:
         description:
             - The rules for importing the configuration.
@@ -74,8 +79,7 @@ EXAMPLES = r"""
     ansible_zabbix_url_path: "zabbixeu"  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
     ansible_host: zabbix-example-fqdn.org
   community.zabbix.zabbix_configuration:
-    content: "{{ lookup('file', 'zbx_export_template.json') }}"
-    format: json
+    content_json: "{{ lookup('file', 'zbx_export_template.json') }}"
     rules:
       templates:
         createMissing: true
@@ -97,17 +101,20 @@ import traceback
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils._text import to_native
+
 from ansible_collections.community.zabbix.plugins.module_utils.base import ZabbixBase
 import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabbix_utils
 
 
 class Configuration(ZabbixBase):
-
     def import_compare(self, content, fmt, rules):
         """Import Zabbix configuration data"""
+        changed = False
         try:
-            importcompare = {"format": fmt, "source": content, "rules": rules}
-            compare_result = self._zapi.configuration.importcompare(importcompare)
+            params = {"format": fmt, "source": content}
+            if rules is not None:
+                params["rules"] = rules
+            compare_result = self._zapi.configuration.importcompare(params)
             if len(compare_result) != 0:
                 changed = True
             return changed
@@ -143,26 +150,45 @@ def main():
     argument_spec = zabbix_utils.zabbix_common_argument_spec()
     argument_spec.update(
         dict(
-            content=dict(type="str", required=True),
-            format=dict(type="str", required=True, choices=["xml", "json", "yaml"]),
-            rules=dict(type="dict", required=False),
+            content_json=dict(type="json", required=False),
+            content_xml=dict(type="str", required=False),
+            content_yaml=dict(type="str", required=False),
+            rules=dict(type="dict", required=False)
         )
     )
 
-    module = AnsibleModule(argument_spec=argument_spec, supports_check_mode=True)
+    module = AnsibleModule(
+        argument_spec=argument_spec,
+        required_one_of=[["content_json", "content_xml", "content_yaml"]],
+        mutually_exclusive=[["content_json", "content_xml", "content_yaml"]],
+        supports_check_mode=True,
+    )
 
-    content = module.params["content"]
-    fmt = module.params["format"]
+    content_json = module.params["content_json"]
+    content_xml = module.params["content_xml"]
+    content_yaml = module.params["content_yaml"]
     rules = module.params["rules"]
 
     configuration = Configuration(module)
 
-    changed = configuration.import_compare(content, fmt, rules)
+    content, format = None, None
+
+    if content_json is not None:
+        format = "json"
+        content = content_json
+    elif content_xml is not None:
+        format = "xml"
+        content = content_xml
+    elif content_yaml is not None:
+        format = "yaml"
+        content = content_yaml
+
+    changed = configuration.import_compare(content, format, rules)
 
     if not changed:
         module.exit_json(changed=changed, result="Configuration is up-to date")
     else:
-        configuration.import_config(content, fmt, rules)
+        configuration.import_config(content, format, rules)
         module.exit_json(changed=changed, result="Configuration imported successfully")
 
 
