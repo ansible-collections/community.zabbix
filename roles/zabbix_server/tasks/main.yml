@@ -35,7 +35,7 @@
 
 - name: Install zabbix-server packages
   ansible.builtin.package:
-    name: "{{ _zabbix_server_packages }}"
+    name: "{{ zabbix_server_packages }}"
     state: "{{ zabbix_server_package_state }}"
     update_cache: true
     disablerepo: "{{ zabbix_server_disable_repo | default(_zabbix_server_disable_repo | default(omit)) }}"
