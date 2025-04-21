@@ -1,0 +1,54 @@
+---
+- name: test - import Zabbix template from XML
+  # set task level variables as we change ansible_connection plugin here
+  community.zabbix.zabbix_configuration:
+    content: "{{ lookup('file', 'new_template.xml') }}"
+    format: xml
+    rules:
+      templates:
+        createMissing: true
+        updateExisting: true
+      items:
+        createMissing: true
+        updateExisting: true
+        deleteMissing: true
+      triggers:
+        createMissing: true
+        updateExisting: true
+        deleteMissing: true
+      valueMaps:
+        createMissing: true
+        updateExisting: false
+  register: zbxconfiguration_import
+
+- name: assert that configuration was imported
+  ansible.builtin.assert:
+    that:
+      - zbxconfiguration_import.changed is sameas True
+
+- name: test - import Zabbix template from XML (not changed)
+  # set task level variables as we change ansible_connection plugin here
+  community.zabbix.zabbix_configuration:
+    content: "{{ lookup('file', 'new_template.xml') }}"
+    format: xml
+    rules:
+      templates:
+        createMissing: true
+        updateExisting: true
+      items:
+        createMissing: true
+        updateExisting: true
+        deleteMissing: true
+      triggers:
+        createMissing: true
+        updateExisting: true
+        deleteMissing: true
+      valueMaps:
+        createMissing: true
+        updateExisting: false
+  register: zbxconfiguration_import
+
+- name: assert that configuration was imported (not changed)
+  ansible.builtin.assert:
+    that:
+      - zbxconfiguration_import.changed is sameas False
