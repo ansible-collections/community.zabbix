@@ -70,10 +70,7 @@
 
 - name: "test - Set key to template_export_key variable(This deals with the key being masked)"
   ansible.builtin.set_fact:
-    template_export_key: "{{ item }}"
-  loop: "{{ gather_template_result.template_json.keys() | list }}"
-  when:
-    - item | regex_search('_export')
+    template_export_key: 'zabbix_export'
 
 - ansible.builtin.assert:
     that:
