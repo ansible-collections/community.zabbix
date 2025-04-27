@@ -6,6 +6,9 @@ on:
       - "plugins/**"
       - "tests/integration/**"
       - ".github/workflows/plugins-integration.yml"
+    branches:
+      - dev
+      - main
   pull_request:
     paths:
       - "plugins/**"
