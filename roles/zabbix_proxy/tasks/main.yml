@@ -172,7 +172,7 @@
     failover_delay: "{{ zabbix_proxy_group_failover_delay | default('1m') }}"
     min_online: "{{ zabbix_proxy_group_min_online | default('1') }}"
     name: "{{ zabbix_proxy_group_name }}"
-    state: "{{ zabbix_proxy_group_state | default('present')  }}"
+    state: "{{ zabbix_proxy_group_state }}"
   when:
     - zabbix_api_create_proxy_group | d(false) | bool == true
     - zabbix_proxy_version is version('7.0', '>=')
@@ -201,10 +201,12 @@
     description: "{{ zabbix_proxy_description | default(omit) }}"
     address: "{{ zabbix_proxy_interface['ip'] }}"
     port: "{{ zabbix_proxy_interface['port'] }}"
-    local_address: "{{ (zabbix_proxy_group_state is defined and zabbix_proxy_group_state == 'present') \
+    local_address: "{{ (zabbix_proxy_group_state is defined and zabbix_proxy_group_state == 'present' \
+                  and zabbix_api_create_proxy_group | d(false) | bool == true) \
                   | ternary(zabbix_proxy_local_address | d(zabbix_proxy_hostname),\
                   zabbix_proxy_local_address | default(omit)) }}"
-    local_port: "{{ (zabbix_proxy_group_state is defined and zabbix_proxy_group_state == 'present') \
+    local_port: "{{ (zabbix_proxy_group_state is defined and zabbix_proxy_group_state == 'present' \
+                  and zabbix_api_create_proxy_group | d(false) | bool == true) \
                   | ternary(zabbix_proxy_local_port | d(zabbix_proxy_listenport),\
                   zabbix_proxy_local_port | default(omit)) }}"
     allowed_addresses: "{{ zabbix_proxy_allowed_addresses | default(omit) }}"
@@ -225,7 +227,9 @@
     tls_psk_identity: "{{ zabbix_proxy_tlspskidentity | default(omit) }}"
     ca_cert: "{{ zabbix_proxy_ca_cert | default(omit) }}"
     tls_subject: "{{ zabbix_proxy_tls_subject | default(omit) }}"
-    proxy_group: "{{ (zabbix_proxy_group_state is defined and zabbix_proxy_group_state == 'present') | ternary(zabbix_proxy_group_name,omit) }}"
+    proxy_group: "{{ (zabbix_proxy_group_state is defined and zabbix_proxy_group_state == 'present' \
+                and zabbix_api_create_proxy_group | d(false) | bool == true) \
+                | ternary(zabbix_proxy_group_name,omit) }}"
   when:
     - zabbix_api_create_proxy | bool
     - zabbix_proxy_version is version('7.0', '>=')
