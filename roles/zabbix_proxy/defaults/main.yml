@@ -135,6 +135,6 @@ zabbix_proxy_status: active # or passive
 zabbix_api_create_proxy_group: false
 zabbix_proxy_group_name: Zabbix Proxy Group 01
 zabbix_proxy_group_state: present
-zabbix_proxy_group_description: demo
+#zabbix_proxy_group_description: demo
 zabbix_proxy_group_failover_delay: 1m
 zabbix_proxy_group_min_online: 1

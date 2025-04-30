@@ -169,12 +169,12 @@
     ansible_httpapi_validate_certs: "{{ zabbix_api_validate_certs }}"
   community.zabbix.zabbix_proxy_group:
     description: "{{ zabbix_proxy_group_description | default(omit) }}"
-    failover_delay: "{{ zabbix_proxy_group_failover_delay | default('1m') }}"
-    min_online: "{{ zabbix_proxy_group_min_online | default('1') }}"
+    failover_delay: "{{ zabbix_proxy_group_failover_delay }}"
+    min_online: "{{ zabbix_proxy_group_min_online }}"
     name: "{{ zabbix_proxy_group_name }}"
     state: "{{ zabbix_proxy_group_state }}"
   when:
-    - zabbix_api_create_proxy_group | d(false) | bool == true
+    - zabbix_api_create_proxy_group | bool
     - zabbix_proxy_version is version('7.0', '>=')
   delegate_to: "{{ zabbix_api_server_host }}"
   tags:
@@ -201,14 +201,10 @@
     description: "{{ zabbix_proxy_description | default(omit) }}"
     address: "{{ zabbix_proxy_interface['ip'] }}"
     port: "{{ zabbix_proxy_interface['port'] }}"
-    local_address: "{{ (zabbix_proxy_group_state is defined and zabbix_proxy_group_state == 'present' \
-                  and zabbix_api_create_proxy_group | d(false) | bool == true) \
-                  | ternary(zabbix_proxy_local_address | d(zabbix_proxy_hostname),\
-                  zabbix_proxy_local_address | default(omit)) }}"
-    local_port: "{{ (zabbix_proxy_group_state is defined and zabbix_proxy_group_state == 'present' \
-                  and zabbix_api_create_proxy_group | d(false) | bool == true) \
-                  | ternary(zabbix_proxy_local_port | d(zabbix_proxy_listenport),\
-                  zabbix_proxy_local_port | default(omit)) }}"
+    local_address: "{{ (zabbix_proxy_group_state is defined and zabbix_proxy_group_state == 'present' and zabbix_api_create_proxy_group | bool) \
+                      | ternary(zabbix_proxy_local_address | d(zabbix_proxy_hostname),zabbix_proxy_local_address | default(omit)) }}"
+    local_port: "{{ (zabbix_proxy_group_state is defined and zabbix_proxy_group_state == 'present' and zabbix_api_create_proxy_group | bool) \
+                      | ternary(zabbix_proxy_local_port | d(zabbix_proxy_listenport),zabbix_proxy_local_port | default(omit)) }}"
     allowed_addresses: "{{ zabbix_proxy_allowed_addresses | default(omit) }}"
     custom_timeouts: "{{ zabbix_proxy_custom_timeouts | default(omit) }}"
     timeout_zabbix_agent: "{{ zabbix_proxy_timeout_zabbix_agent | default(omit) }}"
@@ -228,8 +224,7 @@
     ca_cert: "{{ zabbix_proxy_ca_cert | default(omit) }}"
     tls_subject: "{{ zabbix_proxy_tls_subject | default(omit) }}"
     proxy_group: "{{ (zabbix_proxy_group_state is defined and zabbix_proxy_group_state == 'present' \
-                and zabbix_api_create_proxy_group | d(false) | bool == true) \
-                | ternary(zabbix_proxy_group_name,omit) }}"
+                  and zabbix_api_create_proxy_group | bool) | ternary(zabbix_proxy_group_name,omit) }}"
   when:
     - zabbix_api_create_proxy | bool
     - zabbix_proxy_version is version('7.0', '>=')
