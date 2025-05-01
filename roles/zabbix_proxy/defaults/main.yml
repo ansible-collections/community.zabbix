@@ -131,3 +131,12 @@ zabbix_api_timeout: 30
 zabbix_api_create_proxy: false
 zabbix_proxy_state: present
 zabbix_proxy_status: active # or passive
+zabbix_proxy_local_address: "{{ zabbix_proxy_hostname }}"
+zabbix_proxy_local_port: "{{ zabbix_proxy_listenport }}"
+
+zabbix_api_create_proxy_group: false
+zabbix_proxy_group_name: Zabbix Proxy Group 01
+zabbix_proxy_group_state: present
+#zabbix_proxy_group_description: demo
+zabbix_proxy_group_failover_delay: 1m
+zabbix_proxy_group_min_online: 1
