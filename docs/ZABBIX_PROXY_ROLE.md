@@ -289,6 +289,12 @@ These variables need to be overridden when you want to make use of the Zabbix AP
 * `zabbix_proxy_name`: name of the Zabbix proxy as it is seen by Zabbix server
 * `zabbix_proxy_state`: present (Default) if the proxy needs to be created or absent if you want to delete it. This only works when `zabbix_api_create_proxy` is set to `True`.
 * `zabbix_proxy_status`: active (Default) if the proxy needs to be active or passive.
+* `zabbix_api_create_proxy_group`: When you want to enable the Zabbix API to create/delete the proxy group. This has to be set to `True` if you want to make use of `zabbix_proxy_group_state`. Is using the same API connectivity options as `zabbix_api_create_proxy`. Default: `False`. Version 7.0 or Greater.
+* `zabbix_proxy_group_name`: Name of the Zabbix proxy group as it is seen by Zabbix server. Version 7.0 or Greater.
+* `zabbix_proxy_group_state`: Present (Default) if the proxy group needs to be created or absent if you want to delete it. This only works when `zabbix_api_create_proxy_group` is set to `True`. The Zabbix proxy this variable is used together with, will be automatically assigned to that `zabbix_proxy_group_name` proxy group. Version 7.0 or Greater.
+* `zabbix_proxy_group_description`: Zabbix proxy group description. Default `omit`. Version 7.0 or Greater.
+* `zabbix_proxy_group_failover_delay`: Failover period for each proxy in the group to have online/offline state. Default `1m`. Version 7.0 or Greater.
+* `zabbix_proxy_group_min_online`: Minimum number of online proxies required for the group to be online. Possible values range: 1-1000. Default `1`. Version 7.0 or Greater.
 
 ## Configuration Variables
 
