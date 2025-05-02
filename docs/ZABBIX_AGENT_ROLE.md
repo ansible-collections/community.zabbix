@@ -229,6 +229,25 @@ Otherwise it just for the Zabbix Agent or for the Zabbix Agent 2.
 * `zabbix_win_install_dir_bin`: The directory where Zabbix binary file needs to be installed.
 * `zabbix_win_package`: file name pattern (zip only). This will be used to generate the `zabbix_win_download_link` variable.
 
+### Tweaking the windows service
+
+There might be times where the service is unpredictable, and rather than
+investigating or dealing with it, you can just have it restart upon failure.
+Here are some suggested values for tweaking the service.
+
+* `zabbix_agent_service_start_mode:` `auto`, zabbix comes by default with `delayed`.
+* ```yaml
+  zabbix_agent_service_failure_actions:
+      - type: restart
+        delay_ms: 10000
+      - type: restart
+        delay_ms: 20000
+      - type: restart
+        delay_ms: 40000
+  ```
+* `zabbix_agent_service_failure_reset_period_sec:` `86400` is probably a reasonable time
+
+
 ## macOS Variables
 
 **NOTE**

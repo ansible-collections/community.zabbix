@@ -79,4 +79,8 @@
   ansible.windows.win_service:
     name: "{{ zabbix_agent_win_service }}"
     state: started
-    start_mode: delayed
+    start_mode: "{{ zabbix_agent_service_start_mode | default('delayed') }}"
+    failure_actions: "{{ zabbix_agent_service_failure_actions | default(omit) }}"
+    failure_reset_period_sec: "{{ zabbix_agent_service_failure_reset_period_sec | default(omit) }}"
+  register: _zabbix_agent_service_started
+  until: _zabbix_agent_service_started is succeeded
