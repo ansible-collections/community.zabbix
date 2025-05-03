@@ -1,0 +1,3 @@
+---
+minor_changes:
+  - roles/proxy - optionally creation of proxy_group and adding proxy to group (Zabbix 7.0+)

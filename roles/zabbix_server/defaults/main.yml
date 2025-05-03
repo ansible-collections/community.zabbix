@@ -26,8 +26,7 @@ zabbix_server_dbhost_run_install: true
 zabbix_server_database: pgsql
 zabbix_server_database_creation: true
 zabbix_server_install_database_client: true
-
-zabbix_server_database_file_dir: "{{ zabbix_server_version is version('7.0', '>') | ternary(_zabbix_server_database_file_dir_post72, _zabbix_server_database_file_dir_pre72) }}"
+zabbix_server_database_schemas: "{{ _zabbix_server_database_schemas[zabbix_server_database] }}"
 
 # SELinux specific
 selinux_allow_zabbix_can_network: false
@@ -39,6 +38,7 @@ zabbix_service_state: started
 
 # Yum/APT  Variables
 zabbix_server_version_minor: "*"
+zabbix_server_packages: "{{ _zabbix_server_packages }}"
 zabbix_server_package_state: present
 zabbix_server_conf_mode: 0640
 
