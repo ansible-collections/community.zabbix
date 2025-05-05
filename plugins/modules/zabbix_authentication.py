@@ -59,7 +59,6 @@ options:
         description:
             - LDAP authentication will be enabled if C(true).
             - Works only with Zabbix <= 6.2 and is silently ignored in higher versions.
-            - Removed in Zabbix 6.4
         required: false
         type: bool
     ldap_auth_enabled:
@@ -74,6 +73,7 @@ options:
             - e.g. C(ldap://ldap.zabbix.com)
             - This setting is required if current value of I(ldap_configured) is C(false).
             - Works only with Zabbix <= 6.0 and is silently ignored in higher versions.
+            - Please use community.zabbix.zabbix_user_directory module instead of this parameter with Zabbix >= 6.2.
         required: false
         type: str
     ldap_port:
@@ -81,6 +81,7 @@ options:
             - A port number of LDAP server.
             - This setting is required if current value of I(ldap_configured) is C(false).
             - Works only with Zabbix <= 6.0 and is silently ignored in higher versions.
+            - Please use community.zabbix.zabbix_user_directory module instead of this parameter with Zabbix >= 6.2.
         required: false
         type: int
     ldap_base_dn:
@@ -88,6 +89,7 @@ options:
             - Base DN of LDAP.
             - This setting is required if current value of I(ldap_configured) is C(false).
             - Works only with Zabbix <= 6.0 and is silently ignored in higher versions.
+            - Please use community.zabbix.zabbix_user_directory module instead of this parameter with Zabbix >= 6.2.
         required: false
         type: str
     ldap_search_attribute:
@@ -95,12 +97,14 @@ options:
             - Search attribute of LDAP.
             - This setting is required if current value of I(ldap_configured) is C(false).
             - Works only with Zabbix <= 6.0 and is silently ignored in higher versions.
+            - Please use community.zabbix.zabbix_user_directory module instead of this parameter with Zabbix >= 6.2.
         required: false
         type: str
     ldap_bind_dn:
         description:
             - Bind DN of LDAP.
             - Works only with Zabbix <= 6.0 and is silently ignored in higher versions.
+            - Please use community.zabbix.zabbix_user_directory module instead of this parameter with Zabbix >= 6.2.
         required: false
         type: str
     ldap_case_sensitive:
@@ -112,6 +116,7 @@ options:
         description:
             - Bind password of LDAP.
             - Works only with Zabbix <= 6.0 and is silently ignored in higher versions.
+            - Please use community.zabbix.zabbix_user_directory module instead of this parameter with Zabbix >= 6.2.
         required: false
         type: str
     ldap_userdirectory:
