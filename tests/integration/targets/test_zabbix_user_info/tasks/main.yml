@@ -36,9 +36,17 @@
     that:
       - create_zabbix_user_result.changed is sameas true
 
-- name: test - Set definition_of_results variable
+- name: "test - Get a zabbix user information"
+  community.zabbix.zabbix_user_info:
+    username: example
+  register: get_user_info_result
+
+- name: "test - Set key to user_info_key variable(This deals with the key being masked)"
   ansible.builtin.set_fact:
-    definition_of_results:
+    user_info_key: 'zabbix_user'
+
+- ansible.builtin.assert:
+    that:
       - get_user_info_result[user_info_key].username == "example"
       - get_user_info_result[user_info_key].autologin is defined
       - get_user_info_result[user_info_key].autologout is defined
@@ -70,21 +78,42 @@
       - get_user_info_result[user_info_key].usrgrps.1.name is defined
       - get_user_info_result[user_info_key].usrgrps.1.users_status is defined
       - get_user_info_result[user_info_key].usrgrps.1.usrgrpid is defined
-
-- name: "test - Get a zabbix user information"
-  community.zabbix.zabbix_user_info:
-    username: example
-  register: get_user_info_result
-
-- name: "test - Set key to user_info_key variable(This deals with the key being masked)"
-  ansible.builtin.set_fact:
-    user_info_key: "{{ item }}"
-  loop: "{{ get_user_info_result.keys() | list }}"
-  when:
-    - item | regex_search('_user')
+  when: zabbix_version is version('6.0', '<=')
 
 - ansible.builtin.assert:
-    that: definition_of_results
+    that:
+      - get_user_info_result[user_info_key].username == "example"
+      - get_user_info_result[user_info_key].autologin is defined
+      - get_user_info_result[user_info_key].autologout is defined
+      - get_user_info_result[user_info_key].lang is defined
+      - get_user_info_result[user_info_key].medias.0.active is defined
+      - get_user_info_result[user_info_key].medias.0.mediaid is defined
+      - get_user_info_result[user_info_key].medias.0.period is defined
+      - get_user_info_result[user_info_key].medias.0.sendto is defined
+      - get_user_info_result[user_info_key].medias.0.severity is defined
+      - get_user_info_result[user_info_key].medias.0.userdirectory_mediaid is defined
+      - get_user_info_result[user_info_key].name is defined
+      - get_user_info_result[user_info_key].refresh is defined
+      - get_user_info_result[user_info_key].rows_per_page is defined
+      - get_user_info_result[user_info_key].surname is defined
+      - get_user_info_result[user_info_key].theme is defined
+      - get_user_info_result[user_info_key].roleid is defined
+      - get_user_info_result[user_info_key].url is defined
+      - get_user_info_result[user_info_key].userid is defined
+      - get_user_info_result[user_info_key].users_status is defined
+      - get_user_info_result[user_info_key].timezone is defined
+      - get_user_info_result[user_info_key].usrgrps | length == 2
+      - get_user_info_result[user_info_key].usrgrps.0.debug_mode is defined
+      - get_user_info_result[user_info_key].usrgrps.0.gui_access is defined
+      - get_user_info_result[user_info_key].usrgrps.0.name is defined
+      - get_user_info_result[user_info_key].usrgrps.0.users_status is defined
+      - get_user_info_result[user_info_key].usrgrps.0.usrgrpid is defined
+      - get_user_info_result[user_info_key].usrgrps.1.debug_mode is defined
+      - get_user_info_result[user_info_key].usrgrps.1.gui_access is defined
+      - get_user_info_result[user_info_key].usrgrps.1.name is defined
+      - get_user_info_result[user_info_key].usrgrps.1.users_status is defined
+      - get_user_info_result[user_info_key].usrgrps.1.usrgrpid is defined
+  when: zabbix_version is version('7.0', '>=')
 
 - name: test - Create a new Zabbix user
   community.zabbix.zabbix_user:
@@ -104,13 +133,6 @@
   community.zabbix.zabbix_user_info:
     username: example2
   register: get_user_info_result2
-
-- name: "test - Set key to user_info_key variable(This deals with the key being masked)"
-  ansible.builtin.set_fact:
-    user_info_key: "{{ item }}"
-  loop: "{{ get_user_info_result2.keys() | list }}"
-  when:
-    - item | regex_search('_user')
 
 - ansible.builtin.assert:
     that:
