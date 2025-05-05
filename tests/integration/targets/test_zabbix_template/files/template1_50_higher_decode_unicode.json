@@ -22,8 +22,8 @@
                         "type": "ZABBIX_ACTIVE",
                         "key": "logrt[\"/test.*test.log\",\"test.*total=([0-9.]+)\",,,skip,\\1]"
                     }
-                ],
+                ]
             }
-        ],
+        ]
     }
 }

@@ -32,6 +32,7 @@ options:
     omit_date:
         description:
             - Removes the date field for the dumped template
+            - This parameter will be ignored since Zabbix 6.4.
         required: false
         type: bool
         default: false
@@ -210,6 +211,7 @@ import json
 import xml.etree.ElementTree as ET
 
 from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.compat.version import LooseVersion
 from ansible.module_utils._text import to_native
 from ansible.module_utils.six import PY2
 
@@ -242,7 +244,7 @@ class TemplateInfo(ZabbixBase):
             self._module.fail_json(msg="Invalid JSON provided", details=to_native(e), exception=traceback.format_exc())
 
     def load_yaml_template(self, template_yaml, omit_date=False):
-        if omit_date:
+        if omit_date and LooseVersion(self._zbx_api_version) < LooseVersion("6.4"):
             yaml_lines = template_yaml.splitlines(True)
             for index, line in enumerate(yaml_lines):
                 if "date:" in line:

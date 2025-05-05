@@ -21,7 +21,7 @@
 
 - name: assert that event was acknowledged
   ansible.builtin.assert:
-    that: zabbix_host_events_ack.triggers_problem[0].last_event.acknowledged
+    that: zabbix_host_events_ack.triggers_problem[0].last_event.acknowledged == "1"
 
 - name: test - change severity and unacknowledge
   community.zabbix.zabbix_host_events_update:
