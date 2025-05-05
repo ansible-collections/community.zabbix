@@ -89,7 +89,7 @@ Click on the name of a plugin or module to view that content's documentation:
 
 Some of the components in this collection requires additional dependencies. Review components you are interested in by visiting links present in the [Included content](#included-content) section.
 
-While the various roles and modules may work with earlier versions of Python and Ansible, they are only tested and maintained against Ansible Core >= 2.15 and python >= 3.9 
+While the various roles and modules may work with earlier versions of Python and Ansible, they are only tested and maintained against Ansible Core >= 2.16 and python >= 3.9
 
 #### External Collections
 
