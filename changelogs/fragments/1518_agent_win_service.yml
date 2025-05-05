@@ -1,0 +1,3 @@
+---
+minor_changes:
+  - roles/zabbix_agent - Tweaking the windows service

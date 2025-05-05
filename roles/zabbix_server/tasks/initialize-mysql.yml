@@ -148,7 +148,8 @@
         encoding: "{{ zabbix_server_dbencoding }}"
         collation: "{{ zabbix_server_dbcollation }}"
         state: import
-        target: "{{ zabbix_server_database_file_dir }}/mysql/server.sql.gz"
+        target: "{{ item }}"
+      loop: "{{ zabbix_server_database_schemas }}"
 
   always:
     - name: "MySQL | Revert variable overrides for schema import"

@@ -19,11 +19,7 @@
 
 - name: "test - Set key to template_export_key variable(This deals with the key being masked)"
   ansible.builtin.set_fact:
-    template_export_key: "{{ item }}"
-  loop: "{{ fetch_template_json_format_result.template_json.keys() | list }}"
-  when:
-    - item | regex_search('_export')
-
+    template_export_key: 'zabbix_export'
 - ansible.builtin.assert:
     that:
       - fetch_template_json_format_result.template_json[template_export_key].date is defined
@@ -60,6 +56,13 @@
       - fetch_template_xml_format_result.template_xml | regex_search('<date>.*</date>') is defined
       - fetch_template_xml_format_result.template_xml | regex_search('</date><groups><group><name>Templates</name></group></groups><templates>') is defined
       - fetch_template_xml_format_result.template_xml | regex_search('<templates><template><template>ExampleTemplateForTempleteInfoModule</template><name>ExampleTemplateForTempleteInfoModule</name><groups><group><name>Templates</name></group></groups></template></templates>') is defined
+  when: zabbix_version is version('6.0', '<=')
+
+- ansible.builtin.assert:
+    that:
+      - fetch_template_xml_format_result.template_xml | regex_search('</date><groups><group><name>Templates</name></group></groups><templates>') is defined
+      - fetch_template_xml_format_result.template_xml | regex_search('<templates><template><template>ExampleTemplateForTempleteInfoModule</template><name>ExampleTemplateForTempleteInfoModule</name><groups><group><name>Templates</name></group></groups></template></templates>') is defined
+  when: zabbix_version is version('7.0', '>=')
 
 - name: "test - Fetch template info as a XML format with omit_date parameter from Zabbix Server"
   community.zabbix.zabbix_template_info:
@@ -82,9 +85,16 @@
 
 - ansible.builtin.assert:
     that:
-      - fetch_template_yaml_format_result.template_yaml | regex_search('date: .+') is defined
-      - fetch_template_yaml_format_result.template_yaml | regex_search('name: Templates') is defined
-      - fetch_template_yaml_format_result.template_yaml | regex_search('template: ExampleTemplateForTempleteInfoModule') is defined
+      - (fetch_template_yaml_format_result.template_yaml | from_yaml).zabbix_export.date is defined
+      - (fetch_template_yaml_format_result.template_yaml | from_yaml).zabbix_export.groups | selectattr("name", "eq", "Templates") | length > 0
+      - (fetch_template_yaml_format_result.template_yaml | from_yaml).zabbix_export.templates | selectattr("template", "eq", "ExampleTemplateForTempleteInfoModule") | length > 0
+  when: zabbix_version is version('6.0', '<=')
+
+- ansible.builtin.assert:
+    that:
+      - (fetch_template_yaml_format_result.template_yaml | from_yaml).zabbix_export.template_groups | selectattr("name", "eq", "Templates") | length > 0
+      - (fetch_template_yaml_format_result.template_yaml | from_yaml).zabbix_export.templates | selectattr("template", "eq", "ExampleTemplateForTempleteInfoModule") | length > 0
+  when: zabbix_version is version('7.0', '>=')
 
 - name: "test - Fetch template info as a YAML format with omit_date parameter from Zabbix Server"
   community.zabbix.zabbix_template_info:
@@ -95,9 +105,16 @@
 
 - ansible.builtin.assert:
     that:
-      - fetch_template_yaml_format_result.template_yaml | regex_search('date: .+') is not defined
-      - fetch_template_yaml_format_result.template_yaml | regex_search('name: Templates') is defined
-      - fetch_template_yaml_format_result.template_yaml | regex_search('template: ExampleTemplateForTempleteInfoModule') is defined
+      - (fetch_template_yaml_format_omit_date_result.template_yaml | from_yaml).zabbix_export.date is not defined
+      - (fetch_template_yaml_format_omit_date_result.template_yaml | from_yaml).zabbix_export.groups | selectattr("name", "eq", "Templates") | length > 0
+      - (fetch_template_yaml_format_omit_date_result.template_yaml | from_yaml).zabbix_export.templates | selectattr("template", "eq", "ExampleTemplateForTempleteInfoModule") | length > 0
+  when: zabbix_version is version('6.0', '<=')
+
+- ansible.builtin.assert:
+    that:
+      - (fetch_template_yaml_format_omit_date_result.template_yaml | from_yaml).zabbix_export.template_groups | selectattr("name", "eq", "Templates") | length > 0
+      - (fetch_template_yaml_format_omit_date_result.template_yaml | from_yaml).zabbix_export.templates | selectattr("template", "eq", "ExampleTemplateForTempleteInfoModule") | length > 0
+  when: zabbix_version is version('7.0', '>=')
 
 - name: "test - Fetch template info with none format from Zabbix Server"
   community.zabbix.zabbix_template_info:
