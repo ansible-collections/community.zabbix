@@ -1,7 +1,7 @@
 # Install CI dependencies for the Zabbix Roles
-ansible-core<2.17
+ansible-core
 docker
-molecule>=6,<24.7.0
+molecule
 netaddr>=1.2.1
-pytest<8           # newer versions require python>=3.8
-pytest-testinfra<9 # newer versions require python>=3.9
+pytest
+pytest-testinfra
