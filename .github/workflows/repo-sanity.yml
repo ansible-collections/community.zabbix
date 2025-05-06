@@ -10,7 +10,7 @@ jobs:
     strategy:
       matrix:
         python:
-          - '3.10'
+          - '3.12'
     runs-on: ubuntu-latest
     steps:
       - name: Check out code
@@ -39,12 +39,13 @@ jobs:
           # Testing against `devel` may fail as new tests are added.
 
           # https://docs.ansible.com/ansible/latest/reference_appendices/release_and_maintenance.html#ansible-core-changelogs
-          - stable-2.15
           - stable-2.16
           - stable-2.17
+          - stable-2.18
+          - stable-2.19
           - devel
         python:
-          - '3.11'
+          - '3.12'
     runs-on: ubuntu-latest
     steps:
       # ansible-test requires the collection to be in a directory in the form
