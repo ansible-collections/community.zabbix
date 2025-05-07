@@ -1,0 +1,171 @@
+---
+- name: Create FTP Service Template
+  community.zabbix.zabbix_template:
+    template_name: FTP Service
+    template_groups:
+      - "Templates"
+    state: present
+
+- name: test - import Zabbix template from JSON
+  community.zabbix.zabbix_configuration:
+    content_json: "{{ lookup('file', 'template.json') }}"
+    rules:
+      templates:
+        createMissing: true
+        updateExisting: true
+      items:
+        createMissing: true
+        updateExisting: true
+        deleteMissing: true
+      triggers:
+        createMissing: true
+        updateExisting: true
+        deleteMissing: true
+      valueMaps:
+        createMissing: true
+        updateExisting: false
+      templateLinkage:
+        createMissing: true
+  register: zbxconfiguration_import
+
+- name: assert that configuration was imported
+  ansible.builtin.assert:
+    that:
+      - zbxconfiguration_import.changed is sameas True
+
+- name: test - import Zabbix template from JSON (not changed)
+  community.zabbix.zabbix_configuration:
+    content_json: "{{ lookup('file', 'template.json') }}"
+    rules:
+      templates:
+        createMissing: true
+        updateExisting: true
+      items:
+        createMissing: true
+        updateExisting: true
+        deleteMissing: true
+      triggers:
+        createMissing: true
+        updateExisting: true
+        deleteMissing: true
+      valueMaps:
+        createMissing: true
+        updateExisting: false
+      templateLinkage:
+        createMissing: true
+  register: zbxconfiguration_import
+
+- name: assert that configuration was imported (not changed)
+  ansible.builtin.assert:
+    that:
+      - zbxconfiguration_import.changed is sameas False
+
+- name: test - import Zabbix template from XML
+  community.zabbix.zabbix_configuration:
+    content_xml: "{{ lookup('file', 'template.xml') }}"
+    rules:
+      templates:
+        createMissing: true
+        updateExisting: true
+      items:
+        createMissing: true
+        updateExisting: true
+        deleteMissing: true
+      triggers:
+        createMissing: true
+        updateExisting: true
+        deleteMissing: true
+      valueMaps:
+        createMissing: true
+        updateExisting: false
+  register: zbxconfiguration_import
+
+- name: assert that configuration was imported
+  ansible.builtin.assert:
+    that:
+      - zbxconfiguration_import.changed is sameas True
+
+- name: test - import Zabbix template from XML (not changed)
+  community.zabbix.zabbix_configuration:
+    content_xml: "{{ lookup('file', 'template.xml') }}"
+    rules:
+      templates:
+        createMissing: true
+        updateExisting: true
+      items:
+        createMissing: true
+        updateExisting: true
+        deleteMissing: true
+      triggers:
+        createMissing: true
+        updateExisting: true
+        deleteMissing: true
+      valueMaps:
+        createMissing: true
+        updateExisting: false
+  register: zbxconfiguration_import
+
+- name: assert that configuration was imported (not changed)
+  ansible.builtin.assert:
+    that:
+      - zbxconfiguration_import.changed is sameas False
+
+- name: test - import Zabbix template from YAML
+  community.zabbix.zabbix_configuration:
+    content_yaml: "{{ lookup('file', 'template.yaml') }}"
+    rules:
+      templates:
+        createMissing: true
+        updateExisting: true
+      items:
+        createMissing: true
+        updateExisting: true
+        deleteMissing: true
+      triggers:
+        createMissing: true
+        updateExisting: true
+        deleteMissing: true
+      valueMaps:
+        createMissing: true
+        updateExisting: false
+  register: zbxconfiguration_import
+
+- name: assert that configuration was imported
+  ansible.builtin.assert:
+    that:
+      - zbxconfiguration_import.changed is sameas True
+
+- name: test - import Zabbix template from YAML (not changed)
+  community.zabbix.zabbix_configuration:
+    content_yaml: "{{ lookup('file', 'template.yaml') }}"
+    rules:
+      templates:
+        createMissing: true
+        updateExisting: true
+      items:
+        createMissing: true
+        updateExisting: true
+        deleteMissing: true
+      triggers:
+        createMissing: true
+        updateExisting: true
+        deleteMissing: true
+      valueMaps:
+        createMissing: true
+        updateExisting: false
+  register: zbxconfiguration_import
+
+- name: assert that configuration was imported (not changed)
+  ansible.builtin.assert:
+    that:
+      - zbxconfiguration_import.changed is sameas False
+
+- name: Delete Zabbix template
+  community.zabbix.zabbix_template:
+    template_name: "{{ item }}"
+    state: absent
+  loop:
+    - ExampleTemplateJSON
+    - ExampleTemplateXML
+    - ExampleTemplateYAML
+    - FTP Service
