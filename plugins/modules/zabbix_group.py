@@ -109,6 +109,23 @@ EXAMPLES = r"""
       - Example group1
       - Example group2
   when: inventory_hostname==groups['group_name'][0]
+
+- name: Propagate permissions to sub group (Zabbix >= 6.2)
+  # set task level variables as we change ansible_connection plugin here
+  vars:
+    ansible_network_os: community.zabbix.zabbix
+    ansible_connection: httpapi
+    ansible_httpapi_port: 443
+    ansible_httpapi_use_ssl: true
+    ansible_httpapi_validate_certs: false
+    ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
+    ansible_host: zabbix-example-fqdn.org
+  community.zabbix.zabbix_group:
+    state: present
+    host_groups:
+      - Example group1
+    propagate:
+      permissions: true
 """
 
 
