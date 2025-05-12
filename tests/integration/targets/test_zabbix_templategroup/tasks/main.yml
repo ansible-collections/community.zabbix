@@ -57,3 +57,38 @@
 - name: assert that nothing has been changed
   ansible.builtin.assert:
     that: not zbxtempgrp_missing_delete is changed
+
+- name: test - create template group with propagation
+  community.zabbix.zabbix_templategroup:
+    template_groups:
+      - zbxtmpgrp_example_group01
+      - zbxtmpgrp_example_group01/subgroup
+    propagate:
+      permissions: true
+    state: present
+  register: zbxtmpgrp_create
+
+- name: assert that group was created
+  ansible.builtin.assert:
+    that: zbxtmpgrp_create is changed
+
+- name: test - propagate without creation template group
+  community.zabbix.zabbix_templategroup:
+    template_groups:
+      - zbxtmpgrp_example_group01
+      - zbxtmpgrp_example_group01/subgroup
+    propagate:
+      permissions: true
+    state: present
+  register: zbxtmpgrp_propagate
+
+- name: assert that group was propagated
+  ansible.builtin.assert:
+    that: zbxtmpgrp_propagate is changed
+
+- name: test - delete template groups
+  community.zabbix.zabbix_templategroup:
+    template_groups:
+      - zbxtmpgrp_example_group01
+      - zbxtmpgrp_example_group01/subgroup
+    state: absent
