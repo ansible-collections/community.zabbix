@@ -36,4 +36,6 @@
     state: restarted
     enabled: true
   become: true
-  when: ansible_facts['os_family'] == 'Suse'
+  when: >
+    ansible_facts['os_family'] == 'Suse' or
+    ansible_facts['os_family'] == 'RedHat'

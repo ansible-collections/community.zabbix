@@ -95,8 +95,8 @@
 - name: "Create zabbix-web directory"
   ansible.builtin.file:
     path: /etc/zabbix/web
-    owner: "{{ zabbix_web_user }}"
-    group: "{{ zabbix_web_group }}"
+    owner: "{{ zabbix_php_fpm_conf_user }}"
+    group: "{{ zabbix_php_fpm_conf_group }}"
     state: directory
     mode: 0755
   become: true
@@ -108,24 +108,23 @@
   ansible.builtin.template:
     src: zabbix.conf.php.j2
     dest: /etc/zabbix/web/zabbix.conf.php
-    owner: "{{ zabbix_web_user }}"
-    group: "{{ zabbix_web_group }}"
+    owner: "{{ zabbix_php_fpm_conf_user }}"
+    group: "{{ zabbix_php_fpm_conf_group }}"
     mode: "{{ zabbix_web_conf_mode }}"
   become: true
   tags:
     - config
 
-- name: "Debian / Suse | Install PHP"
+- name: "Install PHP"
   ansible.builtin.template:
     src: php-fpm.conf.j2
     dest: "{{ zabbix_php_fpm_dir }}/zabbix.conf"
-    owner: "{{ zabbix_web_user }}"
-    group: "{{ zabbix_web_group }}"
+    owner: "{{ zabbix_php_fpm_conf_user }}"
+    group: "{{ zabbix_php_fpm_conf_group }}"
     mode: 0644
   become: true
   when:
     - zabbix_web_create_php_fpm
-    - ansible_facts['os_family'] in ["Debian", "Suse"]
   notify:
     - restart php-fpm-version
     - restart php-fpm
