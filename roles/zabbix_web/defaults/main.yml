@@ -38,6 +38,8 @@ zabbix_php_fpm_conf_listen: true
 # zabbix_web_max_input_time: 300
 # zabbix_web_max_input_vars: 10000
 zabbix_apache_custom_includes: []
+zabbix_php_fpm_conf_user: "{{ zabbix_web_user }}"
+zabbix_php_fpm_conf_group: "{{ zabbix_web_group }}"
 
 # Database
 zabbix_server_database: pgsql
