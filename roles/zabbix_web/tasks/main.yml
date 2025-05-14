@@ -115,7 +115,7 @@
   tags:
     - config
 
-- name: "Debian / Suse | Install PHP"
+- name: "Install PHP"
   ansible.builtin.template:
     src: php-fpm.conf.j2
     dest: "{{ zabbix_php_fpm_dir }}/zabbix.conf"
@@ -125,7 +125,6 @@
   become: true
   when:
     - zabbix_web_create_php_fpm
-    - ansible_facts['os_family'] in ["Debian", "Suse"]
   notify:
     - restart php-fpm-version
     - restart php-fpm
