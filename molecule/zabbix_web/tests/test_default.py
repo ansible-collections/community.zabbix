@@ -43,7 +43,7 @@ def test_zabbix_web(host):
         elif zabbix_websrv == "nginx":
             assert zabbix_web.user == "nginx"
             assert zabbix_web.group == "nginx"
-    assert zabbix_web.mode == 0o644
+    assert zabbix_web.mode == 0o640
 
 
 def test_zabbix_api(host):

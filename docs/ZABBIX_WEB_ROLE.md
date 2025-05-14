@@ -147,7 +147,6 @@ The following properties are specific to Zabbix 5.0 and for the PHP(-FPM) config
 * `zabbix_php_fpm_listen`: The path to a socket file or ipaddress:port combination on which PHP-FPM needs to listen. If none are provided, defaults are used.
 * `zabbix_php_fpm_conf_listen`: Default: `true`. If we want to configure the `zabbix_php_fpm_listen` in the PHP-FPM configuration file.
 * `zabbix_php_fpm_conf_user`: The owner of the socket file (When `zabbix_php_fpm_listen` contains a patch to a socket file).
-
 * `zabbix_php_fpm_conf_group`: The group of the owner of the socket file (When `zabbix_php_fpm_listen` contains a patch to a socket file).
 
 ### SElinux
