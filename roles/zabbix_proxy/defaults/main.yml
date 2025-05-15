@@ -31,7 +31,6 @@ zabbix_proxy_database_file_dir: "{{ zabbix_proxy_version is version('7.0', '>') 
 
 # SELinux specific
 selinux_allow_zabbix_can_network: true
-selinux_allow_daemons_enable_cluster_mode: false
 
 # Misc.
 zabbix_proxy_cat_cmd: cat

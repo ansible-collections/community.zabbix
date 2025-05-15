@@ -143,7 +143,6 @@ The following is an overview of all available configuration default for this rol
 Selinux changes will be installed based on the status of selinux running on the target system.
 
 * `selinux_allow_zabbix_can_network`: Default: `True`.
-* `selinux_allow_daemons_enable_cluster_mode`: Default: `False`.
 
 ## Proxy
 
