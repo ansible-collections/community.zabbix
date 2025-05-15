@@ -288,9 +288,11 @@ import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabb
 
 class Service(ZabbixBase):
     def get_service(self, service_name):
-        services = self._zapi.service.get({"selectParents": ["serviceid"], "selectChildren": ["serviceid"], "selectTags": "extend", "selectProblemTags": "extend", "selectStatusRules": "extend", "sortfield": "serviceid","sortorder": "ASC", "filter": {"name": service_name}})
+        services = self._zapi.service.get({"selectParents": ["serviceid"], "selectChildren": ["serviceid"], "selectTags": "extend",
+                                           "selectProblemTags": "extend", "selectStatusRules": "extend", "sortfield": "serviceid",
+                                           "sortorder": "ASC", "filter": {"name": service_name}})
         return services
-       
+
     def delete_service(self, service_ids):
         if self._module.check_mode:
             self._module.exit_json(changed=True)
@@ -316,13 +318,13 @@ class Service(ZabbixBase):
 
     def construct_status_rules(self, status_rules):
         sr_type_map = {"at_least_n_child_services_have_status_or_above": "0",
-                        "at_least_npct_child_services_have_status_or_above": "1",
-                        "less_than_n_child_services_have_status_or_below": "2",
-                        "less_than_npct_child_services_have_status_or_below": "3",
-                        "weight_child_services_with_status_or_above_at_least_w": "4",
-                        "weight_child_services_with_status_or_above_at_least_npct": "5",
-                        "weight_child_services_with_status_or_below_less_w": "6",
-                        "weight_child_services_with_status_or_below_less_npct": "7"}
+                       "at_least_npct_child_services_have_status_or_above": "1",
+                       "less_than_n_child_services_have_status_or_below": "2",
+                       "less_than_npct_child_services_have_status_or_below": "3",
+                       "weight_child_services_with_status_or_above_at_least_w": "4",
+                       "weight_child_services_with_status_or_above_at_least_npct": "5",
+                       "weight_child_services_with_status_or_below_less_w": "6",
+                       "weight_child_services_with_status_or_below_less_npct": "7"}
         for s_rule in status_rules:
             if "type" in s_rule:
                 if s_rule["type"] not in sr_type_map:
@@ -345,7 +347,7 @@ class Service(ZabbixBase):
 
             if "limit_status" in s_rule:
                 sr_ls_map = {"ok": "-1", "not_classified": "0", "information": "1", "warning": "2",
-                                "average": "3", "high": "4", "disaster": 5}
+                             "average": "3", "high": "4", "disaster": 5}
                 if s_rule["limit_status"] not in sr_ls_map:
                     self._module.fail_json(msg="Wrong value for 'limit_status' parameter in status rule.")
                 s_rule["limit_status"] = sr_ls_map[s_rule["limit_status"]]
@@ -354,7 +356,7 @@ class Service(ZabbixBase):
 
             if "new_status" in s_rule:
                 sr_ns_map = {"not_classified": "0", "information": "1", "warning": "2",
-                                "average": "3", "high": "4", "disaster": "5"}
+                             "average": "3", "high": "4", "disaster": "5"}
                 if s_rule["new_status"] not in sr_ns_map:
                     self._module.fail_json(msg="Wrong value for 'new_status' parameter in status rule.")
                 s_rule["new_status"] = sr_ns_map[s_rule["new_status"]]
@@ -398,7 +400,8 @@ class Service(ZabbixBase):
             except Exception as e:
                 self._module.fail_json(msg="Failed creating service %s: %s" % (service_name, e))
 
-    def check_all_properties(self, name, sortorder, weight, algorithm, description, tags, problem_tags, parents, children, propagation_rule, propagation_value, status_rules, service_exist):
+    def check_all_properties(self, name, sortorder, weight, algorithm, description, tags, problem_tags, parents,
+                             children, propagation_rule, propagation_value, status_rules, service_exist):
         # raise Exception("%s ------ %s" % (parents, service_exist))
         if sortorder and sortorder != service_exist['sortorder']:
             return True
@@ -424,7 +427,8 @@ class Service(ZabbixBase):
             return True
         return False
 
-    def update_service(self, service_id, name, sortorder, weight, algorithm, description, tags, problem_tags, parents, children, propagation_rule, propagation_value, status_rules, service_name):
+    def update_service(self, service_id, name, sortorder, weight, algorithm, description, tags, problem_tags,
+                       parents, children, propagation_rule, propagation_value, status_rules, service_name):
         try:
             parameters = {"serviceid": service_id}
             if sortorder is not None:
@@ -454,6 +458,7 @@ class Service(ZabbixBase):
             self._module.exit_json(changed=True, msg="Service %s updated" % name)
         except Exception as e:
             self._module.fail_json(msg="Failed updating service %s: %s" % (service_name, e))
+
 
 def main():
     argument_spec = zabbix_utils.zabbix_common_argument_spec()
@@ -506,7 +511,7 @@ def main():
         ),
         parents=dict(type="list", required=False, elements="str"),
         children=dict(type="list", required=False, elements="str"),
-        propagation_rule=dict(type="str", required=False),
+        propagation_rule=dict(type="str", required=False, default="as_is"),
         propagation_value=dict(type="str", required=False),
         status_rules=dict(
             type="list",
@@ -564,7 +569,6 @@ def main():
     algorithms = {"status_to_ok": "0", "most_crit_if_all_children": "1", "most_crit_of_child_serv": "2"}
     algorithm = algorithms[algorithm]
 
-
     if problem_tags:
         problem_tags = service.construct_problem_tags(problem_tags)
     else:
@@ -600,12 +604,11 @@ def main():
         if propagation_rule is None:
             module.fail_json(msg="If 'propagation_value' is provided then 'propagation_rule' must be provided too.")
         pv_map = {"ok": "-1", "not_classified": "0", "information": "1", "warning": "2",
-                    "average": "3", "high": "4", "disaster": "5"}
+                  "average": "3", "high": "4", "disaster": "5"}
         if propagation_value not in pv_map:
             module.fail_json(msg="Wrong value for 'propagation_value' parameter.")
         else:
             propagation_value = pv_map[propagation_value]
-
 
     # Delete service
     if state == "absent":
@@ -623,14 +626,15 @@ def main():
         # Else we update it if exists
         else:
             # Check if parameters have changed
-            if service.check_all_properties(name, sortorder, weight, algorithm, description,
-                                   tags, problem_tags, parents, children, propagation_rule, propagation_value, status_rules, service_exist[0]):
+            if service.check_all_properties(name, sortorder, weight, algorithm, description, tags, problem_tags, parents,
+                                            children, propagation_rule, propagation_value, status_rules, service_exist[0]):
                 # Update service if a parameter is different
-                service.update_service(service_id, name, sortorder, weight,
-                                   algorithm, description, tags, problem_tags, parents, children, propagation_rule, propagation_value, status_rules, name)
+                service.update_service(service_id, name, sortorder, weight, algorithm, description, tags, problem_tags,
+                                       parents, children, propagation_rule, propagation_value, status_rules, name)
             else:
                 # No parameters changed, no update required.
                 module.exit_json(changed=False)
+
 
 if __name__ == "__main__":
     main()
