@@ -63,24 +63,6 @@
   tags:
     - install
 
-- name: "Workaround for RedHat"
-  when: ansible_facts['os_family'] == 'RedHat'
-  block:
-    - name: "RedHat | Looking for Enviroment Files (See Issue 1474)"
-      ansible.builtin.find:
-        path: /etc/zabbix/
-        patterns: '*.env'
-      register: _env_files
-
-    - name: "RedHat | Create Enviroment File (See Issue 1474)"
-      ansible.builtin.file:
-        path: /etc/zabbix/zabbix_java_gateway.env
-        state: touch
-        owner: root
-        group: root
-        mode: 644
-      when: _env_files['matched'] == 0
-
 - name: "Configure zabbix-proxy"
   ansible.builtin.template:
     src: zabbix_java_gateway.conf.j2
