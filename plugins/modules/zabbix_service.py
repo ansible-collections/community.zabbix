@@ -148,6 +148,7 @@ options:
             - Required with C(propagation_rule)
         required: false
         type: str
+        default: not_classified
     status_rules:
         description:
             - Status rules for the service.
@@ -512,7 +513,7 @@ def main():
         parents=dict(type="list", required=False, elements="str"),
         children=dict(type="list", required=False, elements="str"),
         propagation_rule=dict(type="str", required=False, default="as_is"),
-        propagation_value=dict(type="str", required=False),
+        propagation_value=dict(type="str", required=False, default="not_classified"),
         status_rules=dict(
             type="list",
             required=False,
