@@ -1,0 +1,4 @@
+bugfixes:
+  - zabbix_service - fix propagation_value and propagation_rule parameters
+minor_changes:
+  - zabbix_service - add better idempotency that checks every parameter for change and updates only the changed ones
