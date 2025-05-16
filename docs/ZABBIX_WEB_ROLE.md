@@ -55,15 +55,14 @@ ansible-galaxy collection install community.general
 
 See the following list of supported Operating Systems with the Zabbix releases.
 
-| Zabbix              | 7.2 | 7.0 | 6.4 | 6.0 |
-|---------------------|-----|-----|-----|-----|
-| Red Hat Fam 9       |  V  |  V  |  V  |  V  |
-| Red Hat Fam 8       |  V  |  V  |  V  |  V  |
-| Ubuntu 24.04 noble  |  V  |  V  |  V  |  V  |
-| Ubuntu 22.04 jammy  |  V  |  V  |  V  |  V  |
-| Ubuntu 20.04 focal  |     |     |  V  |  V  |
-| Debian 12 bookworm  |  V  |  V  |  V  |  V  |
-| Debian 11 bullseye  |     |     |  V  |  V  |
+| Zabbix              | 7.2 | 7.0 | 6.0 |
+|---------------------|-----|-----|-----|
+| Red Hat Fam 9       |  V  |  V  |  V  |
+| Red Hat Fam 8       |  V  |  V  |  V  |
+| Ubuntu 24.04 noble  |  V  |  V  |  V  |
+| Ubuntu 22.04 jammy  |  V  |  V  |  V  |
+| Debian 12 bookworm  |  V  |  V  |  V  |
+| Debian 11 bullseye  |     |     |  V  |
 
 You can bypass this matrix by setting `enable_version_check: false`
 

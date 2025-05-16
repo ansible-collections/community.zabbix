@@ -23,7 +23,7 @@
     name: "pymysql>=0.10.0,<0.11.0"
     state: latest
   vars:
-    _upgrade_debian_pymysql: "{{ (ansible_facts['distribution'] in ['Debian', 'Ubuntu'] and ansible_facts['distribution_release'] in ['bullseye', 'focal']) }}"
+    _upgrade_debian_pymysql: "{{ (ansible_facts['distribution'] in ['Debian', 'Ubuntu'] and ansible_facts['distribution_release'] in ['bullseye']) }}"
     _upgrade_suse_pymysql: "{{ ansible_facts['os_family'] in ['Suse'] }}"
   tags:
     - install

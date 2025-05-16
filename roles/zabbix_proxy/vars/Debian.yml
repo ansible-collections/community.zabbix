@@ -16,10 +16,6 @@ zabbix_valid_proxy_versions:
     - 7.2
     - 7.0
     - 6.0
-  "20":
-    - 7.2
-    - 7.0
-    - 6.0
 
 _zabbix_proxy_pgsql_dependencies:
   - "{{ zabbix_proxy_install_database_client | ternary('postgresql-client', '') }}"

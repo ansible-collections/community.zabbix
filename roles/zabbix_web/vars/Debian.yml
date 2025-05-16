@@ -38,8 +38,6 @@ zabbix_valid_web_versions:
     - 7.2
     - 7.0
     - 6.0
-  "20":
-    - 6.0
 
 _zabbix_web_package: zabbix-frontend-php
 _zabbix_web_apache_packages:

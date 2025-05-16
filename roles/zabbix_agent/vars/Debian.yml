@@ -31,8 +31,3 @@ zabbix_valid_agent_versions:
     - 7.2
     - 7.0
     - 6.0
-
-  "20":
-    - 7.2
-    - 7.0
-    - 6.0
