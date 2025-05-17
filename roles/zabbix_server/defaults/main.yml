@@ -29,7 +29,7 @@ zabbix_server_install_database_client: true
 zabbix_server_database_schemas: "{{ _zabbix_server_database_schemas[zabbix_server_database] }}"
 
 # SELinux specific
-selinux_allow_zabbix_can_network: false
+selinux_allow_zabbix_can_network: true
 
 #Misc.
 zabbix_server_include_mode: "0755"

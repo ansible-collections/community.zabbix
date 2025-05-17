@@ -71,8 +71,8 @@ zabbix_server_history_types:
 
 # SELinux specific
 selinux_allow_httpd_can_connect_ldap: false
-selinux_allow_httpd_can_network_connect_db: false
-selinux_allow_httpd_can_connect_zabbix: false
+selinux_allow_httpd_can_connect_zabbix: true
+selinux_allow_httpd_can_network_connect_db: true
 
 zabbix_repo_deb_gpg_key_url: http://repo.zabbix.com/zabbix-official-repo.key
 zabbix_repo_deb_include_deb_src: true
