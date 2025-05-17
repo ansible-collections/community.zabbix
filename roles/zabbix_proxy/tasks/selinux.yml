@@ -25,5 +25,3 @@
   loop:
     - name: zabbix_can_network
       state: "{{ selinux_allow_zabbix_can_network }}"
-    - name: daemons_enable_cluster_mode
-      state: "{{ selinux_allow_daemons_enable_cluster_mode }}"
