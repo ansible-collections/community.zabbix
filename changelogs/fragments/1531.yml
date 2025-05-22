@@ -1,0 +1,2 @@
+breaking_changes:
+  - Collection - Remove support for Ansible 2.16 and 2.17
