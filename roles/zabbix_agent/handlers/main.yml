@@ -18,7 +18,7 @@
 
 - name: restart win zabbix agent
   ansible.windows.win_service:
-    name: "{{ zabbix_win_service }}"
+    name: "{{ zabbix_agent_win_service }}"
     state: restarted
   when:
     - ansible_facts['os_family'] == "Windows"
