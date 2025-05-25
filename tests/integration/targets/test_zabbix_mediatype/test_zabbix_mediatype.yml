@@ -194,6 +194,10 @@
             recovery: operations
             subject: "Internal: {EVENT.NAME}"
             body: "Internal event started at {EVEN.TIME} on {EVENT.DATE}\r\nEvent name: {EVENT.NAME}\r\n"
+          - eventsource: services
+            recovery: operations
+            subject: "Services: {EVENT.NAME}"
+            body: "Services event started at {EVEN.TIME} on {EVENT.DATE}\r\nService name: {EVENT.NAME}\r\n"
       register: zbxmediatype_msg_templates
 
     - ansible.builtin.assert:
@@ -218,6 +222,10 @@
             recovery: operations
             subject: "Internal: {EVENT.NAME}"
             body: "Internal event started at {EVEN.TIME} on {EVENT.DATE}\r\nEvent name: {EVENT.NAME}\r\n"
+          - eventsource: services
+            recovery: operations
+            subject: "Services: {EVENT.NAME}"
+            body: "Services event started at {EVEN.TIME} on {EVENT.DATE}\r\nService name: {EVENT.NAME}\r\n"
       register: zbxmediatype_msg_templates
 
     - ansible.builtin.assert:
@@ -242,6 +250,10 @@
             recovery: operations
             subject: "Internal: {EVENT.NAME}"
             body: "Internal event started at {EVEN.TIME} on {EVENT.DATE}\r\nEvent name: {EVENT.NAME}\r\n"
+          - eventsource: services
+            recovery: operations
+            subject: "Services: {EVENT.NAME}"
+            body: "Services event started at {EVEN.TIME} on {EVENT.DATE}\r\nService name: {EVENT.NAME}\r\n"
       register: zbxmediatype_msg_templates
 
     - ansible.builtin.assert:
@@ -266,6 +278,10 @@
             recovery: operations
             subject: "Internal: {EVENT.NAME}"
             body: "Internal event started at {EVEN.TIME} on {EVENT.DATE}\r\nEvent name: {EVENT.NAME}\r\n"
+          - eventsource: services
+            recovery: operations
+            subject: "Services: {EVENT.NAME}"
+            body: "Services event started at {EVEN.TIME} on {EVENT.DATE}\r\nService name: {EVENT.NAME}\r\n"
       register: zbxmediatype_msg_templates
 
     - ansible.builtin.assert:
@@ -290,6 +306,10 @@
             recovery: operations
             subject: "Internal: {EVENT.NAME}"
             body: "Internal event started at {EVEN.TIME} on {EVENT.DATE}\r\nEvent name: {EVENT.NAME}\r\n"
+          - eventsource: services
+            recovery: operations
+            subject: "Services: {EVENT.NAME}"
+            body: "Services event started at {EVEN.TIME} on {EVENT.DATE}\r\nService name: {EVENT.NAME}\r\n"
       register: zbxmediatype_msg_templates
 
     - ansible.builtin.assert:
