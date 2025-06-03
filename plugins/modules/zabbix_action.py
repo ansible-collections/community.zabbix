@@ -1180,7 +1180,8 @@ class Action(Zapi):
                 "trigger",
                 "discovery",
                 "auto_registration",
-                "internal"], kwargs["event_source"]),
+                "internal",
+                "services"], kwargs["event_source"]),
             "esc_period": kwargs.get("esc_period"),
             "filter": kwargs["conditions"],
             "operations": kwargs["operations"],
@@ -1217,7 +1218,7 @@ class Action(Zapi):
             if isinstance(_params.get("update_operations", None), type(None)) or len(_params.get("update_operations", [])) == 0:
                 _params.pop("update_operations")
 
-        if _params["eventsource"] not in [0, 3]:
+        if _params["eventsource"] not in [0, 4]:
             _params.pop("esc_period")
 
         return _params

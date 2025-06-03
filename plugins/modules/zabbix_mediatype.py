@@ -248,6 +248,7 @@ options:
                     - discovery
                     - autoregistration
                     - internal
+                    - services
             recovery:
                 type: "str"
                 description:
@@ -514,7 +515,8 @@ class MediaTypeModule(ZabbixBase):
                         "triggers": "0",
                         "discovery": "1",
                         "autoregistration": "2",
-                        "internal": "3"}.get(template["eventsource"]),
+                        "internal": "3",
+                        "services": "4"}.get(template["eventsource"]),
                     recovery={
                         "operations": "0",
                         "recovery_operations": "1",
@@ -732,7 +734,7 @@ def main():
             default=[],
             required=False,
             options=dict(
-                eventsource=dict(type="str", choices=["triggers", "discovery", "autoregistration", "internal"]),
+                eventsource=dict(type="str", choices=["triggers", "discovery", "autoregistration", "internal", "services"]),
                 recovery=dict(type="str", choices=["operations", "recovery_operations", "update_operations"]),
                 subject=dict(type="str", default=""),
                 body=dict(type="str", default="")
