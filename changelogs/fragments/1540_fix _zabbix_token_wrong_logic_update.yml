@@ -1,0 +1,2 @@
+minor_changes:
+  - zabbix_token module - update the logic for update of Zabbix Token
