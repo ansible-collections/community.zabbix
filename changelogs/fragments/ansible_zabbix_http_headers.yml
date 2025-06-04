@@ -1,0 +1,2 @@
+minor_changes:
+  - "Add `zabbix_http_headers` variable to allow specifying custom HTTP headers for Zabbix API calls. This can be useful for authentication or other custom header requirements."

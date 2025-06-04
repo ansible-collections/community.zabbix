@@ -48,6 +48,13 @@ options:
       - The http password to access zabbix url with Basic Auth
     vars:
       - name: http_login_password
+  zabbix_http_headers:
+    type: dict
+    description:
+      - A dictionary of additional HTTP headers to be sent with every request to the Zabbix API.
+      - These headers are applied first, and can be overridden by plugin-specific headers like 'Authorization'.
+    vars:
+      - name: ansible_zabbix_http_headers
 """
 
 import json
@@ -119,6 +126,11 @@ class HttpApi(HttpApiBase):
 
     def send_request(self, data, request_method="POST", path="/api_jsonrpc.php"):
         headers = {}
+        # Apply custom headers first. Plugin-specific headers set later will take precedence.
+        custom_headers = self.get_option('zabbix_http_headers')
+        if isinstance(custom_headers, dict):
+            headers.update(custom_headers)
+
         path = self.url_path + path
 
         if self.auth and data['method'] not in ['user.login', 'apiinfo.version']:
