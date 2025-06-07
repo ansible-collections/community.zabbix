@@ -544,7 +544,7 @@ class UserGroup(ZabbixBase):
                     _userdir = self._zapi.userdirectory.get(
                         {
                             "output": "extend",
-                            "filter": {"name": [kwargs["userdirectory"]]},
+                            "search": {"name": [kwargs["userdirectory"]]},
                         }
                     )
                 except Exception as e:
