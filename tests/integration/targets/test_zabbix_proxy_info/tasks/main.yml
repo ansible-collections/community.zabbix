@@ -1,5 +1,5 @@
 ---
-- name: test - Create new Zabbix proxy for Zabbix < 7.0
+- name: test - Create new Zabbix proxy for Zabbix == 6.0
   community.zabbix.zabbix_proxy:
     state: present
     proxy_name: ExampleProxy
@@ -11,13 +11,13 @@
       port: 10051
       dns: ExampleProxy.local
   register: create_proxy_result
-  when: zabbix_version is version('7.0', '<')
+  when: zabbix_version is version('6.0', '==')
 
 
 - ansible.builtin.assert:
     that:
       - create_proxy_result.changed is sameas true
-  when: zabbix_version is version('7.0', '<')
+  when: zabbix_version is version('6.0', '==')
 
 - name: test - Create new Zabbix proxy for Zabbix >= 7.0
   community.zabbix.zabbix_proxy:
@@ -74,7 +74,7 @@
       - get_proxy_info_result["zabbix_proxy"].interface.useip == "1"
       - get_proxy_info_result["zabbix_proxy"].interface.port == "10051"
       - get_proxy_info_result["zabbix_proxy"].interface.dns == "ExampleProxy.local"
-  when: zabbix_version is version('7.0', '<')
+  when: zabbix_version is version('6.0', '==')
 
 - ansible.builtin.assert:
     that:
