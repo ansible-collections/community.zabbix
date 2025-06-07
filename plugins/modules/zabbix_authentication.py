@@ -665,8 +665,8 @@ class Authentication(ZabbixBase):
                     current_authentication["ldap_configured"] == "0"
                     and future_authentication["ldap_configured"] == "1"
                 ):
+                    self._module.fail_json(msg="stop")
                     if LooseVersion(self._zbx_api_version) == LooseVersion("6.0"):
-                        self._module.fail_json(msg="stop")
                         if (
                             not ldap_host
                             or not ldap_port
