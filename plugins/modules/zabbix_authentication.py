@@ -470,7 +470,6 @@ class Authentication(ZabbixBase):
         jit_provision_interval,
         disabled_usrgroup,
     ):
-            self._module.fail_json(msg="stop")
         # try:
             params = {}
 
@@ -503,7 +502,7 @@ class Authentication(ZabbixBase):
             else:
                 if isinstance(ldap_auth_enabled, bool):
                     params["ldap_auth_enabled"] = str(int(ldap_auth_enabled))
-
+            self._module.fail_json(msg="stop")
             if LooseVersion(self._zbx_api_version) == LooseVersion("6.0"):
                 if ldap_host:
                     params["ldap_host"] = ldap_host
