@@ -470,7 +470,7 @@ class Authentication(ZabbixBase):
         jit_provision_interval,
         disabled_usrgroup,
     ):
-        try:
+        # try:
             params = {}
 
             if authentication_type:
@@ -720,10 +720,10 @@ class Authentication(ZabbixBase):
                 self._module.exit_json(
                     changed=False, result="Authentication setting is already up to date"
                 )
-        except Exception as e:
-            self._module.fail_json(
-                msg="Failed to update authentication setting, Exception: %s" % e
-            )
+        # except Exception as e:
+        #     self._module.fail_json(
+        #         msg="Failed to update authentication setting, Exception: %s" % e
+        #     )
 
 
 def main():
