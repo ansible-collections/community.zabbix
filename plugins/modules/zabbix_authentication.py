@@ -665,7 +665,6 @@ class Authentication(ZabbixBase):
                     current_authentication["ldap_configured"] == "0"
                     and future_authentication["ldap_configured"] == "1"
                 ):
-                    self._module.fail_json(msg="stop")
                     if LooseVersion(self._zbx_api_version) == LooseVersion("6.0"):
                         if (
                             not ldap_host
@@ -712,7 +711,7 @@ class Authentication(ZabbixBase):
             if future_authentication != current_authentication:
                 if self._module.check_mode:
                     self._module.exit_json(changed=True)
-
+                self._module.fail_json(msg="stop")
                 self._zapi.authentication.update(params)
                 self._module.exit_json(
                     changed=True, result="Successfully update authentication setting"
