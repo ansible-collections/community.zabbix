@@ -332,203 +332,183 @@
   register: zbx_settings
 
 - name: test - timeout parameters fail for older version of Zabbix
-  community.zabbix.zabbix_settings:
-    timeout_zabbix_agent: 3s
-  ignore_errors: yes
-  when: zabbix_version is version('6.0', '==')
-  register: zbx_settings_failed
+  block:
+    - name: test - timeout parameters fail for older version of Zabbix
+      community.zabbix.zabbix_settings:
+        timeout_zabbix_agent: 3s
+      ignore_errors: yes
+      register: zbx_settings_failed
 
-- name: assert that the setting change failed
-  ansible.builtin.assert:
-    that:
-      - zbx_settings_failed is failed
-  when: zabbix_version is version('6.0', '==')
+    - name: assert that the setting change failed
+      ansible.builtin.assert:
+        that:
+          - zbx_settings_failed is failed
 
-- name: test - timeout parameters fail for older version of Zabbix
-  community.zabbix.zabbix_settings:
-    timeout_simple_check: 30s
-  ignore_errors: yes
-  when: zabbix_version is version('6.0', '==')
-  register: zbx_settings_failed
+    - name: test - timeout parameters fail for older version of Zabbix
+      community.zabbix.zabbix_settings:
+        timeout_simple_check: 30s
+      ignore_errors: yes
+      register: zbx_settings_failed
 
-- name: assert that the setting change failed
-  ansible.builtin.assert:
-    that:
-      - zbx_settings_failed is failed
-  when: zabbix_version is version('6.0', '==')
+    - name: assert that the setting change failed
+      ansible.builtin.assert:
+        that:
+          - zbx_settings_failed is failed
 
-- name: test - timeout parameters fail for older version of Zabbix
-  community.zabbix.zabbix_settings:
-    timeout_snmp_agent: 30s
-  ignore_errors: yes
-  when: zabbix_version is version('6.0', '==')
-  register: zbx_settings_failed
+    - name: test - timeout parameters fail for older version of Zabbix
+      community.zabbix.zabbix_settings:
+        timeout_snmp_agent: 30s
+      ignore_errors: yes
+      register: zbx_settings_failed
 
-- name: assert that the setting change failed
-  ansible.builtin.assert:
-    that:
-      - zbx_settings_failed is failed
-  when: zabbix_version is version('6.0', '==')
+    - name: assert that the setting change failed
+      ansible.builtin.assert:
+        that:
+          - zbx_settings_failed is failed
 
-- name: test - timeout parameters fail for older version of Zabbix
-  community.zabbix.zabbix_settings:
-    timeout_external_check: 30s
-  ignore_errors: yes
-  when: zabbix_version is version('6.0', '==')
-  register: zbx_settings_failed
+    - name: test - timeout parameters fail for older version of Zabbix
+      community.zabbix.zabbix_settings:
+        timeout_external_check: 30s
+      ignore_errors: yes
+      register: zbx_settings_failed
 
-- name: assert that the setting change failed
-  ansible.builtin.assert:
-    that:
-      - zbx_settings_failed is failed
-  when: zabbix_version is version('6.0', '==')
+    - name: assert that the setting change failed
+      ansible.builtin.assert:
+        that:
+          - zbx_settings_failed is failed
 
-- name: test - timeout parameters fail for older version of Zabbix
-  community.zabbix.zabbix_settings:
-    timeout_db_monitor: 30s
-  ignore_errors: yes
-  when: zabbix_version is version('6.0', '==')
-  register: zbx_settings_failed
+    - name: test - timeout parameters fail for older version of Zabbix
+      community.zabbix.zabbix_settings:
+        timeout_db_monitor: 30s
+      ignore_errors: yes
+      register: zbx_settings_failed
 
-- name: assert that the setting change failed
-  ansible.builtin.assert:
-    that:
-      - zbx_settings_failed is failed
-  when: zabbix_version is version('6.0', '==')
+    - name: assert that the setting change failed
+      ansible.builtin.assert:
+        that:
+          - zbx_settings_failed is failed
 
-- name: test - timeout parameters fail for older version of Zabbix
-  community.zabbix.zabbix_settings:
-    timeout_http_agent: 30s
-  ignore_errors: yes
-  when: zabbix_version is version('5.0', '==')
-  register: zbx_settings_failed
+    - name: test - timeout parameters fail for older version of Zabbix
+      community.zabbix.zabbix_settings:
+        timeout_http_agent: 30s
+      ignore_errors: yes
+      register: zbx_settings_failed
 
-- name: assert that the setting change failed
-  ansible.builtin.assert:
-    that:
-      - zbx_settings_failed is failed
-  when: zabbix_version is version('6.0', '==')
+    - name: assert that the setting change failed
+      ansible.builtin.assert:
+        that:
+          - zbx_settings_failed is failed
 
-- name: test - timeout parameters fail for older version of Zabbix
-  community.zabbix.zabbix_settings:
-    timeout_ssh_agent: 30s
-  ignore_errors: yes
-  when: zabbix_version is version('6.0', '==')
-  register: zbx_settings_failed
+    - name: test - timeout parameters fail for older version of Zabbix
+      community.zabbix.zabbix_settings:
+        timeout_ssh_agent: 30s
+      ignore_errors: yes
+      register: zbx_settings_failed
 
-- name: assert that the setting change failed
-  ansible.builtin.assert:
-    that:
-      - zbx_settings_failed is failed
-  when: zabbix_version is version('6.0', '==')
+    - name: assert that the setting change failed
+      ansible.builtin.assert:
+        that:
+          - zbx_settings_failed is failed
 
-- name: test - timeout parameters fail for older version of Zabbix
-  community.zabbix.zabbix_settings:
-    timeout_telnet_agent: 30s
-  ignore_errors: yes
-  when: zabbix_version is version('6.0', '==')
-  register: zbx_settings_failed
+    - name: test - timeout parameters fail for older version of Zabbix
+      community.zabbix.zabbix_settings:
+        timeout_telnet_agent: 30s
+      ignore_errors: yes
+      register: zbx_settings_failed
 
-- name: assert that the setting change failed
-  ansible.builtin.assert:
-    that:
-      - zbx_settings_failed is failed
-  when: zabbix_version is version('6.0', '==')
+    - name: assert that the setting change failed
+      ansible.builtin.assert:
+        that:
+          - zbx_settings_failed is failed
 
-- name: test - timeout parameters fail for older version of Zabbix
-  community.zabbix.zabbix_settings:
-    timeout_script: 30s
-  ignore_errors: yes
-  when: zabbix_version is version('6.0', '==')
-  register: zbx_settings_failed
+    - name: test - timeout parameters fail for older version of Zabbix
+      community.zabbix.zabbix_settings:
+        timeout_script: 30s
+      ignore_errors: yes
+      register: zbx_settings_failed
 
-- name: assert that the setting change failed
-  ansible.builtin.assert:
-    that:
-      - zbx_settings_failed is failed
-  when: zabbix_version is version('6.0', '==')
+    - name: assert that the setting change failed
+      ansible.builtin.assert:
+        that:
+          - zbx_settings_failed is failed
 
-- name: test - timeout parameters fail for older version of Zabbix
-  community.zabbix.zabbix_settings:
-    timeout_browser: 70s
-  ignore_errors: yes
-  when: zabbix_version is version('6.0', '==')
-  register: zbx_settings_failed
+    - name: test - timeout parameters fail for older version of Zabbix
+      community.zabbix.zabbix_settings:
+        timeout_browser: 70s
+      ignore_errors: yes
+      register: zbx_settings_failed
 
-- name: assert that the setting change failed
-  ansible.builtin.assert:
-    that:
-      - zbx_settings_failed is failed
-  when: zabbix_version is version('6.0', '==')
-- name: test - auditlog_mode parameter fails for older version of Zabbix
-  community.zabbix.zabbix_settings:
-    auditlog_mode: false
-  ignore_errors: yes
-  when: zabbix_version is version('6.0', '==')
-  register: zbx_settings_failed
+    - name: assert that the setting change failed
+      ansible.builtin.assert:
+        that:
+          - zbx_settings_failed is failed
 
-- name: assert that the setting change failed
-  ansible.builtin.assert:
-    that:
-      - zbx_settings_failed is failed
+    - name: test - auditlog_mode parameter fails for older version of Zabbix
+      community.zabbix.zabbix_settings:
+        auditlog_mode: false
+      ignore_errors: yes
+      register: zbx_settings_failed
+
+    - name: assert that the setting change failed
+      ansible.builtin.assert:
+        that:
+          - zbx_settings_failed is failed
   when: zabbix_version is version('6.0', '==')
 
 - name: test - Update zabbix v7.0+ settings (same as default)
-  community.zabbix.zabbix_settings:
-    auditlog_mode: true
-    timeout_zabbix_agent: 3s
-    timeout_simple_check: 3s
-    timeout_snmp_agent: 3s
-    timeout_external_check: 3s
-    timeout_db_monitor: 3s
-    timeout_http_agent: 3s
-    timeout_ssh_agent: 3s
-    timeout_telnet_agent: 3s
-    timeout_script: 3s
-    timeout_browser: 60s
-  register: zbx_settings
-  when: zabbix_version is version('7.0', '>=')
+  block:
+    - name: test - Update zabbix v7.0+ settings (same as default)
+      community.zabbix.zabbix_settings:
+        auditlog_mode: true
+        timeout_zabbix_agent: 3s
+        timeout_simple_check: 3s
+        timeout_snmp_agent: 3s
+        timeout_external_check: 3s
+        timeout_db_monitor: 3s
+        timeout_http_agent: 3s
+        timeout_ssh_agent: 3s
+        timeout_telnet_agent: 3s
+        timeout_script: 3s
+        timeout_browser: 60s
+      register: zbx_settings
 
-- name: assert that settings was NOT updated
-  ansible.builtin.assert:
-    that:
-      - zbx_settings.changed is sameas False
-  when: zabbix_version is version('7.0', '>=')
+    - name: assert that settings was NOT updated
+      ansible.builtin.assert:
+        that:
+          - zbx_settings.changed is sameas False
 
-- name: test - Update zabbix v7.0+ settings
-  community.zabbix.zabbix_settings:
-    auditlog_mode: false
-    timeout_zabbix_agent: 30s
-    timeout_simple_check: 30s
-    timeout_snmp_agent: 30s
-    timeout_external_check: 30s
-    timeout_db_monitor: 30s
-    timeout_http_agent: 30s
-    timeout_ssh_agent: 30s
-    timeout_telnet_agent: 30s
-    timeout_script: 30s
-    timeout_browser: 70s
-  register: zbx_settings
-  when: zabbix_version is version('7.0', '>=')
+    - name: test - Update zabbix v7.0+ settings
+      community.zabbix.zabbix_settings:
+        auditlog_mode: false
+        timeout_zabbix_agent: 30s
+        timeout_simple_check: 30s
+        timeout_snmp_agent: 30s
+        timeout_external_check: 30s
+        timeout_db_monitor: 30s
+        timeout_http_agent: 30s
+        timeout_ssh_agent: 30s
+        timeout_telnet_agent: 30s
+        timeout_script: 30s
+        timeout_browser: 70s
+      register: zbx_settings
 
-- name: assert that settings were updated
-  ansible.builtin.assert:
-    that:
-      - zbx_settings.changed is sameas True
-  when: zabbix_version is version('7.0', '>=')
+    - name: assert that settings were updated
+      ansible.builtin.assert:
+        that:
+          - zbx_settings.changed is sameas True
 
-- name: test - Update zabbix v7.0+ settings (same as default)
-  community.zabbix.zabbix_settings:
-    auditlog_mode: true
-    timeout_zabbix_agent: 3s
-    timeout_simple_check: 3s
-    timeout_snmp_agent: 3s
-    timeout_external_check: 3s
-    timeout_db_monitor: 3s
-    timeout_http_agent: 3s
-    timeout_ssh_agent: 3s
-    timeout_telnet_agent: 3s
-    timeout_script: 3s
-    timeout_browser: 60s
-  register: zbx_settings
+    - name: test - Update zabbix v7.0+ settings (same as default)
+      community.zabbix.zabbix_settings:
+        auditlog_mode: true
+        timeout_zabbix_agent: 3s
+        timeout_simple_check: 3s
+        timeout_snmp_agent: 3s
+        timeout_external_check: 3s
+        timeout_db_monitor: 3s
+        timeout_http_agent: 3s
+        timeout_ssh_agent: 3s
+        timeout_telnet_agent: 3s
+        timeout_script: 3s
+        timeout_browser: 60s
+      register: zbx_settings
   when: zabbix_version is version('7.0', '>=')
