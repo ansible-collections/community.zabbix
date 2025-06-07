@@ -538,7 +538,7 @@ class Authentication(ZabbixBase):
 
             if isinstance(saml_auth_enabled, bool):
                 params["saml_auth_enabled"] = str(int(saml_auth_enabled))
-            self._module.fail_json(msg=f"{LooseVersion(self._zbx_api_version)}")
+
             if LooseVersion(self._zbx_api_version) < LooseVersion("7.0"):
                 if saml_idp_entityid:
                     params["saml_idp_entityid"] = saml_idp_entityid
