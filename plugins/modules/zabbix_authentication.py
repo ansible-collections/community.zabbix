@@ -58,7 +58,7 @@ options:
     ldap_configured:
         description:
             - LDAP authentication will be enabled if C(true).
-            - Works only with Zabbix <= 6.2 and is silently ignored in higher versions.
+            - Works only with Zabbix = 6.0 and is silently ignored in higher versions.
         required: false
         type: bool
     ldap_auth_enabled:
@@ -73,7 +73,7 @@ options:
             - e.g. C(ldap://ldap.zabbix.com)
             - This setting is required if current value of I(ldap_configured) is C(false).
             - Works only with Zabbix <= 6.0 and is silently ignored in higher versions.
-            - Please use community.zabbix.zabbix_user_directory module instead of this parameter with Zabbix >= 6.2.
+            - Please use community.zabbix.zabbix_user_directory module instead of this parameter with Zabbix >= 7.0.
         required: false
         type: str
     ldap_port:
@@ -81,7 +81,7 @@ options:
             - A port number of LDAP server.
             - This setting is required if current value of I(ldap_configured) is C(false).
             - Works only with Zabbix <= 6.0 and is silently ignored in higher versions.
-            - Please use community.zabbix.zabbix_user_directory module instead of this parameter with Zabbix >= 6.2.
+            - Please use community.zabbix.zabbix_user_directory module instead of this parameter with Zabbix >= 7.0.
         required: false
         type: int
     ldap_base_dn:
@@ -89,7 +89,7 @@ options:
             - Base DN of LDAP.
             - This setting is required if current value of I(ldap_configured) is C(false).
             - Works only with Zabbix <= 6.0 and is silently ignored in higher versions.
-            - Please use community.zabbix.zabbix_user_directory module instead of this parameter with Zabbix >= 6.2.
+            - Please use community.zabbix.zabbix_user_directory module instead of this parameter with Zabbix >= 7.0.
         required: false
         type: str
     ldap_search_attribute:
@@ -97,14 +97,14 @@ options:
             - Search attribute of LDAP.
             - This setting is required if current value of I(ldap_configured) is C(false).
             - Works only with Zabbix <= 6.0 and is silently ignored in higher versions.
-            - Please use community.zabbix.zabbix_user_directory module instead of this parameter with Zabbix >= 6.2.
+            - Please use community.zabbix.zabbix_user_directory module instead of this parameter with Zabbix >= 7.0.
         required: false
         type: str
     ldap_bind_dn:
         description:
             - Bind DN of LDAP.
             - Works only with Zabbix <= 6.0 and is silently ignored in higher versions.
-            - Please use community.zabbix.zabbix_user_directory module instead of this parameter with Zabbix >= 6.2.
+            - Please use community.zabbix.zabbix_user_directory module instead of this parameter with Zabbix >= 7.0.
         required: false
         type: str
     ldap_case_sensitive:
@@ -116,7 +116,7 @@ options:
         description:
             - Bind password of LDAP.
             - Works only with Zabbix <= 6.0 and is silently ignored in higher versions.
-            - Please use community.zabbix.zabbix_user_directory module instead of this parameter with Zabbix >= 6.2.
+            - Please use community.zabbix.zabbix_user_directory module instead of this parameter with Zabbix >= 7.0.
         required: false
         type: str
     ldap_userdirectory:
@@ -157,82 +157,82 @@ options:
         description:
             - SAML identify provider's entity ID.
             - This setting is required if current value of I(saml_auth_enabled) is C(false).
-            - Works only with Zabbix <= 6.2 and is silently ignored in higher versions.
+            - Works only with Zabbix = 6.0 and is silently ignored in higher versions.
         required: false
         type: str
     saml_sso_url:
         description:
             - URL for single sign on service of SAML.
             - This setting is required if current value of I(saml_auth_enabled) is C(false).
-            - Works only with Zabbix <= 6.2 and is silently ignored in higher versions.
+            - Works only with Zabbix = 6.0 and is silently ignored in higher versions.
         required: false
         type: str
     saml_slo_url:
         description:
             - URL for SAML single logout service.
-            - Works only with Zabbix <= 6.2 and is silently ignored in higher versions.
+            - Works only with Zabbix = 6.0 and is silently ignored in higher versions.
         required: false
         type: str
     saml_username_attribute:
         description:
             - User name attribute of SAML.
             - This setting is required if current value of I(saml_auth_enabled) is C(false).
-            - Works only with Zabbix <= 6.2 and is silently ignored in higher versions.
+            - Works only with Zabbix = 6.0 and is silently ignored in higher versions.
         required: false
         type: str
     saml_sp_entityid:
         description:
             - Entity ID of SAML service provider.
             - This setting is required if current value of I(saml_auth_enabled) is C(false).
-            - Works only with Zabbix <= 6.2 and is silently ignored in higher versions.
+            - Works only with Zabbix = 6.0 and is silently ignored in higher versions.
         required: false
         type: str
     saml_nameid_format:
         description:
             - Name identifier format of SAML service provider.
-            - Works only with Zabbix <= 6.2 and is silently ignored in higher versions.
+            - Works only with Zabbix = 6.0 and is silently ignored in higher versions.
         required: false
         type: str
     saml_sign_messages:
         description:
             - SAML sign messages will be enabled if C(true).
-            - Works only with Zabbix <= 6.2 and is silently ignored in higher versions.
+            - Works only with Zabbix = 6.0 and is silently ignored in higher versions.
         required: false
         type: bool
     saml_sign_assertions:
         description:
             - SAML sign assertions will be enabled if C(true).
-            - Works only with Zabbix <= 6.2 and is silently ignored in higher versions.
+            - Works only with Zabbix = 6.0 and is silently ignored in higher versions.
         required: false
         type: bool
     saml_sign_authn_requests:
         description:
             - SAML sign AuthN requests will be enabled if C(true).
-            - Works only with Zabbix <= 6.2 and is silently ignored in higher versions.
+            - Works only with Zabbix = 6.0 and is silently ignored in higher versions.
         required: false
         type: bool
     saml_sign_logout_requests:
         description:
             - SAML sign logout requests will be enabled if C(true).
-            - Works only with Zabbix <= 6.2 and is silently ignored in higher versions.
+            - Works only with Zabbix = 6.0 and is silently ignored in higher versions.
         required: false
         type: bool
     saml_sign_logout_responses:
         description:
             - SAML sign logout responses will be enabled if C(true).
-            - Works only with Zabbix <= 6.2 and is silently ignored in higher versions.
+            - Works only with Zabbix = 6.0 and is silently ignored in higher versions.
         required: false
         type: bool
     saml_encrypt_nameid:
         description:
             - SAML encrypt name ID will be enabled if C(true).
-            - Works only with Zabbix <= 6.2 and is silently ignored in higher versions.
+            - Works only with Zabbix = 6.0 and is silently ignored in higher versions.
         required: false
         type: bool
     saml_encrypt_assertions:
         description:
             - SAML encrypt assertions will be enabled if C(true).
-            - Works only with Zabbix <= 6.2 and is silently ignored in higher versions.
+            - Works only with Zabbix = 6.0 and is silently ignored in higher versions.
         required: false
         type: bool
     saml_case_sensitive:
@@ -328,7 +328,7 @@ EXAMPLES = """
       - contain_special_characters
       - avoid_easy_to_guess
 
-- name: Update all authentication setting (Zabbix = 6.2)
+- name: Update all authentication setting (Zabbix = 6.0)
   # set task level variables as we change ansible_connection plugin here
   vars:
     ansible_network_os: community.zabbix.zabbix
@@ -370,7 +370,7 @@ EXAMPLES = """
       - contain_special_characters
       - avoid_easy_to_guess
 
-- name: Update all authentication setting (Zabbix >= 6.4)
+- name: Update all authentication setting (Zabbix >= 7.0)
   # set task level variables as we change ansible_connection plugin here
   vars:
     ansible_network_os: community.zabbix.zabbix
@@ -496,14 +496,14 @@ class Authentication(ZabbixBase):
             if isinstance(http_case_sensitive, bool):
                 params["http_case_sensitive"] = str(int(http_case_sensitive))
 
-            if LooseVersion(self._zbx_api_version) < LooseVersion("6.4"):
+            if LooseVersion(self._zbx_api_version) == LooseVersion("6.0"):
                 if isinstance(ldap_configured, bool):
                     params["ldap_configured"] = str(int(ldap_configured))
             else:
                 if isinstance(ldap_auth_enabled, bool):
                     params["ldap_auth_enabled"] = str(int(ldap_auth_enabled))
 
-            if LooseVersion(self._zbx_api_version) < LooseVersion("6.2"):
+            if LooseVersion(self._zbx_api_version) == LooseVersion("6.0"):
                 if ldap_host:
                     params["ldap_host"] = ldap_host
 
@@ -539,7 +539,7 @@ class Authentication(ZabbixBase):
             if isinstance(saml_auth_enabled, bool):
                 params["saml_auth_enabled"] = str(int(saml_auth_enabled))
 
-            if LooseVersion(self._zbx_api_version) < LooseVersion("6.4"):
+            if LooseVersion(self._zbx_api_version) == LooseVersion("6.0"):
                 if saml_idp_entityid:
                     params["saml_idp_entityid"] = saml_idp_entityid
 
@@ -660,12 +660,12 @@ class Authentication(ZabbixBase):
             future_authentication = current_authentication.copy()
             future_authentication.update(params)
 
-            if LooseVersion(self._zbx_api_version) < LooseVersion("6.4"):
+            if LooseVersion(self._zbx_api_version) == LooseVersion("6.0"):
                 if (
                     current_authentication["ldap_configured"] == "0"
                     and future_authentication["ldap_configured"] == "1"
                 ):
-                    if LooseVersion(self._zbx_api_version) < LooseVersion("6.2"):
+                    if LooseVersion(self._zbx_api_version) == LooseVersion("6.0"):
                         if (
                             not ldap_host
                             or not ldap_port
@@ -690,7 +690,7 @@ class Authentication(ZabbixBase):
                             msg="Please set ldap_userdirectory when you change a value of ldap_auth_enabled to true."
                         )
 
-            if LooseVersion(self._zbx_api_version) < LooseVersion("6.4"):
+            if LooseVersion(self._zbx_api_version) == LooseVersion("6.0"):
                 if (
                     current_authentication["saml_auth_enabled"] == "0"
                     and future_authentication["saml_auth_enabled"] == "1"
