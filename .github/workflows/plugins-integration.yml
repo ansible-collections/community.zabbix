@@ -81,7 +81,7 @@ jobs:
       # As we need to connect to an existing docker container we can't use `--docker` here as the VMs would be on different
       # (non-routing) networks, so we run them locally and ensure any required dependencies are installed via `--requirements`
       - name: Run integration test
-        run: ansible-test integration -v --color --continue-on-error --diff --python ${{ matrix.python }} --requirements --coverage test_zabbix_settings
+        run: ansible-test integration -v --color --continue-on-error --diff --python ${{ matrix.python }} --requirements --coverage test_zabbix_user_directory
         working-directory: ./ansible_collections/community/zabbix
 
         # ansible-test support producing code coverage date
