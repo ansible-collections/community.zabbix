@@ -496,14 +496,14 @@ class Authentication(ZabbixBase):
             if isinstance(http_case_sensitive, bool):
                 params["http_case_sensitive"] = str(int(http_case_sensitive))
 
-            if LooseVersion(self._zbx_api_version) == LooseVersion("6.0"):
+            if LooseVersion(self._zbx_api_version) < LooseVersion("7.0"):
                 if isinstance(ldap_configured, bool):
                     params["ldap_configured"] = str(int(ldap_configured))
             else:
                 if isinstance(ldap_auth_enabled, bool):
                     params["ldap_auth_enabled"] = str(int(ldap_auth_enabled))
 
-            if LooseVersion(self._zbx_api_version) == LooseVersion("6.0"):
+            if LooseVersion(self._zbx_api_version) < LooseVersion("7.0"):
                 if ldap_host:
                     params["ldap_host"] = ldap_host
 
@@ -539,7 +539,7 @@ class Authentication(ZabbixBase):
             if isinstance(saml_auth_enabled, bool):
                 params["saml_auth_enabled"] = str(int(saml_auth_enabled))
             self._module.fail_json(msg=f"{LooseVersion(self._zbx_api_version)}")
-            if LooseVersion(self._zbx_api_version) == LooseVersion("6.0"):
+            if LooseVersion(self._zbx_api_version) < LooseVersion("7.0"):
                 if saml_idp_entityid:
                     params["saml_idp_entityid"] = saml_idp_entityid
 
@@ -660,12 +660,12 @@ class Authentication(ZabbixBase):
             future_authentication = current_authentication.copy()
             future_authentication.update(params)
 
-            if LooseVersion(self._zbx_api_version) == LooseVersion("6.0"):
+            if LooseVersion(self._zbx_api_version) < LooseVersion("7.0"):
                 if (
                     current_authentication["ldap_configured"] == "0"
                     and future_authentication["ldap_configured"] == "1"
                 ):
-                    if LooseVersion(self._zbx_api_version) == LooseVersion("6.0"):
+                    if LooseVersion(self._zbx_api_version) < LooseVersion("7.0"):
                         if (
                             not ldap_host
                             or not ldap_port
@@ -690,7 +690,7 @@ class Authentication(ZabbixBase):
                             msg="Please set ldap_userdirectory when you change a value of ldap_auth_enabled to true."
                         )
 
-            if LooseVersion(self._zbx_api_version) == LooseVersion("6.0"):
+            if LooseVersion(self._zbx_api_version) < LooseVersion("7.0"):
                 if (
                     current_authentication["saml_auth_enabled"] == "0"
                     and future_authentication["saml_auth_enabled"] == "1"
