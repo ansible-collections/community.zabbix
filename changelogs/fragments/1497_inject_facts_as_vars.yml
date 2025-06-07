@@ -1,5 +1,5 @@
 ---
-removed_features:
+breaking_changes:
   - zabbix 6.4 in roles is no longer supported
 minor_changes:
   - You can now deploy these roles with inject_facts_as_vars set to false
