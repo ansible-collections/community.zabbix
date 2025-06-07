@@ -50,7 +50,7 @@ options:
         description:
             - Override password for the user.
             - Password will not be updated on subsequent runs without setting this value to yes.
-        default: no
+        default: false
         type: bool
     current_passwd:
         description:
@@ -243,7 +243,7 @@ EXAMPLES = r"""
     passwd: password
     lang: en_GB
     theme: blue-theme
-    autologin: no
+    autologin: false
     autologout: "0"
     refresh: "30"
     rows_per_page: "200"
@@ -255,13 +255,13 @@ EXAMPLES = r"""
           - example1@example.com
         period: 1-7,00:00-24:00
         severity:
-          not_classified: no
-          information: yes
-          warning: yes
-          average: yes
-          high: yes
-          disaster: yes
-        active: no
+          not_classified: false
+          information: true
+          warning: true
+          average: true
+          high: true
+          disaster: true
+        active: false
     state: present
 
 - name: delete existing zabbix user.
@@ -518,7 +518,7 @@ class User(ZabbixBase):
         ):
             user_parameter_difference_check_result = False
 
-        if LooseVersion(self._zbx_api_version) >= LooseVersion("6.4"):
+        if LooseVersion(self._zbx_api_version) >= LooseVersion("7.0"):
             if user_medias:
                 request_data["medias"] = user_medias
                 del request_data["user_medias"]
@@ -566,7 +566,7 @@ class User(ZabbixBase):
             "url": url,
         }
         if user_medias:
-            if LooseVersion(self._zbx_api_version) <= LooseVersion("6.2"):
+            if LooseVersion(self._zbx_api_version) <= LooseVersion("7.0"):
                 request_data["user_medias"] = user_medias
             else:
                 request_data["medias"] = user_medias
@@ -644,7 +644,7 @@ class User(ZabbixBase):
 
         request_data, _del_keys = helper_normalize_data(request_data)
 
-        if LooseVersion(self._zbx_api_version) < LooseVersion("6.4"):
+        if LooseVersion(self._zbx_api_version) < LooseVersion("7.0"):
             try:
                 if user_medias:
                     request_data["user_medias"] = user_medias
@@ -654,7 +654,7 @@ class User(ZabbixBase):
                     msg="Failed to update user %s: %s" % (username, e)
                 )
 
-        if LooseVersion(self._zbx_api_version) >= LooseVersion("6.4"):
+        if LooseVersion(self._zbx_api_version) >= LooseVersion("7.0"):
             try:
                 if user_medias:
                     request_data["medias"] = user_medias
