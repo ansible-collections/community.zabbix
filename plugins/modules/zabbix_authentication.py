@@ -502,7 +502,7 @@ class Authentication(ZabbixBase):
             else:
                 if isinstance(ldap_auth_enabled, bool):
                     params["ldap_auth_enabled"] = str(int(ldap_auth_enabled))
-            self._module.fail_json(msg="stop")
+
             if LooseVersion(self._zbx_api_version) == LooseVersion("6.0"):
                 if ldap_host:
                     params["ldap_host"] = ldap_host
@@ -540,6 +540,7 @@ class Authentication(ZabbixBase):
                 params["saml_auth_enabled"] = str(int(saml_auth_enabled))
 
             if LooseVersion(self._zbx_api_version) == LooseVersion("6.0"):
+                self._module.fail_json(msg="stop")
                 if saml_idp_entityid:
                     params["saml_idp_entityid"] = saml_idp_entityid
 
