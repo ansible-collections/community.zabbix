@@ -470,6 +470,7 @@ class Authentication(ZabbixBase):
         jit_provision_interval,
         disabled_usrgroup,
     ):
+            self._module.fail_json(msg="stop")
         # try:
             params = {}
 
@@ -711,7 +712,7 @@ class Authentication(ZabbixBase):
             if future_authentication != current_authentication:
                 if self._module.check_mode:
                     self._module.exit_json(changed=True)
-                self._module.fail_json(msg="stop")
+
                 self._zapi.authentication.update(params)
                 self._module.exit_json(
                     changed=True, result="Successfully update authentication setting"
