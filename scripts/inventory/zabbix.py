@@ -110,7 +110,7 @@ class ZabbixInventory(object):
             payload["params"] = params
 
         if self.auth != "":
-            if (LooseVersion(self.zabbix_version) >= LooseVersion("6.4")):
+            if (LooseVersion(self.zabbix_version) >= LooseVersion("7.0")):
                 headers["Authorization"] = "Bearer " + self.auth
             else:
                 payload["auth"] = self.auth

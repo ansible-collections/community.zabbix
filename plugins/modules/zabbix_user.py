@@ -518,7 +518,7 @@ class User(ZabbixBase):
         ):
             user_parameter_difference_check_result = False
 
-        if LooseVersion(self._zbx_api_version) >= LooseVersion("6.4"):
+        if LooseVersion(self._zbx_api_version) >= LooseVersion("7.0"):
             if user_medias:
                 request_data["medias"] = user_medias
                 del request_data["user_medias"]
@@ -566,7 +566,7 @@ class User(ZabbixBase):
             "url": url,
         }
         if user_medias:
-            if LooseVersion(self._zbx_api_version) <= LooseVersion("6.2"):
+            if LooseVersion(self._zbx_api_version) <= LooseVersion("7.0"):
                 request_data["user_medias"] = user_medias
             else:
                 request_data["medias"] = user_medias
@@ -644,7 +644,7 @@ class User(ZabbixBase):
 
         request_data, _del_keys = helper_normalize_data(request_data)
 
-        if LooseVersion(self._zbx_api_version) < LooseVersion("6.4"):
+        if LooseVersion(self._zbx_api_version) < LooseVersion("7.0"):
             try:
                 if user_medias:
                     request_data["user_medias"] = user_medias
@@ -654,7 +654,7 @@ class User(ZabbixBase):
                     msg="Failed to update user %s: %s" % (username, e)
                 )
 
-        if LooseVersion(self._zbx_api_version) >= LooseVersion("6.4"):
+        if LooseVersion(self._zbx_api_version) >= LooseVersion("7.0"):
             try:
                 if user_medias:
                     request_data["medias"] = user_medias

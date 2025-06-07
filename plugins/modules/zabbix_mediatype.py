@@ -549,7 +549,7 @@ class MediaTypeModule(ZabbixBase):
             return parameters
 
         elif self._module.params["type"] == "script":
-            if LooseVersion(self._zbx_api_version) < LooseVersion("6.4"):
+            if LooseVersion(self._zbx_api_version) < LooseVersion("7.0"):
                 if self._module.params["script_params"] is None:
                     _script_params = ""  # ZBX-15706
                 else:
@@ -642,7 +642,7 @@ class MediaTypeModule(ZabbixBase):
             for key in kwargs:
                 # sort list of parameters to prevent mismatch due to reordering
                 if key == "parameters" and (kwargs[key] != [] or existing_mediatype[key] != []):
-                    if LooseVersion(self._zbx_api_version) < LooseVersion("6.4"):
+                    if LooseVersion(self._zbx_api_version) < LooseVersion("7.0"):
                         kwargs[key] = sorted(kwargs[key], key=lambda x: x["name"])
                         existing_mediatype[key] = sorted(existing_mediatype[key], key=lambda x: x["name"])
                     else:

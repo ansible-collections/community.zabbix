@@ -83,13 +83,7 @@ class HttpApi(HttpApiBase):
             self.auth = auth_key
             return
 
-        # Zabbix < 5.0 supports only "user" parameter.
-        # Zabbix >= 6.0 and <= 6.2 support both "user" and "username" parameters.
-        # Zabbix >= 6.4 supports only "username" parameter.
-        if StrictVersion(self.api_version()) >= StrictVersion('6.0'):
-            payload = self.payload_builder("user.login", username=username, password=password)
-        else:
-            payload = self.payload_builder("user.login", user=username, password=password)
+        payload = self.payload_builder("user.login", username=username, password=password)
 
         code, response = self.send_request(data=payload)
 

@@ -1043,7 +1043,7 @@ class Settings(ZabbixBase):
                 if geomaps_attribution != current_settings["geomaps_attribution"]:
                     params["geomaps_attribution"] = geomaps_attribution
 
-            if LooseVersion("6.2") <= LooseVersion(self._zbx_api_version):
+            if LooseVersion(self._zbx_api_version) >= LooseVersion("7.0"):
                 if isinstance(vault_provider, str):
                     _vault_provider = str(
                         zabbix_utils.helper_to_numeric_value(
