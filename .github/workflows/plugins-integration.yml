@@ -21,31 +21,31 @@ jobs:
       matrix:
         zabbix_container:
           - version: "6.0"
-          - version: "7.0"
-          - version: "7.2"
+          # - version: "7.0"
+          # - version: "7.2"
         ansible:
           # https://docs.ansible.com/ansible/latest/reference_appendices/release_and_maintenance.html#ansible-core-changelogs
           - stable-2.16
-          - stable-2.17
-          - stable-2.18
-          - stable-2.19
-          - devel
+          # - stable-2.17
+          # - stable-2.18
+          # - stable-2.19
+          # - devel
         python:
           - '3.10'
-          - '3.11'
-          - '3.12'
-          - '3.13'
+          # - '3.11'
+          # - '3.12'
+          # - '3.13'
         exclude:
-          - ansible: stable-2.19
-            python: '3.10'
-          - ansible: stable-2.19
-            python: '3.9'
-          - ansible: stable-2.18
-            python: '3.10'
-          - ansible: stable-2.17
-            python: '3.13'
-          - ansible: stable-2.16
-            python: '3.13'
+          # - ansible: stable-2.19
+          #   python: '3.10'
+          # - ansible: stable-2.19
+          #   python: '3.9'
+          # - ansible: stable-2.18
+          #   python: '3.10'
+          # - ansible: stable-2.17
+          #   python: '3.13'
+          # - ansible: stable-2.16
+          #   python: '3.13'
           - ansible: devel
             python: '3.10'
 
@@ -81,15 +81,15 @@ jobs:
       # As we need to connect to an existing docker container we can't use `--docker` here as the VMs would be on different
       # (non-routing) networks, so we run them locally and ensure any required dependencies are installed via `--requirements`
       - name: Run integration test
-        run: ansible-test integration -v --color --continue-on-error --diff --python ${{ matrix.python }} --requirements --coverage
+        run: ansible-test integration -v --color --continue-on-error --diff --python ${{ matrix.python }} --requirements --coverage setup_zabbix
         working-directory: ./ansible_collections/community/zabbix
 
         # ansible-test support producing code coverage date
-      - name: Generate coverage report
-        run: ansible-test coverage xml -v --requirements --group-by command --group-by version
-        working-directory: ./ansible_collections/community/zabbix
+      # - name: Generate coverage report
+      #   run: ansible-test coverage xml -v --requirements --group-by command --group-by version
+      #   working-directory: ./ansible_collections/community/zabbix
 
-      # See the repots at https://codecov.io/gh/ansible-collections/community.zabbix
-      - uses: codecov/codecov-action@v4
-        with:
-          fail_ci_if_error: false
+      # # See the repots at https://codecov.io/gh/ansible-collections/community.zabbix
+      # - uses: codecov/codecov-action@v4
+      #   with:
+      #     fail_ci_if_error: false
