@@ -21,8 +21,8 @@ jobs:
       matrix:
         zabbix_container:
           - version: "6.0"
-          # - version: "7.0"
-          # - version: "7.2"
+          - version: "7.0"
+          - version: "7.2"
         ansible:
           # https://docs.ansible.com/ansible/latest/reference_appendices/release_and_maintenance.html#ansible-core-changelogs
           - stable-2.16
@@ -81,7 +81,7 @@ jobs:
       # As we need to connect to an existing docker container we can't use `--docker` here as the VMs would be on different
       # (non-routing) networks, so we run them locally and ensure any required dependencies are installed via `--requirements`
       - name: Run integration test
-        run: ansible-test integration -v --color --continue-on-error --diff --python ${{ matrix.python }} --requirements --coverage test_zabbix_action
+        run: ansible-test integration -v --color --continue-on-error --diff --python ${{ matrix.python }} --requirements --coverage test_zabbix_authentication
         working-directory: ./ansible_collections/community/zabbix
 
         # ansible-test support producing code coverage date
