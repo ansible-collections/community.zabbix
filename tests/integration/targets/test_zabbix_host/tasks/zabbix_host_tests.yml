@@ -107,9 +107,9 @@
       - macro: "{$MACRO2}"
         value: test2
     tags:
-      - tag: Tag1
       - tag: Tag2
         value: test2
+      - tag: Tag1
   register: zabbix_host1
 
 - name: updating with same values should be idempotent
