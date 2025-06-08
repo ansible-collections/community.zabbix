@@ -1,6 +1,6 @@
 ---
-- name: Skip test for versions < 6.4 # Connectors available only since Zabbix 6.4
-  when: zabbix_version is version('6.4', '<')
+- name: Skip test for versions < 7.0 # Connectors available only since Zabbix 6.4
+  when: zabbix_version is version('7.0', '<')
   ansible.builtin.meta: end_play
 
 - block:

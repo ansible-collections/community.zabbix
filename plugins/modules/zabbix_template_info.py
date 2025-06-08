@@ -244,7 +244,7 @@ class TemplateInfo(ZabbixBase):
             self._module.fail_json(msg="Invalid JSON provided", details=to_native(e), exception=traceback.format_exc())
 
     def load_yaml_template(self, template_yaml, omit_date=False):
-        if omit_date and LooseVersion(self._zbx_api_version) < LooseVersion("6.4"):
+        if omit_date and LooseVersion(self._zbx_api_version) < LooseVersion("7.0"):
             yaml_lines = template_yaml.splitlines(True)
             for index, line in enumerate(yaml_lines):
                 if "date:" in line:

@@ -488,7 +488,7 @@ def main():
     )
 
     module = AnsibleModule(argument_spec=argument_spec, supports_check_mode=True)
-    """ For future when < 6.4 disappears we should use this, now we cannot do this as at this point Zabbix version is unknown
+    """ For future when < 7.0 disappears we should use this, now we cannot do this as at this point Zabbix version is unknown
     module = AnsibleModule(
         argument_spec=argument_spec,
         supports_check_mode=True,
@@ -522,10 +522,10 @@ def main():
 
     user_directory = ZabbixBase(module)
 
-    if LooseVersion(user_directory._zbx_api_version) < LooseVersion("6.2"):
-        module.fail_json(msg="Zabbix < 6.2 does not support user directories.")
+    if LooseVersion(user_directory._zbx_api_version) < LooseVersion("7.0"):
+        module.fail_json(msg="Zabbix < 7.0 does not support user directories.")
 
-    if LooseVersion(user_directory._zbx_api_version) < LooseVersion("6.4"):
+    if LooseVersion(user_directory._zbx_api_version) < LooseVersion("7.0"):
         parameters["search_filter"] = module.params["search_filter"]
         directory = user_directory._zapi.userdirectory.get(
             {"filter": {"name": parameters["name"]}}

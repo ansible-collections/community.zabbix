@@ -308,7 +308,7 @@ class Template(ZabbixBase):
     def get_group_ids_by_group_names(self, group_names):
         group_ids = []
         for group_name in group_names:
-            if LooseVersion(self._zbx_api_version) >= LooseVersion("6.2"):
+            if LooseVersion(self._zbx_api_version) >= LooseVersion("7.0"):
                 group = self._zapi.templategroup.get({"output": ["groupid"], "filter": {"name": group_name}})
             else:
                 group = self._zapi.hostgroup.get({"output": ["groupid"], "filter": {"name": group_name}})
@@ -405,7 +405,7 @@ class Template(ZabbixBase):
                 update_rules["templateDashboards"] = update_rules.pop("templateScreens")
 
                 # before Zabbix 6.2 host_groups and template_group are joined into groups parameter
-                if LooseVersion(self._zbx_api_version) < LooseVersion("6.2"):
+                if LooseVersion(self._zbx_api_version) < LooseVersion("7.0"):
                     update_rules["groups"] = {"createMissing": True}
                     update_rules.pop("host_groups", None)
                     update_rules.pop("template_groups", None)
@@ -424,7 +424,7 @@ class Template(ZabbixBase):
         changed = False
         existing_template = self.dump_template(template_ids, template_type="json")
         if template_groups is not None:
-            if LooseVersion(self._zbx_api_version) >= LooseVersion("6.2"):
+            if LooseVersion(self._zbx_api_version) >= LooseVersion("7.0"):
                 existing_groups = [g["name"] for g in existing_template["zabbix_export"]["template_groups"]]
             else:
                 existing_groups = [g["name"] for g in existing_template["zabbix_export"]["groups"]]
@@ -579,7 +579,7 @@ class Template(ZabbixBase):
             update_rules["templateDashboards"] = update_rules.pop("templateScreens")
 
             # before Zabbix 6.2 host_groups and template_group are joined into groups parameter
-            if LooseVersion(self._zbx_api_version) < LooseVersion("6.2"):
+            if LooseVersion(self._zbx_api_version) < LooseVersion("7.0"):
                 update_rules["groups"] = {"createMissing": True}
                 update_rules.pop("host_groups", None)
                 update_rules.pop("template_groups", None)

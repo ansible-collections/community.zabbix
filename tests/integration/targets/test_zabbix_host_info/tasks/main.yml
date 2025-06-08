@@ -70,7 +70,7 @@
           - gather_all_facts_result.hosts.0.hostinterfaces.0.type == "1"
           - gather_all_facts_result.hosts.0.hostinterfaces.0.useip == "1"
 
-    - when: zabbix_version is version('6.4', '>=')
+    - when: zabbix_version is version('7.0', '>=')
       ansible.builtin.assert:
         that:
           - gather_all_facts_result.hosts | length == 1

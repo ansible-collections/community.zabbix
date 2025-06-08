@@ -151,8 +151,8 @@
       ansible.builtin.assert:
         that: zbxauth_update.changed is sameas True
 
-- when: zabbix_version is version('6.4', '>=')
-  name: support Zabbix version (>=6.4)
+- when: zabbix_version is version('7.0', '>=')
+  name: support Zabbix version (>=7.0)
   block:
     - name: test - update ldap_configured without mandatory paramters
       community.zabbix.zabbix_authentication:

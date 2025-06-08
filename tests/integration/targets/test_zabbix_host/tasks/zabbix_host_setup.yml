@@ -24,4 +24,4 @@
     - NTP Service
     - HTTP Service
     - LDAP Service
-  when: zabbix_version | float >= 6.4
+  when: zabbix_version | float >= 7.0

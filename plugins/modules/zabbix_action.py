@@ -660,7 +660,7 @@ options:
         description:
             - Whether to pause escalation if event is a symptom event.
             - I(supported) if C(event_source) is set to C(trigger)
-            - Works only with >= Zabbix 6.4
+            - Works only with >= Zabbix 7.0
         default: true
 
 
@@ -1194,7 +1194,7 @@ class Action(Zapi):
 
         if kwargs["event_source"] == "trigger":
             _params["pause_suppressed"] = "1" if kwargs["pause_in_maintenance"] else "0"
-            if LooseVersion(self._zbx_api_version) >= LooseVersion("6.4"):
+            if LooseVersion(self._zbx_api_version) >= LooseVersion("7.0"):
                 _params["pause_symptoms"] = "1" if kwargs["pause_symptoms"] else "0"
             _params["notify_if_canceled"] = "1" if kwargs["notify_if_canceled"] else "0"
 
@@ -2295,7 +2295,7 @@ def main():
                 notify_if_canceled=notify_if_canceled
             )
 
-            if LooseVersion(zapi_wrapper._zbx_api_version) >= LooseVersion("6.4"):
+            if LooseVersion(zapi_wrapper._zbx_api_version) >= LooseVersion("7.0"):
                 kwargs["pause_symptoms"] = pause_symptoms
 
             kwargs[argument_spec["acknowledge_operations"]["aliases"][0]] = acknowledge_ops.construct_the_data(acknowledge_operations)
@@ -2328,7 +2328,7 @@ def main():
 
             kwargs[argument_spec["acknowledge_operations"]["aliases"][0]] = acknowledge_ops.construct_the_data(acknowledge_operations)
 
-            if LooseVersion(zapi_wrapper._zbx_api_version) >= LooseVersion("6.4"):
+            if LooseVersion(zapi_wrapper._zbx_api_version) >= LooseVersion("7.0"):
                 kwargs["pause_symptoms"] = pause_symptoms
 
             action_id = action.add_action(**kwargs)

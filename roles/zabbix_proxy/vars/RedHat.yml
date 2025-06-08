@@ -2,12 +2,10 @@ zabbix_valid_proxy_versions:
   "9":
     - 7.2
     - 7.0
-    - 6.4
     - 6.0
   "8":
     - 7.2
     - 7.0
-    - 6.4
     - 6.0
 
 _zabbix_proxy_pgsql_dependencies:

@@ -88,7 +88,7 @@
           ansible.builtin.assert:
             that: not usergroup_updated_rights_again is changed
 
-    - when: zabbix_version is version('6.4', '>=')
+    - when: zabbix_version is version('7.0', '>=')
       block:
         - name: test - update Zabbix user group with one hostgroup right
           community.zabbix.zabbix_usergroup:
@@ -217,17 +217,8 @@
     - name: test - reset Zabbix user group to default
       community.zabbix.zabbix_usergroup:
 
-    - when: zabbix_version is version('6.4', '>=')
+    - when: zabbix_version is version('7.0', '>=')
       block:
-        - name: test - create new user directory
-          community.zabbix.zabbix_user_directory:
-            name: LDAP infra 1
-            host: "test.com"
-            port: 389
-            base_dn: "ou=Users,dc=example,dc=org"
-            search_attribute: "uid"
-          when: zabbix_version is version('6.4', '<')
-
         - name: test - create new user directory
           community.zabbix.zabbix_user_directory:
             name: LDAP infra 1
@@ -236,7 +227,6 @@
             port: 389
             base_dn: "ou=Users,dc=example,dc=org"
             search_attribute: "uid"
-          when: zabbix_version is version('6.4', '>=')
 
         - name: test - update Zabbix user group with user directory
           community.zabbix.zabbix_usergroup:
@@ -270,4 +260,4 @@
         name: LDAP infra 1
         host: "test.com"
         state: absent
-      when: zabbix_version is version('6.4', '>=')
+      when: zabbix_version is version('7.0', '>=')
