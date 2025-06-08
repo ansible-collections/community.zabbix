@@ -261,6 +261,7 @@
     tags:
       - tag: ExampleHostsTag3
         value: ExampleTagValue
+        operator: 0
       - tag: ExampleHostsTag
       - tag: ExampleHostsTag2
         value: ExampleTagValue
