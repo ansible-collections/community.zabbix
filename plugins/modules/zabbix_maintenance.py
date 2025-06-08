@@ -374,11 +374,16 @@ class MaintenanceModule(ZabbixBase):
         if str(desc) != maintenance["description"]:
             return True
         if tags is not None and "tags" in maintenance:
-            t1 = sorted(tags, key=lambda k: (k["tag"], k.get("value", "")))
-            t2 = sorted(maintenance["tags"], key=lambda k: (k["tag"], k.get("value", "")))
-            if t1 != t2:
-                self._module.fail_json(msg=f"t1: {t1}   t2: {t2}")
-                return True
+            s1 = sorted(tags, key=lambda k: (k["tag"], k.get("value", "")))
+            s2 = sorted(maintenance["tags"], key=lambda k: (k["tag"], k.get("value", "")))
+            if s1 != s2:
+                for item in s1:
+                    comp = s2.pop(0)
+                    if sorted(item.keys()) != sorted(comp.keys()):
+                        return True
+                    for k in item.keys():
+                        if str(item[k]) != str(comp[k]):
+                            return True
 
 
 def main():
