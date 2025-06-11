@@ -75,7 +75,7 @@ options:
     hostgroup_rights:
         description:
             - Host group permissions to assign to the user group
-            - For => Zabbix 6.2
+            - For => Zabbix 7.0
         required: false
         type: list
         elements: dict
@@ -94,7 +94,7 @@ options:
     templategroup_rights:
         description:
             - Template group permissions to assign to the user group
-            - For => Zabbix 6.2
+            - For => Zabbix 7.0
         required: false
         type: list
         elements: dict
@@ -137,7 +137,7 @@ options:
     userdirectory:
         description:
             - Authentication user directory when gui_access set to LDAP or System default.
-            - For => Zabbix 6.2
+            - For => Zabbix 7.0
         required: false
         type: str
     state:
@@ -234,7 +234,7 @@ EXAMPLES = r"""
           permission: read-only
     state: present
 
-# Base create user group with permissions for Zabbix => 6.2
+# Base create user group with permissions for Zabbix => 7.0
 - name: Create user group with permissions
     # set task level variables as we change ansible_connection plugin here
   vars:
@@ -533,7 +533,7 @@ class UserGroup(ZabbixBase):
             ),
             "tag_filters": kwargs["tag_filters"],
         }
-        if LooseVersion(self._zbx_api_version) < LooseVersion("6.2"):
+        if LooseVersion(self._zbx_api_version) < LooseVersion("7.0"):
             _params["rights"] = kwargs["rights"]
         else:
             _params["hostgroup_rights"] = kwargs["hostgroup_rights"]
@@ -541,20 +541,12 @@ class UserGroup(ZabbixBase):
 
             if kwargs["userdirectory"]:
                 try:
-                    if LooseVersion(self._zbx_api_version) <= LooseVersion("6.2"):
-                        _userdir = self._zapi.userdirectory.get(
-                            {
-                                "output": "extend",
-                                "filter": {"name": [kwargs["userdirectory"]]},
-                            }
-                        )
-                    else:
-                        _userdir = self._zapi.userdirectory.get(
-                            {
-                                "output": "extend",
-                                "search": {"name": [kwargs["userdirectory"]]},
-                            }
-                        )
+                    _userdir = self._zapi.userdirectory.get(
+                        {
+                            "output": "extend",
+                            "search": {"name": [kwargs["userdirectory"]]},
+                        }
+                    )
                 except Exception as e:
                     self._module.fail_json(
                         msg="Failed to get user directory '%s': %s"
@@ -598,7 +590,7 @@ class UserGroup(ZabbixBase):
             User group matching user group name.
         """
         try:
-            if LooseVersion(self._zbx_api_version) < LooseVersion("6.2"):
+            if LooseVersion(self._zbx_api_version) < LooseVersion("7.0"):
                 _usergroup = self._zapi.usergroup.get(
                     {
                         "output": "extend",
@@ -794,7 +786,7 @@ def main():
 
     userGroup = UserGroup(module)
     zbx = userGroup._zapi
-    if LooseVersion(userGroup._zbx_api_version) < LooseVersion("6.2"):
+    if LooseVersion(userGroup._zbx_api_version) < LooseVersion("7.0"):
         rgts = Rights(module, zbx)
     else:
         hostgroup_rgts = HostgroupRights(module, zbx)
@@ -815,7 +807,7 @@ def main():
                 msg="User group deleted: %s, ID: %s" % (name, usrgrpid),
             )
         else:
-            if LooseVersion(userGroup._zbx_api_version) < LooseVersion("6.2"):
+            if LooseVersion(userGroup._zbx_api_version) < LooseVersion("7.0"):
                 difference = userGroup.check_difference(
                     usrgrpid=usrgrpid,
                     name=name,
@@ -867,7 +859,7 @@ def main():
                 msg="User group %s does not exists, nothing to delete" % name,
             )
         else:
-            if LooseVersion(userGroup._zbx_api_version) < LooseVersion("6.2"):
+            if LooseVersion(userGroup._zbx_api_version) < LooseVersion("7.0"):
                 usrgrpid = userGroup.add(
                     name=name,
                     gui_access=gui_access,

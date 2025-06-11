@@ -482,7 +482,7 @@ class DiscoveryRule(ZabbixBase):
         existing_drule = zabbix_utils.helper_convert_unicode_to_str(self.check_if_drule_exists(kwargs["name"])[0])
         parameters = zabbix_utils.helper_convert_unicode_to_str(self._construct_parameters(**kwargs))
         change_parameters = {}
-        if LooseVersion(self._zbx_api_version) < LooseVersion("6.4"):
+        if LooseVersion(self._zbx_api_version) < LooseVersion("7.0"):
             if existing_drule["nextcheck"]:
                 existing_drule.pop("nextcheck")
         _diff = zabbix_utils.helper_cleanup_data(zabbix_utils.helper_compare_dictionaries(parameters, existing_drule, change_parameters))

@@ -36,7 +36,7 @@
     ansible_httpapi_pass: zabbix
 
 - debug: var=zabbix_version
-- name: check login to zabbix for Zabbix < 6.4
+- name: check login to zabbix for Zabbix == 6.0
   ansible.builtin.uri:
     url: "{{ zabbix_api_server_url }}/api_jsonrpc.php"
     method: POST
@@ -53,9 +53,9 @@
   delay: 5
   until: check_login_under64_result is defined and 'json' in check_login_under64_result and 'result' in check_login_under64_result.json
   register: check_login_under64_result
-  when: zabbix_version is version('6.4', '<')
+  when: zabbix_version is version('6.0', '==')
 
-- name: check login to zabbix for Zabbix >= 6.4
+- name: check login to zabbix for Zabbix >= 7.0
   ansible.builtin.uri:
     url: "{{ zabbix_api_server_url }}/api_jsonrpc.php"
     method: POST
@@ -72,4 +72,4 @@
   delay: 5
   until: check_login_result is defined and 'json' in check_login_result and 'result' in check_login_result.json
   register: check_login_result
-  when: zabbix_version is version('6.4', '>=')
+  when: zabbix_version is version('7.0', '>=')

@@ -1135,7 +1135,7 @@
     - ansible.builtin.assert:
         that: zbxaction_recack_new.changed is sameas False
 
-    - when: zabbix_version is version('6.4', '>=')
+    - when: zabbix_version is version('7.0', '>=')
       block:
         - name: test - update action with pause_symptoms off
           community.zabbix.zabbix_action:

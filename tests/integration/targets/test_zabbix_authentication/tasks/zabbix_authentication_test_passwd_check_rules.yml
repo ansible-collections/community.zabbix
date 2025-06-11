@@ -3,7 +3,7 @@
   community.zabbix.zabbix_authentication:
     passwd_check_rules: "avoid_easy_to_guess"
 
-- name: Set request parameters based on Zabbix version (Zabbix < 6.4)
+- name: Set request parameters based on Zabbix version (Zabbix == 6.0)
   ansible.builtin.set_fact:
     authentication_get_body:
       jsonrpc: "2.0"
@@ -11,9 +11,9 @@
       params: {}
       id: 1
       auth: "{{ check_login_under64_result.json.result }}"
-  when: zabbix_version is version("6.4", "<")
+  when: zabbix_version is version("6.0", "==")
 
-- name: Set request parameters based on Zabbix version (Zabbix >= 6.4)
+- name: Set request parameters based on Zabbix version (Zabbix >= 7.0)
   ansible.builtin.set_fact:
     authentication_get_body:
       jsonrpc: "2.0"
@@ -22,7 +22,7 @@
       id: 1
     authentication_get_headers:
       Authorization: "Bearer {{ check_login_result.json.result }}"
-  when: zabbix_version is version("6.4", ">=")
+  when: zabbix_version is version("7.0", ">=")
 
 - name: Get the authentication rules
   ansible.builtin.uri:

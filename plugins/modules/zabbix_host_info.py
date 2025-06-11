@@ -142,7 +142,7 @@ class Host(ZabbixBase):
             "selectTags": "extend",
             "selectMacros": "extend"
         }
-        if LooseVersion(self._zbx_api_version) < LooseVersion("6.2"):
+        if LooseVersion(self._zbx_api_version) < LooseVersion("7.0"):
             parameters["selectGroups"] = parameters["selectHostGroups"]
             del parameters["selectHostGroups"]
         host_list = self._zapi.host.get(parameters)
@@ -172,7 +172,7 @@ class Host(ZabbixBase):
                 "selectTags": "extend",
                 "selectMacros": "extend"
             }
-            if LooseVersion(self._zbx_api_version) < LooseVersion("6.2"):
+            if LooseVersion(self._zbx_api_version) < LooseVersion("7.0"):
                 host_get_params["selectGroups"] = host_get_params["selectHostGroups"]
                 del host_get_params["selectHostGroups"]
             host = self._zapi.host.get(host_get_params)
