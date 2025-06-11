@@ -1,2 +1,0 @@
-bugfixes:
-  - zabbix_template_info module - Dump YAML formatted template data without date in Zabbix 7.0 or higher.

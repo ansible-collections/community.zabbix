@@ -1,2 +1,0 @@
-bugfixes:
-  - zabbix_web role - fix /etc/zabbix/web/zabbix.conf.php file mode.

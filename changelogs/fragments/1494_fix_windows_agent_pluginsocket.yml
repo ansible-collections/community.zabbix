@@ -1,2 +1,0 @@
-bugfixes:
-  - zabbix_agent Role - Add _zabbix_agent_pluginsocket variable to override /tmp/agent.plugin.sock

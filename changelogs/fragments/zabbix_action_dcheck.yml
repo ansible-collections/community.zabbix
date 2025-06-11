@@ -1,2 +1,0 @@
-minor_changes:
-  - zabbix_action module - properly configure discovery check condition in discovery action depending on information provided in discovery check `value`.

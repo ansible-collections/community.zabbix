@@ -1,3 +1,0 @@
-minor_changes:
-  - zabbix_group - add propagate parameter
-  - zabbix_templategroup - add propagate parameter

@@ -1,2 +1,0 @@
-minor_changes:
-  - zabbix_item - added support for item types zabbix_agent, snmp_trap, snmp_agent, ipmi_agent and jmx_agent
