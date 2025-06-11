@@ -1,7 +1,7 @@
 ---
-- name: test - do not run tests for Zabbix < 6.4
+- name: test - do not run tests for Zabbix < 7.0
   meta: end_play
-  when: zabbix_version is version('6.4', '<')
+  when: zabbix_version is version('7.0', '<')
 
 - block:
     # setup stuff
