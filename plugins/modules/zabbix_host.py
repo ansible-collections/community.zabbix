@@ -870,7 +870,7 @@ class Host(ZabbixBase):
                 return True
 
         if tags is not None and "tags" in host:
-            if sorted(tags, key=lambda k: k["tag"]) != sorted(host["tags"], key=lambda k: k["tag"]):
+            if sorted(tags, key=lambda k: (k["tag"], k.get("value", ""))) != sorted(host["tags"], key=lambda k: (k["tag"], k.get("value", ""))):
                 return True
 
         return False
