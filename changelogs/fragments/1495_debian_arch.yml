@@ -1,3 +1,0 @@
-bugfixes:
-  - roles/zabbix_repo - debian/ubuntu arm64 repo url fixed for zabbix 7.2
-  - roles/zabbix_repo - debian architectures should map better for i386 and armhf

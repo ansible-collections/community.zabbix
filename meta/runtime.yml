@@ -1,5 +1,5 @@
 ---
-requires_ansible: '>=2.12'
+requires_ansible: '>=2.16'
 action_groups:
   zabbix:
     - zabbix_action
