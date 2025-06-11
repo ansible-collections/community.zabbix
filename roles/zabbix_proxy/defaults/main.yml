@@ -77,7 +77,7 @@ zabbix_proxy_logtype: file
 zabbix_proxy_maxconcurrentchecksperpoller: 1000
 zabbix_proxy_pidfile: /var/run/zabbix/zabbix_proxy.pid
 zabbix_proxy_proxybuffermode: disk
-ProxyConfigFrequency: 10
+zabbix_proxy_proxyconfigfrequency: 10
 zabbix_proxy_proxylocalbuffer: 0
 zabbix_proxy_proxymemorybufferage: 0
 zabbix_proxy_proxymemorybuffersize: 0
