@@ -1,3 +1,0 @@
-bugfixes:
-  - host module - Fixed idempotentcy related to changes in tag order.
-  - maintenace module - Fixed idempotentcy related to changes in tag order.
