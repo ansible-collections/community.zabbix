@@ -11,11 +11,11 @@ listen.group = {{ _nginx_group if zabbix_web_http_server=='nginx' else _apache_g
 listen.mode = 0660
 listen.allowed_clients = 127.0.0.1
 
-pm = {{ zabbix_web_php_fpm_process_manager_mode }}
-pm.max_children = {{ zabbix_web_php_fpm_process_manager_max_childs }}
-pm.start_servers = {{ zabbix_web_php_fpm_process_manager_start_servers }}
-pm.min_spare_servers = {{ zabbix_web_php_fpm_process_manager_min_spare_servers }}
-pm.max_spare_servers = {{ zabbix_web_php_fpm_process_manager_max_spare_servers }}
+pm = {{ zabbix_web_php_fpm_mode }}
+pm.max_children = {{ zabbix_web_php_fpm_max_childs }}
+pm.start_servers = {{ zabbix_web_php_fpm_start_servers }}
+pm.min_spare_servers = {{ zabbix_web_php_fpm_min_spare_servers }}
+pm.max_spare_servers = {{ zabbix_web_php_fpm_max_spare_servers }}
 
 php_value[session.save_handler] = files
 php_value[session.save_path]    = {{ zabbix_php_fpm_session }}
