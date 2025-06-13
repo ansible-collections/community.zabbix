@@ -308,7 +308,7 @@ The following table lists all variables that are exposed to modify the configura
 | AllowRoot | zabbix_proxy_allowroot | `False` | `True`/`False` |
 | AllowUnsupportedDBVersions | zabbix_proxy_allowunsupporteddbversions | `False` | `True`/`False` |
 | CacheSize | zabbix_proxy_cachesize | 32M | |
-| ConfigFrequency | zabbix_proxy_configfrequency | 3600 | |
+| ConfigFrequency | zabbix_proxy_configfrequency | 3600 | Being deprecated. In conflict with ProxyConfigFrequency. |
 | DataSenderFrequency | zabbix_proxy_datasenderfrequency | 1 | |
 | DBHost | zabbix_proxy_dbhost | localhost| |
 | DBName | zabbix_proxy_dbname | zabbix_proxy| |
@@ -350,7 +350,7 @@ The following table lists all variables that are exposed to modify the configura
 | MaxConcurrentChecksPerPoller | zabbix_proxy_maxconcurrentchecksperpoller | 1000 | Version 7.0 or Greater |
 | PidFile | zabbix_proxy_pidfile | /var/run/zabbix/zabbix_proxy.pid| |
 | ProxyBufferMode | zabbix_proxy_proxybuffermode | disk | Version 7.0 or Greater |
-| ProxyConfigFrequency | zabbix_proxy_proxyconfigfrequency | 10 | Version 6.4 or Lower |
+| ProxyConfigFrequency | zabbix_proxy_proxyconfigfrequency | 10 | Version 6.4 or Greater |
 | ProxyLocalBuffer | zabbix_proxy_proxylocalbuffer |0| |
 | ProxyMemoryBufferAge | zabbix_proxy_proxymemorybufferage | 0 | Version 7.0 or Greater |
 | ProxyMemoryBufferSize | zabbix_proxy_proxymemorybuffersize | 0 | Version 7.0 or Greater |
