@@ -1,8 +1,8 @@
 ---
 _zabbix_repo_deb_arch_map:
   aarch64: "arm64"
-  arm6l: "armhf"
-  arm7l: "armhf"
+  armv6l: "armhf"
+  armv7l: "armhf"
   i386: "i386"
   x86_64: "amd64"
 
