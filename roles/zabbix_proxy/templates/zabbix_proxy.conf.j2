@@ -9,7 +9,11 @@
 {{ (zabbix_proxy_allowroot is defined and zabbix_proxy_allowroot is not none) | ternary('','# ') }}AllowRoot={{ zabbix_proxy_allowroot | default (false) | ternary('1', '0') }}
 {{ (zabbix_proxy_allowunsupporteddbversions is defined and zabbix_proxy_allowunsupporteddbversions is not none) | ternary('','# ') }}AllowUnsupportedDBVersions={{ zabbix_proxy_allowunsupporteddbversions | default (false) | ternary('1', '0') }}
 {{ (zabbix_proxy_cachesize is defined and zabbix_proxy_cachesize is not none) | ternary('','# ') }}CacheSize={{ zabbix_proxy_cachesize | default('') }}
+
+{% if zabbix_proxy_version is version('6.4', '<=') %}
 {{ (zabbix_proxy_configfrequency is defined and zabbix_proxy_configfrequency is not none) | ternary('','# ') }}ConfigFrequency={{ zabbix_proxy_configfrequency | default('') }}
+{% endif %}
+
 {{ (zabbix_proxy_datasenderfrequency is defined and zabbix_proxy_datasenderfrequency is not none) | ternary('','# ') }}DataSenderFrequency={{ zabbix_proxy_datasenderfrequency | default('') }}
 {{ (zabbix_proxy_dbhost is defined and zabbix_proxy_dbhost is not none) | ternary('','# ') }}DBHost={{ zabbix_proxy_dbhost | default('') }}
 {{ (zabbix_proxy_dbname is defined and zabbix_proxy_dbname is not none) | ternary('','# ') }}DBName={{ zabbix_proxy_dbname | default('') }}
@@ -57,7 +61,7 @@
 {{ (zabbix_proxy_proxybuffermode is defined and zabbix_proxy_proxybuffermode is not none) | ternary('','# ') }}ProxyBufferMode={{ zabbix_proxy_proxybuffermode | default('') }}
 {% endif %}
 
-{% if zabbix_proxy_version is version('6.4', '<=') %}
+{% if zabbix_proxy_version is version('6.4', '>=') %}
 {{ (zabbix_proxy_proxyconfigfrequency is defined and zabbix_proxy_proxyconfigfrequency is not none) | ternary('','# ') }}ProxyConfigFrequency={{ zabbix_proxy_proxyconfigfrequency | default('') }}
 {% endif %}
 
