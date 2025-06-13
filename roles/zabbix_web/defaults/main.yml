@@ -40,6 +40,12 @@ zabbix_php_fpm_conf_listen: true
 zabbix_apache_custom_includes: []
 zabbix_php_fpm_conf_user: "{{ zabbix_web_user }}"
 zabbix_php_fpm_conf_group: "{{ zabbix_web_group }}"
+zabbix_web_php_fpm_mode: dynamic
+zabbix_web_php_fpm_max_childs: 50
+zabbix_web_php_fpm_start_servers: 5
+zabbix_web_php_fpm_min_spare_servers: 5
+zabbix_web_php_fpm_max_spare_servers: 35
+
 
 # Database
 zabbix_server_database: pgsql

@@ -148,6 +148,22 @@ The following properties are specific to Zabbix 5.0 and for the PHP(-FPM) config
 * `zabbix_php_fpm_conf_user`: The owner of the socket file (When `zabbix_php_fpm_listen` contains a patch to a socket file).
 * `zabbix_php_fpm_conf_group`: The group of the owner of the socket file (When `zabbix_php_fpm_listen` contains a patch to a socket file).
 
+The following values can be used to tune php-fpm for better performance on the frontend:
+
+* `zabbix_web_php_fpm_mode`: Set the mode the php process management will work in. Available dynamic, static, ondemand - default: dynamic
+* `zabbix_web_php_fpm_max_childs`: Set maximum number of process children php-fpm can spawn - default: 50
+* `zabbix_web_php_fpm_start_servers`: The number of child process to be spawned on start. default: 5
+* `zabbix_web_php_fpm_min_spare_servers`: The minimum number of idle child processes PHP-FPM will create. More are created if fewer than this number are available. - default: 5
+* `zabbix_web_php_fpm_max_spare_servers`: The maximum number of idle child processes PHP-FPM will create. If there are more child processes available than this value, then some will be killed off. - default: 35
+
+##### Tunning recommendations
+| Setting                              | Value                                                        |
+|--------------------------------------|--------------------------------------------------------------|
+| zabbix_web_php_fpm_max_childs        | (Total RAM – Memory used for Linux, DB, etc.) / process size |
+| zabbix_web_php_fpm_start_servers     | Number of CPU cores x 4                                      |
+| zabbix_web_php_fpm_min_spare_servers | Number of CPU cores x 2                                      |
+| zabbix_web_php_fpm_max_spare_servers | Same as start_servers                                        |
+
 ### SElinux
 
 Selinux changes will be installed based on the status of selinux running on the target system.
