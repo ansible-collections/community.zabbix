@@ -303,9 +303,10 @@ class TemplateInfo(ZabbixBase):
 def main():
     argument_spec = zabbix_utils.zabbix_common_argument_spec()
     argument_spec.update(dict(
-        template_name=dict(type="str", required=True),
+        template_name=dict(type="str", required=False),
         omit_date=dict(type="bool", required=False, default=False),
-        format=dict(type="str", choices=["json", "xml", "yaml", "none"], default="json")
+        format=dict(type="str", choices=["json", "xml", "yaml", "none"], default="json"),
+        all_templategroups=dict(type="bool", required=False),
     ))
     module = AnsibleModule(
         argument_spec=argument_spec,
