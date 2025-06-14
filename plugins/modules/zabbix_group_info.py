@@ -33,9 +33,14 @@ options:
         description:
             - Name of the hostgroup in Zabbix.
             - hostgroup is the unique identifier used and cannot be updated using this module.
-        required: true
+        required: false
         type: list
         elements: str
+    all_hostgroups:
+        description:
+            - return info about all hostgroups.
+        required: false
+        type: bool
 
 extends_documentation_fragment:
 - community.zabbix.zabbix
@@ -67,6 +72,20 @@ EXAMPLES = r"""
   community.zabbix.zabbix_group_info:
     hostgroup_name:
       - ExampleHostgroup
+
+- name: Get info about all hostgroups
+  # set task level variables as we change ansible_connection plugin here
+  vars:
+    ansible_network_os: community.zabbix.zabbix
+    ansible_connection: httpapi
+    ansible_httpapi_port: 443
+    ansible_httpapi_use_ssl: true
+    ansible_httpapi_validate_certs: false
+    ansible_zabbix_url_path: "zabbixeu"  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
+    ansible_host: zabbix-example-fqdn.org
+  community.zabbix.zabbix_group_info:
+    all_hostgroups: true
+  register: all_hostgroups
 """
 
 from ansible.module_utils.basic import AnsibleModule
@@ -81,12 +100,19 @@ class Host(ZabbixBase):
         if len(group_list) < 1:
             self._module.fail_json(msg="Hostgroup not found: %s" % group_names)
         return group_list
+    def get_all_groups(self):
+        group_list = self._zapi.hostgroup.get({"output": "extend"})
+        if len(group_list) < 1:
+            self._module.fail_json(msg="No Hostgroup can be found")
+        return group_list
+
 
 
 def main():
     argument_spec = zabbix_utils.zabbix_common_argument_spec()
     argument_spec.update(dict(
-        hostgroup_name=dict(type="list", required=True, elements="str"),
+        hostgroup_name=dict(type="list", required=False, elements="str"),
+        all_hostgroups=dict(type="bool", required=False),
     ))
     module = AnsibleModule(
         argument_spec=argument_spec,
@@ -94,10 +120,17 @@ def main():
     )
 
     hostgroup_name = module.params["hostgroup_name"]
+    all_hostgroups = module.params["all_hostgroups"]
+    if hostgroup_name:
+      host = Host(module)
+      host_groups = host.get_group_ids_by_group_names(hostgroup_name)
+      module.exit_json(host_groups=host_groups)
 
-    host = Host(module)
-    host_groups = host.get_group_ids_by_group_names(hostgroup_name)
-    module.exit_json(host_groups=host_groups)
+    if all_hostgroups:
+      host = Host(module)
+      host_groups = host.get_all_groups()
+      module.exit_json(host_groups=host_groups)
+        
 
 
 if __name__ == "__main__":
