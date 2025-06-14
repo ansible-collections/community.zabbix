@@ -128,3 +128,8 @@
       - fetch_template_none_format_result.template_json is not defined
       - fetch_template_none_format_result.template_xml is not defined
       - fetch_template_none_format_result.template_yaml is not defined
+
+- name: "test - Fetch all template groups"
+  community.zabbix.zabbix_template_info:
+    all_templategroups: true
+  register: fetch_all_template_groups

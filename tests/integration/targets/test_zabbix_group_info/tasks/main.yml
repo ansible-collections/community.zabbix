@@ -37,6 +37,17 @@
       - get_hostgorup_info_result.host_groups.0.name == 'zbxgrp_example_group01'
       - get_hostgorup_info_result.host_groups.1.name == 'zbxgrp_example_group02'
 
+- name: test - get all hostgroup info
+  zabbix_group_info:
+    all_hostgroups: true
+  register: get_all_hostgorup_info
+
+- name: assert that at least two group were get
+  ansible.builtin.assert:
+    that:
+      - get_all_hostgorup_info.host_groups.0.name == 'zbxgrp_example_group01'
+      - get_all_hostgorup_info.host_groups.1.name == 'zbxgrp_example_group02'
+
 - name: test - delete Zabbix group
   community.zabbix.zabbix_group:
     host_groups:
