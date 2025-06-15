@@ -133,3 +133,4 @@
   community.zabbix.zabbix_template_info:
     all_templategroups: true
   register: fetch_all_template_groups
+  when: zabbix_version is version('7.0', '>=')
