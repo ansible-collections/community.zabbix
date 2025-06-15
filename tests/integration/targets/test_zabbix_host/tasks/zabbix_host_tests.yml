@@ -427,7 +427,7 @@
 - name: expect to succeed and that things have changed
   ansible.builtin.assert:
     that:
-      -  zabbix_host1 is changed"
+      -  "zabbix_host1 is changed"
 
 - name: "test: change host status"
   community.zabbix.zabbix_host:

@@ -920,7 +920,7 @@ class Host(ZabbixBase):
         request_str = {"hostid": host_id, "templates": template_id_list_, "templates_clear": templates_clear_list_}
         error_msg = "Failed to link templates to host: %s"
         if clear_all_link_templates:
-            request_str = {"hostid": host_id,"templates_clear": templates_clear_list_}
+            request_str = {"hostid": host_id, "templates_clear": templates_clear_list_}
             error_msg = "Failed to clear all templates from host: %s"
         try:
             if self._module.check_mode:
@@ -1172,9 +1172,9 @@ def main():
     host = Host(module)
 
     template_ids = []
-    if link_templates or clear_all_link_templates:
+    if link_templates:
         template_ids = host.get_template_ids(link_templates)
-    
+
     group_ids = []
 
     if host_groups is not None:
@@ -1346,7 +1346,7 @@ def main():
                     monitored_by, proxy_group_id)
 
                 if clear_all_link_templates:
-                     host.link_or_clear_template(host_id, template_ids,clear_all_link_templates=True)
+                    host.link_or_clear_template(host_id, template_ids, clear_all_link_templates=True)
                 else:
                     host.link_or_clear_template(host_id, template_ids)
 
