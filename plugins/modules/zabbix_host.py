@@ -48,6 +48,11 @@ options:
             - List of templates linked to the host.
         type: list
         elements: str
+    clear_all_link_templates:
+        description:
+            - Unlink and Clear all linked tempalte from the host
+        type: bool
+        default: "no"
     inventory_mode:
         description:
             - Configure the inventory mode.
@@ -481,6 +486,21 @@ EXAMPLES = r"""
     tls_connect: 2
     tls_psk: 123456789abcdef123456789abcdef12
     force: false
+
+- name: Remove and clear all linked template
+# Set current task level variables for Zabbix Server host in task
+  vars:
+    ansible_network_os: community.zabbix.zabbix
+    ansible_connection: httpapi
+    ansible_httpapi_port: 443
+    ansible_httpapi_use_ssl: true
+    ansible_httpapi_validate_certs: false
+    ansible_zabbix_url_path: "zabbixeu"  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
+    ansible_host: zabbix-example-fqdn.org # you can use task level ansible_host or delegate_to like in previous example
+  become: false
+  community.zabbix.zabbix_host:
+    host_name: ExampleHost
+    clear_all_link_templates: True
 """
 
 
@@ -876,7 +896,7 @@ class Host(ZabbixBase):
         return False
 
     # link or clear template of the host
-    def link_or_clear_template(self, host_id, template_id_list):
+    def link_or_clear_template(self, host_id, template_id_list, clear_all_link_templates=False):
         # get host's exist template ids
         exist_template_id_list = self.get_host_templates_by_host_id(host_id)
 
@@ -888,19 +908,26 @@ class Host(ZabbixBase):
             template_id_list_.append({"templateid": t})
 
         # get unlink and clear templates
-        templates_clear = exist_template_ids.difference(template_ids)
+        if clear_all_link_templates:
+            templates_clear = exist_template_ids(template_ids)
+        else:
+            templates_clear = exist_template_ids.difference(template_ids)
         templates_clear_list = list(templates_clear)
         templates_clear_list_ = []
         for t in templates_clear_list:
             templates_clear_list_.append({"templateid": t})
 
         request_str = {"hostid": host_id, "templates": template_id_list_, "templates_clear": templates_clear_list_}
+        error_msg = "Failed to link templates to host: %s"
+        if clear_all_link_templates:
+            request_str = {"hostid": host_id,"templates_clear": templates_clear_list_}
+            error_msg = "Failed to clear all templates from host: %s"
         try:
             if self._module.check_mode:
                 self._module.exit_json(changed=True)
             self._zapi.host.update(request_str)
         except Exception as e:
-            self._module.fail_json(msg="Failed to link template to host: %s" % e)
+            self._module.fail_json(msg=error_msg % e)
 
     def inventory_mode_numeric(self, inventory_mode):
         if inventory_mode == "automatic":
@@ -1018,6 +1045,7 @@ def main():
         host_name=dict(type="str", required=True),
         host_groups=dict(type="list", required=False, elements="str"),
         link_templates=dict(type="list", required=False, elements="str"),
+        clear_all_link_templates=dict(type="bool", default=False),
         status=dict(type="str", default="enabled", choices=["enabled", "disabled"]),
         state=dict(type="str", default="present", choices=["present", "absent"]),
         inventory_mode=dict(type="str", required=False, choices=["automatic", "manual", "disabled"]),
@@ -1107,6 +1135,7 @@ def main():
     description = module.params["description"]
     host_groups = module.params["host_groups"]
     link_templates = module.params["link_templates"]
+    clear_all_link_templates = module.params["clear_all_link_templates"]
     inventory_mode = module.params["inventory_mode"]
     ipmi_authtype = module.params["ipmi_authtype"]
     ipmi_privilege = module.params["ipmi_privilege"]
@@ -1143,9 +1172,9 @@ def main():
     host = Host(module)
 
     template_ids = []
-    if link_templates:
+    if link_templates or clear_all_link_templates:
         template_ids = host.get_template_ids(link_templates)
-
+    
     group_ids = []
 
     if host_groups is not None:
@@ -1316,7 +1345,10 @@ def main():
                     ipmi_authtype, ipmi_privilege, ipmi_username, ipmi_password, macros, tags, discovered_host, zabbix_host_obj,
                     monitored_by, proxy_group_id)
 
-                host.link_or_clear_template(host_id, template_ids)
+                if clear_all_link_templates:
+                     host.link_or_clear_template(host_id, template_ids,clear_all_link_templates=True)
+                else:
+                    host.link_or_clear_template(host_id, template_ids)
 
                 host.update_inventory_mode(host_id, inventory_mode)
                 host.update_inventory_zabbix(host_id, inventory_zabbix)

@@ -408,6 +408,27 @@
     that:
       - "not zabbix_host1 is changed"
 
+- name: "test: change add linked templates"
+  community.zabbix.zabbix_host:
+    host_name: ExampleHost
+    link_templates:
+      - "IMAP Service"
+      - "NTP Service"
+      - "HTTP Service"
+      - "LDAP Service"
+  register: zabbix_host1
+
+- name: "test: Unlink and Clear all linked templates"
+  community.zabbix.zabbix_host:
+    host_name: ExampleHost
+    clear_all_link_templates: True
+  register: zabbix_host1
+
+- name: expect to succeed and that things have changed
+  ansible.builtin.assert:
+    that:
+      -  zabbix_host1 is changed"
+
 - name: "test: change host status"
   community.zabbix.zabbix_host:
     host_name: ExampleHost
