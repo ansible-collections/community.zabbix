@@ -121,9 +121,9 @@ EXAMPLES = """
     format: none
   register: template
 
-  - name: Get info about all templategroups
-  # set task level variables as we change ansible_connection plugin here
-  vars:
+    - name: Get info about all templategroups
+    # set task level variables as we change ansible_connection plugin here
+    vars:
     ansible_network_os: community.zabbix.zabbix
     ansible_connection: httpapi
     ansible_httpapi_port: 443
@@ -131,9 +131,9 @@ EXAMPLES = """
     ansible_httpapi_validate_certs: false
     ansible_zabbix_url_path: "zabbixeu"  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
     ansible_host: zabbix-example-fqdn.org
-  community.zabbix.zabbix_template_info:
+    community.zabbix.zabbix_template_info:
     all_templategroups: true
-  register: all_templategroups
+    register: all_templategroups
 """
 
 RETURN = """

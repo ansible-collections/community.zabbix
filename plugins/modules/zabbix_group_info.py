@@ -100,6 +100,7 @@ class Host(ZabbixBase):
         if len(group_list) < 1:
             self._module.fail_json(msg="Hostgroup not found: %s" % group_names)
         return group_list
+    
     def get_all_groups(self):
         group_list = self._zapi.hostgroup.get({"output": "extend"})
         if len(group_list) < 1:
@@ -131,7 +132,6 @@ def main():
       host_groups = host.get_all_groups()
       module.exit_json(host_groups=host_groups)
         
-
 
 if __name__ == "__main__":
     main()
