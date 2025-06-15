@@ -292,7 +292,7 @@ class TemplateInfo(ZabbixBase):
                 return self.load_json_template(dump, omit_date)
         except Exception as e:
             self._module.fail_json(msg="Unable to export template: %s" % e)
-    
+
     def get_all_groups(self):
         group_list = self._zapi.templategroup.get({"output": "extend"})
         if len(group_list) < 1:
@@ -312,7 +312,7 @@ def main():
         argument_spec=argument_spec,
         supports_check_mode=True
     )
-    
+
     template_name = module.params["template_name"]
     all_templategroups = module.params["all_templategroups"]
     omit_date = module.params["omit_date"]
@@ -322,7 +322,7 @@ def main():
 
     if template_name:
         template_id = template_info.get_template_id(template_name)
-    
+
         if not template_id:
             module.fail_json(msg="Template not found: %s" % template_name)
 
@@ -346,7 +346,7 @@ def main():
             )
         elif format == "none":
             module.exit_json(changed=False, template_id=template_id[0])
-    
+
     if all_templategroups:
         template_groups = template_info.get_all_groups()
         module.exit_json(template_groups=template_groups)

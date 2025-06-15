@@ -108,7 +108,6 @@ class Host(ZabbixBase):
         return group_list
 
 
-
 def main():
     argument_spec = zabbix_utils.zabbix_common_argument_spec()
     argument_spec.update(dict(
@@ -123,15 +122,14 @@ def main():
     hostgroup_name = module.params["hostgroup_name"]
     all_hostgroups = module.params["all_hostgroups"]
     if hostgroup_name:
-      host = Host(module)
-      host_groups = host.get_group_ids_by_group_names(hostgroup_name)
-      module.exit_json(host_groups=host_groups)
+        host = Host(module)
+        host_groups = host.get_group_ids_by_group_names(hostgroup_name)
+        module.exit_json(host_groups=host_groups)
 
     if all_hostgroups:
-      host = Host(module)
-      host_groups = host.get_all_groups()
-      module.exit_json(host_groups=host_groups)
-        
+        host = Host(module)
+        host_groups = host.get_all_groups()
+        module.exit_json(host_groups=host_groups)
 
 if __name__ == "__main__":
     main()
