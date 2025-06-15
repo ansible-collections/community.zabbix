@@ -131,5 +131,6 @@ def main():
         host_groups = host.get_all_groups()
         module.exit_json(host_groups=host_groups)
 
+
 if __name__ == "__main__":
     main()
