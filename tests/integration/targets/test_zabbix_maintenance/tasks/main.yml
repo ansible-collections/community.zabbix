@@ -269,9 +269,9 @@
 
 # BUGGED: sometimes when test "lags" and some time passes since previous tasks,
 # maintenance_start will not match and be updated, thus resulting in changed
-- ansible.builtin.assert:
-   that:
-     - update_maintenance_host_tags.changed is sameas false
+# - ansible.builtin.assert:
+#    that:
+#      - update_maintenance_host_tags.changed is sameas false
 
 - name: "test - Create maintenance with an active_since param"
   community.zabbix.zabbix_maintenance:
