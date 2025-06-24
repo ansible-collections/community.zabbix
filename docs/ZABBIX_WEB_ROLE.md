@@ -140,13 +140,14 @@ See https://httpd.apache.org/docs/current/mod/mod_ssl.html for SSL* configuratio
 
 #### PHP-FPM
 
-The following properties are specific to Zabbix 5.0 and for the PHP(-FPM) configuration:
+The following properties are for the PHP(-FPM) configuration:
 
 * `zabbix_php_fpm_session`: The directory where sessions will be stored. If none are provided, defaults are used.
 * `zabbix_php_fpm_listen`: The path to a socket file or ipaddress:port combination on which PHP-FPM needs to listen. If none are provided, defaults are used.
 * `zabbix_php_fpm_conf_listen`: Default: `true`. If we want to configure the `zabbix_php_fpm_listen` in the PHP-FPM configuration file.
 * `zabbix_php_fpm_conf_user`: The owner of the socket file (When `zabbix_php_fpm_listen` contains a patch to a socket file).
 * `zabbix_php_fpm_conf_group`: The group of the owner of the socket file (When `zabbix_php_fpm_listen` contains a patch to a socket file).
+
 
 The following values can be used to tune php-fpm for better performance on the frontend:
 
@@ -155,6 +156,7 @@ The following values can be used to tune php-fpm for better performance on the f
 * `zabbix_web_php_fpm_start_servers`: The number of child process to be spawned on start. default: 5
 * `zabbix_web_php_fpm_min_spare_servers`: The minimum number of idle child processes PHP-FPM will create. More are created if fewer than this number are available. - default: 5
 * `zabbix_web_php_fpm_max_spare_servers`: The maximum number of idle child processes PHP-FPM will create. If there are more child processes available than this value, then some will be killed off. - default: 35
+* `zabbix_web_custom_php`:  Any customer php settings
 
 ##### Tunning recommendations
 | Setting                              | Value                                                        |
