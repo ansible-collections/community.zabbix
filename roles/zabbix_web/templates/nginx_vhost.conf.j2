@@ -82,8 +82,8 @@ server {
     ssl_certificate {{ zabbix_web_tls_crt }};
     ssl_certificate_key {{ zabbix_web_tls_key }};
     {{ (zabbix_web_ssl_cipher_suite is defined and zabbix_web_ssl_cipher_suite is not none) | ternary('', '# ') }}ssl_ciphers {{ zabbix_web_ssl_cipher_suite | default('') }};
-    {{ (zabbix_web_ssl_session_cache is defined and zabbix_web_ssl_session_cache is not none) | ternary('', '# ') }}ssl_session_cache  {{ zabbix_web_ssl_session_cache | default('') }};
-    {{ (zabbix_web_ssl_session_cache_timeout is defined and zabbix_web_ssl_session_cache_timeout is not none) | ternary('', '# ') }}ssl_session_timeout {{ zabbix_web_ssl_session_cache_timeout | default('') }};
+    {{ (zabbix_web_ssl_session_cache is defined and zabbix_web_ssl_session_cache != "INVALID") | ternary('', '# ') }}ssl_session_cache  {{ zabbix_web_ssl_session_cache | default('') }};
+    {{ (zabbix_web_ssl_session_cache_timeout is defined and zabbix_web_ssl_session_cache_timeout != "!INVALID") | ternary('', '# ') }}ssl_session_timeout {{ zabbix_web_ssl_session_cache_timeout | default('') }};
     {{ (zabbix_web_ssl_session_protocols is defined and zabbix_web_ssl_session_protocols is not none) | ternary('', '# ') }}ssl_protocols {{ zabbix_web_ssl_session_protocols | default('') }};
     {{ (zabbix_web_ssl_session_prefer_server_ciphers is defined and zabbix_web_ssl_session_prefer_server_ciphers is not none) | ternary('', '# ') }}ssl_prefer_server_ciphers {{ zabbix_web_ssl_session_prefer_server_ciphers | default('') }};
     {{ (zabbix_web_ssl_session_stapling is defined and zabbix_web_ssl_session_stapling is not none) | ternary('', '# ') }}ssl_stapling {{ zabbix_web_ssl_session_stapling | default('') }};

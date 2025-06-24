@@ -35,8 +35,8 @@ zabbix_php_fpm_conf_listen: true
 # zabbix_web_upload_max_filesize: 2M
 # zabbix_web_max_input_time: 300
 # zabbix_web_max_input_vars: 10000
-zabbix_web_ssl_session_cache_timeout: "{{ zabbix_web_SSLSessionCacheTimeout | default(omit) }}"  # Remove backwards compatability in 4.0
-zabbix_web_ssl_session_cache: "{{ zabbix_web_SSLSessionCache | default(omit) }}"  # Remove backwards compatability in 4.0
+zabbix_web_ssl_session_cache_timeout: "{{ zabbix_web_SSLSessionCacheTimeout | default('!INVALID') }}"  # Remove backwards compatability in 4.0
+zabbix_web_ssl_session_cache: "{{ zabbix_web_SSLSessionCache | default('!INVALID') }}"  # Remove backwards compatability in 4.0
 zabbix_apache_custom_includes: []
 zabbix_php_fpm_conf_user: "{{ zabbix_web_user }}"
 zabbix_php_fpm_conf_group: "{{ zabbix_web_group }}"
