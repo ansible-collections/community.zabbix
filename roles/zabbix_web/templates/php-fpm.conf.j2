@@ -27,3 +27,8 @@ php_value[upload_max_filesize] = {{ zabbix_web_upload_max_filesize | default('2M
 php_value[max_input_time] = {{ zabbix_web_max_input_time | default('300') }}
 php_value[max_input_vars] = {{ zabbix_web_max_input_vars | default('10000') }}
 php_value[date.timezone] = {{ zabbix_timezone }}
+
+
+{% if zabbix_web_custom_php | default('') | length > 0 %}
+{{ zabbix_web_custom_php }}
+{% endif %}
