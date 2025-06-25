@@ -1,5 +1,7 @@
 ---
 - name: Get latest zabbix releases
+  vars:
+    ansible_connection: local
   delegate_to: localhost
   uri:
     url: https://services.zabbix.com/updates/v1
@@ -13,33 +15,140 @@
     _latest_release: "versions[?version=='{{ zabbix_agent_version }}'].latest_release.release | [0]"
   when: zabbix_agent_version_long is undefined
 
-- name: Check for and uninstall old agent
-  when: work_not_in_progress_anymore | default(false)
+- name: Autodetect install zabbix agent version
+  set_fact:
+    zabbix_agent2: false
+  when: ansible_distribution_major_version | int < 10
+
+- name: Check for zabbix agent package installed
+  ansible.windows.win_powershell:
+    script: |
+      Get-ItemProperty HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\* |
+      Where-Object {$_.DisplayName -Like 'Zabbix Agent*'} |
+      Select-Object -ExpandProperty PSChildName
+  #DisplayName, DisplayVersion, Publisher, InstallDate, PSChildName
+  register: _get_zabbix_package_name
+- debug:
+    var: _get_zabbix_package_name
+
+- name: Zabbix write package name in var
+  when: _get_zabbix_package_name.output
+  set_fact:
+    _Zabbix_installed_from_package: "{{ _get_zabbix_package_name.output[0] }}"
+- debug:
+    var: _Zabbix_installed_from_package
+
+- name: Get zabbix-agent path from service
+  #when: _Zabbix_installed_from_package.output is not defined or _Zabbix_installed_from_package.output | length == 0
   block:
     # Work in progress
-    - name: Get product_id for Zabbix Agent
+    - name: Get path for zabbix_agent
       ansible.windows.win_powershell:
         script: |
-          Get-ItemProperty HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\* |
-          Where-Object {$_.DisplayName -Like 'Zabbix Agent*'} |
-          Select-Object -ExpandProperty PSChildName
-      #DisplayName, DisplayVersion, Publisher, InstallDate, PSChildName
-      register: _res
+          Get-ItemProperty -ErrorAction SilentlyContinue `
+              'HKLM:\SYSTEM\CurrentControlSet\Services\Zabbix Agent*' |
+             Select-Object -ExpandProperty ImagePath |
+             ForEach-Object {
+             if ($_ -match '(\w.+.exe)') {
+             $matches[1]
+                 }
+            } 
+      register: _Zabbix_installed
     - debug:
-        var: _res
+        var: _Zabbix_installed
 
-    - name: "Remove package"
-      ansible.windows.win_package:
+# legacy
+- name: Specify directory path
+  when: _Zabbix_installed.output
+  set_fact:
+    zabbix_directory: "{{ _Zabbix_installed.output[0] | win_dirname }}"
+- debug:
+    var: zabbix_directory
+
+- name: "Check if Zabbix agent is present"
+  when: _Zabbix_installed.output
+  ansible.windows.win_stat:
+    path: "{{ _Zabbix_installed.output[0] }}"
+  register: _zabbix_agent_exe
+
+- name: "Get Installed Zabbix Agent Version"
+  community.windows.win_file_version:
+    path: "{{ _Zabbix_installed.output[0] }}"
+  when:
+    - _Zabbix_installed.output
+    - _zabbix_agent_exe.stat.exists
+  register: _zabbix_agent_exe_version
+
+- name: Check zabbix-agent2 is installed
+  when:
+    - _Zabbix_installed.output
+    - _zabbix_agent_exe.stat.exists
+  set_fact:
+    zabbix_agentd_v2_installed: "{{ 'true' if 'zabbix_agent2.exe' in _zabbix_agent_exe.stat.filename else 'false' }}"
+
+- name: "Remove package"
+  when: 
+    - _Zabbix_installed_from_package is defined and _Zabbix_installed_from_package | length > 0
+    - zabbix_agentd_v2_installed is defined
+    - zabbix_agentd_v2_installed != zabbix_agent2 or
+      _zabbix_agent_exe_version.win_file_version.product_version is defined and
+      zabbix_agent_version_long > _zabbix_agent_exe_version.win_file_version.product_version
+  ansible.windows.win_package:
+    state: absent
+    product_id: "{{ _Zabbix_installed_from_package }}"
+
+- name: Uninstall self-installed zabbix-agent service
+  when: 
+    - _Zabbix_installed_from_package is undefined or _Zabbix_installed_from_package | length == 0
+    - _zabbix_agent_exe is defined
+    - zabbix_agentd_v2_installed is defined and zabbix_agentd_v2_installed == false
+  block:
+    - name: Stop zabbix-agent service
+      ansible.windows.win_service:
+        name: "Zabbix Agent"
+        state: stopped
+  
+    - name: Remove zabbix-agent service
+      ansible.windows.win_service:
+        name: "Zabbix Agent"
         state: absent
-        product_id: "{{ _res.output | first }}"
-      register: _res
-    - debug:
-        var: _res
 
-    - fail:
+    - name: Remove entry 'Zabbix Agent' from registry
+      ansible.windows.win_regedit:
+        path: HKLM:\SYSTEM\CurrentControlSet\Services\EventLog\Application\Zabbix Agent
+        state: absent
 
-# TODO: Proper discovery of installed agents from the powershell above
-#       can replace these checks
+    - name: Delete old zabbix files
+      ansible.windows.win_file:
+        path: "{{ zabbix_directory }}"
+        state: absent
+
+- name: Uninstall self-installed zabbix-agent2 service
+  when: 
+    - _Zabbix_installed_from_package is undefined or _Zabbix_installed_from_package | length == 0
+    - _zabbix_agent_exe is defined
+    - zabbix_agentd_v2_installed is defined and zabbix_agentd_v2_installed == true
+  block:
+    - name: Stop zabbix-agent2 service
+      ansible.windows.win_service:
+        name: "Zabbix Agent 2"
+        state: stopped
+
+    - name: Remove zabbix-agent2 service
+      ansible.windows.win_service:
+        name: "Zabbix Agent 2"
+        state: absent
+
+    - name: Remove entry 'Zabbix Agent 2' from registry
+      ansible.windows.win_regedit:
+        path: HKLM:\SYSTEM\CurrentControlSet\Services\EventLog\Application\Zabbix Agent 2
+        state: absent
+
+    - name: Delete old zabbix files
+      ansible.windows.win_file:
+        path: "{{ zabbix_directory }}"
+        state: absent
+
 - name: "Check if Zabbix agent is present"
   ansible.windows.win_stat:
     path: "{{ zabbix_agent_win_exe_path }}"
@@ -53,9 +162,7 @@
 
 - name: Download and install Zabbix Agent
   when: not _zabbix_agent_exe.stat.exists or
-    _install_latest and zabbix_agent_version_long is version('>', _zabbix_agent_exe_version.win_file_version.product_version)
-  vars:
-    _install_latest: "{{ zabbix_agent_package_state == 'latest' }}"
+    zabbix_agent_version_long > _zabbix_agent_exe_version.win_file_version.product_version
   block:
     - name: Download Zabbix Agent
       ansible.windows.win_get_url:
@@ -90,3 +197,8 @@
           - "{{ zabbix_agent_win_package }}"
           - /qn
           - "SERVER={{ zabbix_agent_server }}"
+
+    - name: Remove downloaded files
+      ansible.windows.win_file:
+        path: "C:/Users/{{ ansible_user }}/Downloads/{{ zabbix_agent2_plugins_win_download_package }}"
+        state: absent
