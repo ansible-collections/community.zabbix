@@ -126,10 +126,15 @@ The following is an overview of all available configuration defaults for this ro
 * `zabbix_web_tls_key`: The path to the TLS key file.
 * `zabbix_web_tls_chain`: The path to the TLS certificate chain file.
 * `zabbix_web_SSLPassPhraseDialog`: Type of pass phrase dialog for encrypted private keys.
-* `zabbix_web_SSLSessionCache`: Type of the global/inter-process SSL Session Cache
-* `zabbix_web_SSLSessionCacheTimeout`: Number of seconds before an SSL session expires in the Session Cache
+* `zabbix_web_ssl_session_cache`: Type of the global/inter-process SSL Session Cache
+* `zabbix_web_ssl_session_cache_timeout`: Number of seconds before an SSL session expires in the Session Cache
 * `zabbix_web_SSLCryptoDevice`: Enable use of a cryptographic hardware accelerator
 * `zabbix_apache_custom_includes`: Configure custom includes. Default: `[]`
+* `zabbix_web_ssl_http2`: Bool (default:  False) if using http2
+* `zabbix_web_ssl_session_protocols`: Space seperated list of ssl protocols to explicitly allow (Nginx only)
+* `zabbix_web_ssl_session_prefer_server_ciphers`: (`on`/`off`)  Should server ciphers be prefered over client ciphers (Nginx only)
+* `zabbix_web_ssl_session_stapling`: (`on`/`off`)  Should enable/disable stapling of OCSP responses by server (Nginx only)
+
 
 When `zabbix_web_tls_crt`, `zabbix_web_tls_key` and/or `zabbix_web_tls_chain` are used, make sure that these files exists before executing this role. The Zabbix-Web role will not install the mentioned files.
 
