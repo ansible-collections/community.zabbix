@@ -122,7 +122,6 @@
 
 - name: Ensure proxy definition is up-to-date (added/updated/removed) for Zabbix < 7.0
   vars:
-    gather_facts: false
     ansible_network_os: community.zabbix.zabbix
     ansible_connection: httpapi
     ansible_httpapi_use_ssl: "{{ zabbix_api_use_ssl }}"
