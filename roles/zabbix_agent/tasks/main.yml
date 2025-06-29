@@ -76,7 +76,6 @@
 
 - name: "Run the API calls to Zabbix Server"
   vars:
-    gather_facts: false
     ansible_network_os: community.zabbix.zabbix
     ansible_connection: httpapi
     ansible_httpapi_use_ssl: "{{ zabbix_api_use_ssl }}"
