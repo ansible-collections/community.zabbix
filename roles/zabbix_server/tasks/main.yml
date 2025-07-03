@@ -15,7 +15,7 @@
   when: zabbix_server_version_check | bool
   ansible.builtin.assert:
     that:
-      - "{{ zabbix_server_version|float in zabbix_valid_server_versions[ ansible_facts['distribution_major_version'] ] }}"
+      - zabbix_server_version|float in zabbix_valid_server_versions[ ansible_facts['distribution_major_version'] ]
     fail_msg: Zabbix version {{ zabbix_server_version }} is not supported on {{ ansible_facts['distribution'] }} {{ ansible_facts['distribution_major_version'] }}
   tags:
     - always
