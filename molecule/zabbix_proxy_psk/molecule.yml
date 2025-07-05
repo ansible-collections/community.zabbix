@@ -51,6 +51,8 @@ provisioner:
         zabbix_proxy_tlspskfile: "/home/zabbix/proxy_psk"
         zabbix_proxy_tlspskidentity: "PSK {{ inventory_hostname }}"
         zabbix_proxy_tlspsk_secret: 'f1447b20c0243f3304062d3641fe7e341eb0106bd1adb4273f21659a7717ae6f'
+      v74:
+        zabbix_proxy_version: 7.4
       v72:
         zabbix_proxy_version: 7.2
       v70:
