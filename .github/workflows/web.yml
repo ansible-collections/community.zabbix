@@ -43,10 +43,14 @@ jobs:
           - nginx
           - apache
         version:
-          - v72
-          - v70
-          - v60
+          - v74
+          # - v72
+          # - v70
+          # - v60
         exclude:
+          - container:
+              image: debian11
+            version: v74
           - container:
               image: debian11
             version: v72
