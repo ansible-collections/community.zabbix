@@ -37,6 +37,8 @@ provisioner:
         ansible_connection: community.docker.docker
         zabbix_repo_apt_priority: 1
         zabbix_repo_yum_gpg_check: 1
+      v74:
+        zabbix_javagateway_version: 7.4
       v72:
         zabbix_javagateway_version: 7.2
       v70:

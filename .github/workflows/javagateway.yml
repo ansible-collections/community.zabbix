@@ -36,9 +36,10 @@ jobs:
           - image: opensuseleap15
             ansible_core: ansible-core<2.17
         version:
-          - v72
-          - v70
-          - v60
+          - v74
+          # - v72
+          # - v70
+          # - v60
         collection_role:
           - zabbix_javagateway
     steps:
