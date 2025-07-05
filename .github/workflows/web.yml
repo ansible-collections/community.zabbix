@@ -44,9 +44,9 @@ jobs:
           - apache
         version:
           - v74
-          # - v72
-          # - v70
-          # - v60
+          - v72
+          - v70
+          - v60
         exclude:
           - container:
               image: debian11
