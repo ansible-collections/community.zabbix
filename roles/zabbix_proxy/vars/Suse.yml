@@ -1,6 +1,7 @@
 ---
 zabbix_valid_proxy_versions:
   "15":
+    - 7.4
     - 7.2
     - 7.0
     - 6.0
