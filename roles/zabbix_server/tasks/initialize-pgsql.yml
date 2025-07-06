@@ -104,12 +104,12 @@
         login_host: "{{ zabbix_server_dbhost }}"
         port: "{{ zabbix_server_dbport }}"
         db: "{{ zabbix_server_dbname }}"
-        query: "{{ _is_pre74 | ternary(legacy_path, modern_path) }}"
+        query: "{{ _is_pre74 | ternary(legacy_qry, modern_qry) }}"
       register: _config_db_extension
       vars:
         _is_pre74: "{{ zabbix_server_version is version('7.4', '<') }}"
-        legacy_path: "SELECT db_extension FROM config WHERE db_extension = 'timescaledb'"
-        modern_path: "SELECT * FROM pg_extension WHERE extname = 'timescaledb'"
+        legacy_qry: "SELECT db_extension FROM config WHERE db_extension = 'timescaledb'"
+        modern_qry: "SELECT value_str FROM settings WHERE name = 'db_extension' AND value_str = 'timescaledb'"
 
     # NOTE: Zabbix 7.0 adds a hypertable for auditlog.
     - name: "PostgreSQL | Check for auditlog hypertable"
