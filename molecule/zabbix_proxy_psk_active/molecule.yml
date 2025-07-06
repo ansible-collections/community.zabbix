@@ -9,8 +9,8 @@ driver:
   name: default
 
 platforms:
-  - name: zabbix-proxy-psk-active-${MY_MOLECULE_VERSION:-v72}-${MY_MOLECULE_DATABASE:-mysql}-${MY_MOLECULE_CONTAINER:-rockylinux8}
-    image: geerlingguy/docker-${MY_MOLECULE_IMAGE:-rockylinux8}-ansible:latest
+  - name: zabbix-proxy-psk-active-${MY_MOLECULE_VERSION:-v74}-${MY_MOLECULE_DATABASE:-mysql}-${MY_MOLECULE_CONTAINER:-rockylinux9}
+    image: geerlingguy/docker-${MY_MOLECULE_IMAGE:-rockylinux9}-ansible:latest
     privileged: true
     pre_build_image: true
     command: ${MOLECULE_DOCKER_COMMAND:-""}
@@ -19,10 +19,10 @@ platforms:
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:rw
     cgroupns_mode: host
-    zabbix_proxy_version: ${MY_MOLECULE_VERSION:-v70}
+    zabbix_proxy_version: ${MY_MOLECULE_VERSION:-v74}
     groups:
       - ${MY_MOLECULE_DATABASE:-mysql}
-      - ${MY_MOLECULE_VERSION:-v72}
+      - ${MY_MOLECULE_VERSION:-v74}
 
 provisioner:
   name: ansible
@@ -44,7 +44,7 @@ provisioner:
         zabbix_proxy_hostname: proxy1
         zabbix_api_server_port: 8080
         ansible_zabbix_url_path: ""
-        zabbix_proxy_server: zabbix-proxy-psk-active-${MY_MOLECULE_VERSION:-v72}-${MY_MOLECULE_DATABASE:-mysql}-${MY_MOLECULE_CONTAINER:-rockylinux8}-zserver
+        zabbix_proxy_server: zabbix-proxy-psk-active-${MY_MOLECULE_VERSION:-v72}-${MY_MOLECULE_DATABASE:-mysql}-${MY_MOLECULE_CONTAINER:-rockylinux9}-zserver
         zabbix_proxy_proxymode: 0
         zabbix_proxy_status: active
         zabbix_proxy_configfrequency: 10
