@@ -1,0 +1,2 @@
+bugfixes:
+  - zabbix_agent role - fixes too many requests to check latest zabbix release
