@@ -128,7 +128,7 @@ class Token(ZabbixBase):
     def get_userid_from_name(self, username):
         try:
             userids = self._zapi.user.get(
-                {"output": "userid", "filter": {"username": username}}
+                {"output": "extend", "filter": {"username": username}}
             )
             if not userids or len(userids) > 1:
                 self._module.fail_json("User '%s' cannot be found" % username)
