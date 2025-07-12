@@ -5,6 +5,7 @@
     url: https://services.zabbix.com/updates/v1
     return_content: true
   register: _zabbix_versions
+  run_once: true
 
 - name: Set zabbix_version_long
   set_fact:

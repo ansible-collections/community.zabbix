@@ -24,3 +24,6 @@ antsibull-env
 
 # Ignore Dependency Roles that may get downloaded
 geerlingguy*
+
+# Ignore visual studio code Ansible extension things
+.ansible
