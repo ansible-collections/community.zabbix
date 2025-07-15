@@ -114,6 +114,7 @@ zabbix_agent_win_package: "{{ zabbix_agent2 | ternary('zabbix_agent2', 'zabbix_a
 zabbix_agent_win_download_url: "{{ zabbix_agent_download_base_url }}/{{ zabbix_agent_version }}/{{ zabbix_agent_version_long }}/{{ zabbix_agent_win_package }}"
 
 zabbix_agent_win_install_dir: "C:/Program Files/{{ zabbix_agent2 | ternary('Zabbix Agent 2', 'Zabbix Agent') }}"
+zabbix_agent_win_install_dir_conf: "{{ zabbix_agent_win_install_dir }}"
 zabbix_agent_win_exe_path: "{{ zabbix_agent_win_install_dir }}/{{ zabbix_agent2 | ternary('zabbix_agent2.exe', 'zabbix_agentd.exe') }}"
 zabbix_agent_win_service: "{{ zabbix_agent2 | ternary('Zabbix Agent 2', 'Zabbix Agent') }}"
 

@@ -16,7 +16,7 @@
         - name: Windows | Install user-defined scripts
           ansible.windows.win_copy:
             src: "{{ zabbix_agent_userparameters_scripts_src }}/{{ item.scripts_dir }}"
-            dest: '{{ zabbix_win_install_dir }}\scripts\'
+            dest: '{{ zabbix_agent_win_install_dir }}\scripts\'
           loop: "{{ zabbix_agent_userparameters | selectattr('scripts_dir', 'defined') }}"
 
     - when:

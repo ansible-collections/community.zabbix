@@ -1,0 +1,7 @@
+---
+bugfixes:
+  - zabbix_agent - Fix all variables related to windows installation paths
+
+minor_changes:
+  - zabbix_agent - Removed zabbix_win_install_dir_conf variable and replaced with zabbix_agent_win_install_dir_conf
+  - zabbix_agent - Removed zabbix_win_install_dir variable and replaced with zabbix_agent_win_install_dir
