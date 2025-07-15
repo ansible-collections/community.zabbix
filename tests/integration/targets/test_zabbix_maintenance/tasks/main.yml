@@ -71,6 +71,18 @@
     that:
       - update_maintenance_desc_result.changed is sameas true
 
+- name: "test - Create maintenance with timeperiod_type"
+  community.zabbix.zabbix_maintenance:
+    name: maintenance_tp
+    host_name: example
+    timeperiod_type: 2
+    state: present
+  register: create_maintenance_timeperiod_result
+
+- ansible.builtin.assert:
+    that:
+      - create_maintenance_timeperiod_result.changed is sameas true
+
 - name: "test - Update maintenance with a desc param(again - expectations: no change will occur)"
   community.zabbix.zabbix_maintenance:
     name: maintenance
@@ -369,6 +381,19 @@
 - ansible.builtin.assert:
     that:
       - delete_maintenance_result.changed is sameas true
+
+- name: "test - Delete maintenance_tp"
+  community.zabbix.zabbix_maintenance:
+    name: maintenance_tp
+    host_name: example
+    state: absent
+  register: delete_maintenance_tp_result
+  tags:
+    - cleanup
+
+- ansible.builtin.assert:
+    that:
+      - delete_maintenance_tp_result.changed is sameas true
 
 - name: "test - Delete maintenance(again - expectations: no change will occur)"
   community.zabbix.zabbix_maintenance:

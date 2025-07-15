@@ -83,6 +83,18 @@ options:
             - Gets calculated from I(minutes) if not specified.
         type: "str"
         default: ""
+    timeperiod_type:
+        description:
+            - Type of maintenance time period.
+            - Corresponds to Zabbix API C(timeperiod_type) field.
+            - 0 - one time only.
+            - 1 - reserved.
+            - 2 - daily.
+            - 3 - weekly.
+            - 4 - monthly.
+        type: int
+        default: 0
+        choices: [0, 1, 2, 3, 4]
     tags:
         description:
             - List of tags to assign to the hosts in maintenance.
@@ -238,7 +250,8 @@ from ansible.module_utils.compat.version import LooseVersion
 
 class MaintenanceModule(ZabbixBase):
     def create_maintenance(self, group_ids, host_ids, start_time,
-                           maintenance_type, period, name, desc, tags):
+                           maintenance_type, period, name, desc, tags,
+                           timeperiod_type):
         end_time = start_time + period
         parameters = {
             "groups": [{"groupid": groupid} for groupid in group_ids],
@@ -249,7 +262,7 @@ class MaintenanceModule(ZabbixBase):
             "active_till": str(end_time),
             "description": desc,
             "timeperiods": [{
-                "timeperiod_type": "0",
+                "timeperiod_type": str(timeperiod_type),
                 "start_date": str(start_time),
                 "period": str(period),
             }]
@@ -265,7 +278,8 @@ class MaintenanceModule(ZabbixBase):
         return 0, None, None
 
     def update_maintenance(self, maintenance_id, group_ids, host_ids,
-                           start_time, maintenance_type, period, desc, tags):
+                           start_time, maintenance_type, period, desc, tags,
+                           timeperiod_type):
         end_time = start_time + period
         parameters = {
             "maintenanceid": maintenance_id,
@@ -276,7 +290,7 @@ class MaintenanceModule(ZabbixBase):
             "active_till": str(end_time),
             "description": desc,
             "timeperiods": [{
-                "timeperiod_type": "0",
+                "timeperiod_type": str(timeperiod_type),
                 "start_date": str(start_time),
                 "period": str(period),
             }]
@@ -297,6 +311,7 @@ class MaintenanceModule(ZabbixBase):
             "selectHostGroups": "extend",
             "selectHosts": "extend",
             "selectTags": "extend",
+            "selectTimeperiods": "extend",
         }
         if LooseVersion(self._zbx_api_version) < LooseVersion("7.0"):
             parameters["selectGroups"] = parameters["selectHostGroups"]
@@ -311,6 +326,8 @@ class MaintenanceModule(ZabbixBase):
                                            in maintenance["groups"]] if "groups" in maintenance else []
             maintenance["hostids"] = [host["hostid"] for host
                                       in maintenance["hosts"]] if "hosts" in maintenance else []
+            if maintenance.get("timeperiods"):
+                maintenance["timeperiod_type"] = maintenance["timeperiods"][0].get("timeperiod_type")
             return 0, maintenance, None
 
         return 0, None, None
@@ -360,12 +377,15 @@ class MaintenanceModule(ZabbixBase):
         return 0, host_ids, None
 
     def check_maint_properties(self, maintenance, group_ids, host_ids, maintenance_type,
-                               start_time, period, desc, tags):
+                               start_time, period, desc, tags, timeperiod_type):
         if sorted(group_ids) != sorted(maintenance["groupids"]):
             return True
         if sorted(host_ids) != sorted(maintenance["hostids"]):
             return True
         if str(maintenance_type) != maintenance["maintenance_type"]:
+            return True
+        if maintenance.get("timeperiod_type") is not None and \
+                str(timeperiod_type) != str(maintenance["timeperiod_type"]):
             return True
         if str(int(start_time)) != maintenance["active_since"]:
             return True
@@ -403,6 +423,8 @@ def main():
         visible_name=dict(type="bool", required=False, default=True),
         active_since=dict(type="str", required=False, default=""),
         active_till=dict(type="str", required=False, default=""),
+        timeperiod_type=dict(type="int", required=False, default=0,
+                             choices=[0, 1, 2, 3, 4]),
         tags=dict(
             type="list",
             elements="dict",
@@ -432,6 +454,7 @@ def main():
     visible_name = module.params["visible_name"]
     active_since = module.params["active_since"]
     active_till = module.params["active_till"]
+    timeperiod_type = module.params["timeperiod_type"]
     tags = module.params["tags"]
 
     if collect_data:
@@ -482,12 +505,12 @@ def main():
                 host_ids = list(set(host_ids + maintenance["hostids"]))
 
             if maint.check_maint_properties(maintenance, group_ids, host_ids, maintenance_type,
-                                            start_time, period, desc, tags):
+                                            start_time, period, desc, tags, timeperiod_type):
                 if module.check_mode:
                     changed = True
                 else:
                     (rc, data, error) = maint.update_maintenance(
-                        maintenance["maintenanceid"], group_ids, host_ids, start_time, maintenance_type, period, desc, tags)
+                        maintenance["maintenanceid"], group_ids, host_ids, start_time, maintenance_type, period, desc, tags, timeperiod_type)
                     if rc == 0:
                         changed = True
                     else:
@@ -499,7 +522,7 @@ def main():
                 changed = True
             else:
                 (rc, data, error) = maint.create_maintenance(
-                    group_ids, host_ids, start_time, maintenance_type, period, name, desc, tags)
+                    group_ids, host_ids, start_time, maintenance_type, period, name, desc, tags, timeperiod_type)
                 if rc == 0:
                     changed = True
                 else:
