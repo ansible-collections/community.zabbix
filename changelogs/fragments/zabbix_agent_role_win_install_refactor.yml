@@ -1,0 +1,3 @@
+---
+bigfixes:
+  - zabbix_agent role - Uninstall outdated Zabbix Agent on Windows and install latest version
