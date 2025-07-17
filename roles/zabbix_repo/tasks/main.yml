@@ -1,8 +1,8 @@
 ---
 - name: Include OS-specific variables
-  ansible.builtin.include_vars: "{{ ansible_facts['lsb']['id'] }}.yml"
+  ansible.builtin.include_vars: "{{ ansible_facts['lsb']['id'] | default(ansible_facts['os_family']) }}.yml"
   tags:
     - always
 
 - name: Install the correct repository
-  ansible.builtin.include_tasks: "{{ ansible_facts['lsb']['id'] }}.yml"
+  ansible.builtin.include_tasks: "{{ ansible_facts['lsb']['id'] | default(ansible_facts['os_family']) }}.yml"
