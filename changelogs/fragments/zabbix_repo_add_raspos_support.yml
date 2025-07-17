@@ -1,0 +1,3 @@
+---
+minor_changes:
+  - zabbix_repo role - Added support of Raspbian Pi OS, versions 11 (bullseye) and 12 (bookworm)

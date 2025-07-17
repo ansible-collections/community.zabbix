@@ -6,6 +6,9 @@ zabbix_repo_yum_schema: https
 zabbix_repo_deb_url: "{{ zabbix_repo_version is version('7.0', '>') | ternary(_post_72_deb_repo, _pre_72_deb_repo) }}"
 zabbix_repo_deb_arch: "{{ _zabbix_repo_deb_arch_map[ansible_facts['architecture']] }}"
 zabbix_repo_deb_component: main
+zabbix_repo_rasp_url: "{{ _zabbix_repo_rasp }}"
+zabbix_repo_rasp_arch: "{{ _zabbix_repo_rasp_arch_map[ansible_facts['architecture']] }}"
+zabbix_repo_rasp_component: main
 zabbix_repo_yum:
   - name: zabbix
     description: Zabbix Official Repository - $basearch
@@ -24,6 +27,7 @@ zabbix_repo_yum:
 zabbix_repo_apt_priority:
 zabbix_repo_deb_gpg_key_url: http://repo.zabbix.com/zabbix-official-repo.key
 zabbix_repo_deb_include_deb_src: true
+zabbix_repo_rasp_include_deb_src: true
 zabbix_repo_rpm_gpg_key_url: http://repo.zabbix.com/RPM-GPG-KEY-ZABBIX-08EFA7DD
 
 zabbix_repo_zypper_auto_import_keys: true
