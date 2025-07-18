@@ -35,7 +35,6 @@ provisioner:
     group_vars:
       all:
         ansible_connection: community.docker.docker
-        zabbix_repo_yum_gpg_check: 1
       v72:
         zabbix_server_version: 7.2
       v70:
