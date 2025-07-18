@@ -1,8 +1,8 @@
 ---
 - name: Include OS-specific variables
-  ansible.builtin.include_vars: "{{ ('Debian' if ansible_facts['lsb']['id'] in ['Debian', 'Ubuntu'] else ansible_facts['lsb']['id']) if ansible_facts['lsb']['id'] is defined else ansible_facts['os_family'] }}.yml"
+  ansible.builtin.include_vars: "{{ ansible_facts['os_family'] }}.yml"
   tags:
     - always
 
 - name: Install the correct repository
-  ansible.builtin.include_tasks: "{{ ('Debian' if ansible_facts['lsb']['id'] in ['Debian', 'Ubuntu'] else ansible_facts['lsb']['id']) if ansible_facts['lsb']['id'] is defined else ansible_facts['os_family'] }}.yml"
+  ansible.builtin.include_tasks: "{{ ansible_facts['os_family'] }}.yml"

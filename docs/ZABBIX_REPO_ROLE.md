@@ -61,10 +61,6 @@ Please be aware that this role only installs the repo itself.  It is generally u
 * `zabbix_repo_deb_gpg_key_url`: The URL to download the Zabbix GPG key from. Default `http://repo.zabbix.com/zabbix-official-repo.key`.
 * `zabbix_repo_deb_include_deb_src`: True, if deb-src should be included in the zabbix.sources entry. Default `true`.
 * `zabbix_repo_deb_url`: The URL to the Zabbix repository.  Default `http://repo.zabbix.com/zabbix/{{ zabbix_repo_version }}/{{ ansible_distribution.lower() }}`
-* `zabbix_repo_rasp_component`: The repository component for Debian installs. Default `main`.
-* `zabbix_repo_rasp_gpg_key_url`: The URL to download the Zabbix GPG key from. Default `http://repo.zabbix.com/zabbix-official-repo.key`.
-* `zabbix_repo_rasp_include_deb_src`: True, if deb-src should be included in the zabbix.sources entry. Default `true`.
-* `zabbix_repo_rasp_url`: The URL to the Zabbix repository.  Default `http://repo.zabbix.com/zabbix/{{ zabbix_repo_version }}/{{ ansible_distribution.lower() }}`
 * `zabbix_http_proxy`: Optional: HTTP proxy information.
 * `zabbix_https_proxy`: Optional: HTTPS proxy information.
 * `zabbix_repo_gpg_key`: Optional: The keyring path.  Default: `{{ debian_keyring_path }}zabbix-repo.asc`
