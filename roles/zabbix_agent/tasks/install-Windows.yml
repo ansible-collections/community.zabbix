@@ -21,11 +21,10 @@
     - name: Check if Zabbix Agent is present
       ansible.windows.win_powershell:
         script: >-
-          Get-WmiObject -Class Win32_Product |
-          Where-Object { $_.Name -like "*Zabbix Agent*" } |
-          Select-Object Name, IdentifyingNumber, InstallLocation, Version
+          Get-ItemProperty "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*" |
+          Where-Object { $_.DisplayName -like "*Zabbix Agent*" } |
+          Select-Object DisplayName, DisplayVersion, PSChildName
       register: _zabbix_agent_info
-      changed_when: _zabbix_agent_info.output | length > 0
 
     - name: Uninstall when versions mismatch
       vars:
@@ -35,17 +34,13 @@
           [CmdletBinding()]
           param (
               [String]
-              $IdentNumber
+              $appPSChildName
           )
 
-          $app = Get-WmiObject -Class Win32_Product | Where-Object { $_.IdentifyingNumber -eq $IdentNumber }
-
-          $result = $app.Uninstall()
-
-          exit $result.ReturnValue
+          Start-Process -FilePath "MsiExec.exe" -ArgumentList "/x$appPSChildName /quiet /norestart" -Wait
         parameters:
-          IdentNumber: "{{ item.IdentifyingNumber }}"
-      when: item.Version.split('.')[:3] | join('.') != zabbix_agent_version_long and _install_latest
+          appPSChildName: "{{ item.PSChildName }}"
+      when: item.DisplayVersion.split('.')[:3] | join('.') != zabbix_agent_version_long and _install_latest
       loop: "{{ _zabbix_agent_info.output }}"
       register: _zabbix_agent_uninstall_info
 
