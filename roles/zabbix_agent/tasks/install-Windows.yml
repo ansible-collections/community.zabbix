@@ -50,7 +50,7 @@
       register: _zabbix_agent_uninstall_info
 
     - name: Download and install Zabbix Agent
-      when: _zabbix_agent_info.output | length == 0 or _zabbix_agent_uninstall_info.changed | default(false)
+      when: _zabbix_agent_info.output | length == 0 or _zabbix_agent_uninstall_info is changed | default(false)
       block:
         - name: Get User Path
           ansible.windows.win_shell: "echo $env:USERPROFILE"
