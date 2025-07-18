@@ -22,7 +22,7 @@ zabbix_repo_yum:
     gpgcheck: "{{ zabbix_repo_yum_gpgcheck }}"
     gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-ZABBIX
     state: present
-zabbix_repo_apt_priority:
+zabbix_repo_apt_priority: 1001
 zabbix_repo_deb_gpg_key_url: "{{ zabbix_repo_deb_schema }}://repo.zabbix.com/zabbix-official-repo.key"
 zabbix_repo_deb_include_deb_src: true
 zabbix_repo_rpm_gpg_key_url: "{{ zabbix_repo_yum_schema }}://repo.zabbix.com/RPM-GPG-KEY-ZABBIX-08EFA7DD"

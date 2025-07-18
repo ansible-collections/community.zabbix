@@ -24,7 +24,6 @@
   ansible.builtin.include_role:
     name: community.zabbix.zabbix_repo
   vars:
-    zabbix_repo_apt_priority: "{{ zabbix_server_apt_priority | default (omit) }}"
     zabbix_repo_version: "{{ zabbix_server_version }}"
     zabbix_repo_package: "zabbix-server-{{ zabbix_server_database }}"
   when: zabbix_manage_repo | default(true)
