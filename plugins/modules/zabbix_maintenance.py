@@ -48,13 +48,9 @@ options:
         description:
             - Length of maintenance window in minutes.
             - Will default to 10 minutes if not explicitly set
-            - This argument has been B(depricated) and replaced by the I(time_periods) argument and will be removed in 4.0.0
+            - This argument has been B(DEPRECATED) and replaced by the I(time_periods) argument and will be removed in 4.0.0
             - B(Use of this argument only allows for the creation of a single one-time maintenance window.)
         type: int
-        deprecated:
-            version: "3.1.0"
-            why: Replaced by the time_periods argument.
-            alternative: time_periods
     name:
         description:
             - Unique name of maintenance window.
@@ -579,24 +575,24 @@ def parse_periods(module, time_periods, start_date):
         months = period['months']
 
         NULL_FIELDS = {
-            "once" : {
+            "once": {
                 "day_of_month": day_of_month,
                 "day_of_week": day_of_week,
                 "months": months,
                 "every": every
             },
-            "daily" : {
+            "daily": {
                 "day_of_month": day_of_month,
                 "day_of_week": day_of_week,
                 "months": months,
                 "start_date": start_date
             },
-            "weekly" : {
+            "weekly": {
                 "day_of_month": day_of_month,
                 "months": months,
                 "start_date": start_date
             },
-            "monthly" : {"start_date": start_date}
+            "monthly": {"start_date": start_date}
         }
 
         # Sanitize fields
