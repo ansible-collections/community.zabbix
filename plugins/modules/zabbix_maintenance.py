@@ -51,6 +51,10 @@ options:
             - This argument has been B(depricated) and replaced by the I(time_periods) argument and will be removed in 4.0.0
             - B(Use of this argument only allows for the creation of a single one-time maintenance window.)
         type: int
+        deprecated:
+            version: "3.1.0"
+            why: Replaced by the time_periods argument.
+            alternative: time_periods
     name:
         description:
             - Unique name of maintenance window.
@@ -666,12 +670,7 @@ def main():
                 elements="str"),
             minutes=dict(
                 type="int",
-                required=False,
-                deprecated=dict(
-                    version='3.1.0',
-                    removed=False,
-                    why='Replaced by the time_periods argument.',
-                    alternative='time_periods')),
+                required=False),
             host_groups=dict(
                 type="list",
                 required=False,
