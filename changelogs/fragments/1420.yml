@@ -1,0 +1,7 @@
+deprecated_features:
+  - zabbix_maintenance module - Depreicated `minutes` argument for `time_periods`
+bugfixes:
+  - zabbix_maintenance - Fixed a bug that caused start time to update across multiple runs
+minor_changes:
+  - zabbix_maintenance - Added support for recuring maintenance windows
+  - zabbix_maintenance - Added support for multiple outage periods within a single event
