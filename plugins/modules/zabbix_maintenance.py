@@ -20,7 +20,8 @@ requirements:
 options:
     state:
         description:
-            - Create or remove a maintenance window. Maintenance window to remove is identified by name.
+            - Create or remove a maintenance window.
+            - Maintenance window to remove is identified by name.
         default: present
         choices: [ "present", "absent" ]
         type: str
@@ -46,7 +47,9 @@ options:
     minutes:
         description:
             - Length of maintenance window in minutes.
-        default: 10
+            - Will default to 10 minutes if not explicitly set
+            - This argument has been B(DEPRECATED) and replaced by the I(time_periods) argument and will be removed in 4.0.0
+            - B(Use of this argument only allows for the creation of a single one-time maintenance window.)
         type: int
     name:
         description:
@@ -56,6 +59,7 @@ options:
     desc:
         description:
             - Short description of maintenance window.
+        aliases: [ "description" ]
         default: Created by Ansible
         type: str
     collect_data:
@@ -73,14 +77,16 @@ options:
         description:
             - Time when the maintenance becomes active.
             - The given value will be rounded down to minutes.
-            - Uses `datetime.datetime.now(`) if not specified.
+            - Uses `datetime.datetime.now() if not specified.
+            - NOTE - This time will not update across multiple runs unless explicitly set.
         type: "str"
         default: ""
     active_till:
         description:
             - Time when the maintenance stops being active.
             - The given value will be rounded down to minutes.
-            - Gets calculated from I(minutes) if not specified.
+            - Gets calculated from I(minutes) if not specified when using I(minutes) only.
+            - When using I(time_periods) defaults to one year from I(active_since)
         type: "str"
         default: ""
     tags:
@@ -108,6 +114,63 @@ options:
                     - 2 - Contains
                 type: int
                 default: 2
+    time_periods:
+        description:
+            - List scheduled outages within the maintenance period.
+            - This argument replaces the I(minutes) argument.
+        aliases: [ "time_period" ]
+        type: list
+        elements: dict
+        suboptions:
+            frequency:
+                description:
+                    - The frequency that this maintenance window will occur.
+                type: str
+                required: true
+                choices: ['once', 'daily', 'weekly', 'monthly']
+            duration:
+                description:
+                    - The duration of this maintenance window in minutes.
+                type: int
+                default: 10
+            start_date:
+                description:
+                    - The date that the outage will occur on.
+                    - for a I(frequency) of I(once) only.
+                    - Uses `datetime.date.today() if not specified.
+                type: str
+            start_time:
+                description:
+                    - The time that this outage will start on.
+                    - Times should be entered in the HH:MM format using a 24-hour clock
+                type: str
+                required: true
+            every:
+                description:
+                    - The interval between each event.
+                    - For a I(frequency) of I(daily) or I(weekly) this must be an B(integer).
+                    - For example when I(frequency=daily) and I(every=2) the outage would occur every other day.
+                    - For I'(frequency=monthly) with I(day_of_week) set, valid options include I(first), I(second), I(third), I(forth), I(last) (week)
+                type: str
+            day_of_week:
+                description:
+                    - The day of the week the maintenance window will occur.
+                    - This argument is B(required) if I(frequency=weekly).
+                    - This argument is B(required) if I(frequency=monthly) when I(day_of_month) is not set.
+                type: list
+                elements: str
+            day_of_month:
+                description:
+                    - The day of the month the maintenance window will occur.
+                    - This argument is B(required) if I(frequency=monthly) when I(day_of_week) is not set.
+                type: int
+            months:
+                description:
+                    - The months that the maintenance window will occur.
+                    - This argument is B(required) when the I(frequency=monthly)
+                aliases: [ "month" ]
+                type: list
+                elements: str
 
 extends_documentation_fragment:
 - community.zabbix.zabbix
@@ -148,9 +211,13 @@ EXAMPLES = r"""
     name: Update of www1
     host_name: www1.example.com
     state: present
-    minutes: 90
+    time_periods:
+      - frequency: once
+        duration: 90
+        start_date: 2025-01-01
+        start_time: 17:00
 
-- name: Create a named maintenance window for host www1 and host groups Office and Dev
+- name: Create a  maintenance window that occurs every other day for host www1 and host groups Office and Dev
   # set task level variables as we change ansible_connection plugin here
   vars:
     ansible_network_os: community.zabbix.zabbix
@@ -174,8 +241,12 @@ EXAMPLES = r"""
       - tag: ExampleHostsTag3
         value: ExampleTagValue
         operator: 0
+    time_periods:
+      - frequency: daily
+        start_time: 17:00
+        every: 2
 
-- name: Create a named maintenance window for hosts www1 and db1, without data collection.
+- name: Create a monthly (on the second Monday of the month) maintenance window for hosts www1 and db1, without data collection.
   # set task level variables as we change ansible_connection plugin here
   vars:
     ansible_network_os: community.zabbix.zabbix
@@ -192,6 +263,11 @@ EXAMPLES = r"""
       - db1.example.com
     state: present
     collect_data: false
+    time_periods:
+      - frequency: monthly
+        start_time: 17:00
+        day_of_week: Monday
+        every: second
 
 - name: Remove maintenance window by name
   # set task level variables as we change ansible_connection plugin here
@@ -207,7 +283,7 @@ EXAMPLES = r"""
     name: Test1
     state: absent
 
-- name: Create maintenance window by date
+- name: Create maintenance window by date.  Window will occur on the 1st of January, April, July, and October
   # set task level variables as we change ansible_connection plugin here
   vars:
     ansible_network_os: community.zabbix.zabbix
@@ -224,22 +300,29 @@ EXAMPLES = r"""
       - host.example.org
     active_since: "1979-09-19 09:00"
     active_till: "1979-09-19 17:00"
+    time_periods:
+      - frequency: monthly
+        months:
+          - January
+          - April
+          - July
+          - October
+        day_of_month: 1
+        start_time: 17:00
 """
 
 import datetime
 import time
 
 from ansible.module_utils.basic import AnsibleModule
-
 from ansible_collections.community.zabbix.plugins.module_utils.base import ZabbixBase
 import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabbix_utils
 from ansible.module_utils.compat.version import LooseVersion
 
 
 class MaintenanceModule(ZabbixBase):
-    def create_maintenance(self, group_ids, host_ids, start_time,
-                           maintenance_type, period, name, desc, tags):
-        end_time = start_time + period
+    def create_maintenance(self, group_ids, host_ids, start_time, end_time,
+                           maintenance_type, time_periods, name, desc, tags):
         parameters = {
             "groups": [{"groupid": groupid} for groupid in group_ids],
             "hosts": [{"hostid": hostid} for hostid in host_ids],
@@ -248,11 +331,7 @@ class MaintenanceModule(ZabbixBase):
             "active_since": str(start_time),
             "active_till": str(end_time),
             "description": desc,
-            "timeperiods": [{
-                "timeperiod_type": "0",
-                "start_date": str(start_time),
-                "period": str(period),
-            }]
+            "timeperiods": time_periods
         }
         if LooseVersion(self._zbx_api_version) < LooseVersion("7.0"):
             parameters["groupids"] = group_ids
@@ -265,8 +344,7 @@ class MaintenanceModule(ZabbixBase):
         return 0, None, None
 
     def update_maintenance(self, maintenance_id, group_ids, host_ids,
-                           start_time, maintenance_type, period, desc, tags):
-        end_time = start_time + period
+                           start_time, end_time, maintenance_type, time_periods, desc, tags):
         parameters = {
             "maintenanceid": maintenance_id,
             "groups": [{"groupid": groupid} for groupid in group_ids],
@@ -275,11 +353,7 @@ class MaintenanceModule(ZabbixBase):
             "active_since": str(start_time),
             "active_till": str(end_time),
             "description": desc,
-            "timeperiods": [{
-                "timeperiod_type": "0",
-                "start_date": str(start_time),
-                "period": str(period),
-            }]
+            "timeperiods": time_periods
         }
         if LooseVersion(self._zbx_api_version) < LooseVersion("7.0"):
             parameters["groupids"] = group_ids
@@ -294,9 +368,11 @@ class MaintenanceModule(ZabbixBase):
     def get_maintenance(self, name):
         parameters = {
             "filter": {"name": name},
+            "output": "extend",
             "selectHostGroups": "extend",
             "selectHosts": "extend",
             "selectTags": "extend",
+            "selectTimeperiods": "extend"
         }
         if LooseVersion(self._zbx_api_version) < LooseVersion("7.0"):
             parameters["selectGroups"] = parameters["selectHostGroups"]
@@ -304,15 +380,35 @@ class MaintenanceModule(ZabbixBase):
         maintenances = self._zapi.maintenance.get(parameters)
 
         for maintenance in maintenances:
-            maintenance["groupids"] = [group["groupid"] for group
-                                       in maintenance["hostgroups"]] if "hostgroups" in maintenance else []
-            if LooseVersion(self._zbx_api_version) < LooseVersion("7.0"):
-                maintenance["groupids"] = [group["groupid"] for group
-                                           in maintenance["groups"]] if "groups" in maintenance else []
-            maintenance["hostids"] = [host["hostid"] for host
-                                      in maintenance["hosts"]] if "hosts" in maintenance else []
-            return 0, maintenance, None
+            groupids = []
+            if "hostgroups" in maintenance:
+                groups = maintenance["hostgroups"]
+                maintenance.pop("hostgroups")
+            elif "groups" in maintenance:
+                groups = maintenance["groups"]
 
+            if groups:
+                for group in groups:
+                    groupids.append(group["groupid"])
+            maintenance["groups"] = groupids
+
+            if "hosts" in maintenance:
+                hostids = []
+                for host in maintenance["hosts"]:
+                    hostids.append(host["hostid"])
+            maintenance["hosts"] = hostids
+
+            timeperiods = []
+            for period in maintenance["timeperiods"]:
+                if period["timeperiod_type"] in ["0", "2"]:
+                    for f in ["day", "dayofweek", "month"]:
+                        if f in period.keys():
+                            period.pop(f)
+                if period["timeperiod_type"] == "0" and "every" in period.keys():
+                    period.pop("every")
+                timeperiods.append(period)
+            maintenance["timeperiods"] = timeperiods
+            return 0, maintenance, None
         return 0, None, None
 
     def delete_maintenance(self, maintenance_id):
@@ -359,19 +455,19 @@ class MaintenanceModule(ZabbixBase):
 
         return 0, host_ids, None
 
-    def check_maint_properties(self, maintenance, group_ids, host_ids, maintenance_type,
-                               start_time, period, desc, tags):
-        if sorted(group_ids) != sorted(maintenance["groupids"]):
+    def check_maint_properties(self, maintenance, groups, hosts, start_time,
+                               end_time, maintenance_type, time_periods, desc, tags):
+        if sorted(groups) != sorted(maintenance["groups"]):
             return True
-        if sorted(host_ids) != sorted(maintenance["hostids"]):
-            return True
-        if str(maintenance_type) != maintenance["maintenance_type"]:
+        if sorted(hosts) != sorted(maintenance["hosts"]):
             return True
         if str(int(start_time)) != maintenance["active_since"]:
             return True
-        if str(int(start_time + period)) != maintenance["active_till"]:
+        if str(int(end_time)) != maintenance["active_till"]:
             return True
         if str(desc) != maintenance["description"]:
+            return True
+        if str(maintenance_type) != maintenance["maintenance_type"]:
             return True
         if tags is not None and "tags" in maintenance:
             s1 = sorted(tags, key=lambda k: (k["tag"], k.get("value", "")))
@@ -385,42 +481,246 @@ class MaintenanceModule(ZabbixBase):
                         if str(item[k]) != str(comp[k]):
                             return True
 
+        if len(zabbix_utils.helper_compare_lists(time_periods, maintenance["timeperiods"], [])) > 0:
+            return True
+
+
+def parse_days_of_week(module, days_of_week):
+    DAYS = {
+        "Monday": 1,
+        "Tuesday": 2,
+        "Wednesday": 4,
+        "Thursday": 8,
+        "Friday": 16,
+        "Saturday": 32,
+        "Sunday": 64
+    }
+
+    if len(days_of_week) < 1:
+        module.fail_json(msg="The 'days_of_week' argument must be set.")
+
+    total = 0
+
+    try:
+        for day in days_of_week:
+            total += DAYS[day]
+    except KeyError:
+        module.fail_json(msg=f"{day} is not a valid value for the The 'days_of_week' argument.")
+    return total
+
+
+def parse_week_of_month(module, every):
+    EVERY = {
+        "first": 1,
+        "second": 2,
+        "third": 3,
+        "fourth": 4
+    }
+
+    if every in EVERY.keys():
+        return EVERY[every]
+    else:
+        module.fail_json(msg="The value in 'every' is not valid")
+
+
+def parse_months(module, months):
+    MONTHS = {
+        "January": 1,
+        "February": 2,
+        "March": 4,
+        "April": 8,
+        "May": 16,
+        "June": 32,
+        "July": 64,
+        "August": 128,
+        "September": 256,
+        "October": 512,
+        "November": 1024,
+        "December": 2048
+    }
+
+    if months is None:
+        return 4095
+    elif len(months) < 1:
+        module.fail_json(msg="The 'months' argument may not be an empty list.")
+
+    total = 0
+
+    try:
+        for month in months:
+            total += MONTHS[month]
+    except KeyError:
+        module.fail_json(msg=f"{month} is not a valid value for the the 'month' argument.")
+    return total
+
+
+def parse_periods(module, time_periods, start_date):
+    PERIODS = {
+        "once": 0,
+        "daily": 2,
+        "weekly": 3,
+        "monthly": 4
+    }
+    items = []
+
+    for period in time_periods:
+        this_period = {}
+        frequeny = period['frequency']
+        duration = period['duration'] * 60
+        start_date = period['start_date']
+        start_time = period['start_time']
+        every = period['every']
+        day_of_week = period['day_of_week']
+        day_of_month = period['day_of_month']
+        months = period['months']
+
+        NULL_FIELDS = {
+            "once": {
+                "day_of_month": day_of_month,
+                "day_of_week": day_of_week,
+                "months": months,
+                "every": every
+            },
+            "daily": {
+                "day_of_month": day_of_month,
+                "day_of_week": day_of_week,
+                "months": months,
+                "start_date": start_date
+            },
+            "weekly": {
+                "day_of_month": day_of_month,
+                "months": months,
+                "start_date": start_date
+            },
+            "monthly": {"start_date": start_date}
+        }
+
+        # Sanitize fields
+        null_fields = NULL_FIELDS[frequeny]
+        for f in null_fields.keys():
+            if null_fields[f]:
+                module.fail_json(msg=f"The field '{f}' may not be set for a '{frequeny}' of 'once'")
+
+        # Parse start_date/time fields
+        if frequeny == "once":
+            start_date = start_date + " " + start_time
+            start_date = datetime.datetime.fromisoformat(start_date)
+            start_date = int(time.mktime(start_date.timetuple()))
+            start_date = (start_date // 60) * 60
+            this_period['start_date'] = str(start_date)
+        else:
+            start_time = datetime.time.fromisoformat(start_time)
+            start_time = ((start_time.hour * 60) + start_time.minute) * 60
+            this_period['start_time'] = str(start_time)
+
+        # Parse Every and Day of Week
+        if frequeny in ["daily", "weekly"]:
+            try:
+                every = int(every)
+            except ValueError:
+                module.fail_json(msg=f"The value '{every}' is not valid for the 'every' argument.")
+            if every >= 1:
+                this_period['every'] = str(every)
+            else:
+                module.fail_json(msg="The 'every' argument must be a posative number.")
+
+        if frequeny == "weekly":
+            day_of_week = parse_days_of_week(module, day_of_week)
+            this_period["dayofweek"] = str(day_of_week)
+        elif frequeny == "monthly":
+            if day_of_month and day_of_week:
+                module.fail_json(msg="The 'day_of_week' argument may not be used with the 'day_of_month' argument.")
+
+            if day_of_week:
+                day_of_week = parse_days_of_week(module, day_of_week)
+                this_period['dayofweek'] = str(day_of_week)
+                this_period['every'] = str(parse_week_of_month(module, every))
+            else:
+                if not 1 <= day_of_month <= 31:
+                    module.fail_json(msg=f"The value '{str(day_of_month)}' in the 'day_of_month' argument is not valid.")
+                else:
+                    this_period['day'] = str(day_of_month)
+
+            this_period["month"] = str(parse_months(module, months))
+
+        this_period["timeperiod_type"] = str(PERIODS[frequeny])
+        this_period["period"] = str(duration)
+        items.append(this_period)
+    return items
+
 
 def main():
     argument_spec = zabbix_utils.zabbix_common_argument_spec()
-    argument_spec.update(dict(
-        state=dict(type="str", required=False, default="present",
-                   choices=["present", "absent"]),
-        host_names=dict(type="list", required=False,
-                        default=None, aliases=["host_name"], elements="str"),
-        minutes=dict(type="int", required=False, default=10),
-        host_groups=dict(type="list", required=False,
-                         default=None, aliases=["host_group"], elements="str"),
-        append=dict(type="bool", required=False, default=False),
-        name=dict(type="str", required=True),
-        desc=dict(type="str", required=False, default="Created by Ansible"),
-        collect_data=dict(type="bool", required=False, default=True),
-        visible_name=dict(type="bool", required=False, default=True),
-        active_since=dict(type="str", required=False, default=""),
-        active_till=dict(type="str", required=False, default=""),
-        tags=dict(
-            type="list",
-            elements="dict",
-            required=False,
-            options=dict(
-                tag=dict(type="str", required=True),
-                operator=dict(type="int", default=2),
-                value=dict(type="str", default="")
+    argument_spec.update(
+        dict(
+            state=dict(
+                type="str",
+                required=False,
+                default="present",
+                choices=["present", "absent"]),
+            host_names=dict(
+                type="list",
+                required=False,
+                default=None,
+                aliases=["host_name"],
+                elements="str"),
+            minutes=dict(
+                type="int",
+                required=False),
+            host_groups=dict(
+                type="list",
+                required=False,
+                default=None,
+                aliases=["host_group"],
+                elements="str"),
+            append=dict(type="bool", required=False, default=False),
+            name=dict(type="str", required=True),
+            desc=dict(type="str", required=False, default="Created by Ansible", aliases=["description"]),
+            collect_data=dict(type="bool", required=False, default=True),
+            visible_name=dict(type="bool", required=False, default=True),
+            active_since=dict(type="str", required=False, default=""),
+            active_till=dict(type="str", required=False, default=""),
+            tags=dict(
+                type="list",
+                elements="dict",
+                required=False,
+                options=dict(
+                    tag=dict(type="str", required=True),
+                    operator=dict(type="int", default=2),
+                    value=dict(type="str", default="")
+                )
+            ),
+            time_periods=dict(
+                type="list",
+                elements="dict",
+                required=False,
+                aliases=['time_period'],
+                options=dict(
+                    frequency=dict(
+                        type="str",
+                        required=True,
+                        choices=['once', 'daily', 'weekly', 'monthly']
+                    ),
+                    duration=dict(type="int", default=10),
+                    start_date=dict(type="str"),
+                    start_time=dict(type="str", required=True),
+                    every=dict(type="str"),
+                    day_of_week=dict(type="list", elements="str"),
+                    day_of_month=dict(type="int"),
+                    months=dict(type="list", elements="str", aliases=["month"])
+                )
             )
         )
-    ))
+    )
+    mutually_exclusive = [("minutes", "time_periods")]
+
     module = AnsibleModule(
         argument_spec=argument_spec,
+        mutually_exclusive=mutually_exclusive,
         supports_check_mode=True
     )
 
     maint = MaintenanceModule(module)
-
     host_names = module.params["host_names"]
     host_groups = module.params["host_groups"]
     append = module.params["append"]
@@ -433,6 +733,12 @@ def main():
     active_since = module.params["active_since"]
     active_till = module.params["active_till"]
     tags = module.params["tags"]
+    time_periods = module.params["time_periods"]
+
+    # Set Default for minutes if needed
+    if not time_periods:
+        minutes = minutes if minutes else 10
+        module.params["minutes"] = minutes
 
     if collect_data:
         maintenance_type = 0
@@ -452,10 +758,6 @@ def main():
         if not host_names and not host_groups:
             module.fail_json(
                 msg="At least one host_name or host_group must be defined for each created maintenance.")
-
-        now = datetime.datetime.fromisoformat(active_since) if active_since != "" else datetime.datetime.now().replace(second=0)
-        start_time = int(time.mktime(now.timetuple()))
-        period = int((datetime.datetime.fromisoformat(active_till) - now).total_seconds()) if active_till != "" else 60 * int(minutes)  # N * 60 seconds
 
         if host_groups:
             (rc, group_ids, error) = maint.get_group_ids(host_groups)
@@ -477,37 +779,74 @@ def main():
                 msg="Failed to check maintenance %s existence: %s" % (name, error))
 
         if maintenance:
-            if append:
-                group_ids = list(set(group_ids + maintenance["groupids"]))
-                host_ids = list(set(host_ids + maintenance["hostids"]))
+            if active_since == "":
+                start_time = maintenance['active_since']
+            else:
+                start_time = datetime.datetime.fromisoformat(active_since)
+                start_time = int(time.mktime(start_time.timetuple()))
 
-            if maint.check_maint_properties(maintenance, group_ids, host_ids, maintenance_type,
-                                            start_time, period, desc, tags):
+            if active_till == "":
+                if minutes:
+                    end_time = int(start_time) + (minutes * 60)
+                else:
+                    end_time = maintenance['active_till']
+            else:
+                end_time = datetime.datetime.fromisoformat(active_till)
+                end_time = int(time.mktime(end_time.timetuple()))
+        else:
+            start_time = datetime.datetime.fromisoformat(active_since) if active_since != "" else datetime.datetime.now().replace(second=0)
+            start_time = int(time.mktime(start_time.timetuple()))
+
+            # Set End Time
+            if active_till:
+                end_time = datetime.datetime.fromisoformat(active_till)
+                end_time = int(time.mktime(end_time.timetuple()))
+            elif minutes:
+                end_time = start_time + (minutes * 60)
+            else:
+                end_time = start_time + (60 * 60 * 24 * 365)
+
+        # Logic for backwards compatability.  Remove with 4.0.0
+        if minutes:
+            if time_periods:
+                module.fail_json(msg="The 'time_periods' artibute cannot be set with the 'minutes' attribute.")
+            time_periods = [{
+                "timeperiod_type": "0",
+                "start_date": str(start_time),
+                "period": str((minutes * 60))
+            }]
+        else:
+            time_periods = parse_periods(module, time_periods, active_since)
+
+        if maintenance:
+            if append:
+                group_ids = list(set(group_ids + maintenance["groups"]))
+                host_ids = list(set(host_ids + maintenance["hosts"]))
+
+            if maint.check_maint_properties(maintenance, group_ids, host_ids, start_time, end_time, maintenance_type, time_periods, desc, tags):
                 if module.check_mode:
                     changed = True
                 else:
                     (rc, data, error) = maint.update_maintenance(
-                        maintenance["maintenanceid"], group_ids, host_ids, start_time, maintenance_type, period, desc, tags)
+                        maintenance["maintenanceid"], group_ids, host_ids, start_time, end_time, maintenance_type, time_periods, desc, tags)
                     if rc == 0:
                         changed = True
                     else:
                         module.fail_json(
                             msg="Failed to update maintenance: %s" % error)
-
-        if not maintenance:
+        else:
             if module.check_mode:
                 changed = True
             else:
                 (rc, data, error) = maint.create_maintenance(
-                    group_ids, host_ids, start_time, maintenance_type, period, name, desc, tags)
+                    group_ids, host_ids, start_time, end_time, maintenance_type, time_periods, name, desc, tags)
                 if rc == 0:
                     changed = True
                 else:
                     module.fail_json(
                         msg="Failed to create maintenance: %s" % error)
-
-    if state == "absent":
-
+    # Absent
+    else:
         (rc, maintenance, error) = maint.get_maintenance(name)
         if rc != 0:
             module.fail_json(
