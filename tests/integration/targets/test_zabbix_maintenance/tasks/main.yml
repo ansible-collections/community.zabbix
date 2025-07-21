@@ -1,4 +1,3 @@
----
 # New host create test from here
 - name: "test - Create a new host"
   community.zabbix.zabbix_host:
@@ -14,11 +13,7 @@
         port: 10050
   register: create_host_result
 
-- ansible.builtin.assert:
-    that:
-      - create_host_result.changed is sameas true
-
-- name: "test - Create maintenance with a host_name param"
+- name: "test - Create maintenance with a host_name param (minutes and time_groups not set)"
   community.zabbix.zabbix_maintenance:
     name: maintenance
     host_name: example
@@ -29,21 +24,6 @@
     that:
       - create_maintenance_host_name_result.changed is sameas true
 
-# This check doesn't modify maintenace object and thus will be changed=false unless there are hosts without visible name defined
-- name: "test - Create maintenance with a host_name param and disabled visible_name"
-  community.zabbix.zabbix_maintenance:
-    name: maintenance
-    host_name: example
-    visible_name: false
-    state: present
-  register: create_maintenance_host_name_result
-
-# BUGGED: sometimes when test "lags" and some time passes since previous tasks,
-# maintenance_start will not match and be updated, thus resulting in changed
-# - ansible.builtin.assert:
-#     that:
-#       - create_maintenance_host_name_result.changed is sameas false
-
 - name: "test - Create maintenance with a host_name param(again - expectations: false change will occur)"
   community.zabbix.zabbix_maintenance:
     name: maintenance
@@ -51,11 +31,9 @@
     state: present
   register: create_maintenance_host_name_again_result
 
-# BUGGED: sometimes when test "lags" and some time passes since previous tasks,
-# maintenance_start will not match and be updated, thus resulting in changed
-# - ansible.builtin.assert:
-#     that:
-#       - create_maintenance_host_name_again_result.changed is sameas false
+- ansible.builtin.assert:
+    that:
+      - create_maintenance_host_name_again_result.changed is sameas false
 
 - name: "test - Update maintenance with a desc param"
   community.zabbix.zabbix_maintenance:
@@ -64,8 +42,6 @@
     desc: "test description"
     state: present
   register: update_maintenance_desc_result
-
-- debug: msg="{{ update_maintenance_desc_result }}"
 
 - ansible.builtin.assert:
     that:
@@ -79,11 +55,9 @@
     state: present
   register: update_maintenance_desc_again_result
 
-# BUGGED: sometimes when test "lags" and some time passes since previous tasks,
-# maintenance_start will not match and be updated, thus resulting in changed
-# - ansible.builtin.assert:
-#     that:
-#       - update_maintenance_desc_again_result.changed is sameas false
+- ansible.builtin.assert:
+    that:
+      - update_maintenance_desc_again_result.changed is sameas false
 
 - name: "test - Update maintenance with a collect_data"
   community.zabbix.zabbix_maintenance:
@@ -107,11 +81,9 @@
     state: present
   register: update_maintenance_collect_data_again_result
 
-# BUGGED: sometimes when test "lags" and some time passes since previous tasks,
-# maintenance_start will not match and be updated, thus resulting in changed
-# - ansible.builtin.assert:
-#     that:
-#       - update_maintenance_collect_data_again_result.changed is sameas false
+- ansible.builtin.assert:
+    that:
+      - update_maintenance_collect_data_again_result.changed is sameas false
 
 - name: "test - Update maintenance with a minutes param"
   community.zabbix.zabbix_maintenance:
@@ -137,11 +109,9 @@
     state: present
   register: update_maintenance_minutes_again_result
 
-# BUGGED: sometimes when test "lags" and some time passes since previous tasks,
-# maintenance_start will not match and be updated, thus resulting in changed
-# - ansible.builtin.assert:
-#     that:
-#       - update_maintenance_minutes_again_result.changed is sameas false
+- ansible.builtin.assert:
+    that:
+      - update_maintenance_minutes_again_result.changed is sameas false
 
 - name: "test - Update maintenance with a host_groups param"
   community.zabbix.zabbix_maintenance:
@@ -173,11 +143,9 @@
     state: present
   register: update_maintenance_host_groups_again_result
 
-# BUGGED: sometimes when test "lags" and some time passes since previous tasks,
-# maintenance_start will not match and be updated, thus resulting in changed
-# - ansible.builtin.assert:
-#     that:
-#       - update_maintenance_host_groups_again_result.changed is sameas false
+- ansible.builtin.assert:
+    that:
+      - update_maintenance_host_groups_again_result.changed is sameas false
 
 - name: "test - Update maintenance with change host_name to host_names param"
   community.zabbix.zabbix_maintenance:
@@ -213,11 +181,9 @@
     state: present
   register: update_maintenance_host_names_again_result
 
-# BUGGED: sometimes when test "lags" and some time passes since previous tasks,
-# maintenance_start will not match and be updated, thus resulting in changed
-# - ansible.builtin.assert:
-#     that:
-#       - update_maintenance_host_names_again_result.changed is sameas false
+- ansible.builtin.assert:
+    that:
+      - update_maintenance_host_names_again_result.changed is sameas false
 
 - name: "test - Update maintenance with tags"
   community.zabbix.zabbix_maintenance:
@@ -267,11 +233,9 @@
         value: ExampleTagValue
   register: update_maintenance_host_tags
 
-# BUGGED: sometimes when test "lags" and some time passes since previous tasks,
-# maintenance_start will not match and be updated, thus resulting in changed
-# - ansible.builtin.assert:
-#    that:
-#      - update_maintenance_host_tags.changed is sameas false
+- ansible.builtin.assert:
+    that:
+      - update_maintenance_host_tags.changed is sameas false
 
 - name: "test - Create maintenance with an active_since param"
   community.zabbix.zabbix_maintenance:
@@ -380,6 +344,369 @@
 - ansible.builtin.assert:
     that:
       - delete_maintenance_again_result.changed is sameas false
+
+- name: "test - Create maintenance event using time_periods - once"
+  community.zabbix.zabbix_maintenance:
+    name: maintenance
+    host_name: example
+    desc: "test description"
+    state: present
+    time_periods:
+      - frequency: once
+        start_date: "2025-01-01"
+        start_time: "17:01"
+  register: create_maintenance_tp_once
+
+- ansible.builtin.assert:
+    that:
+      - create_maintenance_tp_once.changed is sameas true
+
+- name: "test - Create maintenance event using time_periods - once (no change)"
+  community.zabbix.zabbix_maintenance:
+    name: maintenance
+    host_name: example
+    desc: "test description"
+    state: present
+    time_periods:
+      - frequency: once
+        start_date: "2025-01-01"
+        start_time: "17:01"
+  register: create_maintenance_tp_once_again
+
+- ansible.builtin.assert:
+    that:
+      - create_maintenance_tp_once_again.changed is sameas false
+
+- name: "test - Create maintenance event using time_periods - once (update date)"
+  community.zabbix.zabbix_maintenance:
+    name: maintenance
+    host_name: example
+    desc: "test description"
+    state: present
+    time_periods:
+      - frequency: once
+        start_date: "2023-01-01"
+        start_time: "17:01"
+  register: create_maintenance_tp_once_update_date
+
+- ansible.builtin.assert:
+    that:
+      - create_maintenance_tp_once_update_date.changed is sameas true
+
+
+- name: "test - Create maintenance event using time_periods - daily"
+  community.zabbix.zabbix_maintenance:
+    name: maintenance
+    host_name: example
+    desc: "test description"
+    state: present
+    time_periods:
+      - frequency: daily
+        start_time: "18:01"
+        duration: 18
+        every: 1
+  register: create_maintenance_tp_daily
+
+- ansible.builtin.assert:
+    that:
+      - create_maintenance_tp_daily.changed is sameas true
+
+- name: "test - Create maintenance event using time_periods - once (no change)"
+  community.zabbix.zabbix_maintenance:
+    name: maintenance
+    host_name: example
+    desc: "test description"
+    state: present
+    time_periods:
+      - frequency: daily
+        start_time: "18:01"
+        duration: 18
+        every: 1
+  register: create_maintenance_tp_daily_again
+
+- ansible.builtin.assert:
+    that:
+      - create_maintenance_tp_daily_again.changed is sameas false
+
+- name: "test - Create maintenance event using time_periods - Update duration"
+  community.zabbix.zabbix_maintenance:
+    name: maintenance
+    host_name: example
+    desc: "test description"
+    state: present
+    time_periods:
+      - frequency: daily
+        start_time: "18:01"
+        duration: 19
+        every: 1
+  register: create_maintenance_tp_daily_update_duration
+
+- ansible.builtin.assert:
+    that:
+      - create_maintenance_tp_daily_update_duration.changed is sameas true
+
+- name: "test - Create maintenance event using time_periods - Update start_time"
+  community.zabbix.zabbix_maintenance:
+    name: maintenance
+    host_name: example
+    desc: "test description"
+    state: present
+    time_periods:
+      - frequency: daily
+        start_time: "19:01"
+        duration: 19
+        every: 1
+  register: create_maintenance_tp_daily_update_start_time
+
+- ansible.builtin.assert:
+    that:
+      - create_maintenance_tp_daily_update_start_time.changed is sameas true
+
+- name: "test - Create maintenance event using time_periods - Weekly"
+  community.zabbix.zabbix_maintenance:
+    name: maintenance
+    host_name: example
+    desc: "test description"
+    state: present
+    time_periods:
+      - frequency: weekly
+        start_time: "19:01"
+        duration: 19
+        every: 2
+        day_of_week: ["Monday"]
+  register: create_maintenance_tp_weekly
+
+- ansible.builtin.assert:
+    that:
+      - create_maintenance_tp_weekly.changed is sameas true
+
+- name: "test - Create maintenance event using time_periods - Weekly (No Change)"
+  community.zabbix.zabbix_maintenance:
+    name: maintenance
+    host_name: example
+    desc: "test description"
+    state: present
+    time_periods:
+      - frequency: weekly
+        start_time: "19:01"
+        duration: 19
+        every: 2
+        day_of_week: ["Monday"]
+  register: create_maintenance_tp_weekly_again
+
+- ansible.builtin.assert:
+    that:
+      - create_maintenance_tp_weekly_again.changed is sameas false
+
+- name: "test - Create maintenance event using time_periods - Weekly (Update Days)"
+  community.zabbix.zabbix_maintenance:
+    name: maintenance
+    host_name: example
+    desc: "test description"
+    state: present
+    time_periods:
+      - frequency: weekly
+        start_time: "19:01"
+        duration: 19
+        every: 2
+        day_of_week: ["Monday", "Friday"]
+  register: create_maintenance_tp_weekly_update_days
+
+- ansible.builtin.assert:
+    that:
+      - create_maintenance_tp_weekly_update_days.changed is sameas true
+
+- name: "test - Create maintenance event using time_periods - Monthly - Day of Month - No Month Listed"
+  community.zabbix.zabbix_maintenance:
+    name: maintenance
+    host_name: example
+    desc: "test description"
+    state: present
+    time_periods:
+      - frequency: monthly
+        start_time: "19:01"
+        duration: 19
+        every: 2
+        day_of_month: 5
+  register: create_maintenance_tp_monthly_day_of_month
+
+- ansible.builtin.assert:
+    that:
+      - create_maintenance_tp_monthly_day_of_month.changed is sameas true
+
+- name: "test - Create maintenance event using time_periods - Monthly - Day of Month - No Month Listed - Again (No Change)"
+  community.zabbix.zabbix_maintenance:
+    name: maintenance
+    host_name: example
+    desc: "test description"
+    state: present
+    time_periods:
+      - frequency: monthly
+        start_time: "19:01"
+        duration: 19
+        every: 2
+        day_of_month: 5
+  register: create_maintenance_tp_monthly_day_of_month_again
+
+- ansible.builtin.assert:
+    that:
+      - create_maintenance_tp_monthly_day_of_month_again.changed is sameas false
+
+- name: "test - Create maintenance event using time_periods - Monthly - Day of Month - Month Listed"
+  community.zabbix.zabbix_maintenance:
+    name: maintenance
+    host_name: example
+    desc: "test description"
+    state: present
+    time_periods:
+      - frequency: monthly
+        start_time: "19:01"
+        duration: 19
+        every: 2
+        day_of_month: 5
+        months: ["January", "December"]
+  register: create_maintenance_tp_monthly_day_of_month
+
+- ansible.builtin.assert:
+    that:
+      - create_maintenance_tp_monthly_day_of_month.changed is sameas true
+
+- name: "test - Create maintenance event using time_periods - Monthly - Day of Month - Month Listed - Again (No Change)"
+  community.zabbix.zabbix_maintenance:
+    name: maintenance
+    host_name: example
+    desc: "test description"
+    state: present
+    time_periods:
+      - frequency: monthly
+        start_time: "19:01"
+        duration: 19
+        every: 2
+        day_of_month: 5
+        months: ["January", "December"]
+  register: create_maintenance_tp_monthly_day_of_month_again
+
+- ansible.builtin.assert:
+    that:
+      - create_maintenance_tp_monthly_day_of_month_again.changed is sameas false
+
+- name: "test - Create maintenance event using time_periods - Monthly - Update Day of Month"
+  community.zabbix.zabbix_maintenance:
+    name: maintenance
+    host_name: example
+    desc: "test description"
+    state: present
+    time_periods:
+      - frequency: monthly
+        start_time: "19:01"
+        duration: 19
+        every: 2
+        day_of_month: 6
+  register: create_maintenance_tp_monthly_day_of_month_update
+
+- ansible.builtin.assert:
+    that:
+      - create_maintenance_tp_monthly_day_of_month_update.changed is sameas true
+
+- name: "test - Create maintenance event using time_periods - Monthly - Day of Week"
+  community.zabbix.zabbix_maintenance:
+    name: maintenance
+    host_name: example
+    desc: "test description"
+    state: present
+    time_periods:
+      - frequency: monthly
+        start_time: "19:01"
+        duration: 19
+        every: first
+        day_of_week: ["Monday"]
+  register: create_maintenance_tp_monthly_day_of_week
+
+- ansible.builtin.assert:
+    that:
+      - create_maintenance_tp_monthly_day_of_week.changed is sameas true
+
+- name: "test - Create maintenance event using time_periods - Monthly - Day of Week - Again (No Change)"
+  community.zabbix.zabbix_maintenance:
+    name: maintenance
+    host_name: example
+    desc: "test description"
+    state: present
+    time_periods:
+      - frequency: monthly
+        start_time: "19:01"
+        duration: 19
+        every: first
+        day_of_week: ["Monday"]
+  register: create_maintenance_tp_monthly_day_of_week_again
+
+- ansible.builtin.assert:
+    that:
+      - create_maintenance_tp_monthly_day_of_week_again.changed is sameas false
+
+- name: "test - Create maintenance event using time_periods - Monthly - Day of Week - Update"
+  community.zabbix.zabbix_maintenance:
+    name: maintenance
+    host_name: example
+    desc: "test description"
+    state: present
+    time_periods:
+      - frequency: monthly
+        start_time: "19:01"
+        duration: 19
+        every: first
+        day_of_week: ["Tuesday"]
+  register: create_maintenance_tp_monthly_day_of_week_update
+  
+- ansible.builtin.assert:
+    that:
+      - create_maintenance_tp_monthly_day_of_week_update.changed is sameas true
+
+- name: "test - Create maintenance event using time_periods - Monthly - Day of Week - Update Every"
+  community.zabbix.zabbix_maintenance:
+    name: maintenance
+    host_name: example
+    desc: "test description"
+    state: present
+    time_periods:
+      - frequency: monthly
+        start_time: "19:01"
+        duration: 19
+        every: second
+        day_of_week: ["Tuesday"]
+  register: create_maintenance_tp_monthly_day_of_week_update_every
+  
+- ansible.builtin.assert:
+    that:
+      - create_maintenance_tp_monthly_day_of_week_update_every.changed is sameas true
+
+- name: test - Define both minutes and host_groups (should fail)
+  community.zabbix.zabbix_maintenance:
+    name: maintenance
+    host_name: example
+    desc: "test description"
+    state: present
+    minutes: 11
+    time_periods:
+      - frequency: monthly
+        start_time: "19:01"
+        duration: 19
+        every: second
+        day_of_week: ["Tuesday"]
+  register: fail_min_and_timeperiods
+  ignore_errors: true
+
+- ansible.builtin.assert:
+    that: fail_min_and_timeperiods.failed is sameas True
+
+- name: "test - Delete maintenance"
+  community.zabbix.zabbix_maintenance:
+    name: maintenance
+    host_name: example
+    state: absent
+  register: delete_maintenance_result
+  tags:
+    - cleanup
 
 - name: "test - Delete testing host"
   community.zabbix.zabbix_host:
