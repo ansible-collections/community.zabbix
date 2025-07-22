@@ -1,8 +1,0 @@
-minor_changes:
-  - Web Role - Added support for `zabbix_web_ssl_session_protocols`
-  - Web Role - Added support for `ssl_prefer_server_ciphers`
-  - Web Role - Added support for `zabbix_web_ssl_session_stapling`
-
-deprecated_features:
-  - Web Role - Depricated `zabbix_web_SSLSessionCache` for `zabbix_web_ssl_session_cache`
-  - Web Role - Depricated `zabbix_web_SSLSessionCacheTimeout` for `zabbix_web_ssl_session_cache_timeout`

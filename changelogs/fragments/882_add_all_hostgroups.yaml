@@ -1,6 +1,0 @@
----
-minor_changes:
-  - zabbix_group_info - Add the possibility to retrive all host Group 
-  - zabbix_template_info - Add the possibility to retrive all template Group
-
-  
