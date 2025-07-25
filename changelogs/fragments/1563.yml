@@ -1,2 +1,0 @@
-minor_changes:
-  - Web Role - Added `zabbix_web_custom_php` to allow for addition of customer PHP settings
