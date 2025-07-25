@@ -1,5 +1,5 @@
 # Install CI dependencies for the Zabbix Roles
-ansible-core
+ansible-core==2.18
 docker
 molecule
 netaddr>=1.2.1
