@@ -12,7 +12,10 @@
 
 {% if zabbix_proxy_version is version('6.4', '<=') %}
 {{ (zabbix_proxy_configfrequency is defined and zabbix_proxy_configfrequency is not none) | ternary('','# ') }}ConfigFrequency={{ zabbix_proxy_configfrequency | default('') }}
+{% else %}
+{{ (zabbix_proxy_proxyconfigfrequency is defined and zabbix_proxy_proxyconfigfrequency is not none) | ternary('','# ') }}ProxyConfigFrequency={{ zabbix_proxy_proxyconfigfrequency | default('') }}
 {% endif %}
+
 
 {{ (zabbix_proxy_datasenderfrequency is defined and zabbix_proxy_datasenderfrequency is not none) | ternary('','# ') }}DataSenderFrequency={{ zabbix_proxy_datasenderfrequency | default('') }}
 {{ (zabbix_proxy_dbhost is defined and zabbix_proxy_dbhost is not none) | ternary('','# ') }}DBHost={{ zabbix_proxy_dbhost | default('') }}
@@ -60,11 +63,6 @@
 {% if zabbix_proxy_version is version('7.0', '>=') %}
 {{ (zabbix_proxy_proxybuffermode is defined and zabbix_proxy_proxybuffermode is not none) | ternary('','# ') }}ProxyBufferMode={{ zabbix_proxy_proxybuffermode | default('') }}
 {% endif %}
-
-{% if zabbix_proxy_version is version('6.4', '>=') %}
-{{ (zabbix_proxy_proxyconfigfrequency is defined and zabbix_proxy_proxyconfigfrequency is not none) | ternary('','# ') }}ProxyConfigFrequency={{ zabbix_proxy_proxyconfigfrequency | default('') }}
-{% endif %}
-
 
 {{ (zabbix_proxy_proxylocalbuffer is defined and zabbix_proxy_proxylocalbuffer is not none) | ternary('','# ') }}ProxyLocalBuffer={{ zabbix_proxy_proxylocalbuffer | default('') }}
 {% if zabbix_proxy_version is version('7.0', '>=') %}
