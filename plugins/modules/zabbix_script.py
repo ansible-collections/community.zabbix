@@ -171,6 +171,46 @@ options:
         required: false
         choices: ["present", "absent"]
         default: "present"
+    user_input_enabled:
+        description:
+            - Allow advanced user input configuration
+            - Available for Zabbix >= 7.0.
+        type: bool
+        default: false
+    user_input_type:
+        description:
+            - Choosing 'regex' allows the use of a regular expression
+            - Choosing 'dropdown' allows a pre-defined list of choices
+            - Required if user_input_enabled is C(true)
+            - Available for Zabbix >= 7.0.
+        type: str
+        choices: ["regex", "dropdown"]
+    user_input_regex:
+        description:
+            - A regular expression to validate user input
+            - Required if user_input_type is C(regex)
+            - Available for Zabbix >= 7.0.
+        type: str
+    user_input_list:
+        description:
+            - A list of possible choices for the user.
+            - Required if user_input_type is C(dropdown).
+            - NOTE the first option will be the default.
+            - Available for Zabbix >= 7.0.
+        type: list
+        elements: str
+    user_input_default_input:
+        description:
+            - Default user input
+            - Available if user_input_type is C(regex)
+            - Available for Zabbix >= 7.0.
+        type: str
+    user_input_confirmation:
+        description:
+            - User input confirmation prompt.
+            - Available if user_input_enabled is C(true).
+            - Available for Zabbix >= 7.0.
+    
 extends_documentation_fragment:
 - community.zabbix.zabbix
 
@@ -407,6 +447,12 @@ def main():
             )
         ),
         description=dict(type="str"),
+        user_input_enabled=dict(type="bool", default=False),
+        user_input_type=dict(type="str", choices=["regex", "dropdown"]),
+        user_input_regex=dict(type="str"),
+        user_input_list=dict(type="list", elements="str"),
+        user_input_default_input=dict(type="str"),
+        user_input_confirmation=dict(type="str"),
         state=dict(
             type="str",
             default="present",
@@ -422,7 +468,10 @@ def main():
         ("script_type", "telnet", ("username", "password", "command",)),
         ("script_type", "script", ("command",)),
         ("script_type", "ipmi", ("command",)),
-        ("script_type", "webhook", ("command",))
+        ("script_type", "webhook", ("command",)),
+        ("user_input_enabled", True, ("user_input_type")),
+        ("user_input_type", "regex", ("user_input_regex")),
+        ("user_input_type", "dropdown", ("user_input_list"))
     ]
 
     module = AnsibleModule(
@@ -453,6 +502,12 @@ def main():
     state = module.params["state"]
     url = module.params["url"]
     new_window = module.params["new_window"]
+    user_input_enabled = module.params["user_input_enabled"]
+    user_input_type = module.params["user_input_type"]
+    user_input_regex = module.params["user_input_regex"]
+    user_input_list = module.params["user_input_list"]
+    user_input_default_input = module.params["user_input_default_input"]
+    user_input_confirmation = module.params["user_input_confirmation"]
 
     script = Script(module)
     script_ids = script.get_script_ids(name)
