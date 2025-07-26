@@ -39,8 +39,6 @@ provisioner:
       all:
         ansible_connection: community.docker.docker
         zabbix_api_server_url: zabbix-web-${MY_MOLECULE_VERSION:-v74}-${MY_MOLECULE_DATABASE:-mysql}-${MY_MOLECULE_CONTAINER:-rockylinux9}
-        zabbix_repo_apt_priority: 1
-        zabbix_repo_yum_gpg_check: 1
       v74:
         zabbix_server_version: 7.4
         zabbix_web_version: 7.4

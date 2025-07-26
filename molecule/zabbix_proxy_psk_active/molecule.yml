@@ -38,8 +38,6 @@ provisioner:
     group_vars:
       all:
         ansible_connection: community.docker.docker
-        zabbix_repo_apt_priority: 1
-        zabbix_repo_yum_gpg_check: 1
         zabbix_api_create_proxy: true
         zabbix_proxy_hostname: proxy1
         zabbix_api_server_port: 8080

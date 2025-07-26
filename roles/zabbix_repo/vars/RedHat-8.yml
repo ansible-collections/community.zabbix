@@ -1,0 +1,4 @@
+---
+_gpg_key_zabbix:
+  "6.0": RPM-GPG-KEY-ZABBIX-A14FE591
+_gpg_key_non_supported: RPM-GPG-KEY-ZABBIX-79EA5ED4
