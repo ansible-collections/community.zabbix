@@ -23,9 +23,9 @@ zabbix_repo_yum:
     gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-ZABBIX
     state: present
 zabbix_repo_apt_priority:
-zabbix_repo_deb_gpg_key_url: {{ zabbix_repo_deb_schema }}://repo.zabbix.com/zabbix-official-repo.key
+zabbix_repo_deb_gpg_key_url: "{{ zabbix_repo_deb_schema }}://repo.zabbix.com/zabbix-official-repo.key"
 zabbix_repo_deb_include_deb_src: true
-zabbix_repo_rpm_gpg_key_url: {{ zabbix_repo_yum_schema }}://repo.zabbix.com/RPM-GPG-KEY-ZABBIX-08EFA7DD
+zabbix_repo_rpm_gpg_key_url: "{{ zabbix_repo_yum_schema }}://repo.zabbix.com/RPM-GPG-KEY-ZABBIX-08EFA7DD"
 
 zabbix_repo_zypper_auto_import_keys: true
 zabbix_repo_zypper_disable_gpg_check: false
