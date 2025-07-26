@@ -465,6 +465,60 @@
       zabbix_script:
         state: absent
 
+- name: test - Test url script type
+  module_defaults:
+    community.zabbix.zabbix_script:
+      name: Test manual event action script
+      scope: manual_event_action
+      script_type: url
+      description: "Test manual event action script"
+      state: present
+
+  block:
+    - name: test - Create new url script
+      zabbix_script:
+        url: "http://google.com"
+        new_window: true
+      register: create_script_url
+
+    - assert:
+        that:
+          - create_script_url.changed is sameas true
+
+    - name: test - Create new url script - again
+      zabbix_script:
+        url: "http://google.com"
+        new_window: true
+      register: create_script_url_again
+
+    - assert:
+        that:
+          - create_script_url_again.changed is sameas false
+
+    - name: test - Create new url script - update url
+      zabbix_script:
+        url: "http://facebook.com"
+        new_window: true
+      register: create_script_url_update_url
+
+    - assert:
+        that:
+          - create_script_url_update_url.changed is sameas true
+
+    - name: test - Create new url script - update new_window
+      zabbix_script:
+        url: "http://facebook.com"
+        new_window: false
+      register: create_script_url_update_new_window
+
+    - assert:
+        that:
+          - create_script_url_update_new_window.changed is sameas true
+
+    - name: test - Delete url host action script
+      zabbix_script:
+        state: absent
+
 - name: test - Test manual event action script
   module_defaults:
     community.zabbix.zabbix_script:

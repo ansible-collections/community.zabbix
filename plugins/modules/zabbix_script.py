@@ -27,9 +27,22 @@ options:
     script_type:
         description:
             - Script type. Required when state is 'present'.
+            - 'url' is only available >= 7.0
         type: str
         required: false
-        choices: ["script", "ipmi", "ssh", "telnet", "webhook"]
+        choices: ["script", "ipmi", "ssh", "telnet", "webhook", "url"]
+    url:
+        description:
+            - The URL for quick access
+            - Required if script_type is C(url)
+            - Only available if script_type is C(url)
+        type: str
+    new_window:
+        description:
+            - Should URL be opened in a new window?
+            - Only available if script_type is C(url)
+        type: bool
+        default: true
     command:
         description:
             - Command to run. Required when state is 'present'
@@ -214,13 +227,14 @@ class Script(ZabbixBase):
         return script_ids
 
     def create_script(self, name, script_type, command, scope, execute_on, menu_path, authtype, username, password,
-                      publickey, privatekey, port, host_group, user_group, host_access, confirmation, script_timeout, parameters, description):
+                      publickey, privatekey, port, host_group, user_group, host_access, confirmation, script_timeout,
+                      parameters, description, url, new_window):
         if self._module.check_mode:
             self._module.exit_json(changed=True)
 
         self._zapi.script.create(self.generate_script_config(name, script_type, command, scope, execute_on, menu_path,
-                                 authtype, username, password, publickey, privatekey, port, host_group, user_group, host_access, confirmation,
-                                 script_timeout, parameters, description))
+                                 authtype, username, password, publickey, privatekey, port, host_group, user_group, 
+                                 host_access, confirmation, script_timeout, parameters, description, url, new_window))
 
     def delete_script(self, script_ids):
         if self._module.check_mode:
@@ -228,7 +242,8 @@ class Script(ZabbixBase):
         self._zapi.script.delete(script_ids)
 
     def generate_script_config(self, name, script_type, command, scope, execute_on, menu_path, authtype, username, password,
-                               publickey, privatekey, port, host_group, user_group, host_access, confirmation, script_timeout, parameters, description):
+                               publickey, privatekey, port, host_group, user_group, host_access, confirmation, script_timeout,
+                               parameters, description, url, new_window):
         if host_group == "all":
             groupid = "0"
         else:
@@ -291,6 +306,13 @@ class Script(ZabbixBase):
             else:
                 request["confirmation"] = confirmation
 
+        if script_type == "url":
+            request["url"] = url
+            if new_window:
+                request["new_window"] = "1"
+            else:
+                request["new_window"] = "0"
+        
         if script_type == "ssh":
             request["authtype"] = str(zabbix_utils.helper_to_numeric_value([
                 "password",
@@ -317,10 +339,11 @@ class Script(ZabbixBase):
         return request
 
     def update_script(self, script_id, name, script_type, command, scope, execute_on, menu_path, authtype, username, password,
-                      publickey, privatekey, port, host_group, user_group, host_access, confirmation, script_timeout, parameters, description):
+                      publickey, privatekey, port, host_group, user_group, host_access, confirmation, script_timeout, parameters,
+                      description, url, new_window):
         generated_config = self.generate_script_config(name, script_type, command, scope, execute_on, menu_path, authtype, username,
                                                        password, publickey, privatekey, port, host_group, user_group, host_access,
-                                                       confirmation, script_timeout, parameters, description)
+                                                       confirmation, script_timeout, parameters, description, url, new_window)
         live_config = self._zapi.script.get({"filter": {"name": name}})[0]
 
         change_parameters = {}
@@ -342,8 +365,10 @@ def main():
         name=dict(type="str", required=True),
         script_type=dict(
             type="str",
-            choices=["script", "ipmi", "ssh", "telnet", "webhook"]),
+            choices=["script", "ipmi", "ssh", "telnet", "webhook", "url"]),
         command=dict(type="str"),
+        url=dict(type="str"),
+        open_window=dict(type="bool", default=True),
         scope=dict(
             type="str",
             choices=["action_operation", "manual_host_action", "manual_event_action"],
@@ -387,6 +412,7 @@ def main():
     required_if = [
         ("state", "present", ("script_type", "command",)),
         ("script_type", "ssh", ("authtype", "username",)),
+        ("script_type", "url", ("new_window", "url",)),
         ("authtype", "password", ("password",)),
         ("authtype", "public_key", ("publickey", "privatekey",)),
         ("script_type", "telnet", ("username", "password")),
@@ -418,6 +444,8 @@ def main():
     parameters = module.params["parameters"]
     description = module.params["description"]
     state = module.params["state"]
+    url = module.params["url"]
+    new_window = module.params["new_window"]
 
     script = Script(module)
     script_ids = script.get_script_ids(name)
@@ -430,14 +458,22 @@ def main():
         module.exit_json(changed=True, result="Successfully deleted script(s) %s" % name)
 
     elif state == "present":
+        if script_type == "url":
+            if scope not in ["manual_host_action", "manual_event_action"]:
+                module.fail_json(changed=False, msg="A scope of '%s' is not valid for type of 'url'" % scope)
+        else:
+            if url:
+                module.fail_json(changed=False, msg="A url can only be set for a type of 'url'" % scope)
+
         if not script_ids:
             script.create_script(name, script_type, command, scope, execute_on, menu_path, authtype, username, password,
-                                 publickey, privatekey, port, host_group, user_group, host_access, confirmation, script_timeout, parameters, description)
+                                 publickey, privatekey, port, host_group, user_group, host_access, confirmation, script_timeout, 
+                                 parameters, description, url, new_window)
             module.exit_json(changed=True, msg="Script %s created" % name)
         else:
             script.update_script(script_ids[0], name, script_type, command, scope, execute_on, menu_path, authtype, username,
                                  password, publickey, privatekey, port, host_group, user_group, host_access, confirmation,
-                                 script_timeout, parameters, description)
+                                 script_timeout, parameters, description, url, new_window)
 
 
 if __name__ == "__main__":
