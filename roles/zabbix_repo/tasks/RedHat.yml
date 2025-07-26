@@ -13,6 +13,9 @@
   ansible.builtin.rpm_key:
     state: present
     key: "{{ zabbix_repo_rpm_gpg_key_url }}"
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   become: true
   tags:
     - install
