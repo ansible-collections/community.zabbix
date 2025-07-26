@@ -279,7 +279,7 @@ class Script(ZabbixBase):
                 "manual_event_action"], scope)),
             "groupid": groupid
         }
-        
+
         if command:
             request["command"] = command
 
