@@ -5,11 +5,7 @@
   {% endfor %}
 
   ## Vhost docroot
-  {% if zabbix_web_version is version('7.0', '<=') %}
-  DocumentRoot "/usr/share/zabbix"
-  {% else %}
-  DocumentRoot "/usr/share/zabbix/ui"
-  {% endif %}
+  DocumentRoot "/usr/share/{{ zabbix_web_version is version('7.0', '<=') | ternary('zabbix', 'zabbix/ui') }}"
 
 {% if zabbix_apache_custom_includes is iterable and (zabbix_apache_custom_includes | length>0) %}
   {% for include in zabbix_apache_custom_includes %}
