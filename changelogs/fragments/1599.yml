@@ -1,0 +1,2 @@
+minor_changes:
+  - repo role - Added support for `zabbix_repo_deb_schema`

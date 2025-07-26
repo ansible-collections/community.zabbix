@@ -54,6 +54,7 @@ Please be aware that this role only installs the repo itself.  It is generally u
 # Role Variables
 
 * `zabbix_repo_apt_priority`: Option:  An integer value for the priority of the repo.
+* `zabbix_repo_deb_schema`: Default: `https`. Option to change the web schema for the deb repository(http/https)
 * `zabbix_repo_deb_component`: The repository component for Debian installs. Default `main`.
 * `zabbix_repo_deb_gpg_key_url`: The URL to download the Zabbix GPG key from. Default `http://repo.zabbix.com/zabbix-official-repo.key`.
 * `zabbix_repo_deb_include_deb_src`: True, if deb-src should be included in the zabbix.sources entry. Default `true`.
