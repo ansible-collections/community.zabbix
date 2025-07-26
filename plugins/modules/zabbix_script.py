@@ -27,7 +27,7 @@ options:
     script_type:
         description:
             - Script type. Required when state is 'present'.
-            - 'url' is only available >= 7.0
+            - 'url' is only available in 7.0 or later
         type: str
         required: false
         choices: ["script", "ipmi", "ssh", "telnet", "webhook", "url"]
@@ -233,7 +233,7 @@ class Script(ZabbixBase):
             self._module.exit_json(changed=True)
 
         self._zapi.script.create(self.generate_script_config(name, script_type, command, scope, execute_on, menu_path,
-                                 authtype, username, password, publickey, privatekey, port, host_group, user_group, 
+                                 authtype, username, password, publickey, privatekey, port, host_group, user_group,
                                  host_access, confirmation, script_timeout, parameters, description, url, new_window))
 
     def delete_script(self, script_ids):
@@ -312,7 +312,7 @@ class Script(ZabbixBase):
                 request["new_window"] = "1"
             else:
                 request["new_window"] = "0"
-        
+
         if script_type == "ssh":
             request["authtype"] = str(zabbix_utils.helper_to_numeric_value([
                 "password",
@@ -463,11 +463,11 @@ def main():
                 module.fail_json(changed=False, msg="A scope of '%s' is not valid for type of 'url'" % scope)
         else:
             if url:
-                module.fail_json(changed=False, msg="A url can only be set for a type of 'url'" % scope)
+                module.fail_json(changed=False, msg="A url can only be set for a type of 'url'")
 
         if not script_ids:
             script.create_script(name, script_type, command, scope, execute_on, menu_path, authtype, username, password,
-                                 publickey, privatekey, port, host_group, user_group, host_access, confirmation, script_timeout, 
+                                 publickey, privatekey, port, host_group, user_group, host_access, confirmation, script_timeout,
                                  parameters, description, url, new_window)
             module.exit_json(changed=True, msg="Script %s created" % name)
         else:
