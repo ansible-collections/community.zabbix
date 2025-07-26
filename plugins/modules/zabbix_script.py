@@ -269,8 +269,8 @@ class Script(ZabbixBase):
                 "ssh",
                 "telnet",
                 "",
-                "webhook"], script_type)),
-            "command": command,
+                "webhook",
+                "url"], script_type)),
             "scope": str(zabbix_utils.helper_to_numeric_value([
                 "",
                 "action_operation",
@@ -279,6 +279,9 @@ class Script(ZabbixBase):
                 "manual_event_action"], scope)),
             "groupid": groupid
         }
+        
+        if command:
+            request["command"] = command
 
         if description is not None:
             request["description"] = description
@@ -310,9 +313,9 @@ class Script(ZabbixBase):
         if script_type == "url":
             request["url"] = url
             if new_window:
-                request["new_window"] = "1"
+                request["new_window"] = 1
             else:
-                request["new_window"] = "0"
+                request["new_window"] = 0
 
         if script_type == "ssh":
             request["authtype"] = str(zabbix_utils.helper_to_numeric_value([
@@ -463,7 +466,7 @@ def main():
 
     elif state == "present":
         if script_type == "url":
-            if LooseVersion(module._zbx_api_version) < LooseVersion('7.0'):
+            if LooseVersion(script._zbx_api_version) < LooseVersion('7.0'):
                 module.fail_json(changed=False, msg="A type of 'url' is only available for Zabbix >= 7.0")
             if scope not in ["manual_host_action", "manual_event_action"]:
                 module.fail_json(changed=False, msg="A scope of '%s' is not valid for type of 'url'" % scope)
