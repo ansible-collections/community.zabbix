@@ -35,15 +35,15 @@ Please send Pull Requests or suggestions when you want to use this role for othe
 
 See the following list of supported Operating systems with the Zabbix releases:
 
-| Zabbix              | 7.2 | 7.0 | 6.0 |
-|---------------------|-----|-----|-----|
-| Red Hat Fam 9       |  V  |  V  |  V  |
-| Red Hat Fam 8       |  V  |  V  |  V  |
-| Ubuntu 24.04 noble  |  V  |  V  |  V  |
-| Ubuntu 22.04 jammy  |  V  |  V  |  V  |
-| Debian 12 bookworm  |  V  |  V  |  V  |
-| Debian 11 bullseye  |  V  |  V  |  V  |
-| Suse Fam 15         |  V  |  V  |  V  |
+| Zabbix              | 7.4 | 7.2 | 7.0 | 6.0 |
+|---------------------|-----|-----|-----|-----|
+| Red Hat Fam 9       |  V  |  V  |  V  |  V  |
+| Red Hat Fam 8       |  V  |  V  |  V  |  V  |
+| Ubuntu 24.04 noble  |  V  |  V  |  V  |  V  |
+| Ubuntu 22.04 jammy  |  V  |  V  |  V  |  V  |
+| Debian 12 bookworm  |  V  |  V  |  V  |  V  |
+| Debian 11 bullseye  |  V  |  V  |  V  |  V  |
+| Suse Fam 15         |  V  |  V  |  V  |  V  |
 
 # Installation
 
@@ -54,6 +54,7 @@ Please be aware that this role only installs the repo itself.  It is generally u
 # Role Variables
 
 * `zabbix_repo_apt_priority`: Option:  An integer value for the priority of the repo.
+* `zabbix_repo_deb_schema`: Default: `https`. Option to change the web schema for the deb repository(http/https)
 * `zabbix_repo_deb_component`: The repository component for Debian installs. Default `main`.
 * `zabbix_repo_deb_gpg_key_url`: The URL to download the Zabbix GPG key from. Default `http://repo.zabbix.com/zabbix-official-repo.key`.
 * `zabbix_repo_deb_include_deb_src`: True, if deb-src should be included in the zabbix.sources entry. Default `true`.
