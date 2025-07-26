@@ -27,7 +27,7 @@ options:
     script_type:
         description:
             - Script type. Required when state is 'present'.
-            - 'url' is only available in 7.0 or later
+            - A value of 'url' is only available in 7.0 or later
         type: str
         required: false
         choices: ["script", "ipmi", "ssh", "telnet", "webhook", "url"]
@@ -368,7 +368,7 @@ def main():
             choices=["script", "ipmi", "ssh", "telnet", "webhook", "url"]),
         command=dict(type="str"),
         url=dict(type="str"),
-        open_window=dict(type="bool", default=True),
+        new_window=dict(type="bool", default=True),
         scope=dict(
             type="str",
             choices=["action_operation", "manual_host_action", "manual_event_action"],
