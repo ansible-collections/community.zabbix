@@ -313,9 +313,9 @@ class Script(ZabbixBase):
         if script_type == "url":
             request["url"] = url
             if new_window:
-                request["new_window"] = 1
+                request["new_window"] = "1"
             else:
-                request["new_window"] = 0
+                request["new_window"] = "0"
 
         if script_type == "ssh":
             request["authtype"] = str(zabbix_utils.helper_to_numeric_value([

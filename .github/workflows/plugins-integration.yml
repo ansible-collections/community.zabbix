@@ -27,15 +27,15 @@ jobs:
         ansible:
           # https://docs.ansible.com/ansible/latest/reference_appendices/release_and_maintenance.html#ansible-core-changelogs
           - stable-2.16
-          # - stable-2.17
-          # - stable-2.18
-          # - stable-2.19
-          # - devel
+          - stable-2.17
+          - stable-2.18
+          - stable-2.19
+          - devel
         python:
-          # - '3.10'
-          # - '3.11'
+          - '3.10'
+          - '3.11'
           - '3.12'
-          # - '3.13'
+          - '3.13'
         exclude:
           - ansible: stable-2.19
             python: '3.10'
