@@ -216,6 +216,7 @@ from ansible.module_utils.basic import AnsibleModule
 
 from ansible_collections.community.zabbix.plugins.module_utils.base import ZabbixBase
 import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabbix_utils
+from ansible.module_utils.compat.version import LooseVersion
 
 
 class Script(ZabbixBase):
@@ -410,12 +411,15 @@ def main():
     ))
 
     required_if = [
-        ("state", "present", ("script_type", "command",)),
-        ("script_type", "ssh", ("authtype", "username",)),
+        ("state", "present", ("script_type",)),
+        ("script_type", "ssh", ("authtype", "username", "command",)),
         ("script_type", "url", ("new_window", "url",)),
         ("authtype", "password", ("password",)),
         ("authtype", "public_key", ("publickey", "privatekey",)),
-        ("script_type", "telnet", ("username", "password")),
+        ("script_type", "telnet", ("username", "password", "command",)),
+        ("script_type", "script", ("command",)),
+        ("script_type", "ipmi", ("command",)),
+        ("script_type", "webhook", ("command",))
     ]
 
     module = AnsibleModule(
@@ -459,6 +463,8 @@ def main():
 
     elif state == "present":
         if script_type == "url":
+            if LooseVersion(module._zbx_api_version) < LooseVersion('7.0'):
+                module.fail_json(changed=False, msg="A type of 'url' is only available for Zabbix >= 7.0")
             if scope not in ["manual_host_action", "manual_event_action"]:
                 module.fail_json(changed=False, msg="A scope of '%s' is not valid for type of 'url'" % scope)
         else:

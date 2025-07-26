@@ -474,6 +474,7 @@
       description: "Test manual event action script"
       state: present
 
+  when: zabbix_version is version('7.0', '>=')
   block:
     - name: test - Create new url script
       zabbix_script:
@@ -518,6 +519,18 @@
     - name: test - Delete url host action script
       zabbix_script:
         state: absent
+
+- name: test - Create new url script for early versions of Zabbix (should fail)
+  zabbix_script:
+    url: "http://google.com"
+    new_window: true
+  register: create_script_url_fail
+  when: zabbix_version is version('7.0', '<')
+  ignore_errors: true
+
+- ansible.builtin.assert:
+    that: create_script_url_fail.failed is sameas True
+  
 
 - name: test - Test manual event action script
   module_defaults:
