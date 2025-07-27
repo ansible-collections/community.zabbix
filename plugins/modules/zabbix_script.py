@@ -384,7 +384,7 @@ class Script(ZabbixBase):
                     if "name" not in parameter.keys() or parameter["name"] is None:
                         self._module.fail_json(msg="When providing parameters to a webhook script, the 'name' option is required.")
                 request["parameters"] = parameters
-                
+
         if user_input_enabled:
             request["manualinput_prompt"] = user_input_prompt
             request["manualinput"] = "1"
@@ -393,7 +393,7 @@ class Script(ZabbixBase):
                 request["manualinput_validator"] = user_input_regex
                 if user_input_default_input:
                     request["manualinput_default_value"] = user_input_default_input
-                
+
             else:
                 request["manualinput_validator_type"] = "1"
                 request["manualinput_validator"] = ",".join(user_input_list)
@@ -549,7 +549,7 @@ def main():
         else:
             if url:
                 module.fail_json(changed=False, msg="A url can only be set for a type of 'url'")
-                
+
         if not user_input_enabled:
             FIELDS = {
                 "user_input_prompt": user_input_prompt,
@@ -565,16 +565,16 @@ def main():
             if LooseVersion(script._zbx_api_version) < LooseVersion('7.0'):
                 module.fail_json(changed=False, msg="user_input options are only available for Zabbix >= 7.0")
             if len(user_input_prompt) < 1:
-                module.fail_json(changed=False, msg=f"The attribute 'user_input_prompt' is required when user_input_enabled is 'True'")
+                module.fail_json(changed=False, msg="The attribute 'user_input_prompt' is required when user_input_enabled is 'True'")
             if user_input_type == "dropdown":
                 if len(user_input_list) < 1:
-                    module.fail_json(changed=False, msg=f"The attribute 'user_input_list' cannot be empty when user_input_type is 'dropdown'")
+                    module.fail_json(changed=False, msg="The attribute 'user_input_list' cannot be empty when user_input_type is 'dropdown'")
                 if user_input_regex:
-                    module.fail_json(changed=False, msg=f"The attribute 'user_input_regex' can't be assigned unless user_input_type is 'regex'")
+                    module.fail_json(changed=False, msg="The attribute 'user_input_regex' can't be assigned unless user_input_type is 'regex'")
                 elif user_input_default_input:
-                    module.fail_json(changed=False, msg=f"The attribute 'user_input_default_input' can't be assigned unless user_input_type is 'regex'")
+                    module.fail_json(changed=False, msg="The attribute 'user_input_default_input' can't be assigned unless user_input_type is 'regex'")
             elif user_input_list:
-                module.fail_json(changed=False, msg=f"The attribute 'user_input_list' can't be assigned unless user_input_type is 'dropdown'")
+                module.fail_json(changed=False, msg="The attribute 'user_input_list' can't be assigned unless user_input_type is 'dropdown'")
 
         if not script_ids:
             script.create_script(name, script_type, command, scope, execute_on, menu_path, authtype, username, password,
