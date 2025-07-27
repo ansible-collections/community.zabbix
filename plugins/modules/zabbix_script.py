@@ -211,7 +211,7 @@ options:
             - Available if user_input_type is C(regex)
             - Available for Zabbix >= 7.0.
         type: str
-    
+
 extends_documentation_fragment:
 - community.zabbix.zabbix
 
