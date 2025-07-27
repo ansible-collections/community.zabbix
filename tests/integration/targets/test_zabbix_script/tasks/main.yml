@@ -516,6 +516,140 @@
         that:
           - create_script_url_update_new_window.changed is sameas true
 
+    - name: test - Enable User Input
+      community.zabbix.zabbix_script:
+        url: "http://facebook.com"
+        new_window: false
+        script_type: url
+        user_input_enabled: true
+        user_input_prompt: "Test user prompt"
+        user_input_type: "regex"
+        user_input_default_input: "test"
+        user_input_regex: "test.*"
+      register: create_script_url_add_user_input
+
+    - assert:
+        that:
+          - create_script_url_update_new_window.changed is sameas true
+
+    - name: test - Enable User Input - Again (No Change)
+      community.zabbix.zabbix_script:
+        url: "http://facebook.com"
+        new_window: false
+        script_type: url
+        user_input_enabled: true
+        user_input_prompt: "Test user prompt"
+        user_input_type: "regex"
+        user_input_default_input: "test"
+        user_input_regex: "test.*"
+      register: create_script_url_add_user_input_again
+
+    - assert:
+        that:
+          - create_script_url_add_user_input_again.changed is sameas false
+
+    - name: test - Enable User Input - Update Input Prompt
+      community.zabbix.zabbix_script:
+        url: "http://facebook.com"
+        new_window: false
+        script_type: url
+        user_input_enabled: true
+        user_input_prompt: "Test user prompt update"
+        user_input_type: "regex"
+        user_input_default_input: "test"
+        user_input_regex: "test.*"
+      register: create_script_user_input_update_prompt
+
+    - assert:
+        that:
+          - create_script_user_input_update_prompt.changed is sameas true
+
+    - name: test - Enable User Input - Update default input
+      community.zabbix.zabbix_script:
+        url: "http://facebook.com"
+        new_window: false
+        script_type: url
+        user_input_enabled: true
+        user_input_prompt: "Test user prompt update"
+        user_input_type: "regex"
+        user_input_default_input: "test2"
+        user_input_regex: "test.*"
+      register: create_script_user_input_update_default_input
+
+    - assert:
+        that:
+          - create_script_user_input_update_default_input.changed is sameas true
+
+    - name: test - Enable User Input - Update regex
+      community.zabbix.zabbix_script:
+        url: "http://facebook.com"
+        new_window: false
+        script_type: url
+        user_input_enabled: true
+        user_input_prompt: "Test user prompt update"
+        user_input_type: "regex"
+        user_input_default_input: "test2"
+        user_input_regex: "tes.*"
+      register: create_script_user_input_update_regex
+
+    - assert:
+        that:
+          - create_script_user_input_update_regex.changed is sameas true
+
+    - name: test - Enable User Input - Change to List
+      community.zabbix.zabbix_script:
+        url: "http://facebook.com"
+        new_window: false
+        script_type: url
+        user_input_enabled: true
+        user_input_prompt: "Test user prompt update"
+        user_input_type: "dropdown"
+        user_input_list:
+          - test 1
+          - test 2
+          - test 3
+      register: create_script_user_input_change_to_list
+
+    - assert:
+        that:
+          - create_script_user_input_change_to_list.changed is sameas true
+
+    - name: test - Enable User Input - Change to List - Again (No Change)
+      community.zabbix.zabbix_script:
+        url: "http://facebook.com"
+        new_window: false
+        script_type: url
+        user_input_enabled: true
+        user_input_prompt: "Test user prompt update"
+        user_input_type: "dropdown"
+        user_input_list:
+          - test 1
+          - test 2
+          - test 3
+      register: create_script_user_input_change_to_list_again
+
+    - assert:
+        that:
+          - create_script_user_input_change_to_list_again.changed is sameas false
+
+    - name: test - Enable User Input - Update List
+      community.zabbix.zabbix_script:
+        url: "http://facebook.com"
+        new_window: false
+        script_type: url
+        user_input_enabled: true
+        user_input_prompt: "Test user prompt update"
+        user_input_type: "dropdown"
+        user_input_list:
+          - test 1
+          - test 2
+          - test 4
+      register: create_script_user_input_update_list
+
+    - assert:
+        that:
+          - create_script_user_input_update_list.changed is sameas true
+
     - name: test - Delete url host action script
       zabbix_script:
         state: absent

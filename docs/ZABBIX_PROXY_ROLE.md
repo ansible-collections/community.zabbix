@@ -296,6 +296,8 @@ These variables need to be overridden when you want to make use of the Zabbix AP
 * `zabbix_proxy_group_description`: Zabbix proxy group description. Default `omit`. Version 7.0 or Greater.
 * `zabbix_proxy_group_failover_delay`: Failover period for each proxy in the group to have online/offline state. Default `1m`. Version 7.0 or Greater.
 * `zabbix_proxy_group_min_online`: Minimum number of online proxies required for the group to be online. Possible values range: 1-1000. Default `1`. Version 7.0 or Greater.
+* `zabbix_proxy_tlspsk_secret`: TLS PSK content to include
+ 
 
 ## Configuration Variables
 
