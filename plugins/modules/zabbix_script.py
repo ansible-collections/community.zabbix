@@ -578,12 +578,14 @@ def main():
         if not script_ids:
             script.create_script(name, script_type, command, scope, execute_on, menu_path, authtype, username, password,
                                  publickey, privatekey, port, host_group, user_group, host_access, confirmation, script_timeout,
-                                 parameters, description, url, new_window)
+                                 parameters, description, url, new_window, user_input_enabled, user_input_type, user_input_regex,
+                                 user_input_list, user_input_default_input, user_input_prompt)
             module.exit_json(changed=True, msg="Script %s created" % name)
         else:
             script.update_script(script_ids[0], name, script_type, command, scope, execute_on, menu_path, authtype, username,
                                  password, publickey, privatekey, port, host_group, user_group, host_access, confirmation,
-                                 script_timeout, parameters, description, url, new_window)
+                                 script_timeout, parameters, description, url, new_window, user_input_enabled,
+                                 user_input_type, user_input_regex, user_input_list, user_input_default_input, user_input_prompt)
 
 
 if __name__ == "__main__":
