@@ -112,7 +112,6 @@ The following is an overview of all available configuration default for this rol
 * `zabbix_agent_version`: This is the version of zabbix. Default: The highest supported version for the operating system. Can be overridden to 6.4 or 6.0
 * `zabbix_agent_version_minor`: When you want to specify a minor version to be installed. Is also used for `zabbix_sender` and `zabbix_get`. RedHat only. Default set to: `*` (latest available)
 * `zabbix_repo_yum`: A list with Yum repository configuration.
-* `zabbix_repo_yum_gpgcheck`: If Yum should check GPG keys on installation
 * `zabbix_repo_yum_schema`: Default: `https`. Option to change the web schema for the yum repository (http/https)
 * `zabbix_agent_disable_repo`: A list of repos to disable during install.  Default `epel`.
 * `zabbix_repo_deb_url`: The URL to the Zabbix repository.  Default `http://repo.zabbix.com/zabbix/{{ zabbix_agent_version }}/{{ ansible_distribution.lower() }}`
@@ -130,7 +129,6 @@ Selinux changes will be installed based on the status of selinux running on the 
 ### Zabbix Agent
 
 * `zabbix_agent2`: Default: `False`. When you want to install the `Zabbix Agent2` instead of the "old" `Zabbix Agent`.
-* `zabbix_agent_apt_priority`: Add a weight (`Pin-Priority`) for the APT repository.
 * `zabbix_agent_chassis`: Default: `false`. When set to `true`, it will give Zabbix Agent access to the Linux DMI table allowing system.hw.chassis info to populate.
 * `zabbix_agent_conf_mode`: Default: `0644`. The "mode" for the Zabbix configuration file.
 * `zabbix_agent_detect_ip`: Default `true`. When set to `false`, it won't detect available ip addresses on the host and no need for the Python module `netaddr` to be installed.

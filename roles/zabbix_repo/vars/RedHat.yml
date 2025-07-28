@@ -1,1 +1,3 @@
 ---
+_gpg_key_zabbix:
+  "6.0": RPM-GPG-KEY-ZABBIX-08EFA7DD
