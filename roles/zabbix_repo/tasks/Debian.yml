@@ -68,9 +68,6 @@
     path: /etc/apt/preferences.d/
     state: directory
     mode: "0755"
-  when:
-    - zabbix_repo_apt_priority is defined
-    - zabbix_repo_apt_priority | int
   become: true
   tags:
     - install
@@ -85,8 +82,6 @@
     owner: root
     mode: "0644"
   when:
-    - zabbix_repo_apt_priority is defined
-    - zabbix_repo_apt_priority | int
     - zabbix_repo_package is defined
     - zabbix_repo_package
   become: true

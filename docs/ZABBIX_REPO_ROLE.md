@@ -53,7 +53,7 @@ Please be aware that this role only installs the repo itself.  It is generally u
 
 # Role Variables
 
-* `zabbix_repo_apt_priority`: Option:  An integer value for the priority of the repo.
+* `zabbix_repo_apt_priority`: Default: `1001`. An integer value for the priority of the repo.
 * `zabbix_repo_deb_schema`: Default: `https`. Option to change the web schema for the deb repository(http/https)
 * `zabbix_repo_deb_component`: The repository component for Debian installs. Default `main`.
 * `zabbix_repo_deb_gpg_key_url`: The URL to download the Zabbix GPG key from. Default `http://repo.zabbix.com/zabbix-official-repo.key`.
@@ -66,7 +66,7 @@ Please be aware that this role only installs the repo itself.  It is generally u
 * `zabbix_repo_package`: The name of the package to lock the apt priority to.
 * `zabbix_repo_version`: Optional. The main version (i.e. major.minor) of Zabbix that will be installed on the host(s).  Default: 6.4
 * `zabbix_repo_yum`: A list with Yum repository configuration.
-* `zabbix_repo_yum_gpg_check`: Optional.  Yum should check GPG keys.  Default: 0
+* `zabbix_repo_yum_gpgcheck`:  Default: `1`. Yum should check GPG keys.
 * `zabbix_repo_yum_gpg_key_url`: The URL to download the Zabbix GPG key from. Default: `http://repo.zabbix.com/RPM-GPG-KEY-ZABBIX-08EFA7DD`
 * `zabbix_repo_yum_schema`: Default: `https`. Option to change the web schema for the yum repository(http/https)
 * `zabbix_repo_zypper`: A list with zypper repository configuration.
