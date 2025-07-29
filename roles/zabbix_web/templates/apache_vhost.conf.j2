@@ -5,11 +5,7 @@
   {% endfor %}
 
   ## Vhost docroot
-  {% if zabbix_web_version is version('7.0', '<=') %}
-  DocumentRoot "/usr/share/zabbix"
-  {% else %}
-  DocumentRoot "/usr/share/zabbix/ui"
-  {% endif %}
+  DocumentRoot "/usr/share/{{ zabbix_web_version is version('7.0', '<=') | ternary('zabbix', 'zabbix/ui') }}"
 
 {% if zabbix_apache_custom_includes is iterable and (zabbix_apache_custom_includes | length>0) %}
   {% for include in zabbix_apache_custom_includes %}
@@ -74,8 +70,8 @@
 {% if zabbix_web_tls and zabbix_web_vhost_tls_port %}
 
 {{ (zabbix_web_SSLPassPhraseDialog is defined and zabbix_web_SSLPassPhraseDialog is not none) | ternary('', '# ') }}SSLPassPhraseDialog {{ zabbix_web_SSLPassPhraseDialog | default('') }}
-{{ (zabbix_web_ssl_session_cache is defined and zabbix_web_ssl_session_cache != "INVALID") | ternary('', '# ') }}SSLSessionCache {{ zabbix_web_ssl_session_cache | default('') }}
-{{ (zabbix_web_ssl_session_cache_timeout is defined and zabbix_web_ssl_session_cache_timeout != "INVALID") | ternary('', '# ') }}SSLSessionCacheTimeout {{ zabbix_web_ssl_session_cache_timeout | default('') }}
+{{ (zabbix_web_ssl_session_cache is defined and zabbix_web_ssl_session_cache != "!INVALID") | ternary('', '# ') }}SSLSessionCache {{ zabbix_web_ssl_session_cache | default('') }}
+{{ (zabbix_web_ssl_session_cache_timeout is defined and zabbix_web_ssl_session_cache_timeout != "!INVALID") | ternary('', '# ') }}SSLSessionCacheTimeout {{ zabbix_web_ssl_session_cache_timeout | default('') }}
 {{ (zabbix_web_SSLCryptoDevice is defined and zabbix_web_SSLCryptoDevice is not none) | ternary('', '# ') }}SSLCryptoDevice {{ zabbix_web_SSLCryptoDevice | default('') }}
 SSLRandomSeed startup file:/dev/urandom  256
 SSLRandomSeed connect builtin
