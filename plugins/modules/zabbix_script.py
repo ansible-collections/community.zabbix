@@ -171,6 +171,46 @@ options:
         required: false
         choices: ["present", "absent"]
         default: "present"
+    user_input_enabled:
+        description:
+            - Allow advanced user input configuration
+            - Available for Zabbix >= 7.0.
+        type: bool
+        default: false
+    user_input_prompt:
+        description:
+            - Prompt to display when user input is enabled
+            - Required when user_input_enabled is C(True)
+            - Available for Zabbix >= 7.0.
+        type: str
+    user_input_type:
+        description:
+            - Choosing 'regex' allows the use of a regular expression
+            - Choosing 'dropdown' allows a pre-defined list of choices
+            - Required if user_input_enabled is C(true)
+            - Available for Zabbix >= 7.0.
+        type: str
+        choices: ["regex", "dropdown"]
+    user_input_regex:
+        description:
+            - A regular expression to validate user input
+            - Required if user_input_type is C(regex)
+            - Available for Zabbix >= 7.0.
+        type: str
+    user_input_list:
+        description:
+            - A list of possible choices for the user.
+            - Required if user_input_type is C(dropdown).
+            - NOTE the first option will be the default.
+            - Available for Zabbix >= 7.0.
+        type: list
+        elements: str
+    user_input_default_input:
+        description:
+            - Default user input
+            - Available if user_input_type is C(regex)
+            - Available for Zabbix >= 7.0.
+        type: str
 extends_documentation_fragment:
 - community.zabbix.zabbix
 
@@ -229,13 +269,16 @@ class Script(ZabbixBase):
 
     def create_script(self, name, script_type, command, scope, execute_on, menu_path, authtype, username, password,
                       publickey, privatekey, port, host_group, user_group, host_access, confirmation, script_timeout,
-                      parameters, description, url, new_window):
+                      parameters, description, url, new_window, user_input_enabled, user_input_type, user_input_regex,
+                      user_input_list, user_input_default_input, user_input_prompt):
         if self._module.check_mode:
             self._module.exit_json(changed=True)
 
         self._zapi.script.create(self.generate_script_config(name, script_type, command, scope, execute_on, menu_path,
                                  authtype, username, password, publickey, privatekey, port, host_group, user_group,
-                                 host_access, confirmation, script_timeout, parameters, description, url, new_window))
+                                 host_access, confirmation, script_timeout, parameters, description, url, new_window,
+                                 user_input_enabled, user_input_type, user_input_regex, user_input_list,
+                                 user_input_default_input, user_input_prompt))
 
     def delete_script(self, script_ids):
         if self._module.check_mode:
@@ -244,7 +287,8 @@ class Script(ZabbixBase):
 
     def generate_script_config(self, name, script_type, command, scope, execute_on, menu_path, authtype, username, password,
                                publickey, privatekey, port, host_group, user_group, host_access, confirmation, script_timeout,
-                               parameters, description, url, new_window):
+                               parameters, description, url, new_window, user_input_enabled, user_input_type, user_input_regex,
+                               user_input_list, user_input_default_input, user_input_prompt):
         if host_group == "all":
             groupid = "0"
         else:
@@ -340,14 +384,30 @@ class Script(ZabbixBase):
                         self._module.fail_json(msg="When providing parameters to a webhook script, the 'name' option is required.")
                 request["parameters"] = parameters
 
+        if user_input_enabled:
+            request["manualinput_prompt"] = user_input_prompt
+            request["manualinput"] = "1"
+            if user_input_type == "regex":
+                request["manualinput_validator_type"] = "0"
+                request["manualinput_validator"] = user_input_regex
+                if user_input_default_input:
+                    request["manualinput_default_value"] = user_input_default_input
+
+            else:
+                request["manualinput_validator_type"] = "1"
+                request["manualinput_validator"] = ",".join(user_input_list)
+
         return request
 
     def update_script(self, script_id, name, script_type, command, scope, execute_on, menu_path, authtype, username, password,
                       publickey, privatekey, port, host_group, user_group, host_access, confirmation, script_timeout, parameters,
-                      description, url, new_window):
+                      description, url, new_window, user_input_enabled, user_input_type, user_input_regex, user_input_list,
+                      user_input_default_input, user_input_prompt):
         generated_config = self.generate_script_config(name, script_type, command, scope, execute_on, menu_path, authtype, username,
                                                        password, publickey, privatekey, port, host_group, user_group, host_access,
-                                                       confirmation, script_timeout, parameters, description, url, new_window)
+                                                       confirmation, script_timeout, parameters, description, url, new_window,
+                                                       user_input_enabled, user_input_type, user_input_regex, user_input_list,
+                                                       user_input_default_input, user_input_prompt)
         live_config = self._zapi.script.get({"filter": {"name": name}})[0]
 
         change_parameters = {}
@@ -407,6 +467,12 @@ def main():
             )
         ),
         description=dict(type="str"),
+        user_input_enabled=dict(type="bool", default=False),
+        user_input_prompt=dict(type="str"),
+        user_input_type=dict(type="str", choices=["regex", "dropdown"]),
+        user_input_regex=dict(type="str"),
+        user_input_list=dict(type="list", elements="str"),
+        user_input_default_input=dict(type="str"),
         state=dict(
             type="str",
             default="present",
@@ -422,7 +488,10 @@ def main():
         ("script_type", "telnet", ("username", "password", "command",)),
         ("script_type", "script", ("command",)),
         ("script_type", "ipmi", ("command",)),
-        ("script_type", "webhook", ("command",))
+        ("script_type", "webhook", ("command",)),
+        ("user_input_enabled", True, ("user_input_type", "user_input_prompt",)),
+        ("user_input_type", "regex", ("user_input_regex",)),
+        ("user_input_type", "dropdown", ("user_input_list",))
     ]
 
     module = AnsibleModule(
@@ -453,6 +522,12 @@ def main():
     state = module.params["state"]
     url = module.params["url"]
     new_window = module.params["new_window"]
+    user_input_enabled = module.params["user_input_enabled"]
+    user_input_prompt = module.params["user_input_prompt"]
+    user_input_type = module.params["user_input_type"]
+    user_input_regex = module.params["user_input_regex"]
+    user_input_list = module.params["user_input_list"]
+    user_input_default_input = module.params["user_input_default_input"]
 
     script = Script(module)
     script_ids = script.get_script_ids(name)
@@ -474,15 +549,43 @@ def main():
             if url:
                 module.fail_json(changed=False, msg="A url can only be set for a type of 'url'")
 
+        if not user_input_enabled:
+            FIELDS = {
+                "user_input_prompt": user_input_prompt,
+                "user_input_type": user_input_type,
+                "user_input_regex": user_input_regex,
+                "user_input_list": user_input_list,
+                "user_input_default_input": user_input_default_input
+            }
+            for f, v in FIELDS.items():
+                if v:
+                    module.fail_json(changed=False, msg=f"The attribute '{f}' can't be assigned unless user_input_enabled is 'True'")
+        else:
+            if LooseVersion(script._zbx_api_version) < LooseVersion('7.0'):
+                module.fail_json(changed=False, msg="user_input options are only available for Zabbix >= 7.0")
+            if len(user_input_prompt) < 1:
+                module.fail_json(changed=False, msg="The attribute 'user_input_prompt' is required when user_input_enabled is 'True'")
+            if user_input_type == "dropdown":
+                if len(user_input_list) < 1:
+                    module.fail_json(changed=False, msg="The attribute 'user_input_list' cannot be empty when user_input_type is 'dropdown'")
+                if user_input_regex:
+                    module.fail_json(changed=False, msg="The attribute 'user_input_regex' can't be assigned unless user_input_type is 'regex'")
+                elif user_input_default_input:
+                    module.fail_json(changed=False, msg="The attribute 'user_input_default_input' can't be assigned unless user_input_type is 'regex'")
+            elif user_input_list:
+                module.fail_json(changed=False, msg="The attribute 'user_input_list' can't be assigned unless user_input_type is 'dropdown'")
+
         if not script_ids:
             script.create_script(name, script_type, command, scope, execute_on, menu_path, authtype, username, password,
                                  publickey, privatekey, port, host_group, user_group, host_access, confirmation, script_timeout,
-                                 parameters, description, url, new_window)
+                                 parameters, description, url, new_window, user_input_enabled, user_input_type, user_input_regex,
+                                 user_input_list, user_input_default_input, user_input_prompt)
             module.exit_json(changed=True, msg="Script %s created" % name)
         else:
             script.update_script(script_ids[0], name, script_type, command, scope, execute_on, menu_path, authtype, username,
                                  password, publickey, privatekey, port, host_group, user_group, host_access, confirmation,
-                                 script_timeout, parameters, description, url, new_window)
+                                 script_timeout, parameters, description, url, new_window, user_input_enabled,
+                                 user_input_type, user_input_regex, user_input_list, user_input_default_input, user_input_prompt)
 
 
 if __name__ == "__main__":
