@@ -218,7 +218,7 @@ class ZabbixInventory(object):
                 # check for a interfaces list that contains at least interface
                 if len(host["interfaces"]) >= 1:
                     # use first interface only
-                    if host["interfaces"][0]["useip"] == 0:
+                    if host["interfaces"][0]["useip"] == '0':
                         hostvars["ansible_ssh_host"] = host["interfaces"][0]["dns"]
                     else:
                         hostvars["ansible_ssh_host"] = host["interfaces"][0]["ip"]
