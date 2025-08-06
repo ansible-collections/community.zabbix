@@ -1,0 +1,5 @@
+minor_changes:
+  - repo role - defaulting `zabbix_repo_apt_priority` to 1001
+  - repo role - defaulting `zabbix_repo_yum_gpgcheck` to 1
+  - repo role - defaulting `zabbix_repo_version` to 7.4
+  - server role - fixing zabbix_repo_package to repo role

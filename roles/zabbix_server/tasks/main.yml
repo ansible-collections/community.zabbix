@@ -15,7 +15,7 @@
   when: zabbix_server_version_check | bool
   ansible.builtin.assert:
     that:
-      - "{{ zabbix_server_version|float in zabbix_valid_server_versions[ ansible_facts['distribution_major_version'] ] }}"
+      - zabbix_server_version|float in zabbix_valid_server_versions[ ansible_facts['distribution_major_version'] ]
     fail_msg: Zabbix version {{ zabbix_server_version }} is not supported on {{ ansible_facts['distribution'] }} {{ ansible_facts['distribution_major_version'] }}
   tags:
     - always
@@ -24,9 +24,8 @@
   ansible.builtin.include_role:
     name: community.zabbix.zabbix_repo
   vars:
-    zabbix_repo_apt_priority: "{{ zabbix_server_apt_priority | default (omit) }}"
     zabbix_repo_version: "{{ zabbix_server_version }}"
-    zabbix_repo_package: "zabbix_server-{{ zabbix_proxy_database }}"
+    zabbix_repo_package: "zabbix-server-{{ zabbix_server_database }}"
   when: zabbix_manage_repo | default(true)
 
 - name: "Configure SELinux when enabled"

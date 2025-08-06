@@ -50,7 +50,6 @@
   vars:
     zabbix_repo_version: "{{ zabbix_agent_version }}"
     zabbix_repo_package: "{{ zabbix_agent_package }}"
-    zabbix_repo_apt_priority: "{{ zabbix_agent_apt_priority | default (omit) }}"
   when:
     - zabbix_manage_repo | default(true)
     - not (zabbix_agent_docker | bool)
@@ -76,7 +75,6 @@
 
 - name: "Run the API calls to Zabbix Server"
   vars:
-    gather_facts: false
     ansible_network_os: community.zabbix.zabbix
     ansible_connection: httpapi
     ansible_httpapi_use_ssl: "{{ zabbix_api_use_ssl }}"

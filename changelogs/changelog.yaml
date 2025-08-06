@@ -1485,3 +1485,29 @@ releases:
     - zabbix_service_idempotency.yml
     - zabbix_token_module_inverted_value.yaml
     release_date: '2025-06-10'
+  4.1.0:
+    changes:
+      bugfixes:
+      - Token Module - Fixed integration with Zabbix 7.4
+      deprecated_features:
+      - Web Role - Depricated `zabbix_web_SSLSessionCacheTimeout` for `zabbix_web_ssl_session_cache_timeout`
+      - Web Role - Depricated `zabbix_web_SSLSessionCache` for `zabbix_web_ssl_session_cache`
+      major_changes:
+      - All Roles - Updated to support Zabbix 7.4
+      minor_changes:
+      - Web Role - Added `zabbix_web_custom_php` to allow for addition of customer
+        PHP settings
+      - Web Role - Added support for `ssl_prefer_server_ciphers`
+      - Web Role - Added support for `zabbix_web_ssl_session_protocols`
+      - Web Role - Added support for `zabbix_web_ssl_session_stapling`
+      - roles/proxy - Fixing the zabbix_proxy_proxyconfigfrequency functionality
+      - zabbix_group_info - Add the possibility to retrive all host Group
+      - zabbix_template_info - Add the possibility to retrive all template Group
+    fragments:
+    - 1514.yml
+    - 1558_fixing_zabbix_proxy_proxyconfigfrequency.yml
+    - 1563.yml
+    - 1578.yml
+    - 1579.yml
+    - 882_add_all_hostgroups.yaml
+    release_date: '2025-07-21'

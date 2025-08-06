@@ -41,10 +41,14 @@ jobs:
           - mysql
           - pgsql
         version:
+          - v74
           - v72
           - v70
           - v60
         exclude:
+          - container:
+              image: debian11
+            version: v74
           - container:
               image: debian11
             version: v72

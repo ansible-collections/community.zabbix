@@ -330,6 +330,7 @@ class Trigger(ZabbixBase):
                 params['type'] = 1
             else:
                 params['type'] = 0
+            del params['generate_multiple_events']
         if 'recovery_mode' in params:
             recovery_mode_id = self.RECOVERY_MODES[params['recovery_mode']]
             params['recovery_mode'] = recovery_mode_id

@@ -10,10 +10,16 @@
     - install
 
 - name: "RedHat | Install GPG key"
-  ansible.builtin.rpm_key:
-    state: present
-    key: "{{ zabbix_repo_rpm_gpg_key_url }}"
+  ansible.builtin.get_url:
+    url: "{{ item }}"
+    dest: "/etc/pki/rpm-gpg/{{ item | basename }}"
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   become: true
+  loop:
+    - "{{ zabbix_repo_rpm_gpg_key_url }}"
+    - "{{ zabbix_repo_rpm_gpg_key_non_supported_url }}"
   tags:
     - install
 

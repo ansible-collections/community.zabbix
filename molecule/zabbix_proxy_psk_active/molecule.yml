@@ -9,8 +9,8 @@ driver:
   name: default
 
 platforms:
-  - name: zabbix-proxy-psk-active-${MY_MOLECULE_VERSION:-v72}-${MY_MOLECULE_DATABASE:-mysql}-${MY_MOLECULE_CONTAINER:-rockylinux8}
-    image: geerlingguy/docker-${MY_MOLECULE_IMAGE:-rockylinux8}-ansible:latest
+  - name: zabbix-proxy-psk-active-${MY_MOLECULE_VERSION:-v74}-${MY_MOLECULE_DATABASE:-mysql}-${MY_MOLECULE_CONTAINER:-rockylinux9}
+    image: geerlingguy/docker-${MY_MOLECULE_IMAGE:-rockylinux9}-ansible:latest
     privileged: true
     pre_build_image: true
     command: ${MOLECULE_DOCKER_COMMAND:-""}
@@ -19,10 +19,10 @@ platforms:
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:rw
     cgroupns_mode: host
-    zabbix_proxy_version: ${MY_MOLECULE_VERSION:-v70}
+    zabbix_proxy_version: ${MY_MOLECULE_VERSION:-v74}
     groups:
       - ${MY_MOLECULE_DATABASE:-mysql}
-      - ${MY_MOLECULE_VERSION:-v72}
+      - ${MY_MOLECULE_VERSION:-v74}
 
 provisioner:
   name: ansible
@@ -38,13 +38,11 @@ provisioner:
     group_vars:
       all:
         ansible_connection: community.docker.docker
-        zabbix_repo_apt_priority: 1
-        zabbix_repo_yum_gpg_check: 1
         zabbix_api_create_proxy: true
         zabbix_proxy_hostname: proxy1
         zabbix_api_server_port: 8080
         ansible_zabbix_url_path: ""
-        zabbix_proxy_server: zabbix-proxy-psk-active-${MY_MOLECULE_VERSION:-v72}-${MY_MOLECULE_DATABASE:-mysql}-${MY_MOLECULE_CONTAINER:-rockylinux8}-zserver
+        zabbix_proxy_server: zabbix-proxy-psk-active-${MY_MOLECULE_VERSION:-v72}-${MY_MOLECULE_DATABASE:-mysql}-${MY_MOLECULE_CONTAINER:-rockylinux9}-zserver
         zabbix_proxy_proxymode: 0
         zabbix_proxy_status: active
         zabbix_proxy_configfrequency: 10
@@ -52,6 +50,8 @@ provisioner:
         zabbix_proxy_tlspskfile: "/home/zabbix/proxy_psk"
         zabbix_proxy_tlspskidentity: "PSK {{ inventory_hostname }}"
         zabbix_proxy_tlspsk_secret: 'f1447b20c0243f3304062d3641fe7e341eb0106bd1adb4273f21659a7717ae6f'
+      v74:
+        zabbix_proxy_version: 7.4
       v72:
         zabbix_proxy_version: 7.2
       v70:

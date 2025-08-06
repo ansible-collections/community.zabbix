@@ -8,26 +8,25 @@ _zabbix_agent_install_recommends: false
 zabbix_valid_agent_versions:
   # Debian
   "12":
+    - 7.4
     - 7.2
     - 7.0
     - 6.0
 
   "11":
-    - 7.2
-    - 7.0
-    - 6.0
-
-  "9":
+    - 7.4
     - 7.2
     - 7.0
     - 6.0
   # Ubuntu
   "24":
+    - 7.4
     - 7.2
     - 7.0
     - 6.0
 
   "22":
+    - 7.4
     - 7.2
     - 7.0
     - 6.0
