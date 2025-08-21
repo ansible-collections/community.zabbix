@@ -138,7 +138,7 @@ Selinux changes will be installed based on the status of selinux running on the 
 * `zabbix_server_dbpassword_hash_method`: Default: `md5`. Allow switching postgresql user password creation to `scram-sha-256`, when anything other than `md5` is used then ansible won't hash the password with `md5`.
 * `zabbix_server_database_creation`: Default: `True`. When you don't want to create the database including user, you can set it to False.
 * `zabbix_server_install_database_client`: Default: `True`. False does not install database client.
-* `zabbix_server_database_install_dependencies`: Default: `True`. False does not install database and depenencies.
+* `zabbix_server_install_dependencies`: Default: `True`. False does not install database and depenencies.
 * `zabbix_server_database_sqlload`:True / False. When you don't want to load the sql files into the database, you can set it to False.
 * `zabbix_server_database_timescaledb`:False / True. When you want to use timescaledb extension into the database, you can set it to True (this option only works for postgreSQL database).
 * `zabbix_server_database_schemas`: List of schemas to load, can be overridden for a non-supported/custom setup.

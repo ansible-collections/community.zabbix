@@ -1,7 +1,7 @@
 ---
 # task file for mysql
 - name: "Install MySQL dependencies"
-  when: zabbix_server_database_install_dependencies
+  when: zabbix_server_install_dependencies
   ansible.builtin.package:
     name: "{{ _zabbix_server_mysql_dependencies | select | list }}"
   environment:

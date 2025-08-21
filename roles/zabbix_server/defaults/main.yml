@@ -26,7 +26,7 @@ zabbix_server_dbhost_run_install: true
 zabbix_server_database: pgsql
 zabbix_server_database_creation: true
 zabbix_server_install_database_client: true
-zabbix_server_database_install_dependencies: true
+zabbix_server_install_dependencies: true
 zabbix_server_database_schemas: "{{ _zabbix_server_database_schemas[zabbix_server_database] }}"
 
 # SELinux specific
