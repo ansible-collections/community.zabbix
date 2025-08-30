@@ -26,6 +26,7 @@ jobs:
       fail-fast: false
       matrix:
         container:
+          - image: rockylinux10
           - image: rockylinux9
           - image: rockylinux8
             ansible_core: ansible-core<2.17
