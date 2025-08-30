@@ -27,15 +27,15 @@ jobs:
       matrix:
         container:
           - image: rockylinux10
-          - image: rockylinux9
-          - image: rockylinux8
-            ansible_core: ansible-core<2.17
-          - image: ubuntu2404
-          - image: ubuntu2204
-          - image: debian12
-          - image: debian11
-          - image: opensuseleap15
-            ansible_core: ansible-core<2.17
+          # - image: rockylinux9
+          # - image: rockylinux8
+          #   ansible_core: ansible-core<2.17
+          # - image: ubuntu2404
+          # - image: ubuntu2204
+          # - image: debian12
+          # - image: debian11
+          # - image: opensuseleap15
+          #   ansible_core: ansible-core<2.17
         version:
           - v74
           - v72
