@@ -26,6 +26,7 @@ jobs:
       fail-fast: false
       matrix:
         container:
+          - image: rockylinux10
           - image: rockylinux9
           - image: rockylinux8
             ansible_core: ansible-core<2.17
@@ -39,7 +40,6 @@ jobs:
           - mysql
           - pgsql
         web_server:
-          # maybe add apache?
           - nginx
           - apache
         version:
@@ -48,6 +48,15 @@ jobs:
           - v70
           - v60
         exclude:
+          - container:
+              image: rockylinux10
+            version: v72
+          - container:
+              image: rockylinux10
+            version: v70
+          - container:
+              image: rockylinux10
+            version: v60
           - container:
               image: debian11
             version: v74

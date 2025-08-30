@@ -26,6 +26,7 @@ jobs:
       fail-fast: false
       matrix:
         container:
+          - image: rockylinux10
           - image: rockylinux9
           - image: rockylinux8
             ansible_core: ansible-core<2.17
@@ -48,6 +49,16 @@ jobs:
           - v72
           - v70
           - v60
+        exclude:
+          - container:
+              image: rockylinux10
+            version: v72
+          - container:
+              image: rockylinux10
+            version: v70
+          - container:
+              image: rockylinux10
+            version: v60
     steps:
       - name: Check out code
         uses: actions/checkout@v4
