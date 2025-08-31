@@ -8,8 +8,6 @@ on:
       - "molecule/requirements.txt"
       - ".github/workflows/server.yml"
       - "roles/zabbix_repo/**"
-      - "molecule/zabbix_repo/**"
-      - ".github/workflows/repo.yml"
   pull_request:
     paths:
       - "roles/zabbix_server/**"
@@ -17,8 +15,6 @@ on:
       - "molecule/requirements.txt"
       - ".github/workflows/server.yml"
       - "roles/zabbix_repo/**"
-      - "molecule/zabbix_repo/**"
-      - ".github/workflows/repo.yml"
 jobs:
   molecule:
     runs-on: ubuntu-22.04
@@ -27,15 +23,15 @@ jobs:
       matrix:
         container:
           - image: rockylinux10
-          # - image: rockylinux9
-          # - image: rockylinux8
-          #   ansible_core: ansible-core<2.17
-          # - image: ubuntu2404
-          # - image: ubuntu2204
-          # - image: debian12
-          # - image: debian11
-          # - image: opensuseleap15
-          #   ansible_core: ansible-core<2.17
+          - image: rockylinux9
+          - image: rockylinux8
+            ansible_core: ansible-core<2.17
+          - image: ubuntu2404
+          - image: ubuntu2204
+          - image: debian12
+          - image: debian11
+          - image: opensuseleap15
+            ansible_core: ansible-core<2.17
         collection_role:
           - zabbix_server
         database:
