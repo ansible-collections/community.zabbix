@@ -97,7 +97,7 @@ jobs:
           MY_MOLECULE_DOCKER_COMMAND=${{ matrix.command }}
           molecule test -s ${{ matrix.collection_role }}
 
-psk:
+  psk:
     runs-on: ubuntu-22.04
     strategy:
       fail-fast: false
