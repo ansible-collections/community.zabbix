@@ -46,6 +46,6 @@
     volumes: "{{ zabbix_agent_docker_volumes }}"
     env: "{{ zabbix_agent_docker_env }}"
   environment:
-    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
-    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
+    http_proxy: "{{ zabbix_http_proxy | default('') }}"
+    https_proxy: "{{ zabbix_https_proxy | default('') }}"
   become: true

@@ -6,8 +6,8 @@
     update_cache: true
     install_recommends: "{{ zabbix_apt_install_recommends | default(_zabbix_agent_install_recommends | default(omit)) }}"
   environment:
-    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
-    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
+    http_proxy: "{{ zabbix_http_proxy | default('') }}"
+    https_proxy: "{{ zabbix_https_proxy | default('') }}"
   register: zabbix_agent_selinux_installed
   until: zabbix_agent_selinux_installed is succeeded
   become: true
@@ -22,8 +22,8 @@
       - python3-policycoreutils
       - zabbix-selinux-policy
   environment:
-    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
-    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
+    http_proxy: "{{ zabbix_http_proxy | default('') }}"
+    https_proxy: "{{ zabbix_https_proxy | default('') }}"
   register: zabbix_agent_selinux_installed
   until: zabbix_agent_selinux_installed is succeeded
   when: ansible_facts['os_family'] == "RedHat"

@@ -70,7 +70,7 @@
         url_password: "{{ zabbix_download_pass | default(omit) }}"
         force: false
         follow_redirects: all
-        proxy_url: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
+        proxy_url: "{{ zabbix_https_proxy | default(omit) }}"
         validate_certs: "{{ zabbix_download_validate_certs | default(false) | bool }}"
         timeout: "{{ zabbix_download_timeout | default(120) | int }}"
       register: _zabbix_agent_win_download

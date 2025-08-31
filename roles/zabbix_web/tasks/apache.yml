@@ -14,8 +14,8 @@
     update_cache: true
     disablerepo: "{{ zabbix_web_disable_repo | default(_zabbix_web_disable_repo | default(omit)) }}"
   environment:
-    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
-    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
+    http_proxy: "{{ zabbix_http_proxy | default('') }}"
+    https_proxy: "{{ zabbix_https_proxy | default('') }}"
   register: zabbix_apache_conf_install
   until: zabbix_apache_conf_install is succeeded
   become: true
