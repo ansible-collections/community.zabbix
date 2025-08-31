@@ -14,8 +14,8 @@
     url: "{{ item }}"
     dest: "/etc/pki/rpm-gpg/{{ item | basename }}"
   environment:
-    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
-    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
+    http_proxy: "{{ zabbix_http_proxy | default('') }}"
+    https_proxy: "{{ zabbix_https_proxy | default('') }}"
   become: true
   loop:
     - "{{ zabbix_repo_rpm_gpg_key_url }}"

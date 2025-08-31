@@ -5,8 +5,8 @@
   ansible.builtin.package:
     name: "{{ _zabbix_proxy_pgsql_dependencies | select | list }}"
   environment:
-    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
-    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
+    http_proxy: "{{ zabbix_http_proxy | default('') }}"
+    https_proxy: "{{ zabbix_https_proxy | default('') }}"
   become: true
   register: _zabbix_proxy_pgsql_packages_installed
   until: _zabbix_proxy_pgsql_packages_installed is succeeded
