@@ -295,7 +295,6 @@ import re
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils._text import to_native
-from ansible.module_utils.six import PY2
 
 from ansible_collections.community.zabbix.plugins.module_utils.base import ZabbixBase
 from ansible.module_utils.compat.version import LooseVersion
@@ -583,13 +582,6 @@ class Template(ZabbixBase):
                 update_rules["groups"] = {"createMissing": True}
                 update_rules.pop("host_groups", None)
                 update_rules.pop("template_groups", None)
-
-            # The loaded unicode slash of multibyte as a string is escaped when parsing JSON by json.loads in Python2.
-            # So, it is imported in the unicode string into Zabbix.
-            # The following processing is removing the unnecessary slash in escaped for decoding correctly to the multibyte string.
-            # https://github.com/ansible-collections/community.zabbix/issues/314
-            if PY2:
-                template_content = re.sub(r"\\\\u([0-9a-z]{,4})", r"\\u\1", template_content)
 
             import_data = {"format": template_type, "source": template_content, "rules": update_rules}
             self._zapi.configuration.import_(import_data)
