@@ -1,13 +1,12 @@
 ---
 - name: Get latest zabbix releases
-  delegate_to: localhost
-  uri:
+  win_uri:
     url: https://services.zabbix.com/updates/v1
     return_content: true
   register: _zabbix_versions
   run_once: true
 
-- name: Set zabbix_version_long
+- name: Set zabbix_agent_version_long
   set_fact:
     zabbix_agent_version_long: "{{ _zabbix_versions.json | json_query(_latest_release) }}"
   vars:
