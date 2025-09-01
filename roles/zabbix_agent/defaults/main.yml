@@ -5,7 +5,6 @@ zabbix_agent_version_check: true
 
 zabbix_agent2: false
 zabbix_agent_version_minor: "*"
-zabbix_version_patch: 0
 zabbix_agent_package_remove: false
 zabbix_agent_package: "{{ _zabbix_agent_package | default(zabbix_agent2 | ternary('zabbix-agent2', 'zabbix-agent')) }}"
 zabbix_agent_package_state: present
