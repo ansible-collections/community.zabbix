@@ -1,4 +1,6 @@
 zabbix_valid_proxy_versions:
+  "10":
+    - 7.4
   "9":
     - 7.4
     - 7.2
@@ -15,7 +17,7 @@ _zabbix_proxy_pgsql_dependencies:
   - python3-psycopg2
 
 _zabbix_proxy_mysql_dependencies:
-  - "{{ zabbix_proxy_install_database_client | ternary('mysql', '') }}"
+  - "{{ zabbix_proxy_install_database_client | ternary(_zabbix_mysql_binary_name, '') }}"
   - python3-PyMySQL
 
 _zabbix_proxy_sqlite3_dependencies:
@@ -30,3 +32,5 @@ _zabbix_proxy_packages:
 
 _zabbix_proxy_disable_repo:
   - epel
+
+_zabbix_mysql_binary_name: "{{ (ansible_facts['distribution_major_version'] != '10') | ternary( 'mysql', 'mysql8.4') }}"

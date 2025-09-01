@@ -11,6 +11,8 @@ _zabbix_agent_disable_repo:
   - epel
 
 zabbix_valid_agent_versions:
+  "10":
+    - 7.4
   "9":
     - 7.4
     - 7.2
