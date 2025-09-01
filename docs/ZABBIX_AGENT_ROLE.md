@@ -223,7 +223,6 @@ Otherwise it just for the Zabbix Agent or for the Zabbix Agent 2.
 * `zabbix_win_firewall_management`: Enable Windows firewall management (add service and port to allow rules). Default: `True`
 * `zabbix_agent_win_install_dir`: The directory where Zabbix needs to be installed. Default: `C:\Program Files\Zabbix Agent 2` when variable `zabbix_agent2` is true, `C:\Program Files\Zabbix Agent` when `zabbix_agent2` is false.
 * `zabbix_agent_win_install_dir_conf`: The directory where Zabbix configuration file needs to be installed. Default: `zabbix_agent_win_install_dir`
-* `zabbix_win_install_dir_bin`: The directory where Zabbix binary file needs to be installed.
 * `zabbix_win_package`: file name pattern (zip only). This will be used to generate the `zabbix_win_download_link` variable.
 
 ### Tweaking the windows service
