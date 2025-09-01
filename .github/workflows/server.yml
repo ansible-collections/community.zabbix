@@ -8,8 +8,6 @@ on:
       - "molecule/requirements.txt"
       - ".github/workflows/server.yml"
       - "roles/zabbix_repo/**"
-      - "molecule/zabbix_repo/**"
-      - ".github/workflows/repo.yml"
   pull_request:
     paths:
       - "roles/zabbix_server/**"
@@ -17,8 +15,6 @@ on:
       - "molecule/requirements.txt"
       - ".github/workflows/server.yml"
       - "roles/zabbix_repo/**"
-      - "molecule/zabbix_repo/**"
-      - ".github/workflows/repo.yml"
 jobs:
   molecule:
     runs-on: ubuntu-22.04
@@ -26,6 +22,7 @@ jobs:
       fail-fast: false
       matrix:
         container:
+          - image: rockylinux10
           - image: rockylinux9
           - image: rockylinux8
             ansible_core: ansible-core<2.17
@@ -46,6 +43,15 @@ jobs:
           - v70
           - v60
         exclude:
+          - container:
+              image: rockylinux10
+            version: v72
+          - container:
+              image: rockylinux10
+            version: v70
+          - container:
+              image: rockylinux10
+            version: v60
           - container:
               image: debian11
             version: v74
