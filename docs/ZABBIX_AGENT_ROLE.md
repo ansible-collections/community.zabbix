@@ -218,7 +218,7 @@ Otherwise it just for the Zabbix Agent or for the Zabbix Agent 2.
 
 * `zabbix_agent_win_include`: The directory in which the Zabbix Agent specific configuration files are stored.
 * `zabbix_agent_win_logfile`: The full path to the logfile for the Zabbix Agent.
-* `zabbix_version_long`: The long (major.minor.patch) version of the Zabbix Agent. This will be used to generate the `zabbix_win_package` and `zabbix_win_download_link` variables. This takes precedence over `zabbix_agent_version`.
+* `zabbix_agent_version_long`: The long (major.minor.patch) version of the Zabbix Agent. This will be used to generate the `zabbix_win_package` and `zabbix_win_download_link` variables. This takes precedence over `zabbix_agent_version`.
 * `zabbix_win_download_link`: The download url to the `win.zip` file.
 * `zabbix_win_firewall_management`: Enable Windows firewall management (add service and port to allow rules). Default: `True`
 * `zabbix_agent_win_install_dir`: The directory where Zabbix needs to be installed. Default: `C:\Program Files\Zabbix Agent 2` when variable `zabbix_agent2` is true, `C:\Program Files\Zabbix Agent` when `zabbix_agent2` is false.
@@ -253,8 +253,8 @@ _Supporting macOS is a best effort (We don't have the possibility to either test
 
 * `zabbix_mac_download_link`: The download url to the `pkg` file.
 * `zabbix_mac_download_url`: The download url.  Default `https://cdn.zabbix.com/zabbix/binaries/stable`
-* `zabbix_mac_package`: The name of the mac install package.  Default `zabbix_agent-{{ zabbix_version_long }}-macos-amd64-openssl.pkg`
-* `zabbix_version_long`: The long (major.minor.patch) version of the Zabbix Agent. This will be used to generate the `zabbix_mac_download_link` link.
+* `zabbix_mac_package`: The name of the mac install package.  Default `zabbix_agent-{{ zabbix_agent_version_long }}-macos-amd64-openssl.pkg`
+* `zabbix_agent_version_long`: The long (major.minor.patch) version of the Zabbix Agent. This will be used to generate the `zabbix_mac_download_link` link.
 
 ## Docker Variables
 
