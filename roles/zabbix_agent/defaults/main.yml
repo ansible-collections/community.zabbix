@@ -5,7 +5,7 @@ zabbix_agent_version_check: true
 
 zabbix_agent2: false
 zabbix_agent_version_minor: "*"
-zabbix_version_patch: 0
+#zabbix_agent_version_long: 7.4.2
 zabbix_agent_package_remove: false
 zabbix_agent_package: "{{ _zabbix_agent_package | default(zabbix_agent2 | ternary('zabbix-agent2', 'zabbix-agent')) }}"
 zabbix_agent_package_state: present
@@ -121,9 +121,8 @@ zabbix_agent_win_service: "{{ zabbix_agent2 | ternary('Zabbix Agent 2', 'Zabbix 
 zabbix_win_firewall_management: true
 
 # macOS Related
-zabbix_version_long: 5.2.4
-zabbix_mac_package: zabbix_agent-{{ zabbix_version_long }}-macos-amd64-openssl.pkg
-zabbix_mac_download_link: "{{ zabbix_agent_download_base_url }}/{{ zabbix_agent_version }}/{{ zabbix_version_long }}/{{ zabbix_mac_package }}"
+zabbix_mac_package: "zabbix_agent-{{ zabbix_agent_version_long }}-macos-amd64-openssl.pkg"
+zabbix_mac_download_link: "{{ zabbix_agent_download_base_url }}/{{ zabbix_agent_version }}/{{ zabbix_agent_version_long }}/{{ zabbix_mac_package }}"
 
 # Zabbix Agent Docker facts
 zabbix_agent_docker: false
