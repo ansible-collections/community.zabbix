@@ -4,6 +4,36 @@ community.zabbix Release Notes
 
 .. contents:: Topics
 
+v4.1.0
+======
+
+Major Changes
+-------------
+
+- All Roles - Updated to support Zabbix 7.4
+
+Minor Changes
+-------------
+
+- Web Role - Added `zabbix_web_custom_php` to allow for addition of customer PHP settings
+- Web Role - Added support for `ssl_prefer_server_ciphers`
+- Web Role - Added support for `zabbix_web_ssl_session_protocols`
+- Web Role - Added support for `zabbix_web_ssl_session_stapling`
+- roles/proxy - Fixing the zabbix_proxy_proxyconfigfrequency functionality
+- zabbix_group_info - Add the possibility to retrive all host Group
+- zabbix_template_info - Add the possibility to retrive all template Group
+
+Deprecated Features
+-------------------
+
+- Web Role - Depricated `zabbix_web_SSLSessionCacheTimeout` for `zabbix_web_ssl_session_cache_timeout`
+- Web Role - Depricated `zabbix_web_SSLSessionCache` for `zabbix_web_ssl_session_cache`
+
+Bugfixes
+--------
+
+- Token Module - Fixed integration with Zabbix 7.4
+
 v4.0.0
 ======
 

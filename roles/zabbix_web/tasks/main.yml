@@ -56,7 +56,6 @@
   vars:
     zabbix_repo_version: "{{ zabbix_web_version }}"
     zabbix_repo_package: "zabbix-web-service"
-    zabbix_repo_apt_priority: "{{ zabbix_web_apt_priority | default (omit) }}"
   when: zabbix_manage_repo | default(true)
 
 - name: Include OS Specific Tasks
@@ -69,8 +68,8 @@
     update_cache: true
     disablerepo: "{{ zabbix_web_disable_repo | default(_zabbix_web_disable_repo | default(omit)) }}"
   environment:
-    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
-    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
+    http_proxy: "{{ zabbix_http_proxy | default('') }}"
+    https_proxy: "{{ zabbix_https_proxy | default('') }}"
   register: _zabbix_web_package_installed
   until: _zabbix_web_package_installed is succeeded
   become: true

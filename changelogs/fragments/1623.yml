@@ -1,0 +1,3 @@
+bugfixes:
+  - zabbix_template - Removed need for PY2
+  - zabbix_template_info - Removed need for PY2

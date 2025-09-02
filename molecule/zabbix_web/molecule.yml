@@ -10,8 +10,8 @@ driver:
   name: default
 
 platforms:
-  - name: zabbix-web-${MY_MOLECULE_VERSION:-v74}-${MY_MOLECULE_DATABASE:-mysql}-${MY_MOLECULE_CONTAINER:-rockylinux9}
-    image: geerlingguy/docker-${MY_MOLECULE_IMAGE:-rockylinux9}-ansible:latest
+  - name: zabbix-web-${MY_MOLECULE_VERSION:-v74}-${MY_MOLECULE_DATABASE:-mysql}-${MY_MOLECULE_CONTAINER:-rockylinux10}
+    image: geerlingguy/docker-${MY_MOLECULE_IMAGE:-rockylinux10}-ansible:latest
     privileged: true
     pre_build_image: true
     command: ${MOLECULE_DOCKER_COMMAND:-""}
@@ -38,9 +38,7 @@ provisioner:
     group_vars:
       all:
         ansible_connection: community.docker.docker
-        zabbix_api_server_url: zabbix-web-${MY_MOLECULE_VERSION:-v74}-${MY_MOLECULE_DATABASE:-mysql}-${MY_MOLECULE_CONTAINER:-rockylinux9}
-        zabbix_repo_apt_priority: 1
-        zabbix_repo_yum_gpg_check: 1
+        zabbix_api_server_url: zabbix-web-${MY_MOLECULE_VERSION:-v74}-${MY_MOLECULE_DATABASE:-mysql}-${MY_MOLECULE_CONTAINER:-rockylinux10}
       v74:
         zabbix_server_version: 7.4
         zabbix_web_version: 7.4

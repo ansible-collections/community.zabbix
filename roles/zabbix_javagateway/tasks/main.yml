@@ -24,7 +24,6 @@
   ansible.builtin.include_role:
     name: community.zabbix.zabbix_repo
   vars:
-    zabbix_repo_apt_priority: "{{ zabbix_proxy_javagateway_priority | default (omit) }}"
     zabbix_repo_version: "{{ zabbix_javagateway_version }}"
     zabbix_repo_package: "zabbix-java-gateway"
   when: zabbix_manage_repo | default(true)
@@ -39,8 +38,8 @@
       - java-{{ zabbix_javagateway_openjdk_version }}-openjdk
     state: "{{ zabbix_javagateway_package_state }}"
   environment:
-    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
-    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
+    http_proxy: "{{ zabbix_http_proxy | default('') }}"
+    https_proxy: "{{ zabbix_https_proxy | default('') }}"
   register: _zabbix_javagateway_openjdk
   until: _zabbix_javagateway_openjdk is succeeded
   become: true
@@ -55,8 +54,8 @@
     disablerepo: "{{ zabbix_javagateway_disable_repo | default(_zabbix_javagateway_disable_repo | default(omit)) }}"
     install_recommends: "{{ zabbix_javagateway_install_recommends | default(_zabbix_javagateway_install_recommends | default(omit)) }}"
   environment:
-    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
-    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
+    http_proxy: "{{ zabbix_http_proxy | default('') }}"
+    https_proxy: "{{ zabbix_https_proxy | default('') }}"
   register: _zabbix_javagateway_install
   until: _zabbix_javagateway_install is succeeded
   become: true

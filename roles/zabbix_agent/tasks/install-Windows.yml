@@ -4,7 +4,7 @@
   block:
     - name: Get latest zabbix releases
       delegate_to: localhost
-      ansible.builtin.uri:
+      ansible.builtin.win_uri:
         url: https://services.zabbix.com/updates/v1
         return_content: true
       register: _zabbix_versions
@@ -65,7 +65,7 @@
           register: _zabbix_agent_win_download
           until: _zabbix_agent_win_download is succeeded
           throttle: "{{ zabbix_download_throttle | default(5) | int }}"
-
+          
         # Would be sweet if this worked.
         # - name: Install Zabbix Agent
         #   ansible.windows.win_package:

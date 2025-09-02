@@ -4,8 +4,8 @@
   ansible.builtin.package:
     name: "{{ _zabbix_server_mysql_dependencies | select | list }}"
   environment:
-    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
-    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
+    http_proxy: "{{ zabbix_http_proxy | default('') }}"
+    https_proxy: "{{ zabbix_https_proxy | default('') }}"
   register: _zabbix_server_dependencies_installed
   until: _zabbix_server_dependencies_installed is succeeded
   become: true

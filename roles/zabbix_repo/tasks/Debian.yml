@@ -7,8 +7,8 @@
     force: true
     state: present
   environment:
-    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
-    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
+    http_proxy: "{{ zabbix_http_proxy | default('') }}"
+    https_proxy: "{{ zabbix_https_proxy | default('') }}"
   register: gnupg_installed
   until: gnupg_installed is succeeded
   become: true
@@ -36,8 +36,8 @@
     mode: "0644"
     force: true
   environment:
-    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
-    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
+    http_proxy: "{{ zabbix_http_proxy | default('') }}"
+    https_proxy: "{{ zabbix_https_proxy | default('') }}"
   register: zabbix_repo_files_installed
   until: zabbix_repo_files_installed is succeeded
   become: true
@@ -68,9 +68,6 @@
     path: /etc/apt/preferences.d/
     state: directory
     mode: "0755"
-  when:
-    - zabbix_repo_apt_priority is defined
-    - zabbix_repo_apt_priority | int
   become: true
   tags:
     - install
@@ -85,8 +82,6 @@
     owner: root
     mode: "0644"
   when:
-    - zabbix_repo_apt_priority is defined
-    - zabbix_repo_apt_priority | int
     - zabbix_repo_package is defined
     - zabbix_repo_package
   become: true
