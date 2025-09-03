@@ -166,7 +166,7 @@ class HttpApi(HttpApiBase):
                     # Re-send the request we initially were trying to execute
                     response, response_data = self.connection.send(
                         path,
-                        data,
+                        json.dumps(data),
                         method=request_method,
                         headers=headers
                     )
