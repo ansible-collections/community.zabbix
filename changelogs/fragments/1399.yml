@@ -1,2 +1,0 @@
-bugfixes:
-  - Proxy Role - Fixed a deprication error with `ProxyConfigFrequency`
