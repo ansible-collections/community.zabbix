@@ -162,9 +162,7 @@ class HttpApi(HttpApiBase):
                     # Need to login with new username/password
                     self.login(self.connection.get_option('remote_user'), self.connection.get_option('password'))
                     # Replace 'auth' field in payload with new one (we got from login process)
-                    data = json.loads(data)
                     data['auth'] = self.connection._auth['auth']
-                    data = json.dumps(data)
                     # Re-send the request we initially were trying to execute
                     response, response_data = self.connection.send(
                         path,
