@@ -67,86 +67,92 @@ from ansible.errors import AnsibleConnectionFailure
 from ansible.plugins.httpapi import HttpApiBase
 from ansible.module_utils.compat.version import StrictVersion
 from ansible.module_utils.connection import ConnectionError
+from ansible.module_utils.common.parameters import remove_values
 
 
 class HttpApi(HttpApiBase):
     auth = None
-    url_path = '/zabbix'  # By default Zabbix WebUI is on http(s)://FQDN/zabbix
+    url_path = "/zabbix"  # By default Zabbix WebUI is on http(s)://FQDN/zabbix
 
     def __init__(self, connection):
         super().__init__(connection)
-        self.connection._auth = {'Content-Type': 'application/json-rpc'}
+        self.connection._auth = {"Content-Type": "application/json-rpc"}
 
     def set_become(self, become_context):
-        """As this is an http rpc call there is no elevation available
-        """
+        """As this is an http rpc call there is no elevation available"""
         pass
 
     def update_auth(self, response, response_text):
         return None
 
     def login(self, username, password):
-        if auth_key := self.get_option('zabbix_auth_key'):
+        if auth_key := self.get_option("zabbix_auth_key"):
             self.auth = auth_key
             return
 
-        payload = self.payload_builder("user.login", username=username, password=password)
+        payload = self.payload_builder(
+            "user.login", username=username, password=password
+        )
 
         code, response = self.send_request(data=payload)
 
-        if code == 200 and response != '':
+        if code == 200 and response != "":
             self.auth = response
 
     def logout(self):
-        if self.auth and not self.get_option('zabbix_auth_key'):
+        if self.auth and not self.get_option("zabbix_auth_key"):
             payload = self.payload_builder("user.logout")
             self.send_request(data=payload)
 
     def api_version(self):
-        url_path = self.get_option('zabbix_url_path')
+        url_path = self.get_option("zabbix_url_path")
         if isinstance(url_path, str):
             # zabbix_url_path provided (even if it is an empty string)
-            if url_path == '':
-                self.url_path = ''
+            if url_path == "":
+                self.url_path = ""
             else:
-                self.url_path = '/' + url_path
-        if not hasattr(self.connection, 'zbx_api_version'):
-            code, version = self.send_request(data=self.payload_builder('apiinfo.version'))
+                self.url_path = "/" + url_path
+        if not hasattr(self.connection, "zbx_api_version"):
+            code, version = self.send_request(
+                data=self.payload_builder("apiinfo.version")
+            )
             if code == 200 and len(version) != 0:
                 self.connection.zbx_api_version = version
             else:
-                raise ConnectionError("Could not get API version from Zabbix. Got HTTP code %s. Got version %s" % (code, version))
+                raise ConnectionError(
+                    "Could not get API version from Zabbix. Got HTTP code %s. Got version %s"
+                    % (code, version)
+                )
         return self.connection.zbx_api_version
 
     def send_request(self, data, request_method="POST", path="/api_jsonrpc.php"):
         headers = {}
         # Apply custom headers first. Plugin-specific headers set later will take precedence.
-        custom_headers = self.get_option('zabbix_http_headers')
+        custom_headers = self.get_option("zabbix_http_headers")
         if isinstance(custom_headers, dict):
             headers.update(custom_headers)
 
         path = self.url_path + path
 
-        if self.auth and data['method'] not in ['user.login', 'apiinfo.version']:
-            if StrictVersion(self.api_version()) >= StrictVersion('6.4'):
-                headers['Authorization'] = 'Bearer ' + self.auth
+        if self.auth and data["method"] not in ["user.login", "apiinfo.version"]:
+            if StrictVersion(self.api_version()) >= StrictVersion("6.4"):
+                headers["Authorization"] = "Bearer " + self.auth
             else:
-                data['auth'] = self.auth
+                data["auth"] = self.auth
 
-        http_login_user = self.get_option('http_login_user')
-        http_login_password = self.get_option('http_login_password')
-        if http_login_user and http_login_user != '-42':
+        http_login_user = self.get_option("http_login_user")
+        http_login_password = self.get_option("http_login_password")
+        if http_login_user and http_login_user != "-42":
             # Need to add Basic auth header
-            credentials = (http_login_user + ':' + http_login_password).encode('ascii')
-            headers['Authorization'] = 'Basic ' + base64.b64encode(credentials).decode("ascii")
+            credentials = (http_login_user + ":" + http_login_password).encode("ascii")
+            headers["Authorization"] = "Basic " + base64.b64encode(credentials).decode(
+                "ascii"
+            )
 
         try:
-            self._display_request(request_method, path, data['method'])
+            self._display_request(request_method, path, data["method"])
             response, response_data = self.connection.send(
-                path,
-                json.dumps(data),
-                method=request_method,
-                headers=headers
+                path, json.dumps(data), method=request_method, headers=headers
             )
             value = to_text(response_data.getvalue())
 
@@ -160,17 +166,15 @@ class HttpApi(HttpApiBase):
                 # Get this response from Zabbix when we switch username to execute REST API
                 if "re-login" in json_data["error"]["data"]:
                     # Need to login with new username/password
-                    self.login(self.connection.get_option('remote_user'), self.connection.get_option('password'))
+                    self.login(
+                        self.connection.get_option("remote_user"),
+                        self.connection.get_option("password"),
+                    )
                     # Replace 'auth' field in payload with new one (we got from login process)
-                    data = json.loads(data)
-                    data['auth'] = self.connection._auth['auth']
-                    data = json.dumps(data)
+                    data["auth"] = self.connection._auth["auth"]
                     # Re-send the request we initially were trying to execute
                     response, response_data = self.connection.send(
-                        path,
-                        data,
-                        method=request_method,
-                        headers=headers
+                        path, json.dumps(data), method=request_method, headers=headers
                     )
                     value = to_text(response_data.getvalue())
 
@@ -181,7 +185,18 @@ class HttpApi(HttpApiBase):
                         raise ConnectionError("Invalid JSON response: %s" % value)
 
                     if "error" in json_data:
-                        raise ConnectionError("REST API returned %s when sending %s" % (json_data["error"], data))
+                        raise ConnectionError(
+                            "REST API returned %s when sending %s"
+                            % (
+                                json_data["error"],
+                                remove_values(
+                                    data,
+                                    [
+                                        self.connection.get_option("password"),
+                                    ],
+                                ),
+                            )
+                        )
 
                     if "result" in json_data:
                         json_data = json_data["result"]
@@ -195,7 +210,18 @@ class HttpApi(HttpApiBase):
 
                     return response.getcode(), json_data
 
-                raise ConnectionError("REST API returned %s when sending %s" % (json_data["error"], data))
+                raise ConnectionError(
+                    "REST API returned %s when sending %s"
+                    % (
+                        json_data["error"],
+                        remove_values(
+                            data,
+                            [
+                                self.connection.get_option("password"),
+                            ],
+                        ),
+                    )
+                )
 
             if "result" in json_data:
                 json_data = json_data["result"]
@@ -222,8 +248,8 @@ class HttpApi(HttpApiBase):
     def _display_request(self, request_method, path, jsonrpc_method):
         self.connection.queue_message(
             "vvvv",
-            "Zabbix httpapi request: %s %s%s (%s)" % (
-                request_method, self.connection._url, path, jsonrpc_method),
+            "Zabbix httpapi request: %s %s%s (%s)"
+            % (request_method, self.connection._url, path, jsonrpc_method),
         )
 
     def _get_response_value(self, response_data):
@@ -239,8 +265,8 @@ class HttpApi(HttpApiBase):
     @staticmethod
     def payload_builder(method_, auth_=None, **kwargs):
         reqid = str(uuid4())
-        req = {'jsonrpc': '2.0', 'method': method_, 'id': reqid}
-        req['params'] = (kwargs)
+        req = {"jsonrpc": "2.0", "method": method_, "id": reqid}
+        req["params"] = kwargs
 
         return req
 
