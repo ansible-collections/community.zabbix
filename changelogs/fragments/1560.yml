@@ -1,3 +1,0 @@
----
-bugfixes:
-  - zabbix_agent role - Fix windows paths to download and install zabbix agent msi

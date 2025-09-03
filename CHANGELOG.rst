@@ -4,6 +4,44 @@ community.zabbix Release Notes
 
 .. contents:: Topics
 
+v4.1.1
+======
+
+Minor Changes
+-------------
+
+- repo role - Added proxy support when downloading RedHat GPG key.
+- repo role - Added support for `zabbix_repo_deb_schema`
+- repo role - defaulting `zabbix_repo_apt_priority` to 1001
+- repo role - defaulting `zabbix_repo_version` to 7.4
+- repo role - defaulting `zabbix_repo_yum_gpgcheck` to 1
+- roles/agent, check to see if zabbix_agent_version_long is already supplied
+- roles/agent, swap uri with win_uri
+- server role - fixing zabbix_repo_package to repo role
+- zabbix_agent - Removed zabbix_win_install_dir variable and replaced with zabbix_agent_win_install_dir
+- zabbix_agent - Removed zabbix_win_install_dir_conf variable and replaced with zabbix_agent_win_install_dir_conf
+- zabbix_maintenance - Added support for multiple outage periods within a single event
+- zabbix_maintenance - Added support for recuring maintenance windows
+- zabbix_script - Added support for type 'url'
+- zabbix_script - Added support for user input.
+
+Deprecated Features
+-------------------
+
+- zabbix_maintenance module - Depreicated `minutes` argument for `time_periods`
+
+Bugfixes
+--------
+
+- Proxy Role - Fixed a deprication error with `ProxyConfigFrequency`
+- web role - Fixed a value test in nginx_vhost.conf
+- zabbix_agent - Fix all variables related to windows installation paths
+- zabbix_agent role - Fix windows paths to download and install zabbix agent msi
+- zabbix_agent role - fixes too many requests to check latest zabbix release
+- zabbix_maintenance - Fixed a bug that caused start time to update across multiple runs
+- zabbix_template - Removed need for PY2
+- zabbix_template_info - Removed need for PY2
+
 v4.1.0
 ======
 
