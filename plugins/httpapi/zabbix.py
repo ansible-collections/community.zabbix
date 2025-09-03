@@ -67,6 +67,7 @@ from ansible.errors import AnsibleConnectionFailure
 from ansible.plugins.httpapi import HttpApiBase
 from ansible.module_utils.compat.version import StrictVersion
 from ansible.module_utils.connection import ConnectionError
+from ansible.module_utils.common.parameters import remove_values
 
 
 class HttpApi(HttpApiBase):
@@ -179,7 +180,7 @@ class HttpApi(HttpApiBase):
                         raise ConnectionError("Invalid JSON response: %s" % value)
 
                     if "error" in json_data:
-                        raise ConnectionError("REST API returned %s when sending %s" % (json_data["error"], data))
+                        raise ConnectionError("REST API returned %s when sending %s" % (json_data["error"], remove_values(data, ['password'])))
 
                     if "result" in json_data:
                         json_data = json_data["result"]
@@ -193,7 +194,7 @@ class HttpApi(HttpApiBase):
 
                     return response.getcode(), json_data
 
-                raise ConnectionError("REST API returned %s when sending %s" % (json_data["error"], data))
+                raise ConnectionError("REST API returned %s when sending %s" % (json_data["error"], remove_values(data, ['password'])))
 
             if "result" in json_data:
                 json_data = json_data["result"]
