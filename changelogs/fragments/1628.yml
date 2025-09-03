@@ -1,3 +1,0 @@
-minor_changes:
-  - roles/agent, swap uri with win_uri
-  - roles/agent, check to see if zabbix_agent_version_long is already supplied
