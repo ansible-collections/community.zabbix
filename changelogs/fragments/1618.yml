@@ -1,0 +1,3 @@
+---
+minor_changes:
+  - role zabbix_server - Added option to disable install task for cliend and dependencies with variable `zabbix_server_install_dependencies`. Default is `True`.
