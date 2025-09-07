@@ -19,6 +19,11 @@ author:
 requirements:
     - "python >= 3.9"
 options:
+    host_name:
+        type: "str"
+        description:
+            - Name of host to add value map to.
+        required: true
     name:
         type: "str"
         description:
@@ -46,6 +51,10 @@ options:
             map_to:
                 type: "str"
                 description: Value to which the original value is mapped to.
+                required: true
+            type:
+                type: "int"
+                description: Mapping match type.
                 required: true
 
 extends_documentation_fragment:
@@ -80,12 +89,14 @@ EXAMPLES = r"""
     ansible_zabbix_url_path: "zabbixeu"  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
     ansible_host: zabbix-example-fqdn.org
   community.zabbix.zabbix_valuemap:
+    host_name: example_host
     name: Numbers
     mappings:
       - value: 1
         map_to: one
       - value: 2
         map_to: two
+        type: 0
     state: present
 """
 
@@ -106,15 +117,18 @@ def construct_parameters(**kwargs):
     """
     if kwargs["mappings"] is None:
         return dict(
+            hostid=kwargs["hostid"],
             name=kwargs["name"]
         )
 
     return dict(
+        hostid=kwargs["hostid"],
         name=kwargs["name"],
         mappings=[
             dict(
                 value=mapping["value"],
-                newvalue=mapping["map_to"]
+                newvalue=mapping["map_to"],
+                type=str(mapping["type"])
             ) for mapping in kwargs["mappings"]
         ]
     )
@@ -164,7 +178,14 @@ def get_update_params(existing_valuemap, **kwargs):
 
 
 class ValuemapModule(ZabbixBase):
-    def check_if_valuemap_exists(self, name):
+    def get_host_id(self, host_name):
+        host_list = self._zapi.host.get({"filter": {"host": host_name}})
+        if len(host_list) < 1:
+            self._module.fail_json(msg="Host not found: %s" % host_name)
+        else:
+            return host_list[0]["hostid"]
+
+    def check_if_valuemap_exists(self, hostid, name):
         """Checks if value map exists.
 
         Args:
@@ -178,8 +199,10 @@ class ValuemapModule(ZabbixBase):
             valuemap_list = self._zapi.valuemap.get({
                 "output": "extend",
                 "selectMappings": "extend",
-                "filter": {"name": [name]}
+                "filter": {"hostid": [hostid], "name": [name]}
             })
+            if len(valuemap_list) > 0:
+                valuemap_list = [valuemap for valuemap in valuemap_list if valuemap["uuid"] == ""]
             if len(valuemap_list) < 1:
                 return False, None
             else:
@@ -209,6 +232,7 @@ class ValuemapModule(ZabbixBase):
 def main():
     argument_spec = zabbix_utils.zabbix_common_argument_spec()
     argument_spec.update(dict(
+        host_name=dict(type="str", required=True),
         name=dict(type="str", required=True),
         state=dict(type="str", default="present", choices=["present", "absent"]),
         mappings=dict(
@@ -216,7 +240,8 @@ def main():
             elements="dict",
             options=dict(
                 value=dict(type="str", required=True),
-                map_to=dict(type="str", required=True)
+                map_to=dict(type="str", required=True),
+                type=dict(type="int", required=False, default=0)
             )
         )
     ))
@@ -230,13 +255,16 @@ def main():
 
     vm = ValuemapModule(module)
 
+    host_name = module.params["host_name"]
+    hostid = vm.get_host_id(host_name)
     name = module.params["name"]
     state = module.params["state"]
     mappings = module.params["mappings"]
 
-    valuemap_exists, valuemap_object = vm.check_if_valuemap_exists(name)
+    valuemap_exists, valuemap_object = vm.check_if_valuemap_exists(hostid, name)
 
     parameters = construct_parameters(
+        hostid=hostid,
         name=name,
         mappings=mappings
     )
@@ -247,7 +275,8 @@ def main():
             if module.check_mode:
                 module.exit_json(
                     changed=True,
-                    msg="Value map would have been deleted. Name: {name}, ID: {_id}".format(
+                    msg="Value map would have been deleted. Host name: {host_name}, Name: {name}, ID: {_id}".format(
+                        host_name=host_name,
                         name=name,
                         _id=valuemap_id
                     )
@@ -255,7 +284,8 @@ def main():
             valuemap_id = vm.delete(valuemap_id)
             module.exit_json(
                 changed=True,
-                msg="Value map deleted. Name: {name}, ID: {_id}".format(
+                msg="Value map deleted. Host name: {host_name}, Name: {name}, ID: {_id}".format(
+                    host_name=host_name,
                     name=name,
                     _id=valuemap_id
                 )
@@ -265,14 +295,18 @@ def main():
             if params_to_update == {}:
                 module.exit_json(
                     changed=False,
-                    msg="Value map is up to date: {name}".format(name=name)
+                    msg="Value map is up to date: Host name: {host_name}, Name: {name}".format(
+                        host_name=host_name,
+                        name=name
+                    )
                 )
             else:
                 if module.check_mode:
                     module.exit_json(
                         changed=True,
                         diff=diff,
-                        msg="Value map would have been updated. Name: {name}, ID: {_id}".format(
+                        msg="Value map would have been updated. Host name: {host_name}, Name: {name}, ID: {_id}".format(
+                            host_name=host_name,
                             name=name,
                             _id=valuemap_id
                         )
@@ -281,7 +315,8 @@ def main():
                 module.exit_json(
                     changed=True,
                     diff=diff,
-                    msg="Value map updated. Name: {name}, ID: {_id}".format(
+                    msg="Value map updated. Host name: {host_name}, Name: {name}, ID: {_id}".format(
+                        host_name=host_name,
                         name=name,
                         _id=valuemap_id
                     )
@@ -293,7 +328,8 @@ def main():
             if module.check_mode:
                 module.exit_json(
                     changed=True,
-                    msg="Value map would have been created. Name: {name}, ID: {_id}".format(
+                    msg="Value map would have been created. Host name: {host_name}, Name: {name}, ID: {_id}".format(
+                        host_name=host_name,
                         name=name,
                         _id=valuemap_id
                     )
@@ -301,7 +337,8 @@ def main():
             valuemap_id = vm.create(**parameters)
             module.exit_json(
                 changed=True,
-                msg="Value map created: {name}, ID: {_id}".format(
+                msg="Value map created: Host name: {host_name}, Name: {name}, ID: {_id}".format(
+                    host_name=host_name,
                     name=name,
                     _id=valuemap_id
                 )
