@@ -38,7 +38,7 @@
 
 - name: test - update existing zabbix valuemap
   community.zabbix.zabbix_valuemap:
-    name: TestItem
+    name: TestValuemap
     host_name: ExampleHost
     mappings:
       - value: 0
@@ -56,7 +56,7 @@
 
 - name: test - attempt to delete previously created zabbix item
   community.zabbix.zabbix_valuemap:
-    name: TestItem
+    name: TestValuemap
     host_name: ExampleHost
     state: absent
   register: zbxvaluemap_existing_delete
@@ -67,7 +67,7 @@
 
 - name: test - attempt to delete non-existing zabbix item
   community.zabbix.zabbix_valuemap:
-    name: TestItem
+    name: TestValuemap
     host_name: ExampleHost
     state: absent
   register: zbxvaluemap_missing_delete

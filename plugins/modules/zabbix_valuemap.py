@@ -55,7 +55,8 @@ options:
             type:
                 type: "int"
                 description: Mapping match type.
-                required: true
+                default: 0
+                required: false
 
 extends_documentation_fragment:
 - community.zabbix.zabbix
