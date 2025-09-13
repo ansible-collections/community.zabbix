@@ -1,0 +1,23 @@
+---
+
+- name: Create test host
+  community.zabbix.zabbix_host:
+    host_name: ExampleHost
+    host_groups:
+      - Linux servers
+      - Zabbix servers
+    status: enabled
+    state: present
+    interfaces:
+      - type: 1
+        main: 1
+        useip: 1
+        ip: 10.1.1.1
+        dns: ""
+        port: "10050"
+      - type: 1
+        main: 0
+        useip: 0
+        ip: ""
+        dns: "community.zabbix.ansible"
+        port: "10050"
