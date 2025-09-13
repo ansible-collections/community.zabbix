@@ -1,0 +1,21 @@
+---
+- name: test - do not run tests for Zabbix < 7.0
+  meta: end_play
+  when: zabbix_version is version('7.0', '<')
+
+- block:
+    # setup stuff
+    - include_tasks: zabbix_setup.yml
+
+    # zabbix_valuemap module tests
+    - include_tasks: zabbix_tests.yml
+
+    # tear down stuff set up earlier
+    - include_tasks: zabbix_teardown.yml
+  always:
+    - name: "cleanup valuemap if tests failed"
+      community.zabbix.zabbix_valuemap:
+        host_name: ExampleHost
+        name: TestValuemap
+        state: absent
+      ignore_errors: true

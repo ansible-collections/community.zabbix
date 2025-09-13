@@ -1,0 +1,77 @@
+---
+
+- name: test - create new Zabbix valuemap
+  community.zabbix.zabbix_valuemap:
+    name: TestValuemap
+    host_name: ExampleHost
+    mappings:
+      - value: 0
+        map_to: "Down"
+        type: 0
+      - value: 1
+        map_to: "Up"
+        type: 1
+    state: present
+  register: zbxvaluemap_new
+
+- name: assert that item was created
+  ansible.builtin.assert:
+    that: zbxvaluemap_new is changed
+
+- name: test - create new Zabbix valuemap once again
+  community.zabbix.zabbix_valuemap:
+    name: TestValuemap
+    host_name: ExampleHost
+    mappings:
+      - value: 0
+        map_to: "Down"
+        type: 0
+      - value: 1
+        map_to: "Up"
+        type: 1
+    state: present
+  register: zbxvaluemap_existing
+
+- name: assert that nothing has been changed
+  ansible.builtin.assert:
+    that: not zbxvaluemap_existing is changed
+
+- name: test - update existing zabbix valuemap
+  community.zabbix.zabbix_valuemap:
+    name: TestValuemap
+    host_name: ExampleHost
+    mappings:
+      - value: 0
+        map_to: "Unknown"
+        type: 0
+      - value: 1
+        map_to: "Up"
+        type: 1
+    state: present
+  register: zbxvaluemap_changed
+
+- name: expect to succeed and that things changed
+  ansible.builtin.assert:
+    that: zbxvaluemap_changed is changed
+
+- name: test - attempt to delete previously created zabbix item
+  community.zabbix.zabbix_valuemap:
+    name: TestValuemap
+    host_name: ExampleHost
+    state: absent
+  register: zbxvaluemap_existing_delete
+
+- name: assert that item was deleted
+  ansible.builtin.assert:
+    that: zbxvaluemap_existing_delete is changed
+
+- name: test - attempt to delete non-existing zabbix item
+  community.zabbix.zabbix_valuemap:
+    name: TestValuemap
+    host_name: ExampleHost
+    state: absent
+  register: zbxvaluemap_missing_delete
+
+- name: assert that nothing has been changed
+  ansible.builtin.assert:
+    that: not zbxvaluemap_missing_delete is changed
