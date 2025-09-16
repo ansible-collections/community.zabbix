@@ -16,7 +16,7 @@
 
 - name: assert that no valuemaps are present for host
   ansible.builtin.assert:
-    that: get_valuemap_info_result | length == 0
+    that: get_valuemap_info_result.valuemaps | length == 0
 
 - name: test - get valuemap
   community.zabbix.zabbix_valuemap_info:
@@ -62,7 +62,7 @@
 
 - name: assert that two valuemaps are present for host
   ansible.builtin.assert:
-    that: get_valuemap_info_result | length == 2
+    that: get_valuemap_info_result.valuemaps | length == 2
 
 - name: test - get valuemap
   community.zabbix.zabbix_valuemap_info:
