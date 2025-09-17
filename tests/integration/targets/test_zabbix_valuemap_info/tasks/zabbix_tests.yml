@@ -1,0 +1,99 @@
+---
+
+- name: test - get valuemaps without host_name
+  community.zabbix.zabbix_valuemap_info:
+  ignore_errors: true
+  register: get_valuemap_info_result
+
+- name: assert that host_name is required
+  ansible.builtin.assert:
+    that: get_valuemap_info_result.failed
+
+- name: test - get all valuemaps for host
+  community.zabbix.zabbix_valuemap_info:
+    host_name: ExampleHost
+  register: get_valuemap_info_result
+
+- name: assert that no valuemaps are present for host
+  ansible.builtin.assert:
+    that: get_valuemap_info_result.valuemaps | length == 0
+
+- name: test - get valuemap
+  community.zabbix.zabbix_valuemap_info:
+    host_name: ExampleHost
+    name: TestValuemap
+  ignore_errors: true
+  register: get_valuemap_info_result
+
+- name: assert that valuemap is not present
+  ansible.builtin.assert:
+    that: get_valuemap_info_result.failed
+
+- name: test - create new valuemap
+  community.zabbix.zabbix_valuemap:
+    name: TestValuemap
+    host_name: ExampleHost
+    mappings:
+      - value: 0
+        map_to: "Down"
+        type: 0
+      - value: 1
+        map_to: "Up"
+        type: 1
+    state: present
+
+- name: test - create another valuemap
+  community.zabbix.zabbix_valuemap:
+    name: AnotherTestValuemap
+    host_name: ExampleHost
+    mappings:
+      - value: 0
+        map_to: "Down"
+        type: 0
+      - value: 1
+        map_to: "Up"
+        type: 1
+    state: present
+
+- name: test - get all valuemaps for host
+  community.zabbix.zabbix_valuemap_info:
+    host_name: ExampleHost
+  register: get_valuemap_info_result
+
+- name: assert that two valuemaps are present for host
+  ansible.builtin.assert:
+    that: get_valuemap_info_result.valuemaps | length == 2
+
+- name: test - get valuemap
+  community.zabbix.zabbix_valuemap_info:
+    host_name: ExampleHost
+    name: TestValuemap
+  register: get_valuemap_info_result
+
+- name: assert that valuemap content is returned
+  ansible.builtin.assert:
+    that:
+      - get_valuemap_info_result.valuemaps | length == 1
+      - get_valuemap_info_result.valuemaps.0.hostid is defined
+      - get_valuemap_info_result.valuemaps.0.name == "TestValuemap"
+      - get_valuemap_info_result.valuemaps.0.uuid == ""
+      - get_valuemap_info_result.valuemaps.0.valuemapid is defined
+      - get_valuemap_info_result.valuemaps.0.mappings | length == 2
+      - get_valuemap_info_result.valuemaps.0.mappings.0.newvalue is defined
+      - get_valuemap_info_result.valuemaps.0.mappings.0.type is defined
+      - get_valuemap_info_result.valuemaps.0.mappings.0.value is defined
+      - get_valuemap_info_result.valuemaps.0.mappings.1.newvalue is defined
+      - get_valuemap_info_result.valuemaps.0.mappings.1.type is defined
+      - get_valuemap_info_result.valuemaps.0.mappings.1.value is defined
+
+- name: test - remove test valuemap
+  community.zabbix.zabbix_valuemap:
+    name: TestValuemap
+    host_name: ExampleHost
+    state: absent
+
+- name: test - remove another valuemap
+  community.zabbix.zabbix_valuemap:
+    name: AnotherTestValuemap
+    host_name: ExampleHost
+    state: absent
