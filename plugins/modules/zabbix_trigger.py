@@ -295,7 +295,7 @@ class Trigger(ZabbixBase):
             host = template_name
         triggers = []
         try:
-            triggers = self._zapi.trigger.get({'filter': {'description': trigger_name, 'host': host}})
+            triggers = self._zapi.trigger.get({'filter': {'description': trigger_name, 'host': host}, "selectDependencies": "extend", "selectTags": "extend"})
         except Exception as e:
             self._module.fail_json(msg="Failed to get trigger: %s" % e)
         return triggers
@@ -383,7 +383,7 @@ class Trigger(ZabbixBase):
 
     def check_trigger_changed(self, old_trigger):
         try:
-            new_trigger = self._zapi.trigger.get({"triggerids": "%s" % old_trigger['triggerid']})[0]
+            new_trigger = self._zapi.trigger.get({"triggerids": "%s" % old_trigger['triggerid'], "selectDependencies": "extend", "selectTags": "extend"})[0]
         except Exception as e:
             self._module.fail_json(msg="Failed to get trigger: %s" % e)
         return old_trigger != new_trigger

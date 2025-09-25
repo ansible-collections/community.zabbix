@@ -1,0 +1,2 @@
+bugfixes:
+  - zabbix_trigger - add selectDependencies and selectTags when requesting triggers to detect changes to those values
