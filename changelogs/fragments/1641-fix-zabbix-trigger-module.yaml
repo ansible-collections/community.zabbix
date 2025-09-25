@@ -1,2 +1,2 @@
 bugfixes:
-  - zabbix_trigger - add selectDependencies and selectTags when requesting triggers to detect changes to those values (https://github.com/ansible-collections/community.zabbix/pull/1641)
+  - zabbix_trigger - add selectDependencies and selectTags when requesting triggers to detect changes to those values
