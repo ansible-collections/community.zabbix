@@ -48,9 +48,6 @@ jobs:
             version: v72
           - container:
               image: rockylinux10
-            version: v70
-          - container:
-              image: rockylinux10
             version: v60
           - container:
               image: debian11
