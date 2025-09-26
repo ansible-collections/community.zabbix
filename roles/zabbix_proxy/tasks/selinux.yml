@@ -1,15 +1,35 @@
 ---
+- name: "SELinux | Install epel-release"
+  ansible.builtin.package:
+    name: epel-release
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default('') }}"
+    https_proxy: "{{ zabbix_https_proxy | default('') }}"
+  register: _zabbix_proxy_dependencies_installed
+  until: _zabbix_proxy_dependencies_installed is succeeded
+  become: true
+  when:
+    - ansible_facts['os_family'] == 'RedHat'
+    - ansible_facts['distribution_major_version'] is version('10', '>=')
+  tags:
+    - install
+
 - name: "SELinux | Install related SELinux packages"
   ansible.builtin.package:
-    name:
+    name: "{{ _packages | select }}"
+  vars:
+    _is_ge_el10: "{{ ansible_facts['os_family'] == 'RedHat' and
+      ansible_facts['distribution_major_version'] is version('10', '>=') }}"
+    _packages:
+      - "{{ (_is_ge_el10) | ternary('selinux-policy-epel', '') }}"
       - python3-libsemanage
       - python3-policycoreutils
       - zabbix-selinux-policy
   environment:
     http_proxy: "{{ zabbix_http_proxy | default('') }}"
     https_proxy: "{{ zabbix_https_proxy | default('') }}"
-  register: zabbix_proxy_dependencies_installed
-  until: zabbix_proxy_dependencies_installed is succeeded
+  register: _zabbix_proxy_dependencies_installed
+  until: _zabbix_proxy_dependencies_installed is succeeded
   become: true
   tags:
     - install
