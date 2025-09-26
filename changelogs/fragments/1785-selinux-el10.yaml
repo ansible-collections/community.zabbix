@@ -1,0 +1,2 @@
+bugfixes:
+  - zabbix_agent, zabbix_proxy, zabbix_server roles - install ``selinux-policy-epel`` on EL10, where the zabbix SELinux module (providing ``zabbix_can_network`` and ``zabbix_run_sudo``) moved out of ``selinux-policy`` (https://github.com/ansible-collections/community.zabbix/issues/1645).
