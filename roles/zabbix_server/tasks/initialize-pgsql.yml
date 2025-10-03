@@ -65,7 +65,13 @@
         port: "{{ zabbix_server_dbport }}"
         login_unix_socket: "{{ zabbix_server_pgsql_login_unix_socket | default(omit) }}"
         db: "{{ zabbix_server_dbname }}"
-        name: timescaledb
+        schema: >-
+        {{ (zabbix_server_dbschema is defined and zabbix_server_dbschema | length > 0 and zabbix_server_dbschema != "public")
+        | ternary(zabbix_server_dbschema, omit) }}
+        cascade: >-
+        {{ (zabbix_server_dbschema is defined and zabbix_server_dbschema | length > 0 and zabbix_server_dbschema != "public")
+        | ternary(true, omit) }}
+        name: timescaledb 
 
 - name: "PostgreSQL verify or create schema"
   when: zabbix_server_database_sqlload
