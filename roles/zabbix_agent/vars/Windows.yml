@@ -8,10 +8,11 @@ _zabbix_agent_pluginsocket: "\\\\.\\pipe\\agent.plugin.sock"
 _zabbix_agent_tlspskfile: "{{ zabbix_agent_win_install_dir }}\\tls_psk_auto.secret.txt"
 _zabbix_agent_tlspskidentity_file: "{{ zabbix_agent_win_install_dir }}\\tls_psk_auto.identity.txt"
 
-# Maps from ansible_facts['architecture']
+# ansible_facts['architecture'] is affected by locale
+# so we map to ansible_facts['architecture2']
 _zabbix_agent_win_arch:
-  "64-bit": amd64
-  "32-bit": i386
+  "x86_64": amd64
+  "i386": i386
 
 # For application install/removal, might not be as reliable
 _zabbix_agent_win_product_code:
