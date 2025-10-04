@@ -98,3 +98,24 @@
         state: restore
         target: "{{ zabbix_proxy_database_file_dir }}/postgresql/proxy.sql"
         target_opts: "-n {{ zabbix_proxy_dbschema }}"
+
+- name: check proxy DB visibility
+  community.postgresql.postgresql_query:
+    login_user: "{{ zabbix_proxy_dbuser }}"
+    login_password: "{{ zabbix_proxy_dbpassword }}"
+    login_host: "{{ zabbix_proxy_dbhost }}"
+    port: "{{ zabbix_proxy_dbport }}"
+    db: "{{ zabbix_proxy_dbname }}"
+    search_path: "{{ zabbix_proxy_dbschema }}"
+    query: >
+      SELECT
+        (SELECT count(*) FROM information_schema.tables
+         WHERE table_schema = current_schema()
+           AND table_name IN ('dbversion','proxy_history')) AS tables_present;
+  register: _zbx_proxy_tables
+
+- name: Assert schema has required tables
+  ansible.builtin.assert:
+    that:
+      - _zbx_proxy_tables.query_result[0].tables_present | int >= 1
+    fail_msg: "Expected proxy tables not found in schema {{ zabbix_proxy_dbschema }}. Check DBSchema= and the import."

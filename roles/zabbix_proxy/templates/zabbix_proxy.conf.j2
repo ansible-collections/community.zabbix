@@ -21,7 +21,7 @@
 {{ (zabbix_proxy_dbhost is defined and zabbix_proxy_dbhost is not none) | ternary('','# ') }}DBHost={{ zabbix_proxy_dbhost | default('') }}
 {{ (zabbix_proxy_dbname is defined and zabbix_proxy_dbname is not none) | ternary('','# ') }}DBName={{ zabbix_proxy_dbname | default('') }}
 {{ (zabbix_proxy_dbpassword is defined and zabbix_proxy_dbpassword is not none) | ternary('','# ') }}DBPassword={{ zabbix_proxy_dbpassword | default('') }}
-{{ (zabbix_proxy_dbschema is defined and zabbix_proxy_dbschema is not none) | ternary('','# ') }}DBSchema={{ zabbix_proxy_dbschema | default('') }}
+{{ (zabbix_proxy_dbschema | default('', true) | trim | length > 0) | ternary('', '# ') }}DBSchema={{ zabbix_proxy_dbschema | default('', true) }}
 {{ (zabbix_proxy_dbsocket is defined and zabbix_proxy_dbsocket is not none) | ternary('','# ') }}DBSocket={{ zabbix_proxy_dbsocket | default('') }}
 {{ (zabbix_proxy_dbtlscafile is defined and zabbix_proxy_dbtlscafile is not none) | ternary('','# ') }}DBTLSCAFile={{ zabbix_proxy_dbtlscafile | default('') }}
 {{ (zabbix_proxy_dbtlscertfile is defined and zabbix_proxy_dbtlscertfile is not none) | ternary('','# ') }}DBTLSCertFile={{ zabbix_proxy_dbtlscertfile | default('') }}
