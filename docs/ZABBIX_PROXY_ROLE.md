@@ -312,7 +312,7 @@ The following table lists all variables that are exposed to modify the configura
 | DBName | zabbix_proxy_dbname | zabbix_proxy| |
 | DBPassword | zabbix_proxy_dbpassword | zabbix_proxy| |
 | DBPort | zabbix_proxy_dbport | Varies by database | |
-| DBSchema | zabbix_proxy_dbschema || |
+| DBSchema | zabbix_proxy_dbschema |public| |
 | DBSocket | zabbix_proxy_dbsocket || |
 | DBTLSCAFile | zabbix_proxy_dbtlscafile || |
 | DBTLSCertFile | zabbix_proxy_dbtlscertfile || |

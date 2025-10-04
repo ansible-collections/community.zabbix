@@ -40,22 +40,37 @@
         login_password: "{{ zabbix_proxy_pgsql_login_password | default(omit) }}"
         login_host: "{{ zabbix_proxy_pgsql_login_host | default(omit) }}"
         port: "{{ zabbix_proxy_dbport }}"
-        login_unix_socket: "{{ zabbix_proxy_login_unix_socket | default(omit) }}"
+        login_unix_socket: "{{ zabbix_proxy_pgsql_login_unix_socket | default(omit) }}"
         name: "{{ zabbix_proxy_dbuser }}"
         password: "{{ ('md5' + (zabbix_proxy_dbpassword + zabbix_proxy_dbuser)|hash('md5')) if zabbix_proxy_dbpassword_hash_method == 'md5' else zabbix_proxy_dbpassword }}"
 
-    - name: "PostgreSQL | Set database/user permissions"
+    - name: "PostgreSQL | Create schema (skip for public)"
+      community.postgresql.postgresql_schema:
+        login_user: "{{ zabbix_proxy_pgsql_login_user | default(omit) }}"
+        login_password: "{{ zabbix_proxy_pgsql_login_password | default(omit) }}"
+        login_host: "{{ zabbix_proxy_pgsql_login_host | default(omit) }}"
+        port: "{{ zabbix_proxy_dbport }}"
+        login_unix_socket: "{{ zabbix_proxy_pgsql_login_unix_socket | default(omit) }}"
+        db: "{{ zabbix_proxy_dbname }}"
+        name: "{{ zabbix_proxy_dbschema }}"
+        owner: "{{ zabbix_proxy_dbuser }}"
+      when: zabbix_proxy_dbschema != 'public'
+      register: proxy_schema_created
+
+    - name: "PostgreSQL | Grant privileges on schema (only if created)"
       community.postgresql.postgresql_privs:
         login_user: "{{ zabbix_proxy_pgsql_login_user | default(omit) }}"
         login_password: "{{ zabbix_proxy_pgsql_login_password | default(omit) }}"
         login_host: "{{ zabbix_proxy_pgsql_login_host | default(omit) }}"
         port: "{{ zabbix_proxy_dbport }}"
-        login_unix_socket: "{{ zabbix_proxy_login_unix_socket | default(omit) }}"
+        login_unix_socket: "{{ zabbix_proxy_pgsql_login_unix_socket | default(omit) }}"
         db: "{{ zabbix_proxy_dbname }}"
-        privs: ALL
         type: schema
-        objs: public
-        role: "{{ zabbix_proxy_dbuser }}"
+        objs: "{{ zabbix_proxy_dbschema }}"
+        roles: "{{ zabbix_proxy_dbuser }}"
+        privs: ALL
+        grant_option: yes
+      when: (proxy_schema_created is defined) and (proxy_schema_created.changed | default(false))
 
 - name: "PostgreSQL verify or create schema"
   when: zabbix_proxy_database_sqlload | bool
@@ -69,7 +84,9 @@
         login_host: "{{ zabbix_proxy_dbhost }}"
         port: "{{ zabbix_proxy_dbport }}"
         db: "{{ zabbix_proxy_dbname }}"
-        query: 'SELECT mandatory FROM dbversion'
+        query: "SELECT mandatory FROM dbversion"
+        search_path: "{{ zabbix_proxy_dbschema }}"
+      register: _zabbix_proxy_db_version
   rescue:
     - name: "PostgreSQL | Import schema"
       community.postgresql.postgresql_db:
@@ -80,3 +97,4 @@
         db: "{{ zabbix_proxy_dbname }}"
         state: restore
         target: "{{ zabbix_proxy_database_file_dir }}/postgresql/proxy.sql"
+        target_opts: "-n {{ zabbix_proxy_dbschema }}"
