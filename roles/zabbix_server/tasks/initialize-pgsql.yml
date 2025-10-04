@@ -98,7 +98,7 @@
         port: "{{ zabbix_server_dbport }}"
         db: "{{ zabbix_server_dbname }}"
         query: "SELECT mandatory FROM dbversion"
-        search_path : "{{ zabbix_server_dbschema }}"
+        search_path: "{{ zabbix_server_dbschema }}"
       register: _zabbix_server_db_version
   rescue:
     - name: "PostgreSQL | Import schema"
@@ -126,7 +126,7 @@
         port: "{{ zabbix_server_dbport }}"
         db: "{{ zabbix_server_dbname }}"
         query: "{{ _is_pre74 | ternary(legacy_qry, modern_qry) }}"
-        search_path : "{{ zabbix_server_dbschema }}"
+        search_path: "{{ zabbix_server_dbschema }}"
       register: _config_db_extension
       vars:
         _is_pre74: "{{ zabbix_server_version is version('7.4', '<') }}"
@@ -142,7 +142,7 @@
         port: "{{ zabbix_server_dbport }}"
         db: "{{ zabbix_server_dbname }}"
         query: "SELECT hypertable_name FROM timescaledb_information.hypertables WHERE hypertable_name = 'auditlog'"
-        search_path : "{{ zabbix_server_dbschema }}"
+        search_path: "{{ zabbix_server_dbschema }}"
       register: _hypertable_auditlog
 
     - name: "PostgreSQL | Create TimescaleDB hypertables"
