@@ -1,2 +1,0 @@
-bugfixes:
-  - zabbix_server - Fix task for creation of TimescaleDB Extension not schema aware (https://github.com/ansible-collections/community.zabbix/issues/1647).

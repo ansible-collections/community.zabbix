@@ -1,0 +1,3 @@
+bugfixes:
+  - zabbix_server - Adapt all the PostgresDB related task to be schema aware (https://github.com/ansible-collections/community.zabbix/issues/1647).
+  - zabbix_web - define zabbix_server_dbschema default value

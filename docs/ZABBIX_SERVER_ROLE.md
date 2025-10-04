@@ -295,7 +295,7 @@ The following table lists all variables that are exposed to modify the configura
 |DBName | zabbix_server_dbname | zabbix-server |  |
 |DBPassword | zabbix_server_dbpassword | zabbix-server |  |
 |DBPort | zabbix_server_dbport | varies by database |  |
-|DBSchema | zabbix_server_dbschema | |  |
+|DBSchema | zabbix_server_dbschema |public |  |
 |DBSocket | zabbix_server_dbsocket | |  |
 |DBTLSCAFile | zabbix_server_dbtlscafile | |  |
 |DBTLSCertFile | zabbix_server_dbtlscertfile | |  |

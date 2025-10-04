@@ -43,7 +43,20 @@
         name: "{{ zabbix_server_dbuser }}"
         password: "{{ ('md5' + (zabbix_server_dbpassword + zabbix_server_dbuser)|hash('md5')) if zabbix_server_dbpassword_hash_method == 'md5' else zabbix_server_dbpassword }}"
 
-    - name: "PostgreSQL | Set database/user permissions"
+    - name: "PostgreSQL | Create schema"
+      community.postgresql.postgresql_schema:
+        login_user: "{{ zabbix_server_pgsql_login_user | default(omit) }}"
+        login_password: "{{ zabbix_server_pgsql_login_password | default(omit) }}"
+        login_host: "{{ zabbix_server_pgsql_login_host | default(omit) }}"
+        port: "{{ zabbix_server_dbport }}"
+        login_unix_socket: "{{ zabbix_server_pgsql_login_unix_socket | default(omit) }}"
+        db: "{{ zabbix_server_dbname }}"
+        name: "{{ zabbix_server_dbschema }}"
+        owner: "{{ zabbix_server_dbuser }}"
+      when: zabbix_server_dbschema != 'public'
+      register: schema_created
+
+    - name: "PostgreSQL | Grant privileges on schema"
       community.postgresql.postgresql_privs:
         login_user: "{{ zabbix_server_pgsql_login_user | default(omit) }}"
         login_password: "{{ zabbix_server_pgsql_login_password | default(omit) }}"
@@ -51,10 +64,12 @@
         port: "{{ zabbix_server_dbport }}"
         login_unix_socket: "{{ zabbix_server_pgsql_login_unix_socket | default(omit) }}"
         db: "{{ zabbix_server_dbname }}"
-        privs: ALL
         type: schema
-        objs: public
-        role: "{{ zabbix_server_dbuser }}"
+        objs: "{{ zabbix_server_dbschema }}"
+        roles: "{{ zabbix_server_dbuser }}"
+        privs: ALL
+        grant_option: yes
+      when: (schema_created is defined and schema_created.changed | default(false)) or (zabbix_server_dbschema == 'public')
 
     - name: "PostgreSQL | Create timescaledb extension"
       when: zabbix_server_database_timescaledb
@@ -65,13 +80,10 @@
         port: "{{ zabbix_server_dbport }}"
         login_unix_socket: "{{ zabbix_server_pgsql_login_unix_socket | default(omit) }}"
         db: "{{ zabbix_server_dbname }}"
-        schema: >-
-        {{ (zabbix_server_dbschema is defined and zabbix_server_dbschema | length > 0 and zabbix_server_dbschema != "public")
-        | ternary(zabbix_server_dbschema, omit) }}
-        cascade: >-
-        {{ (zabbix_server_dbschema is defined and zabbix_server_dbschema | length > 0 and zabbix_server_dbschema != "public")
-        | ternary(true, omit) }}
-        name: timescaledb 
+        name: timescaledb
+        schema: "{{ (zabbix_server_dbschema != 'public') | ternary(zabbix_server_dbschema, omit) }}"
+        cascade: "{{ (zabbix_server_dbschema != 'public') | ternary(true, omit) }}"
+        state: present
 
 - name: "PostgreSQL verify or create schema"
   when: zabbix_server_database_sqlload
@@ -86,6 +98,8 @@
         port: "{{ zabbix_server_dbport }}"
         db: "{{ zabbix_server_dbname }}"
         query: "SELECT mandatory FROM dbversion"
+        search_path : "{{ zabbix_server_dbschema }}"
+      register: _zabbix_server_db_version
   rescue:
     - name: "PostgreSQL | Import schema"
       community.postgresql.postgresql_db:
@@ -96,6 +110,7 @@
         db: "{{ zabbix_server_dbname }}"
         state: restore
         target: "{{ item }}"
+        target_opts: "-n {{ zabbix_server_dbschema }}"
       loop: "{{ zabbix_server_database_schemas }}"
 
 - name: "Configure Timescale"
@@ -111,6 +126,7 @@
         port: "{{ zabbix_server_dbport }}"
         db: "{{ zabbix_server_dbname }}"
         query: "{{ _is_pre74 | ternary(legacy_qry, modern_qry) }}"
+        search_path : "{{ zabbix_server_dbschema }}"
       register: _config_db_extension
       vars:
         _is_pre74: "{{ zabbix_server_version is version('7.4', '<') }}"
@@ -126,6 +142,7 @@
         port: "{{ zabbix_server_dbport }}"
         db: "{{ zabbix_server_dbname }}"
         query: "SELECT hypertable_name FROM timescaledb_information.hypertables WHERE hypertable_name = 'auditlog'"
+        search_path : "{{ zabbix_server_dbschema }}"
       register: _hypertable_auditlog
 
     - name: "PostgreSQL | Create TimescaleDB hypertables"
@@ -139,6 +156,7 @@
         db: "{{ zabbix_server_dbname }}"
         state: restore
         target: "{{ _zabbix_server_database_scripts_dir }}/{{ _is_pre70 | ternary(legacy_path, modern_path) }}"
+        target_opts: "-n {{ zabbix_server_dbschema }}"
       vars:
         _is_pre70: "{{ zabbix_server_version is version('7.0', '<') }}"
         legacy_path: postgresql/timescaledb.sql
