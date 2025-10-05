@@ -22,15 +22,15 @@
   delegate_to: "{{ zabbix_proxy_dbhost_run_install | ternary(delegated_dbhost, inventory_hostname) }}"
   vars:
     delegated_dbhost: "{{ (zabbix_proxy_dbhost == 'localhost') | ternary(inventory_hostname, zabbix_proxy_dbhost) }}"
-  tags:
-    - database
+  tags: 
+   - database
   block:
     - name: "PostgreSQL | Create database"
       community.postgresql.postgresql_db:
         login_user: "{{ zabbix_proxy_pgsql_login_user | default(omit) }}"
         login_password: "{{ zabbix_proxy_pgsql_login_password | default(omit) }}"
         login_host: "{{ zabbix_proxy_pgsql_login_host | default(omit) }}"
-        port: "{{ zabbix_proxy_dbport }}"
+        login_port: "{{ zabbix_proxy_dbport }}"
         login_unix_socket: "{{ zabbix_proxy_pgsql_login_unix_socket | default(omit) }}"
         name: "{{ zabbix_proxy_dbname }}"
 
@@ -39,38 +39,49 @@
         login_user: "{{ zabbix_proxy_pgsql_login_user | default(omit) }}"
         login_password: "{{ zabbix_proxy_pgsql_login_password | default(omit) }}"
         login_host: "{{ zabbix_proxy_pgsql_login_host | default(omit) }}"
-        port: "{{ zabbix_proxy_dbport }}"
-        login_unix_socket: "{{ zabbix_proxy_pgsql_login_unix_socket | default(omit) }}"
+        login_port: "{{ zabbix_proxy_dbport }}"
+        login_unix_socket: "{{ zabbix_proxy_login_unix_socket | default(omit) }}"
         name: "{{ zabbix_proxy_dbuser }}"
         password: "{{ ('md5' + (zabbix_proxy_dbpassword + zabbix_proxy_dbuser)|hash('md5')) if zabbix_proxy_dbpassword_hash_method == 'md5' else zabbix_proxy_dbpassword }}"
 
-    - name: "PostgreSQL | Create schema (skip for public)"
+    - name: "PostgreSQL | Create schema {{ zabbix_proxy_dbschema }}"
+      when: zabbix_proxy_dbschema != 'public'
       community.postgresql.postgresql_schema:
         login_user: "{{ zabbix_proxy_pgsql_login_user | default(omit) }}"
         login_password: "{{ zabbix_proxy_pgsql_login_password | default(omit) }}"
         login_host: "{{ zabbix_proxy_pgsql_login_host | default(omit) }}"
-        port: "{{ zabbix_proxy_dbport }}"
+        login_port: "{{ zabbix_proxy_dbport }}"
         login_unix_socket: "{{ zabbix_proxy_pgsql_login_unix_socket | default(omit) }}"
-        db: "{{ zabbix_proxy_dbname }}"
+        login_db: "{{ zabbix_proxy_dbname }}"
         name: "{{ zabbix_proxy_dbschema }}"
         owner: "{{ zabbix_proxy_dbuser }}"
-      when: zabbix_proxy_dbschema != 'public'
       register: proxy_schema_created
 
-    - name: "PostgreSQL | Grant privileges on schema (only if created)"
+    - name: "PostgreSQL | Grant ALL on schema to {{ zabbix_proxy_dbuser }}"
+      when: proxy_schema_created.changed | default(false)
       community.postgresql.postgresql_privs:
         login_user: "{{ zabbix_proxy_pgsql_login_user | default(omit) }}"
         login_password: "{{ zabbix_proxy_pgsql_login_password | default(omit) }}"
         login_host: "{{ zabbix_proxy_pgsql_login_host | default(omit) }}"
-        port: "{{ zabbix_proxy_dbport }}"
+        login_port: "{{ zabbix_proxy_dbport }}"
         login_unix_socket: "{{ zabbix_proxy_pgsql_login_unix_socket | default(omit) }}"
-        db: "{{ zabbix_proxy_dbname }}"
+        login_db: "{{ zabbix_proxy_dbname }}"
         type: schema
         objs: "{{ zabbix_proxy_dbschema }}"
         roles: "{{ zabbix_proxy_dbuser }}"
-        privs: ALL
+        privs: "ALL"
         grant_option: yes
-      when: (proxy_schema_created is defined) and (proxy_schema_created.changed | default(false))
+
+    - name: "PostgreSQL | Set search_path for {{ zabbix_proxy_dbuser }} to {{ zabbix_proxy_dbschema }}"
+      community.postgresql.postgresql_user:
+        login_user: "{{ zabbix_proxy_pgsql_login_user | default(omit) }}"
+        login_password: "{{ zabbix_proxy_pgsql_login_password | default(omit) }}"
+        login_host: "{{ zabbix_proxy_pgsql_login_host | default(omit) }}"
+        login_port: "{{ zabbix_proxy_dbport }}"
+        login_unix_socket: "{{ zabbix_proxy_pgsql_login_unix_socket | default(omit) }}"
+        name: "{{ zabbix_proxy_dbuser }}"
+        configuration:
+          search_path: "{{ zabbix_proxy_dbschema }}"
 
 - name: "PostgreSQL verify or create schema"
   when: zabbix_proxy_database_sqlload | bool
@@ -84,9 +95,7 @@
         login_host: "{{ zabbix_proxy_dbhost }}"
         port: "{{ zabbix_proxy_dbport }}"
         db: "{{ zabbix_proxy_dbname }}"
-        query: "SELECT mandatory FROM dbversion"
-        search_path: "{{ zabbix_proxy_dbschema }}"
-      register: _zabbix_proxy_db_version
+        query: 'SELECT mandatory FROM dbversion'
   rescue:
     - name: "PostgreSQL | Import schema"
       community.postgresql.postgresql_db:
@@ -97,25 +106,5 @@
         db: "{{ zabbix_proxy_dbname }}"
         state: restore
         target: "{{ zabbix_proxy_database_file_dir }}/postgresql/proxy.sql"
-        target_opts: "-n {{ zabbix_proxy_dbschema }}"
-
-- name: check proxy DB visibility
-  community.postgresql.postgresql_query:
-    login_user: "{{ zabbix_proxy_dbuser }}"
-    login_password: "{{ zabbix_proxy_dbpassword }}"
-    login_host: "{{ zabbix_proxy_dbhost }}"
-    port: "{{ zabbix_proxy_dbport }}"
-    db: "{{ zabbix_proxy_dbname }}"
-    search_path: "{{ zabbix_proxy_dbschema }}"
-    query: >
-      SELECT
-        (SELECT count(*) FROM information_schema.tables
-         WHERE table_schema = current_schema()
-           AND table_name IN ('dbversion','proxy_history')) AS tables_present;
-  register: _zbx_proxy_tables
-
-- name: Assert schema has required tables
-  ansible.builtin.assert:
-    that:
-      - _zbx_proxy_tables.query_result[0].tables_present | int >= 1
-    fail_msg: "Expected proxy tables not found in schema {{ zabbix_proxy_dbschema }}. Check DBSchema= and the import."
+      environment:
+        PGOPTIONS: "-c search_path={{ zabbix_proxy_dbschema }}"

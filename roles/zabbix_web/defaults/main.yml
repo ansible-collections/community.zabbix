@@ -54,9 +54,9 @@ zabbix_server_dbpassword: zabbix-server
 zabbix_server_dbhost: localhost
 zabbix_server_dbport: "{{ _zabbix_server_database_default_port[zabbix_server_database] }}"
 zabbix_server_dbname: zabbix-server
+zabbix_server_dbschema: public
 zabbix_server_dbencryption: false
 zabbix_server_dbverifyhost: false
-zabbix_server_dbschema: public
 
 # Yum/APT Variables
 zabbix_web_version_minor: "*"
