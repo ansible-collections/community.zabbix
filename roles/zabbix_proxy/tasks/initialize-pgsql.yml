@@ -55,10 +55,8 @@
         login_db: "{{ zabbix_proxy_dbname }}"
         name: "{{ zabbix_proxy_dbschema }}"
         owner: "{{ zabbix_proxy_dbuser }}"
-      register: proxy_schema_created
 
-    - name: "PostgreSQL | Grant ALL on schema to {{ zabbix_proxy_dbuser }}"
-      when: proxy_schema_created.changed | default(false)
+    - name: "PostgreSQL | Grant ALL on schema {{ zabbix_proxy_dbschema }} to {{ zabbix_proxy_dbuser }}"
       community.postgresql.postgresql_privs:
         login_user: "{{ zabbix_proxy_pgsql_login_user | default(omit) }}"
         login_password: "{{ zabbix_proxy_pgsql_login_password | default(omit) }}"

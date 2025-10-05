@@ -58,10 +58,8 @@
         login_db: "{{ zabbix_server_dbname }}"
         name: "{{ zabbix_server_dbschema }}"
         owner: "{{ zabbix_server_dbuser }}"
-      register: schema_created
 
-    - name: "PostgreSQL | Grant ALL on schema to {{ zabbix_server_dbuser }}"
-      when: schema_created.changed | default(false)
+    - name: "PostgreSQL | Grant ALL on schema {{ zabbix_server_dbschema }} to {{ zabbix_server_dbuser }}"
       community.postgresql.postgresql_privs:
         login_user: "{{ zabbix_server_pgsql_login_user | default(omit) }}"
         login_password: "{{ zabbix_server_pgsql_login_password | default(omit) }}"
