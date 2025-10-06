@@ -1,6 +1,5 @@
 ---
-# PostgreSQL for Zabbix — aligned with current docs
-
+# task file for postgresql
 - name: "Install PostgreSQL dependencies"
   ansible.builtin.package:
     name: "{{ _zabbix_server_pgsql_dependencies | select | list }}"
@@ -22,8 +21,8 @@
   delegate_to: "{{ zabbix_server_dbhost_run_install | ternary(delegated_dbhost, inventory_hostname) }}"
   vars:
     delegated_dbhost: "{{ (zabbix_server_dbhost == 'localhost') | ternary(inventory_hostname, zabbix_server_dbhost) }}"
-  tags: 
-  - database
+  tags:
+    - database
   block:
     - name: "PostgreSQL | Create database user"
       community.postgresql.postgresql_user:
@@ -44,8 +43,6 @@
         login_unix_socket: "{{ zabbix_server_pgsql_login_unix_socket | default(omit) }}"
         name: "{{ zabbix_server_dbname }}"
         owner: "{{ zabbix_server_dbuser }}"
-        encoding: "UTF8"
-        template: "template0"
 
     - name: "PostgreSQL | Create schema {{ zabbix_server_dbschema }}"
       when: zabbix_server_dbschema != 'public'
