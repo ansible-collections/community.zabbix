@@ -56,7 +56,7 @@
         name: "{{ zabbix_server_dbschema }}"
         owner: "{{ zabbix_server_dbuser }}"
 
-    - name: "PostgreSQL | Grant ALL on schema {{ zabbix_server_dbschema }} to {{ zabbix_server_dbuser }}"
+    - name: "PostgreSQL | Grant ALL on schema {{ zabbix_server_dbschema }} to user {{ zabbix_server_dbuser }}"
       community.postgresql.postgresql_privs:
         login_user: "{{ zabbix_server_pgsql_login_user | default(omit) }}"
         login_password: "{{ zabbix_server_pgsql_login_password | default(omit) }}"
@@ -70,7 +70,7 @@
         privs: "ALL"
         grant_option: yes
 
-    - name: "PostgreSQL | Set search_path for {{ zabbix_server_dbuser }} to schema {{ zabbix_server_dbschema }}"
+    - name: "PostgreSQL | Set search_path for user {{ zabbix_server_dbuser }} to schema {{ zabbix_server_dbschema }}"
       community.postgresql.postgresql_user:
         login_user: "{{ zabbix_server_pgsql_login_user | default(omit) }}"
         login_password: "{{ zabbix_server_pgsql_login_password | default(omit) }}"
@@ -81,7 +81,7 @@
         configuration:
           search_path: "{{ zabbix_server_dbschema }}"
 
-    - name: "Enable TimescaleDB extension in schema {{ zabbix_server_dbschema }}"
+    - name: "PostgreSQL | Enable TimescaleDB extension in schema {{ zabbix_server_dbschema }}"
       when: zabbix_server_database_timescaledb | default(false)
       community.postgresql.postgresql_ext:
         login_user: "{{ zabbix_server_pgsql_login_user | default(omit) }}"
@@ -103,8 +103,8 @@
         login_user: "{{ zabbix_server_dbuser }}"
         login_password: "{{ zabbix_server_dbpassword }}"
         login_host: "{{ zabbix_server_dbhost }}"
-        port: "{{ zabbix_server_dbport }}"
-        db: "{{ zabbix_server_dbname }}"
+        login_port: "{{ zabbix_server_dbport }}"
+        login_db: "{{ zabbix_server_dbname }}"
         query: "SELECT mandatory FROM dbversion"
   rescue:
     - name: "PostgreSQL | Import Zabbix schema into {{ zabbix_server_dbschema }}"
@@ -132,14 +132,16 @@
         login_user: "{{ zabbix_server_dbuser }}"
         login_password: "{{ zabbix_server_dbpassword }}"
         login_host: "{{ zabbix_server_dbhost }}"
-        port: "{{ zabbix_server_dbport }}"
-        db: "{{ zabbix_server_dbname }}"
+        login_port: "{{ zabbix_server_dbport }}"
+        login_db: "{{ zabbix_server_dbname }}"
         query: "{{ _is_pre74 | ternary(legacy_qry, modern_qry) }}"
       register: _config_db_extension
       vars:
         _is_pre74: "{{ zabbix_server_version is version('7.4', '<') }}"
         legacy_qry: "SELECT db_extension FROM config WHERE db_extension = 'timescaledb'"
         modern_qry: "SELECT value_str FROM settings WHERE name = 'db_extension' AND value_str = 'timescaledb'"
+      environment:
+        PGOPTIONS: "-c search_path={{ zabbix_server_dbschema }}"
 
     # NOTE: Zabbix 7.0 adds a hypertable for auditlog.
     - name: "PostgreSQL | Check for auditlog hypertable"
@@ -147,19 +149,20 @@
         login_user: "{{ zabbix_server_dbuser }}"
         login_password: "{{ zabbix_server_dbpassword }}"
         login_host: "{{ zabbix_server_dbhost }}"
-        port: "{{ zabbix_server_dbport }}"
-        db: "{{ zabbix_server_dbname }}"
+        login_port: "{{ zabbix_server_dbport }}"
+        login_db: "{{ zabbix_server_dbname }}"
         query: "SELECT hypertable_name FROM timescaledb_information.hypertables WHERE hypertable_name = 'auditlog'"
       register: _hypertable_auditlog
+      environment:
+        PGOPTIONS: "-c search_path={{ zabbix_server_dbschema }}"
 
     - name: "PostgreSQL | Create TimescaleDB hypertables"
-      when: (_config_db_extension.query_result | length == 0) or
-        (zabbix_server_version is version('7.0', '>=') and _hypertable_auditlog.query_result | length == 0)
+      when: zabbix_server_version is version('7.0','>=') and _config_db_extension.query_result | length > 0
       community.postgresql.postgresql_db:
         login_user: "{{ zabbix_server_dbuser }}"
         login_password: "{{ zabbix_server_dbpassword }}"
         login_host: "{{ zabbix_server_dbhost }}"
-        port: "{{ zabbix_server_dbport }}"
+        login_port: "{{ zabbix_server_dbport }}"
         db: "{{ zabbix_server_dbname }}"
         state: restore
         target: "{{ _zabbix_server_database_scripts_dir }}/{{ _is_pre70 | ternary(legacy_path, modern_path) }}"
