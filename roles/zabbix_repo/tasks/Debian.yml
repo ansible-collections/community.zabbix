@@ -7,8 +7,8 @@
     force: true
     state: present
   environment:
-    http_proxy: "{{ zabbix_http_proxy | default('') }}"
-    https_proxy: "{{ zabbix_https_proxy | default('') }}"
+    http_proxy: "{{ zabbix_http_proxy | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(omit) }}"
   register: gnupg_installed
   until: gnupg_installed is succeeded
   become: true
@@ -36,8 +36,8 @@
     mode: "0644"
     force: true
   environment:
-    http_proxy: "{{ zabbix_http_proxy | default('') }}"
-    https_proxy: "{{ zabbix_https_proxy | default('') }}"
+    http_proxy: "{{ zabbix_http_proxy | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(omit) }}"
   register: zabbix_repo_files_installed
   until: zabbix_repo_files_installed is succeeded
   become: true
