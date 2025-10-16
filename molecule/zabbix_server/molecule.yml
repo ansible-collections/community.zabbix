@@ -64,6 +64,7 @@ provisioner:
         zabbix_server_pgsql_login_password: changeme
         zabbix_server_pgsql_login_port: 5432
         zabbix_server_database_timescaledb: true
+        zabbix_server_dbschema: zabbix
 
 verifier:
   name: testinfra
