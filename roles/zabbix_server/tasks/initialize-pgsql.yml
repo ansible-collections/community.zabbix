@@ -157,7 +157,8 @@
         PGOPTIONS: "-c search_path={{ zabbix_server_dbschema }}"
 
     - name: "PostgreSQL | Create TimescaleDB hypertables"
-      when: zabbix_server_version is version('7.0','>=') and _config_db_extension.query_result | length > 0
+      when: (_config_db_extension.query_result | length == 0) or
+        (zabbix_server_version is version('7.0', '>=') and _hypertable_auditlog.query_result | length == 0)
       community.postgresql.postgresql_db:
         login_user: "{{ zabbix_server_dbuser }}"
         login_password: "{{ zabbix_server_dbpassword }}"
