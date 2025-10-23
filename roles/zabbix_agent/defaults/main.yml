@@ -4,6 +4,7 @@
 zabbix_agent_version_check: true
 
 zabbix_agent2: false
+zabbix_agent_releases_url: "https://services.zabbix.com/updates/v1"
 zabbix_agent_version_minor: "*"
 #zabbix_agent_version_long: 7.4.2
 zabbix_agent_package_remove: false
