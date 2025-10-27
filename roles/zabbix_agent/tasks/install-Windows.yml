@@ -4,8 +4,9 @@
   block:
     - name: Get latest zabbix releases
       win_uri:
-        url: https://services.zabbix.com/updates/v1
+        url: "{{ zabbix_agent_releases_url }}"
         return_content: true
+        status_code: [200, 304]
       register: _zabbix_versions
       run_once: true
 
