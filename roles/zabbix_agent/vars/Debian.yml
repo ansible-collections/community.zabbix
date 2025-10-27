@@ -7,6 +7,9 @@ _zabbix_agent_install_recommends: false
 
 zabbix_valid_agent_versions:
   # Debian
+  "13":
+    - 7.4
+    - 7.0
   "12":
     - 7.4
     - 7.2
