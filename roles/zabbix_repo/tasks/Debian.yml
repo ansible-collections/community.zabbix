@@ -29,18 +29,27 @@
       (ansible_facts['distribution'] == "Debian" and ansible_facts['distribution_major_version'] < "12")
 
 - name: "Debian | Download gpg key"
-  when: not ansible_check_mode # Because get_url always has changed status in check_mode.
-  ansible.builtin.get_url:
+  when: not ansible_check_mode
+  ansible.builtin.uri:
     url: "{{ zabbix_repo_deb_gpg_key_url }}"
     dest: "{{ zabbix_repo_gpg_key }}"
-    mode: "0644"
-    force: true
+    creates: "{{ zabbix_repo_gpg_key }}"
+    status_code: [200, 304]
   environment:
-    http_proxy: "{{ zabbix_http_proxy | default('') }}"
-    https_proxy: "{{ zabbix_https_proxy | default('') }}"
+    http_proxy: "{{ zabbix_http_proxy | default(None) | default(omit) }}"
+    https_proxy: "{{ zabbix_https_proxy | default(None) | default(omit) }}"
   register: zabbix_repo_files_installed
   until: zabbix_repo_files_installed is succeeded
   become: true
+  tags:
+    - install
+
+- name: "Debian | Set GPG key permissions"
+  ansible.builtin.file:
+    path: "{{ zabbix_repo_gpg_key }}"
+    mode: "0644"
+  become: true
+  when: zabbix_repo_files_installed is changed
   tags:
     - install
 
