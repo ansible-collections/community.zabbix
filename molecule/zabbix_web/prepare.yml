@@ -88,6 +88,7 @@
               - php{{ __php_default_version_debian }}-curl
               - php{{ __php_default_version_debian }}-imap
               - php-json
+              - default-mysql-client
               - php{{ __php_default_version_debian }}-opcache
               - php{{ __php_default_version_debian }}-xml
               - php{{ __php_default_version_debian }}-mbstring
