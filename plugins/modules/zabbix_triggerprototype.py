@@ -302,9 +302,11 @@ class Triggerprototype(ZabbixBase):
         triggerprototypes = []
         try:
             if templated:
-                triggerprototypes = self._zapi.triggerprototype.get({'filter': {'description': triggerprototype_name, 'host': host, 'templated': templated}})
+                triggerprototypes = self._zapi.triggerprototype.get(
+                    {'filter': {'description': triggerprototype_name, 'host': host, 'templated': templated}})
             else:
-                triggerprototypes = self._zapi.triggerprototype.get({'filter': {'description': triggerprototype_name, 'host': host, 'templated': templated, 'templateid': 0}})
+                triggerprototypes = self._zapi.triggerprototype.get(
+                    {'filter': {'description': triggerprototype_name, 'host': host, 'templated': templated, 'templateid': 0}})
         except Exception as e:
             self._module.fail_json(msg="Failed to get triggerprototype: %s" % e)
         return triggerprototypes
