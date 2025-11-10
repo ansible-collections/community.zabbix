@@ -99,7 +99,7 @@ The following is an overview of all available configuration default for this rol
 
 * `zabbix_proxy_version`:  Optional. The latest available major.minor version of Zabbix will be installed on the host(s). If you want to use an older version, please specify this in the major.minor format. Example: `zabbix_proxy_version: 6.0`.
 * `zabbix_proxy_version_minor`: When you want to specify a minor version to be installed. RedHat only. Default set to: `*` (latest available)
-* `zabbix_proxy_ip`: The IP address of the host. When not provided, it will be determined via the `ansible_default_ipv4` fact.
+* `zabbix_proxy_ip`: The IP address of the host. When not provided, it will be determined via the `ansible_default_ipv4` fact, with a fallback to the first available IP address.
 * `zabbix_proxy_server`: The ip or dns name for the zabbix-server machine.
 * `zabbix_proxy_install_database_client`: Default: `True`. False does not install database client.
 * `zabbix_proxy_manage_service`: Default: `True`. When you run multiple Zabbix proxies in a High Available cluster setup (e.g. pacemaker), you don't want Ansible to manage the zabbix-proxy service, because Pacemaker is in control of zabbix-proxy service.
@@ -442,7 +442,7 @@ Including an example of how to use your role (for instance, with variables passe
 
 # Molecule
 
-This role is configured to be tested with Molecule. You can find on this page some more information regarding Molecule: 
+This role is configured to be tested with Molecule. You can find on this page some more information regarding Molecule:
 
 * http://werner-dijkerman.nl/2016/07/10/testing-ansible-roles-with-molecule-testinfra-and-docker/
 * http://werner-dijkerman.nl/2016/07/27/extending-ansible-role-testing-with-molecule-by-adding-group_vars-dependencies-and-using-travis-ci/
@@ -461,4 +461,3 @@ See LICENCE to see the full text.
 Please send suggestion or pull requests to make this role better. Also let us know if you encounter any issues installing or using this role.
 
 Github: https://github.com/ansible-collections/community.zabbix
-
