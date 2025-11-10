@@ -9,7 +9,7 @@ zabbix_valid_proxy_versions:
 _zabbix_proxy_pgsql_dependencies:
   - "{{ zabbix_proxy_install_database_client | ternary('postgresql', '') }}"
   - gzip
-  - python3-psycopg2
+  - "python3{% if ansible_facts.python.version.minor == 11 %}11{% endif %}-psycopg2"
 
 _zabbix_proxy_mysql_dependencies:
   - "{{ zabbix_proxy_install_database_client | ternary('mysql', '') }}"
