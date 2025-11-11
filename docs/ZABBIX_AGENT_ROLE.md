@@ -172,7 +172,7 @@ Selinux changes will be installed based on the status of selinux running on the 
 * `zabbix_agent_tls_subject`:  The subject of the TLS certificate.
 * `zabbix_agent_visible_hostname` : Configure Zabbix visible name inside Zabbix web UI for the node.
 
-The results are stored in the Ansible variables `zabbix_agent_tlspskidentity` and `zabbix_agent_tlspsk_secret`, so that they may be used later in the code, for example with [zabbix_host](https://docs.ansible.com/ansible/latest/collections/community/zabbix/zabbix_host_module.html) to configure the Zabbix server or with `debug: msg:` to display them to the user.
+The results are stored in the Ansible variables `zabbix_agent_tlspskidentity` and `zabbix_agent_tlspsk_secret`, so that they may be used later in the code, for example with [zabbix_host](https://docs.ansible.com/projects/ansible/latest/collections/community/zabbix/zabbix_host_module.html) to configure the Zabbix server or with `debug: msg:` to display them to the user.
 
 ## Zabbix API variables
 
