@@ -37,9 +37,9 @@ The collection includes a variety of Ansible content to help automate the manage
   * [Social Spaces](https://forum.ansible.com/c/chat/4): gather and interact with fellow enthusiasts.
   * [News & Announcements](https://forum.ansible.com/c/news/5): track project-wide announcements including social events.
 
-* The Ansible [Bullhorn newsletter](https://docs.ansible.com/ansible/devel/community/communication.html#the-bullhorn): used to announce releases and important changes.
+* The Ansible [Bullhorn newsletter](https://docs.ansible.com/projects/ansible/devel/community/communication.html#the-bullhorn): used to announce releases and important changes.
 
-For more information about communication, see the [Ansible communication guide](https://docs.ansible.com/ansible/devel/community/communication.html).
+For more information about communication, see the [Ansible communication guide](https://docs.ansible.com/projects/ansible/devel/community/communication.html).
 
 ## Included content
 
@@ -47,35 +47,35 @@ Click on the name of a plugin or module to view that content's documentation:
 
   - **Inventory Sources**:
     - [zabbix](scripts/inventory/zabbix.py) - Zabbix Inventory Script
-    - [zabbix_inventory](https://docs.ansible.com/ansible/latest/collections/community/zabbix/zabbix_inventory_inventory.html) - Zabbix Ansible Inventory Plugin
+    - [zabbix_inventory](https://docs.ansible.com/projects/ansible/latest/collections/community/zabbix/zabbix_inventory_inventory.html) - Zabbix Ansible Inventory Plugin
   - **Modules**:
-    - [zabbix_action](https://docs.ansible.com/ansible/latest/collections/community/zabbix/zabbix_action_module.html)
-    - [zabbix_authentication](https://docs.ansible.com/ansible/latest/collections/community/zabbix/zabbix_authentication_module.html)
-    - [zabbix_autoregister](https://docs.ansible.com/ansible/latest/collections/community/zabbix/zabbix_autoregister_module.html)
-    - [zabbix_discovery_rule](https://docs.ansible.com/ansible/latest/collections/community/zabbix/zabbix_discovery_rule_module.html)
-    - [zabbix_globalmacro](https://docs.ansible.com/ansible/latest/collections/community/zabbix/zabbix_globalmacro_module.html)
-    - [zabbix_group_info](https://docs.ansible.com/ansible/latest/collections/community/zabbix/zabbix_group_info_module.html)
-    - [zabbix_group_events_info](https://docs.ansible.com/ansible/latest/collections/community/zabbix/zabbix_group_events_info_module.html)
-    - [zabbix_group](https://docs.ansible.com/ansible/latest/collections/community/zabbix/zabbix_group_module.html)
-    - [zabbix_host_events_info](https://docs.ansible.com/ansible/latest/collections/community/zabbix/zabbix_host_events_info_module.html)
-    - [zabbix_host_info](https://docs.ansible.com/ansible/latest/collections/community/zabbix/zabbix_host_info_module.html)
-    - [zabbix_host](https://docs.ansible.com/ansible/latest/collections/community/zabbix/zabbix_host_module.html)
-    - [zabbix_hostmacro](https://docs.ansible.com/ansible/latest/collections/community/zabbix/zabbix_hostmacro_module.html)
-    - [zabbix_housekeeping](https://docs.ansible.com/ansible/latest/collections/community/zabbix/zabbix_housekeeping_module.html)
-    - [zabbix_maintenance](https://docs.ansible.com/ansible/latest/collections/community/zabbix/zabbix_maintenance_module.html)
-    - [zabbix_map](https://docs.ansible.com/ansible/latest/collections/community/zabbix/zabbix_map_module.html)
-    - [zabbix_mediatype](https://docs.ansible.com/ansible/latest/collections/community/zabbix/zabbix_mediatype_module.html)
-    - [zabbix_proxy_info](https://docs.ansible.com/ansible/latest/collections/community/zabbix/zabbix_proxy_info_module.html)
-    - [zabbix_proxy](https://docs.ansible.com/ansible/latest/collections/community/zabbix/zabbix_proxy_module.html)
+    - [zabbix_action](https://docs.ansible.com/projects/ansible/latest/collections/community/zabbix/zabbix_action_module.html)
+    - [zabbix_authentication](https://docs.ansible.com/projects/ansible/latest/collections/community/zabbix/zabbix_authentication_module.html)
+    - [zabbix_autoregister](https://docs.ansible.com/projects/ansible/latest/collections/community/zabbix/zabbix_autoregister_module.html)
+    - [zabbix_discovery_rule](https://docs.ansible.com/projects/ansible/latest/collections/community/zabbix/zabbix_discovery_rule_module.html)
+    - [zabbix_globalmacro](https://docs.ansible.com/projects/ansible/latest/collections/community/zabbix/zabbix_globalmacro_module.html)
+    - [zabbix_group_info](https://docs.ansible.com/projects/ansible/latest/collections/community/zabbix/zabbix_group_info_module.html)
+    - [zabbix_group_events_info](https://docs.ansible.com/projects/ansible/latest/collections/community/zabbix/zabbix_group_events_info_module.html)
+    - [zabbix_group](https://docs.ansible.com/projects/ansible/latest/collections/community/zabbix/zabbix_group_module.html)
+    - [zabbix_host_events_info](https://docs.ansible.com/projects/ansible/latest/collections/community/zabbix/zabbix_host_events_info_module.html)
+    - [zabbix_host_info](https://docs.ansible.com/projects/ansible/latest/collections/community/zabbix/zabbix_host_info_module.html)
+    - [zabbix_host](https://docs.ansible.com/projects/ansible/latest/collections/community/zabbix/zabbix_host_module.html)
+    - [zabbix_hostmacro](https://docs.ansible.com/projects/ansible/latest/collections/community/zabbix/zabbix_hostmacro_module.html)
+    - [zabbix_housekeeping](https://docs.ansible.com/projects/ansible/latest/collections/community/zabbix/zabbix_housekeeping_module.html)
+    - [zabbix_maintenance](https://docs.ansible.com/projects/ansible/latest/collections/community/zabbix/zabbix_maintenance_module.html)
+    - [zabbix_map](https://docs.ansible.com/projects/ansible/latest/collections/community/zabbix/zabbix_map_module.html)
+    - [zabbix_mediatype](https://docs.ansible.com/projects/ansible/latest/collections/community/zabbix/zabbix_mediatype_module.html)
+    - [zabbix_proxy_info](https://docs.ansible.com/projects/ansible/latest/collections/community/zabbix/zabbix_proxy_info_module.html)
+    - [zabbix_proxy](https://docs.ansible.com/projects/ansible/latest/collections/community/zabbix/zabbix_proxy_module.html)
     - [zabbix_screen](https://docs.ansible.com/ansible/latest/collections/community/zabbix/zabbix_screen_module.html)
-    - [zabbix_script](https://docs.ansible.com/ansible/latest/collections/community/zabbix/zabbix_script_module.html)
-    - [zabbix_service](https://docs.ansible.com/ansible/latest/collections/community/zabbix/zabbix_service_module.html)
-    - [zabbix_template_info](https://docs.ansible.com/ansible/latest/collections/community/zabbix/zabbix_template_info_module.html)
-    - [zabbix_template](https://docs.ansible.com/ansible/latest/collections/community/zabbix/zabbix_template_module.html)
-    - [zabbix_user_info](https://docs.ansible.com/ansible/latest/collections/community/zabbix/zabbix_user_info_module.html)
-    - [zabbix_user](https://docs.ansible.com/ansible/latest/collections/community/zabbix/zabbix_user_module.html)
-    - [zabbix_usergroup](https://docs.ansible.com/ansible/latest/collections/community/zabbix/zabbix_usergroup_module.html)
-    - [zabbix_valuemap](https://docs.ansible.com/ansible/latest/collections/community/zabbix/zabbix_valuemap_module.html)
+    - [zabbix_script](https://docs.ansible.com/projects/ansible/latest/collections/community/zabbix/zabbix_script_module.html)
+    - [zabbix_service](https://docs.ansible.com/projects/ansible/latest/collections/community/zabbix/zabbix_service_module.html)
+    - [zabbix_template_info](https://docs.ansible.com/projects/ansible/latest/collections/community/zabbix/zabbix_template_info_module.html)
+    - [zabbix_template](https://docs.ansible.com/projects/ansible/latest/collections/community/zabbix/zabbix_template_module.html)
+    - [zabbix_user_info](https://docs.ansible.com/projects/ansible/latest/collections/community/zabbix/zabbix_user_info_module.html)
+    - [zabbix_user](https://docs.ansible.com/projects/ansible/latest/collections/community/zabbix/zabbix_user_module.html)
+    - [zabbix_usergroup](https://docs.ansible.com/projects/ansible/latest/collections/community/zabbix/zabbix_usergroup_module.html)
+    - [zabbix_valuemap](https://docs.ansible.com/projects/ansible/latest/collections/community/zabbix/zabbix_valuemap_module.html)
   - **Roles**:
     - [zabbix_agent](docs/ZABBIX_AGENT_ROLE.md)
     - [zabbix_javagateway](docs/ZABBIX_JAVAGATEWAY_ROLE.md)

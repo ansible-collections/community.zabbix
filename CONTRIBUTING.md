@@ -18,7 +18,7 @@ Thank you very much for taking time to improve this Ansible collection. We appre
 
 Please note that this project is released with following codes of conduct and by participating in the project you agree to abide by them:
 * [Contributor Covenant Code of Conduct](CODE_OF_CONDUCT.md)
-* [Community Code of Conduct](https://docs.ansible.com/ansible/devel/community/code_of_conduct.html)
+* [Community Code of Conduct](https://docs.ansible.com/projects/ansible/devel/community/code_of_conduct.html)
 
 If you are interested in joining us as a maintainer, please open an issue.
 
@@ -27,7 +27,7 @@ If you are interested in joining us as a maintainer, please open an issue.
 1. Fork this repository with community Zabbix collection.
 2. Create a new branch and apply your changes to it. In addition to that:
     1. Ensure that any changes you introduce to this collection are reflected in the documentation.
-    2. Ensure that your PR contains valid [changelog fragment](https://docs.ansible.com/ansible/devel/community/development_process.html#changelogs).
+    2. Ensure that your PR contains valid [changelog fragment](https://docs.ansible.com/projects/ansible/devel/community/development_process.html#changelogs).
     3. Include tests with your contribution to ensure that future pull requests will not break your functionality.
     4. Make sure that tests succeed.
 3. Push the branch to your forked repository.
@@ -41,7 +41,7 @@ If you are interested in joining us as a maintainer, please open an issue.
 
 Style guides are important because they ensure consistency in the content, look, and feel of a book or a website. Any contributions to this collection must adhere to the following rules:
 
-* [Ansible style guide](http://docs.ansible.com/ansible/latest/dev_guide/style_guide/).
+* [Ansible style guide](https://docs.ansible.com/projects/ansible/latest/dev_guide/style_guide/).
 * Use "Ansible" when referring to the product and ``ansible`` when referring to the command line tool, package and so on.
 
 ### Zabbix roles
@@ -59,7 +59,7 @@ These rules are required for any contributions proposing a new Zabbix module or 
   * In `DOCUMENTATION` block via `extends_documentation_fragment` keyword.
   * In module `argument_spec` as a set of module parameters.
 * Implement proper logout mechanism as other modules do.
-* Comply with [Ansible module best practices](https://docs.ansible.com/ansible/devel/dev_guide/developing_modules_best_practices.html).
+* Comply with [Ansible module best practices](https://docs.ansible.com/projects/ansible/devel/dev_guide/developing_modules_best_practices.html).
 
 ## Testing and Development
 
@@ -99,7 +99,7 @@ Once this is done, you can reference modules and roles from testing playbook lik
 
 *This section is subject to change as our CI regarding roles is being reworked and may not work for you right now!*
 
-Roles make use of [Molecule](https://molecule.readthedocs.io/en/latest/) to verify and test the execution of each role. In order to start testing with Molecule, you need to install the required dependencies. Requirements file can be found in the root of the [dj-wasabi/ansible-ci-base](https://github.com/dj-wasabi/ansible-ci-base) repository.
+Roles make use of [Molecule](https://docs.ansible.com/projects/molecule/) to verify and test the execution of each role. In order to start testing with Molecule, you need to install the required dependencies. Requirements file can be found in the root of the [dj-wasabi/ansible-ci-base](https://github.com/dj-wasabi/ansible-ci-base) repository.
 
 It is recommended to create a [new Python virtual environment](#virtualenv) for this to not clutter your global Python installation. First, install the dependencies:
 
@@ -115,7 +115,7 @@ molecule test
 
 ### Testing Zabbix modules
 
-Modules are tested via `ansible-test` command. Configurations for integration and sanity tests for the command are contained within `tests` directory. Refer to the [official documentation](https://docs.ansible.com/ansible/latest/dev_guide/testing_integration.html) for introduction to module integration testing within Ansible. Please note that this may fail if you get your directory structure wrong. If this happens, please see the start of [Testing and Development](#testing-and-development) regarding the placement of the collection.
+Modules are tested via `ansible-test` command. Configurations for integration and sanity tests for the command are contained within `tests` directory. Refer to the [official documentation](https://docs.ansible.com/projects/ansible/latest/dev_guide/testing_integration.html) for introduction to module integration testing within Ansible. Please note that this may fail if you get your directory structure wrong. If this happens, please see the start of [Testing and Development](#testing-and-development) regarding the placement of the collection.
 
 Running test suites locally requires a few dependencies to be installed. Same as for the roles, it is recommended to use [Python virtual environment](#virtualenv):
 
@@ -156,11 +156,11 @@ A few resources describing virtualenvs:
 ## Links
 
 * [Ansible](https://www.ansible.com/)
-* [Ansible style guide](http://docs.ansible.com/ansible/latest/dev_guide/style_guide/)
-* [Ansible module best practices](https://docs.ansible.com/ansible/devel/dev_guide/developing_modules_best_practices.html)
-* [Integration testing with `ansible-test`](https://docs.ansible.com/ansible/latest/dev_guide/testing_integration.html)
+* [Ansible style guide](https://docs.ansible.com/projects/ansible/latest/dev_guide/style_guide/)
+* [Ansible module best practices](https://docs.ansible.com/projects/ansible/devel/dev_guide/developing_modules_best_practices.html)
+* [Integration testing with `ansible-test`](https://docs.ansible.com/projects/ansible/latest/dev_guide/testing_integration.html)
 * [Docker installation guide](https://docs.docker.com/install/)
-* [Molecule](https://molecule.readthedocs.io/)
+* [Molecule](https://docs.ansible.com/projects/molecule/)
 * [Molecule V2 with your own role](https://werner-dijkerman.nl/2017/09/05/using-molecule-v2-to-test-ansible-roles/)
 * [dj-wasabi/ansible-ci-base](https://github.com/dj-wasabi/ansible-ci-base)
 * [Current Zabbix releases](https://www.zabbix.com/life_cycle_and_release_policy)
