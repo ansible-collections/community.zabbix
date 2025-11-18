@@ -1,5 +1,8 @@
 zabbix_valid_proxy_versions:
   # Debian
+  "13":
+    - 7.4
+    - 7.0
   "12":
     - 7.4
     - 7.2
