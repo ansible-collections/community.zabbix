@@ -787,7 +787,7 @@ v1.5.0
 Minor Changes
 -------------
 
-- Added requirements.txt to collection root to be used with Ansible Builder. See https://ansible-builder.readthedocs.io/en/latest/collection_metadata.html
+- Added requirements.txt to collection root to be used with Ansible Builder. See https://docs.ansible.com/projects/builder/en/latest/collection_metadata/
 - some roles are now using new naming for API connection parameters (https://github.com/ansible-collections/community.zabbix/pull/492 and https://github.com/ansible-collections/community.zabbix/pull/495).
 - some roles can now utilize an option `zabbix_repo_yum_gpgcheck` to enable/disable GPG check for YUM repository (https://github.com/ansible-collections/community.zabbix/pull/438).
 - zabbix inventory - Enabled the usage of environment variables in zabbix inventory plugin.

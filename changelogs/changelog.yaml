@@ -460,7 +460,7 @@ releases:
       - zabbix_web - permissions for accesing php-fpm socket has been fixed (See https://github.com/ansible-collections/community.zabbix/pull/426).
       minor_changes:
       - Added requirements.txt to collection root to be used with Ansible Builder.
-        See https://ansible-builder.readthedocs.io/en/latest/collection_metadata.html
+        See https://docs.ansible.com/projects/builder/en/latest/collection_metadata/
       - some roles are now using new naming for API connection parameters (https://github.com/ansible-collections/community.zabbix/pull/492
         and https://github.com/ansible-collections/community.zabbix/pull/495).
       - some roles can now utilize an option `zabbix_repo_yum_gpgcheck` to enable/disable
