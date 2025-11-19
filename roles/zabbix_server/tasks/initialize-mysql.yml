@@ -149,6 +149,7 @@
         collation: "{{ zabbix_server_dbcollation }}"
         state: import
         target: "{{ item }}"
+        use_shell: true
       loop: "{{ zabbix_server_database_schemas }}"
 
   always:
