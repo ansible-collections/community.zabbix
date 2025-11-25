@@ -312,6 +312,7 @@ The following table lists all variables that are exposed to modify the configura
 |ExternalScripts | zabbix_server_externalscriptspath | /usr/lib/zabbix/externalscripts |  |
 |Fping6Location | zabbix_server_fping6location | OS Specific Value |  |
 |FpingLocation | zabbix_server_fpinglocation | OS Specific Value |  |
+|FrontendAllowedIP | zabbix_server_frontendallowedip | | Version 7.4 or later |
 |HANodeName | zabbix_server_hanodename | |  |
 |HistoryCacheSize | zabbix_server_historycachesize | 16M |  |
 |HistoryIndexCacheSize | zabbix_server_historyindexcachesize | 4M |  |
@@ -382,7 +383,11 @@ The following table lists all variables that are exposed to modify the configura
 |TLSCipherPSK | zabbix_server_tlscipherpsk | |  |
 |TLSCipherPSK13 | zabbix_server_tlscipherpsk13 | |  |
 |TLSCRLFile | zabbix_server_tlscrlfile | |  |
+|TLSFrontendAccept | zabbix_server_tlsfrontendaccept | unencrypted | Version 7.4 or later |
+|TLSFrontendCertIssuer | zabbix_server_tlsfrontendcertissuer | | Optional. Version 7.4 or later |
+|TLSFrontendCertSubject | zabbix_server_tlsfrontendcertsubject | | Optional. Version 7.4 or later |
 |TLSKeyFile | zabbix_server_tlskeyfile | |  |
+|TLSListen | zabbix_server_tlslisten | | Version 7.4 or later |
 |TmpDir | zabbix_server_tmpdir | /tmp |  |
 |TrapperTimeout | zabbix_server_trappertimeout | 300 |  |
 |TrendCacheSize | zabbix_server_trendcachesize | 4M |  |
