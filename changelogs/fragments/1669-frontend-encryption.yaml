@@ -1,0 +1,2 @@
+added_functionality:
+  - zabbix frontend and server encryption support: https://www.zabbix.com/documentation/7.4/en/manual/introduction/whatsnew#tls-encryption-between-frontend-and-server & https://www.zabbix.com/documentation/current/en/manual/appendix/install/frontend_encrypt
