@@ -1,0 +1,2 @@
+minor_changes:
+  - zabbix_agent - add zabbix 8 and debian 13 support
