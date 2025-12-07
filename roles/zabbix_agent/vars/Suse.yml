@@ -9,6 +9,7 @@ zabbix_agent2_conf: zabbix_agent2.conf
 zabbix_valid_agent_versions:
   # SLES
   "15":
+    - 8.0
     - 7.4
     - 7.2
     - 7.0
