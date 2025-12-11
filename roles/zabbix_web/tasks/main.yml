@@ -95,7 +95,7 @@
   ansible.builtin.file:
     path: /etc/zabbix/web
     owner: "{{ zabbix_php_fpm_conf_user }}"
-    group: "{{ zabbix_php_fpm_conf_group }}"
+    group: root
     state: directory
     mode: 0755
   become: true
