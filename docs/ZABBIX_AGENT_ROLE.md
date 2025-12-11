@@ -99,7 +99,7 @@ See the following list of supported Operating systems with the Zabbix releases:
 | Debian 11 bullseye  |  V  |  V  |  V  |  V  |
 | Suse Fam 15         |  V  |  V  |  V  |  V  |
 
-You can bypass this matrix by setting `enable_version_check: false`
+You can bypass this matrix by setting `zabbix_agent_version_check: false`
 
 # Role Variables
 
