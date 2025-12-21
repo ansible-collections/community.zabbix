@@ -144,6 +144,7 @@ Selinux changes will be installed based on the status of selinux running on the 
   * `scripts_dir`: Directory name of the custom scripts needed for userparameters
 * `zabbix_agent_userparameters_scripts_src`: indicates the relative path (from `files/`) where userparameter scripts are searched
 * `zabbix_agent_userparameters_templates_src`: indicates the relative path (from `templates/`) where userparameter templates are searched
+* `zabbix_agent_visible_hostname` : Configure Zabbix visible name inside Zabbix web UI for the node.
 
 ## TLS Specific configuration
 * `zabbix_agent_tlspsk_auto`: Enables auto generation and storing of individual pre-shared keys and identities on clients. Is false by default. If set to true and if `zabbix_agent_tlspskfile` and `zabbix_agent_tlspsk_secret` are undefined, it generates the files `/etc/zabbix/tls_psk_auto.identity` and `/etc/zabbix/tls_psk_auto.secret`, which are populated by values automatically (identity is set to hostname, underscore and 4 random alphanumeric digits; secret is 64 random alphanumeric digits) in such a way that the values are generated once and are never overwritten.
@@ -170,7 +171,6 @@ Selinux changes will be installed based on the status of selinux running on the 
 * `zabbix_agent_tlsservercertissuer`: Allowed server certificate issuer.
 * `zabbix_agent_tlsservercertsubject`: Allowed server certificate subject.
 * `zabbix_agent_tls_subject`:  The subject of the TLS certificate.
-* `zabbix_agent_visible_hostname` : Configure Zabbix visible name inside Zabbix web UI for the node.
 
 The results are stored in the Ansible variables `zabbix_agent_tlspskidentity` and `zabbix_agent_tlspsk_secret`, so that they may be used later in the code, for example with [zabbix_host](https://docs.ansible.com/projects/ansible/latest/collections/community/zabbix/zabbix_host_module.html) to configure the Zabbix server or with `debug: msg:` to display them to the user.
 
