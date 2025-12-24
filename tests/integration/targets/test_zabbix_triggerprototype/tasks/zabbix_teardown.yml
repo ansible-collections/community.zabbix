@@ -4,6 +4,24 @@
     template_name: ExampleTemplate
     state: absent
 
+- name: remove test host item
+  community.zabbix.zabbix_item:
+    name: ExampleHostItem
+    host_name: ExampleHost
+    state: absent
+
+- name: remove new Zabbix discoveryrule on host
+  community.zabbix.zabbix_discoveryrule:
+    name: ExampleHostRule
+    host_name: ExampleHost
+    state: absent
+
+- name: remove similar Zabbix discoveryrule on template
+  community.zabbix.zabbix_discoveryrule:
+    name: ExampleTemplateRule
+    template_name: ExampleTemplate
+    state: absent
+
 - name: remove test host
   community.zabbix.zabbix_host:
     host_name: ExampleHost
