@@ -21,6 +21,7 @@ __epel_repo:
 zabbix_valid_web_versions:
   "10":
     - 7.4
+    - 7.0
   "9":
     - 7.4
     - 7.2
