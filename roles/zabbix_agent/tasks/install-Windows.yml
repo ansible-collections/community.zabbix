@@ -56,7 +56,7 @@
 
 - name: Download and install Zabbix Agent
   when: not _zabbix_agent_exe.stat.exists or
-    _install_latest and zabbix_agent_version_long is version('>', _zabbix_agent_exe_version.win_file_version.product_version)
+    _install_latest and zabbix_agent_version_long is version(_zabbix_agent_exe_version.win_file_version.product_version, '>')
   vars:
     _install_latest: "{{ zabbix_agent_package_state == 'latest' }}"
   block:

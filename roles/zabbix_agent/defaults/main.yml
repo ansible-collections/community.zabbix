@@ -111,7 +111,7 @@ zabbix_agent_ipmi_privilege: 2
 zabbix_agent_download_base_url: https://cdn.zabbix.com/zabbix/binaries/stable
 
 # Windows Related
-zabbix_agent_win_package: "{{ zabbix_agent2 | ternary('zabbix_agent2', 'zabbix_agent') }}-{{ zabbix_agent_version_long }}-windows-{{  _zabbix_agent_win_arch[ansible_facts.architecture] }}-openssl.msi"
+zabbix_agent_win_package: "{{ zabbix_agent2 | ternary('zabbix_agent2', 'zabbix_agent') }}-{{ zabbix_agent_version_long }}-windows-{{  _zabbix_agent_win_arch[ansible_facts.architecture2] }}-openssl.msi"
 zabbix_agent_win_download_url: "{{ zabbix_agent_download_base_url }}/{{ zabbix_agent_version }}/{{ zabbix_agent_version_long }}/{{ zabbix_agent_win_package }}"
 
 zabbix_agent_win_install_dir: "C:/Program Files/{{ zabbix_agent2 | ternary('Zabbix Agent 2', 'Zabbix Agent') }}"
