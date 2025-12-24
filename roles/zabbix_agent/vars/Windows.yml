@@ -21,6 +21,7 @@ _zabbix_agent_win_product_code:
 
 zabbix_valid_agent_versions:
   "10":
+    - 7.4
     - 7.2
     - 7.0
     - 6.0
