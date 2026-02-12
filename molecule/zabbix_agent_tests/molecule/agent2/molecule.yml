@@ -3,9 +3,15 @@ scenario:
   name: agent2
 provisioner:
   name: ansible
+  config_options:
+    privilege_escalation:
+      become_method: ansible.builtin.su
   inventory:
     group_vars:
       all:
+        zabbix_http_proxy: ${HTTP_PROXY}
+        zabbix_https_proxy: ${HTTPS_PROXY}
+        zabbix_no_proxy: ${NO_PROXY}
         zabbix_agent2: true
         zabbix_agent_tlspsk_auto: False
         zabbix_agent_tlspskidentity: my_Identity

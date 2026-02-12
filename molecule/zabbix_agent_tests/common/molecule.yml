@@ -25,6 +25,9 @@ platforms:
 
 provisioner:
   name: ansible
+  config_options:
+    privilege_escalation:
+      become_method: ansible.builtin.su
   playbooks:
     create: ../../common/playbooks/create.yml
     prepare: ../../common/playbooks/prepare.yml
@@ -37,6 +40,9 @@ provisioner:
   inventory:
     group_vars:
       all:
+        zabbix_http_proxy: ${HTTP_PROXY}
+        zabbix_https_proxy: ${HTTPS_PROXY}
+        zabbix_no_proxy: ${NO_PROXY}
         ansible_connection: community.docker.docker
         zabbix_agent_server: 192.168.3.33
         zabbix_agent_serveractive: 192.168.3.33

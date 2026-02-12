@@ -34,9 +34,15 @@ provisioner:
     # https://github.com/ansible/molecule/issues/4015#issuecomment-1680859724
     ANSIBLE_ROLES_PATH: ../../roles
     ANSIBLE_INJECT_FACT_VARS: "False"
+  config_options:
+    privilege_escalation:
+      become_method: ansible.builtin.su
   inventory:
     group_vars:
       all:
+        zabbix_http_proxy: ${HTTP_PROXY}
+        zabbix_https_proxy: ${HTTPS_PROXY}
+        zabbix_no_proxy: ${NO_PROXY}
         ansible_connection: community.docker.docker
         zabbix_api_server_url: zabbix-web-${MY_MOLECULE_VERSION:-v74}-${MY_MOLECULE_DATABASE:-mysql}-${MY_MOLECULE_CONTAINER:-rockylinux10}
       v74:
