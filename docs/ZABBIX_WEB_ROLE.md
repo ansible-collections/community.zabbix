@@ -18,6 +18,7 @@
       - [PHP-FPM](#php-fpm)
     - [SElinux](#selinux)
     - [Zabbix Server](#zabbix-server)
+    - [Zabbix Frontend Encrypt](#zabbix-frontend-encrypt)
   * [proxy](#proxy)
 - [Example Playbook](#example-playbook)
   - [Single instance](#single-instance)
@@ -201,6 +202,19 @@ The following properties are related when using Elasticsearch for history storag
 See the following links for more information regarding Zabbix and Elasticsearch
 https://www.zabbix.com/documentation/3.4/manual/appendix/install/elastic_search_setup
 https://www.zabbix.com/documentation/4.0/manual/appendix/install/elastic_search_setup
+
+### Zabbix Frontend Encrypt
+Supported as of Zabbix 7.4.
+
+* `zabbix_server_tls_active`: 0 = unencrypted, 1 = active.
+* `zabbix_server_tls_ca_file`: Path to the CA certificate file.
+* `zabbix_server_tls_key_file`: Path to the key file.
+* `zabbix_server_tls_cert_file`: Path to the certificate file.
+* `zabbix_server_tls_certificate_issuer`: Allowed frontend certificate issuer. Optional.
+* `zabbix_server_tls_certificate_subject`: Allowed frontend certificate subject. Optional.
+
+https://www.zabbix.com/documentation/7.4/en/manual/introduction/whatsnew#tls-encryption-between-frontend-and-server
+https://www.zabbix.com/documentation/7.4/en/manual/appendix/install/frontend_encrypt
 
 ## proxy
 

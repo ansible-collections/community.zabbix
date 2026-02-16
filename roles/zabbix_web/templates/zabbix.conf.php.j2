@@ -52,4 +52,16 @@ $SSO['SP_CERT'] = '{{ zabbix_saml_sp_crt }}';
 {% if zabbix_saml_sp_key is defined %}
 $SSO['SP_KEY'] = '{{ zabbix_saml_sp_key }}';
 {% endif %}
+
+{% if zabbix_server_version is version('7.4', '>=') %}
+{% if zabbix_server_tls_active is defined and zabbix_server_tls_active == '1' %}
+{{ (zabbix_server_tls_active is defined and zabbix_server_tls_active is not none) | ternary('', '// ') }}$ZBX_SERVER_TLS['ACTIVE'] = '{{ zabbix_server_tls_active | default('0') }}';
+{{ (zabbix_server_tls_ca_file is defined and zabbix_server_tls_ca_file is not none) | ternary('', '// ') }}$ZBX_SERVER_TLS['CA_FILE'] = '{{ zabbix_server_tls_ca_file | default('') }}';
+{{ (zabbix_server_tls_key_file is defined and zabbix_server_tls_key_file is not none) | ternary('', '// ') }}$ZBX_SERVER_TLS['KEY_FILE'] = '{{ zabbix_server_tls_key_file | default('') }}';
+{{ (zabbix_server_tls_cert_file is defined and zabbix_server_tls_cert_file is not none) | ternary('', '// ') }}$ZBX_SERVER_TLS['CERT_FILE'] = '{{ zabbix_server_tls_cert_file | default('') }}';
+// Optionally: https://www.zabbix.com/documentation/current/en/manual/appendix/install/frontend_encrypt
+{{ (zabbix_server_tls_certificate_issuer is defined and zabbix_server_tls_certificate_issuer is not none) | ternary('', '// ') }}$ZBX_SERVER_TLS['CERTIFICATE_ISSUER']  = '{{ zabbix_server_tls_certificate_issuer | default('') }}';
+{{ (zabbix_server_tls_certificate_subject is defined and zabbix_server_tls_certificate_subject is not none) | ternary('', '// ') }}$ZBX_SERVER_TLS['CERTIFICATE_SUBJECT'] = '{{ zabbix_server_tls_certificate_subject | default('') }}';
+{% endif %}
+{% endif %}
 ?>
