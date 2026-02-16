@@ -28,7 +28,7 @@ AllowKey={{ item }}
 {% else %}
 # AllowKey=
 {% endif %}
-{% if not zabbix_agent2 and ansible_os_family != "Windows" %}
+{% if not zabbix_agent2 and ansible_facts.os_family != "Windows" %}
 {{ (zabbix_agent_allowroot is defined and zabbix_agent_allowroot is not none) | ternary('', '# ') }}AllowRoot={{ zabbix_agent_allowroot | default (false) | ternary('1', '0') }}
 {% endif %}
 {{ (zabbix_agent_buffersend is defined and zabbix_agent_buffersend is not none) | ternary('', '# ') }}BufferSend={{ zabbix_agent_buffersend | default('') }}
@@ -78,7 +78,7 @@ Include={{ item }}/*.conf
 {% endif %}
 {{ (zabbix_agent_listenip is defined and zabbix_agent_listenip is not none) | ternary('', '# ') }}ListenIP={{ zabbix_agent_listenip | default('') }}
 {{ (zabbix_agent_listenport is defined and zabbix_agent_listenport is not none) | ternary('', '# ') }}ListenPort={{ zabbix_agent_listenport | default('') }}
-{% if not zabbix_agent2 and ansible_os_family != "Windows" %}
+{% if not zabbix_agent2 and ansible_facts.os_family != "Windows" %}
 {{ (zabbix_agent_loadmodule is defined and zabbix_agent_loadmodule is not none) | ternary('', '# ') }}LoadModule={{ zabbix_agent_loadmodule | default('') }}
 {{ (zabbix_agent_loadmodulepath is defined and zabbix_agent_loadmodulepath is not none) | ternary('', '# ') }}LoadModulePath={{ zabbix_agent_loadmodulepath | default('') }}
 {% endif %}
@@ -91,7 +91,7 @@ Include={{ item }}/*.conf
 {% if not zabbix_agent2 %}
 {{ (zabbix_agent_maxlinespersecond is defined and zabbix_agent_maxlinespersecond is not none) | ternary('', '# ') }}MaxLinesPerSecond={{ zabbix_agent_maxlinespersecond | default('') }}
 {% endif %}
-{% if not zabbix_agent2 and ansible_os_family == "Windows" %}
+{% if not zabbix_agent2 and ansible_facts.os_family == "Windows" %}
 {{ (zabbix_agent_perfcounter is defined and zabbix_agent_perfcounter is not none) | ternary('', '# ') }}PerfCounter={{ zabbix_agent_perfcounter | default('') }}
 {{ (zabbix_agent_perfcounteren is defined and zabbix_agent_perfcounteren is not none) | ternary('', '# ') }}PerfCounterEn={{ zabbix_agent_perfcounteren | default('') }}
 {% endif %}
@@ -99,7 +99,7 @@ Include={{ item }}/*.conf
 {{ (zabbix_agent_persistentbufferfile is defined and zabbix_agent_persistentbufferfile is not none) | ternary('', '# ') }}PersistentBufferFile={{ zabbix_agent_persistentbufferfile | default('') }}
 {{ (zabbix_agent_persistentbufferperiod is defined and zabbix_agent_persistentbufferperiod is not none) | ternary('', '# ') }}PersistentBufferPeriod={{ zabbix_agent_persistentbufferperiod | default('') }}
 {% endif %}
-{% if ansible_os_family != "Windows" %}
+{% if ansible_facts.os_family != "Windows" %}
 {{ (zabbix_agent_pidfile is defined and zabbix_agent_pidfile is not none) | ternary('', '# ') }}PidFile={{ zabbix_agent_pidfile | default('') }}
 {% endif %}
 {% if zabbix_agent_plugins is defined and zabbix_agent_plugins %}
@@ -130,7 +130,7 @@ Plugins.{{ my_name }}.{{ param }}={{ value }}
 {{ (zabbix_agent_tlsconnect is defined and zabbix_agent_tlsaccept is not none) | ternary('', '# ') }}TLSAccept={{ zabbix_agent_tlsaccept | default('') }}
 {{ (zabbix_agent_tlscafile is defined and zabbix_agent_tlscafile is not none) | ternary('', '# ') }}TLSCAFile={{ zabbix_agent_tlscafile | default('') }}
 {{ (zabbix_agent_tlscertfile is defined and zabbix_agent_tlscertfile is not none) | ternary('', '# ') }}TLSCertFile={{ zabbix_agent_tlscertfile | default('') }}
-{% if not zabbix_agent2 and ansible_os_family != "Windows" %}
+{% if not zabbix_agent2 and ansible_facts.os_family != "Windows" %}
 {{ (zabbix_agent_tlscipherall is defined and zabbix_agent_tlscipherall is not none) | ternary('', '# ') }}TLSCipherAll={{ zabbix_agent_tlscipherall | default('') }}
 {{ (zabbix_agent_tlscipherall13 is defined and zabbix_agent_tlscipherall13 is not none) | ternary('', '# ') }}TLSCipherAll13={{ zabbix_agent_tlscipherall13 | default('') }}
 {{ (zabbix_agent_tlsciphercert is defined and zabbix_agent_tlsciphercert is not none) | ternary('', '# ') }}TLSCipherCert={{ zabbix_agent_tlsciphercert | default('') }}
@@ -148,7 +148,7 @@ Plugins.{{ my_name }}.{{ param }}={{ value }}
 {{ (zabbix_agent_tlsservercertissuer is defined and zabbix_agent_tlsservercertissuer is not none) | ternary('', '# ') }}TLSServerCertIssuer={{ zabbix_agent_tlsservercertissuer | default('') }}
 {{ (zabbix_agent_tlsservercertsubject is defined and zabbix_agent_tlsservercertsubject is not none) | ternary('', '# ') }}TLSServerCertSubject={{ zabbix_agent_tlsservercertsubject | default('') }}
 {{ (zabbix_agent_unsafeuserparameters is defined and zabbix_agent_unsafeuserparameters is not none) | ternary('', '# ') }}UnsafeUserParameters={{ zabbix_agent_unsafeuserparameters | default (false) | ternary('1', '0') }}
-{% if not zabbix_agent2 and ansible_os_family != "Windows" %}
+{% if not zabbix_agent2 and ansible_facts.os_family != "Windows" %}
 {{ (zabbix_agent_runas_user is defined and zabbix_agent_runas_user is not none) | ternary('', '# ') }}User={{ zabbix_agent_runas_user | default('') }}
 {% endif %}
 {{ (zabbix_agent_userparamater is defined and zabbix_agent_userparamater is not none) | ternary('', '# ') }}UserParameter={{ zabbix_agent_userparamater | default('') }}
