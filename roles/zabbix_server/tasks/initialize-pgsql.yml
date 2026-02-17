@@ -143,6 +143,18 @@
       environment:
         PGOPTIONS: "-c search_path={{ zabbix_server_dbschema }}"
 
+    - name: "PostgreSQL | Check for history_uint hypertable"
+      community.postgresql.postgresql_query:
+        login_user: "{{ zabbix_server_dbuser }}"
+        login_password: "{{ zabbix_server_dbpassword }}"
+        login_host: "{{ zabbix_server_dbhost }}"
+        login_port: "{{ zabbix_server_dbport }}"
+        login_db: "{{ zabbix_server_dbname }}"
+        query: "SELECT hypertable_name FROM timescaledb_information.hypertables WHERE hypertable_schema = '{{ zabbix_server_dbschema }}' AND hypertable_name = 'history_uint'"
+      register: _hypertable_history_uint
+      environment:
+        PGOPTIONS: "-c search_path={{ zabbix_server_dbschema }}"
+
     # NOTE: Zabbix 7.0 adds a hypertable for auditlog.
     - name: "PostgreSQL | Check for auditlog hypertable"
       when: zabbix_server_version is version('7.0', '>=')
@@ -152,13 +164,13 @@
         login_host: "{{ zabbix_server_dbhost }}"
         login_port: "{{ zabbix_server_dbport }}"
         login_db: "{{ zabbix_server_dbname }}"
-        query: "SELECT hypertable_name FROM timescaledb_information.hypertables WHERE hypertable_name = 'auditlog'"
+        query: "SELECT hypertable_name FROM timescaledb_information.hypertables WHERE hypertable_schema = '{{ zabbix_server_dbschema }}' AND hypertable_name = 'auditlog'"
       register: _hypertable_auditlog
       environment:
         PGOPTIONS: "-c search_path={{ zabbix_server_dbschema }}"
 
     - name: "PostgreSQL | Create TimescaleDB hypertables"
-      when: (_config_db_extension.query_result | length == 0) or
+      when: (_hypertable_history_uint.query_result | length == 0) or
         (zabbix_server_version is version('7.0', '>=') and _hypertable_auditlog.query_result | default([]) | length == 0)
       community.postgresql.postgresql_db:
         login_user: "{{ zabbix_server_dbuser }}"
