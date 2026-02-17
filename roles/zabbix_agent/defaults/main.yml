@@ -91,7 +91,7 @@ zabbix_agent_interfaces:
     main: 1
     useip: "{{ zabbix_useuip }}"
     ip: "{{ zabbix_agent_ip }}"
-    dns: "{{ ansible_fqdn }}"
+    dns: "{{ ansible_facts.fqdn }}"
     port: "{{ zabbix_agent_listenport }}"
 
 # statusportzabbix_agent_zabbix_alias: # Deprecate after 3.0
