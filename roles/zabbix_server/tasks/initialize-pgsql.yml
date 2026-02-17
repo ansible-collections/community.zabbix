@@ -145,6 +145,7 @@
 
     # NOTE: Zabbix 7.0 adds a hypertable for auditlog.
     - name: "PostgreSQL | Check for auditlog hypertable"
+      when: zabbix_server_version is version('7.0', '>=')
       community.postgresql.postgresql_query:
         login_user: "{{ zabbix_server_dbuser }}"
         login_password: "{{ zabbix_server_dbpassword }}"
@@ -158,7 +159,7 @@
 
     - name: "PostgreSQL | Create TimescaleDB hypertables"
       when: (_config_db_extension.query_result | length == 0) or
-        (zabbix_server_version is version('7.0', '>=') and _hypertable_auditlog.query_result | length == 0)
+        (zabbix_server_version is version('7.0', '>=') and _hypertable_auditlog.query_result | default([]) | length == 0)
       community.postgresql.postgresql_db:
         login_user: "{{ zabbix_server_dbuser }}"
         login_password: "{{ zabbix_server_dbpassword }}"

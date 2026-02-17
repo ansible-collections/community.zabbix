@@ -72,6 +72,7 @@
         grant_option: yes
 
     - name: "PostgreSQL | Set search_path for {{ zabbix_proxy_dbuser }} to {{ zabbix_proxy_dbschema }}"
+      when: zabbix_proxy_dbschema != 'public'
       community.postgresql.postgresql_user:
         login_user: "{{ zabbix_proxy_pgsql_login_user | default(omit) }}"
         login_password: "{{ zabbix_proxy_pgsql_login_password | default(omit) }}"
@@ -95,6 +96,8 @@
         port: "{{ zabbix_proxy_dbport }}"
         db: "{{ zabbix_proxy_dbname }}"
         query: 'SELECT mandatory FROM dbversion'
+      environment:
+        PGOPTIONS: "{{ (zabbix_proxy_dbschema != 'public') | ternary('-c search_path=' ~ zabbix_proxy_dbschema, omit) }}"
   rescue:
     - name: "PostgreSQL | Import schema"
       community.postgresql.postgresql_db:
@@ -106,4 +109,4 @@
         state: restore
         target: "{{ zabbix_proxy_database_file_dir }}/postgresql/proxy.sql"
       environment:
-        PGOPTIONS: "-c search_path={{ zabbix_proxy_dbschema }}"
+        PGOPTIONS: "{{ (zabbix_proxy_dbschema != 'public') | ternary('-c search_path=' ~ zabbix_proxy_dbschema, omit) }}"
