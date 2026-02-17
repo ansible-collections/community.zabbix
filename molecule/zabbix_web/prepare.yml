@@ -44,6 +44,29 @@
           - php-xml
       when: ansible_facts['os_family'] == 'RedHat'
 
+    - name: Workaround for geerlingguy.php Debian 13 support
+      when:
+        - ansible_facts['distribution'] == "Debian"
+        - ansible_facts['distribution_major_version'] >= '13'
+      block:
+        - name: Set PHP Version
+          ansible.builtin.set_fact:
+            __php_default_version_debian: "8.4"
+        - name: Set PHP packages
+          ansible.builtin.set_fact:
+            __php_packages:
+              - php{{ __php_default_version_debian }}-common
+              - php{{ __php_default_version_debian }}-cli
+              - php{{ __php_default_version_debian }}-dev
+              - php{{ __php_default_version_debian }}-fpm
+              - php{{ __php_default_version_debian }}-gd
+              - php{{ __php_default_version_debian }}-curl
+              - php-json
+              - php{{ __php_default_version_debian }}-opcache
+              - php{{ __php_default_version_debian }}-xml
+              - php{{ __php_default_version_debian }}-mbstring
+              - php{{ __php_default_version_debian }}-apcu
+              - php{{ __php_default_version_debian }}-sqlite3
     - name: Workaround for geerlingguy.php missing ubuntu-24.04 support
       when:
         - ansible_facts['distribution'] == "Ubuntu"
@@ -65,6 +88,7 @@
               - php{{ __php_default_version_debian }}-curl
               - php{{ __php_default_version_debian }}-imap
               - php-json
+              - default-mysql-client
               - php{{ __php_default_version_debian }}-opcache
               - php{{ __php_default_version_debian }}-xml
               - php{{ __php_default_version_debian }}-mbstring

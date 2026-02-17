@@ -28,6 +28,7 @@ jobs:
             ansible_core: ansible-core<2.17
           - image: ubuntu2404
           - image: ubuntu2204
+          - image: debian13
           - image: debian12
           - image: debian11
           - image: opensuseleap15
@@ -53,6 +54,12 @@ jobs:
           - container:
               image: rockylinux10
             version: v60
+          - container:
+              image: debian13
+            version: v60
+          - container:
+              image: debian13
+            version: v72
     steps:
       - name: Check out code
         uses: actions/checkout@v4

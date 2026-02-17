@@ -23,6 +23,9 @@ _nginx_tls_dhparam: /etc/ssl/private/dhparams.pem
 
 zabbix_valid_web_versions:
   # Debian
+  "13":
+    - 7.4
+    - 7.0
   "12":
     - 7.4
     - 7.2
