@@ -47,6 +47,7 @@ This role will work on the following operating systems:
  * Ubuntu
  * Windows (Best effort)
  * macOS (Best effort)
+ * FreeBSD (Best effort)
 
 ## Ansible 2.10 and higher
 
@@ -98,6 +99,9 @@ See the following list of supported Operating systems with the Zabbix releases:
 | Debian 12 bookworm  |  V  |  V  |  V  |  V  |
 | Debian 11 bullseye  |  V  |  V  |  V  |  V  |
 | Suse Fam 15         |  V  |  V  |  V  |  V  |
+| FreeBSD 15          |  V  |  V  |  V  |  V  |
+| FreeBSD 14          |  V  |  V  |  V  |  V  |
+| FreeBSD 13          |  V  |  V  |  V  |  V  |
 
 You can bypass this matrix by setting `zabbix_agent_version_check: false`
 

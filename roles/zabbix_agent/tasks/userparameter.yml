@@ -3,7 +3,7 @@
     - config
   block:
     - when:
-        - ansible_os_family == "Windows"
+        - ansible_facts['os_family'] == "Windows"
       notify:
         - restart win zabbix agent
       block:
@@ -20,7 +20,7 @@
           loop: "{{ zabbix_agent_userparameters | selectattr('scripts_dir', 'defined') }}"
 
     - when:
-        - ansible_os_family != 'Windows'
+        - ansible_facts['os_family'] != 'Windows'
       notify:
         - restart zabbix-agent
         - restart mac zabbix agent
