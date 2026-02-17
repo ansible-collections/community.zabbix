@@ -7,7 +7,7 @@
   become: true
   when:
     - not zabbix_agent_docker
-    - ansible_os_family != "Windows" and ansible_os_family != "Darwin"
+    - ansible_facts['os_family'] != "Windows" and ansible_facts['os_family'] != "Darwin"
 
 - name: firewalld-reload
   ansible.builtin.command: "firewall-cmd --reload"
@@ -28,7 +28,7 @@
   become: true
   when:
     - not zabbix_agent_docker
-    - ansible_os_family == "Darwin"
+    - ansible_facts['os_family'] == "Darwin"
 
 - name: restart sysctl
   ansible.builtin.service:
@@ -36,4 +36,4 @@
     state: restarted
   become: true
   when:
-    - ansible_os_family == "FreeBSD"
+    - ansible_facts['os_family'] == "FreeBSD"
