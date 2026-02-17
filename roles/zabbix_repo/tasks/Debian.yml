@@ -44,6 +44,8 @@
   tags:
     - install
 
+# Debian 13 (trixie) is available upstream; no suite override needed.
+
 - name: "Debian | Installing repository {{ ansible_facts['distribution'] }}"
   ansible.builtin.copy:
     dest: /etc/apt/sources.list.d/zabbix.sources

@@ -1,0 +1,3 @@
+---
+bugfixes:
+  - zabbix_agent - add Debian 13 to supported versions.
