@@ -31,10 +31,10 @@
 
 - name: "Set default ip address for zabbix_proxy_ip"
   ansible.builtin.set_fact:
-    zabbix_proxy_ip: "{{ ansible_facts['default_ipv4'].address }}"
+    zabbix_proxy_ip: "{{ ansible_facts['default_ipv4'].address | default(ansible_facts['all_ipv4_addresses'][0]) }}"
   when:
     - zabbix_proxy_ip is not defined
-    - "'default_ipv4' in ansible_facts"
+    - ansible_facts['default_ipv4'].address is defined or ansible_facts['all_ipv4_addresses'] | length > 0
   tags:
     - install
     - config
