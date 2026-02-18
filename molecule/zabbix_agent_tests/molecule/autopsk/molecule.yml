@@ -3,9 +3,13 @@ scenario:
   name: autopsk
 provisioner:
   name: ansible
-  config_options:
-    privilege_escalation:
-      become_method: ansible.builtin.su
+  env:
+    HTTP_PROXY: "${HTTP_PROXY}"
+    HTTPS_PROXY: "${HTTPS_PROXY}"
+    NO_PROXY: "${NO_PROXY}"
+    http_proxy: "${HTTP_PROXY}"
+    https_proxy: "${HTTPS_PROXY}"
+    no_proxy: "${NO_PROXY}"
   inventory:
     group_vars:
       all:

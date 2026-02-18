@@ -32,9 +32,12 @@ provisioner:
     # https://github.com/ansible/molecule/issues/4015#issuecomment-1680859724
     ANSIBLE_ROLES_PATH: ../../roles
     ANSIBLE_INJECT_FACT_VARS: "False"
-  config_options:
-    privilege_escalation:
-      become_method: ansible.builtin.su
+    HTTP_PROXY: "${HTTP_PROXY}"
+    HTTPS_PROXY: "${HTTPS_PROXY}"
+    NO_PROXY: "${NO_PROXY}"
+    http_proxy: "${HTTP_PROXY}"
+    https_proxy: "${HTTPS_PROXY}"
+    no_proxy: "${NO_PROXY}"
   inventory:
     group_vars:
       all:

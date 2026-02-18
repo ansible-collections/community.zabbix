@@ -2,51 +2,12 @@
 - name: Prepare
   hosts: all
 
-  tasks:
-    # before anything else, put optional proxy configs in important parts of the os
-    - name: "bash proxy"
-      ansible.builtin.copy:
-        content: |
-          export HTTP_PROXY="{{ zabbix_http_proxy }}"
-          export HTTPS_PROXY="{{ zabbix_https_proxy }}"
-          export http_proxy="{{ zabbix_http_proxy }}"
-          export https_proxy="{{ zabbix_https_proxy }}"
-          export no_proxy="{{ zabbix_no_proxy }}"
-          export NO_PROXY="{{ zabbix_no_proxy }}"
-        dest: /etc/profile.d/proxy.sh
-      when:
-        - zabbix_http_proxy is defined
-    - name: "apt proxy"
-      ansible.builtin.copy:
-        content: |
-          Acquire::http::Proxy "{{ zabbix_http_proxy }}";
-          Acquire::https::Proxy "{{ zabbix_https_proxy }}";
-        dest: /etc/apt/apt.conf.d/99proxy
-      when:
-        - ansible_facts['os_family'] == 'Debian'
-        - zabbix_http_proxy is defined
-    - name: "dnf proxy"
-      ansible.builtin.lineinfile:
-        regexp: '^proxy='
-        line: 'proxy={{ zabbix_http_proxy }}'
-        path: /etc/dnf/dnf.conf
-      when:
-        - ansible_facts['os_family'] == 'RedHat'
-        - zabbix_http_proxy is defined
-    - name: "suse proxy"
-      ansible.builtin.copy:
-        content: |
-          export HTTP_PROXY="{{ zabbix_http_proxy }}"
-          export HTTPS_PROXY="{{ zabbix_https_proxy }}"
-          export http_proxy="{{ zabbix_http_proxy }}"
-          export https_proxy="{{ zabbix_https_proxy }}"
-          export no_proxy="{{ zabbix_no_proxy }}"
-          export NO_PROXY="{{ zabbix_no_proxy }}"
-        dest: /etc/sysconfig/proxy
-      when:
-        - ansible_facts['os_family'] == 'Suse'
-        - zabbix_http_proxy is defined
+  environment:
+    http_proxy: "{{ zabbix_http_proxy }}"
+    https_proxy: "{{ zabbix_https_proxy }}"
+    no_proxy: "{{ zabbix_no_proxy }}"
 
+  tasks:
     - name: "Configure SUDO."
       ansible.builtin.lineinfile:
         dest: /etc/sudoers

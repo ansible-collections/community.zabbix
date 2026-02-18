@@ -2,51 +2,12 @@
 - name: Prepare
   hosts: all
 
-  pre_tasks:
-    # before anything else, put optional proxy configs in important parts of the os
-    - name: "bash proxy"
-      ansible.builtin.copy:
-        content: |
-          export HTTP_PROXY="{{ zabbix_http_proxy }}"
-          export HTTPS_PROXY="{{ zabbix_https_proxy }}"
-          export http_proxy="{{ zabbix_http_proxy }}"
-          export https_proxy="{{ zabbix_https_proxy }}"
-          export no_proxy="{{ zabbix_no_proxy }}"
-          export NO_PROXY="{{ zabbix_no_proxy }}"
-        dest: /etc/profile.d/proxy.sh
-      when:
-        - zabbix_http_proxy is defined
-    - name: "apt proxy"
-      ansible.builtin.copy:
-        content: |
-          Acquire::http::Proxy "{{ zabbix_http_proxy }}";
-          Acquire::https::Proxy "{{ zabbix_https_proxy }}";
-        dest: /etc/apt/apt.conf.d/99proxy
-      when:
-        - ansible_facts['os_family'] == 'Debian'
-        - zabbix_http_proxy is defined
-    - name: "dnf proxy"
-      ansible.builtin.lineinfile:
-        regexp: '^proxy='
-        line: 'proxy={{ zabbix_http_proxy }}'
-        path: /etc/dnf/dnf.conf
-      when:
-        - ansible_facts['os_family'] == 'RedHat'
-        - zabbix_http_proxy is defined
-    - name: "suse proxy"
-      ansible.builtin.copy:
-        content: |
-          export HTTP_PROXY="{{ zabbix_http_proxy }}"
-          export HTTPS_PROXY="{{ zabbix_https_proxy }}"
-          export http_proxy="{{ zabbix_http_proxy }}"
-          export https_proxy="{{ zabbix_https_proxy }}"
-          export no_proxy="{{ zabbix_no_proxy }}"
-          export NO_PROXY="{{ zabbix_no_proxy }}"
-        dest: /etc/sysconfig/proxy
-      when:
-        - ansible_facts['os_family'] == 'Suse'
-        - zabbix_http_proxy is defined
+  environment:
+    http_proxy: "{{ zabbix_http_proxy }}"
+    https_proxy: "{{ zabbix_https_proxy }}"
+    no_proxy: "{{ zabbix_no_proxy }}"
 
+  pre_tasks:
     - name: "Installing packages"
       ansible.builtin.package:
         name:
@@ -54,6 +15,10 @@
         state: present
       register: installation_dependencies
       until: installation_dependencies is succeeded
+
+    # workaround for "Authentication service cannot retrieve authentication info"
+    - name: "SUDO permissions workaround"
+      ansible.builtin.command: chmod 0400 /etc/shadow
 
     # https://github.com/geerlingguy/ansible-role-java/issues/64
     - name: "Workaround Java issue for Debian"
