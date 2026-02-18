@@ -33,9 +33,18 @@ provisioner:
     # https://github.com/ansible/molecule/issues/4015#issuecomment-1680859724
     ANSIBLE_ROLES_PATH: ../../roles
     ANSIBLE_INJECT_FACT_VARS: "False"
+    HTTP_PROXY: "${http_proxy}"
+    HTTPS_PROXY: "${https_proxy}"
+    NO_PROXY: "${no_proxy}"
+    http_proxy: "${http_proxy}"
+    https_proxy: "${https_proxy}"
+    no_proxy: "${no_proxy}"
   inventory:
     group_vars:
       all:
+        zabbix_http_proxy: ${http_proxy}
+        zabbix_https_proxy: ${https_proxy}
+        zabbix_no_proxy: ${no_proxy}
         ansible_connection: community.docker.docker
         zabbix_api_create_proxy: true
         zabbix_proxy_hostname: proxy1

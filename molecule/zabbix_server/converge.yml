@@ -1,5 +1,9 @@
 ---
 - hosts: all
   become: true
+  environment:
+    http_proxy: "{{ zabbix_http_proxy }}"
+    https_proxy: "{{ zabbix_https_proxy }}"
+    no_proxy: "{{ zabbix_no_proxy }}"
   roles:
     - role: zabbix_server

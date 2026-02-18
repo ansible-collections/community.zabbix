@@ -2,6 +2,11 @@
 - name: Prepare
   hosts: all
 
+  environment:
+    http_proxy: "{{ zabbix_http_proxy }}"
+    https_proxy: "{{ zabbix_https_proxy }}"
+    no_proxy: "{{ zabbix_no_proxy }}"
+
   pre_tasks:
     # issues on redhat with curl, so install curl-minimal.
     - name: "Installing packages"
@@ -18,6 +23,10 @@
         dest: /etc/sudoers
         line: "Defaults    !requiretty"
         state: present
+
+    # workaround for "Authentication service cannot retrieve authentication info"
+    - name: "SUDO permissions workaround"
+      ansible.builtin.command: chmod 0400 /etc/shadow
 
     - name: Enabling PHP 8.0
       ansible.builtin.dnf:

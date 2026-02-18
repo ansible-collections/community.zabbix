@@ -2,6 +2,11 @@
 - name: Prepare
   hosts: all
 
+  environment:
+    http_proxy: "{{ zabbix_http_proxy }}"
+    https_proxy: "{{ zabbix_https_proxy }}"
+    no_proxy: "{{ zabbix_no_proxy }}"
+
   tasks:
     - name: "Configure SUDO."
       ansible.builtin.lineinfile:
