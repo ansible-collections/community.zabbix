@@ -124,6 +124,7 @@
         login_unix_socket: "{{ zabbix_server_pgsql_login_unix_socket | default(omit) }}"
         login_db: "{{ zabbix_server_dbname }}"
         name: "timescaledb"
+        cascade: true
         schema: "{{ zabbix_server_dbschema }}"
 
 - name: "PostgreSQL verify or create schema"
