@@ -81,8 +81,41 @@
         configuration:
           search_path: "{{ zabbix_server_dbschema }}"
 
-    - name: "PostgreSQL | Enable TimescaleDB extension in schema {{ zabbix_server_dbschema }}"
+    - name: "PostgreSQL | Get TimescaleDB extension schema"
       when: zabbix_server_database_timescaledb | default(false)
+      community.postgresql.postgresql_query:
+        login_user: "{{ zabbix_server_pgsql_login_user | default(omit) }}"
+        login_password: "{{ zabbix_server_pgsql_login_password | default(omit) }}"
+        login_host: "{{ zabbix_server_pgsql_login_host | default(omit) }}"
+        login_port: "{{ zabbix_server_dbport }}"
+        login_unix_socket: "{{ zabbix_server_pgsql_login_unix_socket | default(omit) }}"
+        login_db: "{{ zabbix_server_dbname }}"
+        query: |
+          SELECT n.nspname AS schema_name
+          FROM pg_extension e
+          JOIN pg_namespace n ON n.oid = e.extnamespace
+          WHERE e.extname = 'timescaledb'
+      register: _timescaledb_extension_schema
+
+    - name: "PostgreSQL | Drop TimescaleDB extension when schema differs"
+      when:
+        - zabbix_server_database_timescaledb | default(false)
+        - _timescaledb_extension_schema.query_result | length > 0
+        - _timescaledb_extension_schema.query_result[0].schema_name != zabbix_server_dbschema
+      community.postgresql.postgresql_query:
+        login_user: "{{ zabbix_server_pgsql_login_user | default(omit) }}"
+        login_password: "{{ zabbix_server_pgsql_login_password | default(omit) }}"
+        login_host: "{{ zabbix_server_pgsql_login_host | default(omit) }}"
+        login_port: "{{ zabbix_server_dbport }}"
+        login_unix_socket: "{{ zabbix_server_pgsql_login_unix_socket | default(omit) }}"
+        login_db: "{{ zabbix_server_dbname }}"
+        query: "DROP EXTENSION IF EXISTS timescaledb CASCADE"
+
+    - name: "PostgreSQL | Create TimescaleDB extension in schema {{ zabbix_server_dbschema }}"
+      when:
+        - zabbix_server_database_timescaledb | default(false)
+        - _timescaledb_extension_schema.query_result | length == 0 or
+          _timescaledb_extension_schema.query_result[0].schema_name != zabbix_server_dbschema
       community.postgresql.postgresql_ext:
         login_user: "{{ zabbix_server_pgsql_login_user | default(omit) }}"
         login_password: "{{ zabbix_server_pgsql_login_password | default(omit) }}"
@@ -109,7 +142,7 @@
   rescue:
     - name: "PostgreSQL | Import Zabbix schema into {{ zabbix_server_dbschema }}"
       community.postgresql.postgresql_db:
-        name: "{{ zabbix_server_dbname }}"               # destination DB
+        name: "{{ zabbix_server_dbname }}"
         login_user: "{{ zabbix_server_dbuser }}"
         login_password: "{{ zabbix_server_dbpassword }}"
         login_host: "{{ zabbix_server_dbhost }}"
