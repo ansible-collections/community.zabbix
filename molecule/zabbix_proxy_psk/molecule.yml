@@ -73,6 +73,7 @@ provisioner:
         zabbix_proxy_database: pgsql
         zabbix_proxy_dbport: 5432
         zabbix_proxy_dbhost: "{{ inventory_hostname }}-db"
+        zabbix_proxy_dbschema: zabbix
         zabbix_proxy_dbhost_run_install: false
         zabbix_proxy_pgsql_login_host: "{{ inventory_hostname }}-db"
         zabbix_proxy_pgsql_login_user: postgres
