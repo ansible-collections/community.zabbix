@@ -9,7 +9,7 @@ zabbix_valid_server_versions:
 _zabbix_server_pgsql_dependencies:
   - "{{ zabbix_server_install_database_client | ternary('postgresql', '') }}"
   - gzip
-  - python311-psycopg2
+  - python3{% if ansible_facts.python.version.minor != 6 %}{{ ansible_facts.python.version.minor }}{% endif %}-psycopg2
 
 _zabbix_server_mysql_dependencies:
   - "{{ zabbix_server_install_database_client | ternary('mysql', '') }}"
