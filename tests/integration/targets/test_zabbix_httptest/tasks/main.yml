@@ -1,0 +1,25 @@
+---
+- name: test - do not run tests for Zabbix < 7.0
+  meta: end_play
+  when: zabbix_version is version('7.0', '<')
+
+- block:
+    # setup stuff
+    - include_tasks: zabbix_setup.yml
+
+    # zabbix_httptest module tests
+    - include_tasks: zabbix_tests.yml
+
+    # tear down stuff set up earlier
+    - include_tasks: zabbix_teardown.yml
+
+  always:
+    - name: "cleanup httptest if tests failed"
+      community.zabbix.zabbix_httptest:
+        host_name: ExampleHost
+        name: "{{ item }}"
+        state: absent
+      ignore_errors: true
+      loop:
+        - ExampleTest
+        - NewExampleTest
