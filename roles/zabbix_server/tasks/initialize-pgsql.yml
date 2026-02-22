@@ -1,6 +1,7 @@
 ---
 # task file for postgresql
 - name: "Install PostgreSQL dependencies"
+  when: zabbix_server_install_dependencies
   ansible.builtin.package:
     name: "{{ _zabbix_server_pgsql_dependencies | select | list }}"
   environment:
