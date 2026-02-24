@@ -1,0 +1,12 @@
+---
+- name: Test community.zabbix.zabbix_agent on Debian 13 VM
+  hosts: debian13
+  become: true
+  gather_facts: true
+  vars:
+    zabbix_agent_server: 127.0.0.1
+    zabbix_agent_serveractive: 127.0.0.1
+    zabbix_manage_repo: true
+    zabbix_agent_version_check: true
+  roles:
+    - role: community.zabbix.zabbix_agent

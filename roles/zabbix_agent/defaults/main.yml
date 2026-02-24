@@ -3,6 +3,7 @@
 
 zabbix_agent_version_check: true
 
+# Install Agent2 instead of legacy agent.
 zabbix_agent2: false
 zabbix_agent_releases_url: "https://services.zabbix.com/updates/v1"
 zabbix_agent_version_minor: "*"
