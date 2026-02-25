@@ -140,6 +140,7 @@ Selinux changes will be installed based on the status of selinux running on the 
 * `zabbix_server_install_database_client`: Default: `True`. False does not install database client. Default true
 * `zabbix_server_database_sqlload`:True / False. When you don't want to load the sql files into the database, you can set it to False.
 * `zabbix_server_database_timescaledb`:False / True. When you want to use timescaledb extension into the database, you can set it to True (this option only works for postgreSQL database).
+* `zabbix_server_database_timescaledb_force_schema`:False / True. When you want to use timescaledb extension into the database, and force the extension to be created in the schema deefined in zabbix_server_database_schemas. If the extension is not already in the zabbix_server_database_schemas it will be dropped (lost of data) and created in the defined one.
 * `zabbix_server_database_schemas`: List of schemas to load, can be overridden for a non-supported/custom setup.
 * `zabbix_server_dbencoding`: Default: `utf8`. The encoding for the MySQL database.
 * `zabbix_server_dbcollation`: Default: `utf8_bin`. The collation for the MySQL database.

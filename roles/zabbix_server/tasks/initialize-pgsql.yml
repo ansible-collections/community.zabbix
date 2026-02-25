@@ -82,7 +82,7 @@
           search_path: "{{ zabbix_server_dbschema }}"
 
     - name: "PostgreSQL | Get TimescaleDB extension schema"
-      when: zabbix_server_database_timescaledb | default(false)
+      when: zabbix_server_database_timescaledb
       community.postgresql.postgresql_query:
         login_user: "{{ zabbix_server_pgsql_login_user | default(omit) }}"
         login_password: "{{ zabbix_server_pgsql_login_password | default(omit) }}"
@@ -97,10 +97,26 @@
           WHERE e.extname = 'timescaledb'
       register: _timescaledb_extension_schema
 
+    - name: "PostgreSQL | Warn when TimescaleDB extension schema differs"
+      when:
+        - _timescaledb_extension_schema.query_result | length > 0 | default(0)
+      ansible.builtin.assert:
+        that:
+          - _timescaledb_extension_schema.query_result[0].schema_name == zabbix_server_dbschema
+        fail_msg: >-
+          TimescaleDB extension schema mismatch detected:
+          _timescaledb_extension_schema.query_result[0].schema_name
+          ({{ _timescaledb_extension_schema.query_result[0].schema_name }})
+          != zabbix_server_dbschema ({{ zabbix_server_dbschema }}).
+          Re-run with zabbix_server_database_timescaledb_force_schema=true to automatically
+          drop and recreate the extension in the correct schema.
+      failed_when: false
+      changed_when: false
+
     - name: "PostgreSQL | Drop TimescaleDB extension when schema differs"
       when:
-        - zabbix_server_database_timescaledb | default(false)
-        - _timescaledb_extension_schema.query_result | length > 0
+        - zabbix_server_database_timescaledb_force_schema | default(false)
+        - _timescaledb_extension_schema.query_result | length > 0 | default(0)
         - _timescaledb_extension_schema.query_result[0].schema_name != zabbix_server_dbschema
       community.postgresql.postgresql_query:
         login_user: "{{ zabbix_server_pgsql_login_user | default(omit) }}"
@@ -113,7 +129,6 @@
 
     - name: "PostgreSQL | Create TimescaleDB extension in schema {{ zabbix_server_dbschema }}"
       when:
-        - zabbix_server_database_timescaledb | default(false)
         - _timescaledb_extension_schema.query_result | length == 0 or
           _timescaledb_extension_schema.query_result[0].schema_name != zabbix_server_dbschema
       community.postgresql.postgresql_ext:
@@ -153,8 +168,6 @@
         # Extra args passed to the restore program (psql for plain SQL)
         target_opts: "-v ON_ERROR_STOP=1 -q"
       loop: "{{ zabbix_server_database_schemas }}"
-      environment:
-        PGOPTIONS: "-c search_path={{ zabbix_server_dbschema }}"
 
 - name: "Configure Timescale"
   when: zabbix_server_database_timescaledb
@@ -174,24 +187,9 @@
         _is_pre74: "{{ zabbix_server_version is version('7.4', '<') }}"
         legacy_qry: "SELECT db_extension FROM config WHERE db_extension = 'timescaledb'"
         modern_qry: "SELECT value_str FROM settings WHERE name = 'db_extension' AND value_str = 'timescaledb'"
-      environment:
-        PGOPTIONS: "-c search_path={{ zabbix_server_dbschema }}"
-
-    - name: "PostgreSQL | Check for history_uint hypertable"
-      community.postgresql.postgresql_query:
-        login_user: "{{ zabbix_server_dbuser }}"
-        login_password: "{{ zabbix_server_dbpassword }}"
-        login_host: "{{ zabbix_server_dbhost }}"
-        login_port: "{{ zabbix_server_dbport }}"
-        login_db: "{{ zabbix_server_dbname }}"
-        query: "SELECT hypertable_name FROM timescaledb_information.hypertables WHERE hypertable_schema = '{{ zabbix_server_dbschema }}' AND hypertable_name = 'history_uint'"
-      register: _hypertable_history_uint
-      environment:
-        PGOPTIONS: "-c search_path={{ zabbix_server_dbschema }}"
 
     # NOTE: Zabbix 7.0 adds a hypertable for auditlog.
     - name: "PostgreSQL | Check for auditlog hypertable"
-      when: zabbix_server_version is version('7.0', '>=')
       community.postgresql.postgresql_query:
         login_user: "{{ zabbix_server_dbuser }}"
         login_password: "{{ zabbix_server_dbpassword }}"
@@ -205,9 +203,8 @@
 
     - name: "PostgreSQL | Create TimescaleDB hypertables"
       when:
-        - _config_db_extension.query_result | length == 0
-        - (_hypertable_history_uint.query_result | length == 0) or
-          (zabbix_server_version is version('7.0', '>=') and _hypertable_auditlog.query_result | default([]) | length == 0)
+        - _config_db_extension.query_result | length == 0 or 
+          (zabbix_server_version is version('7.0', '>=') and _hypertable_auditlog.query_result | length == 0)
       community.postgresql.postgresql_db:
         login_user: "{{ zabbix_server_dbuser }}"
         login_password: "{{ zabbix_server_dbpassword }}"
@@ -220,5 +217,3 @@
         _is_pre70: "{{ zabbix_server_version is version('7.0', '<') }}"
         legacy_path: postgresql/timescaledb.sql
         modern_path: postgresql/timescaledb/schema.sql
-      environment:
-        PGOPTIONS: "-c search_path={{ zabbix_server_dbschema }}"
