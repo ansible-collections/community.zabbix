@@ -14,9 +14,11 @@ zabbix_server_dbpassword: zabbix-server
 zabbix_server_dbhost: localhost
 zabbix_server_dbport: "{{ _zabbix_server_database_default_port[zabbix_server_database] }}"
 zabbix_server_dbname: zabbix-server
+zabbix_server_dbschema: public
 
 zabbix_server_database_sqlload: true
 zabbix_server_database_timescaledb: false
+zabbix_server_database_timescaledb_force_schema: false
 zabbix_server_privileged_host: localhost
 zabbix_server_dbencoding: utf8
 zabbix_server_dbcollation: utf8_bin

@@ -24,48 +24,62 @@
   tags:
     - database
   block:
-    - name: "PostgreSQL | Create database"
-      community.postgresql.postgresql_db:
-        login_user: "{{ zabbix_server_pgsql_login_user | default(omit) }}"
-        login_password: "{{ zabbix_server_pgsql_login_password | default(omit) }}"
-        login_host: "{{ zabbix_server_pgsql_login_host | default(omit) }}"
-        port: "{{ zabbix_server_dbport }}"
-        login_unix_socket: "{{ zabbix_server_pgsql_login_unix_socket | default(omit) }}"
-        name: "{{ zabbix_server_dbname }}"
-
     - name: "PostgreSQL | Create database user"
       community.postgresql.postgresql_user:
         login_user: "{{ zabbix_server_pgsql_login_user | default(omit) }}"
         login_password: "{{ zabbix_server_pgsql_login_password | default(omit) }}"
         login_host: "{{ zabbix_server_pgsql_login_host | default(omit) }}"
-        port: "{{ zabbix_server_dbport }}"
+        login_port: "{{ zabbix_server_dbport }}"
         login_unix_socket: "{{ zabbix_server_pgsql_login_unix_socket | default(omit) }}"
         name: "{{ zabbix_server_dbuser }}"
         password: "{{ ('md5' + (zabbix_server_dbpassword + zabbix_server_dbuser)|hash('md5')) if zabbix_server_dbpassword_hash_method == 'md5' else zabbix_server_dbpassword }}"
 
-    - name: "PostgreSQL | Set database/user permissions"
+    - name: "PostgreSQL | Create database"
+      community.postgresql.postgresql_db:
+        login_user: "{{ zabbix_server_pgsql_login_user | default(omit) }}"
+        login_password: "{{ zabbix_server_pgsql_login_password | default(omit) }}"
+        login_host: "{{ zabbix_server_pgsql_login_host | default(omit) }}"
+        login_port: "{{ zabbix_server_dbport }}"
+        login_unix_socket: "{{ zabbix_server_pgsql_login_unix_socket | default(omit) }}"
+        name: "{{ zabbix_server_dbname }}"
+        owner: "{{ zabbix_server_dbuser }}"
+
+    - name: "PostgreSQL | Create schema {{ zabbix_server_dbschema }}"
+      when: zabbix_server_dbschema != 'public'
+      community.postgresql.postgresql_schema:
+        login_user: "{{ zabbix_server_pgsql_login_user | default(omit) }}"
+        login_password: "{{ zabbix_server_pgsql_login_password | default(omit) }}"
+        login_host: "{{ zabbix_server_pgsql_login_host | default(omit) }}"
+        login_port: "{{ zabbix_server_dbport }}"
+        login_unix_socket: "{{ zabbix_server_pgsql_login_unix_socket | default(omit) }}"
+        login_db: "{{ zabbix_server_dbname }}"
+        name: "{{ zabbix_server_dbschema }}"
+        owner: "{{ zabbix_server_dbuser }}"
+
+    - name: "PostgreSQL | Grant ALL on schema {{ zabbix_server_dbschema }} to user {{ zabbix_server_dbuser }}"
       community.postgresql.postgresql_privs:
         login_user: "{{ zabbix_server_pgsql_login_user | default(omit) }}"
         login_password: "{{ zabbix_server_pgsql_login_password | default(omit) }}"
         login_host: "{{ zabbix_server_pgsql_login_host | default(omit) }}"
-        port: "{{ zabbix_server_dbport }}"
+        login_port: "{{ zabbix_server_dbport }}"
         login_unix_socket: "{{ zabbix_server_pgsql_login_unix_socket | default(omit) }}"
-        db: "{{ zabbix_server_dbname }}"
-        privs: ALL
+        login_db: "{{ zabbix_server_dbname }}"
         type: schema
-        objs: public
-        role: "{{ zabbix_server_dbuser }}"
+        objs: "{{ zabbix_server_dbschema }}"
+        roles: "{{ zabbix_server_dbuser }}"
+        privs: "ALL"
+        grant_option: yes
 
-    - name: "PostgreSQL | Create timescaledb extension"
-      when: zabbix_server_database_timescaledb
-      community.postgresql.postgresql_ext:
+    - name: "PostgreSQL | Set search_path for user {{ zabbix_server_dbuser }} to schema {{ zabbix_server_dbschema }}"
+      community.postgresql.postgresql_user:
         login_user: "{{ zabbix_server_pgsql_login_user | default(omit) }}"
         login_password: "{{ zabbix_server_pgsql_login_password | default(omit) }}"
         login_host: "{{ zabbix_server_pgsql_login_host | default(omit) }}"
-        port: "{{ zabbix_server_dbport }}"
+        login_port: "{{ zabbix_server_dbport }}"
         login_unix_socket: "{{ zabbix_server_pgsql_login_unix_socket | default(omit) }}"
-        db: "{{ zabbix_server_dbname }}"
-        name: timescaledb
+        name: "{{ zabbix_server_dbuser }}"
+        configuration:
+          search_path: "{{ zabbix_server_dbschema }}"
 
 - name: "PostgreSQL verify or create schema"
   when: zabbix_server_database_sqlload
@@ -77,33 +91,95 @@
         login_user: "{{ zabbix_server_dbuser }}"
         login_password: "{{ zabbix_server_dbpassword }}"
         login_host: "{{ zabbix_server_dbhost }}"
-        port: "{{ zabbix_server_dbport }}"
-        db: "{{ zabbix_server_dbname }}"
+        login_port: "{{ zabbix_server_dbport }}"
+        login_db: "{{ zabbix_server_dbname }}"
         query: "SELECT mandatory FROM dbversion"
   rescue:
     - name: "PostgreSQL | Import schema"
       community.postgresql.postgresql_db:
+        name: "{{ zabbix_server_dbname }}"
         login_user: "{{ zabbix_server_dbuser }}"
         login_password: "{{ zabbix_server_dbpassword }}"
         login_host: "{{ zabbix_server_dbhost }}"
-        port: "{{ zabbix_server_dbport }}"
-        db: "{{ zabbix_server_dbname }}"
+        login_port: "{{ zabbix_server_dbport }}"
         state: restore
         target: "{{ item }}"
       loop: "{{ zabbix_server_database_schemas }}"
 
-- name: "Configure Timescale"
+- name: "Configure TimescaleDB extension"
   when: zabbix_server_database_timescaledb
   tags:
     - database
   block:
-    - name: "PostgreSQL | Check if TimescaleDB has been configured"
+    - name: "TimescaleDB | Get extension schema"
+      community.postgresql.postgresql_query:
+        login_user: "{{ zabbix_server_pgsql_login_user | default(omit) }}"
+        login_password: "{{ zabbix_server_pgsql_login_password | default(omit) }}"
+        login_host: "{{ zabbix_server_pgsql_login_host | default(omit) }}"
+        login_port: "{{ zabbix_server_dbport }}"
+        login_unix_socket: "{{ zabbix_server_pgsql_login_unix_socket | default(omit) }}"
+        login_db: "{{ zabbix_server_dbname }}"
+        query: |
+          SELECT n.nspname AS schema_name
+          FROM pg_extension e
+          JOIN pg_namespace n ON n.oid = e.extnamespace
+          WHERE e.extname = 'timescaledb'
+      register: _timescaledb_extension_schema
+
+    - name: "TimescaleDB | Warn when extension schema differs"
+      when:
+        - _timescaledb_extension_schema.query_result | length > 0 | default(0)
+      ansible.builtin.assert:
+        that:
+          - _timescaledb_extension_schema.query_result[0].schema_name == zabbix_server_dbschema
+        fail_msg: >-
+          TimescaleDB extension schema mismatch detected:
+          _timescaledb_extension_schema.query_result[0].schema_name
+          ({{ _timescaledb_extension_schema.query_result[0].schema_name }})
+          != zabbix_server_dbschema ({{ zabbix_server_dbschema }}).
+          Re-run with zabbix_server_database_timescaledb_force_schema=true to automatically
+          drop and recreate the extension in the correct schema.
+      failed_when: >
+        (not (zabbix_server_database_timescaledb_force_schema | default(false) | bool)) and
+        (_timescaledb_extension_schema.query_result[0].schema_name != zabbix_server_dbschema)
+      changed_when: false
+
+    - name: "TimescaleDB | Drop extension when schema differs"
+      when:
+        - zabbix_server_database_timescaledb_force_schema | default(false)
+        - _timescaledb_extension_schema.query_result | length > 0 | default(0)
+        - _timescaledb_extension_schema.query_result[0].schema_name != zabbix_server_dbschema
+      community.postgresql.postgresql_query:
+        login_user: "{{ zabbix_server_pgsql_login_user | default(omit) }}"
+        login_password: "{{ zabbix_server_pgsql_login_password | default(omit) }}"
+        login_host: "{{ zabbix_server_pgsql_login_host | default(omit) }}"
+        login_port: "{{ zabbix_server_dbport }}"
+        login_unix_socket: "{{ zabbix_server_pgsql_login_unix_socket | default(omit) }}"
+        login_db: "{{ zabbix_server_dbname }}"
+        query: "DROP EXTENSION IF EXISTS timescaledb CASCADE"
+
+    - name: "TimescaleDB | Create extension"
+      when:
+        - _timescaledb_extension_schema.query_result | length == 0 or
+          _timescaledb_extension_schema.query_result[0].schema_name != zabbix_server_dbschema
+      community.postgresql.postgresql_ext:
+        login_user: "{{ zabbix_server_pgsql_login_user | default(omit) }}"
+        login_password: "{{ zabbix_server_pgsql_login_password | default(omit) }}"
+        login_host: "{{ zabbix_server_pgsql_login_host | default(omit) }}"
+        login_port: "{{ zabbix_server_dbport }}"
+        login_unix_socket: "{{ zabbix_server_pgsql_login_unix_socket | default(omit) }}"
+        login_db: "{{ zabbix_server_dbname }}"
+        name: "timescaledb"
+        cascade: true
+        schema: "{{ zabbix_server_dbschema }}"
+
+    - name: "TimescaleDB | Check if TimescaleDB has been configured"
       community.postgresql.postgresql_query:
         login_user: "{{ zabbix_server_dbuser }}"
         login_password: "{{ zabbix_server_dbpassword }}"
         login_host: "{{ zabbix_server_dbhost }}"
-        port: "{{ zabbix_server_dbport }}"
-        db: "{{ zabbix_server_dbname }}"
+        login_port: "{{ zabbix_server_dbport }}"
+        login_db: "{{ zabbix_server_dbname }}"
         query: "{{ _is_pre74 | ternary(legacy_qry, modern_qry) }}"
       register: _config_db_extension
       vars:
@@ -112,24 +188,25 @@
         modern_qry: "SELECT value_str FROM settings WHERE name = 'db_extension' AND value_str = 'timescaledb'"
 
     # NOTE: Zabbix 7.0 adds a hypertable for auditlog.
-    - name: "PostgreSQL | Check for auditlog hypertable"
+    - name: "TimescaleDB | Check for auditlog hypertable"
       community.postgresql.postgresql_query:
         login_user: "{{ zabbix_server_dbuser }}"
         login_password: "{{ zabbix_server_dbpassword }}"
         login_host: "{{ zabbix_server_dbhost }}"
-        port: "{{ zabbix_server_dbport }}"
-        db: "{{ zabbix_server_dbname }}"
-        query: "SELECT hypertable_name FROM timescaledb_information.hypertables WHERE hypertable_name = 'auditlog'"
+        login_port: "{{ zabbix_server_dbport }}"
+        login_db: "{{ zabbix_server_dbname }}"
+        query: "SELECT hypertable_name FROM timescaledb_information.hypertables WHERE hypertable_schema = '{{ zabbix_server_dbschema }}' AND hypertable_name = 'auditlog'"
       register: _hypertable_auditlog
 
-    - name: "PostgreSQL | Create TimescaleDB hypertables"
-      when: (_config_db_extension.query_result | length == 0) or
-        (zabbix_server_version is version('7.0', '>=') and _hypertable_auditlog.query_result | length == 0)
+    - name: "TimescaleDB | Create hypertables"
+      when:
+        - _config_db_extension.query_result | length == 0 or 
+          (zabbix_server_version is version('7.0', '>=') and _hypertable_auditlog.query_result | length == 0)
       community.postgresql.postgresql_db:
         login_user: "{{ zabbix_server_dbuser }}"
         login_password: "{{ zabbix_server_dbpassword }}"
         login_host: "{{ zabbix_server_dbhost }}"
-        port: "{{ zabbix_server_dbport }}"
+        login_port: "{{ zabbix_server_dbport }}"
         db: "{{ zabbix_server_dbname }}"
         state: restore
         target: "{{ _zabbix_server_database_scripts_dir }}/{{ _is_pre70 | ternary(legacy_path, modern_path) }}"

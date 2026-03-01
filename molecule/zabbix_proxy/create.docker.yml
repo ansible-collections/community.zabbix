@@ -34,7 +34,7 @@
           - name: zabbix
         env: "{{ _container[_db_type].env }}"
       loop: "{{ molecule_yml.platforms }}"
-      when: item.groups | intersect(_database_groups)
+      when: (item.groups | intersect(_database_groups) | length) > 0
       vars:
         _database_groups: ['mysql', 'pgsql']
         _db_type: "{{ item.groups | intersect(_database_groups) | first }}"
