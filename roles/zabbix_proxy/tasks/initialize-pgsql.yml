@@ -96,8 +96,7 @@
         port: "{{ zabbix_proxy_dbport }}"
         db: "{{ zabbix_proxy_dbname }}"
         query: 'SELECT mandatory FROM dbversion'
-      environment:
-        PGOPTIONS: "{{ (zabbix_proxy_dbschema != 'public') | ternary('-c search_path=' ~ zabbix_proxy_dbschema, omit) }}"
+
   rescue:
     - name: "PostgreSQL | Import schema"
       community.postgresql.postgresql_db:
@@ -108,5 +107,3 @@
         db: "{{ zabbix_proxy_dbname }}"
         state: restore
         target: "{{ zabbix_proxy_database_file_dir }}/postgresql/proxy.sql"
-      environment:
-        PGOPTIONS: "{{ (zabbix_proxy_dbschema != 'public') | ternary('-c search_path=' ~ zabbix_proxy_dbschema, omit) }}"
