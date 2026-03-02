@@ -80,6 +80,19 @@
         name: "{{ zabbix_server_dbuser }}"
         configuration:
           search_path: "{{ zabbix_server_dbschema }}"
+        
+    - name: "TimescaleDB | Create extension"
+      when: zabbix_server_database_timescaledb
+      community.postgresql.postgresql_ext:
+        login_user: "{{ zabbix_server_pgsql_login_user | default(omit) }}"
+        login_password: "{{ zabbix_server_pgsql_login_password | default(omit) }}"
+        login_host: "{{ zabbix_server_pgsql_login_host | default(omit) }}"
+        login_port: "{{ zabbix_server_dbport }}"
+        login_unix_socket: "{{ zabbix_server_pgsql_login_unix_socket | default(omit) }}"
+        login_db: "{{ zabbix_server_dbname }}"
+        name: "timescaledb"
+        cascade: true
+        schema: "{{ zabbix_server_dbschema }}"
 
 - name: "PostgreSQL verify or create schema"
   when: zabbix_server_database_sqlload
@@ -128,7 +141,8 @@
 
     - name: "TimescaleDB | Warn when extension schema differs"
       when:
-        - _timescaledb_extension_schema.query_result | length > 0 | default(0)
+        - _timescaledb_extension_schema.query_result | length > 0
+        - not zabbix_server_database_timescaledb_force_schema 
       ansible.builtin.assert:
         that:
           - _timescaledb_extension_schema.query_result[0].schema_name == zabbix_server_dbschema
@@ -139,10 +153,6 @@
           != zabbix_server_dbschema ({{ zabbix_server_dbschema }}).
           Re-run with zabbix_server_database_timescaledb_force_schema=true to automatically
           drop and recreate the extension in the correct schema.
-      failed_when: >
-        (not (zabbix_server_database_timescaledb_force_schema | default(false) | bool)) and
-        (_timescaledb_extension_schema.query_result[0].schema_name != zabbix_server_dbschema)
-      changed_when: false
 
     - name: "TimescaleDB | Drop extension when schema differs"
       when:
@@ -157,21 +167,6 @@
         login_unix_socket: "{{ zabbix_server_pgsql_login_unix_socket | default(omit) }}"
         login_db: "{{ zabbix_server_dbname }}"
         query: "DROP EXTENSION IF EXISTS timescaledb CASCADE"
-
-    - name: "TimescaleDB | Create extension"
-      when:
-        - _timescaledb_extension_schema.query_result | length == 0 or
-          _timescaledb_extension_schema.query_result[0].schema_name != zabbix_server_dbschema
-      community.postgresql.postgresql_ext:
-        login_user: "{{ zabbix_server_pgsql_login_user | default(omit) }}"
-        login_password: "{{ zabbix_server_pgsql_login_password | default(omit) }}"
-        login_host: "{{ zabbix_server_pgsql_login_host | default(omit) }}"
-        login_port: "{{ zabbix_server_dbport }}"
-        login_unix_socket: "{{ zabbix_server_pgsql_login_unix_socket | default(omit) }}"
-        login_db: "{{ zabbix_server_dbname }}"
-        name: "timescaledb"
-        cascade: true
-        schema: "{{ zabbix_server_dbschema }}"
 
     - name: "TimescaleDB | Check if TimescaleDB has been configured"
       community.postgresql.postgresql_query:
