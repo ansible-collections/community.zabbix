@@ -156,8 +156,8 @@
 
     - name: "TimescaleDB | Drop extension when schema differs"
       when:
-        - zabbix_server_database_timescaledb_force_schema | default(false)
-        - _timescaledb_extension_schema.query_result | length > 0 | default(0)
+        - zabbix_server_database_timescaledb_force_schema
+        - _timescaledb_extension_schema.query_result | length > 0
         - _timescaledb_extension_schema.query_result[0].schema_name != zabbix_server_dbschema
       community.postgresql.postgresql_query:
         login_user: "{{ zabbix_server_pgsql_login_user | default(omit) }}"
