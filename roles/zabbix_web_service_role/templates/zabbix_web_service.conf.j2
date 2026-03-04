@@ -1,0 +1,137 @@
+# This is a configuration file for Zabbix web_service
+# To get more information about Zabbix, visit https://www.zabbix.com
+
+############ GENERAL PARAMETERS #################
+
+### Option: LogType
+#	Specifies where log messages are written to:
+#		system  - syslog
+#		file    - file specified with LogFile parameter
+#		console - standard output
+#
+# Mandatory: no
+# Default:
+# LogType=file
+
+{{ (zabbix_web_service_logtype is defined and zabbix_web_service_logtype is not none) | ternary('', '# ') }}LogType={{ zabbix_web_service_logtype }}
+
+### Option: LogFile
+#	Log file name for LogType 'file' parameter.
+#
+# Mandatory: yes, if LogType is set to file, otherwise no
+# Default:
+# LogFile=/tmp/zabbix_web_service.log
+
+{{ (zabbix_web_service_logfile is defined and zabbix_web_service_logfile is not none) | ternary('', '# ') }}LogFile={{ zabbix_web_service_logfile }}
+
+### Option: LogFileSize
+#	Maximum size of log file in MB.
+#	0 - disable automatic log rotation.
+#
+# Mandatory: no
+# Range: 0-1024
+# Default:
+# LogFileSize=1
+
+{{ (zabbix_web_service_logfilesize is defined and zabbix_web_service_logfilesize is not none) | ternary('', '# ') }}LogFileSize={{ zabbix_web_service_logfilesize }}
+
+### Option: DebugLevel
+#	Specifies debug level:
+#	0 - basic information about starting and stopping of Zabbix processes
+#	1 - critical information
+#	2 - error information
+#	3 - warnings
+#	4 - for debugging (produces lots of information)
+#	5 - extended debugging (produces even more information)
+#
+# Mandatory: no
+# Range: 0-5
+# Default:
+# DebugLevel=3
+
+{{ (zabbix_web_service_debuglevel is defined and zabbix_web_service_debuglevel is not none) | ternary('', '# ') }}DebugLevel={{ zabbix_web_service_debuglevel }}
+
+### Option: AllowedIP
+#	List of comma delimited IP addresses, optionally in CIDR notation, or DNS names of Zabbix servers and Zabbix proxies.
+#	Incoming connections will be accepted only from the hosts listed here.
+#	If IPv6 support is enabled then '127.0.0.1', '::127.0.0.1', '::ffff:127.0.0.1' are treated equally
+#	and '::/0' will allow any IPv4 or IPv6 address.
+#	'0.0.0.0/0' can be used to allow any IPv4 address.
+#	Example: AllowedIP=127.0.0.1,192.168.1.0/24,::1,2001:db8::/32,zabbix.example.com
+#
+# Mandatory: yes
+# Default:
+# AllowedIP=
+
+{{ (zabbix_web_service_allowedip is defined and zabbix_web_service_allowedip is not none) | ternary('', '# ') }}AllowedIP={{ zabbix_web_service_allowedip }}
+
+### Option: ListenPort
+#	Service will listen on this port for connections from the server.
+#
+# Mandatory: no
+# Range: 1024-32767
+# Default:
+# ListenPort=10053
+
+{{ (zabbix_web_service_listenport is defined and zabbix_web_service_listenport is not none) | ternary('', '# ') }}ListenPort={{ zabbix_web_service_listenport }}
+
+### Option: Timeout
+#	Spend no more than Timeout seconds on formatting dashboard as PDF
+#
+# Mandatory: no
+# Range: 1-30
+# Default:
+# Timeout=10
+
+{{ (zabbix_web_service_timeout is defined and zabbix_web_service_timeout is not none) | ternary('', '# ') }}Timeout={{ zabbix_web_service_timeout }}
+
+### Option: TLSAccept
+#	What incoming connections to accept.
+#	Specifies what type of connection to use:
+#		unencrypted - accept connections without encryption
+#		cert        - accept connections secured with TLS and a certificate
+#
+# Mandatory: no
+# Default:
+# TLSAccept=unencrypted
+
+{{ (zabbix_web_service_tlsaccept is defined and zabbix_web_service_tlsaccept is not none) | ternary('', '# ') }}TLSAccept={{ zabbix_web_service_tlsaccept }}
+
+### Option: TLSCAFile
+#	Full pathname of a file containing the top-level CA(s) certificates for
+#	peer certificate verification.
+#
+# Mandatory: no
+# Default:
+# TLSCAFile=
+
+{{ (zabbix_web_service_tlscafile is defined and zabbix_web_service_tlscafile is not none) | ternary('', '# ') }}TLSCAFile={{ zabbix_web_service_tlscafile }}
+
+### Option: TLSCertFile
+#	Full pathname of a file containing the service certificate or certificate chain.
+#
+# Mandatory: no
+# Default:
+# TLSCertFile=
+
+{{ (zabbix_web_service_tlscertfile is defined and zabbix_web_service_tlscertfile is not none) | ternary('', '# ') }}TLSCertFile={{ zabbix_web_service_tlscertfile }}
+
+### Option: TLSKeyFile
+#	Full pathname of a file containing the service private key.
+#
+# Mandatory: no
+# Default:
+# TLSKeyFile=
+
+{{ (zabbix_web_service_tlskeyfile is defined and zabbix_web_service_tlskeyfile is not none) | ternary('', '# ') }}TLSKeyFile={{ zabbix_web_service_tlskeyfile }}
+
+### Option: IgnoreURLCertErrors
+#	Ignore TLS certificate errors when accessing Frontend URL
+#		0 - do not ignore
+#		1 - ignore
+#
+# Mandatory: no
+# Default:
+# IgnoreURLCertErrors=0
+
+{{ (zabbix_web_service_ignoreurlcerterrors is defined and zabbix_web_service_ignoreurlcerterrors is not none) | ternary('', '# ') }}IgnoreURLCertErrors={{ zabbix_web_service_ignoreurlcerterrors }}

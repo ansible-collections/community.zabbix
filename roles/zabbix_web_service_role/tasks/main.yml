@@ -1,0 +1,155 @@
+---
+- name: Include OS-specific variables
+  ansible.builtin.include_vars: "{{ ansible_facts['os_family'] }}.yml"
+  tags:
+    - always
+
+- name: Determine Latest Supported Zabbix Version
+  ansible.builtin.set_fact:
+    zabbix_web_service_version: "{{ zabbix_valid_web_service_versions[ansible_facts['distribution_major_version']][0] | default(7.4) }}"
+  when: zabbix_web_service_version is not defined
+  tags:
+    - always
+
+- name: Check that version is supported
+  when: zabbix_web_service_version_check | bool
+  ansible.builtin.assert:
+    that:
+      - zabbix_web_service_version|float in zabbix_valid_web_service_versions[ ansible_facts['distribution_major_version'] ]
+    fail_msg: Zabbix version {{ zabbix_web_service_version }} is not supported on {{ ansible_facts['distribution'] }} {{ ansible_facts['distribution_major_version'] }}
+  tags:
+    - always
+
+- name: Install Repository
+  ansible.builtin.include_role:
+    name: community.zabbix.zabbix_repo
+  vars:
+    zabbix_repo_version: "{{ zabbix_web_service_version }}"
+  when: zabbix_manage_repo | default(true)
+
+- name: "Configure SELinux when enabled"
+  ansible.builtin.include_tasks: selinux.yml
+  when: ansible_facts.selinux.status | default('disabled') == 'enabled'
+
+- name: Install Google Chrome GPG key
+  become: true
+  block:
+    # Newer OS releases (like RHEL 10) enforce strict crypto-policies that cause standard modules to fail (gpg: packet(6) with unknown version 6) with external GPG keys.
+    # Workaround: Using command/shell instead of Ansible 'rpm_key'/'get_url' modules.
+    - name: Import Google GPG key on RHEL/CentOS/Fedora
+      ansible.builtin.command: "rpm --import {{ google_signing_key }}"
+      when: ansible_facts['os_family'] in ["RedHat", "Suse"]
+      changed_when: false
+
+    - name: Import Google GPG key on Debian/Ubuntu (using keyrings)
+      block:
+        - name: Create keyrings directory if it doesn't exist
+          ansible.builtin.file:
+            path: "{{ apt_keyrings_path }}"
+            state: directory
+            mode: '0755'
+
+        - name: Import GPG key to keyrings directory directly from URL
+          ansible.builtin.shell: |
+            curl -fsSL "{{ google_signing_key }}" | gpg --dearmor -o {{ apt_keyrings_path }}/{{ apt_keyrings_path_google_file }}
+            chmod 644 {{ apt_keyrings_path }}/{{ apt_keyrings_path_google_file }}
+          args:
+            creates: "{{ apt_keyrings_path }}/{{ apt_keyrings_path_google_file }}"
+      when: >
+        (ansible_facts['distribution'] == "Ubuntu" and ansible_facts['distribution_version'] is version('22.04', '>=')) or
+        (ansible_facts['distribution'] == "Debian" and ansible_facts['distribution_version'] is version('12', '>='))
+
+    - name: Import Google GPG key on Debian/Ubuntu (using apt-key)
+      ansible.builtin.apt_key:
+        url: "{{ google_signing_key }}"
+        state: present
+      when: >
+        (ansible_facts['distribution'] == "Ubuntu" and ansible_facts['distribution_version'] is version('22.04', '<')) or
+        (ansible_facts['distribution'] == "Debian" and ansible_facts['distribution_version'] is version('12', '<'))
+
+- name: Install zabbix-web-service packages
+  become: true
+  ansible.builtin.package:
+    name: "{{ zabbix_web_service_packages }}"
+    state: "{{ zabbix_web_service_package_state }}"
+    update_cache: true
+    disablerepo: "{{ zabbix_web_service_disable_repo | default(_zabbix_web_service_disable_repo | default(omit)) }}"
+    install_recommends: "{{ zabbix_web_service_install_recommends | default(_zabbix_web_service_install_recommends | default(omit)) }}"
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default('') }}"
+    https_proxy: "{{ zabbix_https_proxy | default('') }}"
+  register: _zabbix_web_service_package_installed
+  until: _zabbix_web_service_package_installed is success
+  tags:
+    - install
+
+- name: Google-chrome requirement - Create Zabbix directory structure with proper permissions
+  become: true
+  ansible.builtin.file:
+    path: "{{ mimeapps_list_path }}"
+    state: directory
+    owner: "{{ zabbix_os_user }}"
+    group: "{{ zabbix_os_user }}"
+    mode: '0755'
+    recurse: true
+  notify:
+    - zabbix-web-service restarted
+  changed_when: false
+
+- name: Google-chrome requirement - Create mimeapps.list file
+  become: true
+  ansible.builtin.file:
+    path: "{{ mimeapps_list_path }}/mimeapps.list"
+    state: touch
+    owner: "{{ zabbix_os_user }}"
+    group: "{{ zabbix_os_user }}"
+    mode: '0644'
+  notify:
+    - zabbix-web-service restarted
+  changed_when: false
+
+- name: "Configure zabbix-web-service"
+  become: true
+  ansible.builtin.template:
+    src: zabbix_web_service.conf.j2
+    dest: "{{ zabbix_web_service_config }}"
+    owner: "{{ zabbix_os_user }}"
+    group: "{{ zabbix_os_user }}"
+    mode: "{{ zabbix_web_service_conf_mode }}"
+  notify:
+    - zabbix-web-service restarted
+  tags:
+    - config
+
+- name: "Zabbix-web-service started"
+  become: true
+  ansible.builtin.service:
+    name: zabbix-web-service
+    state: "{{ zabbix_service_state }}"
+    enabled: "{{ zabbix_service_enabled }}"
+  tags:
+    - service
+  when: zabbix_web_service_manage_service | bool
+
+- name: Setting up the Frontend URL
+  become: false
+  run_once: true
+  vars:
+    ansible_network_os: community.zabbix.zabbix
+    ansible_connection: httpapi
+    ansible_httpapi_use_ssl: "{{ zabbix_api_use_ssl }}"
+    # --- Basic Auth (Begin) ---
+    http_login_user: "{{ zabbix_api_http_user | default(-42) }}"
+    http_login_password: "{{ zabbix_api_http_password | default(-42) }}"
+    # --- Basic Auth (End) ---
+    ansible_user: "{{ zabbix_api_login_user }}"
+    ansible_httpapi_pass: "{{ zabbix_api_login_pass }}"
+    ansible_httpapi_port: "{{ zabbix_api_server_port }}"
+    ansible_httpapi_validate_certs: "{{ zabbix_api_validate_certs }}"
+  community.zabbix.zabbix_settings:
+    frontend_url: "{{ zabbix_frontend_url }}"
+  when:
+    - zabbix_api_frontend_url | bool
+  delegate_to: "{{ zabbix_api_server_host }}"
+  tags:
+    - api
