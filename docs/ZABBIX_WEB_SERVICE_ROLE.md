@@ -95,7 +95,7 @@ To automatically configure the `Frontend URL` parameter in Zabbix global setting
 
 For the Zabbix Web Service to function properly and generate scheduled reports, the Zabbix Server **must** be configured to communicate with it.
 
-If the Zabbix Server is managed using the `community.zabbix.zabbix_server` role, please refer to the [ZABBIX_SERVER_ROLE.md](https://github.com/ansible-collections/community.zabbix/blob/main/docs/ZABBIX_SERVER_ROLE.md) documentation. At least the following two variables must be set in the Zabbix Server configuration:
+If the Zabbix Server is managed using the `community.zabbix.zabbix_server` role, please refer to the [ZABBIX_SERVER_ROLE.md](ZABBIX_SERVER_ROLE.md) documentation. At least the following two variables must be set in the Zabbix Server configuration:
 
 * `zabbix_server_webserviceurl`: The URL to the Zabbix Web Service (e.g., `http://localhost:10053/report`).
 * `zabbix_server_startreportwriters`: The number of pre-forked report writer instances (must be set to `1` or higher).
