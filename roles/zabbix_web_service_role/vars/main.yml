@@ -1,0 +1,6 @@
+---
+# Dependency Google Chrome
+google_signing_key: "https://dl.google.com/linux/linux_signing_key.pub"
+apt_keyrings_path: "/etc/apt/keyrings"
+apt_keyrings_path_google_file: "google-chrome.gpg"
+mimeapps_list_path: "/var/lib/zabbix/.local/share/applications"
