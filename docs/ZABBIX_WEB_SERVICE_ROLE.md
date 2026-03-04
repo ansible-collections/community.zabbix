@@ -2,6 +2,22 @@
 
 This role installs and configures the Zabbix Web Service, a component used for generating scheduled reports in Zabbix. It also handles the necessary prerequisites, such as installing Google Chrome, GPG keys and setting up the required directory structures for report generation.
 
+## Table of Contents
+
+* [Official Documentation](#official-documentation)
+* [Requirements](#requirements)
+  * [Target OS](#target-os)
+  * [Ansible](#ansible)
+* [Role Variables](#role-variables)
+  * [Main Variables](#main-variables)
+  * [Configuration Variables](#configuration-variables)
+  * [API Variables (Frontend URL Setup)](#api-variables-frontend-url-setup)
+* [Integration with Zabbix Server](#integration-with-zabbix-server)
+* [Dependencies](#dependencies)
+* [Example Playbook](#example-playbook)
+* [License](#license)
+* [Author Information](#author-information)
+
 ## Official Documentation
 
 For more detailed information about the Zabbix Web Service and its usage, please refer to the official Zabbix documentation:
