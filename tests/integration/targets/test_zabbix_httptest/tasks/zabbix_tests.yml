@@ -1,0 +1,112 @@
+---
+
+- name: test - create new Zabbix httptest on host with many options set
+  community.zabbix.zabbix_httptest:
+    name: ExampleTest
+    host_name: ExampleHost
+    params:
+      steps:
+        - name: Test
+          url: https://example.com
+          status_codes: [200]
+      interval: 1h
+      enabled: true
+    state: present
+  register: zbx_host_httptest_created
+
+- name: assert that httptest was created
+  ansible.builtin.assert:
+    that: zbx_host_httptest_created is changed
+
+- name: test - create same Zabbix httptest on host once again
+  community.zabbix.zabbix_httptest:
+    name: ExampleTest
+    host_name: ExampleHost
+    params:
+      steps:
+        - name: Test
+          url: https://example.com
+          status_codes: [200]
+      interval: 1h
+      enabled: true
+    state: present
+  register: zbx_host_httptest_existing
+
+- name: assert that nothing has been changed
+  ansible.builtin.assert:
+    that: not zbx_host_httptest_existing is changed
+
+- name: test - update existing zabbix httptest on host
+  community.zabbix.zabbix_httptest:
+    name: ExampleTest
+    host_name: ExampleHost
+    params:
+      interval: 2h
+    state: present
+  register: zbx_host_httptest_changed
+
+- name: expect to succeed and that things changed
+  ansible.builtin.assert:
+    that: zbx_host_httptest_changed is changed
+
+- name: test - rename existing zabbix httptest on host
+  community.zabbix.zabbix_httptest:
+    name: ExampleTest
+    host_name: ExampleHost
+    params:
+      new_name: NewExampleTest
+    state: present
+  register: zbx_host_httptest_renamed
+
+- name: expect to succeed and that things changed
+  ansible.builtin.assert:
+    that: zbx_host_httptest_renamed is changed
+
+- name: test - rename existing zabbix httptest on host again
+  community.zabbix.zabbix_httptest:
+    name: ExampleTest
+    host_name: ExampleHost
+    params:
+      new_name: NewExampleTest
+    state: present
+  register: zbx_host_httptest_rename_again
+
+- name: assert that nothing has been changed
+  ansible.builtin.assert:
+    that: not zbx_host_httptest_rename_again is changed
+
+- name: test - rename non-existing zabbix httptest on host
+  community.zabbix.zabbix_httptest:
+    name: ExampleTest
+    host_name: ExampleHost
+    params:
+      new_name: NewExampleTest2
+    state: present
+  ignore_errors: true
+  register: zbx_host_httptest_rename_failed
+
+- name: expect to fail
+  ansible.builtin.assert:
+    that: zbx_host_httptest_rename_failed is failed
+
+- name: test - attempt to delete previously created zabbix httptest on host
+  community.zabbix.zabbix_httptest:
+    name: NewExampleTest
+    host_name: ExampleHost
+    state: absent
+  register: zbx_host_httptest_delete
+
+- name: assert that httptest was deleted
+  ansible.builtin.assert:
+    that: zbx_host_httptest_delete is changed
+
+- name: test - attempt to delete non-existing zabbix httptest on host
+  community.zabbix.zabbix_httptest:
+    name: NewExampleTest
+    host_name: ExampleHost
+    state: absent
+  register: zbx_host_httptest_missing_delete
+
+- name: assert that nothing has been changed
+  ansible.builtin.assert:
+    that: not zbx_host_httptest_missing_delete is changed
