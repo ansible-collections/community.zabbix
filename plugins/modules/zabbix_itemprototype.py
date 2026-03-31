@@ -255,6 +255,7 @@ EXAMPLES = r'''
       key: "{% raw %}vfs.fs.size[{#FSNAME},used]{% endraw %}"
       value_type: numeric_unsigned
       interval: 1m
+      status: enabled
     state: present
 
 # Create item prototype on example_template using example_rule
@@ -277,6 +278,7 @@ EXAMPLES = r'''
       key: "{% raw %}vfs.fs.size[{#FSNAME},used]{% endraw %}"
       value_type: numeric_unsigned
       interval: 1m
+      status: enabled
     state: present
 
 
@@ -300,6 +302,7 @@ EXAMPLES = r'''
       key: "{% raw %}vfs.fs.size[{#FSNAME},used]{% endraw %}"
       value_type: numeric_unsigned
       interval: 1m
+      status: enabled
       tags:
           - tag: class
             value: application
@@ -324,6 +327,7 @@ EXAMPLES = r'''
         key: '{% raw %}vfs.fs.size.half[{#FSNAME}]{% endraw %}'
         value_type: numeric_float
         units: B
+        status: enabled
         master_item:
           item_name: '{% raw %}{#FSNAME}:example_item_prototype{% endraw %}'
           discoveryrule_name: example_rule
