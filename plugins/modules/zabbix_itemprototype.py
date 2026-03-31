@@ -503,6 +503,15 @@ class Itemprototype(ZabbixBase):
         if 'enabled' in params:
             params['status'] = params['enabled']
             params.pop('enabled')
+        if 'status' in params:
+            status = params['status']
+            if status == 'enabled':
+                params['status'] = 0
+            elif status == 'disabled':
+                params['status'] = 1
+            else:
+                self._module.fail_json(
+                    msg="Status must be 'enabled' or 'disabled', got %s" % status)
         if 'master_item' in params:
             if 'host_name' not in params['master_item']:
                 params['master_item']['host_name'] = None
