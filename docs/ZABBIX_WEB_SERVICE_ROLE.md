@@ -6,6 +6,7 @@ This role installs and configures the Zabbix Web Service, a component used for g
 
 * [Official Documentation](#official-documentation)
 * [Requirements](#requirements)
+  * [Google Chrome](#google-chrome)
   * [Target OS](#target-os)
   * [Ansible](#ansible)
 * [Role Variables](#role-variables)
