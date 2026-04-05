@@ -1,0 +1,23 @@
+---
+__epel_repo:
+  - epel
+
+zabbix_valid_web_service_versions:
+  "10":
+    - 7.4
+  "9":
+    - 7.4
+    - 7.2
+    - 7.0
+    - 6.0
+  "8":
+    - 7.4
+    - 7.2
+    - 7.0
+    - 6.0
+
+_zabbix_web_service_disable_repo:
+  - epel
+
+_zabbix_web_service_packages:
+  - "zabbix-web-service-{{ zabbix_web_service_version }}.{{ zabbix_web_service_version_minor }}"
