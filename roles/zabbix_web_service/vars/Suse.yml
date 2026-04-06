@@ -1,0 +1,9 @@
+---
+zabbix_valid_web_service_versions:
+  "15":
+    - 7.4
+    - 7.0
+    - 6.0
+
+_zabbix_web_service_packages:
+  - "zabbix-web-service-{{ zabbix_web_service_version }}.{{ zabbix_web_service_version_minor }}"
