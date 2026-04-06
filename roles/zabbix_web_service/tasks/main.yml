@@ -62,15 +62,22 @@
 
 - name: Google-chrome requirement - Create mimeapps.list file
   become: true
+  ansible.builtin.command:
+    cmd: "touch {{ mimeapps_list_path }}/mimeapps.list"
+    creates: "{{ mimeapps_list_path }}/mimeapps.list"
+  notify:
+    - zabbix-web-service restarted
+
+- name: Google-chrome requirement - Set mimeapps.list attributes
+  become: true
   ansible.builtin.file:
     path: "{{ mimeapps_list_path }}/mimeapps.list"
-    state: touch
+    state: file
     owner: "{{ zabbix_os_user }}"
     group: "{{ zabbix_os_user }}"
     mode: '0644'
   notify:
     - zabbix-web-service restarted
-  changed_when: false
 
 - name: "Configure zabbix-web-service"
   become: true
