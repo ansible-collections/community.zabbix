@@ -18,6 +18,7 @@ zabbix_url_aliases: []
 zabbix_web_create_vhost: true
 zabbix_web_create_php_fpm: "{{ _zabbix_web_create_php_fpm | default(zabbix_web_create_vhost) }}"
 
+zabbix_server_version: "{{ zabbix_web_version }}"
 zabbix_server_name: "{{ inventory_hostname }}"
 zabbix_server_hostname: "{{ inventory_hostname }}"
 zabbix_server_listenport: 10051
