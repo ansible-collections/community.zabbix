@@ -51,7 +51,6 @@
         p_to_s:
           v60: 6.0
           v70: 7.0
-          v72: 7.2
           v74: 7.4
 
     - name: Create database container for Zabbix server
