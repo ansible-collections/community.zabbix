@@ -8,20 +8,6 @@ mysql_create_dir: create/
 __epel_repo:
   - epel
 
-zabbix_valid_server_versions:
-  "10":
-    - 7.4
-  "9":
-    - 7.4
-    - 7.2
-    - 7.0
-    - 6.0
-  "8":
-    - 7.4
-    - 7.2
-    - 7.0
-    - 6.0
-
 _zabbix_server_pgsql_dependencies:
   - "{{ zabbix_server_install_database_client | ternary('postgresql', '') }}"
   - python3-psycopg2
