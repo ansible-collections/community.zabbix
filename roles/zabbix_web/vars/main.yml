@@ -2,3 +2,35 @@
 _zabbix_server_database_default_port:
   mysql: 3306
   pgsql: 5432
+
+_os_key: "{{ (ansible_facts.os_family in ['RedHat', 'Suse']) | ternary(ansible_facts.os_family, ansible_facts.distribution) }}-{{ ansible_facts.distribution_major_version }}"
+_zabbix_web_valid_versions:
+  Debian-12:
+    - "7.4"
+    - "7.0"
+    - "6.0"
+  Debian-11:
+    - "6.0"
+  RedHat-10:
+    - "7.4"
+    - "7.0"
+  RedHat-9:
+    - "7.4"
+    - "7.0"
+    - "6.0"
+  RedHat-8:
+    - "7.4"
+    - "7.0"
+    - "6.0"
+  Suse-15:
+    - "7.4"
+    - "7.0"
+    - "6.0"
+  Ubuntu-24:
+    - "7.4"
+    - "7.0"
+    - "6.0"
+  Ubuntu-22:
+    - "7.4"
+    - "7.0"
+    - "6.0"

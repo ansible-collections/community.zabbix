@@ -21,27 +21,6 @@ _nginx_tls_crt: /etc/ssl/certs/ssl-cert-snakeoil.pem
 _nginx_tls_key: /etc/ssl/private/ssl-cert-snakeoil.key
 _nginx_tls_dhparam: /etc/ssl/private/dhparams.pem
 
-zabbix_valid_web_versions:
-  # Debian
-  "12":
-    - 7.4
-    - 7.2
-    - 7.0
-    - 6.0
-  "11":
-    - 6.0
-  # Ubuntu
-  "24":
-    - 7.4
-    - 7.2
-    - 7.0
-    - 6.0
-  "22":
-    - 7.4
-    - 7.2
-    - 7.0
-    - 6.0
-
 _zabbix_web_package: zabbix-frontend-php
 _zabbix_web_apache_packages:
   - zabbix-apache-conf
