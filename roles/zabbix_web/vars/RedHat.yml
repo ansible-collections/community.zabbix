@@ -18,20 +18,6 @@ _nginx_service: nginx
 __epel_repo:
   - epel
 
-zabbix_valid_web_versions:
-  "10":
-    - 7.4
-  "9":
-    - 7.4
-    - 7.2
-    - 7.0
-    - 6.0
-  "8":
-    - 7.4
-    - 7.2
-    - 7.0
-    - 6.0
-
 _zabbix_web_package: "zabbix-web-{{ zabbix_server_database }}-{{ zabbix_web_version }}.{{ zabbix_web_version_minor }}"
 _zabbix_web_apache_packages:
   - "zabbix-apache-conf-{{ zabbix_web_version }}.{{ zabbix_web_version_minor }}"
