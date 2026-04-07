@@ -25,3 +25,4 @@ dependencies:
   community.general: "*"
   community.mysql: "*"
   community.postgresql: "*"
+  community.windows: "*"
