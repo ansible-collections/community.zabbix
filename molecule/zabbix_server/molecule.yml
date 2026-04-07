@@ -38,8 +38,6 @@ provisioner:
         ansible_connection: community.docker.docker
       v74:
         zabbix_server_version: 7.4
-      v72:
-        zabbix_server_version: 7.2
       v70:
         zabbix_server_version: 7.0
       v60:

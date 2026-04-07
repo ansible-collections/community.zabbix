@@ -40,16 +40,9 @@ jobs:
           - sqlite3
         version:
           - v74
-          - v72
           - v70
           - v60
         exclude:
-          - container:
-              image: rockylinux10
-            version: v72
-          - container:
-              image: rockylinux10
-            version: v70
           - container:
               image: rockylinux10
             version: v60
@@ -122,16 +115,9 @@ jobs:
           - sqlite3
         version:
           - v74
-          - v72
           - v70
           - v60
         exclude:
-          - container:
-              image: rockylinux10
-            version: v72
-          - container:
-              image: rockylinux10
-            version: v70
           - container:
               image: rockylinux10
             version: v60
