@@ -5,13 +5,6 @@
   tags:
     - always
 
-- name: Determine Latest Supported Zabbix Version
-  ansible.builtin.set_fact:
-    zabbix_proxy_version: "{{ zabbix_valid_proxy_versions[ansible_facts['distribution_major_version']][0] | default(7.2) }}"
-  when: zabbix_proxy_version is not defined or zabbix_proxy_version is none
-  tags:
-    - always
-
 - name: Set More Variables
   ansible.builtin.set_fact:
     zabbix_proxy_db_long: "{{ 'postgresql' if zabbix_proxy_database == 'pgsql' else zabbix_proxy_database }}"
@@ -20,12 +13,19 @@
   tags:
     - always
 
+- name: Determine Latest Supported Zabbix Version
+  when: zabbix_proxy_version is not defined or zabbix_proxy_version is none
+  ansible.builtin.set_fact:
+    zabbix_proxy_version: "{{ zabbix_proxy_valid_versions[_os_key] | default(['7.4']) | first }}"
+  tags:
+    - always
+
 - name: Check that version is supported
   when: zabbix_proxy_version_check | bool
   ansible.builtin.assert:
     that:
-      - zabbix_proxy_version|float in zabbix_valid_proxy_versions[ ansible_facts['distribution_major_version'] ]
-    fail_msg: Zabbix version {{ zabbix_proxy_version }} is not supported on {{ ansible_facts['distribution'] }} {{ ansible_facts['distribution_major_version'] }}
+      - (zabbix_proxy_version | string) in _zabbix_proxy_valid_versions[_os_key]
+    fail_msg: Zabbix version {{ zabbix_proxy_version }} is not supported on {{ _os_key }}
   tags:
     - always
 
