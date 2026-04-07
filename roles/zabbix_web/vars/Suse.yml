@@ -15,13 +15,6 @@ _nginx_vhost_location: /etc/nginx/conf.d/zabbix.conf
 _nginx_log_path: /var/log/nginx
 _nginx_service: nginx
 
-zabbix_valid_web_versions:
-  "15":
-    - 7.4
-    - 7.2
-    - 7.0
-    - 6.0
-
 _zabbix_web_package: "zabbix-web-{{ zabbix_server_database }}"
 _zabbix_web_apache_packages:
   - zabbix-apache-conf
