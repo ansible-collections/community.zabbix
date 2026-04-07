@@ -1,11 +1,4 @@
 ---
-zabbix_valid_server_versions:
-  "15":
-    - 7.4
-    - 7.2
-    - 7.0
-    - 6.0
-
 _zabbix_server_pgsql_dependencies:
   - "{{ zabbix_server_install_database_client | ternary('postgresql', '') }}"
   - gzip
