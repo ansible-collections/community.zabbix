@@ -41,15 +41,6 @@
     - config
     - install
 
-- name: Set PHP Variables
-  ansible.builtin.set_fact:
-    zabbix_php_fpm_listen: "{{ zabbix_php_fpm_listen if zabbix_php_fpm_listen is defined else _zabbix_php_fpm_listen }}"
-    zabbix_php_fpm_dir: "{{ zabbix_php_fpm_dir if zabbix_php_fpm_dir is defined else _php_fpm_dir }}"
-    zabbix_php_fpm_session: "{{ zabbix_php_fpm_session if zabbix_php_fpm_session is defined else _php_fpm_session }}"
-  tags:
-    - config
-    - install
-
 - name: Install Repository
   ansible.builtin.include_role:
     name: community.zabbix.zabbix_repo

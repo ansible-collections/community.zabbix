@@ -5,12 +5,11 @@ _apache_log: apache2
 _apache_service: apache2
 _apache_vhost_location: /etc/apache2/sites-available/zabbix.conf
 
-_php_fpm_dir: /etc/php/{{ zabbix_web_php_installed_version }}/fpm/pool.d
-_php_fpm_session: /tmp
-_zabbix_php_fpm_listen: /run/php/zabbix.sock
-_zabbix_php_fpm_mode: "0666"
+_zabbix_php_fpm_dir: /etc/php/{{ zabbix_web_php_installed_version }}/fpm/pool.d
+_zabbix_php_fpm_listen: /var/run/php/zabbix.sock
+_zabbix_php_fpm_mode: "0660"
 _zabbix_php_fpm_allowed_clients: 127.0.0.1
-
+_zabbix_php_fpm_session: /var/lib/php/sessions/
 
 _nginx_user: www-data
 _nginx_group: www-data
