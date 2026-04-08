@@ -5,8 +5,8 @@ _apache_log: apache2
 _apache_service: apache2
 _apache_vhost_location: /etc/apache2/conf.d/zabbix.conf
 
-_php_fpm_dir: "/etc/php8/fpm/php-fpm.d"
-_php_fpm_session: /var/lib/php8/sessions
+_zabbix_php_fpm_dir: "/etc/php8/fpm/php-fpm.d"
+_zabbix_php_fpm_session: /var/lib/php8/sessions
 _zabbix_php_fpm_listen: /run/php-fpm/zabbix.sock
 
 _nginx_user: nginx
