@@ -5,10 +5,13 @@
   tags:
     - always
 
+- name: Load Appropriate Defaults
+  ansible.builtin.include_vars: "{{ zabbix_agent2 | ternary('agent2', 'agent') }}_vars.yml"
+
 - name: Determine Latest Supported Zabbix Version
-  ansible.builtin.set_fact:
-    zabbix_agent_version: "{{ zabbix_valid_agent_versions[ansible_distribution_major_version][0] | default(7.2) }}"
   when: zabbix_agent_version is not defined or zabbix_agent_version is none
+  ansible.builtin.set_fact:
+    zabbix_agent_version: "{{ (_zabbix_agent_valid_versions[_os_key] | first) | default('7.4') }}"
   tags:
     - always
 
@@ -16,13 +19,10 @@
   when: zabbix_agent_version_check | bool
   ansible.builtin.assert:
     that:
-      - zabbix_agent_version | float in zabbix_valid_agent_versions[ansible_distribution_major_version]
-    fail_msg: Zabbix version {{ zabbix_agent_version }} is not supported on {{ ansible_distribution }} {{ ansible_distribution_major_version }}
+      - (zabbix_agent_version | string) in _zabbix_agent_valid_versions[_os_key]
+    fail_msg: Zabbix version {{ zabbix_agent_version }} is not supported on {{ _os_key }}
   tags:
     - always
-
-- name: Load Appropriate Defaults
-  ansible.builtin.include_vars: "{{ zabbix_agent2 | ternary('agent2', 'agent') }}_vars.yml"
 
 - when: zabbix_agent_tlspsk_auto | bool
   tags:

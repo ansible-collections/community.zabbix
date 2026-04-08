@@ -1,0 +1,51 @@
+---
+_os_key: "{{ (ansible_facts.os_family in ['RedHat', 'Suse', 'Windows']) | ternary(ansible_facts.os_family, ansible_facts.distribution) }}-{{ ansible_facts.distribution_major_version }}"
+_zabbix_agent_valid_versions:
+  Debian-12:
+    - "7.4"
+    - "7.0"
+    - "6.0"
+  Debian-11:
+    - "7.4"
+    - "7.0"
+    - "6.0"
+  FreeBSD-15:
+    - "7.4"
+    - "7.0"
+    - "6.0"
+  FreeBSD-14:
+    - "7.4"
+    - "7.0"
+    - "6.0"
+  FreeBSD-13:
+    - "7.4"
+    - "7.0"
+    - "6.0"
+  RedHat-10:
+    - "7.4"
+    - "7.0"
+  RedHat-9:
+    - "7.4"
+    - "7.0"
+    - "6.0"
+  RedHat-8:
+    - "7.4"
+    - "7.0"
+    - "6.0"
+  Suse-15:
+    - "7.4"
+    - "7.0"
+    - "6.0"
+  Ubuntu-24:
+    - "7.4"
+    - "7.0"
+    - "6.0"
+  Ubuntu-22:
+    - "7.4"
+    - "7.0"
+    - "6.0"
+# (Windows 11, Server 2022-2025 all report distribution_major_version as 10)
+  Windows-10:
+    - "7.4"
+    - "7.0"
+    - "6.0"
