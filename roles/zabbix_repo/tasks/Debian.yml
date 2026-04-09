@@ -91,5 +91,5 @@
 - name: "Debian | Update apt cache if repo was added"
   ansible.builtin.apt:
     update_cache: true
-  when: zabbix_repo_apt_file.changed
+  when: zabbix_repo_apt_file is changed
   become: true

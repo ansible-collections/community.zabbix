@@ -5,6 +5,7 @@
     state: "{{ zabbix_agent_package_state }}"
   environment:
     http_proxy: "{{ zabbix_http_proxy | default('') }}"
+    https_proxy: "{{ zabbix_https_proxy | default('') }}"
   register: _zabbix_agent_packages_installed
   until: _zabbix_agent_packages_installed is succeeded
   become: true
