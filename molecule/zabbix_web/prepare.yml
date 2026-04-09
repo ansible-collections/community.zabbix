@@ -71,11 +71,6 @@
               - php{{ __php_default_version_debian }}-apcu
               - php{{ __php_default_version_debian }}-sqlite3
 
-    - name: Set PHP Version (Suse)
-      ansible.builtin.set_fact:
-        __php_default_version_suse: "8"
-      when: ansible_facts['os_family'] == 'Suse'
-
     - name: Workaround for geerlingguy roles
       ansible.builtin.set_fact:
         ansible_distribution: "{{ ansible_facts['distribution'] }}"
@@ -92,16 +87,23 @@
       when:
         - zabbix_web_http_server == "nginx"
     - role: geerlingguy.php
+      when:
+        - ansible_facts.os_family != "Suse"
     - role: zabbix_server
 
-  post_tasks:
-    - name: Suse | Create default php-fpm config
-      ansible.builtin.copy:
-        remote_src: true
-        src: "/etc/php{{ __php_default_version_suse }}/fpm/php-fpm.conf.default"
-        dest: "/etc/php{{ __php_default_version_suse }}/fpm/php-fpm.conf"
-      when: ansible_facts['os_family'] == 'Suse'
+  tasks:
+    - name: Install prerequisite packages for zabbix_web role
+      when: ansible_facts.os_family == "Suse"
+      package:
+        name: "{{ _zabbix_web_prerequisite_packages[zabbix_web_http_server][ansible_facts.os_family] }}"
+      vars:
+        _zabbix_web_prerequisite_packages:
+          apache:
+            Suse: php8-fpm-apache
+          nginx:
+            Suse: php8-fpm
 
+  post_tasks:
     - name: "Remove file"
       ansible.builtin.file:
         path: "{{ item }}"

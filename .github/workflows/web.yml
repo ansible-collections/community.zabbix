@@ -30,6 +30,8 @@ jobs:
           - image: ubuntu2204
           - image: debian12
           - image: debian11
+          - image: opensuseleap15
+            ansible_core: ansible-core<2.17
         collection_role:
           - zabbix_web
         database:
