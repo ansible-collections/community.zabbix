@@ -22,15 +22,9 @@
 {% set directory_paths = ['/usr/share/zabbix/conf', '/usr/share/zabbix/app', '/usr/share/zabbix/include', '/usr/share/zabbix/include/classes'] %}
 
   <Directory "/usr/share/zabbix">
-  {% if apache_version|string() == '2.4' %}
     Options FollowSymLinks
     AllowOverride None
     Require all granted
-  {% else %}
-    AllowOverride None
-    Order Allow,Deny
-    Allow from all
-  {% endif %}
 
     <IfModule dir_module>
         DirectoryIndex index.php
@@ -46,13 +40,7 @@
 
 {% for my_path in directory_paths %}
   <Directory "{{ my_path }}">
-  {% if apache_version|string() == '2.4' %}
     Require all denied
-  {% else %}
-    AllowOverride None
-    Order Deny,Allow
-    Deny from all
-  {% endif %}
   </Directory>
 
 {% endfor %}
@@ -98,9 +86,7 @@ SSLRandomSeed connect builtin
   SSLEngine on
   {{ (zabbix_web_ssl_cipher_suite is defined and zabbix_web_ssl_cipher_suite is not none) | ternary('', '# ') }}SSLCipherSuite {{ zabbix_web_ssl_cipher_suite | default('') }}
   {{ (zabbix_web_ssl_cipher_suite is defined and zabbix_web_ssl_cipher_suite is not none) | ternary('', '# ') }}SSLHonorCipherOrder On
-{% if apache_version|string() == '2.4' %}
   SSLCompression off
-{% endif %}
   SSLCertificateFile {{ zabbix_web_tls_crt }}
   SSLCertificateKeyFile {{ zabbix_web_tls_key }}
   {{ (zabbix_web_tls_chain is defined and zabbix_web_tls_chain is not none) | ternary('', '# ') }}SSLCertificateChainFile {{ zabbix_web_tls_chain | default('') }}
@@ -108,15 +94,9 @@ SSLRandomSeed connect builtin
 {% set directory_paths = ['/usr/share/zabbix/conf', '/usr/share/zabbix/app', '/usr/share/zabbix/include', '/usr/share/zabbix/include/classes'] %}
 
   <Directory "/usr/share/zabbix">
-  {% if apache_version|string() == '2.4' %}
     Options FollowSymLinks
     AllowOverride None
     Require all granted
-  {% else %}
-    AllowOverride None
-    Order Allow,Deny
-    Allow from all
-  {% endif %}
 
     <IfModule dir_module>
         DirectoryIndex index.php
@@ -132,13 +112,7 @@ SSLRandomSeed connect builtin
 
 {% for my_path in directory_paths %}
   <Directory "{{ my_path }}">
-  {% if apache_version|string() == '2.4' %}
     Require all granted
-  {% else %}
-    AllowOverride None
-    Order Deny,Allow
-    Deny from all
-  {% endif %}
   </Directory>
 
 {% endfor %}
