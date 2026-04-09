@@ -58,7 +58,7 @@
       Components: {{ zabbix_repo_deb_component }}
       Architectures: {{ zabbix_repo_deb_arch }}
       Signed-By: {{ zabbix_repo_gpg_key }}
-  register: zabbix_repo_apt_file
+  register: _zabbix_repo_apt_file
   become: true
   tags:
     - install
@@ -89,7 +89,7 @@
     - install
 
 - name: "Debian | Update apt cache if repo was added"
+  when: _zabbix_repo_apt_file is changed
   ansible.builtin.apt:
     update_cache: true
-  when: zabbix_repo_apt_file.changed
   become: true
