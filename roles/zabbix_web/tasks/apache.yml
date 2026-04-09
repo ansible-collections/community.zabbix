@@ -24,25 +24,6 @@
     - dependencies
     - database
 
-- name: "Apache | Get Apache version"
-  ansible.builtin.shell: |
-    PATH=/usr/sbin:$PATH
-    set -o pipefail
-    apachectl -v | grep 'version' | awk -F '/' '{ print $2 }'| awk '{ print $1 }' | cut -c 1-3
-  changed_when: false
-  register: apachectl_version
-  check_mode: false
-  args:
-    executable: /bin/bash
-  tags:
-    - config
-
-- name: "Apache | Set correct apache_version"
-  ansible.builtin.set_fact:
-    apache_version: "{{ apachectl_version.stdout }}"
-  tags:
-    - config
-
 - name: "Apache | Install apache vhost"
   ansible.builtin.template:
     src: apache_vhost.conf.j2
