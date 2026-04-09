@@ -37,8 +37,7 @@
     username: "{{ item.username | default(omit) }}"
     password: "{{ item.password | default(omit) }}"
     sslverify: "{{ item.sslverify  | default('true') }}"
-  with_items: "{{ zabbix_repo_yum }}"
-  register: yum_repo_installed
+  loop: "{{ zabbix_repo_yum }}"
   become: true
   tags:
     - install
