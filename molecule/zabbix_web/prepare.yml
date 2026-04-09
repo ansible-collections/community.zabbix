@@ -71,11 +71,6 @@
               - php{{ __php_default_version_debian }}-apcu
               - php{{ __php_default_version_debian }}-sqlite3
 
-    - name: Set PHP Version (Suse)
-      ansible.builtin.set_fact:
-        __php_default_version_suse: "8"
-      when: ansible_facts['os_family'] == 'Suse'
-
     - name: Workaround for geerlingguy roles
       ansible.builtin.set_fact:
         ansible_distribution: "{{ ansible_facts['distribution'] }}"
@@ -87,21 +82,51 @@
   roles:
     - role: geerlingguy.apache
       when:
+        - ansible_facts.os_family != "Suse"
         - zabbix_web_http_server == "apache"
     - role: geerlingguy.nginx
       when:
+        - ansible_facts.os_family != "Suse"
         - zabbix_web_http_server == "nginx"
     - role: geerlingguy.php
+      when:
+        - ansible_facts.os_family != "Suse"
     - role: zabbix_server
 
-  post_tasks:
-    - name: Suse | Create default php-fpm config
-      ansible.builtin.copy:
-        remote_src: true
-        src: "/etc/php{{ __php_default_version_suse }}/fpm/php-fpm.conf.default"
-        dest: "/etc/php{{ __php_default_version_suse }}/fpm/php-fpm.conf"
-      when: ansible_facts['os_family'] == 'Suse'
+  tasks:
+    - name: Install prerequisite packages for zabbix_web role
+      when: ansible_facts.os_family == "Suse"
+      package:
+        name: "{{ _zabbix_web_prerequisite_packages[zabbix_web_http_server][ansible_facts.os_family] }}"
+      vars:
+        _zabbix_web_prerequisite_packages:
+          apache:
+            Suse: ["apache2", "php8-cli", "php8-mysql", "php8-openssl", "php8-pgsql", "php8-xmlreader", "php8-xmlwriter"]
+          nginx:
+            Suse: ["nginx", "php8-cli", "php8-fpm", "php8-mysql", "php8-openssl", "php8-pgsql", "php8-xmlreader", "php8-xmlwriter"]
 
+    - name: Suse | Enable apache modules
+      when:
+        - ansible_facts.os_family == "Suse"
+        - zabbix_web_http_server == "apache"
+      lineinfile:
+        path: /etc/sysconfig/apache2
+        # Negative lookahead so we won't match on line that already contains option
+        regexp: "^APACHE_MODULES=\"((?!.*\\b{{ item }}\\b).*)\"$"
+        backrefs: true
+        line: "APACHE_MODULES=\"\\1 {{ item }}\""
+      loop:
+        - rewrite
+        - ssl
+      notify: restart apache
+
+  handlers:
+    - name: restart apache
+      service:
+        name: apache2
+        state: restarted
+
+  post_tasks:
     - name: "Remove file"
       ansible.builtin.file:
         path: "{{ item }}"
