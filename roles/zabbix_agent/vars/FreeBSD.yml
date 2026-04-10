@@ -1,6 +1,5 @@
 ---
 zabbix_agent_service: zabbix_agentd
-zabbix_agent_conf: zabbix_agentd.conf
 
 # No agent2 package for bsd
 zabbix_agent2: false

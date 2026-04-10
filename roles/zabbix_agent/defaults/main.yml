@@ -14,7 +14,7 @@ zabbix_agent_get_package: "{{ _zabbix_agent_get_package | default('zabbix-get') 
 zabbix_agent_sender_package: "{{ _zabbix_agent_sender_package | default('zabbix-sender') }}"
 zabbix_agent_selinux: false
 zabbix_agent_conf_dir: "{{ _zabbix_agent_conf_dir | default('/etc/zabbix') }}"
-zabbix_agent_conf: "{{ zabbix_agent2 | ternary('zabbix_agent2.conf', 'zabbix_agentd.conf') }}"
+zabbix_agent_conf_file: "{{ zabbix_agent_conf_dir }}/{{ zabbix_agent2 | ternary('zabbix_agent2.conf', 'zabbix_agentd.conf') }}"
 zabbix_agent_conf_mode: "0644"
 # Retaining backwards compatability by using the awkwardly named old variable
 zabbix_agent_detect_ip: "{{ not zabbix_agent_dont_detect_ip | default(false) }}" # True
