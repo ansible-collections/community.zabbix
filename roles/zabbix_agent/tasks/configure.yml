@@ -125,6 +125,7 @@
     - config
 
 - name: "Update sysctl settings"
+  become: true
   ansible.posix.sysctl:
     name: "{{ item }}"
     value: '1'
