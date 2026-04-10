@@ -1,0 +1,15 @@
+---
+- name: Deprecation zabbix_agent_win_install_dir_conf
+  block:
+    - name: Verify zabbix_agent_win_install_dir_conf goes undefined
+      assert:
+        that:
+          - zabbix_agent_win_install_dir_conf is not defined
+        fail_msg: Deprecated configuration option provided
+  rescue:
+    - name: Deprecation notice for zabbix_agent_win_install_dir_conf
+      debug:
+        msg: "{{ deprecation_notice.split('\n') }}"
+      vars:
+        deprecation_notice: |
+          zabbix_agent_win_install_dir_conf has been deprecated, changed name to zabbix_agent_conf_dir.

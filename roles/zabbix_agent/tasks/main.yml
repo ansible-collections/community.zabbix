@@ -8,6 +8,9 @@
 - name: Load Appropriate Defaults
   ansible.builtin.include_vars: "{{ zabbix_agent2 | ternary('agent2', 'agent') }}_vars.yml"
 
+- name: Include deprecation checks
+  include_tasks: deprecation_checks.yml
+
 - name: Determine Latest Supported Zabbix Version
   when: zabbix_agent_version is not defined or zabbix_agent_version is none
   ansible.builtin.set_fact:
