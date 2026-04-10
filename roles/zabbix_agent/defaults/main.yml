@@ -84,8 +84,7 @@ zabbix_agent_inventory_mode: disabled
 zabbix_useuip: 1
 zabbix_host_groups:
   - Linux servers
-zabbix_agent_link_templates:
-  - Linux by Zabbix agent
+zabbix_agent_link_templates: "{{ _zabbix_agent_link_templates | default(['Linux by Zabbix agent']) }}"
 
 zabbix_agent_interfaces:
   - type: 1
