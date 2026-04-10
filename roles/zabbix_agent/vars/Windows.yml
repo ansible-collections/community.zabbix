@@ -6,6 +6,9 @@ _zabbix_agent_controlsocket: "\\\\.\\pipe\\agent.sock"
 _zabbix_agent_pluginsocket: "\\\\.\\pipe\\agent.plugin.sock"
 _zabbix_agent_conf_dir: "{{ zabbix_agent_win_install_dir_conf | default(zabbix_agent_win_install_dir) }}"
 
+_zabbix_agent_link_templates:
+  - Windows by Zabbix agent
+
 # ansible_facts['architecture'] is affected by locale
 # so we map to ansible_facts['architecture2']
 _zabbix_agent_win_arch:
