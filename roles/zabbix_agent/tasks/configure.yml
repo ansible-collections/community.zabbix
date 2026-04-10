@@ -81,7 +81,7 @@
 - name: "Configure zabbix-agent"
   ansible.builtin.template:
     src: agent.conf.j2
-    dest: "/etc/zabbix/zabbix_agent{{ (zabbix_agent2 | bool) | ternary('2', 'd') }}.conf"
+    dest: "/etc/zabbix/{{ zabbix_agent_conf_file }}"
     owner: root
     group: root
     mode: "{{ zabbix_agent_conf_mode }}"
