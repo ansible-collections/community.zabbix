@@ -4,15 +4,8 @@ zabbix_agent_service: zabbix_agentd
 # No agent2 package for bsd
 zabbix_agent2: false
 
-zabbix_agent_package: "{{ _zabbix_agent_package_versions[zabbix_agent_version] }}"
-
+_zabbix_agent_package: "zabbix{{ zabbix_agent_version | regex_replace('\\.0?', '') }}-agent"
 _zabbix_agent_conf_dir: "/usr/local/etc/zabbix{{ zabbix_agent_version | regex_replace('\\.0?', '') }}"
 zabbix_agent_include: "{{ _zabbix_agent_conf_dir }}/zabbix_agentd.conf.d"
 
 zabbix_root_group: wheel
-
-_zabbix_agent_package_versions:
-  "7.4": zabbix74-agent
-  "7.2": zabbix72-agent
-  "7.0": zabbix7-agent
-  "6.0": zabbix6-agent
