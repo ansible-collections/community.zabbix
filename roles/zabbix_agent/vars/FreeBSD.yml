@@ -6,13 +6,10 @@ zabbix_agent2: false
 
 zabbix_agent_package: "{{ _zabbix_agent_package_versions[zabbix_agent_version] }}"
 
-zabbix_base_dir: "/usr/local/etc/{{ zabbix_agent_package | split('-') | first }}"
-zabbix_agent_include: "{{ zabbix_base_dir }}/zabbix_agentd.conf.d"
+_zabbix_agent_conf_dir: "/usr/local/etc/zabbix{{ zabbix_agent_version | regex_replace('\\.0?', '') }}"
+zabbix_agent_include: "{{ _zabbix_agent_conf_dir }}/zabbix_agentd.conf.d"
 
 zabbix_root_group: wheel
-
-_zabbix_agent_tlspskfile: "{{ zabbix_base_dir }}/tls_psk_auto.secret"
-_zabbix_agent_tlspskidentity_file: "{{ zabbix_base_dir }}/tls_psk_auto.identity"
 
 _zabbix_agent_package_versions:
   "7.4": zabbix74-agent
