@@ -1,11 +1,13 @@
 ---
-zabbix_agent_service: zabbix_agentd
-
-# No agent2 package for bsd
+# Purposefully override these defaults
+zabbix_manage_repo: false
 zabbix_agent2: false
 
 _zabbix_agent_package: "zabbix{{ zabbix_agent_version | regex_replace('\\.0?', '') }}-agent"
 _zabbix_agent_conf_dir: "/usr/local/etc/zabbix{{ zabbix_agent_version | regex_replace('\\.0?', '') }}"
-zabbix_agent_include: "{{ _zabbix_agent_conf_dir }}/zabbix_agentd.conf.d"
+_zabbix_agent_service: zabbix_agentd
+
+_zabbix_agent_include_dirs:
+  - "{{ _zabbix_agent_conf_dir }}/zabbix_agentd.conf.d"
 
 _zabbix_agent_root_group: wheel
