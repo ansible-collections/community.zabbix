@@ -13,6 +13,7 @@ zabbix_agent_package_state: present
 zabbix_agent_get_package: "{{ _zabbix_agent_get_package | default('zabbix-get') }}"
 zabbix_agent_sender_package: "{{ _zabbix_agent_sender_package | default('zabbix-sender') }}"
 zabbix_agent_selinux: false
+zabbix_agent_conf_dir: "{{ _zabbix_agent_conf_dir | default('/etc/zabbix') }}"
 zabbix_agent_conf_file: "{{ zabbix_agent2 | ternary('zabbix_agent2.conf', 'zabbix_agentd.conf') }}"
 zabbix_agent_conf_mode: "0644"
 # Retaining backwards compatability by using the awkwardly named old variable
@@ -49,8 +50,8 @@ zabbix_agent_timeout: 3
 zabbix_agent_tlsaccept: "unencrypted"
 zabbix_agent_tlsconnect: "unencrypted"
 zabbix_agent_tlspsk_auto: false
-zabbix_agent_tlspskfile: "{{ _zabbix_agent_tlspskfile | default('/etc/zabbix/tls_psk_auto.secret') }}"
-zabbix_agent_tlspskidentity_file: "{{ _zabbix_agent_tlspskidentity_file | default('/etc/zabbix/tls_psk_auto.identity') }}"
+zabbix_agent_tlspskfile: "{{ _zabbix_agent_tlspskfile | default(zabbix_agent_conf_dir ~ '/tls_psk_auto.secret') }}"
+zabbix_agent_tlspskidentity_file: "{{ _zabbix_agent_tlspskidentity_file | default(zabbix_agent_conf_dir ~ '/tls_psk_auto.identity') }}"
 zabbix_agent_tls_subject: "{{ _tls_subject }}"
 
 zabbix_agent_unsafeuserparameters: false
