@@ -11,3 +11,6 @@ _zabbix_agent_include_dirs:
   - "{{ _zabbix_agent_conf_dir }}/zabbix_agentd.conf.d"
 
 _zabbix_agent_root_group: wheel
+
+_zabbix_agent_link_templates:
+  - FreeBSD by Zabbix agent
