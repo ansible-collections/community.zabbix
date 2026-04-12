@@ -23,7 +23,7 @@
     state: latest
   vars:
     _upgrade_debian_pymysql: "{{ (ansible_facts['distribution'] in ['Debian', 'Ubuntu'] and ansible_facts['distribution_release'] in ['bullseye']) }}"
-    _upgrade_suse_pymysql: "{{ ansible_facts['os_family'] in ['Suse'] }}"
+    _upgrade_suse_pymysql: "{{ ansible_facts['os_family'] == 'Suse' and ansible_facts.python.version.minor == 6 }}"
   tags:
     - install
     - database
