@@ -1,13 +1,4 @@
 ---
-apache_user: apache
-apache_group: apache
-apache_log: httpd
-
-mysql_create_dir: create/
-
-__epel_repo:
-  - epel
-
 _zabbix_server_pgsql_dependencies:
   - "{{ zabbix_server_install_database_client | ternary('postgresql', '') }}"
   - python3-psycopg2
