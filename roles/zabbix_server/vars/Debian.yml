@@ -1,10 +1,4 @@
 ---
-apache_user: www-data
-apache_group: www-data
-apache_log: apache2
-
-mysql_create_dir: ""
-
 _zabbix_server_pgsql_dependencies:
   - "{{ zabbix_server_install_database_client | ternary('postgresql-client', '') }}"
   - python3-psycopg2
