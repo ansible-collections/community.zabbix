@@ -15,9 +15,6 @@ _nginx_vhost_location: /etc/nginx/conf.d/zabbix.conf
 _nginx_log_path: /var/log/nginx
 _nginx_service: nginx
 
-__epel_repo:
-  - epel
-
 zabbix_valid_web_versions:
   "10":
     - 7.4
