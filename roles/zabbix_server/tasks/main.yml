@@ -4,6 +4,9 @@
   tags:
     - always
 
+- name: Include deprecation checks
+  include_tasks: deprecation_checks.yml
+
 - name: Determine Latest Supported Zabbix Version
   when: zabbix_server_version is not defined
   ansible.builtin.set_fact:
