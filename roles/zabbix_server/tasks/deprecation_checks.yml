@@ -24,3 +24,18 @@
     - name: Provide deprecation override for zabbix_server_include_dir
       set_fact:
         zabbix_server_include_dir: "/etc/zabbix/zabbix_server.conf.d"
+
+- name: Deprecation zabbix_server_config
+  block:
+    - name: Verify zabbix_server_config goes undefined
+      assert:
+        that:
+          - zabbix_server_config is not defined
+        fail_msg: Deprecated configuration option provided
+  rescue:
+    - name: Deprecation notice for zabbix_server_config
+      debug:
+        msg: "{{ deprecation_notice.split('\n') }}"
+      vars:
+        deprecation_notice: |
+          zabbix_server_config has been deprecated, changed name to zabbix_server_conf_file.

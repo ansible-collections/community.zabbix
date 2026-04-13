@@ -57,7 +57,7 @@
 - name: "Configure zabbix-server"
   ansible.builtin.template:
     src: zabbix_server.conf.j2
-    dest: "{{ zabbix_server_config }}"
+    dest: "{{ zabbix_server_conf_file }}"
     owner: "{{ zabbix_os_user }}"
     group: "{{ zabbix_os_user }}"
     mode: "{{ zabbix_server_conf_mode }}"
