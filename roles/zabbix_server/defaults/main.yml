@@ -35,7 +35,7 @@ selinux_allow_zabbix_can_network: true
 
 #Misc.
 zabbix_server_conf_dir: /etc/zabbix
-zabbix_server_config: "{{ zabbix_server_conf_dir }}/zabbix_server.conf"
+zabbix_server_conf_file: "{{ zabbix_server_config | default(zabbix_server_conf_dir ~ '/zabbix_server.conf') }}"
 zabbix_server_conf_mode: "0640"
 zabbix_service_state: started
 
