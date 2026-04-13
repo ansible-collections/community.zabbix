@@ -1,7 +1,4 @@
 ---
-__epel_repo:
-  - epel
-
 zabbix_valid_web_service_versions:
   "10":
     - 7.4
