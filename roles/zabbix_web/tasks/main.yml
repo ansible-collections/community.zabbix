@@ -27,7 +27,8 @@
     - always
 
 - name: Determine PHP Version
-  ansible.builtin.shell: php --version | head -1 | awk '{ print $2 }' | awk -F '.' '{print $1"."$2}'
+  ansible.builtin.command:
+    cmd: php --version
   register: _zabbix_web_php_installed_version
   changed_when: false
   tags:
@@ -36,7 +37,13 @@
 
 - name: Set PHP Version
   ansible.builtin.set_fact:
-    zabbix_web_php_installed_version: "{{ _zabbix_web_php_installed_version.stdout }}"
+    zabbix_web_php_installed_version: "{{ _php_version[ansible_facts.os_family] }}"
+  vars:
+    _php_version_query: 'PHP\s*(\d+\.\d+)\.\d+'
+    _php_version:
+      Debian: "{{ _zabbix_web_php_installed_version.stdout | regex_search(_php_version_query, '\\1') }}" # }}"
+      RedHat: "{{ _zabbix_web_php_installed_version.stdout | regex_search(_php_version_query, '\\1') | regex_replace('\\.', '') }}"
+      Suse:   "{{ _zabbix_web_php_installed_version.stdout | regex_search(_php_version_query, '\\1') | regex_replace('(\\d+)\\.\\d+', '\\1') }}"
   tags:
     - config
     - install
@@ -52,9 +59,6 @@
 - name: "Configure SELinux when enabled"
   ansible.builtin.include_tasks: selinux.yml
   when: ansible_facts.selinux.status | default('disabled') == 'enabled'
-
-- name: Include OS Specific Tasks
-  ansible.builtin.include_tasks: "{{ ansible_facts['os_family'] }}.yml"
 
 - name: "Install zabbix-web package"
   ansible.builtin.package:
