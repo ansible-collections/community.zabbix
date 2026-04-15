@@ -453,6 +453,9 @@ class Template(ZabbixBase):
 
         if template_macros is not None:
             existing_macros = existing_template["zabbix_export"]["templates"][0]["macros"]
+            for item in existing_macros:
+                if "value" not in item:
+                    item["value"] = ""
             if template_macros != existing_macros:
                 changed = True
 
@@ -460,6 +463,9 @@ class Template(ZabbixBase):
             existing_template["zabbix_export"]["templates"][0]["tags"] = []
         if template_tags is not None:
             existing_tags = existing_template["zabbix_export"]["templates"][0]["tags"]
+            for item in existing_tags:
+                if "value" not in item:
+                    item["value"] = ""
             if template_tags != existing_tags:
                 changed = True
 
