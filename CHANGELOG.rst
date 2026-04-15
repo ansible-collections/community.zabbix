@@ -4,6 +4,40 @@ community.zabbix Release Notes
 
 .. contents:: Topics
 
+v4.2.0
+======
+
+Minor Changes
+-------------
+
+- host - Added support for vault passwords.
+- web role - added support for IPv6
+- zabbix frontend and server encryption support: https://www.zabbix.com/documentation/7.4/en/manual/introduction/whatsnew#tls-encryption-between-frontend-and-server & https://www.zabbix.com/documentation/current/en/manual/appendix/install/frontend_encrypt
+- zabbix_agent - [WINDOWS] Add INSTALLFOLDER parameter to msi install
+- zabbix_agent - add variable for customizing releases url (https://services.zabbix.com/updates/v1)
+- zabbix_triggerprototype - use templated and templateid=0 when host_name is given, only templated for template_name
+- zabbix_valuemap - add value mappings type suboption which specifies the mapping match type (https://github.com/ansible-collections/community.zabbix/issues/1636).
+
+Bugfixes
+--------
+
+- Added 'status' handling to sanatize_params in zabbix_itemprototype module to allow for 'enabled'/'disabled' values.
+- Updated tests to reflect the change in parameter handling.
+- add zabbix_agent 7.4 as valid for windows
+- all modules - fixed password handeling
+- fix zabbix_agent_version_long version comparison
+- server role - fixed issues with mysql import
+- use architecture2 in map for amd64/i386
+- web role - Fixed ownership of `/etc/zabbix/web` directory to match Debian distributions packages
+- zabbix_agent - add fallback to first ipv4 address if default cant be determined for zabbix_agent_ip
+- zabbix_proxy - add fallback to first ipv4 address if default cant be determined for zabbix_proxy_ip
+- zabbix_server - Adapt all the PostgresDB related task to be schema aware (https://github.com/ansible-collections/community.zabbix/issues/1647).
+- zabbix_template - prevent false reporting of password change
+- zabbix_trigger - add selectDependencies and selectTags when requesting triggers to detect changes to those values
+- zabbix_valuemap - add missing host_name option which is required by the Zabbix API (https://github.com/ansible-collections/community.zabbix/issues/1636).
+- zabbix_web - define zabbix_server_dbschema default value
+- zabbix_web - nginx vhost template did not support http2 configuration (https://github.com/ansible-collections/community.zabbix/issues/1668).
+
 v4.1.1
 ======
 

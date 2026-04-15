@@ -1,2 +1,0 @@
-bugfixes:
-  - web role - Fixed ownership of `/etc/zabbix/web` directory to match Debian distributions packages

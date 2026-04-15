@@ -114,6 +114,11 @@ plugins:
       name: zabbix_housekeeping
       namespace: ''
       version_added: 1.6.0
+    zabbix_httptest:
+      description: Create/delete Zabbix httptests aka Web Scenarios
+      name: zabbix_httptest
+      namespace: ''
+      version_added: null
     zabbix_item:
       description: Create/delete Zabbix items
       name: zabbix_item
@@ -249,9 +254,14 @@ plugins:
       name: zabbix_valuemap
       namespace: ''
       version_added: null
+    zabbix_valuemap_info:
+      description: Gather information about Zabbix valuemap
+      name: zabbix_valuemap_info
+      namespace: ''
+      version_added: null
   netconf: {}
   shell: {}
   strategy: {}
   test: {}
   vars: {}
-version: 4.1.1
+version: 4.2.0

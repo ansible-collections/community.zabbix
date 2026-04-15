@@ -1,3 +1,0 @@
-bugfixes:
-  - zabbix_agent - add fallback to first ipv4 address if default cant be determined for zabbix_agent_ip
-  - zabbix_proxy - add fallback to first ipv4 address if default cant be determined for zabbix_proxy_ip
