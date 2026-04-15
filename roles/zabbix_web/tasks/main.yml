@@ -49,6 +49,10 @@
     zabbix_repo_package: "zabbix-web-service"
   when: zabbix_manage_repo | default(true)
 
+- name: "Configure SELinux when enabled"
+  ansible.builtin.include_tasks: selinux.yml
+  when: ansible_facts.selinux.status | default('disabled') == 'enabled'
+
 - name: Include OS Specific Tasks
   ansible.builtin.include_tasks: "{{ ansible_facts['os_family'] }}.yml"
 
