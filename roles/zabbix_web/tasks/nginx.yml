@@ -1,13 +1,4 @@
 ---
-- name: "Nginx | Set websrv specific variables"
-  ansible.builtin.set_fact:
-    zabbix_web_user: "{{ zabbix_web_user if zabbix_web_user is defined else _nginx_user }}"
-    zabbix_web_group: "{{ zabbix_web_group if zabbix_web_group is defined else _nginx_group }}"
-    zabbix_web_vhost_location: "{{ zabbix_web_vhost_location if zabbix_web_vhost_location is defined else _nginx_vhost_location }}"
-  tags:
-    - config
-    - install
-
 - name: "Nginx | Install vhost in conf.d"
   ansible.builtin.template:
     src: nginx_vhost.conf.j2
