@@ -16,9 +16,7 @@ _nginx_log_path: /var/log/nginx
 _nginx_service: nginx
 
 _zabbix_web_package: "zabbix-web-{{ zabbix_server_database }}-{{ zabbix_web_version }}.{{ zabbix_web_version_minor }}"
-_zabbix_web_apache_packages:
-  - "zabbix-apache-conf-{{ zabbix_web_version }}.{{ zabbix_web_version_minor }}"
-_zabbix_web_nginx_packages:
-  - "zabbix-nginx-conf-{{ zabbix_web_version }}.{{ zabbix_web_version_minor }}"
+_zabbix_web_conf_package: "zabbix-{{ zabbix_web_http_server }}-conf-{{ zabbix_web_version }}.{{ zabbix_web_version_minor }}"
+
 _zabbix_web_disable_repo:
   - epel

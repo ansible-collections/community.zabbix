@@ -16,7 +16,3 @@ _nginx_log_path: /var/log/nginx
 _nginx_service: nginx
 
 _zabbix_web_package: "zabbix-web-{{ zabbix_server_database }}"
-_zabbix_web_apache_packages:
-  - zabbix-apache-conf
-_zabbix_web_nginx_packages:
-  - zabbix-nginx-conf
