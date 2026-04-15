@@ -1,2 +1,0 @@
-bugfixes:
-  - zabbix_web - nginx vhost template did not support http2 configuration (https://github.com/ansible-collections/community.zabbix/issues/1668).

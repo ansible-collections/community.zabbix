@@ -1,5 +1,0 @@
----
-bugfixes:
-  - add zabbix_agent 7.4 as valid for windows
-  - use architecture2 in map for amd64/i386
-  - fix zabbix_agent_version_long version comparison

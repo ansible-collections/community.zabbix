@@ -1,5 +1,0 @@
-bugfixes:
-  - zabbix_valuemap - add missing host_name option which is required by the Zabbix API (https://github.com/ansible-collections/community.zabbix/issues/1636).
-
-minor_changes:
-  - zabbix_valuemap - add value mappings type suboption which specifies the mapping match type (https://github.com/ansible-collections/community.zabbix/issues/1636).
