@@ -1,17 +1,20 @@
 ---
-_apache_user: apache
-_apache_group: apache
+_zabbix_web_user:
+  apache: apache
+  nginx: nginx
+_zabbix_web_group:
+  apache: apache
+  nginx: nginx
+_zabbix_web_vhost_location:
+  apache: /etc/httpd/conf.d/zabbix.conf
+  nginx: /etc/nginx/conf.d/zabbix.conf
+
 _apache_log: httpd
 _apache_service: httpd
-_apache_vhost_location: /etc/httpd/conf.d/zabbix.conf
 
 _zabbix_php_fpm_dir: /etc/php-fpm.d
 _zabbix_php_fpm_listen: /run/php-fpm/zabbix.sock
 _zabbix_php_fpm_session: /var/lib/php/session
-
-_nginx_user: nginx
-_nginx_group: nginx
-_nginx_vhost_location: /etc/nginx/conf.d/zabbix.conf
 
 _zabbix_web_package: "zabbix-web-{{ zabbix_server_database }}-{{ zabbix_web_version }}.{{ zabbix_web_version_minor }}"
 _zabbix_web_apache_packages:

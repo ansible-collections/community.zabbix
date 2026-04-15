@@ -1,12 +1,4 @@
 ---
-- name: Setting Web Server Facts
-  ansible.builtin.set_fact:
-    zabbix_web_user: "{{ zabbix_web_user if zabbix_web_user is defined else _apache_user }}"
-    zabbix_web_group: "{{ zabbix_web_group if zabbix_web_group is defined else _apache_group }}"
-    zabbix_web_vhost_location: "{{ zabbix_web_vhost_location if zabbix_web_vhost_location is defined else _apache_vhost_location }}"
-  tags:
-    - always
-
 - name: "Apache | Installing Zabbix Apache Conf"
   package:
     name: "{{ _zabbix_web_apache_packages + _zabbix_web_apache_php_dependencies | default([]) }}"

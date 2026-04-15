@@ -18,6 +18,10 @@ zabbix_server_name: "{{ inventory_hostname }}"
 zabbix_server_hostname: "{{ inventory_hostname }}"
 zabbix_server_listenport: 10051
 
+zabbix_web_user: "{{ _zabbix_web_user[zabbix_web_http_server] }}"
+zabbix_web_group: "{{ _zabbix_web_group[zabbix_web_http_server] }}"
+
+zabbix_web_vhost_location: "{{ _zabbix_web_vhost_location[zabbix_web_http_server] }}"
 zabbix_web_vhost_port: 80
 zabbix_web_vhost_tls_port: 443
 zabbix_web_vhost_listen_ip: "*"
