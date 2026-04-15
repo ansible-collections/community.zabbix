@@ -1,7 +1,7 @@
 ---
 # tasks file for zabbix_agent
 - name: "Include OS-specific variables"
-  ansible.builtin.include_vars: "{{ ansible_os_family }}.yml"
+  ansible.builtin.include_vars: "{{ ansible_facts['os_family'] }}.yml"
   tags:
     - always
 
@@ -53,7 +53,7 @@
   when:
     - zabbix_manage_repo | default(true)
     - not (zabbix_agent_docker | bool)
-    - ansible_facts['os_family'] not in ['Alpine', 'Darwin', 'Windows']
+    - ansible_facts['os_family'] not in ['Alpine', 'Darwin', 'FreeBSD', 'Windows']
 
 - name: "Install the agent"
   when: not (zabbix_agent_docker | bool)

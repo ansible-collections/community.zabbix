@@ -1,0 +1,10 @@
+---
+- name: zabbix-web-service restarted
+  become: true
+  ansible.builtin.service:
+    name: zabbix-web-service
+    state: restarted
+    enabled: true
+  tags: zabbix-web-service
+  when:
+    - zabbix_web_service_manage_service | bool
