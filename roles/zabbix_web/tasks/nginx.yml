@@ -1,19 +1,4 @@
 ---
-- name: "Nginx | Installing Zabbix Nginx Conf"
-  package:
-    name: "{{ _zabbix_web_nginx_packages }}"
-    state: "{{ zabbix_web_package_state }}"
-    update_cache: true
-    disablerepo: "{{ zabbix_web_disable_repo | default(_zabbix_web_disable_repo | default(omit)) }}"
-  environment:
-    http_proxy: "{{ zabbix_http_proxy | default('') }}"
-    https_proxy: "{{ zabbix_https_proxy | default('') }}"
-  register: zabbix_nginx_conf_install
-  until: zabbix_nginx_conf_install is succeeded
-  become: true
-  tags:
-    - install
-
 - name: "Nginx | Determining Nginx version"
   when:
     - zabbix_web_create_vhost
