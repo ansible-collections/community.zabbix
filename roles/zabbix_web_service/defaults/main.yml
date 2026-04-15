@@ -1,0 +1,50 @@
+---
+# mimeapps path, for Google Chrome
+mimeapps_list_path: "/var/lib/zabbix/.local/share/applications"
+
+# defaults file for zabbix_web_service
+zabbix_web_service_version_check: true
+
+# zabbix_web_service_version:
+zabbix_os_user: zabbix
+zabbix_service_enabled: true
+zabbix_web_service_manage_service: true
+
+# SELinux specific
+selinux_allow_zabbix_can_network: true
+
+#Misc.
+zabbix_web_service_include_mode: "0755"
+zabbix_web_service_config: /etc/zabbix/zabbix_web_service.conf
+zabbix_service_state: started
+
+# Yum/APT  Variables
+zabbix_web_service_version_minor: "*"
+zabbix_web_service_packages: "{{ _zabbix_web_service_packages }}"
+zabbix_web_service_package_state: present
+zabbix_web_service_conf_mode: "0640"
+
+# Web Service Configuration Variables (Only ones with role provided defaults)
+zabbix_web_service_logtype: "file"
+zabbix_web_service_logfile: '/var/log/zabbix/zabbix_web_service.log'
+zabbix_web_service_logfilesize: 0
+zabbix_web_service_debuglevel: 3
+zabbix_web_service_allowedip: "127.0.0.1,::1"
+zabbix_web_service_listenport: 10053
+zabbix_web_service_timeout: 10
+zabbix_web_service_tlsaccept: "unencrypted"
+zabbix_web_service_tlscafile: ''
+zabbix_web_service_tlscertfile: ''
+zabbix_web_service_tlskeyfile: ''
+zabbix_web_service_ignoreurlcerterrors: 0
+
+# Zabbix API stuff
+zabbix_api_use_ssl: false
+zabbix_api_login_user: Admin
+zabbix_api_login_pass: !unsafe zabbix
+zabbix_api_server_host: localhost
+zabbix_api_server_port: "{{ zabbix_api_use_ssl | ternary('443', '80') }}"
+zabbix_api_validate_certs: false
+zabbix_api_timeout: 30
+zabbix_api_frontend_url: false
+zabbix_frontend_url: ''

@@ -1,0 +1,27 @@
+---
+- name: "SELinux | Install related SELinux packages"
+  become: true
+  ansible.builtin.package:
+    name:
+      - python3-libsemanage
+      - python3-policycoreutils
+      - zabbix-selinux-policy
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default('') }}"
+    https_proxy: "{{ zabbix_https_proxy | default('') }}"
+  register: zabbix_web_service_dependencies_installed
+  until: zabbix_web_service_dependencies_installed is succeeded
+  tags:
+    - install
+
+- name: "SELinux | Set booleans"
+  become: true
+  ansible.posix.seboolean:
+    name: "{{ item.name }}"
+    state: "{{ item.state }}"
+    persistent: true
+  tags:
+    - config
+  loop:
+    - name: zabbix_can_network
+      state: "{{ selinux_allow_zabbix_can_network }}"
