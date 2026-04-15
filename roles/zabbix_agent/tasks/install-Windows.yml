@@ -97,3 +97,4 @@
           - "{{ zabbix_agent_win_package }}"
           - /qn
           - "SERVER={{ zabbix_agent_server }}"
+          - "INSTALLFOLDER={{ zabbix_agent_win_install_dir }}"
