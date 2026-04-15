@@ -1,9 +1,16 @@
 ---
-_apache_user: www-data
-_apache_group: www-data
+_zabbix_web_user:
+  apache: www-data
+  nginx: www-data
+_zabbix_web_group:
+  apache: www-data
+  nginx: www-data
+_zabbix_web_vhost_location:
+  apache: /etc/apache2/sites-available/zabbix.conf
+  nginx: /etc/nginx/conf.d/zabbix.conf
+
 _apache_log: apache2
 _apache_service: apache2
-_apache_vhost_location: /etc/apache2/sites-available/zabbix.conf
 
 _zabbix_web_create_php_fpm: "{{ zabbix_web_http_server != 'apache' }}"
 _zabbix_php_fpm_dir: /etc/php/{{ zabbix_web_php_installed_version }}/fpm/pool.d
@@ -12,9 +19,6 @@ _zabbix_php_fpm_mode: "0660"
 _zabbix_php_fpm_allowed_clients: 127.0.0.1
 _zabbix_php_fpm_session: /var/lib/php/sessions/
 
-_nginx_user: www-data
-_nginx_group: www-data
-_nginx_vhost_location: /etc/nginx/conf.d/zabbix.conf
 _nginx_tls_crt: /etc/ssl/certs/ssl-cert-snakeoil.pem
 _nginx_tls_key: /etc/ssl/private/ssl-cert-snakeoil.key
 _nginx_tls_dhparam: /etc/ssl/private/dhparams.pem
