@@ -4,6 +4,10 @@
 zabbix_web_version_check: true
 
 # zabbix_web_version:
+
+zabbix_web_packages:
+  - "{{ _zabbix_web_package }}"
+  - "{{ _zabbix_web_conf_package | default('zabbix-' ~ zabbix_web_http_server ~ '-conf') }}"
 zabbix_web_package_state: present
 zabbix_web_doubleprecision: false
 zabbix_web_conf_mode: "0640"
