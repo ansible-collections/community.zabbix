@@ -87,6 +87,20 @@
   tags:
     - install
 
+- name: "Configure http server vhost"
+  when: zabbix_web_create_vhost
+  ansible.builtin.template:
+    src: "{{ zabbix_web_http_server }}_vhost.conf.j2"
+    dest: "{{ zabbix_web_vhost_location }}"
+    owner: "{{ zabbix_web_user }}"
+    group: "{{ zabbix_web_group }}"
+    mode: 0644
+  become: true
+  notify:
+    - "restart {{ zabbix_web_http_server }}"
+  tags:
+    - config
+
 - name: "Install the web server specific tasks"
   ansible.builtin.include_tasks: "{{ zabbix_web_http_server }}.yml"
 

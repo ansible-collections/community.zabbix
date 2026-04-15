@@ -1,18 +1,4 @@
 ---
-- name: "Apache | Install apache vhost"
-  ansible.builtin.template:
-    src: apache_vhost.conf.j2
-    dest: "{{ zabbix_web_vhost_location }}"
-    owner: "{{ zabbix_web_user }}"
-    group: "{{ zabbix_web_group }}"
-    mode: 0644
-  when: zabbix_web_create_vhost
-  become: true
-  notify:
-    - restart apache
-  tags:
-    - config
-
 - name: "Apache | Enable Site (Debian Only)"
   ansible.builtin.file:
     src: "{{ zabbix_web_vhost_location }}"
