@@ -85,7 +85,7 @@ See the following list of supported Operating systems with the Zabbix releases:
 | Debian 11 bullseye  |     |     |     |  V  |
 | Suse Fam 15         |  V  |  V  |  V  |  V  |
 
-You can bypass this matrix by setting `enable_version_check: false`
+You can bypass this matrix by setting `zabbix_server_version_check: false`
 
 # Installation
 
@@ -140,6 +140,7 @@ Selinux changes will be installed based on the status of selinux running on the 
 * `zabbix_server_install_database_client`: Default: `True`. False does not install database client. Default true
 * `zabbix_server_database_sqlload`:True / False. When you don't want to load the sql files into the database, you can set it to False.
 * `zabbix_server_database_timescaledb`:False / True. When you want to use timescaledb extension into the database, you can set it to True (this option only works for postgreSQL database).
+* `zabbix_server_database_timescaledb_force_schema`:False / True. When you want to use timescaledb extension into the database, and force the extension to be created in the schema deefined in zabbix_server_database_schemas. If the extension is not already in the zabbix_server_database_schemas it will be dropped (lost of data) and created in the defined one.
 * `zabbix_server_database_schemas`: List of schemas to load, can be overridden for a non-supported/custom setup.
 * `zabbix_server_dbencoding`: Default: `utf8`. The encoding for the MySQL database.
 * `zabbix_server_dbcollation`: Default: `utf8_bin`. The collation for the MySQL database.
@@ -295,7 +296,7 @@ The following table lists all variables that are exposed to modify the configura
 |DBName | zabbix_server_dbname | zabbix-server |  |
 |DBPassword | zabbix_server_dbpassword | zabbix-server |  |
 |DBPort | zabbix_server_dbport | varies by database |  |
-|DBSchema | zabbix_server_dbschema | |  |
+|DBSchema | zabbix_server_dbschema |public |  |
 |DBSocket | zabbix_server_dbsocket | |  |
 |DBTLSCAFile | zabbix_server_dbtlscafile | |  |
 |DBTLSCertFile | zabbix_server_dbtlscertfile | |  |
@@ -312,6 +313,7 @@ The following table lists all variables that are exposed to modify the configura
 |ExternalScripts | zabbix_server_externalscriptspath | /usr/lib/zabbix/externalscripts |  |
 |Fping6Location | zabbix_server_fping6location | OS Specific Value |  |
 |FpingLocation | zabbix_server_fpinglocation | OS Specific Value |  |
+|FrontendAllowedIP | zabbix_server_frontendallowedip | | Version 7.4 or later |
 |HANodeName | zabbix_server_hanodename | |  |
 |HistoryCacheSize | zabbix_server_historycachesize | 16M |  |
 |HistoryIndexCacheSize | zabbix_server_historyindexcachesize | 4M |  |
@@ -382,7 +384,11 @@ The following table lists all variables that are exposed to modify the configura
 |TLSCipherPSK | zabbix_server_tlscipherpsk | |  |
 |TLSCipherPSK13 | zabbix_server_tlscipherpsk13 | |  |
 |TLSCRLFile | zabbix_server_tlscrlfile | |  |
+|TLSFrontendAccept | zabbix_server_tlsfrontendaccept | unencrypted | Version 7.4 or later |
+|TLSFrontendCertIssuer | zabbix_server_tlsfrontendcertissuer | | Optional. Version 7.4 or later |
+|TLSFrontendCertSubject | zabbix_server_tlsfrontendcertsubject | | Optional. Version 7.4 or later |
 |TLSKeyFile | zabbix_server_tlskeyfile | |  |
+|TLSListen | zabbix_server_tlslisten | | Version 7.4 or later |
 |TmpDir | zabbix_server_tmpdir | /tmp |  |
 |TrapperTimeout | zabbix_server_trappertimeout | 300 |  |
 |TrendCacheSize | zabbix_server_trendcachesize | 4M |  |

@@ -119,7 +119,16 @@
 {{ (zabbix_server_tlscipherpsk is defined and zabbix_server_tlscipherpsk is not none) | ternary('', '# ') }}TLSCipherPSK={{ zabbix_server_tlscipherpsk | default('') }}
 {{ (zabbix_server_tlscipherpsk13 is defined and zabbix_server_tlscipherpsk13 is not none) | ternary('', '# ') }}TLSCipherPSK13={{ zabbix_server_tlscipherpsk13 | default('') }}
 {{ (zabbix_server_tlscrlfile is defined and zabbix_server_tlscrlfile is not none) | ternary('', '# ') }}TLSCRLFile={{ zabbix_server_tlscrlfile | default('') }}
+{% if zabbix_server_version is version('7.4', '>=') %}
+{{ (zabbix_server_tlsfrontendaccept is defined and zabbix_server_tlsfrontendaccept is not none) | ternary('', '# ') }}TLSFrontendAccept={{ zabbix_server_tlsfrontendaccept | default('') }}
+{{ (zabbix_server_tlsfrontendcertissuer is defined and zabbix_server_tlsfrontendcertissuer is not none) | ternary('', '# ') }}TLSFrontendCertIssuer={{ zabbix_server_tlsfrontendcertissuer | default('') }}
+{{ (zabbix_server_tlsfrontendcertsubject is defined and zabbix_server_tlsfrontendcertsubject is not none) | ternary('', '# ') }}TLSFrontendCertSubject={{ zabbix_server_tlsfrontendcertsubject | default('') }}
+{{ (zabbix_server_frontendallowedip is defined and zabbix_server_frontendallowedip is not none) | ternary('', '# ') }}FrontendAllowedIP={{ zabbix_server_frontendallowedip | default('') }}
+{% endif %}
 {{ (zabbix_server_tlskeyfile is defined and zabbix_server_tlskeyfile is not none) | ternary('', '# ') }}TLSKeyFile={{ zabbix_server_tlskeyfile | default('') }}
+{% if zabbix_server_version is version('7.4', '>=') %}
+{{ (zabbix_server_tlslisten is defined and zabbix_server_tlslisten is not none) | ternary('', '# ') }}TLSListen={{ zabbix_server_tlslisten | default('') }}
+{% endif %}
 {{ (zabbix_server_tmpdir is defined and zabbix_server_tmpdir is not none) | ternary('', '# ') }}TmpDir={{ zabbix_server_tmpdir | default('') }}
 {{ (zabbix_server_trappertimeout is defined and zabbix_server_trappertimeout is not none) | ternary('', '# ') }}TrapperTimeout={{ zabbix_server_trappertimeout | default('') }}
 {{ (zabbix_server_trendcachesize is defined and zabbix_server_trendcachesize is not none) | ternary('', '# ') }}TrendCacheSize={{ zabbix_server_trendcachesize | default('') }}

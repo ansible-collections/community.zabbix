@@ -120,8 +120,23 @@
   when:
     - zabbix_agent_chassis is defined
     - zabbix_agent_chassis | bool
+    - ansible_facts['os_family'] != "FreeBSD"
   tags:
     - config
+
+- name: "Update sysctl settings"
+  ansible.posix.sysctl:
+    name: "{{ item }}"
+    value: '1'
+    sysctl_set: true
+  with_items:
+    - security.bsd.see_other_gids
+    - security.bsd.see_other_uids
+  when:
+    - ansible_facts['os_family'] == "FreeBSD"
+  tags:
+    - config
+  notify: restart sysctl
 
 - meta: flush_handlers
 

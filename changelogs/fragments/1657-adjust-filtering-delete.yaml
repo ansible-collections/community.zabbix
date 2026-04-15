@@ -1,0 +1,2 @@
+minor_changes:
+  - zabbix_triggerprototype - use templated and templateid=0 when host_name is given, only templated for template_name

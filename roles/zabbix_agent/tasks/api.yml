@@ -8,10 +8,10 @@
 
 - name: "Set default ip address for zabbix_agent_ip | {{ ansible_facts['os_family'] }}"
   ansible.builtin.set_fact:
-    zabbix_agent_ip: "{{ ansible_facts['default_ipv4'].address }}"
+    zabbix_agent_ip: "{{ ansible_facts['default_ipv4'].address | default(ansible_facts['all_ipv4_addresses'][0]) }}"
   when:
     - zabbix_agent_ip is not defined
-    - ansible_facts['default_ipv4'].address is defined
+    - ansible_facts['default_ipv4'].address is defined or ansible_facts['all_ipv4_addresses'] | length > 0
     - ansible_facts['os_family'] != 'Windows'
 
 # Fun fact, the first set_fact that successfully defines zabbix_agent_ip

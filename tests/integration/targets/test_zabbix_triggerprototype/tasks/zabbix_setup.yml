@@ -35,6 +35,16 @@
         enabled: True
     state: present
 
+- name: Create similar Zabbix discoveryrule on template
+  community.zabbix.zabbix_discoveryrule:
+    name: ExampleTemplateRule
+    template_name: ExampleTemplate
+    params:
+        type: zabbix_trapper
+        key: 'fs.discovery'
+        enabled: True
+    state: present
+
 - name: Create host item prototype
   community.zabbix.zabbix_itemprototype:
     name: '{% raw %}{#FSNAME}:ExampleItemPrototype{% endraw %}'
@@ -45,4 +55,22 @@
         key: '{% raw %}vfs.fs.size[{#FSNAME}, pused]{% endraw %}'
         value_type: numeric_unsigned
         interval: 1m
+        tags:
+        - tag: tag
+          value: hostitem
+    state: present
+
+- name: Create template item prototype
+  community.zabbix.zabbix_itemprototype:
+    name: '{% raw %}{#FSNAME}:ExampleItemPrototype templated{% endraw %}'
+    discoveryrule_name: ExampleTemplateRule
+    template_name: ExampleTemplate
+    params:
+        type: zabbix_agent_active
+        key: '{% raw %}vfs.fs.size[{#FSNAME}, pused ]{% endraw %}'
+        value_type: numeric_unsigned
+        interval: 1m
+        tags:
+        - tag: tag
+          value: templated
     state: present

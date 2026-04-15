@@ -1,0 +1,12 @@
+---
+- name: "Installing zabbix-agent"
+  community.general.pkgng:
+    name: "{{ zabbix_agent_package }}"
+    state: "{{ zabbix_agent_package_state }}"
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default('') }}"
+  register: _zabbix_agent_packages_installed
+  until: _zabbix_agent_packages_installed is succeeded
+  become: true
+  tags:
+    - install
