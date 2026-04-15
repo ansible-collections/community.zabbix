@@ -216,6 +216,7 @@
     template_name: ExampleTemplate
     params:
       interval: 2m
+      status: enabled
     state: present
   register: zbxtempitem_changed
 
@@ -258,6 +259,7 @@
     template_name: ExampleTemplate
     params:
       new_name: '{% raw %}{#FSNAME}:NewTestItemPrototype2{% endraw %}'
+      enabled: True
     state: present
   ignore_errors: yes
   register: zbxnameitem_failed

@@ -1,0 +1,3 @@
+bugfixes:
+  - Added 'status' handling to sanatize_params in zabbix_itemprototype module to allow for 'enabled'/'disabled' values.
+  - Updated tests to reflect the change in parameter handling.
