@@ -38,8 +38,6 @@ provisioner:
         ansible_connection: community.docker.docker
       v74:
         zabbix_server_version: 7.4
-      v72:
-        zabbix_server_version: 7.2
       v70:
         zabbix_server_version: 7.0
       v60:
@@ -54,7 +52,6 @@ provisioner:
         zabbix_server_mysql_login_host: "{{ inventory_hostname }}-db"
         zabbix_server_mysql_login_user: root
         zabbix_server_mysql_login_password: changeme
-        zabbix_server_mysql_login_port: 3306
       pgsql:
         zabbix_server_database: pgsql
         zabbix_server_dbhost: "{{ inventory_hostname }}-db"
@@ -62,7 +59,6 @@ provisioner:
         zabbix_server_pgsql_login_host: "{{ inventory_hostname }}-db"
         zabbix_server_pgsql_login_user: postgres
         zabbix_server_pgsql_login_password: changeme
-        zabbix_server_pgsql_login_port: 5432
         zabbix_server_database_timescaledb: true
         zabbix_server_database_timescaledb_force_schema: true
         zabbix_server_dbschema: zabbix

@@ -52,8 +52,6 @@ provisioner:
         zabbix_proxy_tlspsk_secret: 'f1447b20c0243f3304062d3641fe7e341eb0106bd1adb4273f21659a7717ae6f'
       v74:
         zabbix_proxy_version: 7.4
-      v72:
-        zabbix_proxy_version: 7.2
       v70:
         zabbix_proxy_version: 7.0
       v60:
@@ -62,24 +60,20 @@ provisioner:
         zabbix_proxy_dbname: zabbix
         zabbix_proxy_dbuser: zabbix-dbuser
         zabbix_proxy_database: mysql
-        zabbix_proxy_dbport: 3306
         zabbix_proxy_dbhost: "{{ inventory_hostname }}-db"
         zabbix_proxy_dbhost_run_install: false
         zabbix_proxy_privileged_host: "%"
         zabbix_proxy_mysql_login_host: "{{ inventory_hostname }}-db"
         zabbix_proxy_mysql_login_user: root
         zabbix_proxy_mysql_login_password: changeme
-        zabbix_proxy_mysql_login_port: 3306
       pgsql:
         zabbix_proxy_database: pgsql
-        zabbix_proxy_dbport: 5432
         zabbix_proxy_dbhost: "{{ inventory_hostname }}-db"
         zabbix_proxy_dbschema: zabbix
         zabbix_proxy_dbhost_run_install: false
         zabbix_proxy_pgsql_login_host: "{{ inventory_hostname }}-db"
         zabbix_proxy_pgsql_login_user: postgres
         zabbix_proxy_pgsql_login_password: changeme
-        zabbix_proxy_pgsql_login_port: 5432
       sqlite3:
         zabbix_proxy_database: sqlite3
         zabbix_proxy_database_long: sqlite3

@@ -81,9 +81,9 @@
 - name: "Configure zabbix-agent"
   ansible.builtin.template:
     src: agent.conf.j2
-    dest: "/etc/zabbix/zabbix_agent{{ (zabbix_agent2 | bool) | ternary('2', 'd') }}.conf"
+    dest: "{{ zabbix_agent_conf_dir }}/{{ zabbix_agent_conf_file }}"
     owner: root
-    group: root
+    group: "{{ _zabbix_agent_root_group | default('root') }}"
     mode: "{{ zabbix_agent_conf_mode }}"
   notify:
     - restart zabbix-agent
@@ -95,7 +95,7 @@
   ansible.builtin.file:
     path: "{{ include_dir }}"
     owner: root
-    group: root
+    group: "{{ _zabbix_agent_root_group | default('root') }}"
     mode: "{{ zabbix_agent_include_mode }}"
     state: directory
   loop: "{{ zabbix_agent_include_dirs }}"
@@ -125,6 +125,7 @@
     - config
 
 - name: "Update sysctl settings"
+  become: true
   ansible.posix.sysctl:
     name: "{{ item }}"
     value: '1'

@@ -40,7 +40,7 @@ def test_zabbix_server_dot_conf(host):
 
 
 def test_zabbix_include_dir(host):
-    zabbix_include_dir = host.file("/etc/zabbix/zabbix_server.conf.d")
+    zabbix_include_dir = host.file("/etc/zabbix/zabbix_server.d")
     assert zabbix_include_dir.is_directory
     assert zabbix_include_dir.user == "zabbix"
     assert zabbix_include_dir.group == "zabbix"

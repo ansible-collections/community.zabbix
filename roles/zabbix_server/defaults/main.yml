@@ -34,15 +34,15 @@ zabbix_server_database_schemas: "{{ _zabbix_server_database_schemas[zabbix_serve
 selinux_allow_zabbix_can_network: true
 
 #Misc.
-zabbix_server_include_mode: "0755"
-zabbix_server_config: /etc/zabbix/zabbix_server.conf
+zabbix_server_conf_dir: /etc/zabbix
+zabbix_server_conf_file: "{{ zabbix_server_config | default(zabbix_server_conf_dir ~ '/zabbix_server.conf') }}"
+zabbix_server_conf_mode: "0640"
 zabbix_service_state: started
 
 # Yum/APT  Variables
 zabbix_server_version_minor: "*"
 zabbix_server_packages: "{{ _zabbix_server_packages }}"
 zabbix_server_package_state: present
-zabbix_server_conf_mode: 0640
 
 # Server Configuration Variables (Only ones with role provided defaults)
 zabbix_server_alertscriptspath: /usr/lib/zabbix/alertscripts
@@ -61,8 +61,9 @@ zabbix_server_historyindexcachesize: 4M
 zabbix_server_historystoragedateindex: false
 zabbix_server_historystoragetypes: uint,dbl,str,log,text
 zabbix_server_housekeepingfrequency: 1
-zabbix_server_include_dir: /etc/zabbix/zabbix_server.conf.d
-zabbix_server_include: "{{ zabbix_server_include_dir + '/*.conf' }}"
+zabbix_server_include_dir: "{{ zabbix_server_conf_dir }}/zabbix_server.d"
+zabbix_server_include: "{{ zabbix_server_include_dir }}/*.conf"
+zabbix_server_include_mode: "0755"
 zabbix_server_javagatewayport: 10052
 zabbix_server_listenip: 0.0.0.0
 zabbix_server_listenport: 10051

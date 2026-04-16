@@ -4,6 +4,10 @@
 zabbix_web_version_check: true
 
 # zabbix_web_version:
+
+zabbix_web_packages:
+  - "{{ _zabbix_web_package }}"
+  - "{{ _zabbix_web_conf_package | default('zabbix-' ~ zabbix_web_http_server ~ '-conf') }}"
 zabbix_web_package_state: present
 zabbix_web_doubleprecision: false
 zabbix_web_conf_mode: "0640"
@@ -18,6 +22,10 @@ zabbix_server_name: "{{ inventory_hostname }}"
 zabbix_server_hostname: "{{ inventory_hostname }}"
 zabbix_server_listenport: 10051
 
+zabbix_web_user: "{{ _zabbix_web_user[zabbix_web_http_server] }}"
+zabbix_web_group: "{{ _zabbix_web_group[zabbix_web_http_server] }}"
+
+zabbix_web_vhost_location: "{{ _zabbix_web_vhost_location[zabbix_web_http_server] }}"
 zabbix_web_vhost_port: 80
 zabbix_web_vhost_tls_port: 443
 zabbix_web_vhost_listen_ip: "*"
@@ -38,8 +46,13 @@ zabbix_php_fpm_conf_listen: true
 zabbix_web_ssl_session_cache_timeout: "{{ zabbix_web_SSLSessionCacheTimeout | default('!INVALID') }}"  # Remove backwards compatability in 4.0
 zabbix_web_ssl_session_cache: "{{ zabbix_web_SSLSessionCache | default('!INVALID') }}"  # Remove backwards compatability in 4.0
 zabbix_apache_custom_includes: []
+
+zabbix_php_fpm_dir: "{{ _zabbix_php_fpm_dir }}"
+zabbix_php_fpm_listen: "{{ _zabbix_php_fpm_listen }}"
 zabbix_php_fpm_conf_user: "{{ zabbix_web_user }}"
 zabbix_php_fpm_conf_group: "{{ zabbix_web_group }}"
+zabbix_php_fpm_session: "{{ _zabbix_php_fpm_session }}"
+
 zabbix_web_php_fpm_mode: dynamic
 zabbix_web_php_fpm_max_childs: 50
 zabbix_web_php_fpm_start_servers: 5

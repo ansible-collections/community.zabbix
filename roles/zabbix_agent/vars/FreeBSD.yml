@@ -1,41 +1,16 @@
 ---
-# vars file for zabbix_agent (FreeBSD)
-
-zabbix_agent_service: zabbix_agentd
-zabbix_agent_conf: zabbix_agentd.conf
-
-# No agent2 package for bsd
+# Purposefully override these defaults
+zabbix_manage_repo: false
 zabbix_agent2: false
 
-zabbix_agent_package: "{{ _zabbix_agent_package_versions[zabbix_agent_version] }}"
+_zabbix_agent_package: "zabbix{{ zabbix_agent_version | regex_replace('\\.0?', '') }}-agent"
+_zabbix_agent_conf_dir: "/usr/local/etc/zabbix{{ zabbix_agent_version | regex_replace('\\.0?', '') }}"
+_zabbix_agent_service: zabbix_agentd
 
-zabbix_base_dir: "/usr/local/etc/{{ zabbix_agent_package | split('-') | first }}"
-zabbix_agent_include: "{{ zabbix_base_dir }}/zabbix_agentd.conf.d"
+_zabbix_agent_include_dirs:
+  - "{{ _zabbix_agent_conf_dir }}/zabbix_agentd.conf.d"
 
-zabbix_root_group: wheel
+_zabbix_agent_root_group: wheel
 
-_zabbix_agent_tlspskfile: "{{ zabbix_base_dir }}/tls_psk_auto.secret"
-_zabbix_agent_tlspskidentity_file: "{{ zabbix_base_dir }}/tls_psk_auto.identity"
-
-zabbix_valid_agent_versions:
-  "15":
-    - 7.4
-    - 7.2
-    - 7.0
-    - 6.0
-  "14":
-    - 7.4
-    - 7.2
-    - 7.0
-    - 6.0
-  "13":
-    - 7.4
-    - 7.2
-    - 7.0
-    - 6.0
-
-_zabbix_agent_package_versions:
-  "7.4": zabbix74-agent
-  "7.2": zabbix72-agent
-  "7.0": zabbix7-agent
-  "6.0": zabbix6-agent
+_zabbix_agent_link_templates:
+  - FreeBSD by Zabbix agent

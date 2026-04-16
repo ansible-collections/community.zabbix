@@ -4,10 +4,13 @@
   tags:
     - always
 
+- name: Include deprecation checks
+  include_tasks: deprecation_checks.yml
+
 - name: Determine Latest Supported Zabbix Version
-  ansible.builtin.set_fact:
-    zabbix_server_version: "{{ zabbix_valid_server_versions[ansible_facts['distribution_major_version']][0] | default(7.2) }}"
   when: zabbix_server_version is not defined
+  ansible.builtin.set_fact:
+    zabbix_server_version: "{{ (_zabbix_server_valid_versions[_os_key] | first) | default('7.4') }}"
   tags:
     - always
 
@@ -15,8 +18,8 @@
   when: zabbix_server_version_check | bool
   ansible.builtin.assert:
     that:
-      - zabbix_server_version|float in zabbix_valid_server_versions[ ansible_facts['distribution_major_version'] ]
-    fail_msg: Zabbix version {{ zabbix_server_version }} is not supported on {{ ansible_facts['distribution'] }} {{ ansible_facts['distribution_major_version'] }}
+      - (zabbix_server_version | string) in _zabbix_server_valid_versions[_os_key]
+    fail_msg: Zabbix version {{ zabbix_server_version }} is not supported on {{ _os_key }}
   tags:
     - always
 
@@ -54,7 +57,7 @@
 - name: "Configure zabbix-server"
   ansible.builtin.template:
     src: zabbix_server.conf.j2
-    dest: "{{ zabbix_server_config }}"
+    dest: "{{ zabbix_server_conf_file }}"
     owner: "{{ zabbix_os_user }}"
     group: "{{ zabbix_os_user }}"
     mode: "{{ zabbix_server_conf_mode }}"

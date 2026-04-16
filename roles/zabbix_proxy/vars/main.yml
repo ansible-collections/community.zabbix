@@ -5,3 +5,37 @@ _zabbix_proxy_database_default_port:
 
 _zabbix_proxy_database_file_dir_post72: /usr/share/zabbix/sql-scripts
 _zabbix_proxy_database_file_dir_pre72: /usr/share/zabbix-sql-scripts
+
+_os_key: "{{ (ansible_facts.os_family in ['RedHat', 'Suse']) | ternary(ansible_facts.os_family, ansible_facts.distribution) }}-{{ ansible_facts.distribution_major_version }}"
+_zabbix_proxy_valid_versions:
+  Debian-12:
+    - "7.4"
+    - "7.0"
+    - "6.0"
+  Debian-11:
+    - "7.4"
+    - "7.0"
+    - "6.0"
+  RedHat-10:
+    - "7.4"
+    - "7.0"
+  RedHat-9:
+    - "7.4"
+    - "7.0"
+    - "6.0"
+  RedHat-8:
+    - "7.4"
+    - "7.0"
+    - "6.0"
+  Suse-15:
+    - "7.4"
+    - "7.0"
+    - "6.0"
+  Ubuntu-24:
+    - "7.4"
+    - "7.0"
+    - "6.0"
+  Ubuntu-22:
+    - "7.4"
+    - "7.0"
+    - "6.0"
