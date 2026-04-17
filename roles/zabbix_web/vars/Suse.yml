@@ -12,6 +12,7 @@ _zabbix_web_vhost_location:
 _apache_log: apache2
 _apache_service: apache2
 
+_zabbix_web_create_php_fpm: "{{ zabbix_web_http_server != 'apache' }}"
 _zabbix_php_fpm_dir: "/etc/php{{ zabbix_web_php_installed_version }}/fpm/php-fpm.d"
 _zabbix_php_fpm_session: "/var/lib/php{{ zabbix_web_php_installed_version }}/sessions"
 _zabbix_php_fpm_listen: /run/php-fpm/zabbix.sock
