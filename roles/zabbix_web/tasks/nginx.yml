@@ -27,8 +27,8 @@
   ansible.builtin.template:
     src: nginx_vhost.conf.j2
     dest: "{{ zabbix_web_vhost_location }}"
-    owner: "{{ zabbix_web_user }}"
-    group: "{{ zabbix_web_group }}"
+    owner: root
+    group: root
     mode: 0644
   vars:
     _document_root: "{{ zabbix_web_version is version('7.2', '>=') | ternary('/usr/share/zabbix/ui','/usr/share/zabbix') }}"
@@ -40,3 +40,28 @@
     - restart nginx
   tags:
     - config
+
+- name: Debian family symlinks
+  when:
+    - ansible_facts['os_family'] == 'Debian'
+    - zabbix_web_create_vhost
+  become: true
+  tags:
+    - config
+  block:
+    - name: Add symlinks
+      when: item.is_required | default(true)
+      ansible.builtin.file:
+        path: "{{ item.path }}"
+        state: link
+        src: "{{ item.src }}"
+        owner: root
+        group: root
+      loop:
+        - path: /etc/nginx/conf.d/zabbix.conf
+          src: "{{ zabbix_web_vhost_location }}"
+          is_required: "{{ zabbix_web_vhost_location != '/etc/nginx/conf.d/zabbix.conf' }}"
+      loop_control:
+        label: "{{ item.path }}"
+      notify:
+        - restart nginx

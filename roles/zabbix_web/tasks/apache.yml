@@ -3,8 +3,8 @@
   ansible.builtin.template:
     src: apache_vhost.conf.j2
     dest: "{{ zabbix_web_vhost_location }}"
-    owner: "{{ zabbix_web_user }}"
-    group: "{{ zabbix_web_group }}"
+    owner: root
+    group: root
     mode: 0644
   vars:
     _document_root: "{{ zabbix_web_version is version('7.2', '>=') | ternary('/usr/share/zabbix/ui','/usr/share/zabbix') }}"
@@ -15,15 +15,39 @@
   tags:
     - config
 
-- name: "Apache | Enable Site (Debian Only)"
-  ansible.builtin.file:
-    src: "{{ zabbix_web_vhost_location }}"
-    dest: /etc/apache2/sites-enabled/zabbix.conf
-    state: link
-    owner: "{{ zabbix_web_user }}"
-    group: "{{ zabbix_web_group }}"
-    mode: 0644
+- name: Debian family symlinks
+  when:
+    - ansible_facts['os_family'] == 'Debian'
+    - zabbix_web_create_vhost
   become: true
-  when: ansible_facts['os_family'] == 'Debian' and zabbix_web_create_vhost
   tags:
     - config
+  block:
+    - name: Remove symlinks
+      ansible.builtin.file:
+        state: absent
+        path: "{{ item }}"
+      loop:
+        - /etc/apache2/mods-enabled/zabbix.conf
+        - /etc/apache2/sites-enabled/000-default.conf  # XXX should this be our responsibility?
+      notify:
+        - restart apache
+
+    - name: Add symlinks
+      when: item.is_required | default(true)
+      ansible.builtin.file:
+        path: "{{ item.path }}"
+        state: link
+        src: "{{ item.src }}"
+        owner: root
+        group: root
+      loop:
+        - path: /etc/apache2/sites-available/zabbix.conf
+          src: "{{ zabbix_web_vhost_location }}"
+          is_required: "{{ zabbix_web_vhost_location not in ['/etc/apache2/sites-available/zabbix.conf', '/etc/apache2/sites-enabled/zabbix.conf'] }}"
+        - path: /etc/apache2/sites-enabled/zabbix.conf
+          src: ../sites-available/zabbix.conf
+      loop_control:
+        label: "{{ item.path }}"
+      notify:
+        - restart apache
