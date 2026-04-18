@@ -132,7 +132,7 @@ The following is an overview of all available configuration defaults for this ro
 * `zabbix_web_ssl_session_cache_timeout`: Number of seconds before an SSL session expires in the Session Cache
 * `zabbix_web_SSLCryptoDevice`: Enable use of a cryptographic hardware accelerator
 * `zabbix_apache_custom_includes`: Configure custom includes. Default: `[]`
-* `zabbix_web_tls_http2`: Bool (default:  False) if using http2
+* `zabbix_web_tls_http2`: Bool (default: `false`)
 * `zabbix_web_ssl_session_protocols`: Space seperated list of ssl protocols to explicitly allow (Nginx only)
 * `zabbix_web_ssl_session_prefer_server_ciphers`: (`on`/`off`)  Should server ciphers be prefered over client ciphers (Nginx only)
 * `zabbix_web_ssl_session_stapling`: (`on`/`off`)  Should enable/disable stapling of OCSP responses by server (Nginx only)

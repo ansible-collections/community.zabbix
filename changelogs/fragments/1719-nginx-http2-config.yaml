@@ -1,2 +1,2 @@
 bugfixes:
-  - zabbix_web - nginx vhost template for RHEL10
+  - zabbix_web - nginx vhost template now selects HTTP/2 syntax based on the installed Nginx version.

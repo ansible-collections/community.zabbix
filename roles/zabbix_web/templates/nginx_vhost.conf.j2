@@ -75,14 +75,12 @@ server {
 }
 
 {% if zabbix_web_tls|default(false) %}
-{% set _zabbix_web_use_http2_directive = zabbix_web_tls_http2 and ansible_facts['os_family'] == 'RedHat' and ansible_facts['distribution_major_version'] is version('10', '>=') %}
-{% set _zabbix_web_http2_listen_parameter = ' http2' if zabbix_web_tls_http2 and not _zabbix_web_use_http2_directive else '' %}
 server {
-    listen {{ zabbix_web_vhost_tls_port }} ssl{{ _zabbix_web_http2_listen_parameter }};
-    listen [::]:{{ zabbix_web_vhost_tls_port }} ssl{{ _zabbix_web_http2_listen_parameter }};
-    {{ 'http2 on;' if _zabbix_web_use_http2_directive else '' }}
+    listen {{ zabbix_web_vhost_tls_port }} ssl{{ zabbix_web_http2_listen_option | default('') }};
+    listen [::]:{{ zabbix_web_vhost_tls_port }} ssl{{ zabbix_web_http2_listen_option | default('') }};
+    {{ zabbix_web_http2_directive | default('') }}
     server_tokens off;
-    server_name {{ zabbix_api_server_url }}{%- for alias in zabbix_url_aliases %} {{ alias }}{%- endfor %}; 
+    server_name {{ zabbix_api_server_url }}{%- for alias in zabbix_url_aliases %} {{ alias }}{%- endfor %};
     ssl_certificate {{ zabbix_web_tls_crt }};
     ssl_certificate_key {{ zabbix_web_tls_key }};
     {{ (zabbix_web_ssl_cipher_suite is defined and zabbix_web_ssl_cipher_suite is not none) | ternary('', '# ') }}ssl_ciphers {{ zabbix_web_ssl_cipher_suite | default('') }};
