@@ -76,10 +76,8 @@ server {
 
 {% if zabbix_web_tls|default(false) %}
 server {
-    listen {{ zabbix_web_vhost_tls_port }} ssl;
-    {{ 'http2 on;' if zabbix_web_ssl_http2 else '' }}
-    listen [::]:{{ zabbix_web_vhost_tls_port }} ssl
-    {{ 'http2 on;' if zabbix_web_ssl_http2 else '' }};
+    listen {{ zabbix_web_vhost_tls_port }} ssl {{ 'http2' if zabbix_web_ssl_http2 else '' }};
+    listen [::]:{{ zabbix_web_vhost_tls_port }} ssl {{ 'http2' if zabbix_web_ssl_http2 else '' }};
     server_tokens off;
     server_name {{ zabbix_api_server_url }} {% for alias in zabbix_url_aliases -%}{{ alias -}} {% endfor %};
 
