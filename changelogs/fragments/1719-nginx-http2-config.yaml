@@ -1,0 +1,2 @@
+bugfixes:
+  - zabbix_web - nginx vhost template for RHEL10
