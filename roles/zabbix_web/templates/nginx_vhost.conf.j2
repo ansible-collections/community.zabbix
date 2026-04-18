@@ -4,7 +4,7 @@ server {
     listen {{ zabbix_web_vhost_port }};
     listen [::]:{{ zabbix_web_vhost_port }};
     server_tokens off;
-    server_name {{ zabbix_api_server_url }} {% for alias in zabbix_url_aliases -%}{{ alias -}} {% endfor %};
+    server_name {{ zabbix_api_server_url }}{%- for alias in zabbix_url_aliases %} {{ alias }}{%- endfor %};
 
     {% if zabbix_web_redirect|default(false) and zabbix_web_tls|default(false) %}
     return 301 https://{{ zabbix_api_server_url }}$request_uri;
@@ -82,8 +82,7 @@ server {
     listen [::]:{{ zabbix_web_vhost_tls_port }} ssl{{ _zabbix_web_http2_listen_parameter }};
     {{ 'http2 on;' if _zabbix_web_use_http2_directive else '' }}
     server_tokens off;
-    server_name {{ zabbix_api_server_url }} {% for alias in zabbix_url_aliases -%}{{ alias -}} {% endfor %};
-
+    server_name {{ zabbix_api_server_url }}{%- for alias in zabbix_url_aliases %} {{ alias }}{%- endfor %}; 
     ssl_certificate {{ zabbix_web_tls_crt }};
     ssl_certificate_key {{ zabbix_web_tls_key }};
     {{ (zabbix_web_ssl_cipher_suite is defined and zabbix_web_ssl_cipher_suite is not none) | ternary('', '# ') }}ssl_ciphers {{ zabbix_web_ssl_cipher_suite | default('') }};
