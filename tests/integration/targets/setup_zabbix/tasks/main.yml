@@ -1,28 +1,59 @@
 ---
-- name: get zabbix version
-  ansible.builtin.uri:
-    url: "{{ zabbix_api_server_url }}/api_jsonrpc.php"
-    method: POST
-    body:
-      jsonrpc: "2.0"
-      method: "apiinfo.version"
-      params: []
-      id: "1"
-    body_format: json
-    status_code: 200
-  retries: 60
-  delay: 5
-  until: zabbix_version_result is defined and 'json' in zabbix_version_result and 'result' in zabbix_version_result.json
-  register: zabbix_version_result
+- name: Check for cached Zabbix setup data
+  ansible.builtin.stat:
+    path: "{{ zabbix_setup_cache_file }}"
+  register: zabbix_setup_cache_stat
 
-- name: set zabbix_version variable
+- name: Load cached Zabbix setup data
+  when: zabbix_setup_cache_stat.stat.exists
+  block:
+    - name: Read cached Zabbix setup data
+      ansible.builtin.slurp:
+        path: "{{ zabbix_setup_cache_file }}"
+      register: zabbix_setup_cache_raw
+
+    - name: Restore cached Zabbix setup data
+      ansible.builtin.set_fact:
+        zabbix_setup_cache: "{{ zabbix_setup_cache_raw.content | b64decode | from_json }}"
+
+- name: Probe Zabbix API when cache is missing
+  when: not zabbix_setup_cache_stat.stat.exists
+  block:
+    - name: Get Zabbix version
+      ansible.builtin.uri:
+        url: "{{ zabbix_api_server_url }}/api_jsonrpc.php"
+        method: POST
+        body:
+          jsonrpc: "2.0"
+          method: "apiinfo.version"
+          params: []
+          id: "1"
+        body_format: json
+        status_code: 200
+      retries: 60
+      delay: 5
+      until: zabbix_version_result is defined and 'json' in zabbix_version_result and 'result' in zabbix_version_result.json
+      register: zabbix_version_result
+
+    - name: Build Zabbix setup cache data
+      ansible.builtin.set_fact:
+        zabbix_setup_cache:
+          zabbix_version: >-
+            {{ [0,1]
+              | map('extract', zabbix_version_result.json.result.split('.'))
+              | list
+              | join('.')
+            }}
+
+    - name: Save Zabbix setup cache data
+      ansible.builtin.copy:
+        content: "{{ zabbix_setup_cache | to_nice_json }}"
+        dest: "{{ zabbix_setup_cache_file }}"
+        mode: "0600"
+
+- name: Set Zabbix connection variables
   ansible.builtin.set_fact:
-    zabbix_version: >-
-      {{ [0,1]
-        | map('extract', zabbix_version_result.json.result.split('.'))
-        | list
-        | join('.')
-      }}
+    zabbix_version: "{{ zabbix_setup_cache.zabbix_version }}"
     ansible_network_os: community.zabbix.zabbix
     ansible_connection: httpapi
     # ansible_zabbix_auth_key: 8ec0d52432c15c91fcafe9888500cf9a607f44091ab554dbee860f6b44fac895
@@ -35,41 +66,6 @@
     ansible_user: Admin
     ansible_httpapi_pass: zabbix
 
-- debug: var=zabbix_version
-- name: check login to zabbix for Zabbix == 6.0
-  ansible.builtin.uri:
-    url: "{{ zabbix_api_server_url }}/api_jsonrpc.php"
-    method: POST
-    body:
-      jsonrpc: "2.0"
-      method: "user.login"
-      params:
-        user: "{{ zabbix_api_login_user }}"
-        password: "{{ zabbix_api_login_pass }}"
-      id: "1"
-    body_format: json
-    status_code: 200
-  retries: 60
-  delay: 5
-  until: check_login_under64_result is defined and 'json' in check_login_under64_result and 'result' in check_login_under64_result.json
-  register: check_login_under64_result
-  when: zabbix_version is version('6.0', '==')
-
-- name: check login to zabbix for Zabbix >= 7.0
-  ansible.builtin.uri:
-    url: "{{ zabbix_api_server_url }}/api_jsonrpc.php"
-    method: POST
-    body:
-      jsonrpc: "2.0"
-      method: "user.login"
-      params:
-        username: "{{ zabbix_api_login_user }}"
-        password: "{{ zabbix_api_login_pass }}"
-      id: "1"
-    body_format: json
-    status_code: 200
-  retries: 60
-  delay: 5
-  until: check_login_result is defined and 'json' in check_login_result and 'result' in check_login_result.json
-  register: check_login_result
-  when: zabbix_version is version('7.0', '>=')
+- name: Show detected Zabbix version
+  ansible.builtin.debug:
+    var: zabbix_version
