@@ -1,6 +1,7 @@
 ---
 name: "community.zabbix.zabbix_javagateway"
 on:
+  workflow_call:
   push:
     paths:
       - "roles/zabbix_javagateway/**"
@@ -15,7 +16,9 @@ on:
       - "molecule/requirements.txt"
       - ".github/workflows/javagateway.yml"
       - "roles/zabbix_repo/**"
-jobs:
+concurrency:
+  group: gateway-${{ github.workflow }}-${{ github.event.pull_request.head.repo.full_name || github.repository }}-${{ github.event.pull_request.head.ref || github.ref }}
+  cancel-in-progress: truejobs:
   molecule:
     runs-on: ubuntu-22.04
     strategy:

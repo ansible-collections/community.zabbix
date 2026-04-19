@@ -1,0 +1,164 @@
+---
+name: plugins-integration-targeted
+on:
+  push:
+    paths:
+      - "plugins/modules/**"
+      - "tests/integration/**"
+  pull_request:
+    paths:
+      - "plugins/modules/**"
+      - "tests/integration/**"
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    outputs:
+      has_targets: ${{ steps.targets.outputs.has_targets }}
+      targets: ${{ steps.targets.outputs.targets }}
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          path: ansible_collections/community/zabbix
+
+      - name: Determine changed module test targets
+        id: targets
+        shell: bash
+        working-directory: ./ansible_collections/community/zabbix
+        run: |
+          set -euo pipefail
+
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            base_ref="origin/${{ github.base_ref }}"
+            git fetch --no-tags origin "${{ github.base_ref }}"
+            diff_range="${base_ref}...HEAD"
+          else
+            before_sha="${{ github.event.before }}"
+
+            if [[ -n "${before_sha}" && "${before_sha}" != "0000000000000000000000000000000000000000" ]]; then
+              diff_range="${before_sha}...HEAD"
+            else
+              diff_range="$(git rev-list --max-parents=0 HEAD)..HEAD"
+            fi
+          fi
+
+          mapfile -t changed_modules < <(
+            git diff --name-only "${diff_range}" -- 'plugins/modules/*.py' |
+              sed -n 's#^plugins/modules/\(.*\)\.py$#\1#p' |
+              sort -u
+          )
+
+          targets=()
+          for module in "${changed_modules[@]}"; do
+            target="test_${module}"
+            if [[ -d "tests/integration/targets/${target}" ]]; then
+              targets+=("${target}")
+            fi
+          done
+
+          mapfile -t changed_test_targets < <(
+            git diff --name-only "${diff_range}" -- 'tests/integration/targets/**' |
+              sed -n 's#^tests/integration/targets/\([^/]*\)/.*$#\1#p' |
+              sort -u
+          )
+
+          for target in "${changed_test_targets[@]}"; do
+            if [[ -d "tests/integration/targets/${target}" ]]; then
+              targets+=("${target}")
+            fi
+          done
+
+          if [[ ${#targets[@]} -gt 0 ]]; then
+            mapfile -t targets < <(printf '%s\n' "${targets[@]}" | sort -u)
+          fi
+
+          if [[ ${#targets[@]} -eq 0 ]]; then
+            echo "has_targets=false" >> "${GITHUB_OUTPUT}"
+            echo "targets=" >> "${GITHUB_OUTPUT}"
+            exit 0
+          fi
+
+          printf -v targets_csv '%s,' "${targets[@]}"
+          targets_csv="${targets_csv%,}"
+
+          echo "has_targets=true" >> "${GITHUB_OUTPUT}"
+          echo "targets=${targets_csv}" >> "${GITHUB_OUTPUT}"
+
+  integration:
+    needs: prepare
+    if: needs.prepare.outputs.has_targets == 'true'
+    runs-on: ubuntu-latest
+    name: I (${{ matrix.zabbix_container.version}} Ⓐ${{ matrix.ansible_python.ansible }}+py${{ matrix.ansible_python.python }}})
+    strategy:
+      fail-fast: false
+      matrix:
+        zabbix_container:
+          - version: "6.0"
+          - version: "7.0"
+          - version: "7.2"
+          - version: "7.4"
+        ansible_python:
+          - ansible: stable-2.16
+            python: '3.10'
+          - ansible: stable-2.16
+            python: '3.12'
+          - ansible: stable-2.17
+            python: '3.10'
+          - ansible: stable-2.17
+            python: '3.12'
+          - ansible: stable-2.18
+            python: '3.11'
+          - ansible: stable-2.18
+            python: '3.13'
+          - ansible: stable-2.19
+            python: '3.11'
+          - ansible: stable-2.19
+            python: '3.13'
+          - ansible: devel
+            python: '3.12'
+          - ansible: devel
+            python: '3.13'
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v6
+        with:
+          path: ansible_collections/community/zabbix
+
+      - name: Set up Python ${{ matrix.ansible_python.python }}
+        uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.ansible_python.python }}
+
+      - name: Install ansible-base (${{ matrix.ansible_python.ansible }})
+        run: pip install https://github.com/ansible/ansible/archive/${{ matrix.ansible_python.ansible }}.tar.gz --disable-pip-version-check
+
+      - name: Install ansible.netcommon collection
+        run: ansible-galaxy collection install ansible.netcommon -p $GITHUB_WORKSPACE
+        working-directory: ./ansible_collections/community/zabbix
+
+      - name: Zabbix container server provisioning
+        uses: hoverkraft-tech/compose-action@v2
+        with:
+          compose-file: "./ansible_collections/community/zabbix/docker-compose.yml"
+        env:
+          zabbix_version: ${{ matrix.zabbix_container.version }}
+
+      - name: Run targeted integration tests
+        env:
+          TARGETS: ${{ needs.prepare.outputs.targets }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          IFS=',' read -r -a targets <<< "${TARGETS}"
+          ansible-test integration -v --color --continue-on-error --diff --python "${{ matrix.ansible_python.python }}" --requirements --coverage "${targets[@]}"
+        working-directory: ./ansible_collections/community/zabbix
+
+      - name: Generate coverage report
+        run: ansible-test coverage xml -v --requirements --group-by command --group-by version
+        working-directory: ./ansible_collections/community/zabbix
+
+      - uses: codecov/codecov-action@v6
+        with:
+          fail_ci_if_error: false
