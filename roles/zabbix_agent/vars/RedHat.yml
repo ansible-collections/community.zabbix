@@ -7,3 +7,5 @@ _zabbix_agent_sender_package: "zabbix-sender-{{ zabbix_agent_version }}.{{ zabbi
 
 _zabbix_agent_disable_repo:
   - epel
+
+_zabbix_agent_pidfile: "/run/zabbix/{{ zabbix_agent2 | ternary('zabbix_agent2.pid', 'zabbix_agentd.pid') }}"

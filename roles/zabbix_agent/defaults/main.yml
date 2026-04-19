@@ -19,7 +19,7 @@ zabbix_agent_conf_mode: "0644"
 # Retaining backwards compatability by using the awkwardly named old variable
 zabbix_agent_detect_ip: "{{ not zabbix_agent_dont_detect_ip | default(false) }}" # True
 
-zabbix_agent_pidfile: "{{ _pidfile }}"
+zabbix_agent_pidfile: "{{ _zabbix_agent_pidfile | default('/var/run/zabbix/' ~ zabbix_agent2 | ternary('zabbix_agent2.pid', 'zabbix_agentd.pid')) }}"
 zabbix_agent_service: "{{ _zabbix_agent_service | default(zabbix_agent2 | ternary('zabbix-agent2', 'zabbix-agent')) }}"
 
 zabbix_agent_allowroot: false

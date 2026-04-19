@@ -1,4 +1,3 @@
-_pidfile: /var/run/zabbix/zabbix_agent2.pid
 _includes:
   - /etc/zabbix/zabbix_agent2.d
   - /etc/zabbix/zabbix_agent2.d/plugins.d
