@@ -1,6 +1,7 @@
 ---
 name: "community.zabbix.zabbix_agent"
 on:
+  workflow_call:
   push:
     paths:
       - "roles/zabbix_agent/**"
@@ -15,6 +16,9 @@ on:
       - "molecule/requirements.txt"
       - ".github/workflows/agent.yml"
       - "roles/zabbix_repo/**"
+concurrency:
+  group: agent-${{ github.workflow }}-${{ github.event.pull_request.head.repo.full_name || github.repository }}-${{ github.event.pull_request.head.ref || github.ref }}
+  cancel-in-progress: true
 jobs:
   base:
     runs-on: ubuntu-22.04
