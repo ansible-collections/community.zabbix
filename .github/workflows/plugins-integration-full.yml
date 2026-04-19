@@ -8,12 +8,14 @@ on:
       - "plugins/httpapi/**"
       - "plugins/module_utils/**"
       - ".github/workflows/plugins-integration*.yml"
+      - "tests/integration/targets/setup_zabbix/**"
   pull_request:
     paths:
       - "plugins/inventory/**"
       - "plugins/httpapi/**"
       - "plugins/module_utils/**"
       - ".github/workflows/plugins-integration*.yml"
+      - "tests/integration/targets/setup_zabbix/**"
 concurrency:
   group: pi-full-${{ github.workflow }}-${{ github.event.pull_request.head.repo.full_name || github.repository }}-${{ github.event.pull_request.head.ref || github.ref }}
   cancel-in-progress: true
