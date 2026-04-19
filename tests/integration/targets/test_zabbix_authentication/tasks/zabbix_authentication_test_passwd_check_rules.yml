@@ -3,6 +3,38 @@
   community.zabbix.zabbix_authentication:
     passwd_check_rules: "avoid_easy_to_guess"
 
+- name: Login to Zabbix for Zabbix == 6.0
+  ansible.builtin.uri:
+    url: "{{ zabbix_api_server_url }}/api_jsonrpc.php"
+    method: POST
+    body:
+      jsonrpc: "2.0"
+      method: "user.login"
+      params:
+        user: "{{ zabbix_api_login_user }}"
+        password: "{{ zabbix_api_login_pass }}"
+      id: "1"
+    body_format: json
+    status_code: 200
+  register: check_login_under64_result
+  when: zabbix_version is version("6.0", "==")
+
+- name: Login to Zabbix for Zabbix >= 7.0
+  ansible.builtin.uri:
+    url: "{{ zabbix_api_server_url }}/api_jsonrpc.php"
+    method: POST
+    body:
+      jsonrpc: "2.0"
+      method: "user.login"
+      params:
+        username: "{{ zabbix_api_login_user }}"
+        password: "{{ zabbix_api_login_pass }}"
+      id: "1"
+    body_format: json
+    status_code: 200
+  register: check_login_result
+  when: zabbix_version is version("7.0", ">=")
+
 - name: Set request parameters based on Zabbix version (Zabbix == 6.0)
   ansible.builtin.set_fact:
     authentication_get_body:
