@@ -47,7 +47,7 @@
         - nginx-light
       when:
         - ansible_facts.packages[item] is defined
-        - (zabbix_web_nginx_installed_version | default('')) == ''
+        - zabbix_web_nginx_installed_version is not defined
 
 - name: "Nginx | Install vhost in conf.d"
   ansible.builtin.template:
