@@ -14,7 +14,7 @@
 - name: Determine Latest Supported Zabbix Version
   when: zabbix_agent_version is not defined or zabbix_agent_version is none
   ansible.builtin.set_fact:
-    zabbix_agent_version: "{{ (_zabbix_agent_valid_versions[_os_key] | first) | default('7.4') }}"
+    zabbix_agent_version: "{{ _zabbix_agent_valid_versions[_os_key] | default(['7.4']) | first }}"
   tags:
     - always
 
