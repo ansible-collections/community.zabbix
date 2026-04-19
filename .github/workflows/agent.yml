@@ -113,10 +113,9 @@ jobs:
             ~/.ansible/collections
             ~/.ansible/roles
             ~/.cache/ansible-compat
-          key: ${{ runner.os }}-agent-${{ matrix.container.image }}-${{ hashFiles('molecule/requirements.txt', 'molecule/zabbix_agent_tests/common/collections.yml') }}
+          key: ${{ runner.os }}-molecule-galaxy-${{ hashFiles('molecule/requirements.txt', 'molecule/zabbix_agent_tests/common/collections.yml') }}
           restore-keys: |
-            ${{ runner.os }}-agent-${{ matrix.container.image }}-
-            ${{ runner.os }}-agent-
+            ${{ runner.os }}-molecule-galaxy-
 
       - name: Install specific version ansible-core
         if: matrix.container.ansible_core != null
@@ -199,10 +198,9 @@ jobs:
             ~/.ansible/collections
             ~/.ansible/roles
             ~/.cache/ansible-compat
-          key: ${{ runner.os }}-agent-${{ matrix.container.image }}-${{ hashFiles('molecule/requirements.txt', 'molecule/zabbix_agent_tests/common/collections.yml') }}
+          key: ${{ runner.os }}-molecule-galaxy-${{ hashFiles('molecule/requirements.txt', 'molecule/zabbix_agent_tests/common/collections.yml') }}
           restore-keys: |
-            ${{ runner.os }}-agent-${{ matrix.container.image }}-
-            ${{ runner.os }}-agent-
+            ${{ runner.os }}-molecule-galaxy-
 
       - name: Install specific version ansible-core
         if: matrix.container.ansible_core != null
