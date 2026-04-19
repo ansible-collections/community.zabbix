@@ -5,10 +5,12 @@ on:
     paths:
       - "plugins/modules/**"
       - "tests/integration/**"
+      - "!tests/integration/targets/setup_zabbix/**"
   pull_request:
     paths:
       - "plugins/modules/**"
       - "tests/integration/**"
+      - "!tests/integration/targets/setup_zabbix/**"
 jobs:
   prepare:
     runs-on: ubuntu-latest
@@ -59,6 +61,7 @@ jobs:
 
           mapfile -t changed_test_targets < <(
             git diff --name-only "${diff_range}" -- 'tests/integration/targets/**' |
+              grep -v '^tests/integration/targets/setup_zabbix/' |
               sed -n 's#^tests/integration/targets/\([^/]*\)/.*$#\1#p' |
               sort -u
           )
