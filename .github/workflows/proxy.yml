@@ -18,7 +18,8 @@ on:
       - "roles/zabbix_repo/**"
 concurrency:
   group: proxy-${{ github.workflow }}-${{ github.event.pull_request.head.repo.full_name || github.repository }}-${{ github.event.pull_request.head.ref || github.ref }}
-  cancel-in-progress: truejobs:
+  cancel-in-progress: true
+jobs:
   base:
     runs-on: ubuntu-22.04
     strategy:
