@@ -25,54 +25,29 @@
   tags:
     - install
 
-- name: "Nginx | Gather package facts for HTTP/2 syntax detection"
-  ansible.builtin.package_facts:
-    manager: auto
-  become: true
+- name: "Nginx | Determining Nginx version"
   when:
     - zabbix_web_create_vhost
     - zabbix_web_tls
-    - zabbix_web_tls_http2
   tags:
     - config
+  block:
+    - name: "Nginx | Gather package facts"
+      ansible.builtin.package_facts:
+        manager: auto
+      become: true
 
-- name: "Nginx | Default HTTP/2 syntax values"
-  ansible.builtin.set_fact:
-    zabbix_web_http2_directive: ""
-    zabbix_web_http2_listen_option: ""
-  when:
-    - zabbix_web_create_vhost
-    - zabbix_web_tls
-  tags:
-    - config
-
-- name: "Nginx | Detect installed Nginx version"
-  ansible.builtin.set_fact:
-    zabbix_web_nginx_installed_version: "{{ ((ansible_facts.packages[item] | first).version | split(':') | last | split('-') | first) | default('0.0.0', true) }}"
-  loop:
-    - nginx
-    - nginx-core
-    - nginx-full
-    - nginx-light
-  when:
-    - zabbix_web_create_vhost
-    - zabbix_web_tls
-    - zabbix_web_tls_http2
-    - ansible_facts.packages[item] is defined
-    - (zabbix_web_nginx_installed_version | default('')) == ''
-  tags:
-    - config
-
-- name: "Nginx | Determine HTTP/2 syntax flags"
-  ansible.builtin.set_fact:
-    zabbix_web_http2_directive: "{{ 'http2 on;' if (zabbix_web_nginx_installed_version | default('0.0.0')) is version('1.25.1', '>=') else '' }}"
-    zabbix_web_http2_listen_option: "{{ ' http2' if (zabbix_web_nginx_installed_version | default('0.0.0')) is version('1.25.1', '<') else '' }}"
-  when:
-    - zabbix_web_create_vhost
-    - zabbix_web_tls
-    - zabbix_web_tls_http2
-  tags:
-    - config
+    - name: "Nginx | Parse installed package version"
+      ansible.builtin.set_fact:
+        zabbix_web_nginx_installed_version: "{{ ((ansible_facts.packages[item] | first).version | split(':') | last | split('-') | first) | default('0.0.0', true) }}"
+      loop:
+        - nginx
+        - nginx-core
+        - nginx-full
+        - nginx-light
+      when:
+        - ansible_facts.packages[item] is defined
+        - (zabbix_web_nginx_installed_version | default('')) == ''
 
 - name: "Nginx | Install vhost in conf.d"
   ansible.builtin.template:
@@ -81,6 +56,8 @@
     owner: "{{ zabbix_web_user }}"
     group: "{{ zabbix_web_group }}"
     mode: 0644
+  vars:
+    _nginx_version: "{{ zabbix_web_nginx_installed_version | default('0.0.0') }}"
   when:
     - zabbix_web_create_vhost
   become: true

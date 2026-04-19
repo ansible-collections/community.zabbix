@@ -76,9 +76,14 @@ server {
 
 {% if zabbix_web_tls|default(false) %}
 server {
-    listen {{ zabbix_web_vhost_tls_port }} ssl{{ zabbix_web_http2_listen_option | default('') }};
-    listen [::]:{{ zabbix_web_vhost_tls_port }} ssl{{ zabbix_web_http2_listen_option | default('') }};
-    {{ zabbix_web_http2_directive | default('') }}
+    {% if _nginx_version is version('1.25.1', '>=') %}
+    listen {{ zabbix_web_vhost_tls_port }} ssl;
+    listen [::]:{{ zabbix_web_vhost_tls_port }} ssl;
+    http2 {{ zabbix_web_tls_http2 | ternary('on', 'off') }};
+    {% else %}
+    listen {{ zabbix_web_vhost_tls_port }} ssl{{ zabbix_web_tls_http2 | ternary(' http2', '') }};
+    listen [::]:{{ zabbix_web_vhost_tls_port }} ssl{{ zabbix_web_tls_http2 | ternary(' http2', '') }};
+    {% endif %}
     server_tokens off;
     server_name {{ zabbix_api_server_url }}{%- for alias in zabbix_url_aliases %} {{ alias }}{%- endfor %};
     ssl_certificate {{ zabbix_web_tls_crt }};
