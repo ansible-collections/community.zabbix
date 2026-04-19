@@ -20,7 +20,45 @@ concurrency:
   group: proxy-${{ github.workflow }}-${{ github.event.pull_request.head.repo.full_name || github.repository }}-${{ github.event.pull_request.head.ref || github.ref }}
   cancel-in-progress: true
 jobs:
+  build-collection:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v6
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v6
+        with:
+          python-version: 3.11
+          cache: pip
+          cache-dependency-path: molecule/requirements.txt
+
+      - name: Install latest pip
+        run: python -m pip install --upgrade pip
+
+      - name: Install dependencies
+        run: pip install -r molecule/requirements.txt
+
+      - name: Build the collection
+        run: |
+          # Pin versions to speed up CI
+          sed -i 's/ansible\.windows:\s*"\*"/ansible.windows: "2.8.0"/' galaxy.yml
+          sed -i 's/ansible\.netcommon:\s*"\*"/ansible.netcommon: "7.2.0"/' galaxy.yml
+          sed -i 's/ansible\.posix:\s*"\*"/ansible.posix: "2.0.0"/' galaxy.yml
+          sed -i 's/community\.general:\s*"\*"/community.general: "10.5.0"/' galaxy.yml
+          sed -i 's/community\.mysql:\s*"\*"/community.mysql: "3.13.0"/' galaxy.yml
+          sed -i 's/community\.postgresql:\s*"\*"/community.postgresql: "3.12.0"/' galaxy.yml
+
+          ansible-galaxy collection build -f
+
+      - name: Upload collection artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: proxy-collection
+          path: community-zabbix-*.tar.gz
+
   base:
+    needs: build-collection
     runs-on: ubuntu-22.04
     strategy:
       fail-fast: false
@@ -65,9 +103,23 @@ jobs:
         uses: actions/setup-python@v6
         with:
           python-version: 3.11
+          cache: pip
+          cache-dependency-path: molecule/requirements.txt
 
       - name: Install latest pip
         run: python -m pip install --upgrade pip
+
+      - name: Cache Ansible Galaxy content
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.ansible/collections
+            ~/.ansible/roles
+            ~/.cache/ansible-compat
+          key: ${{ runner.os }}-proxy-${{ matrix.container.image }}-${{ hashFiles('molecule/requirements.txt', 'molecule/default/collections.yml') }}
+          restore-keys: |
+            ${{ runner.os }}-proxy-${{ matrix.container.image }}-
+            ${{ runner.os }}-proxy-
 
       - name: Install specific version ansible-core
         if: matrix.container.ansible_core != null
@@ -76,21 +128,13 @@ jobs:
       - name: Install dependencies
         run: pip install -r molecule/requirements.txt
 
-      - name: Build the collection
-        run: |
-          # Pin versions to speed up CI
-          sed -i 's/ansible\.windows:\s*"\*"/ansible.windows: "2.8.0"/' galaxy.yml
-          sed -i 's/ansible\.netcommon:\s*"\*"/ansible.netcommon: "7.2.0"/' galaxy.yml
-          sed -i 's/ansible\.posix:\s*"\*"/ansible.posix: "2.0.0"/' galaxy.yml
-          sed -i 's/community\.general:\s*"\*"/community.general: "10.5.0"/' galaxy.yml
-          sed -i 's/community\.mysql:\s*"\*"/community.mysql: "3.13.0"/' galaxy.yml
-          sed -i 's/community\.postgresql:\s*"\*"/community.postgresql: "3.12.0"/' galaxy.yml
-
-          collection_file=$( basename $(ansible-galaxy collection build -f | awk -F" " '{print $NF}'))
-          echo "COLLECTION_FILE=$collection_file" >> $GITHUB_ENV
+      - name: Download collection artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: proxy-collection
 
       - name: Install the collection
-        run: ansible-galaxy collection install -vvvv $COLLECTION_FILE
+        run: ansible-galaxy collection install -vvvv community-zabbix-*.tar.gz
 
       - name: Run role tests
         run: >-
@@ -102,6 +146,7 @@ jobs:
           molecule test -s ${{ matrix.collection_role }}
 
   psk:
+    needs: build-collection
     runs-on: ubuntu-22.04
     strategy:
       fail-fast: false
@@ -132,9 +177,23 @@ jobs:
         uses: actions/setup-python@v6
         with:
           python-version: 3.11
+          cache: pip
+          cache-dependency-path: molecule/requirements.txt
 
       - name: Install latest pip
         run: python -m pip install --upgrade pip
+
+      - name: Cache Ansible Galaxy content
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.ansible/collections
+            ~/.ansible/roles
+            ~/.cache/ansible-compat
+          key: ${{ runner.os }}-proxy-${{ matrix.container.image }}-${{ hashFiles('molecule/requirements.txt', 'molecule/default/collections.yml') }}
+          restore-keys: |
+            ${{ runner.os }}-proxy-${{ matrix.container.image }}-
+            ${{ runner.os }}-proxy-
 
       - name: Install specific version ansible-core
         if: matrix.container.ansible_core != null
@@ -143,21 +202,13 @@ jobs:
       - name: Install dependencies
         run: pip install -r molecule/requirements.txt
 
-      - name: Build the collection
-        run: |
-          # Pin versions to speed up CI
-          sed -i 's/ansible\.windows:\s*"\*"/ansible.windows: "2.8.0"/' galaxy.yml
-          sed -i 's/ansible\.netcommon:\s*"\*"/ansible.netcommon: "7.2.0"/' galaxy.yml
-          sed -i 's/ansible\.posix:\s*"\*"/ansible.posix: "2.0.0"/' galaxy.yml
-          sed -i 's/community\.general:\s*"\*"/community.general: "10.5.0"/' galaxy.yml
-          sed -i 's/community\.mysql:\s*"\*"/community.mysql: "3.13.0"/' galaxy.yml
-          sed -i 's/community\.postgresql:\s*"\*"/community.postgresql: "3.12.0"/' galaxy.yml
-
-          collection_file=$( basename $(ansible-galaxy collection build -f | awk -F" " '{print $NF}'))
-          echo "COLLECTION_FILE=$collection_file" >> $GITHUB_ENV
+      - name: Download collection artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: proxy-collection
 
       - name: Install the collection
-        run: ansible-galaxy collection install -vvvv $COLLECTION_FILE
+        run: ansible-galaxy collection install -vvvv community-zabbix-*.tar.gz
 
       - name: Run role tests
         run: >-

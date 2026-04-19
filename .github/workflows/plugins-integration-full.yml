@@ -69,6 +69,18 @@ jobs:
         uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.ansible_python.python }}
+          cache: pip
+
+      - name: Cache Ansible content
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.ansible/collections
+            ~/.ansible/tmp
+          key: ${{ runner.os }}-plugins-full-${{ matrix.ansible_python.ansible }}-py${{ matrix.ansible_python.python }}-${{ hashFiles('ansible_collections/community/zabbix/galaxy.yml') }}
+          restore-keys: |
+            ${{ runner.os }}-plugins-full-${{ matrix.ansible_python.ansible }}-py${{ matrix.ansible_python.python }}-
+            ${{ runner.os }}-plugins-full-${{ matrix.ansible_python.ansible }}-
 
       - name: Install ansible-base (${{ matrix.ansible_python.ansible }})
         run: pip install https://github.com/ansible/ansible/archive/${{ matrix.ansible_python.ansible }}.tar.gz --disable-pip-version-check
