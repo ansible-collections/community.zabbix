@@ -5,7 +5,7 @@
   {% endfor %}
 
   ## Vhost docroot
-  DocumentRoot "/usr/share/{{ zabbix_web_version is version('7.0', '<=') | ternary('zabbix', 'zabbix/ui') }}"
+  DocumentRoot "{{ _document_root }}"
 
 {% if zabbix_apache_custom_includes is iterable and (zabbix_apache_custom_includes | length>0) %}
   {% for include in zabbix_apache_custom_includes %}
@@ -19,9 +19,7 @@
   RewriteRule ^/?(.*) https://%{SERVER_NAME}/$1 [R,L]
 {% endif %}
 
-{% set directory_paths = ['/usr/share/zabbix/conf', '/usr/share/zabbix/app', '/usr/share/zabbix/include', '/usr/share/zabbix/include/classes'] %}
-
-  <Directory "/usr/share/zabbix">
+  <Directory "{{ _document_root }}">
     Options FollowSymLinks
     AllowOverride None
     Require all granted
@@ -38,6 +36,7 @@
 
   </Directory>
 
+{% set directory_paths = [ _document_root ~ '/conf', _document_root ~ '/app', _document_root ~ '/include', _document_root ~ '/linclude/classes' ] %}
 {% for my_path in directory_paths %}
   <Directory "{{ my_path }}">
     Require all denied
@@ -71,11 +70,7 @@ SSLRandomSeed connect builtin
   {% endfor %}
 
   ## Vhost docroot
-  {% if zabbix_web_version is version('7.0', '<=') %}
-  DocumentRoot "/usr/share/zabbix"
-  {% else %}
-  DocumentRoot "/usr/share/zabbix/ui"
-  {% endif %}
+  DocumentRoot "{{ _document_root }}"
 
 {% if zabbix_apache_custom_includes is iterable and (zabbix_apache_custom_includes | length>0) %}
   {% for include in zabbix_apache_custom_includes %}
@@ -91,9 +86,7 @@ SSLRandomSeed connect builtin
   SSLCertificateKeyFile {{ zabbix_web_tls_key }}
   {{ (zabbix_web_tls_chain is defined and zabbix_web_tls_chain is not none) | ternary('', '# ') }}SSLCertificateChainFile {{ zabbix_web_tls_chain | default('') }}
 
-{% set directory_paths = ['/usr/share/zabbix/conf', '/usr/share/zabbix/app', '/usr/share/zabbix/include', '/usr/share/zabbix/include/classes'] %}
-
-  <Directory "/usr/share/zabbix">
+  <Directory "{{ _document_root }}">
     Options FollowSymLinks
     AllowOverride None
     Require all granted
@@ -110,6 +103,7 @@ SSLRandomSeed connect builtin
 
   </Directory>
 
+{% set directory_paths = [ _document_root ~ '/conf', _document_root ~ '/app', _document_root ~ '/include', _document_root ~ '/linclude/classes' ] %}
 {% for my_path in directory_paths %}
   <Directory "{{ my_path }}">
     Require all granted

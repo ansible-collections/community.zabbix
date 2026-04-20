@@ -6,6 +6,8 @@
     owner: "{{ zabbix_web_user }}"
     group: "{{ zabbix_web_group }}"
     mode: 0644
+  vars:
+    _document_root: "{{ zabbix_web_version is version('7.2', '>=') | ternary('/usr/share/zabbix/ui','/usr/share/zabbix') }}"
   when: zabbix_web_create_vhost
   become: true
   notify:

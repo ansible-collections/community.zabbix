@@ -31,6 +31,7 @@
     group: "{{ zabbix_web_group }}"
     mode: 0644
   vars:
+    _document_root: "{{ zabbix_web_version is version('7.2', '>=') | ternary('/usr/share/zabbix/ui','/usr/share/zabbix') }}"
     _nginx_version: "{{ zabbix_web_nginx_installed_version | default('0.0.0') }}"
   when:
     - zabbix_web_create_vhost
