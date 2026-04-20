@@ -25,6 +25,30 @@
   tags:
     - install
 
+- name: "Nginx | Determining Nginx version"
+  when:
+    - zabbix_web_create_vhost
+    - zabbix_web_tls
+  tags:
+    - config
+  block:
+    - name: "Nginx | Gather package facts"
+      ansible.builtin.package_facts:
+        manager: auto
+      become: true
+
+    - name: "Nginx | Parse installed package version"
+      ansible.builtin.set_fact:
+        zabbix_web_nginx_installed_version: "{{ (ansible_facts.packages[item] | first).version | regex_search('\\d+\\.\\d+\\.\\d+') }}"
+      loop:
+        - nginx
+        - nginx-core
+        - nginx-full
+        - nginx-light
+      when:
+        - item in ansible_facts.packages
+        - zabbix_web_nginx_installed_version is not defined
+
 - name: "Nginx | Install vhost in conf.d"
   ansible.builtin.template:
     src: nginx_vhost.conf.j2
@@ -32,6 +56,8 @@
     owner: "{{ zabbix_web_user }}"
     group: "{{ zabbix_web_group }}"
     mode: 0644
+  vars:
+    _nginx_version: "{{ zabbix_web_nginx_installed_version | default('0.0.0') }}"
   when:
     - zabbix_web_create_vhost
   become: true

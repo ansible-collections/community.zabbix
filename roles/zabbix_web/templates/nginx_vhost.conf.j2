@@ -4,7 +4,7 @@ server {
     listen {{ zabbix_web_vhost_port }};
     listen [::]:{{ zabbix_web_vhost_port }};
     server_tokens off;
-    server_name {{ zabbix_api_server_url }} {% for alias in zabbix_url_aliases -%}{{ alias -}} {% endfor %};
+    server_name {{ zabbix_api_server_url }}{%- for alias in zabbix_url_aliases %} {{ alias }}{%- endfor %};
 
     {% if zabbix_web_redirect|default(false) and zabbix_web_tls|default(false) %}
     return 301 https://{{ zabbix_api_server_url }}$request_uri;
@@ -76,13 +76,16 @@ server {
 
 {% if zabbix_web_tls|default(false) %}
 server {
+    {% if _nginx_version is version('1.25.1', '>=') %}
     listen {{ zabbix_web_vhost_tls_port }} ssl;
-    {{ 'http2 on;' if zabbix_web_ssl_http2 else '' }}
-    listen [::]:{{ zabbix_web_vhost_tls_port }} ssl
-    {{ 'http2 on;' if zabbix_web_ssl_http2 else '' }};
+    listen [::]:{{ zabbix_web_vhost_tls_port }} ssl;
+    http2 {{ zabbix_web_tls_http2 | ternary('on', 'off') }};
+    {% else %}
+    listen {{ zabbix_web_vhost_tls_port }} ssl{{ zabbix_web_tls_http2 | ternary(' http2', '') }};
+    listen [::]:{{ zabbix_web_vhost_tls_port }} ssl{{ zabbix_web_tls_http2 | ternary(' http2', '') }};
+    {% endif %}
     server_tokens off;
-    server_name {{ zabbix_api_server_url }} {% for alias in zabbix_url_aliases -%}{{ alias -}} {% endfor %};
-
+    server_name {{ zabbix_api_server_url }}{%- for alias in zabbix_url_aliases %} {{ alias }}{%- endfor %};
     ssl_certificate {{ zabbix_web_tls_crt }};
     ssl_certificate_key {{ zabbix_web_tls_key }};
     {{ (zabbix_web_ssl_cipher_suite is defined and zabbix_web_ssl_cipher_suite is not none) | ternary('', '# ') }}ssl_ciphers {{ zabbix_web_ssl_cipher_suite | default('') }};
