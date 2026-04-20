@@ -23,6 +23,7 @@ zabbix_web_vhost_tls_port: 443
 zabbix_web_vhost_listen_ip: "*"
 zabbix_web_tls: false
 zabbix_web_tls_http2: false
+zabbix_web_tls_http2: "{{ zabbix_web_ssl_http2 | default(false) }}"
 zabbix_timezone: Europe/Amsterdam
 zabbix_php_fpm_conf_listen: true
 # zabbix_web_tls_crt: /etc/pki/server.crt
