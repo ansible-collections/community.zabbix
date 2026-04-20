@@ -1,4 +1,56 @@
-# Nginx configuration for Zabbix Web
+{% macro common_config() %}
+        root    {{ _document_root }};
+
+        index   index.php;
+
+        location = /favicon.ico {
+                log_not_found   off;
+        }
+
+        location / {
+                try_files       $uri $uri/ =404;
+        }
+
+        location /assets/ {
+                access_log      off;
+                expires         10d;
+        }
+
+        location ~ /\.ht {
+                deny            all;
+        }
+
+        location ~ /(api\/|conf[^\.]|include|locale) {
+                deny            all;
+                return          404;
+        }
+
+        location ~ [^/]\.php(/|$) {
+                fastcgi_pass    unix:{{ zabbix_php_fpm_listen }};
+                fastcgi_split_path_info ^(.+\.php)(/.+)$;
+                fastcgi_index   index.php;
+
+                fastcgi_param   DOCUMENT_ROOT   {{ _document_root }};
+                fastcgi_param   SCRIPT_FILENAME {{ _document_root }}$fastcgi_script_name;
+                fastcgi_param   PATH_TRANSLATED {{ _document_root }}$fastcgi_script_name;
+
+                include fastcgi_params;
+                fastcgi_param   QUERY_STRING    $query_string;
+                fastcgi_param   REQUEST_METHOD  $request_method;
+                fastcgi_param   CONTENT_TYPE    $content_type;
+                fastcgi_param   CONTENT_LENGTH  $content_length;
+
+                fastcgi_intercept_errors        on;
+                fastcgi_ignore_client_abort     off;
+                fastcgi_connect_timeout         60;
+                fastcgi_send_timeout            180;
+                fastcgi_read_timeout            180;
+                fastcgi_buffer_size             128k;
+                fastcgi_buffers                 4 256k;
+                fastcgi_busy_buffers_size       256k;
+                fastcgi_temp_file_write_size    256k;
+        }
+{% endmacro %}
 
 server {
     listen {{ zabbix_web_vhost_port }};
@@ -9,58 +61,7 @@ server {
     {% if zabbix_web_redirect|default(false) and zabbix_web_tls|default(false) %}
     return 301 https://{{ zabbix_api_server_url }}$request_uri;
     {% else %}
-
-    root    {{ _document_root }};
-
-    index   index.php;
-
-    location = /favicon.ico {
-        log_not_found   off;
-    }
-
-    location / {
-        try_files       $uri $uri/ =404;
-    }
-
-    location /assets/ {
-        access_log      off;
-        expires         10d;
-    }
-
-    location ~ /\.ht {
-        deny            all;
-    }
-
-    location ~ /(api\/|conf[^\.]|include|locale) {
-        deny            all;
-        return          404;
-    }
-
-    location ~ [^/]\.php(/|$) {
-        fastcgi_pass    unix:{{ zabbix_php_fpm_listen }};
-        fastcgi_split_path_info ^(.+\.php)(/.+)$;
-        fastcgi_index   index.php;
-
-        fastcgi_param   DOCUMENT_ROOT   {{ _document_root }};
-        fastcgi_param   SCRIPT_FILENAME {{ _document_root }}$fastcgi_script_name;
-        fastcgi_param   PATH_TRANSLATED {{ _document_root }}$fastcgi_script_name;
-
-        include fastcgi_params;
-        fastcgi_param   QUERY_STRING    $query_string;
-        fastcgi_param   REQUEST_METHOD  $request_method;
-        fastcgi_param   CONTENT_TYPE    $content_type;
-        fastcgi_param   CONTENT_LENGTH  $content_length;
-
-        fastcgi_intercept_errors        on;
-        fastcgi_ignore_client_abort     off;
-        fastcgi_connect_timeout         60;
-        fastcgi_send_timeout            180;
-        fastcgi_read_timeout            180;
-        fastcgi_buffer_size             128k;
-        fastcgi_buffers                 4 256k;
-        fastcgi_busy_buffers_size       256k;
-        fastcgi_temp_file_write_size    256k;
-    }
+{{ common_config() }}
     {% endif %}
 }
 
@@ -85,56 +86,6 @@ server {
     {{ (zabbix_web_ssl_session_prefer_server_ciphers is defined and zabbix_web_ssl_session_prefer_server_ciphers is not none) | ternary('', '# ') }}ssl_prefer_server_ciphers {{ zabbix_web_ssl_session_prefer_server_ciphers | default('') }};
     {{ (zabbix_web_ssl_session_stapling is defined and zabbix_web_ssl_session_stapling is not none) | ternary('', '# ') }}ssl_stapling {{ zabbix_web_ssl_session_stapling | default('') }};
 
-    root    {{ _document_root }};
-
-    index   index.php;
-
-    location = /favicon.ico {
-        log_not_found   off;
-    }
-
-    location / {
-        try_files       $uri $uri/ =404;
-    }
-
-    location /assets/ {
-        access_log      off;
-        expires         10d;
-    }
-
-    location ~ /\.ht {
-        deny            all;
-    }
-
-    location ~ /(api\/|conf[^\.]|include|locale) {
-        deny            all;
-        return          404;
-    }
-
-    location ~ [^/]\.php(/|$) {
-        fastcgi_pass    unix:{{ zabbix_php_fpm_listen }};
-        fastcgi_split_path_info ^(.+\.php)(/.+)$;
-        fastcgi_index   index.php;
-
-        fastcgi_param   DOCUMENT_ROOT   {{ _document_root }};
-        fastcgi_param   SCRIPT_FILENAME {{ _document_root }}$fastcgi_script_name;
-        fastcgi_param   PATH_TRANSLATED {{ _document_root }}$fastcgi_script_name;
-
-        include fastcgi_params;
-        fastcgi_param   QUERY_STRING    $query_string;
-        fastcgi_param   REQUEST_METHOD  $request_method;
-        fastcgi_param   CONTENT_TYPE    $content_type;
-        fastcgi_param   CONTENT_LENGTH  $content_length;
-
-        fastcgi_intercept_errors        on;
-        fastcgi_ignore_client_abort     off;
-        fastcgi_connect_timeout         60;
-        fastcgi_send_timeout            180;
-        fastcgi_read_timeout            180;
-        fastcgi_buffer_size             128k;
-        fastcgi_buffers                 4 256k;
-        fastcgi_busy_buffers_size       256k;
-        fastcgi_temp_file_write_size    256k;
-    }
+{{ common_config() }}
 }
 {% endif %}
