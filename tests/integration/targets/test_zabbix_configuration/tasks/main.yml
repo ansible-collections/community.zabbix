@@ -169,3 +169,124 @@
     - ExampleTemplateXML
     - ExampleTemplateYAML
     - FTP Service
+
+- name: test - import Zabbix host from YAML
+  community.zabbix.zabbix_configuration:
+    content_yaml: "{{ lookup('file', 'host.yaml') }}"
+    rules:
+      hosts:
+        createMissing: true
+        updateExisting: true
+      items:
+        createMissing: true
+        updateExisting: true
+        deleteMissing: true
+      triggers:
+        createMissing: true
+        updateExisting: true
+        deleteMissing: true
+      valueMaps:
+        createMissing: true
+        updateExisting: false
+  register: zbxconfiguration_import
+
+- name: assert that configuration was imported
+  ansible.builtin.assert:
+    that:
+      - zbxconfiguration_import.changed is sameas True
+
+- name: Test for Zabbix version < 7.0
+  when: zabbix_version is version("7.0", "<")
+  block:
+    - name: get imported host
+      ansible.builtin.uri:
+        url: "{{ zabbix_api_server_url }}/api_jsonrpc.php"
+        method: POST
+        body:
+          jsonrpc: "2.0"
+          method: "host.get"
+          params: 
+            output: "extend"
+            filter: 
+              host:
+                - "Imported_host"
+          id: "1"
+          auth: "{{ check_login_under64_result.json.result }}"
+        body_format: json
+        status_code: 200
+      retries: 5
+      delay: 5
+      until: zabbix_get_host_result is defined and 'json' in zabbix_get_host_result and 'result' in zabbix_get_host_result.json
+      register: zabbix_get_host_result
+
+    - name: assert that host was imported
+      ansible.builtin.assert:
+        that:
+          - zabbix_get_host_result.json.result[0].host == 'Imported_host'
+
+    - name: delete imported host
+      ansible.builtin.uri:
+        url: "{{ zabbix_api_server_url }}/api_jsonrpc.php"
+        method: POST
+        body:
+          jsonrpc: "2.0"
+          method: "host.delete"
+          params: 
+            - "{{ zabbix_get_host_result.json.result[0].hostid }}"
+          id: "1"
+          auth: "{{ check_login_under64_result.json.result }}"
+        body_format: json
+        status_code: 200
+      retries: 5
+      delay: 5
+      until: zabbix_delete_host_result is defined and 'json' in zabbix_delete_host_result and 'result' in zabbix_delete_host_result.json
+      register: zabbix_delete_host_result
+
+- name: Test for Zabbix version >= 7.0
+  when: zabbix_version is version("7.0", ">=")
+  block:
+    - name: get imported host
+      ansible.builtin.uri:
+        url: "{{ zabbix_api_server_url }}/api_jsonrpc.php"
+        method: POST
+        headers: 
+          Authorization: "Bearer {{ check_login_result.json.result }}"
+        body:
+          jsonrpc: "2.0"
+          method: "host.get"
+          params: 
+            output: "extend"
+            filter: 
+              host:
+                - "Imported_host"
+          id: "1"
+        body_format: json
+        status_code: 200
+      retries: 5
+      delay: 5
+      until: zabbix_get_host_result is defined and 'json' in zabbix_get_host_result and 'result' in zabbix_get_host_result.json
+      register: zabbix_get_host_result
+
+    - name: assert that host was imported
+      ansible.builtin.assert:
+        that:
+          - zabbix_get_host_result.json.result[0].host == 'Imported_host'
+
+    - name: delete imported host
+      ansible.builtin.uri:
+        url: "{{ zabbix_api_server_url }}/api_jsonrpc.php"
+        method: POST
+        headers: 
+          Authorization: "Bearer {{ check_login_result.json.result }}"
+        body:
+          jsonrpc: "2.0"
+          method: "host.delete"
+          params: 
+            - "{{ zabbix_get_host_result.json.result[0].hostid }}"
+          id: "1"
+        body_format: json
+        status_code: 200
+      retries: 5
+      delay: 5
+      until: zabbix_delete_host_result is defined and 'json' in zabbix_delete_host_result and 'result' in zabbix_delete_host_result.json
+      register: zabbix_delete_host_result
