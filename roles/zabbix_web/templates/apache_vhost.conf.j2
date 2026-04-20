@@ -4,6 +4,12 @@
   ServerAlias {{ alias }}
   {% endfor %}
 
+{% if zabbix_web_redirect | default(false) and zabbix_web_tls | default(false) %}
+  RewriteEngine On
+  RewriteCond %{HTTPS} !=on
+  RewriteRule ^/?(.*) https://%{SERVER_NAME}/$1 [R,L]
+{% endif %}
+
   ## Vhost docroot
   DocumentRoot "{{ _document_root }}"
 
@@ -11,12 +17,6 @@
   {% for include in zabbix_apache_custom_includes %}
   {{ include }}
   {% endfor %}
-{% endif %}
-
-{% if zabbix_web_redirect|default(false) and zabbix_web_tls|default(false) %}
-  RewriteEngine On
-  RewriteCond %{HTTPS} !=on
-  RewriteRule ^/?(.*) https://%{SERVER_NAME}/$1 [R,L]
 {% endif %}
 
   <Directory "{{ _document_root }}">
@@ -69,6 +69,14 @@ SSLRandomSeed connect builtin
   ServerAlias {{ alias }}
   {% endfor %}
 
+  SSLEngine on
+  {{ (zabbix_web_ssl_cipher_suite is defined and zabbix_web_ssl_cipher_suite is not none) | ternary('', '# ') }}SSLCipherSuite {{ zabbix_web_ssl_cipher_suite | default('') }}
+  {{ (zabbix_web_ssl_cipher_suite is defined and zabbix_web_ssl_cipher_suite is not none) | ternary('', '# ') }}SSLHonorCipherOrder On
+  SSLCompression off
+  SSLCertificateFile {{ zabbix_web_tls_crt }}
+  SSLCertificateKeyFile {{ zabbix_web_tls_key }}
+  {{ (zabbix_web_tls_chain is defined and zabbix_web_tls_chain is not none) | ternary('', '# ') }}SSLCertificateChainFile {{ zabbix_web_tls_chain | default('') }}
+
   ## Vhost docroot
   DocumentRoot "{{ _document_root }}"
 
@@ -77,14 +85,6 @@ SSLRandomSeed connect builtin
   {{ include }}
   {% endfor %}
 {% endif %}
-
-  SSLEngine on
-  {{ (zabbix_web_ssl_cipher_suite is defined and zabbix_web_ssl_cipher_suite is not none) | ternary('', '# ') }}SSLCipherSuite {{ zabbix_web_ssl_cipher_suite | default('') }}
-  {{ (zabbix_web_ssl_cipher_suite is defined and zabbix_web_ssl_cipher_suite is not none) | ternary('', '# ') }}SSLHonorCipherOrder On
-  SSLCompression off
-  SSLCertificateFile {{ zabbix_web_tls_crt }}
-  SSLCertificateKeyFile {{ zabbix_web_tls_key }}
-  {{ (zabbix_web_tls_chain is defined and zabbix_web_tls_chain is not none) | ternary('', '# ') }}SSLCertificateChainFile {{ zabbix_web_tls_chain | default('') }}
 
   <Directory "{{ _document_root }}">
     Options FollowSymLinks
