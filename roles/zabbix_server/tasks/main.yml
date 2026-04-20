@@ -10,7 +10,7 @@
 - name: Determine Latest Supported Zabbix Version
   when: zabbix_server_version is not defined
   ansible.builtin.set_fact:
-    zabbix_server_version: "{{ (_zabbix_server_valid_versions[_os_key] | first) | default('7.4') }}"
+    zabbix_server_version: "{{ _zabbix_server_valid_versions[_os_key] | default(['7.4']) | first }}"
   tags:
     - always
 
