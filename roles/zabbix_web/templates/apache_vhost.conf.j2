@@ -1,3 +1,47 @@
+{% macro common_config() %}
+DocumentRoot "{{ _document_root }}"
+
+{% if zabbix_apache_custom_includes is iterable and (zabbix_apache_custom_includes | length>0) %}
+  {% for include in zabbix_apache_custom_includes %}
+{{ include }}
+  {% endfor %}
+{% endif %}
+
+<Directory "{{ _document_root }}">
+  Options FollowSymLinks
+  AllowOverride None
+  Require all granted
+
+  <IfModule dir_module>
+      DirectoryIndex index.php
+  </IfModule>
+
+{% if ansible_facts['os_family'] in ["RedHat", "Suse"] %}
+  <FilesMatch \.(php|phar)$>
+      SetHandler "proxy:unix:{{ zabbix_php_fpm_listen }}|fcgi://localhost"
+  </FilesMatch>
+{% endif %}
+</Directory>
+
+{% set directory_paths = [ _document_root ~ '/conf', _document_root ~ '/app', _document_root ~ '/include', _document_root ~ '/linclude/classes' ] %}
+{% for my_path in directory_paths %}
+<Directory "{{ my_path }}">
+  Require all denied
+</Directory>
+{% endfor %}
+{% endmacro %}
+
+{% macro common_logging(_log_suffix='') %}
+  ## Logging
+  ErrorLog "/var/log/{{ _apache_log }}/{{ zabbix_api_server_url }}{{ _log_suffix }}_error.log"
+  ServerSignature Off
+  CustomLog "/var/log/{{ _apache_log }}/{{ zabbix_api_server_url }}{{ _log_suffix }}_access.log" combined
+
+  ## Rewrite rules
+  RewriteEngine On
+  RewriteRule ^$ /index.php [L]
+{% endmacro %}
+
 <VirtualHost {{ zabbix_web_vhost_listen_ip }}:{{ zabbix_web_vhost_port }}>
   ServerName {{ zabbix_api_server_url }}
   {% for alias in zabbix_url_aliases %}
@@ -8,49 +52,11 @@
   RewriteEngine On
   RewriteCond %{HTTPS} !=on
   RewriteRule ^/?(.*) https://%{SERVER_NAME}/$1 [R,L]
+{% else %}
+  {{ common_config() | indent(2) }}
+
+  {{ common_logging() | indent(2) }}
 {% endif %}
-
-  ## Vhost docroot
-  DocumentRoot "{{ _document_root }}"
-
-{% if zabbix_apache_custom_includes is iterable and (zabbix_apache_custom_includes | length>0) %}
-  {% for include in zabbix_apache_custom_includes %}
-  {{ include }}
-  {% endfor %}
-{% endif %}
-
-  <Directory "{{ _document_root }}">
-    Options FollowSymLinks
-    AllowOverride None
-    Require all granted
-
-    <IfModule dir_module>
-        DirectoryIndex index.php
-    </IfModule>
-
-{% if ansible_facts['os_family'] in ["RedHat", "Suse"] %}
-    <FilesMatch \.(php|phar)$>
-        SetHandler "proxy:unix:{{ zabbix_php_fpm_listen }}|fcgi://localhost"
-    </FilesMatch>
-{% endif %}
-
-  </Directory>
-
-{% set directory_paths = [ _document_root ~ '/conf', _document_root ~ '/app', _document_root ~ '/include', _document_root ~ '/linclude/classes' ] %}
-{% for my_path in directory_paths %}
-  <Directory "{{ my_path }}">
-    Require all denied
-  </Directory>
-
-{% endfor %}
-  ## Logging
-  ErrorLog "/var/log/{{ _apache_log }}/{{ zabbix_api_server_url }}_error.log"
-  ServerSignature Off
-  CustomLog "/var/log/{{ _apache_log }}/{{ zabbix_api_server_url }}_access.log" combined
-
-  ## Rewrite rules
-  RewriteEngine On
-  RewriteRule ^$ /index.php [L]
 </VirtualHost>
 
 {# Set up TLS vhosts #}
@@ -77,47 +83,8 @@ SSLRandomSeed connect builtin
   SSLCertificateKeyFile {{ zabbix_web_tls_key }}
   {{ (zabbix_web_tls_chain is defined and zabbix_web_tls_chain is not none) | ternary('', '# ') }}SSLCertificateChainFile {{ zabbix_web_tls_chain | default('') }}
 
-  ## Vhost docroot
-  DocumentRoot "{{ _document_root }}"
+  {{ common_config() | indent(2) }}
 
-{% if zabbix_apache_custom_includes is iterable and (zabbix_apache_custom_includes | length>0) %}
-  {% for include in zabbix_apache_custom_includes %}
-  {{ include }}
-  {% endfor %}
-{% endif %}
-
-  <Directory "{{ _document_root }}">
-    Options FollowSymLinks
-    AllowOverride None
-    Require all granted
-
-    <IfModule dir_module>
-        DirectoryIndex index.php
-    </IfModule>
-
-{% if ansible_facts['os_family'] in ["RedHat", "Suse"] %}
-    <FilesMatch \.(php|phar)$>
-        SetHandler "proxy:unix:{{ zabbix_php_fpm_listen }}|fcgi://localhost"
-    </FilesMatch>
-{% endif %}
-
-  </Directory>
-
-{% set directory_paths = [ _document_root ~ '/conf', _document_root ~ '/app', _document_root ~ '/include', _document_root ~ '/linclude/classes' ] %}
-{% for my_path in directory_paths %}
-  <Directory "{{ my_path }}">
-    Require all granted
-  </Directory>
-
-{% endfor %}
-  ## Logging
-  ErrorLog "/var/log/{{ _apache_log }}/{{ zabbix_api_server_url }}_tls_error.log"
-  ServerSignature Off
-  CustomLog "/var/log/{{ _apache_log }}/{{ zabbix_api_server_url }}_tls_access.log" combined
-
-  ## Rewrite rules
-  RewriteEngine On
-  RewriteRule ^$ /index.php [L]
-
+  {{ common_logging('_tls') | indent(2) }}
 </VirtualHost>
 {% endif %}
