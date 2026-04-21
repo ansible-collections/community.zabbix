@@ -3,6 +3,8 @@
 
         index   index.php;
 
+        client_max_body_size 5m;
+
         location = /favicon.ico {
                 log_not_found   off;
         }
@@ -11,7 +13,7 @@
                 try_files       $uri $uri/ =404;
         }
 
-        location /assets/ {
+        location /assets {
                 access_log      off;
                 expires         10d;
         }
@@ -21,6 +23,11 @@
         }
 
         location ~ /(api\/|conf[^\.]|include|locale) {
+                deny            all;
+                return          404;
+        }
+
+        location /vendor {
                 deny            all;
                 return          404;
         }
