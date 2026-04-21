@@ -23,7 +23,13 @@ DocumentRoot "{{ _document_root }}"
 {% endif %}
 </Directory>
 
-{% set directory_paths = [ _document_root ~ '/conf', _document_root ~ '/app', _document_root ~ '/include', _document_root ~ '/linclude/classes' ] %}
+{% set directory_paths = [
+     _document_root ~ '/conf',
+     _document_root ~ '/app',
+     _document_root ~ '/include',
+     _document_root ~ '/local',
+     _document_root ~ '/vendor'
+   ] %}
 {% for my_path in directory_paths %}
 <Directory "{{ my_path }}">
   Require all denied
