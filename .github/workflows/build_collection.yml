@@ -1,7 +1,16 @@
 ---
-name: "community.zabbix.build_collection"
+name: "community.zabbix.repo-build"
 on:
   workflow_call:
+  push:
+    paths:
+      - ".github/workflows/repo-build.yml"
+  pull_request:
+    paths:
+      - ".github/workflows/repo-build.yml"
+concurrency:
+  group: repo-build-${{ github.workflow }}-${{ github.event.pull_request.head.repo.full_name || github.repository }}-${{ github.event.pull_request.head.ref || github.ref }}
+  cancel-in-progress: true
 jobs:
   build-collection:
     runs-on: ubuntu-22.04
@@ -24,20 +33,30 @@ jobs:
 
       - name: Build the collection
         run: |
-          # Pin versions to speed up CI
-          sed -i 's/ansible\.windows:\s*"\*"/ansible.windows: "2.8.0"/' galaxy.yml
-          sed -i 's/ansible\.netcommon:\s*"\*"/ansible.netcommon: "7.2.0"/' galaxy.yml
-          sed -i 's/ansible\.posix:\s*"\*"/ansible.posix: "2.0.0"/' galaxy.yml
-          sed -i 's/community\.general:\s*"\*"/community.general: "10.5.0"/' galaxy.yml
-          sed -i 's/community\.mysql:\s*"\*"/community.mysql: "3.13.0"/' galaxy.yml
-          sed -i 's/community\.postgresql:\s*"\*"/community.postgresql: "3.12.0"/' galaxy.yml
-          echo '  geerlingguy.apache: "4.2.0"' >> galaxy.yml
-          echo '  geerlingguy.nginx: "3.3.0"' >> galaxy.yml
-          echo '  geerlingguy.php: "6.0.0"' >> galaxy.yml
+          yq -yi '
+            .dependencies."ansible.windows" = "2.8.0" |
+            .dependencies."ansible.netcommon" = "7.2.0" |
+            .dependencies."ansible.posix" = "2.0.0" |
+            .dependencies."community.general" = "10.5.0" |
+            .dependencies."community.mysql" = "3.13.0" |
+            .dependencies."community.postgresql" = "3.12.0"
+          ' galaxy.yml
+
           ansible-galaxy collection build -f
 
-      - name: Upload collection artifact
-        uses: actions/upload-artifact@v4
+      - name: Cache Ansible Galaxy content
+        uses: actions/cache@v4
         with:
-          name: web-collection
-          path: community-zabbix-*.tar.gz
+          path: |
+            ~/.ansible/collections
+            ~/.ansible/roles
+            ~/.cache/ansible-compat
+          key: ${{ runner.os }}-molecule-galaxy-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-molecule-galaxy-
+
+
+      - name: Install Collections and Roles 
+        run: |
+          ansible-galaxy collection install -f -vvvv  community-zabbix-*.tar.gz
+          ansible-galaxy role install -r molecule/zabbix_web/requirements.yml
