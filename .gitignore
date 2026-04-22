@@ -21,6 +21,10 @@ venv.bak/
 .devcontainer
 local_play.yml
 antsibull-env
+inventory.yml
+playbook.yml
+module_args/
+api_request_dev.py
 
 # Ignore Dependency Roles that may get downloaded
 geerlingguy*
