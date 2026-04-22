@@ -198,7 +198,7 @@ jobs:
             ~/.ansible/collections
             ~/.ansible/roles
             ~/.cache/ansible-compat
-          key: ${{ runner.os }}-molecule-galaxy-${{ hashFiles('molecule/requirements.txt', 'molecule/zabbix_agent_tests/common/collections.yml') }}
+          key: ${{ runner.os }}-molecule-galaxy-${{ hashFiles('galaxy.yml', 'molecule/zabbix_agent_tests/common/collections.yml') }}
           restore-keys: |
             ${{ runner.os }}-molecule-galaxy-
 
