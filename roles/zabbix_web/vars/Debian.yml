@@ -6,8 +6,8 @@ _zabbix_web_group:
   apache: www-data
   nginx: www-data
 _zabbix_web_vhost_location:
-  apache: /etc/apache2/sites-available/zabbix.conf
-  nginx: /etc/nginx/conf.d/zabbix.conf
+  apache: /etc/zabbix/apache.conf
+  nginx: /etc/zabbix/nginx.conf
 
 _apache_log: apache2
 _apache_service: apache2

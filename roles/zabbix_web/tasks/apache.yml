@@ -29,6 +29,7 @@
         path: "{{ item }}"
       loop:
         - /etc/apache2/mods-enabled/zabbix.conf
+        - /etc/apache2/mods-available/zabbix.conf
         - /etc/apache2/sites-enabled/000-default.conf  # XXX should this be our responsibility?
       notify:
         - restart apache
