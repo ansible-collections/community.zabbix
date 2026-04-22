@@ -185,7 +185,6 @@ jobs:
           ansible-galaxy role install -r molecule/zabbix_web/requirements.yml
 
       - name: Run role tests
-        working-directory: molecule/zabbix_agent_tests
         run: >-
           MY_MOLECULE_CONTAINER=${{ matrix.container.image }}
           MY_MOLECULE_IMAGE=${{ matrix.container.image }}
