@@ -59,7 +59,6 @@ provisioner:
         zabbix_server_mysql_login_host: "{{ inventory_hostname }}-db"
         zabbix_server_mysql_login_user: root
         zabbix_server_mysql_login_password: changeme
-        zabbix_server_mysql_login_port: 3306
       pgsql:
         zabbix_server_database: pgsql
         zabbix_server_dbhost: "{{ inventory_hostname }}-db"
@@ -67,7 +66,6 @@ provisioner:
         zabbix_server_pgsql_login_host: "{{ inventory_hostname }}-db"
         zabbix_server_pgsql_login_user: postgres
         zabbix_server_pgsql_login_password: changeme
-        zabbix_server_pgsql_login_port: 5432
         zabbix_server_dbschema: zabbix
       apache:
         zabbix_web_http_server: apache
