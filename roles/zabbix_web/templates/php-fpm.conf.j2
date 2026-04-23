@@ -4,7 +4,7 @@ group = {{ zabbix_php_fpm_conf_group }}
 
 listen = {{ zabbix_php_fpm_listen }}
 {% if zabbix_php_fpm_conf_listen and ansible_facts['os_family'] not in ['Debian', 'Suse'] %}
-listen.acl_users = {{ zabbix_php_fpm_conf_user }}
+listen.acl_users = {{ (zabbix_php_fpm_conf_user not in ['apache', 'nginx']) | ternary(zabbix_php_fpm_conf_user, 'apache,nginx') }}
 {% endif %}
 listen.owner = {{ zabbix_php_fpm_conf_user }}
 listen.group = {{ zabbix_php_fpm_conf_group }}

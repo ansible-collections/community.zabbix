@@ -3,7 +3,7 @@ _zabbix_web_user:
   apache: wwwrun
   nginx: nginx
 _zabbix_web_group:
-  apache: wwwrun
+  apache: www
   nginx: nginx
 _zabbix_web_vhost_location:
   apache: /etc/apache2/conf.d/zabbix.conf

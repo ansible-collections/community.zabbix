@@ -90,14 +90,19 @@
 - name: "Install the web server specific tasks"
   ansible.builtin.include_tasks: "{{ zabbix_web_http_server }}.yml"
 
-- name: "Create zabbix-web directory"
+- name: "Create /etc/zabbix/web directory"
   ansible.builtin.file:
     path: /etc/zabbix/web
     owner: "{{ zabbix_php_fpm_conf_user }}"
-    group: root
+    group: "{{ _group[ansible_facts.os_family] | default(zabbix_php_fpm_conf_group) }}"
     state: directory
-    mode: 0755
+    mode: "{{ _mode[ansible_facts.os_family] | default('0755') }}"
   become: true
+  vars:
+    _group:
+      Debian: root
+    _mode:
+      Suse: "0750"
   tags:
     - install
     - config
