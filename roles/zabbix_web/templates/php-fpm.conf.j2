@@ -4,10 +4,10 @@ group = {{ zabbix_php_fpm_conf_group }}
 
 listen = {{ zabbix_php_fpm_listen }}
 {% if zabbix_php_fpm_conf_listen and ansible_facts['os_family'] not in ['Debian', 'Suse'] %}
-listen.acl_users = {{ zabbix_php_fpm_conf_user }}
+listen.acl_users = {{ (zabbix_php_fpm_conf_user not in ['apache', 'nginx']) | ternary(zabbix_php_fpm_conf_user, 'apache,nginx') }}
 {% endif %}
 listen.owner = {{ zabbix_php_fpm_conf_user }}
-listen.group = {{ _nginx_group if zabbix_web_http_server=='nginx' else _apache_group }}
+listen.group = {{ zabbix_php_fpm_conf_group }}
 listen.mode = 0660
 listen.allowed_clients = 127.0.0.1
 

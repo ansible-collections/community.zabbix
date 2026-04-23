@@ -4,16 +4,16 @@
   tags:
     - always
 
-- name: Determine Latest Supported Zabbix Version
-  ansible.builtin.set_fact:
-    zabbix_web_version: "{{ zabbix_valid_web_versions[ansible_facts['distribution_major_version']][0] | default(7.2) }}"
-  when: zabbix_web_version is not defined
-  tags:
-    - always
-
 - name: Set More Variables
   ansible.builtin.set_fact:
     zabbix_db_type_long: "{{ 'postgresql' if zabbix_server_database == 'pgsql' else 'mysql' }}"
+  tags:
+    - always
+
+- name: Determine Latest Supported Zabbix Version
+  when: zabbix_web_version is not defined
+  ansible.builtin.set_fact:
+    zabbix_web_version: "{{ _zabbix_web_valid_versions[_os_key] | default(['7.4']) | first }}"
   tags:
     - always
 
@@ -21,13 +21,14 @@
   when: zabbix_web_version_check | bool
   ansible.builtin.assert:
     that:
-      - "{{ zabbix_web_version|float in zabbix_valid_web_versions[ ansible_facts['distribution_major_version'] ] }}"
-    fail_msg: Zabbix version {{ zabbix_web_version }} is not supported on {{ ansible_facts['distribution'] }} {{ ansible_facts['distribution_major_version'] }}
+      - (zabbix_web_version | string) in _zabbix_web_valid_versions[_os_key]
+    fail_msg: Zabbix version {{ zabbix_web_version }} is not supported on {{ _os_key }}
   tags:
     - always
 
 - name: Determine PHP Version
-  ansible.builtin.shell: php --version | head -1 | awk '{ print $2 }' | awk -F '.' '{print $1"."$2}'
+  ansible.builtin.command:
+    cmd: php --version
   register: _zabbix_web_php_installed_version
   changed_when: false
   tags:
@@ -36,16 +37,13 @@
 
 - name: Set PHP Version
   ansible.builtin.set_fact:
-    zabbix_web_php_installed_version: "{{ _zabbix_web_php_installed_version.stdout }}"
-  tags:
-    - config
-    - install
-
-- name: Set PHP Variables
-  ansible.builtin.set_fact:
-    zabbix_php_fpm_listen: "{{ zabbix_php_fpm_listen if zabbix_php_fpm_listen is defined else _zabbix_php_fpm_listen }}"
-    zabbix_php_fpm_dir: "{{ zabbix_php_fpm_dir if zabbix_php_fpm_dir is defined else _php_fpm_dir }}"
-    zabbix_php_fpm_session: "{{ zabbix_php_fpm_session if zabbix_php_fpm_session is defined else _php_fpm_session }}"
+    zabbix_web_php_installed_version: "{{ _php_version[ansible_facts.os_family] }}"
+  vars:
+    _php_version_query: 'PHP\s*(\d+\.\d+)\.\d+'
+    _php_version:
+      Debian: "{{ _zabbix_web_php_installed_version.stdout | regex_search(_php_version_query, '\\1') | first }}" # }}"
+      RedHat: "{{ _zabbix_web_php_installed_version.stdout | regex_search(_php_version_query, '\\1') | first | regex_replace('\\.', '') }}"
+      Suse:   "{{ _zabbix_web_php_installed_version.stdout | regex_search(_php_version_query, '\\1') | first | regex_replace('(\\d+)\\.\\d+', '\\1') }}"
   tags:
     - config
     - install
@@ -58,12 +56,13 @@
     zabbix_repo_package: "zabbix-web-service"
   when: zabbix_manage_repo | default(true)
 
-- name: Include OS Specific Tasks
-  ansible.builtin.include_tasks: "{{ ansible_facts['os_family'] }}.yml"
+- name: "Configure SELinux when enabled"
+  ansible.builtin.include_tasks: selinux.yml
+  when: ansible_facts.selinux.status | default('disabled') == 'enabled'
 
-- name: "Install zabbix-web package"
+- name: "Install zabbix-web packages"
   ansible.builtin.package:
-    name: "{{ _zabbix_web_package }}"
+    name: "{{ zabbix_web_packages }}"
     state: "{{ zabbix_web_package_state }}"
     update_cache: true
     disablerepo: "{{ zabbix_web_disable_repo | default(_zabbix_web_disable_repo | default(omit)) }}"
@@ -91,14 +90,19 @@
 - name: "Install the web server specific tasks"
   ansible.builtin.include_tasks: "{{ zabbix_web_http_server }}.yml"
 
-- name: "Create zabbix-web directory"
+- name: "Create /etc/zabbix/web directory"
   ansible.builtin.file:
     path: /etc/zabbix/web
     owner: "{{ zabbix_php_fpm_conf_user }}"
-    group: root
+    group: "{{ _group[ansible_facts.os_family] | default(zabbix_php_fpm_conf_group) }}"
     state: directory
-    mode: 0755
+    mode: "{{ _mode[ansible_facts.os_family] | default('0755') }}"
   become: true
+  vars:
+    _group:
+      Debian: root
+    _mode:
+      Suse: "0750"
   tags:
     - install
     - config

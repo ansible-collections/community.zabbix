@@ -1,9 +1,0 @@
-- name: "RedHat | Setting Short PHP Version"
-  ansible.builtin.set_fact:
-    zabbix_web_php_installed_version: "{{ zabbix_web_php_installed_version | regex_replace('\\.', '') }}"
-  tags:
-    - always
-
-- name: "Configure SELinux when enabled"
-  ansible.builtin.include_tasks: selinux.yml
-  when: ansible_facts.selinux.status | default('disabled') == 'enabled'

@@ -1,30 +1,4 @@
 ---
-- name: "Nginx | Set websrv specific variables"
-  ansible.builtin.set_fact:
-    zabbix_web_user: "{{ zabbix_web_user if zabbix_web_user is defined else _nginx_user }}"
-    zabbix_web_group: "{{ zabbix_web_group if zabbix_web_group is defined else _nginx_group }}"
-    zabbix_web_vhost_location: "{{ zabbix_web_vhost_location if zabbix_web_vhost_location is defined else _nginx_vhost_location }}"
-    zabbix_nginx_log_path: "{{ zabbix_nginx_log_path if zabbix_nginx_log_path is defined else _nginx_log_path }}"
-    zabbix_nginx_service: "{{ zabbix_nginx_service if zabbix_nginx_service is defined else _nginx_service }}"
-  tags:
-    - config
-    - install
-
-- name: "Nginx | Installing Zabbix Nginx Conf"
-  package:
-    name: "{{ _zabbix_web_nginx_packages + _zabbix_web_nginx_php_dependencies | default([]) }}"
-    state: "{{ zabbix_web_package_state }}"
-    update_cache: true
-    disablerepo: "{{ zabbix_web_disable_repo | default(_zabbix_web_disable_repo | default(omit)) }}"
-  environment:
-    http_proxy: "{{ zabbix_http_proxy | default('') }}"
-    https_proxy: "{{ zabbix_https_proxy | default('') }}"
-  register: zabbix_nginx_conf_install
-  until: zabbix_nginx_conf_install is succeeded
-  become: true
-  tags:
-    - install
-
 - name: "Nginx | Determining Nginx version"
   when:
     - zabbix_web_create_vhost
@@ -53,10 +27,11 @@
   ansible.builtin.template:
     src: nginx_vhost.conf.j2
     dest: "{{ zabbix_web_vhost_location }}"
-    owner: "{{ zabbix_web_user }}"
-    group: "{{ zabbix_web_group }}"
+    owner: root
+    group: root
     mode: 0644
   vars:
+    _document_root: "{{ zabbix_web_version is version('7.2', '>=') | ternary('/usr/share/zabbix/ui','/usr/share/zabbix') }}"
     _nginx_version: "{{ zabbix_web_nginx_installed_version | default('0.0.0') }}"
   when:
     - zabbix_web_create_vhost
@@ -65,3 +40,28 @@
     - restart nginx
   tags:
     - config
+
+- name: Debian family symlinks
+  when:
+    - ansible_facts['os_family'] == 'Debian'
+    - zabbix_web_create_vhost
+  become: true
+  tags:
+    - config
+  block:
+    - name: Add symlinks
+      when: item.is_required | default(true)
+      ansible.builtin.file:
+        path: "{{ item.path }}"
+        state: link
+        src: "{{ item.src }}"
+        owner: root
+        group: root
+      loop:
+        - path: /etc/nginx/conf.d/zabbix.conf
+          src: "{{ zabbix_web_vhost_location }}"
+          is_required: "{{ zabbix_web_vhost_location != '/etc/nginx/conf.d/zabbix.conf' }}"
+      loop_control:
+        label: "{{ item.path }}"
+      notify:
+        - restart nginx

@@ -1,72 +1,99 @@
+{% macro common_config() %}
+DocumentRoot "{{ _document_root }}"
+
+{% if zabbix_apache_custom_includes is iterable and (zabbix_apache_custom_includes | length > 0) %}
+{%   for include in zabbix_apache_custom_includes %}
+{{ include }}
+{%   endfor %}
+{% endif %}
+
+<Directory "{{ _document_root }}">
+  Options FollowSymLinks
+  AllowOverride None
+  Require all granted
+
+{% if zabbix_web_create_php_fpm %}
+  <IfModule dir_module>
+      DirectoryIndex index.php
+  </IfModule>
+
+  <FilesMatch \.(php|phar)$>
+      SetHandler "proxy:unix:{{ zabbix_php_fpm_listen }}|fcgi://localhost"
+  </FilesMatch>
+{% else %}
+  <IfModule mod_php.c>
+      php_value max_execution_time 300
+      php_value memory_limit 128M
+      php_value post_max_size 16M
+      php_value upload_max_filesize 2M
+      php_value max_input_time 300
+      php_value max_input_vars 10000
+      php_value always_populate_raw_post_data -1
+  </IfModule>
+
+  <IfModule mod_php7.c>
+      php_value max_execution_time 300
+      php_value memory_limit 128M
+      php_value post_max_size 16M
+      php_value upload_max_filesize 2M
+      php_value max_input_time 300
+      php_value max_input_vars 10000
+      php_value always_populate_raw_post_data -1
+  </IfModule>
+{% endif %}
+</Directory>
+
+{% set directory_paths = [
+     _document_root ~ '/conf',
+     _document_root ~ '/app',
+     _document_root ~ '/include',
+     _document_root ~ '/local',
+     _document_root ~ '/vendor'
+   ] %}
+{% for my_path in directory_paths %}
+<Directory "{{ my_path }}">
+  Require all denied
+</Directory>
+{%   if not loop.last %}{{ "\n" }}{%   endif %}
+{% endfor %}
+{% endmacro %}
+
+{% macro common_logging(_log_suffix='') %}
+  ## Logging
+  ErrorLog "/var/log/{{ _apache_log }}/{{ zabbix_api_server_url }}{{ _log_suffix }}_error.log"
+  ServerSignature Off
+  CustomLog "/var/log/{{ _apache_log }}/{{ zabbix_api_server_url }}{{ _log_suffix }}_access.log" combined
+
+  ## Rewrite rules
+  RewriteEngine On
+  RewriteRule ^$ /index.php [L]
+{% endmacro %}
+
+{# ################# #}
+{#       PLAIN       #}
+{# ################# #}
+
 <VirtualHost {{ zabbix_web_vhost_listen_ip }}:{{ zabbix_web_vhost_port }}>
+
   ServerName {{ zabbix_api_server_url }}
   {% for alias in zabbix_url_aliases %}
   ServerAlias {{ alias }}
   {% endfor %}
 
-  ## Vhost docroot
-  DocumentRoot "/usr/share/{{ zabbix_web_version is version('7.0', '<=') | ternary('zabbix', 'zabbix/ui') }}"
-
-{% if zabbix_apache_custom_includes is iterable and (zabbix_apache_custom_includes | length>0) %}
-  {% for include in zabbix_apache_custom_includes %}
-  {{ include }}
-  {% endfor %}
-{% endif %}
-
-{% if zabbix_web_redirect|default(false) and zabbix_web_tls|default(false) %}
+{% if zabbix_web_redirect | default(false) and zabbix_web_tls | default(false) %}
   RewriteEngine On
   RewriteCond %{HTTPS} !=on
   RewriteRule ^/?(.*) https://%{SERVER_NAME}/$1 [R,L]
+{% else %}
+  {{ common_config() | indent(2) }}
+
+  {{ common_logging() | indent(2) }}
 {% endif %}
-
-{% set directory_paths = ['/usr/share/zabbix/conf', '/usr/share/zabbix/app', '/usr/share/zabbix/include', '/usr/share/zabbix/include/classes'] %}
-
-  <Directory "/usr/share/zabbix">
-  {% if apache_version|string() == '2.4' %}
-    Options FollowSymLinks
-    AllowOverride None
-    Require all granted
-  {% else %}
-    AllowOverride None
-    Order Allow,Deny
-    Allow from all
-  {% endif %}
-
-    <IfModule dir_module>
-        DirectoryIndex index.php
-    </IfModule>
-
-{% if ansible_facts['os_family'] in ["RedHat", "Suse"] %}
-    <FilesMatch \.(php|phar)$>
-        SetHandler "proxy:unix:{{ zabbix_php_fpm_listen }}|fcgi://localhost"
-    </FilesMatch>
-{% endif %}
-
-  </Directory>
-
-{% for my_path in directory_paths %}
-  <Directory "{{ my_path }}">
-  {% if apache_version|string() == '2.4' %}
-    Require all denied
-  {% else %}
-    AllowOverride None
-    Order Deny,Allow
-    Deny from all
-  {% endif %}
-  </Directory>
-
-{% endfor %}
-  ## Logging
-  ErrorLog "/var/log/{{ _apache_log }}/{{ zabbix_api_server_url }}_error.log"
-  ServerSignature Off
-  CustomLog "/var/log/{{ _apache_log }}/{{ zabbix_api_server_url }}_access.log" combined
-
-  ## Rewrite rules
-  RewriteEngine On
-  RewriteRule ^$ /index.php [L]
 </VirtualHost>
 
-{# Set up TLS vhosts #}
+{# ################# #}
+{#       HTTPS       #}
+{# ################# #}
 {% if zabbix_web_tls and zabbix_web_vhost_tls_port %}
 
 {{ (zabbix_web_SSLPassPhraseDialog is defined and zabbix_web_SSLPassPhraseDialog is not none) | ternary('', '# ') }}SSLPassPhraseDialog {{ zabbix_web_SSLPassPhraseDialog | default('') }}
@@ -77,79 +104,22 @@ SSLRandomSeed startup file:/dev/urandom  256
 SSLRandomSeed connect builtin
 
 <VirtualHost {{ zabbix_web_vhost_listen_ip }}:{{ zabbix_web_vhost_tls_port }}>
+
   ServerName {{ zabbix_api_server_url }}
   {% for alias in zabbix_url_aliases %}
   ServerAlias {{ alias }}
   {% endfor %}
 
-  ## Vhost docroot
-  {% if zabbix_web_version is version('7.0', '<=') %}
-  DocumentRoot "/usr/share/zabbix"
-  {% else %}
-  DocumentRoot "/usr/share/zabbix/ui"
-  {% endif %}
-
-{% if zabbix_apache_custom_includes is iterable and (zabbix_apache_custom_includes | length>0) %}
-  {% for include in zabbix_apache_custom_includes %}
-  {{ include }}
-  {% endfor %}
-{% endif %}
-
   SSLEngine on
   {{ (zabbix_web_ssl_cipher_suite is defined and zabbix_web_ssl_cipher_suite is not none) | ternary('', '# ') }}SSLCipherSuite {{ zabbix_web_ssl_cipher_suite | default('') }}
   {{ (zabbix_web_ssl_cipher_suite is defined and zabbix_web_ssl_cipher_suite is not none) | ternary('', '# ') }}SSLHonorCipherOrder On
-{% if apache_version|string() == '2.4' %}
   SSLCompression off
-{% endif %}
   SSLCertificateFile {{ zabbix_web_tls_crt }}
   SSLCertificateKeyFile {{ zabbix_web_tls_key }}
   {{ (zabbix_web_tls_chain is defined and zabbix_web_tls_chain is not none) | ternary('', '# ') }}SSLCertificateChainFile {{ zabbix_web_tls_chain | default('') }}
 
-{% set directory_paths = ['/usr/share/zabbix/conf', '/usr/share/zabbix/app', '/usr/share/zabbix/include', '/usr/share/zabbix/include/classes'] %}
+  {{ common_config() | indent(2) }}
 
-  <Directory "/usr/share/zabbix">
-  {% if apache_version|string() == '2.4' %}
-    Options FollowSymLinks
-    AllowOverride None
-    Require all granted
-  {% else %}
-    AllowOverride None
-    Order Allow,Deny
-    Allow from all
-  {% endif %}
-
-    <IfModule dir_module>
-        DirectoryIndex index.php
-    </IfModule>
-
-{% if ansible_facts['os_family'] in ["RedHat", "Suse"] %}
-    <FilesMatch \.(php|phar)$>
-        SetHandler "proxy:unix:{{ zabbix_php_fpm_listen }}|fcgi://localhost"
-    </FilesMatch>
-{% endif %}
-
-  </Directory>
-
-{% for my_path in directory_paths %}
-  <Directory "{{ my_path }}">
-  {% if apache_version|string() == '2.4' %}
-    Require all granted
-  {% else %}
-    AllowOverride None
-    Order Deny,Allow
-    Deny from all
-  {% endif %}
-  </Directory>
-
-{% endfor %}
-  ## Logging
-  ErrorLog "/var/log/{{ _apache_log }}/{{ zabbix_api_server_url }}_tls_error.log"
-  ServerSignature Off
-  CustomLog "/var/log/{{ _apache_log }}/{{ zabbix_api_server_url }}_tls_access.log" combined
-
-  ## Rewrite rules
-  RewriteEngine On
-  RewriteRule ^$ /index.php [L]
-
+  {{ common_logging('_tls') | indent(2) }}
 </VirtualHost>
 {% endif %}

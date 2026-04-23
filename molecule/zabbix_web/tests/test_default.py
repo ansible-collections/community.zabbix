@@ -16,7 +16,7 @@ def test_zabbix_package(host):
     package_name = f'zabbix-{webserver}-conf'
     if host.system_info.distribution == "opensuse-leap" and version == 7.0:
         package_name = f'zabbix-{webserver}-conf-php8'
-    
+
     zabbix_web = host.package(package_name)
     assert str(version) in zabbix_web.version
 
@@ -39,11 +39,11 @@ def test_zabbix_web(host):
     elif host.system_info.distribution == "opensuse-leap":
         if zabbix_websrv == "apache":
             assert zabbix_web.user == "wwwrun"
-            assert zabbix_web.group == "wwwrun"
+            assert zabbix_web.group == "www"
         elif zabbix_websrv == "nginx":
             assert zabbix_web.user == "nginx"
             assert zabbix_web.group == "nginx"
-    assert zabbix_web.mode == 0o640
+    assert zabbix_web.mode == 0o600
 
 
 def test_zabbix_api(host):
@@ -51,11 +51,12 @@ def test_zabbix_api(host):
     version = my_host['zabbix_web_version']
     zabbix_api_server_url = str(my_host["zabbix_api_server_url"])
     hostname = "http://" + zabbix_api_server_url + "/api_jsonrpc.php"
+
     if version <= 7.0:
         post_data = '{"jsonrpc": "2.0", "method": "user.login", "params": { "username": "Admin", "password": "zabbix" }, "id": 1, "auth": null}'
     else:
         post_data = '{"jsonrpc": "2.0", "method": "user.login", "params": { "username": "Admin", "password": "zabbix" }, "id": 1}'
-        
+
     headers = "Content-Type: application/json-rpc"
     command = (
         "curl -XPOST -H '"

@@ -4,7 +4,6 @@ dependency:
   enabled: true
   options:
     requirements-file: molecule/default/collections.yml
-    role-file: molecule/zabbix_web/requirements.yml
 
 driver:
   name: default
@@ -28,8 +27,8 @@ platforms:
 provisioner:
   name: ansible
   playbooks:
-    create: ../default/create.docker.yml
-    destroy: ../default/destroy.docker.yml
+    create: create.docker.yml
+    destroy: destroy.docker.yml
   env:
     # https://github.com/ansible/molecule/issues/4015#issuecomment-1680859724
     ANSIBLE_ROLES_PATH: ../../roles
@@ -38,42 +37,27 @@ provisioner:
     group_vars:
       all:
         ansible_connection: community.docker.docker
+        zabbix_server_dbuser: zabbix
+        zabbix_server_dbpassword: zabbix
+        zabbix_server_dbhost: "{{ inventory_hostname }}-db"
+        zabbix_server_dbname: zabbix
         zabbix_api_server_url: zabbix-web-${MY_MOLECULE_VERSION:-v74}-${MY_MOLECULE_DATABASE:-mysql}-${MY_MOLECULE_CONTAINER:-rockylinux10}
       v74:
-        zabbix_server_version: 7.4
         zabbix_web_version: 7.4
       v72:
-        zabbix_server_version: 7.2
         zabbix_web_version: 7.2
       v70:
-        zabbix_server_version: 7.0
         zabbix_web_version: 7.0
       v60:
-        zabbix_server_version: 6.0
         zabbix_web_version: 6.0
       mysql:
         zabbix_server_database: mysql
-        zabbix_server_dbhost: "{{ inventory_hostname }}-db"
-        zabbix_server_dbhost_run_install: false
-        zabbix_server_privileged_host: "%"
-        zabbix_server_mysql_login_host: "{{ inventory_hostname }}-db"
-        zabbix_server_mysql_login_user: root
-        zabbix_server_mysql_login_password: changeme
-        zabbix_server_mysql_login_port: 3306
       pgsql:
         zabbix_server_database: pgsql
-        zabbix_server_dbhost: "{{ inventory_hostname }}-db"
-        zabbix_server_dbhost_run_install: false
-        zabbix_server_pgsql_login_host: "{{ inventory_hostname }}-db"
-        zabbix_server_pgsql_login_user: postgres
-        zabbix_server_pgsql_login_password: changeme
-        zabbix_server_pgsql_login_port: 5432
-        zabbix_server_dbschema: zabbix
       apache:
         zabbix_web_http_server: apache
       nginx:
         zabbix_web_http_server: nginx
-        php_webserver_daemon: nginx
 
 verifier:
   name: testinfra
