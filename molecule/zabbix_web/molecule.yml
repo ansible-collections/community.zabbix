@@ -4,7 +4,6 @@ dependency:
   enabled: true
   options:
     requirements-file: molecule/default/collections.yml
-    role-file: molecule/zabbix_web/requirements.yml
 
 driver:
   name: default
@@ -71,7 +70,6 @@ provisioner:
         zabbix_web_http_server: apache
       nginx:
         zabbix_web_http_server: nginx
-        php_webserver_daemon: nginx
 
 verifier:
   name: testinfra

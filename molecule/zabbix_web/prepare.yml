@@ -26,58 +26,19 @@
         - ansible_facts['os_family'] == 'RedHat'
         - ansible_facts['distribution_major_version'] == "8"
 
-    - name: Set PHP packages (Centos 8+)
-      ansible.builtin.set_fact:
-        php_packages:
-          - php
-          - php-cli
-          - php-common
-          - php-devel
-          - php-fpm
-          - php-gd
-          - php-ldap
-          - php-mbstring
-          - php-opcache
-          - php-pdo
-          - php-pear
-          - php-pecl-apcu
-          - php-xml
-      when: ansible_facts['os_family'] == 'RedHat'
-
-    - name: Workaround for geerlingguy roles
-      ansible.builtin.set_fact:
-        ansible_distribution: "{{ ansible_facts['distribution'] }}"
-        ansible_distribution_major_version: "{{ ansible_facts['distribution_major_version'] }}"
-        ansible_distribution_version: "{{ ansible_facts['distribution_version'] }}"
-        ansible_os_family: "{{ ansible_facts['os_family'] }}"
-        ansible_processor_count: "{{ ansible_facts['processor_count'] }}"
-
-  roles:
-    - role: geerlingguy.apache
-      when:
-        - ansible_facts.os_family not in ["Debian", "Suse"]
-        - zabbix_web_http_server == "apache"
-    - role: geerlingguy.nginx
-      when:
-        - ansible_facts.os_family not in ["Debian", "Suse"]
-        - zabbix_web_http_server == "nginx"
-    - role: geerlingguy.php
-      when:
-        - ansible_facts.os_family not in ["Debian", "Suse"]
-    - role: zabbix_server
-
   tasks:
     - name: Install prerequisite packages for zabbix_web role
-      when: ansible_facts.os_family in ["Debian", "Suse"]
       package:
         name: "{{ _zabbix_web_prerequisite_packages[zabbix_web_http_server][ansible_facts.os_family] }}"
       vars:
         _zabbix_web_prerequisite_packages:
           apache:
             Debian: ["apache2", "php-cli", "php-mysql", "php-pgsql"]
+            RedHat: ["httpd", "php-cli", "php-fpm"]
             Suse: ["apache2", "php8-cli", "php8-mysql", "php8-openssl", "php8-pgsql", "php8-xmlreader", "php8-xmlwriter"]
           nginx:
             Debian: ["nginx", "php-fpm", "php-mysql", "php-pgsql"]
+            RedHat: ["nginx", "php-cli", "php-fpm"]
             Suse: ["nginx", "php8-cli", "php8-fpm", "php8-mysql", "php8-openssl", "php8-pgsql", "php8-xmlreader", "php8-xmlwriter"]
 
     - name: Debian | Enable apache modules
