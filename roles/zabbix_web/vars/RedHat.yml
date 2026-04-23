@@ -1,10 +1,6 @@
 ---
-_zabbix_web_user:
-  apache: apache
-  nginx: nginx
-_zabbix_web_group:
-  apache: apache
-  nginx: nginx
+_zabbix_web_user: apache
+_zabbix_web_group: apache
 _zabbix_web_http_service:
   apache: httpd
   nginx: nginx

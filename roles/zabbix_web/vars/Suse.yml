@@ -1,10 +1,6 @@
 ---
-_zabbix_web_user:
-  apache: wwwrun
-  nginx: nginx
-_zabbix_web_group:
-  apache: wwwrun
-  nginx: nginx
+_zabbix_web_user: wwwrun
+_zabbix_web_group: www
 _zabbix_web_http_service:
   apache: apache2
   nginx: nginx

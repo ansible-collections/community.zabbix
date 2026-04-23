@@ -31,30 +31,18 @@
       ansible.builtin.assert:
         that:
           - _zabbix_conf_php.stat.exists
-          - _zabbix_conf_php.stat.pw_name == _owner
-          - _zabbix_conf_php.stat.gr_name == _group
-          - _zabbix_conf_php.stat.mode == '0640'
+          - _zabbix_conf_php.stat.pw_name == _owner[ansible_facts.os_family]
+          - _zabbix_conf_php.stat.gr_name == _group[ansible_facts.os_family]
+          - _zabbix_conf_php.stat.mode == '0600'
       vars:
-        _owner_map:
-          apache:
-            Debian: www-data
-            RedHat: apache
-            Suse: wwwrun
-          nginx:
-            Debian: nginx
-            RedHat: nginx
-            Suse: nginx
-        _owner: "{{ _owner_map[zabbix_web_http_server][ansible_facts.os_family] }}"
-        _group_map:
-          apache:
-            Debian: www-data
-            RedHat: apache
-            Suse: www
-          nginx:
-            Debian: nginx
-            RedHat: nginx
-            Suse: nginx
-        _group: "{{ _group_map[zabbix_web_http_server][ansible_facts.os_family] }}"
+        _owner:
+          Debian: www-data
+          RedHat: apache
+          Suse: wwwrun
+        _group:
+          Debian: www-data
+          RedHat: apache
+          Suse: www
 
     - name: Test Zabbix API login
       ansible.builtin.uri:

@@ -1,10 +1,6 @@
 ---
-_zabbix_web_user:
-  apache: www-data
-  nginx: www-data
-_zabbix_web_group:
-  apache: www-data
-  nginx: www-data
+_zabbix_web_user: www-data
+_zabbix_web_group: www-data
 _zabbix_web_http_service:
   apache: apache2
   nginx: nginx
