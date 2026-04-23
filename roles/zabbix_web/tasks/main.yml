@@ -117,19 +117,37 @@
 
 - name: "Configure PHP-FPM"
   when: zabbix_web_create_php_fpm
+  become: true
   tags:
     - config
   block:
     - name: "Create PHP-FPM pool for zabbix"
       ansible.builtin.template:
         src: php-fpm.conf.j2
-        dest: "{{ zabbix_php_fpm_dir }}/zabbix.conf"
-        owner: "{{ zabbix_php_fpm_conf_user }}"
-        group: "{{ zabbix_php_fpm_conf_group }}"
+        dest: "{{ zabbix_web_php_fpm_conf_file }}"
+        owner: root
+        group: root
         mode: 0644
-      become: true
       notify:
         - restart php-fpm
+
+    - name: Debian family symlinks
+      when:
+        - ansible_facts['os_family'] == 'Debian'
+        - zabbix_web_php_fpm_conf_file == '/etc/zabbix/php-fpm.conf'
+      block:
+        - name: Add symlinks
+          ansible.builtin.file:
+            path: "{{ zabbix_php_fpm_dir }}/zabbix-php-fpm.conf"
+            state: link
+            src: "{{ zabbix_web_php_fpm_conf_file }}"
+            owner: root
+            group: root
+
+        - name: Remove legacy PHP-FPM pool
+          ansible.builtin.file:
+            path: "{{ zabbix_php_fpm_dir }}/zabbix.conf"
+            state: absent
 
     - meta: flush_handlers
 

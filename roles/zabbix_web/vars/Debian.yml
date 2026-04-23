@@ -13,8 +13,8 @@ _apache_test_cmd: apache2ctl configtest
 
 _zabbix_web_create_php_fpm: "{{ zabbix_web_http_server != 'apache' }}"
 _zabbix_php_fpm_dir: /etc/php/{{ zabbix_web_php_installed_version }}/fpm/pool.d
+_zabbix_web_php_fpm_conf_file: /etc/zabbix/php-fpm.conf
 _zabbix_php_fpm_listen: /var/run/php/zabbix.sock
-_zabbix_php_fpm_mode: "0666"
 _zabbix_php_fpm_allowed_clients: 127.0.0.1
 _zabbix_php_fpm_session: /var/lib/php/sessions/
 

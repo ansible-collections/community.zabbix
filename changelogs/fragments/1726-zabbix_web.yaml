@@ -1,3 +1,7 @@
 ---
 minor_changes:
   - change in default user, group and mode for zabbix.conf.php
+  - removed `zabbix_php_fpm_conf_listen`, didn't do anything useful
+  - added `zabbix_php_fpm_conf_listen_owner`, controls ownership and access to php-fpm socket
+  - added `zabbix_php_fpm_conf_listen_group`, controls group access to php-fpm socket
+  - added `zabbix_web_php_fpm_max_requests`, how many requests a worker will process before respawning

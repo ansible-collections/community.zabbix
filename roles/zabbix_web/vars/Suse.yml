@@ -13,7 +13,8 @@ _apache_test_cmd: start_apache2 -t
 
 _zabbix_web_create_php_fpm: "{{ zabbix_web_http_server != 'apache' }}"
 _zabbix_php_fpm_dir: "/etc/php{{ zabbix_web_php_installed_version }}/fpm/php-fpm.d"
-_zabbix_php_fpm_session: "/var/lib/php{{ zabbix_web_php_installed_version }}/sessions"
 _zabbix_php_fpm_listen: /run/php-fpm/zabbix.sock
+_zabbix_php_fpm_conf_listen_owner: "{{ (zabbix_web_http_server == 'nginx') | ternary('nginx', zabbix_web_user) }}"
+_zabbix_php_fpm_session: "/var/lib/php{{ zabbix_web_php_installed_version }}/sessions"
 
 _zabbix_web_package: "zabbix-web-{{ zabbix_server_database }}"
