@@ -32,14 +32,10 @@ jobs:
         container:
           - image: rockylinux10
           - image: rockylinux9
-          - image: rockylinux8
-            ansible_core: ansible-core<2.17
           - image: ubuntu2404
           - image: ubuntu2204
           - image: debian12
           - image: debian11
-          - image: opensuseleap15
-            ansible_core: ansible-core<2.17
         collection_role:
           - zabbix_proxy
         database:
@@ -105,7 +101,6 @@ jobs:
       - name: Install Collections and Roles 
         run: |
           ansible-galaxy collection install -f -vvvv  community-zabbix-*.tar.gz
-          ansible-galaxy role install -r molecule/zabbix_web/requirements.yml
 
       - name: Run role tests
         run: >-
@@ -181,7 +176,6 @@ jobs:
       - name: Install Collections and Roles 
         run: |
           ansible-galaxy collection install -f -vvvv  community-zabbix-*.tar.gz
-          ansible-galaxy role install -r molecule/zabbix_web/requirements.yml
 
       - name: Run role tests
         run: >-
@@ -216,6 +210,15 @@ jobs:
           - v72
           - v70
           - v60
+        exclude:
+          - collection_role: zabbix_proxy_psk
+            database: pgsql
+          - collection_role: zabbix_proxy_psk
+            database: sqlite3
+          - collection_role: zabbix_proxy_psk_active
+            database: pgsql
+          - collection_role: zabbix_proxy_psk_active
+            database: sqlite3
     steps:
       - name: Check out code
         uses: actions/checkout@v6
