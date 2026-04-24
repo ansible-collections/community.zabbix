@@ -40,7 +40,7 @@
         _db_type: "{{ item.groups | intersect(_database_groups) | first }}"
         _container:
           mysql:
-            image: "mysql:8.0"
+            image: "mysql:8.0.45"
             env: { MYSQL_ROOT_PASSWORD: changeme }
           pgsql:
             image: "timescale/timescaledb:latest-pg13"
