@@ -104,6 +104,6 @@
         login_password: "{{ zabbix_proxy_dbpassword }}"
         login_host: "{{ zabbix_proxy_dbhost }}"
         login_port: "{{ zabbix_proxy_dbport }}"
-        login_db: "{{ zabbix_proxy_dbname }}"
+        name: "{{ zabbix_proxy_dbname }}"
         state: restore
         target: "{{ zabbix_proxy_database_file_dir }}/postgresql/proxy.sql"
