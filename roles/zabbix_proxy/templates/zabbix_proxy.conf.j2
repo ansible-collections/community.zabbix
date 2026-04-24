@@ -10,10 +10,10 @@
 {{ (zabbix_proxy_allowunsupporteddbversions is defined and zabbix_proxy_allowunsupporteddbversions is not none) | ternary('','# ') }}AllowUnsupportedDBVersions={{ zabbix_proxy_allowunsupporteddbversions | default (false) | ternary('1', '0') }}
 {{ (zabbix_proxy_cachesize is defined and zabbix_proxy_cachesize is not none) | ternary('','# ') }}CacheSize={{ zabbix_proxy_cachesize | default('') }}
 
-{% if zabbix_proxy_version is version('6.4', '<=') %}
-{{ (zabbix_proxy_configfrequency is defined and zabbix_proxy_configfrequency is not none) | ternary('','# ') }}ConfigFrequency={{ zabbix_proxy_configfrequency | default('') }}
-{% else %}
+{% if zabbix_proxy_version is version('6.4', '>=') %}
 {{ (zabbix_proxy_proxyconfigfrequency is defined and zabbix_proxy_proxyconfigfrequency is not none) | ternary('','# ') }}ProxyConfigFrequency={{ zabbix_proxy_proxyconfigfrequency | default('') }}
+{% else %}
+{{ (zabbix_proxy_configfrequency is defined and zabbix_proxy_configfrequency is not none) | ternary('','# ') }}ConfigFrequency={{ zabbix_proxy_configfrequency | default('') }}
 {% endif %}
 
 
