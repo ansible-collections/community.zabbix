@@ -136,6 +136,25 @@
             login_unix_socket: "{{ zabbix_server_mysql_login_unix_socket | default(omit) }}"
             check_hostname: "{{ zabbix_server_dbtlsconnect is defined and zabbix_server_dbtlsconnect != '' }}"
 
+    - name: Show MySQL variables before Zabbix schema import
+      community.mysql.mysql_query:
+        login_host: "{{ zabbix_server_dbhost }}"
+        login_user: root
+        login_password: "{{ mysql_root_password }}"
+        query:
+          - "SELECT VERSION()"
+          - "SHOW VARIABLES LIKE 'innodb_default_row_format'"
+          - "SHOW VARIABLES LIKE 'innodb_strict_mode'"
+          - "SHOW VARIABLES LIKE 'innodb_page_size'"
+          - "SHOW VARIABLES LIKE 'sql_mode'"
+          - "SHOW VARIABLES LIKE 'character_set_server'"
+          - "SHOW VARIABLES LIKE 'collation_server'"
+      register: mysql_debug_vars
+
+    - name: Print MySQL variables
+      debug:
+        var: mysql_debug_vars
+
     - name: "MySQL | Import schema"
       community.mysql.mysql_db:
         login_user: "{{ zabbix_server_dbuser }}"
