@@ -138,9 +138,11 @@
 
     - name: Show MySQL variables before Zabbix schema import
       community.mysql.mysql_query:
+        login_user: "{{ zabbix_server_dbuser }}"
+        login_password: "{{ zabbix_server_dbpassword }}"
         login_host: "{{ zabbix_server_dbhost }}"
-        login_user: root
-        login_password: "{{ mysql_root_password }}"
+        login_port: "{{ zabbix_server_dbport }}"
+        check_hostname: "{{ zabbix_server_dbtlsconnect is defined and zabbix_server_dbtlsconnect != '' }}"
         query:
           - "SELECT VERSION()"
           - "SHOW VARIABLES LIKE 'innodb_default_row_format'"
