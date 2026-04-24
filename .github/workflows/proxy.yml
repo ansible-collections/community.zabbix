@@ -273,7 +273,6 @@ jobs:
       - name: Install Collections and Roles 
         run: |
           ansible-galaxy collection install -f -vvvv  community-zabbix-*.tar.gz
-          ansible-galaxy role install -r molecule/zabbix_web/requirements.yml
 
       - name: Run role tests
         run: >-
