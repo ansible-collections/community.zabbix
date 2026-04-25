@@ -1,0 +1,33 @@
+---
+name: prep-all
+on:
+  push:
+    branches:
+      - "*-prep"
+      - "**/*-prep"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  repo-sanity:
+    uses: ./.github/workflows/repo-sanity.yml
+
+  agent:
+    uses: ./.github/workflows/agent.yml
+
+  javagateway:
+    uses: ./.github/workflows/javagateway.yml
+
+  plugins-integration-full:
+    uses: ./.github/workflows/plugins-integration-full.yml
+
+  proxy:
+    uses: ./.github/workflows/proxy.yml
+
+  server:
+    uses: ./.github/workflows/server.yml
+
+  web:
+    uses: ./.github/workflows/web.yml

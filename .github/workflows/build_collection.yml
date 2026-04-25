@@ -1,0 +1,61 @@
+---
+name: "community.zabbix.repo-build"
+on:
+  workflow_call:
+  push:
+    paths:
+      - ".github/workflows/repo-build.yml"
+  pull_request:
+    paths:
+      - ".github/workflows/repo-build.yml"
+concurrency:
+  group: repo-build-${{ github.workflow }}-${{ github.event.pull_request.head.repo.full_name || github.repository }}-${{ github.event.pull_request.head.ref || github.ref }}
+  cancel-in-progress: true
+jobs:
+  build-collection:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v6
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v6
+        with:
+          python-version: 3.11
+          cache: pip
+          cache-dependency-path: molecule/requirements.txt
+
+      - name: Install latest pip
+        run: python -m pip install --upgrade pip yq
+
+      - name: Install dependencies
+        run: pip install -r molecule/requirements.txt
+
+      - name: Build the collection
+        run: |
+          yq -yi '
+            .dependencies."ansible.windows" = "2.8.0" |
+            .dependencies."ansible.netcommon" = "7.2.0" |
+            .dependencies."ansible.posix" = "2.0.0" |
+            .dependencies."community.general" = "10.5.0" |
+            .dependencies."community.mysql" = "3.13.0" |
+            .dependencies."community.postgresql" = "3.12.0"
+          ' galaxy.yml
+
+          ansible-galaxy collection build -f
+
+      - name: Cache Ansible Galaxy content
+        uses: actions/cache@v5
+        with:
+          path: |
+            ~/.ansible/collections
+            ~/.ansible/roles
+            ~/.cache/ansible-compat
+          key: ${{ runner.os }}-molecule-galaxy-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-molecule-galaxy-
+
+
+      - name: Install Collections and Roles 
+        run: |
+          ansible-galaxy collection install -f -vvvv  community-zabbix-*.tar.gz

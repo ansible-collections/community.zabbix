@@ -1,21 +1,28 @@
 ---
-name: plugins-integration
+name: plugins-integration-full
 on:
+  workflow_call:
   push:
     paths:
-      - "plugins/**"
-      - "tests/integration/**"
-      - ".github/workflows/plugins-integration.yml"
+      - "plugins/inventory/**"
+      - "plugins/httpapi/**"
+      - "plugins/module_utils/**"
+      - ".github/workflows/plugins-integration*.yml"
+      - "tests/integration/targets/setup_zabbix/**"
   pull_request:
     paths:
-      - "plugins/**"
-      - "tests/integration/**"
-      - ".github/workflows/plugins-integration.yml"
-
+      - "plugins/inventory/**"
+      - "plugins/httpapi/**"
+      - "plugins/module_utils/**"
+      - ".github/workflows/plugins-integration*.yml"
+      - "tests/integration/targets/setup_zabbix/**"
+concurrency:
+  group: pi-full-${{ github.workflow }}-${{ github.event.pull_request.head.repo.full_name || github.repository }}-${{ github.event.pull_request.head.ref || github.ref }}
+  cancel-in-progress: true
 jobs:
   integration:
     runs-on: ubuntu-latest
-    name: I (${{ matrix.zabbix_container.version}} Ⓐ${{ matrix.ansible }}+py${{ matrix.python }}})
+    name: I (${{ matrix.zabbix_container.version}} Ⓐ${{ matrix.ansible_python.ansible }}+py${{ matrix.ansible_python.python }}})
     strategy:
       fail-fast: false
       matrix:
@@ -24,31 +31,33 @@ jobs:
           - version: "7.0"
           - version: "7.2"
           - version: "7.4"
-        ansible:
+        ansible_python:
           # https://docs.ansible.com/projects/ansible/latest/reference_appendices/release_and_maintenance.html#ansible-core-changelogs
-          - stable-2.16
-          - stable-2.17
-          - stable-2.18
-          - stable-2.19
-          - devel
-        python:
-          - '3.10'
-          - '3.11'
-          - '3.12'
-          - '3.13'
-        exclude:
-          - ansible: stable-2.19
+          # Only test the minimum and maximum supported Python versions for each Ansible branch.
+          - ansible: stable-2.16
             python: '3.10'
-          - ansible: stable-2.18
+          - ansible: stable-2.16
+            python: '3.12'
+          - ansible: stable-2.17
             python: '3.10'
           - ansible: stable-2.17
-            python: '3.13'
-          - ansible: stable-2.16
-            python: '3.13'
-          - ansible: devel
-            python: '3.10'
-          - ansible: devel
+            python: '3.12'
+          - ansible: stable-2.18
             python: '3.11'
+          - ansible: stable-2.18
+            python: '3.13'
+          - ansible: stable-2.19
+            python: '3.11'
+          - ansible: stable-2.19
+            python: '3.13'
+          - ansible: stable-2.20
+            python: '3.12'
+          - ansible: stable-2.20
+            python: '3.14'
+          - ansible: devel
+            python: '3.12'
+          - ansible: devel
+            python: '3.14'
 
     steps:
       - name: Check out code
@@ -56,13 +65,14 @@ jobs:
         with:
           path: ansible_collections/community/zabbix
 
-      - name: Set up Python ${{ matrix.python }}
+      - name: Set up Python ${{ matrix.ansible_python.python }}
         uses: actions/setup-python@v6
         with:
-          python-version: ${{ matrix.python }}
+          python-version: ${{ matrix.ansible_python.python }}
+          cache: pip
 
-      - name: Install ansible-base (${{ matrix.ansible }})
-        run: pip install https://github.com/ansible/ansible/archive/${{ matrix.ansible }}.tar.gz --disable-pip-version-check
+      - name: Install ansible-base (${{ matrix.ansible_python.ansible }})
+        run: pip install https://github.com/ansible/ansible/archive/${{ matrix.ansible_python.ansible }}.tar.gz --disable-pip-version-check
 
       - name: Install ansible.netcommon collection
         run: ansible-galaxy collection install ansible.netcommon -p $GITHUB_WORKSPACE
@@ -72,7 +82,7 @@ jobs:
       # the Zabbix server. To do this we spin up a Docker container using the `matrix`
       # of version and ports specified earlier.
       - name: Zabbix container server provisioning
-        uses: hoverkraft-tech/compose-action@v2.5.0
+        uses: hoverkraft-tech/compose-action@v2
         with:
           compose-file: "./ansible_collections/community/zabbix/docker-compose.yml"
         env:
@@ -82,7 +92,7 @@ jobs:
       # As we need to connect to an existing docker container we can't use `--docker` here as the VMs would be on different
       # (non-routing) networks, so we run them locally and ensure any required dependencies are installed via `--requirements`
       - name: Run integration test
-        run: ansible-test integration -v --color --continue-on-error --diff --python ${{ matrix.python }} --requirements --coverage 
+        run: ansible-test integration -v --color --continue-on-error --diff --python ${{ matrix.ansible_python.python }} --requirements --coverage
         working-directory: ./ansible_collections/community/zabbix
 
         # ansible-test support producing code coverage date

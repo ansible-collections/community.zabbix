@@ -1,9 +1,12 @@
 ---
 name: repo-sanity
 on:
+  workflow_call:
   push:
   pull_request:
-
+concurrency:
+  group: sanity-${{ github.workflow }}-${{ github.event.pull_request.head.repo.full_name || github.repository }}-${{ github.event.pull_request.head.ref || github.ref }}
+  cancel-in-progress: true
 jobs:
   tox-linters:
     name: Tox-Lint (py${{ matrix.python }})
@@ -22,6 +25,7 @@ jobs:
         uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python }}
+          cache: pip
 
       - name: Install dependencies
         run: pip install flake8 tox
@@ -60,6 +64,7 @@ jobs:
         uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python }}
+          cache: pip
 
       # Install the head of the given branch (devel, stable-2.10)
       - name: Install ansible-base (${{ matrix.ansible }})

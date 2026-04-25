@@ -1,6 +1,7 @@
 ---
 name: "community.zabbix.zabbix_javagateway"
 on:
+  workflow_call:
   push:
     paths:
       - "roles/zabbix_javagateway/**"
@@ -15,8 +16,15 @@ on:
       - "molecule/requirements.txt"
       - ".github/workflows/javagateway.yml"
       - "roles/zabbix_repo/**"
+concurrency:
+  group: gateway-${{ github.workflow }}-${{ github.event.pull_request.head.repo.full_name || github.repository }}-${{ github.event.pull_request.head.ref || github.ref }}
+  cancel-in-progress: true
 jobs:
-  molecule:
+  build-collection:
+    uses: ./.github/workflows/build_collection.yml
+
+  base:
+    needs: build-collection
     runs-on: ubuntu-22.04
     strategy:
       fail-fast: false
@@ -24,14 +32,10 @@ jobs:
         container:
           - image: rockylinux10
           - image: rockylinux9
-          - image: rockylinux8
-            ansible_core: ansible-core<2.17
           - image: ubuntu2404
           - image: ubuntu2204
           - image: debian12
           - image: debian11
-          - image: opensuseleap15
-            ansible_core: ansible-core<2.17
         version:
           - v74
           - v72
@@ -57,9 +61,91 @@ jobs:
         uses: actions/setup-python@v6
         with:
           python-version: 3.11
+          cache: pip
+          cache-dependency-path: molecule/requirements.txt
 
       - name: Install latest pip
-        run: python -m pip install --upgrade pip
+        run: python -m pip install --upgrade pip yq
+
+      - name: Install dependencies
+        run: pip install -r molecule/requirements.txt
+
+      - name: Build the collection
+        run: |
+          yq -yi '
+            .dependencies."ansible.windows" = "2.8.0" |
+            .dependencies."ansible.netcommon" = "7.2.0" |
+            .dependencies."ansible.posix" = "2.0.0" |
+            .dependencies."community.general" = "10.5.0" |
+            .dependencies."community.mysql" = "3.13.0" |
+            .dependencies."community.postgresql" = "3.12.0"
+          ' galaxy.yml
+
+          ansible-galaxy collection build -f
+
+      - name: Cache Ansible Galaxy content
+        uses: actions/cache@v5
+        with:
+          path: |
+            ~/.ansible/collections
+            ~/.ansible/roles
+            ~/.cache/ansible-compat
+          key: ${{ runner.os }}-molecule-galaxy-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-molecule-galaxy-
+
+      - name: Install Collections and Roles 
+        run: |
+          ansible-galaxy collection install -f -vvvv  community-zabbix-*.tar.gz
+
+      - name: Run role tests
+        run: >-
+          MY_MOLECULE_CONTAINER=${{ matrix.container.image }}
+          MY_MOLECULE_IMAGE=${{ matrix.container.image }}
+          MY_MOLECULE_VERSION=${{ matrix.version }}
+          MY_MOLECULE_DOCKER_COMMAND=${{ matrix.command }}
+          molecule test -s ${{ matrix.collection_role }}
+
+  legacy:
+    needs: build-collection
+    runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+      matrix:
+        container:
+          - image: rockylinux8
+            ansible_core: ansible-core<2.17
+          - image: opensuseleap15
+            ansible_core: ansible-core<2.17
+        version:
+          - v74
+          - v72
+          - v70
+          - v60
+        collection_role:
+          - zabbix_javagateway
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v6
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v6
+        with:
+          python-version: 3.11
+
+      - name: Install latest pip
+        run: python -m pip install --upgrade pip yq
+
+      - name: Cache Ansible Galaxy content
+        uses: actions/cache@v5
+        with:
+          path: |
+            ~/.ansible/collections
+            ~/.ansible/roles
+            ~/.cache/ansible-compat
+          key: ${{ runner.os }}-molecule-galaxy-${{ hashFiles('molecule/requirements.txt', 'molecule/zabbix_agent_tests/common/collections.yml') }}
+          restore-keys: |
+            ${{ runner.os }}-molecule-galaxy-
 
       - name: Install specific version ansible-core
         if: matrix.container.ansible_core != null
@@ -70,19 +156,31 @@ jobs:
 
       - name: Build the collection
         run: |
-          # Pin versions to speed up CI
-          sed -i 's/ansible\.windows:\s*"\*"/ansible.windows: "2.8.0"/' galaxy.yml
-          sed -i 's/ansible\.netcommon:\s*"\*"/ansible.netcommon: "7.2.0"/' galaxy.yml
-          sed -i 's/ansible\.posix:\s*"\*"/ansible.posix: "2.0.0"/' galaxy.yml
-          sed -i 's/community\.general:\s*"\*"/community.general: "10.5.0"/' galaxy.yml
-          sed -i 's/community\.mysql:\s*"\*"/community.mysql: "3.13.0"/' galaxy.yml
-          sed -i 's/community\.postgresql:\s*"\*"/community.postgresql: "3.12.0"/' galaxy.yml
+          yq -yi '
+            .dependencies."ansible.windows" = "2.8.0" |
+            .dependencies."ansible.netcommon" = "7.2.0" |
+            .dependencies."ansible.posix" = "2.0.0" |
+            .dependencies."community.general" = "10.5.0" |
+            .dependencies."community.mysql" = "3.13.0" |
+            .dependencies."community.postgresql" = "3.12.0"
+          ' galaxy.yml
 
-          collection_file=$( basename $(ansible-galaxy collection build -f | awk -F" " '{print $NF}'))
-          echo "COLLECTION_FILE=$collection_file" >> $GITHUB_ENV
+          ansible-galaxy collection build -f
 
-      - name: Install the collection
-        run: ansible-galaxy collection install -vvvv $COLLECTION_FILE
+      - name: Cache Ansible Galaxy content
+        uses: actions/cache@v5
+        with:
+          path: |
+            ~/.ansible/collections
+            ~/.ansible/roles
+            ~/.cache/ansible-compat
+          key: ${{ runner.os }}-molecule-galaxy-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-molecule-galaxy-
+
+      - name: Install Collections and Roles 
+        run: |
+          ansible-galaxy collection install -f -vvvv  community-zabbix-*.tar.gz
 
       - name: Run role tests
         run: >-
