@@ -124,21 +124,22 @@ jobs:
     runs-on: ubuntu-22.04
     strategy:
       fail-fast: false
-      container:
-        - image: rockylinux8
-          ansible_core: ansible-core<2.17
-        - image: opensuseleap15
-          ansible_core: ansible-core<2.17
-      collection_role:
-        - zabbix_server
-      database:
-        - mysql
-        - pgsql
-      version:
-        - v74
-        - v72
-        - v70
-        - v60
+      matrix:
+        container:
+          - image: rockylinux8
+            ansible_core: ansible-core<2.17
+          - image: opensuseleap15
+            ansible_core: ansible-core<2.17
+        collection_role:
+          - zabbix_server
+        database:
+          - mysql
+          - pgsql
+        version:
+          - v74
+          - v72
+          - v70
+          - v60
     steps:
       - name: Check out code
         uses: actions/checkout@v6
