@@ -21,6 +21,7 @@
             image: "{{ _container[_db_type].image }}"
             state: started
             recreate: true
+            command: "{{ _container[_db_type].command | default(omit) }}"
             networks:
               - name: zabbix
             env: "{{ _container[_db_type].env }}"
@@ -29,8 +30,9 @@
           vars:
             _container:
               mysql:
-                image: "mysql:8.0"
+                image: "mysql:8.4.8"
                 env: { MYSQL_ROOT_PASSWORD: changeme }
+                command: --mysql-native-password=ON
               pgsql:
                 image: "timescale/timescaledb:latest-pg13"
                 env:
