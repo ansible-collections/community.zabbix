@@ -32,8 +32,6 @@ jobs:
         container:
           - image: rockylinux10
           - image: rockylinux9
-          - image: rockylinux8
-            ansible_core: ansible-core<2.17
           - image: ubuntu2404
           - image: ubuntu2204
           - image: debian12
@@ -132,6 +130,8 @@ jobs:
       fail-fast: false
       matrix:
         container:
+          - image: rockylinux8
+            ansible_core: ansible-core<2.17
           - image: rockylinux8
             ansible_core: ansible-core<2.17
         collection_role:
