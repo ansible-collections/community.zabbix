@@ -119,7 +119,7 @@ jobs:
           MY_MOLECULE_DOCKER_COMMAND=${{ matrix.command }}
           molecule test -s ${{ matrix.collection_role }}
 
-legacy:
+  legacy:
     needs: build-collection
     runs-on: ubuntu-22.04
     strategy:
