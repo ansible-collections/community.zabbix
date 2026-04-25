@@ -6,7 +6,6 @@
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
-import os
 from ansible_collections.community.zabbix.plugins.module_utils.api_request import ZabbixApiRequest
 
 
