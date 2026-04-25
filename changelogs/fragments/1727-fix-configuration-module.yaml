@@ -1,0 +1,2 @@
+bugfixes:
+  - zabbix_configuration - Fix configuration module to import host and some resource

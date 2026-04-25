@@ -26,82 +26,55 @@
         - ansible_facts['os_family'] == 'RedHat'
         - ansible_facts['distribution_major_version'] == "8"
 
-    - name: Set PHP packages (Centos 8+)
-      ansible.builtin.set_fact:
-        php_packages:
-          - php
-          - php-cli
-          - php-common
-          - php-devel
-          - php-fpm
-          - php-gd
-          - php-ldap
-          - php-mbstring
-          - php-opcache
-          - php-pdo
-          - php-pear
-          - php-pecl-apcu
-          - php-xml
-      when: ansible_facts['os_family'] == 'RedHat'
+  tasks:
+    - name: Install prerequisite packages for zabbix_web role
+      package:
+        name: "{{ _zabbix_web_prerequisite_packages[zabbix_web_http_server][ansible_facts.os_family] }}"
+      vars:
+        _zabbix_web_prerequisite_packages:
+          apache:
+            Debian: ["apache2", "php-cli", "php-mysql", "php-pgsql"]
+            RedHat: ["httpd", "php-cli", "php-fpm"]
+            Suse: ["apache2", "php8-cli", "php8-mysql", "php8-openssl", "php8-pgsql", "php8-xmlreader", "php8-xmlwriter"]
+          nginx:
+            Debian: ["nginx", "php-fpm", "php-mysql", "php-pgsql"]
+            RedHat: ["nginx", "php-cli", "php-fpm"]
+            Suse: ["nginx", "php8-cli", "php8-fpm", "php8-mysql", "php8-openssl", "php8-pgsql", "php8-xmlreader", "php8-xmlwriter"]
 
-    - name: Workaround for geerlingguy.php missing ubuntu-24.04 support
+    - name: Debian | Enable apache modules
       when:
-        - ansible_facts['distribution'] == "Ubuntu"
-        - ansible_facts['distribution_major_version'] >= '24'
-      block:
-        - name: Set PHP Version
-          ansible.builtin.set_fact:
-            __php_default_version_debian: "8.3"
-
-        - name: Set PHP packages
-          ansible.builtin.set_fact:
-            __php_packages:
-              - php{{ __php_default_version_debian }}-common
-              - php{{ __php_default_version_debian }}-cli
-              - php{{ __php_default_version_debian }}-dev
-              - php{{ __php_default_version_debian }}-fpm
-              - libpcre3-dev
-              - php{{ __php_default_version_debian }}-gd
-              - php{{ __php_default_version_debian }}-curl
-              - php{{ __php_default_version_debian }}-imap
-              - php-json
-              - php{{ __php_default_version_debian }}-opcache
-              - php{{ __php_default_version_debian }}-xml
-              - php{{ __php_default_version_debian }}-mbstring
-              - php{{ __php_default_version_debian }}-apcu
-              - php{{ __php_default_version_debian }}-sqlite3
-
-    - name: Set PHP Version (Suse)
-      ansible.builtin.set_fact:
-        __php_default_version_suse: "8"
-      when: ansible_facts['os_family'] == 'Suse'
-
-    - name: Workaround for geerlingguy roles
-      ansible.builtin.set_fact:
-        ansible_distribution: "{{ ansible_facts['distribution'] }}"
-        ansible_distribution_major_version: "{{ ansible_facts['distribution_major_version'] }}"
-        ansible_distribution_version: "{{ ansible_facts['distribution_version'] }}"
-        ansible_os_family: "{{ ansible_facts['os_family'] }}"
-        ansible_processor_count: "{{ ansible_facts['processor_count'] }}"
-
-  roles:
-    - role: geerlingguy.apache
-      when:
+        - ansible_facts.os_family == "Debian"
         - zabbix_web_http_server == "apache"
-    - role: geerlingguy.nginx
+      community.general.apache2_module:
+        state: present
+        name: "{{ item }}"
+      loop:
+        - rewrite
+        - ssl
+      notify: restart apache
+
+    - name: Suse | Enable apache modules
       when:
-        - zabbix_web_http_server == "nginx"
-    - role: geerlingguy.php
-    - role: zabbix_server
+        - ansible_facts.os_family == "Suse"
+        - zabbix_web_http_server == "apache"
+      lineinfile:
+        path: /etc/sysconfig/apache2
+        # Negative lookahead so we won't match on line that already contains option
+        regexp: "^APACHE_MODULES=\"((?!.*\\b{{ item }}\\b).*)\"$"
+        backrefs: true
+        line: "APACHE_MODULES=\"\\1 {{ item }}\""
+      loop:
+        - rewrite
+        - ssl
+      notify: restart apache
+
+  handlers:
+    - name: restart apache
+      service:
+        name: apache2
+        state: restarted
 
   post_tasks:
-    - name: Suse | Create default php-fpm config
-      ansible.builtin.copy:
-        remote_src: true
-        src: "/etc/php{{ __php_default_version_suse }}/fpm/php-fpm.conf.default"
-        dest: "/etc/php{{ __php_default_version_suse }}/fpm/php-fpm.conf"
-      when: ansible_facts['os_family'] == 'Suse'
-
     - name: "Remove file"
       ansible.builtin.file:
         path: "{{ item }}"

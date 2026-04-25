@@ -5,6 +5,7 @@ _apache_log: apache2
 _apache_service: apache2
 _apache_vhost_location: /etc/apache2/sites-available/zabbix.conf
 
+_zabbix_web_create_php_fpm: "{{ zabbix_web_http_server != 'apache' }}"
 _php_fpm_dir: /etc/php/{{ zabbix_web_php_installed_version }}/fpm/pool.d
 _php_fpm_session: /tmp
 _zabbix_php_fpm_listen: /run/php/zabbix.sock

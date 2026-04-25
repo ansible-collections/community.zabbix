@@ -1,0 +1,18 @@
+zabbix_export:
+  version: '6.0'
+  date: '2023-05-03T11:24:04Z'
+  groups:
+    - uuid: dc579cd7a1a34222933f24f52a68bcd8
+      name: 'Linux servers'
+  hosts:
+    - host: Imported_host
+      name: Imported_host
+      templates:
+        - name: 'Zabbix server health'
+      groups:
+        - name: 'Linux servers'
+      items:
+        - name: Test_item1
+          type: ZABBIX_ACTIVE
+          key: kernel.maxproc
+      inventory_mode: DISABLED

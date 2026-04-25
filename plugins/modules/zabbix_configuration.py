@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2025, ONODERA Masaru <masaru-onodera@ieee.org>
+# Copyright: (c) 2025, ONODERA Masaru <masa-orca>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
@@ -45,6 +45,7 @@ options:
         description:
             - The rules for importing the configuration.
             - Please refer to rules of the Zabbix configuration.import API documentation for more details.
+            - If you set C(hosts), C(images), C(maps) or C(mediaTypes) in this parameter, this module import configuration without compare.
             - https://www.zabbix.com/documentation/current/en/manual/api/reference/configuration/import
         required: false
         type: dict
@@ -183,7 +184,11 @@ def main():
         format = "yaml"
         content = content_yaml
 
-    changed = configuration.import_compare(content, format, rules)
+    uncomparable_rules = ["hosts", "images", "maps", "mediaTypes"]
+    if set(rules.keys()).isdisjoint(uncomparable_rules):
+        changed = configuration.import_compare(content, format, rules)
+    else:
+        changed = True
 
     if not changed:
         module.exit_json(changed=changed, result="Configuration is up-to date")
