@@ -14,8 +14,6 @@ platforms:
     privileged: true
     pre_build_image: true
     command: ${MOLECULE_DOCKER_COMMAND:-""}
-    networks:
-      - name: zabbix
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:rw
     cgroupns_mode: host
