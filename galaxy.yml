@@ -23,6 +23,6 @@ dependencies:
   ansible.netcommon: ">=3.1.1"
   ansible.posix: "*"
   community.general: "*"
-  community.mysql: "*"
+  community.mysql: ">=3.10.0"
   community.postgresql: "*"
   community.windows: "*"
