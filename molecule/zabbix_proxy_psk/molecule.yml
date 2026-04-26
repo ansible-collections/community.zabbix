@@ -9,7 +9,7 @@ driver:
   name: default
 
 platforms:
-  - name: zabbix-proxy-psk-${MY_MOLECULE_VERSION:-v74}-${MY_MOLECULE_DATABASE:-mysql}-${MY_MOLECULE_CONTAINER:-rockylinux9}
+  - name: zabbix-proxy-psk-${MY_MOLECULE_DATABASE:-mysql}-${MY_MOLECULE_VERSION:-v74}-${MY_MOLECULE_CONTAINER:-rockylinux9}
     image: geerlingguy/docker-${MY_MOLECULE_IMAGE:-rockylinux9}-ansible:latest
     privileged: true
     pre_build_image: true
