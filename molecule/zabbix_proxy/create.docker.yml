@@ -5,21 +5,23 @@
 
   gather_facts: false
 
+  vars:
+    _version_groups: ["v60", "v70", "v72", "v74"]
+    _g_to_v:
+      v60: "6.0"
+      v70: "7.0"
+      v72: "7.2"
+      v74: "7.4"
+
   pre_tasks:
     - name: Create network
       community.docker.docker_network:
         name: zabbix
 
     - name: Create dependency/integration containers
+      vars:
+        _version: "{{ item.groups | intersect(_version_groups) | first }}"
       block:
-        - name: Create proxy to server version matches
-          set_fact:
-            p_to_s:
-              v60: 6.0
-              v70: 7.0
-              v72: 7.2
-              v74: 7.4
-
         - name: Create Zabbix server database container
           community.docker.docker_container:
             name: "{{ item.name }}-zserver-db"
@@ -36,7 +38,7 @@
         - name: Create Zabbix server container
           community.docker.docker_container:
             name: "{{ item.name }}-zserver"
-            image: "zabbix/zabbix-server-pgsql:alpine-{{ p_to_s[item.zabbix_proxy_version] }}-latest"
+            image: "zabbix/zabbix-server-pgsql:alpine-{{ _g_to_v[_version] }}-latest"
             state: started
             recreate: true
             networks:
@@ -53,7 +55,7 @@
         - name: Create Zabbix web container
           community.docker.docker_container:
             name: "{{ item.name }}-zweb"
-            image: "zabbix/zabbix-web-nginx-pgsql:alpine-{{ p_to_s[item.zabbix_proxy_version] }}-latest"
+            image: "zabbix/zabbix-web-nginx-pgsql:alpine-{{ _g_to_v[_version] }}-latest"
             state: started
             recreate: true
             published_ports:
