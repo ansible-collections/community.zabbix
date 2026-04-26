@@ -7,8 +7,7 @@ _zabbix_proxy_pgsql_dependencies:
 _zabbix_proxy_mysql_dependencies:
   - "{{ zabbix_proxy_install_database_client | ternary('mysql', '') }}"
   - python3-PyMySQL
-  - "{{ {% 'mariadb-connector' if zabbix_proxy_mysql_auth_plugin in ['caching_sha2_password', 'sha256_password'] %} | default(omit) }}"
-
+  - "{{ 'mariadb-connector' if zabbix_proxy_mysql_auth_plugin in ['caching_sha2_password', 'sha256_password'] | default('') }}"
 
 _zabbix_proxy_sqlite3_dependencies:
   - sqlite
