@@ -5,6 +5,15 @@
 
   gather_facts: false
 
+  vars:
+    _version_groups: ["v60", "v70", "v72", "v74", "v80"]
+    _g_to_v:
+      v60: "6.0"
+      v70: "7.0"
+      v70: "7.2"
+      v74: "7.4"
+      v80: "8.0"
+
   tasks:
     - name: Destroy OS container(s)
       community.docker.docker_container:
@@ -26,27 +35,42 @@
 
   post_tasks:
     - name: Destroy dependency/integration containers
+      vars:
+        # molecule_yml.platforms    => [ { ..., "groups": [ "mysql", "v74" ], ... }, { ... } ]
+        # map(attribute='groups')   => [ [ "mysql", "v74" ], [ "pgsql", "v70" ], ... ]
+        # flatten                   => [ "mysql", "v74", "pgsql", "v70", "sqlite3", "v60", ... ]
+        # intersect(_version_groups => [ "v74", "v70", "v60" ]
+        _active_versions: "{{ molecule_yml.platforms | map(attribute='groups') | flatten | intersect(_version_groups) }}"
       block:
         - name: Destroy Zabbix web container
           community.docker.docker_container:
-            name: "{{ item.name }}-zweb"
+            name: "zabbix-web-{{ _version }}"
             state: absent
             force_kill: true
-          loop: "{{ molecule_yml.platforms }}"
+          loop: "{{ _active_versions }}"
+          loop_control:
+            label: "zabbix-web-{{ _version }}"
+            loop_var: _version
 
         - name: Destroy Zabbix server container
           community.docker.docker_container:
-            name: "{{ item.name }}-zserver"
+            name: "zabbix-server-{{ _version }}"
             state: absent
             force_kill: true
-          loop: "{{ molecule_yml.platforms }}"
+          loop: "{{ _active_versions }}"
+          loop_control:
+            label: "zabbix-server-{{ _version }}"
+            loop_var: _version
 
         - name: Destroy Zabbis database container
           community.docker.docker_container:
-            name: "{{ item.name }}-zserver-db"
+            name: "zabbix-server-{{ _version }}-db"
             state: absent
             force_kill: true
-          loop: "{{ molecule_yml.platforms }}"
+          loop: "{{ _active_versions }}"
+          loop_control:
+            label: "zabbix-server-{{ _version }}-db"
+            loop_var: _version
 
     - name: Destroy network
       community.docker.docker_network:
