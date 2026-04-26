@@ -2,6 +2,11 @@
 - name: Prepare
   hosts: all
 
+  environment:
+    http_proxy: "{{ zabbix_http_proxy }}"
+    https_proxy: "{{ zabbix_https_proxy }}"
+    no_proxy: "{{ zabbix_no_proxy }}"
+
   pre_tasks:
     - name: "Installing packages"
       ansible.builtin.package:
@@ -10,6 +15,10 @@
         state: present
       register: installation_dependencies
       until: installation_dependencies is succeeded
+
+    # workaround for "Authentication service cannot retrieve authentication info"
+    - name: "SUDO permissions workaround"
+      ansible.builtin.command: chmod 0400 /etc/shadow
 
     # https://github.com/geerlingguy/ansible-role-java/issues/64
     - name: "Workaround Java issue for Debian"

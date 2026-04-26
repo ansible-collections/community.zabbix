@@ -110,7 +110,7 @@ pip install -r requirements.txt
 Note that Docker is required when testing roles as Molecule is configured to use it. Once everything is installed, validate your role changes with:
 
 ```bash
-molecule test
+molecule test --all
 ```
 
 ### Testing Zabbix modules

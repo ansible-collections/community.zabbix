@@ -3,9 +3,19 @@ scenario:
   name: agent2
 provisioner:
   name: ansible
+  env:
+    HTTP_PROXY: "${http_proxy}"
+    HTTPS_PROXY: "${https_proxy}"
+    NO_PROXY: "${no_proxy}"
+    http_proxy: "${http_proxy}"
+    https_proxy: "${https_proxy}"
+    no_proxy: "${no_proxy}"
   inventory:
     group_vars:
       all:
+        zabbix_http_proxy: ${http_proxy}
+        zabbix_https_proxy: ${https_proxy}
+        zabbix_no_proxy: ${no_proxy}
         zabbix_agent2: true
         zabbix_agent_tlspsk_auto: False
         zabbix_agent_tlspskidentity: my_Identity
