@@ -11,6 +11,7 @@
     + [Testing Zabbix roles](#testing-zabbix-roles)
     + [Testing Zabbix modules](#testing-zabbix-modules)
 - [Additional information](#additional-information)
+  * [Podman as a Replacement for Docker](#podman-as-a-replacement-for-docker)
   * [Virtualenv](#virtualenv)
   * [Links](#links)
 
@@ -97,20 +98,40 @@ Once this is done, you can reference modules and roles from testing playbook lik
 
 ### Testing Zabbix roles
 
-*This section is subject to change as our CI regarding roles is being reworked and may not work for you right now!*
+Roles make use of [Molecule](https://docs.ansible.com/projects/molecule/) to verify and test the execution of each role. Podman or Docker is required, as Molecule is configured to use a container backend.
 
-Roles make use of [Molecule](https://docs.ansible.com/projects/molecule/) to verify and test the execution of each role. In order to start testing with Molecule, you need to install the required dependencies. Requirements file can be found in the root of the [dj-wasabi/ansible-ci-base](https://github.com/dj-wasabi/ansible-ci-base) repository.
-
-It is recommended to create a [new Python virtual environment](#virtualenv) for this to not clutter your global Python installation. First, install the dependencies:
+It is recommended to create a [new Python virtual environment](#virtualenv) to avoid cluttering your global Python installation:
 
 ```bash
-pip install -r requirements.txt
+python3 -m venv ansible-2.18.x-venv
+source ansible-2.18.x-venv/bin/activate
 ```
 
-Note that Docker is required when testing roles as Molecule is configured to use it. Once everything is installed, validate your role changes with:
+Then install the required dependencies:
 
 ```bash
-molecule test
+(ansible-2.18.x-venv) ... $ pip install -r molecule/requirements.txt
+```
+
+Molecule works with the concept of scenarios. The primary scenarios are named after the roles they test (e.g., `zabbix_repo`, `zabbix_server`, `zabbix_web`, `zabbix_proxy`), but there may be others for testing specific configurations — have a look in `molecule/`.
+
+During development, the two most useful commands are:
+
+```bash
+# Apply roles to the test containers — run repeatedly as you edit until it passes.
+(ansible-2.18.x-venv) ... $ molecule converge -s <scenario_name>
+# Run integration tests to confirm everything still works as expected.
+(ansible-2.18.x-venv) ... $ molecule verify -s <scenario_name>
+```
+
+You can change what you test against by setting environment variables such as `MY_MOLECULE_DATABASE`, `MY_MOLECULE_VERSION`, `MY_MOLECULE_CONTAINER`, and `MY_MOLECULE_IMAGE`.
+
+**Pro tip:** To test multiple targets at once, add additional entries under `platforms` in your scenario's `molecule.yml`. See the commented-out "Developer example" in `molecule/zabbix_proxy/molecule.yml` for a working multi-platform setup.
+
+Once you are confident everything works as expected, run the full test sequence:
+
+```bash
+(ansible-2.18.x-venv) ... $ molecule test -s <scenario_name>
 ```
 
 ### Testing Zabbix modules
@@ -142,6 +163,45 @@ ansible-test sanity -v --color --docker --python 3.6
 ```
 
 # Additional information
+
+## Podman as a Replacement for Docker
+
+Podman is a great alternative to Docker and can be used as a drop-in replacement with a few small changes.
+
+Enable the Podman socket and user lingering so rootless containers work correctly, then point `DOCKER_HOST` at the Podman socket:
+
+```bash
+loginctl enable-linger
+systemctl --user enable --now podman.socket
+export DOCKER_HOST=unix:///run/user/$(id -u)/podman/podman.sock
+```
+
+To make this persistent, add the following to `~/.bashrc` or `~/.bashrc.d/containers`:
+
+```bash
+if [ ! -f "/var/lib/systemd/linger/$(whoami)" ]; then
+  loginctl enable-linger
+fi
+if [ ! -f "/run/user/$(id -u)/podman/podman.sock" ]; then
+  systemctl --user enable --now podman.socket
+fi
+
+export DOCKER_HOST=unix:///run/user/$(id -u)/podman/podman.sock
+```
+
+Some Molecule scenarios run many containers in parallel. If you hit inotify limits, create `/etc/sysctl.d/inotify.conf` with:
+
+```ini
+fs.inotify.max_user_watches = 65536
+fs.inotify.max_user_instances = 8192
+```
+
+Then apply without rebooting:
+
+```bash
+sudo sysctl -p /etc/sysctl.d/inotify.conf
+```
+
 
 ## Virtualenv
 

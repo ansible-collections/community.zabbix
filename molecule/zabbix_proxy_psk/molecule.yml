@@ -24,39 +24,48 @@ platforms:
 provisioner:
   name: ansible
   playbooks:
-    prepare: ../zabbix_proxy/prepare.yml
     create: ../zabbix_proxy/create.docker.yml
+    prepare: ../zabbix_proxy/prepare.yml
     converge: ../zabbix_proxy/converge.yml
     destroy: ../zabbix_proxy/destroy.docker.yml
   env:
     # https://github.com/ansible/molecule/issues/4015#issuecomment-1680859724
     ANSIBLE_ROLES_PATH: ../../roles
+    ANSIBLE_INJECT_FACT_VARS: "False"
   inventory:
     group_vars:
       all:
         ansible_connection: community.docker.docker
-        zabbix_api_create_proxy: true
-        zabbix_proxy_hostname: proxy1
-        zabbix_api_server_port: 8080
-        ansible_zabbix_url_path: ""
-        zabbix_proxy_server: 0.0.0.0/0
+        zabbix_proxy_hostname: "{{ inventory_hostname }}"
         zabbix_proxy_proxymode: 1
         zabbix_proxy_status: passive
         zabbix_proxy_tlsaccept: psk
         zabbix_proxy_tlspskfile: "/home/zabbix/proxy_psk"
         zabbix_proxy_tlspskidentity: "PSK {{ inventory_hostname }}"
         zabbix_proxy_tlspsk_secret: 'f1447b20c0243f3304062d3641fe7e341eb0106bd1adb4273f21659a7717ae6f'
+        zabbix_api_create_proxy: true
+        ansible_zabbix_url_path: ""
       v74:
-        zabbix_proxy_version: 7.4
+        zabbix_proxy_version: "7.4"
+        zabbix_proxy_server: zabbix-server-v74
+        zabbix_api_server_host: zabbix-web-v74
+        zabbix_api_server_port: 8074
       v72:
-        zabbix_proxy_version: 7.2
+        zabbix_proxy_version: "7.2"
+        zabbix_proxy_server: zabbix-server-v72
+        zabbix_api_server_host: zabbix-web-v72
+        zabbix_api_server_port: 8072
       v70:
-        zabbix_proxy_version: 7.0
+        zabbix_proxy_version: "7.0"
+        zabbix_proxy_server: zabbix-server-v70
+        zabbix_api_server_host: zabbix-web-v70
+        zabbix_api_server_port: 8070
       v60:
-        zabbix_proxy_version: 6.0
+        zabbix_proxy_version: "6.0"
+        zabbix_proxy_server: zabbix-server-v60
+        zabbix_api_server_host: zabbix-web-v60
+        zabbix_api_server_port: 8060
       mysql:
-        zabbix_proxy_dbname: zabbix
-        zabbix_proxy_dbuser: zabbix-dbuser
         zabbix_proxy_database: mysql
         zabbix_proxy_dbhost: "{{ inventory_hostname }}-db"
         zabbix_proxy_dbhost_run_install: false
@@ -67,7 +76,6 @@ provisioner:
       pgsql:
         zabbix_proxy_database: pgsql
         zabbix_proxy_dbhost: "{{ inventory_hostname }}-db"
-        zabbix_proxy_dbschema: zabbix
         zabbix_proxy_dbhost_run_install: false
         zabbix_proxy_pgsql_login_host: "{{ inventory_hostname }}-db"
         zabbix_proxy_pgsql_login_user: postgres
