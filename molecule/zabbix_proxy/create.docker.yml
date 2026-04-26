@@ -10,6 +10,65 @@
       community.docker.docker_network:
         name: zabbix
 
+    - name: Create dependency/integration containers
+      block:
+        - name: Create proxy to server version matches
+          set_fact:
+            p_to_s:
+              v60: 6.0
+              v70: 7.0
+              v72: 7.2
+              v74: 7.4
+
+        - name: Create Zabbix server database container
+          community.docker.docker_container:
+            name: "{{ item.name }}-zserver-db"
+            image: "timescale/timescaledb:latest-pg13"
+            state: started
+            recreate: true
+            networks:
+              - name: zabbix
+            env:
+              POSTGRES_USER: "zabbix"
+              POSTGRES_PASSWORD: "zabbix"
+          loop: "{{ molecule_yml.platforms }}"
+
+        - name: Create Zabbix server container
+          community.docker.docker_container:
+            name: "{{ item.name }}-zserver"
+            image: "zabbix/zabbix-server-pgsql:alpine-{{ p_to_s[item.zabbix_proxy_version] }}-latest"
+            state: started
+            recreate: true
+            networks:
+              - name: zabbix
+            env:
+              DB_SERVER_HOST: "{{ item.name }}-zserver-db"
+              POSTGRES_USER: "zabbix"
+              POSTGRES_PASSWORD: "zabbix"
+              POSTGRES_DB: "zabbix"
+              ENABLE_TIMESCALEDB: "true"
+              ZBX_PROXYCONFIGFREQUENCY: "10"
+          loop: "{{ molecule_yml.platforms }}"
+
+        - name: Create Zabbix web container
+          community.docker.docker_container:
+            name: "{{ item.name }}-zweb"
+            image: "zabbix/zabbix-web-nginx-pgsql:alpine-{{ p_to_s[item.zabbix_proxy_version] }}-latest"
+            state: started
+            recreate: true
+            published_ports:
+              - 8080:8080
+            networks:
+              - name: zabbix
+            env:
+              DB_SERVER_HOST: "{{ item.name }}-zserver-db"
+              POSTGRES_USER: "zabbix"
+              POSTGRES_PASSWORD: "zabbix"
+              POSTGRES_DB: "zabbix"
+              ZBX_SERVER_HOST: "{{ item.name }}-zserver"
+              PHP_TZ: "America/Toronto"
+          loop: "{{ molecule_yml.platforms }}"
+
   tasks:
     - name: Create OS container(s)
       community.docker.docker_container:
@@ -45,68 +104,3 @@
           pgsql:
             image: "postgres:13"
             env: { POSTGRES_PASSWORD: changeme }
-
-    - name: Create proxy to server version matches
-      set_fact:
-        p_to_s:
-          v60: 6.0
-          v70: 7.0
-          v72: 7.2
-          v74: 7.4
-
-    - name: Create database container for Zabbix server
-      community.docker.docker_container:
-        name: "{{ item.name }}-zserver-db"
-        image: "timescale/timescaledb:latest-pg13"
-        state: started
-        recreate: true
-        networks:
-          - name: zabbix
-        env:
-          POSTGRES_DB: zabbix
-          POSTGRES_USER: "zabbix"
-          POSTGRES_PASSWORD: "zabbix"
-        links:
-          - "{{ item.name }}-zserver-db"
-      loop: "{{ molecule_yml.platforms }}"
-
-    - name: Create container for Zabbix server
-      community.docker.docker_container:
-        name: "{{ item.name }}-zserver"
-        image: "zabbix/zabbix-server-pgsql:alpine-{{ p_to_s[item.zabbix_proxy_version] }}-latest"
-        state: started
-        recreate: true
-        networks:
-          - name: zabbix
-        env:
-          DB_SERVER_HOST: "{{ item.name }}-zserver-db"
-          POSTGRES_USER: "zabbix"
-          POSTGRES_PASSWORD: "zabbix"
-          POSTGRES_DB: "zabbix"
-          ENABLE_TIMESCALEDB: "true"
-          ZBX_PROXYCONFIGFREQUENCY: "10"
-        links:
-          - "{{ item.name }}-zserver-db"
-      loop: "{{ molecule_yml.platforms }}"
-
-    - name: Create container for Zabbix Web server
-      community.docker.docker_container:
-        name: "{{ item.name }}-zweb"
-        image: "zabbix/zabbix-web-nginx-pgsql:alpine-{{ p_to_s[item.zabbix_proxy_version] }}-latest"
-        state: started
-        recreate: true
-        published_ports:
-          - 8080:8080
-        networks:
-          - name: zabbix
-        env:
-          DB_SERVER_HOST: "{{ item.name }}-zserver-db"
-          POSTGRES_USER: "zabbix"
-          POSTGRES_PASSWORD: "zabbix"
-          POSTGRES_DB: "zabbix"
-          ZBX_SERVER_HOST: "{{ item.name }}-zserver"
-          PHP_TZ: "America/Toronto"
-        links:
-          - "{{ item.name }}-zserver-db"
-          - "{{ item.name }}-zserver"
-      loop: "{{ molecule_yml.platforms }}"
