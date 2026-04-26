@@ -7,6 +7,9 @@ _zabbix_server_mysql_dependencies:
   - "{{ zabbix_server_install_database_client | ternary('mysql', '') }}"
   - gzip
   - python3{% if ansible_facts.python.version.minor != 6 %}{{ ansible_facts.python.version.minor }}{% endif %}-PyMySQL
+{% if zabbix_server_mysql_auth_plugin in ['caching_sha2_password', 'sha256_password'] %}
+  - mariadb-connector
+{% endif %}
 
 _zabbix_server_pgsql_dependencies:
   - "{{ zabbix_server_install_database_client | ternary('postgresql', '') }}"
