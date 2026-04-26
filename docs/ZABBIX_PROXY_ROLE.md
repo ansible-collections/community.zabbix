@@ -123,7 +123,8 @@ The following is an overview of all available configuration default for this rol
 * `zabbix_proxy_database_sqlload`:True / False. When you don't want to load the sql files into the database, you can set it to False.
 * `zabbix_proxy_dbencoding`: Default: `utf8`. The encoding for the MySQL database.
 * `zabbix_proxy_dbcollation`: Default: `utf8_bin`. The collation for the MySQL database.zabbix_proxy_
-
+* `zabbix_proxy_mysql_auth_plugin`: Default `mysql_native_password`. Allows selecting MySQL authentication plugin (`mysql_native_password`, `caching_sha2_password`, `sha256_password`)
+* `zabbix_proxy_mysql_auth_plugin_salt`: Required for idempotency when creating a MySQL user using `caching_sha2_password` or `sha256_password` authentication plugins. Has to be exactly 20 characters
 
 ### Yum/APT
 * `zabbix_repo_yum`: A list with Yum repository configuration.

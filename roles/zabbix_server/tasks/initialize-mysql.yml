@@ -60,7 +60,16 @@
         login_unix_socket: "{{ zabbix_server_mysql_login_unix_socket | default(omit) }}"
         check_hostname: "{{ zabbix_server_dbtlsconnect is defined and zabbix_server_dbtlsconnect != '' }}"
         name: "{{ zabbix_server_dbuser }}"
-        password: "{{ zabbix_server_dbpassword }}"
+        password: >-
+          {{ zabbix_server_dbpassword
+            if zabbix_server_mysql_auth_plugin == 'mysql_native_password'
+            else omit }}
+        plugin_auth_string: >-
+          {{ zabbix_server_dbpassword
+            if zabbix_server_mysql_auth_plugin in ['caching_sha2_password', 'sha256_password']
+            else omit }}
+        plugin: "{{ zabbix_server_mysql_auth_plugin | default(omit) }}"
+        salt: "{{ zabbix_server_mysql_auth_plugin_salt | default(omit) }}"
         host: "{{ zabbix_server_privileged_host }}"
         priv: "{{ zabbix_server_dbname }}.*:ALL"
         state: present
