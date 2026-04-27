@@ -56,6 +56,8 @@ provisioner:
         zabbix_web_version: 6.0
       mysql:
         zabbix_server_database: mysql
+        zabbix_server_mysql_auth_plugin: caching_sha2_password
+        zabbix_server_mysql_auth_plugin_salt: 0123456789abcdfeghij
       pgsql:
         zabbix_server_database: pgsql
       apache:

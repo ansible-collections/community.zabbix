@@ -29,6 +29,7 @@ zabbix_server_database: pgsql
 zabbix_server_database_creation: true
 zabbix_server_install_database_client: true
 zabbix_server_database_schemas: "{{ _zabbix_server_database_schemas[zabbix_server_database] }}"
+zabbix_server_mysql_auth_plugin: mysql_native_password
 
 # SELinux specific
 selinux_allow_zabbix_can_network: true

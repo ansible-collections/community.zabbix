@@ -144,6 +144,8 @@ Selinux changes will be installed based on the status of selinux running on the 
 * `zabbix_server_database_schemas`: List of schemas to load, can be overridden for a non-supported/custom setup.
 * `zabbix_server_dbencoding`: Default: `utf8`. The encoding for the MySQL database.
 * `zabbix_server_dbcollation`: Default: `utf8_bin`. The collation for the MySQL database.
+* `zabbix_server_mysql_auth_plugin`: Default `mysql_native_password`. Allows selecting MySQL authentication plugin (`mysql_native_password`, `caching_sha2_password`, `sha256_password`)
+* `zabbix_server_mysql_auth_plugin_salt`: Required for idempotency when creating a MySQL user using `caching_sha2_password` or `sha256_password` authentication plugins. Has to be exactly 20 characters
 
 ### Custom Zabbix Scripts
 

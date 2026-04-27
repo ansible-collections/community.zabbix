@@ -87,7 +87,7 @@ jobs:
           sed -i 's/ansible\.netcommon:\s*"\*"/ansible.netcommon: "7.2.0"/' galaxy.yml
           sed -i 's/ansible\.posix:\s*"\*"/ansible.posix: "2.0.0"/' galaxy.yml
           sed -i 's/community\.general:\s*"\*"/community.general: "10.5.0"/' galaxy.yml
-          sed -i 's/community\.mysql:\s*"\*"/community.mysql: "3.13.0"/' galaxy.yml
+          sed -i 's/community\.mysql:\s*"\*"/community.mysql: "3.10.0"/' galaxy.yml
           sed -i 's/community\.postgresql:\s*"\*"/community.postgresql: "3.12.0"/' galaxy.yml
 
           collection_file=$( basename $(ansible-galaxy collection build -f | awk -F" " '{print $NF}'))
