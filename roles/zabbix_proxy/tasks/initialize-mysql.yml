@@ -61,14 +61,8 @@
         login_port: "{{ zabbix_proxy_mysql_login_port | default(omit) }}"
         login_unix_socket: "{{ zabbix_proxy_mysql_login_unix_socket | default(omit) }}"
         name: "{{ zabbix_proxy_dbuser }}"
-        password: >-
-          {{ zabbix_proxy_dbpassword
-            if zabbix_proxy_mysql_auth_plugin == 'mysql_native_password'
-            else omit }}
-        plugin_auth_string: >-
-          {{ zabbix_proxy_dbpassword
-            if zabbix_proxy_mysql_auth_plugin in ['caching_sha2_password', 'sha256_password']
-            else omit }}
+        password: "{{ (zabbix_proxy_mysql_auth_plugin == 'mysql_native_password') | ternary(zabbix_proxy_dbpassword, omit) }}"
+        plugin_auth_string: "{{ (zabbix_proxy_mysql_auth_plugin in ['caching_sha2_password', 'sha256_password']) | ternary(zabbix_proxy_dbpassword, omit) }}"
         plugin: "{{ zabbix_proxy_mysql_auth_plugin | default(omit) }}"
         salt: "{{ zabbix_proxy_mysql_auth_plugin_salt | default(omit) }}"
         host: "{{ zabbix_proxy_privileged_host }}"
