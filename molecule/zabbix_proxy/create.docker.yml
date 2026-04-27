@@ -5,25 +5,91 @@
 
   gather_facts: false
 
+  vars:
+    _version_groups: ["v60", "v70", "v72", "v74", "v80"]
+    _g_to_v:
+      v60: "6.0"
+      v70: "7.0"
+      v72: "7.2"
+      v74: "7.4"
+      v80: "8.0"
+
   pre_tasks:
     - name: Create network
       community.docker.docker_network:
         name: zabbix
 
-  tasks:
-    - name: Create OS container(s)
-      community.docker.docker_container:
-        state: started
-        recreate: true
-        name: "{{ item.name }}"
-        image: "{{ item.image }}"
-        privileged: "{{ item.privileged | default(omit) }}"
-        command: "{{ item.command | default(omit) }}"
-        networks: "{{ item.networks | default(omit) }}"
-        volumes: "{{ item.volumes | default(omit) }}"
-        cgroupns_mode: "{{ item.cgroupns_mode | default(omit) }}"
-      loop: "{{ molecule_yml.platforms }}"
+    # We create 1 zabbix db/server/web instance per version of zabbix proxy we're testing.
+    # For github workflows this is a 1-1 mapping, but developers can add multiple
+    # entries to molecule_yml.platforms to test multiple configurations at once, and
+    # we don't need 3x the containers for every configuration when testing integration between proxy and server.
+    - name: Create dependency/integration containers
+      vars:
+        # molecule_yml.platforms    => [ { ..., "groups": [ "mysql", "v74" ], ... }, { ... } ]
+        # map(attribute='groups')   => [ [ "mysql", "v74" ], [ "pgsql", "v70" ], ... ]
+        # flatten                   => [ "mysql", "v74", "pgsql", "v70", "sqlite3", "v60", ... ]
+        # intersect(_version_groups => [ "v74", "v70", "v60" ]
+        _active_versions: "{{ molecule_yml.platforms | map(attribute='groups') | flatten | intersect(_version_groups) }}"
+      block:
+        - name: Create Zabbix server database container
+          community.docker.docker_container:
+            name: "zabbix-server-{{ _version }}-db"
+            image: "timescale/timescaledb:latest-pg13"
+            state: started
+            recreate: true
+            networks:
+              - name: zabbix
+            env:
+              POSTGRES_USER: "zabbix"
+              POSTGRES_PASSWORD: "zabbix"
+          loop: "{{ _active_versions }}"
+          loop_control:
+            label: "zabbix-server-{{ _version }}-db"
+            loop_var: _version
 
+        - name: Create Zabbix server container
+          community.docker.docker_container:
+            name: "zabbix-server-{{ _version }}"
+            image: "zabbix/zabbix-server-pgsql:alpine-{{ _g_to_v[_version] }}-latest"
+            state: started
+            recreate: true
+            networks:
+              - name: zabbix
+            env:
+              DB_SERVER_HOST: "zabbix-server-{{ _version }}-db"
+              POSTGRES_USER: "zabbix"
+              POSTGRES_PASSWORD: "zabbix"
+              POSTGRES_DB: "zabbix"
+              ENABLE_TIMESCALEDB: "true"
+              ZBX_PROXYCONFIGFREQUENCY: "10"
+          loop: "{{ _active_versions }}"
+          loop_control:
+            label: "zabbix-server-{{ _version }}"
+            loop_var: _version
+
+        - name: Create Zabbix web container
+          community.docker.docker_container:
+            name: "zabbix-web-{{ _version }}"
+            image: "zabbix/zabbix-web-nginx-pgsql:alpine-{{ _g_to_v[_version] }}-latest"
+            state: started
+            recreate: true
+            networks:
+              - name: zabbix
+            published_ports:
+              - "{{ 8000 + (_version | regex_replace('v', '') | int) }}:8080"
+            env:
+              DB_SERVER_HOST: "zabbix-server-{{ _version }}-db"
+              POSTGRES_USER: "zabbix"
+              POSTGRES_PASSWORD: "zabbix"
+              POSTGRES_DB: "zabbix"
+              ZBX_SERVER_HOST: "zabbix-server-{{ _version }}"
+              PHP_TZ: "America/Toronto"
+          loop: "{{ _active_versions }}"
+          loop_control:
+            label: "zabbix-web-{{ _version }}"
+            loop_var: _version
+
+  tasks:
     - name: Create database container(s)
       community.docker.docker_container:
         name: "{{ item.name }}-db"
@@ -34,6 +100,8 @@
           - name: zabbix
         env: "{{ _container[_db_type].env }}"
       loop: "{{ molecule_yml.platforms }}"
+      loop_control:
+        label: "{{ item.name }}-db"
       when: (item.groups | intersect(_database_groups) | length) > 0
       vars:
         _database_groups: ['mysql', 'pgsql']
@@ -43,69 +111,21 @@
             image: "mysql:8.0.45"
             env: { MYSQL_ROOT_PASSWORD: changeme }
           pgsql:
-            image: "timescale/timescaledb:latest-pg13"
+            image: "postgres:13"
             env: { POSTGRES_PASSWORD: changeme }
 
-    - name: Create proxy to server version matches
-      set_fact:
-        p_to_s:
-          v60: 6.0
-          v70: 7.0
-          v72: 7.2
-          v74: 7.4
-
-    - name: Create database container for Zabbix server
+    - name: Create OS container(s)
       community.docker.docker_container:
-        name: "{{ item.name }}-zserver-db"
-        image: postgres:13
+        name: "{{ item.name }}"
+        image: "{{ item.image }}"
         state: started
         recreate: true
+        privileged: "{{ item.privileged | default(omit) }}"
+        command: "{{ item.command | default(omit) }}"
         networks:
           - name: zabbix
-        env:
-          POSTGRES_DB: zabbix
-          POSTGRES_USER: "zabbix"
-          POSTGRES_PASSWORD: "zabbix"
-        links:
-          - "{{ item.name }}-zserver-db"
+        volumes: "{{ item.volumes | default(omit) }}"
+        cgroupns_mode: "{{ item.cgroupns_mode | default(omit) }}"
       loop: "{{ molecule_yml.platforms }}"
-
-    - name: Create container for Zabbix server
-      community.docker.docker_container:
-        name: "{{ item.name }}-zserver"
-        image: "zabbix/zabbix-server-pgsql:alpine-{{ p_to_s[item.zabbix_proxy_version] }}-latest"
-        state: started
-        recreate: true
-        networks:
-          - name: zabbix
-        env:
-          DB_SERVER_HOST: "{{ item.name }}-zserver-db"
-          POSTGRES_USER: "zabbix"
-          POSTGRES_PASSWORD: "zabbix"
-          POSTGRES_DB: "zabbix"
-          ZBX_PROXYCONFIGFREQUENCY: "10"
-        links:
-          - "{{ item.name }}-zserver-db"
-      loop: "{{ molecule_yml.platforms }}"
-
-    - name: Create container for Zabbix Web server
-      community.docker.docker_container:
-        name: "{{ item.name }}-zweb"
-        image: "zabbix/zabbix-web-nginx-pgsql:alpine-{{ p_to_s[item.zabbix_proxy_version] }}-latest"
-        state: started
-        recreate: true
-        published_ports:
-          - 8080:8080
-        networks:
-          - name: zabbix
-        env:
-          DB_SERVER_HOST: "{{ item.name }}-zserver-db"
-          POSTGRES_USER: "zabbix"
-          POSTGRES_PASSWORD: "zabbix"
-          POSTGRES_DB: "zabbix"
-          ZBX_SERVER_HOST: "{{ item.name }}-zserver"
-          PHP_TZ: "America/Toronto"
-        links:
-          - "{{ item.name }}-zserver-db"
-          - "{{ item.name }}-zserver"
-      loop: "{{ molecule_yml.platforms }}"
+      loop_control:
+        label: "{{ item.name }}"
