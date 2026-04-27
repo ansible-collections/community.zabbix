@@ -27,6 +27,7 @@ provisioner:
     create: ../zabbix_proxy/create.docker.yml
     prepare: ../zabbix_proxy/prepare.yml
     converge: ../zabbix_proxy/converge.yml
+    verify: ../zabbix_proxy/verify.yml
     destroy: ../zabbix_proxy/destroy.docker.yml
   env:
     # https://github.com/ansible/molecule/issues/4015#issuecomment-1680859724
@@ -84,8 +85,10 @@ provisioner:
         zabbix_proxy_database: sqlite3
         zabbix_proxy_database_long: sqlite3
         zabbix_proxy_dbname: /path/to/sqlite3.db
+
 verifier:
-  name: testinfra
+  name: ansible
+
 scenario:
   test_sequence:
     - dependency

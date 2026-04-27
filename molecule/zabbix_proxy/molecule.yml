@@ -109,5 +109,6 @@ provisioner:
         zabbix_proxy_database: sqlite3
         zabbix_proxy_database_long: sqlite3
         zabbix_proxy_dbname: /path/to/sqlite3.db
+
 verifier:
-  name: testinfra
+  name: ansible
