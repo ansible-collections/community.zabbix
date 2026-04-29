@@ -35,8 +35,8 @@ selinux_allow_zabbix_can_network: true
 
 # Misc.
 zabbix_proxy_conf_mode: "0644"
-zabbix_proxy_config: /etc/zabbix/zabbix_proxy.conf
-zabbix_proxy_include_mode: "0755"
+zabbix_proxy_conf_dir: /etc/zabbix
+zabbix_proxy_config: "{{ zabbix_proxy_conf_dir }}/zabbix_proxy.conf"
 zabbix_proxy_manage_service: true
 zabbix_proxy_privileged_host: localhost
 zabbix_proxy_tls_config:
@@ -64,8 +64,9 @@ zabbix_proxy_historycachesize: 16M
 zabbix_proxy_historyindexcachesize: 4M
 zabbix_proxy_hostname: "{{ inventory_hostname }}"
 zabbix_proxy_housekeepingfrequency: 1
-zabbix_proxy_include_dir: /etc/zabbix/zabbix_proxy.conf.d
-zabbix_proxy_include: "{{ zabbix_proxy_include_dir + '/*.conf' }}"
+zabbix_proxy_include_dir: "{{ zabbix_proxy_conf_dir }}/zabbix_proxy.d"
+zabbix_proxy_include: "{{ zabbix_proxy_include_dir }}/*.conf"
+zabbix_proxy_include_mode: "0755"
 zabbix_proxy_javagatewayport: 10052
 zabbix_proxy_listenip: 0.0.0.0
 zabbix_proxy_libdir: /usr/lib/zabbix

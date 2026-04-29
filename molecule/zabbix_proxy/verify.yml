@@ -47,9 +47,9 @@
           - "'ListenPort=10051' in _proxy_conf_content.content | b64decode"
           - "'DebugLevel=3' in _proxy_conf_content.content | b64decode"
 
-    - name: Stat zabbix_proxy.conf.d include directory
+    - name: Stat zabbix_proxy.d include directory
       ansible.builtin.stat:
-        path: /etc/zabbix/zabbix_proxy.conf.d
+        path: /etc/zabbix/zabbix_proxy.d
       register: _proxy_include_dir
 
     - name: Assert include directory exists with correct ownership

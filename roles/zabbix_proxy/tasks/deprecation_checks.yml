@@ -1,0 +1,26 @@
+---
+# TODO: Update or remove in 6.0.0
+- name: Deprecation /etc/zabbix/zabbix_proxy.conf.d
+  block:
+    - name: Check for deprecated zabbix_proxy.conf.d
+      stat:
+        path: "/etc/zabbix/zabbix_proxy.conf.d"
+      register: _proxy_conf_d
+    - name: Verify zabbix_proxy.conf.d is removed or explicitly specified
+      assert:
+        that:
+          - not _proxy_conf_d.stat.exists or
+            zabbix_proxy_include_dir == '/etc/zabbix/zabbix_proxy.conf.d'
+        fail_msg: Old (deprecated) existing configuration
+  rescue:
+    - name: Deprecation notice for zabbix_proxy.conf.d
+      debug:
+        msg: "{{ deprecation_notice.split('\n') }}"
+      vars:
+        deprecation_notice: |
+          [DEPRECATION] You should either manually set 'zabbix_proxy_include_dir' with existing legacy path, OR move
+          files from '/etc/zabbix/zabbix_proxy.conf.d' to '{{ zabbix_proxy_include_dir }}', update 'Include=' in
+          'zabbix_proxy.conf', and remove the old '/etc/zabbix/zabbix_proxy.conf.d' directory.
+    - name: Provide deprecation override for zabbix_proxy_include_dir
+      set_fact:
+        zabbix_proxy_include_dir: "/etc/zabbix/zabbix_proxy.conf.d"
