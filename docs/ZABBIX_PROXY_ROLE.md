@@ -103,21 +103,23 @@ The following is an overview of all available configuration default for this rol
 * `zabbix_proxy_server`: The ip or dns name for the zabbix-server machine.
 * `zabbix_proxy_install_database_client`: Default: `True`. False does not install database client.
 * `zabbix_proxy_manage_service`: Default: `True`. When you run multiple Zabbix proxies in a High Available cluster setup (e.g. pacemaker), you don't want Ansible to manage the zabbix-proxy service, because Pacemaker is in control of zabbix-proxy service.
+* `zabbix_proxy_conf_dir`: Default: `/etc/zabbix`. The absolute path for general Zabbix configuration files.
+* `zabbix_proxy_conf_file`: Default: `/etc/zabbix/zabbix_proxy.conf`. The absolute path for the Zabbix proxy configuration file.
+* `zabbix_proxy_conf_mode`: Default: `0640`. The "mode" for the Zabbix proxy configuration file.
 * `zabbix_proxy_include_mode`: Default: `0755`. The "mode" for the directory configured with `zabbix_proxy_include`.
-* `zabbix_proxy_conf_mode`: Default: `0640`. The "mode" for the Zabbix configuration file.
 * `zabbix_manage_repo`: Have the collection install and configure the Zabbix repo Default `true`.
 
 ### Database specific
 
 * `zabbix_proxy_dbhost_run_install`: Default: `True`. When set to `True`, sql files will be executed on the host running the database.
 * `zabbix_proxy_database`: Default: `mysql`. The type of database used. Can be: `mysql`, `pgsql` or `sqlite3`
-* `zabbix_proxy_dbhost`: Default: localhost. The hostname on which the database is running. Will be ignored when `sqlite3` is used as database.
-* `zabbix_proxy_real_dbhost`: The hostname of the dbhost that is running behind a loadbalancer/VIP (loadbalancers doesn't accept ssh connections) Will be ignored when `sqlite3` is used as database.
-* `zabbix_proxy_dbname`: Default: zabbix_proxy. The database name which is used by the Zabbix Proxy.
 * `zabbix_proxy_dbuser`: Default: zabbix_proxy. The database username which is used by the Zabbix Proxy. Will be ignored when `sqlite3` is used as database.
 * `zabbix_proxy_dbpassword`: Default: zabbix_proxy. The database user password which is used by the Zabbix Proxy. Will be ignored when `sqlite3` is used as database.
 * `zabbix_proxy_dbpassword_hash_method`: Default: `md5`. Allow switching postgresql user password creation to `scram-sha-256`, when anything other than `md5` is used then ansible won't hash the password with `md5`.
+* `zabbix_proxy_dbhost`: Default: localhost. The hostname on which the database is running. Will be ignored when `sqlite3` is used as database.
 * `zabbix_proxy_dbport`: The database port which is used by the Zabbix Proxy. Will be ignored when `sqlite3` is used as database.
+* `zabbix_proxy_real_dbhost`: The hostname of the dbhost that is running behind a loadbalancer/VIP (loadbalancers doesn't accept ssh connections) Will be ignored when `sqlite3` is used as database.
+* `zabbix_proxy_dbname`: Default: zabbix_proxy. The database name which is used by the Zabbix Proxy.
 * `zabbix_proxy_database_creation`: Default: `True`. When you don't want to create the database including user, you can set it to False.
 * `zabbix_proxy_install_database_client`: Default: `True`. False does not install database client. Default true
 * `zabbix_proxy_database_sqlload`:True / False. When you don't want to load the sql files into the database, you can set it to False.
