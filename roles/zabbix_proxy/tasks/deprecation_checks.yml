@@ -24,3 +24,18 @@
     - name: Provide deprecation override for zabbix_proxy_include_dir
       set_fact:
         zabbix_proxy_include_dir: "/etc/zabbix/zabbix_proxy.conf.d"
+
+- name: Deprecation zabbix_proxy_config
+  block:
+    - name: Verify zabbix_proxy_config goes undefined
+      assert:
+        that:
+          - zabbix_proxy_config is not defined
+        fail_msg: Deprecated configuration option provided
+  rescue:
+    - name: Deprecation notice for zabbix_proxy_config
+      debug:
+        msg: "{{ deprecation_notice.split('\n') }}"
+      vars:
+        deprecation_notice: |
+          zabbix_proxy_config has been deprecated, changed name to zabbix_proxy_conf_file.
