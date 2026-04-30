@@ -27,14 +27,13 @@
         path: /etc/zabbix/zabbix_proxy.conf
       register: _proxy_conf
 
-    # TODO/FIXME: Setting 0644 on a file containing passwords?
     - name: Assert zabbix_proxy.conf exists with correct ownership and mode
       ansible.builtin.assert:
         that:
           - _proxy_conf.stat.exists
           - _proxy_conf.stat.pw_name == 'zabbix'
           - _proxy_conf.stat.gr_name == 'zabbix'
-          - _proxy_conf.stat.mode == '0644'
+          - _proxy_conf.stat.mode == '0640'
 
     - name: Read zabbix_proxy.conf
       ansible.builtin.slurp:
