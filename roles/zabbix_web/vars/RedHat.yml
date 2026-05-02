@@ -5,12 +5,15 @@ _zabbix_web_user:
 _zabbix_web_group:
   apache: apache
   nginx: nginx
+_zabbix_web_http_service:
+  apache: httpd
+  nginx: nginx
 _zabbix_web_vhost_location:
   apache: /etc/httpd/conf.d/zabbix.conf
   nginx: /etc/nginx/conf.d/zabbix.conf
 
 _apache_log: httpd
-_apache_service: httpd
+_apache_test_cmd: apachectl configtest
 
 _zabbix_php_fpm_dir: /etc/php-fpm.d
 _zabbix_php_fpm_listen: /run/php-fpm/zabbix.sock

@@ -9,25 +9,22 @@
     _php_fpm_service:
       Debian: "php{{ zabbix_web_php_installed_version }}-fpm"
 
-- name: restart apache
+- name: test http service config
+  listen: restart http service
+  ansible.builtin.command:
+    cmd: "{{ _cmd[zabbix_web_http_server] }}"
+  become: true
+  vars:
+    _cmd:
+      apache: "{{ _apache_test_cmd }}"
+      nginx: nginx -t
+  register: _test_http_service
+  notify: restart tested http service config
+
+- name: restart tested http service config
+  when: _test_http_service.rc == 0
   ansible.builtin.service:
-    name: "{{ _apache_service }}"
+    name: "{{ zabbix_web_http_service }}"
     state: restarted
     enabled: true
   become: true
-
-- name: test nginx config
-  listen: restart nginx
-  ansible.builtin.command: nginx -t
-  register: zabbix_nginx_cfg_check
-  notify: restart nginx tested
-  become: true
-
-- name: restart nginx tested
-  ansible.builtin.service:
-    name: nginx
-    state: restarted
-    enabled: true
-  become: true
-  when:
-    - zabbix_nginx_cfg_check.rc == 0

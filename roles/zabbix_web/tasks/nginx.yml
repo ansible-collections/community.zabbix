@@ -24,6 +24,7 @@
         - zabbix_web_nginx_installed_version is not defined
 
 - name: "Nginx | Install vhost in conf.d"
+  when: zabbix_web_create_vhost
   ansible.builtin.template:
     src: nginx_vhost.conf.j2
     dest: "{{ zabbix_web_vhost_location }}"
@@ -33,11 +34,8 @@
   vars:
     _document_root: "{{ zabbix_web_version is version('7.2', '>=') | ternary('/usr/share/zabbix/ui', '/usr/share/zabbix') }}"
     _nginx_version: "{{ zabbix_web_nginx_installed_version | default('0.0.0') }}"
-  when:
-    - zabbix_web_create_vhost
   become: true
-  notify:
-    - restart nginx
+  notify: restart http service
   tags:
     - config
 
@@ -63,5 +61,4 @@
           is_required: "{{ zabbix_web_vhost_location != '/etc/nginx/conf.d/zabbix.conf' }}"
       loop_control:
         label: "{{ item.path }}"
-      notify:
-        - restart nginx
+      notify: restart http service

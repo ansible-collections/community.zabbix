@@ -5,12 +5,15 @@ _zabbix_web_user:
 _zabbix_web_group:
   apache: wwwrun
   nginx: nginx
+_zabbix_web_http_service:
+  apache: apache2
+  nginx: nginx
 _zabbix_web_vhost_location:
   apache: /etc/apache2/conf.d/zabbix.conf
   nginx: /etc/nginx/conf.d/zabbix.conf
 
 _apache_log: apache2
-_apache_service: apache2
+_apache_test_cmd: start_apache2 -t
 
 _zabbix_web_create_php_fpm: "{{ zabbix_web_http_server != 'apache' }}"
 _zabbix_php_fpm_dir: "/etc/php{{ zabbix_web_php_installed_version }}/fpm/php-fpm.d"

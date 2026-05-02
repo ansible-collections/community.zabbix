@@ -14,6 +14,7 @@ zabbix_web_conf_mode: "0640"
 zabbix_web_connect_ha_backend: false
 zabbix_api_server_url: zabbix.example.com
 zabbix_web_http_server: apache
+zabbix_web_http_service: "{{ _zabbix_web_http_service[zabbix_web_http_server] }}"
 zabbix_url_aliases: []
 zabbix_web_create_vhost: true
 zabbix_web_create_php_fpm: "{{ _zabbix_web_create_php_fpm | default(zabbix_web_create_vhost) }}"

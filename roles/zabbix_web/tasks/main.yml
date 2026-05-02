@@ -137,5 +137,13 @@
         _php_fpm_service:
           Debian: "php{{ zabbix_web_php_installed_version }}-fpm"
 
-- name: "Install the web server specific tasks"
+- name: "Configure http server"
   ansible.builtin.include_tasks: "{{ zabbix_web_http_server }}.yml"
+
+- meta: flush_handlers
+
+- name: "Ensure http server is running"
+  ansible.builtin.service:
+    name: "{{ zabbix_web_http_service }}"
+    state: started
+    enabled: true

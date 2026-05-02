@@ -1,17 +1,17 @@
 ---
 - name: "Apache | Install apache vhost"
+  when: zabbix_web_create_vhost
   ansible.builtin.template:
     src: apache_vhost.conf.j2
     dest: "{{ zabbix_web_vhost_location }}"
     owner: root
     group: root
     mode: 0644
+  become: true
   vars:
     _document_root: "{{ zabbix_web_version is version('7.2', '>=') | ternary('/usr/share/zabbix/ui', '/usr/share/zabbix') }}"
-  when: zabbix_web_create_vhost
-  become: true
   notify:
-    - restart apache
+    - restart http service
   tags:
     - config
 
@@ -30,8 +30,7 @@
       loop:
         - /etc/apache2/mods-enabled/zabbix.conf
         - /etc/apache2/sites-enabled/000-default.conf  # XXX should this be our responsibility?
-      notify:
-        - restart apache
+      notify: restart http service
 
     - name: Add symlinks
       when: item.is_required | default(true)
@@ -49,5 +48,4 @@
           src: ../sites-available/zabbix.conf
       loop_control:
         label: "{{ item.path }}"
-      notify:
-        - restart apache
+      notify: restart http service
