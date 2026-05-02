@@ -48,12 +48,6 @@ jobs:
           - container:
               image: rockylinux10
             version: v72
-          - container:
-              image: rockylinux10
-            version: v70
-          - container:
-              image: rockylinux10
-            version: v60
     steps:
       - name: Check out code
         uses: actions/checkout@v6
@@ -133,12 +127,6 @@ jobs:
           - container:
               image: rockylinux10
             version: v72
-          - container:
-              image: rockylinux10
-            version: v70
-          - container:
-              image: rockylinux10
-            version: v60
     steps:
       - name: Check out code
         uses: actions/checkout@v6
