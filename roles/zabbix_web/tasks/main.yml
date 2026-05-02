@@ -110,21 +110,32 @@
   tags:
     - config
 
-- name: "Install PHP"
-  ansible.builtin.template:
-    src: php-fpm.conf.j2
-    dest: "{{ zabbix_php_fpm_dir }}/zabbix.conf"
-    owner: "{{ zabbix_php_fpm_conf_user }}"
-    group: "{{ zabbix_php_fpm_conf_group }}"
-    mode: 0644
-  become: true
-  when:
-    - zabbix_web_create_php_fpm
-  notify:
-    - restart php-fpm-version
-    - restart php-fpm
+- name: "Configure PHP-FPM"
+  when: zabbix_web_create_php_fpm
   tags:
     - config
+  block:
+    - name: "Create PHP-FPM pool for zabbix"
+      ansible.builtin.template:
+        src: php-fpm.conf.j2
+        dest: "{{ zabbix_php_fpm_dir }}/zabbix.conf"
+        owner: "{{ zabbix_php_fpm_conf_user }}"
+        group: "{{ zabbix_php_fpm_conf_group }}"
+        mode: 0644
+      become: true
+      notify:
+        - restart php-fpm
+
+    - meta: flush_handlers
+
+    - name: "Ensure PHP-FPM is running"
+      ansible.builtin.service:
+        name: "{{ _php_fpm_service[ansible_facts['os_family']] | default('php-fpm') }}"
+        state: started
+        enabled: true
+      vars:
+        _php_fpm_service:
+          Debian: "php{{ zabbix_web_php_installed_version }}-fpm"
 
 - name: "Install the web server specific tasks"
   ansible.builtin.include_tasks: "{{ zabbix_web_http_server }}.yml"
