@@ -26,28 +26,6 @@
   tags:
     - always
 
-- name: Determine PHP Version
-  ansible.builtin.command:
-    cmd: php --version
-  register: _zabbix_web_php_installed_version
-  changed_when: false
-  tags:
-    - config
-    - install
-
-- name: Set PHP Version
-  ansible.builtin.set_fact:
-    zabbix_web_php_installed_version: "{{ _php_version[ansible_facts.os_family] }}"
-  vars:
-    _php_version_query: 'PHP\s*(\d+\.\d+)\.\d+'
-    _php_version:
-      Debian: "{{ _zabbix_web_php_installed_version.stdout | regex_search(_php_version_query, '\\1') | first }}" # }}"
-      RedHat: "{{ _zabbix_web_php_installed_version.stdout | regex_search(_php_version_query, '\\1') | first | regex_replace('\\.', '') }}"
-      Suse:   "{{ _zabbix_web_php_installed_version.stdout | regex_search(_php_version_query, '\\1') | first | regex_replace('(\\d+)\\.\\d+', '\\1') }}"
-  tags:
-    - config
-    - install
-
 - name: Install Repository
   ansible.builtin.include_role:
     name: community.zabbix.zabbix_repo
@@ -87,8 +65,27 @@
   tags:
     - install
 
-- name: "Install the web server specific tasks"
-  ansible.builtin.include_tasks: "{{ zabbix_web_http_server }}.yml"
+- name: Determine PHP Version
+  ansible.builtin.command:
+    cmd: php --version
+  register: _zabbix_web_php_installed_version
+  changed_when: false
+  tags:
+    - config
+    - install
+
+- name: Set PHP Version
+  ansible.builtin.set_fact:
+    zabbix_web_php_installed_version: "{{ _php_version[ansible_facts.os_family] }}"
+  vars:
+    _php_version_query: 'PHP\s*(\d+\.\d+)\.\d+'
+    _php_version:
+      Debian: "{{ _zabbix_web_php_installed_version.stdout | regex_search(_php_version_query, '\\1') | first }}" # }}"
+      RedHat: "{{ _zabbix_web_php_installed_version.stdout | regex_search(_php_version_query, '\\1') | first | regex_replace('\\.', '') }}"
+      Suse:   "{{ _zabbix_web_php_installed_version.stdout | regex_search(_php_version_query, '\\1') | first | regex_replace('(\\d+)\\.\\d+', '\\1') }}"
+  tags:
+    - config
+    - install
 
 - name: "Create zabbix-web directory"
   ansible.builtin.file:
@@ -128,3 +125,6 @@
     - restart php-fpm
   tags:
     - config
+
+- name: "Install the web server specific tasks"
+  ansible.builtin.include_tasks: "{{ zabbix_web_http_server }}.yml"
