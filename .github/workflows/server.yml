@@ -34,6 +34,7 @@ jobs:
           - image: rockylinux9
           - image: ubuntu2404
           - image: ubuntu2204
+          - image: debian13
           - image: debian12
           - image: debian11
         collection_role:
@@ -56,6 +57,9 @@ jobs:
           - container:
               image: rockylinux10
             version: v60
+          - container:
+              image: debian13
+            version: v72
           - container:
               image: debian11
             version: v74

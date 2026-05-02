@@ -1,6 +1,10 @@
 ---
 _os_key: "{{ (ansible_facts.os_family in ['RedHat', 'Suse']) | ternary(ansible_facts.os_family, ansible_facts.distribution) }}-{{ ansible_facts.distribution_major_version }}"
 _zabbix_web_service_valid_versions:
+  Debian-13:
+    - "7.4"
+    - "7.0"
+    - "6.0"
   Debian-12:
     - "7.4"
     - "7.0"

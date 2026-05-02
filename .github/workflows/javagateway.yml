@@ -34,6 +34,7 @@ jobs:
           - image: rockylinux9
           - image: ubuntu2404
           - image: ubuntu2204
+          - image: debian13
           - image: debian12
           - image: debian11
         version:
@@ -44,6 +45,9 @@ jobs:
         collection_role:
           - zabbix_javagateway
         exclude:
+          - container:
+              image: debian13
+            version: v72
           - container:
               image: rockylinux10
             version: v72

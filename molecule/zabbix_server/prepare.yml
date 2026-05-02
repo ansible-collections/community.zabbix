@@ -25,3 +25,15 @@
         dest: /etc/sudoers
         line: "Defaults    !requiretty"
         state: present
+
+    - name: "Workaround for mysql on Debian-13"
+      when:
+        - ansible_facts.distribution == "Debian"
+        - ansible_facts.distribution_major_version == "13"
+        - "'mysql' in group_names"
+      copy:
+        dest: /root/.my.cnf
+        content: |
+          [client]
+          skip-ssl = true
+        mode: '0600'
