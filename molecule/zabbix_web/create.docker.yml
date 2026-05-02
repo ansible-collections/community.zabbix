@@ -5,17 +5,26 @@
 
   gather_facts: false
 
+  vars:
+    _version_groups: ["v60", "v70", "v72", "v74", "v80"]
+    _g_to_v:
+      v60: "6.0"
+      v70: "7.0"
+      v72: "7.2"
+      v74: "7.4"
+      v80: "8.0"
+
   pre_tasks:
     - name: Create network
       community.docker.docker_network:
         name: zabbix
 
-  tasks:
-    - vars:
+    - name: Create dependency/integration containers
+      vars:
         _database_groups: ['mysql', 'pgsql']
         _db_type: "{{ item.groups | intersect(_database_groups) | first }}"
       block:
-        - name: Create database container(s)
+        - name: Create Zabbix server database container(s)
           community.docker.docker_container:
             name: "{{ item.name }}-db"
             image: "{{ _container[_db_type].image }}"
@@ -25,6 +34,8 @@
               - name: zabbix
             env: "{{ _container[_db_type].env }}"
           loop: "{{ molecule_yml.platforms }}"
+          loop_control:
+            label: "{{ item.name }}-db"
           when: (item.groups | intersect(_database_groups) | length) > 0
           vars:
             _container:
@@ -45,18 +56,12 @@
             recreate: true
             networks:
               - name: zabbix
-#                links:
-#                  - "{{ item.name }}-db"
             env: "{{ _container[_db_type].env }}"
           loop: "{{ molecule_yml.platforms }}"
+          loop_control:
+            label: "{{ item.name }}-server"
           vars:
-            _version_groups: ["v60", "v70", "v72", "v74"]
             _version: "{{ item.groups | intersect(_version_groups) | first }}"
-            _g_to_v:
-              v60: "6.0"
-              v70: "7.0"
-              v72: "7.2"
-              v74: "7.4"
             _container:
               mysql:
                 env:
@@ -70,6 +75,7 @@
                   POSTGRES_PASSWORD: zabbix
                   DB_SERVER_HOST: "{{ item.name }}-db"
 
+  tasks:
     - name: Create OS container(s)
       community.docker.docker_container:
         state: started
@@ -78,7 +84,13 @@
         image: "{{ item.image }}"
         privileged: "{{ item.privileged | default(omit) }}"
         command: "{{ item.command | default(omit) }}"
-        networks: "{{ item.networks | default(omit) }}"
+        networks:
+          - name: zabbix
         volumes: "{{ item.volumes | default(omit) }}"
         cgroupns_mode: "{{ item.cgroupns_mode | default(omit) }}"
+        published_ports:
+          - "{{ 8000 + ansible_loop.index0 }}:80"
       loop: "{{ molecule_yml.platforms }}"
+      loop_control:
+        label: "{{ item.name }}"
+        extended: true

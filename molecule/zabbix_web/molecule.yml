@@ -9,20 +9,64 @@ driver:
   name: default
 
 platforms:
-  - name: zabbix-web-${MY_MOLECULE_VERSION:-v74}-${MY_MOLECULE_DATABASE:-mysql}-${MY_MOLECULE_CONTAINER:-rockylinux10}
+  - name: zabbix-web-${MY_MOLECULE_WEB_SERVER:-apache}-${MY_MOLECULE_DATABASE:-mysql}-${MY_MOLECULE_VERSION:-v74}-${MY_MOLECULE_CONTAINER:-rockylinux10}
     image: geerlingguy/docker-${MY_MOLECULE_IMAGE:-rockylinux10}-ansible:latest
     privileged: true
     pre_build_image: true
     command: ${MOLECULE_DOCKER_COMMAND:-""}
-    networks:
-      - name: zabbix
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:rw
     cgroupns_mode: host
     groups:
+      - ${MY_MOLECULE_WEB_SERVER:-apache}
       - ${MY_MOLECULE_DATABASE:-mysql}
       - ${MY_MOLECULE_VERSION:-v74}
-      - ${MY_MOLECULE_WEB_SERVER:-apache}
+
+#  # Developer example
+#  - name: zabbix-web-apache-mysql-v74-debian13
+#    image: geerlingguy/docker-debian13-ansible:latest
+#    privileged: true
+#    pre_build_image: true
+#    volumes:
+#      - /sys/fs/cgroup:/sys/fs/cgroup:rw
+#    cgroupns_mode: host
+#    groups:
+#      - apache
+#      - mysql
+#      - v74
+#  - name: zabbix-web-apache-pgsql-v74-debian13
+#    image: geerlingguy/docker-debian13-ansible:latest
+#    privileged: true
+#    pre_build_image: true
+#    volumes:
+#      - /sys/fs/cgroup:/sys/fs/cgroup:rw
+#    cgroupns_mode: host
+#    groups:
+#      - apache
+#      - pgsql
+#      - v74
+#  - name: zabbix-web-nginx-mysql-v74-debian13
+#    image: geerlingguy/docker-debian13-ansible:latest
+#    privileged: true
+#    pre_build_image: true
+#    volumes:
+#      - /sys/fs/cgroup:/sys/fs/cgroup:rw
+#    cgroupns_mode: host
+#    groups:
+#      - nginx
+#      - mysql
+#      - v74
+#  - name: zabbix-web-nginx-pgsql-v74-debian13
+#    image: geerlingguy/docker-debian13-ansible:latest
+#    privileged: true
+#    pre_build_image: true
+#    volumes:
+#      - /sys/fs/cgroup:/sys/fs/cgroup:rw
+#    cgroupns_mode: host
+#    groups:
+#      - nginx
+#      - pgsql
+#      - v74
 
 provisioner:
   name: ansible
@@ -41,7 +85,7 @@ provisioner:
         zabbix_server_dbpassword: zabbix
         zabbix_server_dbhost: "{{ inventory_hostname }}-db"
         zabbix_server_dbname: zabbix
-        zabbix_api_server_url: zabbix-web-${MY_MOLECULE_VERSION:-v74}-${MY_MOLECULE_DATABASE:-mysql}-${MY_MOLECULE_CONTAINER:-rockylinux10}
+        zabbix_api_server_url: zabbix-web-${MY_MOLECULE_WEB_SERVER:-apache}-${MY_MOLECULE_DATABASE:-mysql}-${MY_MOLECULE_VERSION:-v74}-${MY_MOLECULE_CONTAINER:-rockylinux10}
       v74:
         zabbix_web_version: 7.4
       v72:
