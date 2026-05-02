@@ -34,17 +34,33 @@
   tasks:
     - name: Install prerequisite packages for zabbix_web role
       package:
-        name: "{{ _zabbix_web_prerequisite_packages[zabbix_web_http_server][ansible_facts.os_family] }}"
+        name: "{{ _zabbix_web_prerequisite_packages[zabbix_web_http_server][ansible_facts.os_family] + _zabbix_web_php_deps[ansible_facts.os_family] | default([]) }}"
       vars:
+        _suse_php_v: "{{ zabbix_web_version is version('7.0', '>=') | ternary('8', '7') }}"
+        _suse_php_json: "{{ (_suse_php_v == '7') | ternary(['php7-json'], []) }}"  # php7-json is built-in on php8. Returns list for concatenation with _php_common.
+        _suse_php_common: ["php{{ _suse_php_v }}-mysql", "php{{ _suse_php_v }}-openssl", "php{{ _suse_php_v }}-pgsql", "php{{ _suse_php_v }}-xmlreader", "php{{ _suse_php_v }}-xmlwriter"]
         _zabbix_web_prerequisite_packages:
           apache:
-            Debian: ["apache2", "php-cli", "php-mysql", "php-pgsql"]
+            Debian: ["apache2", "php-cli"]
             RedHat: ["httpd", "php-cli", "php-fpm"]
-            Suse: ["apache2", "php8-cli", "php8-mysql", "php8-openssl", "php8-pgsql", "php8-xmlreader", "php8-xmlwriter"]
+            Suse: ["apache2", "php{{ _suse_php_v }}-cli"]
           nginx:
-            Debian: ["nginx", "php-fpm", "php-mysql", "php-pgsql"]
+            Debian: ["nginx", "php-fpm"]
             RedHat: ["nginx", "php-cli", "php-fpm"]
-            Suse: ["nginx", "php8-cli", "php8-fpm", "php8-mysql", "php8-openssl", "php8-pgsql", "php8-xmlreader", "php8-xmlwriter"]
+            Suse: ["nginx", "php{{ _suse_php_v }}-cli", "php{{ _suse_php_v }}-fpm"]
+        _zabbix_web_php_deps:  # php packages that aren't necessarily installed with the the main ones
+          Debian: ["php-mysql", "php-pgsql"]
+          Suse: "{{ _suse_php_json + _suse_php_common }}"
+
+    - name: Suse | Create php-fpm config for php7
+      when:
+        - ansible_facts.os_family == "Suse"
+        - zabbix_web_version is not version('7.0', '>=')
+        - zabbix_web_http_server == "nginx"
+      copy:
+        remote_src: true
+        src: /etc/php7/fpm/php-fpm.conf.default
+        dest: /etc/php7/fpm/php-fpm.conf
 
     - name: Debian | Enable apache modules
       when:
