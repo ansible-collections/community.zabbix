@@ -1,0 +1,80 @@
+---
+- name: Verify zabbix_web
+  hosts: all
+  gather_facts: true
+
+  tasks:
+    - name: Gather package facts
+      ansible.builtin.package_facts:
+
+    - name: Assert zabbix-web packages are installed with correct version
+      ansible.builtin.assert:
+        that:
+          - _web_pkg_name in ansible_facts.packages
+          - zabbix_web_version in (ansible_facts.packages[_web_pkg_name] | first).version
+          - _conf_pkg_name in ansible_facts.packages
+          - zabbix_web_version in (ansible_facts.packages[_conf_pkg_name] | first).version
+      vars:
+        # Starting with version 7.0, Suse appears to append -php8 to the package names zabbix-apache-conf and zabbix-nginx-conf.
+        _php_suffix: "{{ (ansible_facts.os_family == 'Suse' and zabbix_web_version is version('7.0', '>=')) | ternary('-php8', '') }}"
+        _web_pkg_map:
+          Debian: "zabbix-frontend-php"
+        _web_pkg_name: "{{ _web_pkg_map[ansible_facts.os_family] | default('zabbix-web-' ~ zabbix_server_database) }}"
+        _conf_pkg_name: "zabbix-{{ zabbix_web_http_server }}-conf{{ _php_suffix }}"
+
+    - name: Stat zabbix.conf.php
+      ansible.builtin.stat:
+        path: /etc/zabbix/web/zabbix.conf.php
+      register: _zabbix_conf_php
+
+    - name: Assert zabbix.conf.php exists with correct ownership and mode
+      ansible.builtin.assert:
+        that:
+          - _zabbix_conf_php.stat.exists
+          - _zabbix_conf_php.stat.pw_name == _owner
+          - _zabbix_conf_php.stat.gr_name == _group
+          - _zabbix_conf_php.stat.mode == '0640'
+      vars:
+        _owner_map:
+          apache:
+            Debian: www-data
+            RedHat: apache
+            Suse: wwwrun
+          nginx:
+            Debian: nginx
+            RedHat: nginx
+            Suse: nginx
+        _owner: "{{ _owner_map[zabbix_web_http_server][ansible_facts.os_family] }}"
+        _group_map:
+          apache:
+            Debian: www-data
+            RedHat: apache
+            Suse: www
+          nginx:
+            Debian: nginx
+            RedHat: nginx
+            Suse: nginx
+        _group: "{{ _group_map[zabbix_web_http_server][ansible_facts.os_family] }}"
+
+    - name: Test Zabbix API login
+      ansible.builtin.uri:
+        url: "http://{{ zabbix_api_server_url }}/api_jsonrpc.php"
+        method: POST
+        headers:
+          Content-Type: application/json-rpc
+        body_format: json
+        body:
+          jsonrpc: "2.0"
+          method: "user.login"
+          params:
+            username: Admin
+            password: zabbix
+          id: auth
+        return_content: true
+      register: _zabbix_api_response
+
+    - name: Assert Zabbix API login succeeded
+      ansible.builtin.assert:
+        that:
+          - _zabbix_api_response.json.result is defined
+          - _zabbix_api_response.json.result | length > 0

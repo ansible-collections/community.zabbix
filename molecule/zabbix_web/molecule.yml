@@ -85,15 +85,15 @@ provisioner:
         zabbix_server_dbpassword: zabbix
         zabbix_server_dbhost: "{{ inventory_hostname }}-db"
         zabbix_server_dbname: zabbix
-        zabbix_api_server_url: zabbix-web-${MY_MOLECULE_WEB_SERVER:-apache}-${MY_MOLECULE_DATABASE:-mysql}-${MY_MOLECULE_VERSION:-v74}-${MY_MOLECULE_CONTAINER:-rockylinux10}
+        zabbix_api_server_url: "{{ inventory_hostname }}"
       v74:
-        zabbix_web_version: 7.4
+        zabbix_web_version: "7.4"
       v72:
-        zabbix_web_version: 7.2
+        zabbix_web_version: "7.2"
       v70:
-        zabbix_web_version: 7.0
+        zabbix_web_version: "7.0"
       v60:
-        zabbix_web_version: 6.0
+        zabbix_web_version: "6.0"
       mysql:
         zabbix_server_database: mysql
       pgsql:
@@ -104,4 +104,4 @@ provisioner:
         zabbix_web_http_server: nginx
 
 verifier:
-  name: testinfra
+  name: ansible

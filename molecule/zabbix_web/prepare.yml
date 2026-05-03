@@ -4,12 +4,17 @@
 
   pre_tasks:
     # issues on redhat with curl, so install curl-minimal.
+    # suse containers have a partial python3.11 install, py311-rpm needed for ansible.builtin.package_facts
     - name: "Installing packages"
       ansible.builtin.package:
-        name:
-          - "curl{% if ansible_facts['os_family'] == 'RedHat' and ansible_facts['distribution_major_version'] | int > 8 %}-minimal{% endif %}"
-          - sudo
+        name: "{{ _packages | select | list }}"
         update_cache: "{{ (ansible_facts['os_family'] in ['Debian', 'Suse']) | ternary(true, omit) }}"
+      vars:
+        _py3_rpm: "python3{% if ansible_facts.python.version.minor != 6 %}{{ ansible_facts.python.version.minor }}{% endif %}-rpm"
+        _packages:
+          - "curl{% if ansible_facts['os_family'] == 'RedHat' and ansible_facts['distribution_major_version'] | int > 8 %}-minimal{% endif %}"
+          - "{{ (ansible_facts['os_family'] == 'Suse') | ternary(_py3_rpm, '') }}"
+          - sudo
       register: installation_dependencies
       until: installation_dependencies is succeeded
 
