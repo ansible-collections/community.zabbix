@@ -219,6 +219,7 @@ zabbix_server_mysql_login_host: mysql-host
 zabbix_server_mysql_login_user: root
 zabbix_server_mysql_login_password: changeme
 zabbix_server_mysql_login_port: 3306
+zabbix_server_mysql_login_unix_socket: /var/run/mysqld/mysqld.sock
 ```
 
 Please generate a value for the `zabbix_server_dbpassword` property (Maybe use `ansible-vault` for this). The zabbix-server role will create an database and username (With the provided value for the password) in `MySQL`.
