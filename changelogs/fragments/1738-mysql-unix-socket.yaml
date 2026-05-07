@@ -1,4 +1,2 @@
-bugfixes:
-  - zabbix_server - add ``zabbix_server_mysql_login_unix_socket`` variable to
-    support connecting to MySQL via Unix socket in the version check and schema
-    import tasks (https://github.com/ansible-collections/community.zabbix/pull/1738).
+minor_changes:
+  - zabbix_server - add ``zabbix_server_mysql_login_unix_socket`` variable to support connecting to MySQL via Unix socket in the version check and schema import tasks.
