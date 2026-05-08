@@ -87,14 +87,12 @@
     #  register: _res
 
     # https://www.zabbix.com/documentation/current/en/manual/installation/install_from_packages/win_msi
+    # cmd: form needed so MSI public properties with spaces can use the
+    # PROPERTY="value" quoting msiexec requires.
     - name: Install Zabbix Agent
       ansible.windows.win_command:
         chdir: "{{ _zabbix_agent_win_userprofile_path.stdout | trim }}/Downloads"
-        argv:
-          - msiexec
-          - /i
-          #- "/l*v zabbix-install.log"
-          - "{{ zabbix_agent_win_package }}"
-          - /qn
-          - "SERVER={{ zabbix_agent_server }}"
-          - "INSTALLFOLDER={{ zabbix_agent_win_install_dir }}"
+        cmd: >-
+          msiexec /i "{{ zabbix_agent_win_package }}" /qn
+          SERVER="{{ zabbix_agent_server }}"
+          INSTALLFOLDER="{{ zabbix_agent_win_install_dir | replace('/', '\\') }}"

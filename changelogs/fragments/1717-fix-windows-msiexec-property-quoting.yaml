@@ -1,0 +1,2 @@
+bugfixes:
+  - zabbix_agent - fix Windows agent installation hanging indefinitely when MSI public properties contain spaces; switch ``win_command`` from ``argv:`` to ``cmd:`` form so values can use the ``PROPERTY="value"`` quoting msiexec requires (https://github.com/ansible-collections/community.zabbix/issues/1717).
