@@ -111,6 +111,7 @@ The following is an overview of all available configuration defaults for this ro
 * `zabbix_saml_idp_crt`: (Optional) The path to the certificate of the Identity Provider used for SAML authentication
 * `zabbix_saml_sp_crt`: (Optional) The path to the public certificate of Zabbix as Service Provider
 * `zabbix_saml_sp_key`: (Optional) The path to the private certificate of Zabbix as Service Provider
+* `zabbix_web_custom_zabbix_conf_php`: (Optional) Any custom php options appended to zabbix.conf.php
 
 #### Apache/Nginx Configuration
 
