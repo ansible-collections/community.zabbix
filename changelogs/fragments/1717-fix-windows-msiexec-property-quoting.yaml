@@ -1,2 +1,3 @@
 bugfixes:
   - zabbix_agent - fix Windows agent installation hanging indefinitely when MSI public properties contain spaces; switch ``win_command`` from ``argv:`` to ``cmd:`` form so values can use the ``PROPERTY="value"`` quoting msiexec requires (https://github.com/ansible-collections/community.zabbix/issues/1717).
+  - zabbix_agent - fix Windows agent ``Include`` paths in ``zabbix_agent2.conf`` reverting to Linux defaults (``/etc/zabbix/zabbix_agent2.d``); ``_zabbix_agent_include_dirs`` referenced the now-deprecated ``zabbix_agent_win_install_dir_conf`` without a fallback, which made it evaluate as undefined and ``default(_includes)`` fall through to the Linux paths. Same regression as previously reported in #1378 and #1580.
