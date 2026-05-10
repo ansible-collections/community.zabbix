@@ -52,7 +52,7 @@
     name: community.zabbix.zabbix_repo
   vars:
     zabbix_repo_version: "{{ zabbix_agent_version }}"
-    zabbix_repo_package: "{{ zabbix_agent_package }}"
+    zabbix_repo_package: "{{ zabbix_agent_package }} zabbix-get zabbix-sender"
   when:
     - zabbix_manage_repo | default(true)
     - not (zabbix_agent_docker | bool)

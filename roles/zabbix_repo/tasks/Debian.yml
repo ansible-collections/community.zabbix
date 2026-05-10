@@ -74,9 +74,9 @@
 
 - name: "Debian | Configuring the weight for APT"
   ansible.builtin.copy:
-    dest: "/etc/apt/preferences.d/{{ zabbix_repo_package }}"
+    dest: "/etc/apt/preferences.d/{{ item }}"
     content: |
-      Package: {{ zabbix_repo_package }}
+      Package: {{ item }}
       Pin: origin repo.zabbix.com
       Pin-Priority: {{ zabbix_repo_apt_priority }}
     owner: root
@@ -84,6 +84,7 @@
   when:
     - zabbix_repo_package is defined
     - zabbix_repo_package | length > 0
+  loop: "{{ zabbix_repo_package | split }}"
   become: true
   tags:
     - install

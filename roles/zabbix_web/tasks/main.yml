@@ -31,7 +31,7 @@
     name: community.zabbix.zabbix_repo
   vars:
     zabbix_repo_version: "{{ zabbix_web_version }}"
-    zabbix_repo_package: "zabbix-web-service"
+    zabbix_repo_package: "{{ zabbix_web_packages | join(' ') }}"
   when: zabbix_manage_repo | default(true)
 
 - name: "Configure SELinux when enabled"
