@@ -134,6 +134,8 @@ jobs:
             ansible_core: ansible-core<2.17
           - image: rockylinux8
             ansible_core: ansible-core<2.17
+          - image: opensuseleap15
+            ansible_core: ansible-core<2.17
         collection_role:
           - zabbix_web
         database:
@@ -147,6 +149,10 @@ jobs:
           - v72
           - v70
           - v60
+        exclude:
+          - container:
+              image: opensuseleap15
+            version: v72
     steps:
       - name: Check out code
         uses: actions/checkout@v6
