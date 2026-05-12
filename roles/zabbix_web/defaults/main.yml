@@ -46,7 +46,7 @@ zabbix_web_php_fpm_max_childs: 50
 zabbix_web_php_fpm_start_servers: 5
 zabbix_web_php_fpm_min_spare_servers: 5
 zabbix_web_php_fpm_max_spare_servers: 35
-
+zabbix_web_custom_zabbix_conf_php: ""
 
 # Database
 zabbix_server_database: pgsql

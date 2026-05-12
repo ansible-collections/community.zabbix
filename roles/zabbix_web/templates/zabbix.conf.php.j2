@@ -65,7 +65,7 @@ $SSO['SP_KEY'] = '{{ zabbix_saml_sp_key }}';
 {% endif %}
 {% endif %}
 
-{% if zabbix_web_custom_zabbix_conf_php | default('') | length > 0 %}
+{% if zabbix_web_custom_zabbix_conf_php | length > 0 %}
 {{ zabbix_web_custom_zabbix_conf_php }}
 {% endif %}
 ?>
