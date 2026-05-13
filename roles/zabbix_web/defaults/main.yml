@@ -81,8 +81,6 @@ selinux_allow_httpd_can_connect_ldap: false
 selinux_allow_httpd_can_connect_zabbix: true
 selinux_allow_httpd_can_network_connect_db: true
 
-zabbix_repo_deb_gpg_key_url: http://repo.zabbix.com/zabbix-official-repo.key
-zabbix_repo_deb_include_deb_src: true
 # SAML certificates
 # zabbix_saml_idp_crt:
 # zabbix_saml_sp_crt:
