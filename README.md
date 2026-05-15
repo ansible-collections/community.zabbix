@@ -97,8 +97,8 @@ Additional collections may be required when running the various roles.
 
 * `ansible.posix`:  Required if using SELinux portion of any roles
 * `ansible.general`:  Required if using SELinux portion of any roles
+* `ansible.mysql`:  Required for the proxy or server roles if using MySQL
 * `ansible.netcommon`:  Required when using the agent role
-* `community.mysql`:  Required for the proxy or server roles if using MySQL
 * `community.postgresql`:  Required for the proxy or server roles if using PostgreSQL
 * `community.windows`:  Required for the agent role if installing on Windows
 

@@ -59,10 +59,10 @@ ansible-galaxy collection install ansible.netcommon
 
 ### MySQL
 
-When you are a MySQL user and using Ansible 2.10 or newer, then there is a dependency on the collection named `community.mysql`. This collections are needed as the `mysql_` modules are now part of collections and not standard in Ansible anymmore. Installing the collection:
+When you are a MySQL user and using Ansible 2.10 or newer, then there is a dependency on the collection named `ansible.mysql`. This collections are needed as the `mysql_` modules are now part of collections and not standard in Ansible anymmore. Installing the collection:
 
 ```sh
-ansible-galaxy collection install community.mysql
+ansible-galaxy collection install ansible.mysql
 ```
 
 ### PostgreSQL

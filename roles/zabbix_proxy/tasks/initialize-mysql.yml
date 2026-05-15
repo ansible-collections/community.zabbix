@@ -41,7 +41,7 @@
     - skip_ansible_lint
   block:
     - name: "MySQL | Register active MySQL authentication plugins"
-      community.mysql.mysql_query:
+      ansible.mysql.mysql_query:
         login_user: "{{ zabbix_proxy_mysql_login_user | default(omit) }}"
         login_password: "{{ zabbix_proxy_mysql_login_password | default(omit) }}"
         login_host: "{{ zabbix_proxy_mysql_login_host | default(omit) }}"
@@ -78,7 +78,7 @@
           - zabbix_proxy_mysql_auth_salt | length == 20
 
     - name: "MySQL | Create database"
-      community.mysql.mysql_db:
+      ansible.mysql.mysql_db:
         login_user: "{{ zabbix_proxy_mysql_login_user | default(omit) }}"
         login_password: "{{ zabbix_proxy_mysql_login_password | default(omit) }}"
         login_host: "{{ zabbix_proxy_mysql_login_host | default(omit) }}"
@@ -91,7 +91,7 @@
       register: zabbix_database_created
 
     - name: "MySQL | Create database user"
-      community.mysql.mysql_user:
+      ansible.mysql.mysql_user:
         login_user: "{{ zabbix_proxy_mysql_login_user | default(omit) }}"
         login_password: "{{ zabbix_proxy_mysql_login_password | default(omit) }}"
         login_host: "{{ zabbix_proxy_mysql_login_host | default(omit) }}"
@@ -117,7 +117,7 @@
     - database
   block:
     - name: "MySQL | Get current database version"
-      community.mysql.mysql_query:
+      ansible.mysql.mysql_query:
         login_user: "{{ zabbix_proxy_dbuser }}"
         login_password: "{{ zabbix_proxy_dbpassword }}"
         login_host: "{{ zabbix_proxy_dbhost }}"
@@ -129,7 +129,7 @@
       delegate_to: "{{ zabbix_proxy_real_dbhost | default(zabbix_proxy_dbhost_run_install | ternary(delegated_dbhost, inventory_hostname)) }}"
       block:
         - name: "MySQL | Get current value for variables"
-          community.mysql.mysql_variables:
+          ansible.mysql.mysql_variables:
             variable: "{{ name }}"
             login_user: "{{ zabbix_proxy_mysql_login_user | default(omit) }}"
             login_password: "{{ zabbix_proxy_mysql_login_password | default(omit) }}"
@@ -144,7 +144,7 @@
           register: _mysql_variable_defaults
 
         - name: "MySQL | Set variable overrides for schema import"
-          community.mysql.mysql_variables:
+          ansible.mysql.mysql_variables:
             variable: "{{ item.name }}"
             value: "{{ _mysql_schema_import_overrides[item.name] }}"
             login_user: "{{ zabbix_proxy_mysql_login_user | default(omit) }}"
@@ -162,7 +162,7 @@
               log_bin_trust_function_creators: "ON"
 
     - name: "MySQL | Import schema"
-      community.mysql.mysql_db:
+      ansible.mysql.mysql_db:
         login_user: "{{ zabbix_proxy_dbuser }}"
         login_password: "{{ zabbix_proxy_dbpassword }}"
         login_host: "{{ zabbix_proxy_dbhost }}"
@@ -176,7 +176,7 @@
   always:
     - name: "MySQL | Revert variable overrides for schema import"
       delegate_to: "{{ zabbix_proxy_real_dbhost | default(zabbix_proxy_dbhost_run_install | ternary(delegated_dbhost, inventory_hostname)) }}"
-      community.mysql.mysql_variables:
+      ansible.mysql.mysql_variables:
         variable: "{{ item.name }}"
         value: "{{ item.msg }}"
         login_user: "{{ zabbix_proxy_mysql_login_user | default(omit) }}"

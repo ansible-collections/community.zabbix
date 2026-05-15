@@ -1,0 +1,2 @@
+breaking_changes:
+  - Migrate and update `community.mysql` deprecated collection to `ansible.mysql`
