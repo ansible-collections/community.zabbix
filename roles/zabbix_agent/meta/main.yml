@@ -34,7 +34,6 @@ galaxy_info:
         - 13.2
     - name: FreeBSD
       versions:
-        - 13
         - 14
         - 15
     - name: Windows

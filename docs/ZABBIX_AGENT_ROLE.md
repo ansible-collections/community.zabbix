@@ -101,7 +101,6 @@ See the following list of supported Operating systems with the Zabbix releases:
 | Suse Fam 15         |  V  |  V  |  V  |  V  |
 | FreeBSD 15          |  V  |  V  |  V  |  V  |
 | FreeBSD 14          |  V  |  V  |  V  |  V  |
-| FreeBSD 13          |  V  |  V  |  V  |  V  |
 
 You can bypass this matrix by setting `zabbix_agent_version_check: false`
 
