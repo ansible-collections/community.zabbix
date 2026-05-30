@@ -36,7 +36,6 @@ jobs:
           - image: ubuntu2204
           - image: debian13
           - image: debian12
-          - image: debian11
         version:
           - v74
           - v72

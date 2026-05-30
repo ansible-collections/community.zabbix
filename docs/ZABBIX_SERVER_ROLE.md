@@ -82,7 +82,6 @@ See the following list of supported Operating systems with the Zabbix releases:
 | Ubuntu 24.04 noble  |  V  |  V  |  V  |  V  |
 | Ubuntu 22.04 jammy  |  V  |  V  |  V  |  V  |
 | Debian 12 bookworm  |  V  |  V  |  V  |  V  |
-| Debian 11 bullseye  |     |     |     |  V  |
 | Suse Fam 15         |  V  |  V  |  V  |  V  |
 
 You can bypass this matrix by setting `zabbix_server_version_check: false`

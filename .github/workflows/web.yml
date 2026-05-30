@@ -36,7 +36,6 @@ jobs:
           - image: ubuntu2204
           - image: debian13
           - image: debian12
-          - image: debian11
         collection_role:
           - zabbix_web
         database:
@@ -63,15 +62,6 @@ jobs:
           - container:
               image: debian13
             version: v72
-          - container:
-              image: debian11
-            version: v74
-          - container:
-              image: debian11
-            version: v72
-          - container:
-              image: debian11
-            version: v70
     steps:
       - name: Check out code
         uses: actions/checkout@v6

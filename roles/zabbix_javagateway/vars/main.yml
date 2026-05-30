@@ -10,11 +10,6 @@ _zabbix_javagateway_valid_versions:
     - "7.2"
     - "7.0"
     - "6.0"
-  Debian-11:
-    - "7.4"
-    - "7.2"
-    - "7.0"
-    - "6.0"
   RedHat-10:
     - "7.4"
     - "7.0"
