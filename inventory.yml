@@ -1,0 +1,4 @@
+test:
+  hosts:
+    test_host:
+      ansible_host: 192.168.30.201

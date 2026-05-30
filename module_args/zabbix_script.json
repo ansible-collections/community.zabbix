@@ -1,0 +1,17 @@
+{
+    "ANSIBLE_MODULE_ARGS": {
+        "name": "Test manual event action script",
+        "scope": "manual_event_action",
+        "script_type": "url",
+        "description": "Test manual event action script",
+        "state": "present",
+        "url": "http://google2.com",
+        "new_window": false,
+        "user_input_enabled": true,
+        "user_input_type": "regex",
+        "user_input_regex": "test.*",
+        "user_input_default_input": "test",
+        "user_input_prompt": "test prompt",
+        "confirmation": "test confirmation"
+    }
+}

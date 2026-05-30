@@ -1,0 +1,4 @@
+bugfixes:
+- zabbix_proxy - Remove usage of deprecated postgresql parameter aliases
+breaking_changes:
+- All roles - Set minimum supported version for common.postgresql to 3.5.0

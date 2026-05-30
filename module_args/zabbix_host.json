@@ -1,0 +1,17 @@
+{
+    "ANSIBLE_MODULE_ARGS": {
+        "host_name": "Test_host",
+        "visible_name": "Visible name",
+        "description": "test description",
+        "host_groups": [
+            "Linux servers"
+        ],
+        "inventory_mode": "manual",
+        "status": "enabled",
+        "state": "present",
+        "monitored_by": "zabbix_server",
+        "ipmi_privilege": 1,
+        "ipmi_username": "test_username",
+        "ipmi_password": "PASSword123"
+    }
+}
