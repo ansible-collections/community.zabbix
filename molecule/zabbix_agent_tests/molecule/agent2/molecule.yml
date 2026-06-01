@@ -17,3 +17,5 @@ provisioner:
             options:
               - parameter: LogRemoteCommands
                 value: 0
+        zabbix_agent2_plugins:
+          - zabbix-agent2-plugin-mongodb
