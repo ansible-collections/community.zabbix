@@ -67,6 +67,14 @@
   loop_control:
     loop_var: _install_tasks_file
 
+- name: "Install zabbix_agent2_plugins"
+  ansible.builtin.package:
+    name: "{{ zabbix_agent2_plugins }}"
+    state: "{{ zabbix_agent_package_state }}"
+    update_cache: true
+    disablerepo: "{{ zabbix_agent_disable_repo | default(_zabbix_agent_disable_repo | default(omit)) }}"
+  when: zabbix_agent2_plugins is defined
+
 - name: "Configure Agent"
   when: ansible_facts['os_family'] not in ['Darwin']
   ansible.builtin.include_tasks: "{{ _configure_tasks_file }}"

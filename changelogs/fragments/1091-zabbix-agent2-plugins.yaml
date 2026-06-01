@@ -1,0 +1,2 @@
+minor_changes:
+  - zabbix_agent - added zabbix_agent2_plugins variable to install agent2 plugin packages (https://github.com/ansible-collections/community.zabbix/issues/1091).

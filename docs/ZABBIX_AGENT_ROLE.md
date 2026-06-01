@@ -343,6 +343,7 @@ The following table lists all variables that are exposed to modify the configura
 | PersistentBufferPeriod | zabbix_agent_persistentbufferperiod | 1h | Agent 2 Only |
 | PidFile | zabbix_agent_pidfile | /var/run/zabbix/`{{ agent version specific }}`.pid | Linux Systems Only |
 | Plugin | zabbix_agent_plugins |  |  |
+| — | zabbix_agent2_plugins |  | List of agent2 plugin packages to install. Agent 2 Only. Undefined by default. |
 | PluginSocket | zabbix_agent_pluginsocket | /tmp/agent.plugin.sock | Agent 2 Only  |
 | PluginTimeout | zabbix_agent_plugintimeout | 3 | Agent 2 Only |
 | RefreshActiveChecks | zabbix_agent_refreshactivechecks |  |  |
