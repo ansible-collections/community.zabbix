@@ -143,7 +143,19 @@ Selinux changes will be installed based on the status of selinux running on the 
 * `zabbix_agent_install_agent_only`: Only install the Zabbix Agent and not the `zabbix-sender` and `zabbix-get` packages. Default: `False`
 * `zabbix_agent_package_remove`: If `zabbix_agent2: True` and you want to remove the old installation. Default: `False`.
 * `zabbix_agent_package_state`: If Zabbix-agent needs to be `present` (default) or `latest`.
-* `zabbix_agent_package`: The name of the zabbix-agent package. Default: `zabbix-agent` if `zabbix_agent2` is false and `zabbix-agent2` if `true`.
+* `zabbix_agent_packages`: List of packages to install. Defaults to `[zabbix-agent]` or `[zabbix-agent2]` depending on `zabbix_agent2`. Use this to add agent2 plugin packages:
+  ```yaml
+  # Debian/Ubuntu
+  zabbix_agent_packages:
+    - zabbix-agent2
+    - zabbix-agent2-plugin-mongodb
+
+  # RedHat — include version suffix to stay consistent with the agent package
+  zabbix_agent_packages:
+    - "zabbix-agent2-{{ zabbix_agent_version }}.{{ zabbix_agent_version_minor }}"
+    - "zabbix-agent2-plugin-mongodb-{{ zabbix_agent_version }}.{{ zabbix_agent_version_minor }}"
+  ```
+* `zabbix_agent_package`: **Deprecated.** Use `zabbix_agent_packages` instead. The name of the zabbix-agent package. Default: `zabbix-agent` if `zabbix_agent2` is false and `zabbix-agent2` if `true`.
 * `zabbix_agent_sender_package`: The name of the zabbix-sender package. Default: `zabbix-sender`.
 * `zabbix_agent_userparameters`: Default: `[]`. List of userparameter names and scripts (if any). Detailed description is given in the [Deploying Userparameters](#deploying-userparameters) section.
   * `name`: Userparameter name (should be the same with userparameter template file name)
@@ -343,7 +355,6 @@ The following table lists all variables that are exposed to modify the configura
 | PersistentBufferPeriod | zabbix_agent_persistentbufferperiod | 1h | Agent 2 Only |
 | PidFile | zabbix_agent_pidfile | /var/run/zabbix/`{{ agent version specific }}`.pid | Linux Systems Only |
 | Plugin | zabbix_agent_plugins |  |  |
-| — | zabbix_agent2_plugins |  | List of agent2 plugin packages to install. Agent 2 Only. Undefined by default. |
 | PluginSocket | zabbix_agent_pluginsocket | /tmp/agent.plugin.sock | Agent 2 Only  |
 | PluginTimeout | zabbix_agent_plugintimeout | 3 | Agent 2 Only |
 | RefreshActiveChecks | zabbix_agent_refreshactivechecks |  |  |

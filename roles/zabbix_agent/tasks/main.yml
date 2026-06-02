@@ -52,7 +52,7 @@
     name: community.zabbix.zabbix_repo
   vars:
     zabbix_repo_version: "{{ zabbix_agent_version }}"
-    zabbix_repo_package: "{{ zabbix_agent_package }} zabbix-get zabbix-sender"
+    zabbix_repo_package: "{{ zabbix_agent_packages | flatten | first }} zabbix-get zabbix-sender"
   when:
     - zabbix_manage_repo | default(true)
     - not (zabbix_agent_docker | bool)
@@ -66,14 +66,6 @@
     - "install.yml"
   loop_control:
     loop_var: _install_tasks_file
-
-- name: "Install zabbix_agent2_plugins"
-  ansible.builtin.package:
-    name: "{{ zabbix_agent2_plugins }}"
-    state: "{{ zabbix_agent_package_state }}"
-    update_cache: true
-    disablerepo: "{{ zabbix_agent_disable_repo | default(_zabbix_agent_disable_repo | default(omit)) }}"
-  when: zabbix_agent2_plugins is defined
 
 - name: "Configure Agent"
   when: ansible_facts['os_family'] not in ['Darwin']

@@ -1,7 +1,7 @@
 ---
 - name: "Installing zabbix-agent"
   community.general.pkgng:
-    name: "{{ zabbix_agent_package }}"
+    name: "{{ zabbix_agent_packages }}"
     state: "{{ zabbix_agent_package_state }}"
   environment:
     http_proxy: "{{ zabbix_http_proxy | default('') }}"

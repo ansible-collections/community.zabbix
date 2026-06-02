@@ -15,7 +15,7 @@
   tags:
     - install
   loop:
-    - name: "{{ zabbix_agent_package }}"
+    - name: "{{ zabbix_agent_packages }}"
       state: "{{ zabbix_agent_package_state }}"
     - name: "{{ zabbix_agent_get_package }}"
       state: "{{ zabbix_agent_install_agent_only | ternary('absent', zabbix_agent_package_state) }}"
