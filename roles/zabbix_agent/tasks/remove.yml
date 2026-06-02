@@ -16,7 +16,7 @@
 
 - name: "Remove | Package removal"
   ansible.builtin.package:
-    name: "{{ zabbix_agent_packages | flatten | first | replace('agent2', 'agent') }}"
+    name: zabbix-agent
     state: absent
   become: true
 
