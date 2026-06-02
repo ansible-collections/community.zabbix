@@ -1,4 +1,23 @@
 ---
+- name: Deprecation zabbix_agent_package
+  block:
+    - name: Verify zabbix_agent_package goes undefined
+      assert:
+        that:
+          - zabbix_agent_package is not defined
+        fail_msg: Deprecated configuration option provided
+  rescue:
+    - name: Deprecation notice for zabbix_agent_package
+      debug:
+        msg: "{{ deprecation_notice.split('\n') }}"
+      vars:
+        deprecation_notice: |
+          zabbix_agent_package has been deprecated, use zabbix_agent_packages (list) instead.
+          Example:
+            zabbix_agent_packages:
+              - zabbix-agent2
+              - zabbix-agent2-plugin-mongodb
+
 - name: Deprecation zabbix_agent_win_install_dir_conf
   block:
     - name: Verify zabbix_agent_win_install_dir_conf goes undefined
