@@ -36,20 +36,29 @@ jobs:
 
   sanity:
     name: Sanity (Ⓐ${{ matrix.ansible }}+py${{ matrix.python }})
+    # devel is the next-stable branch; test it but do not let its expected breakages block the run.
+    continue-on-error: ${{ matrix.ansible == 'devel' }}
     strategy:
+      fail-fast: false
       matrix:
-        ansible:
-          # It's important that Sanity is tested against all stable-X.Y branches
-          # Testing against `devel` may fail as new tests are added.
-
-          # https://docs.ansible.com/projects/ansible/latest/reference_appendices/release_and_maintenance.html#ansible-core-changelogs
-          - stable-2.16
-          - stable-2.17
-          - stable-2.18
-          - stable-2.19
-          - devel
-        python:
-          - '3.12'
+        # Newest first (fast feedback), then older releases retroactively, each paired with a
+        # supported controller Python. devel = next stable (Python >= 3.13).
+        # https://docs.ansible.com/projects/ansible/latest/reference_appendices/release_and_maintenance.html#ansible-core-changelogs
+        include:
+          - ansible: devel
+            python: '3.13'
+          - ansible: stable-2.21
+            python: '3.13'
+          - ansible: stable-2.20
+            python: '3.13'
+          - ansible: stable-2.19
+            python: '3.12'
+          - ansible: stable-2.18
+            python: '3.12'
+          - ansible: stable-2.17
+            python: '3.12'
+          - ansible: stable-2.16
+            python: '3.12'
     runs-on: ubuntu-latest
     steps:
       # ansible-test requires the collection to be in a directory in the form

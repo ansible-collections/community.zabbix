@@ -93,6 +93,8 @@ jobs:
     if: needs.prepare.outputs.has_targets == 'true'
     runs-on: ubuntu-latest
     name: I (${{ matrix.zabbix_container.version}} Ⓐ${{ matrix.ansible_python.ansible }}+py${{ matrix.ansible_python.python }}})
+    # devel is the next-stable branch; test it but do not let its expected breakages block the run.
+    continue-on-error: ${{ matrix.ansible_python.ansible == 'devel' }}
     strategy:
       fail-fast: false
       matrix:
@@ -102,26 +104,36 @@ jobs:
           - version: "7.2"
           - version: "7.4"
         ansible_python:
-          - ansible: stable-2.16
-            python: '3.10'
-          - ansible: stable-2.16
+          # Newest first (fast feedback), then older releases retroactively. Test the minimum and
+          # maximum supported controller Python per ansible-core branch. devel = next stable.
+          - ansible: devel
+            python: '3.14'
+          - ansible: devel
+            python: '3.13'
+          - ansible: stable-2.21
+            python: '3.14'
+          - ansible: stable-2.21
             python: '3.12'
-          - ansible: stable-2.17
-            python: '3.10'
-          - ansible: stable-2.17
+          - ansible: stable-2.20
+            python: '3.14'
+          - ansible: stable-2.20
             python: '3.12'
-          - ansible: stable-2.18
-            python: '3.11'
-          - ansible: stable-2.18
+          - ansible: stable-2.19
             python: '3.13'
           - ansible: stable-2.19
             python: '3.11'
-          - ansible: stable-2.19
+          - ansible: stable-2.18
             python: '3.13'
-          - ansible: devel
+          - ansible: stable-2.18
+            python: '3.11'
+          - ansible: stable-2.17
             python: '3.12'
-          - ansible: devel
-            python: '3.13'
+          - ansible: stable-2.17
+            python: '3.10'
+          - ansible: stable-2.16
+            python: '3.12'
+          - ansible: stable-2.16
+            python: '3.10'
 
     steps:
       - name: Check out code
