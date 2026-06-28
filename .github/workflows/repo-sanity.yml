@@ -36,8 +36,6 @@ jobs:
 
   sanity:
     name: Sanity (Ⓐ${{ matrix.ansible }}+py${{ matrix.python }})
-    # devel is the next-stable branch; test it but do not let its expected breakages block the run.
-    continue-on-error: ${{ matrix.ansible == 'devel' }}
     strategy:
       fail-fast: false
       matrix:

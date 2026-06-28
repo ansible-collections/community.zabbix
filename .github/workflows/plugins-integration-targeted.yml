@@ -93,8 +93,6 @@ jobs:
     if: needs.prepare.outputs.has_targets == 'true'
     runs-on: ubuntu-latest
     name: I (${{ matrix.zabbix_container.version}} Ⓐ${{ matrix.ansible_python.ansible }}+py${{ matrix.ansible_python.python }}})
-    # devel is the next-stable branch; test it but do not let its expected breakages block the run.
-    continue-on-error: ${{ matrix.ansible_python.ansible == 'devel' }}
     strategy:
       fail-fast: false
       matrix:
