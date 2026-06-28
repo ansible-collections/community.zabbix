@@ -1,4 +1,7 @@
 tests/output
+# ansible-test regenerates this per run with the local interpreter; committing it
+# leaks developer/environment-specific paths (e.g. an absolute ansible_python_interpreter).
+tests/integration/inventory
 __pycache__
 
 # ignore visual studio code things, and intelliJ
