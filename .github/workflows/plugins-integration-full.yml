@@ -2,6 +2,7 @@
 name: plugins-integration-full
 on:
   workflow_call:
+  workflow_dispatch:
   push:
     paths:
       - "plugins/inventory/**"

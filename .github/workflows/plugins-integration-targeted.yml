@@ -1,6 +1,7 @@
 ---
 name: plugins-integration-targeted
 on:
+  workflow_dispatch:
   push:
     paths:
       - "plugins/modules/**"
