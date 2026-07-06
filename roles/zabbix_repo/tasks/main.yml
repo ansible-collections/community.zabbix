@@ -1,9 +1,19 @@
 ---
 - name: Include OS-specific variables
-  ansible.builtin.include_vars: "{{ item }}"
-  with_first_found:
-    - "{{ ansible_facts['os_family'] }}-{{ ansible_facts['distribution_major_version'] }}.yml"
-    - "{{ ansible_facts['os_family'] }}.yml"
+  # Pin the first_found search to the role's own vars/ directory. The bare with_first_found form
+  # relied on the lookup's default search path covering vars/, which breaks on ansible-core 2.20+
+  # when ansible_search_path is set (it then takes precedence over role_path and no longer includes
+  # vars/), so the lookup finds nothing and, since 2.17+, raises "No file was found" - aborting the
+  # role before any repository is configured. An explicit lookup with paths pinned to
+  # {{ role_path }}/vars is independent of ansible_search_path and behaves identically otherwise.
+  ansible.builtin.include_vars: "{{ lookup('ansible.builtin.first_found', _ff_params) }}"
+  vars:
+    _ff_params:
+      files:
+        - "{{ ansible_facts['os_family'] }}-{{ ansible_facts['distribution_major_version'] }}.yml"
+        - "{{ ansible_facts['os_family'] }}.yml"
+      paths:
+        - "{{ role_path }}/vars"
   tags:
     - always
 
