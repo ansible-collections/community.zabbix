@@ -7,30 +7,43 @@ _zabbix_web_service_valid_versions:
     - "6.0"
   Debian-12:
     - "7.4"
+    - "7.2"
     - "7.0"
     - "6.0"
   Debian-11:
+    - "7.4"
+    - "7.2"
+    - "7.0"
     - "6.0"
   RedHat-10:
+    # EL10 has no zabbix-web-service package for 6.0 (agent-only branch); 7.0+ only.
     - "7.4"
     - "7.0"
   RedHat-9:
     - "7.4"
+    - "7.2"
     - "7.0"
     - "6.0"
   RedHat-8:
     - "7.4"
+    - "7.2"
     - "7.0"
     - "6.0"
   Suse-15:
     - "7.4"
+    - "7.2"
     - "7.0"
     - "6.0"
+  Ubuntu-26:
+    - "7.4"
+    - "7.0"
   Ubuntu-24:
     - "7.4"
+    - "7.2"
     - "7.0"
     - "6.0"
   Ubuntu-22:
     - "7.4"
+    - "7.2"
     - "7.0"
     - "6.0"
