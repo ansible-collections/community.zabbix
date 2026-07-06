@@ -1,0 +1,8 @@
+---
+plugin: community.zabbix.zabbix_inventory
+server_url: http://127.0.0.1:8080
+login_user: Admin
+login_password: zabbix
+validate_certs: false
+host_zapi_query:
+  selectGroups: ['name']
