@@ -1,0 +1,215 @@
+---
+name: "Reusable role test"
+on:
+  workflow_call:
+    inputs:
+      role:
+        description: Label used in artifact/check/report names.
+        required: true
+        type: string
+      working_directory:
+        description: Working directory for the molecule run (default repo root).
+        required: false
+        type: string
+        default: "."
+      molecule_config:
+        description: "Value passed to molecule -c <x> (empty = no -c flag)."
+        required: false
+        type: string
+        default: ""
+      scenario:
+        description: "Molecule scenario name passed to molecule test -s <scenario>."
+        required: true
+        type: string
+      database:
+        description: "MY_MOLECULE_DATABASE value (empty = role does not use a DB)."
+        required: false
+        type: string
+        default: ""
+      web_server:
+        description: "MY_MOLECULE_WEB_SERVER value (empty = role does not use a web server)."
+        required: false
+        type: string
+        default: ""
+
+permissions:
+  contents: read
+  checks: write
+  pull-requests: write
+
+jobs:
+  # Zabbix does not ship every package for every distro/version/arch. The gating package
+  # differs per role (agent is widest; server/web need server-side packages that are absent
+  # on some distros). Rather than test unsupported cells and fail the role's version gate, we
+  # compute the per-role exclude list here (single source of truth, keyed on inputs.role) and
+  # feed it into the molecule matrix. Availability verified against repo.zabbix.com 2026-07-04.
+  setup:
+    runs-on: ubuntu-22.04
+    outputs:
+      exclude: ${{ steps.gen.outputs.exclude }}
+    steps:
+      - name: Compute per-role matrix excludes
+        id: gen
+        env:
+          ROLE: ${{ inputs.role }}
+        run: |
+          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          import json, os
+          role = os.environ["ROLE"]
+          # Common gaps (every role): no arm64 packages for Debian 11 bullseye (any version);
+          # no Zabbix 6.0 repo for Ubuntu 26.04 resolute; EL8 default python 3.6 is too old for
+          # ansible-core 2.21 modules.
+          exclude = [
+              {"distro": "debian11", "arch": "arm64"},
+              {"distro": "ubuntu2604", "zabbix": "v60"},
+              {"distro": "rockylinux8", "ansible": "2.21"},
+          ]
+          if role != "agent":
+              # EL10 (Rocky 10) Zabbix 6.0 ships zabbix-agent only; no server/proxy/web/java/web-service.
+              exclude.append({"distro": "rockylinux10", "zabbix": "v60"})
+          if role in ("server", "web"):
+              # Debian 11 (bullseye) ships no zabbix-server / zabbix-frontend-php for 7.0 or 7.4.
+              exclude.append({"distro": "debian11", "zabbix": "v70"})
+              exclude.append({"distro": "debian11", "zabbix": "v74"})
+          print("exclude=" + json.dumps(exclude))
+          PY
+
+  molecule:
+    needs: setup
+    # ubuntu-24.04 runners break systemd/sudo in EL/older geerlingguy containers (converge fact-gather
+    # fails with sudo PAM "authentication info" errors); classified on 2026-07-03 (same cell passes on
+    # 22.04, fails on 24.04). Use 22.04 (amd64) / 22.04-arm (arm64); revisit 24.04-compat later.
+    runs-on: ${{ matrix.arch == 'arm64' && 'ubuntu-22.04-arm' || 'ubuntu-22.04' }}
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        distro:
+          - rockylinux8
+          - rockylinux9
+          - rockylinux10
+          - ubuntu2204
+          - ubuntu2404
+          - ubuntu2604
+          - debian11
+          - debian12
+          - debian13
+          - opensuseleap15
+        arch:
+          - amd64
+          - arm64
+        ansible:
+          - "2.16"
+          - "2.21"
+        zabbix:
+          - v60
+          - v70
+          - v74
+        # Computed per-role in the `setup` job (see comment there). Common exclusions:
+        # debian11 arm64 (no packages), ubuntu2604 + v60 (no 6.0 repo), rockylinux8 + ansible 2.21
+        # (EL8 default python 3.6 too old). Plus role-specific package-availability gaps.
+        exclude: ${{ fromJSON(needs.setup.outputs.exclude) }}
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v6
+
+      # Python 3.12 is the only controller Python in BOTH ansible-core 2.16 (>=3.10) and
+      # 2.21 (>=3.12) ranges, so it works for every cell of the ansible matrix.
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: molecule/requirements.txt
+
+      - name: Install latest pip and yq
+        run: python -m pip install --upgrade pip yq
+
+      - name: Install ansible-core
+        run: pip install "ansible-core~=${{ matrix.ansible }}.0"
+
+      - name: Install dependencies
+        run: pip install -r molecule/requirements.txt
+
+      - name: Build the collection
+        run: |
+          yq -yi '
+            .dependencies."ansible.windows" = "2.8.0" |
+            .dependencies."ansible.netcommon" = "7.2.0" |
+            .dependencies."ansible.posix" = "2.0.0" |
+            .dependencies."community.general" = "10.5.0" |
+            .dependencies."community.mysql" = "3.13.0" |
+            .dependencies."community.postgresql" = "3.12.0"
+          ' galaxy.yml
+
+          ansible-galaxy collection build -f
+
+      - name: Cache Ansible Galaxy content
+        uses: actions/cache@v5
+        with:
+          path: |
+            ~/.ansible/collections
+            ~/.ansible/roles
+            ~/.cache/ansible-compat
+          key: ${{ runner.os }}-${{ matrix.arch }}-molecule-galaxy-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-${{ matrix.arch }}-molecule-galaxy-
+
+      - name: Install Collections and Roles
+        # Retry to survive transient Galaxy 5xx responses while downloading deps.
+        run: |
+          for i in 1 2 3; do
+            ansible-galaxy collection install -f -vvvv community-zabbix-*.tar.gz && exit 0
+            echo "galaxy install failed (attempt $i), retrying"; sleep 15
+          done
+          exit 1
+
+      - name: Run role tests
+        id: run
+        working-directory: ${{ inputs.working_directory }}
+        env:
+          ANSIBLE_CALLBACKS_ENABLED: ansible.builtin.junit
+          JUNIT_OUTPUT_DIR: ${{ github.workspace }}/junit
+          MOL_CONFIG: ${{ inputs.molecule_config != '' && format('-c {0}', inputs.molecule_config) || '' }}
+        run: |
+          # shellcheck disable=SC2086
+          MY_MOLECULE_CONTAINER=${{ matrix.distro }} \
+          MY_MOLECULE_IMAGE=${{ matrix.distro }} \
+          MY_MOLECULE_VERSION=${{ matrix.zabbix }} \
+          MY_MOLECULE_DATABASE=${{ inputs.database }} \
+          MY_MOLECULE_WEB_SERVER=${{ inputs.web_server }} \
+          molecule $MOL_CONFIG test -s ${{ inputs.scenario }}
+
+      - name: Publish test results
+        if: always()
+        uses: ./.github/actions/publish-test-results
+        with:
+          junit-path: junit/*.xml
+          working-directory: "."
+          artifact-name: >-
+            junit-${{ inputs.role }}-${{ inputs.scenario }}-${{ inputs.database }}-${{ inputs.web_server }}-${{ matrix.distro }}-${{ matrix.zabbix }}-${{ matrix.arch }}-ac${{ matrix.ansible }}
+          check-name: >-
+            JUnit ${{ inputs.role }} ${{ inputs.scenario }} ${{ inputs.database }} ${{ inputs.web_server }} ${{ matrix.distro }} ${{ matrix.zabbix }} ${{ matrix.arch }} ac${{ matrix.ansible }}
+
+      - name: Upload failure logs
+        if: failure()
+        uses: ./.github/actions/upload-failure-logs
+        with:
+          artifact-name: >-
+            logs-${{ inputs.role }}-${{ inputs.scenario }}-${{ inputs.database }}-${{ inputs.web_server }}-${{ matrix.distro }}-${{ matrix.zabbix }}-${{ matrix.arch }}-ac${{ matrix.ansible }}
+          paths: |
+            junit/
+            ~/.cache/molecule/
+
+      - name: Report result
+        if: always()
+        uses: ./.github/actions/report-result
+        with:
+          outcome: ${{ steps.run.outcome }}
+          scenario: ${{ inputs.scenario }}
+          container: ${{ matrix.distro }}
+          zabbix: ${{ matrix.zabbix }}
+          arch: ${{ matrix.arch }}
+          ansible: ${{ matrix.ansible }}
+          python: "3.12"
+          database: "${{ inputs.database }}${{ inputs.web_server && format('/{0}', inputs.web_server) || '' }}"

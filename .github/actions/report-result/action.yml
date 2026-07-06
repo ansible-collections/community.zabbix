@@ -1,0 +1,71 @@
+---
+# Reusable reporter: append a one-row result table to the job's GitHub Actions step summary.
+# Keeps CI results visible at a glance without copy-pasting summary code into every job.
+# Text only (PASS/FAIL) — no emoji, per project output rules.
+name: Report result
+description: Append a single result row to the GitHub Actions step summary for this job.
+inputs:
+  outcome:
+    description: The tested step's outcome (success/failure/cancelled).
+    required: true
+  scenario:
+    description: Scenario or test target name.
+    required: false
+    default: ""
+  container:
+    description: Container image / distro.
+    required: false
+    default: ""
+  zabbix:
+    description: Zabbix version.
+    required: false
+    default: ""
+  database:
+    description: Database or web-server dimension.
+    required: false
+    default: ""
+  arch:
+    description: CPU architecture.
+    required: false
+    default: "amd64"
+  ansible:
+    description: ansible-core branch/version.
+    required: false
+    default: ""
+  python:
+    description: Python version.
+    required: false
+    default: ""
+  result-file:
+    description: Optional path to append a machine-readable "cell|...|RESULT" line for the aggregator.
+    required: false
+    default: ""
+runs:
+  using: composite
+  steps:
+    - name: Append result row to step summary
+      shell: bash
+      env:
+        OUTCOME: ${{ inputs.outcome }}
+        SCENARIO: ${{ inputs.scenario }}
+        CONTAINER: ${{ inputs.container }}
+        ZABBIX: ${{ inputs.zabbix }}
+        DATABASE: ${{ inputs.database }}
+        ARCH: ${{ inputs.arch }}
+        ANSIBLE: ${{ inputs.ansible }}
+        PYTHON: ${{ inputs.python }}
+        RESULT_FILE: ${{ inputs.result-file }}
+      run: |
+        result="FAIL"
+        if [ "${OUTCOME}" = "success" ]; then result="PASS"; fi
+        {
+          echo "### Result";
+          echo "";
+          echo "| Scenario | Container | Zabbix | DB/Web | Arch | Ansible+Py | Result |";
+          echo "|---|---|---|---|---|---|---|";
+          echo "| ${SCENARIO} | ${CONTAINER} | ${ZABBIX} | ${DATABASE} | ${ARCH} | ${ANSIBLE} ${PYTHON} | ${result} |";
+        } >> "$GITHUB_STEP_SUMMARY"
+        if [ -n "${RESULT_FILE}" ]; then
+          mkdir -p "$(dirname "${RESULT_FILE}")"
+          echo "${SCENARIO}|${CONTAINER}|${ZABBIX}|${DATABASE}|${ARCH}|${ANSIBLE}|${PYTHON}|${result}" > "${RESULT_FILE}"
+        fi

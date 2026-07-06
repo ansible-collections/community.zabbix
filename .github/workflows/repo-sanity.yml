@@ -7,9 +7,12 @@ on:
 concurrency:
   group: sanity-${{ github.workflow }}-${{ github.event.pull_request.head.repo.full_name || github.repository }}-${{ github.event.pull_request.head.ref || github.ref }}
   cancel-in-progress: true
+permissions:
+  contents: read
 jobs:
   tox-linters:
     name: Tox-Lint (py${{ matrix.python }})
+    timeout-minutes: 30
     strategy:
       matrix:
         python:
@@ -31,25 +34,42 @@ jobs:
         run: pip install flake8 tox
 
       - name: Run lint test for py3
+        id: run
         run: tox -elinters-py3 -vv
         working-directory: ./ansible_collections/community/zabbix
 
+      - name: Report result
+        if: always()
+        uses: ./ansible_collections/community/zabbix/.github/actions/report-result
+        with:
+          outcome: ${{ steps.run.outcome }}
+          scenario: tox-lint
+          python: py${{ matrix.python }}
+
   sanity:
     name: Sanity (Ⓐ${{ matrix.ansible }}+py${{ matrix.python }})
+    timeout-minutes: 30
     strategy:
+      fail-fast: false
       matrix:
-        ansible:
-          # It's important that Sanity is tested against all stable-X.Y branches
-          # Testing against `devel` may fail as new tests are added.
-
-          # https://docs.ansible.com/projects/ansible/latest/reference_appendices/release_and_maintenance.html#ansible-core-changelogs
-          - stable-2.16
-          - stable-2.17
-          - stable-2.18
-          - stable-2.19
-          - devel
-        python:
-          - '3.12'
+        # Newest first (fast feedback), then older releases retroactively, each paired with a
+        # supported controller Python. devel = next stable (Python >= 3.13).
+        # https://docs.ansible.com/projects/ansible/latest/reference_appendices/release_and_maintenance.html#ansible-core-changelogs
+        include:
+          - ansible: devel
+            python: '3.13'
+          - ansible: stable-2.21
+            python: '3.13'
+          - ansible: stable-2.20
+            python: '3.13'
+          - ansible: stable-2.19
+            python: '3.12'
+          - ansible: stable-2.18
+            python: '3.12'
+          - ansible: stable-2.17
+            python: '3.12'
+          - ansible: stable-2.16
+            python: '3.12'
     runs-on: ubuntu-latest
     steps:
       # ansible-test requires the collection to be in a directory in the form
@@ -74,5 +94,39 @@ jobs:
       # The docker container has all the pinned dependencies that are required.
       # Explicity specify the version of Python we want to test
       - name: Run sanity tests
+        id: run
         run: ansible-test sanity --docker -v --color --exclude molecule/ --python ${{ matrix.python }}
         working-directory: ./ansible_collections/community/zabbix
+
+      # ansible-test sanity emits no JUnit, so only a PASS/FAIL summary row is published here.
+      - name: Report result
+        if: always()
+        uses: ./ansible_collections/community/zabbix/.github/actions/report-result
+        with:
+          outcome: ${{ steps.run.outcome }}
+          scenario: sanity
+          ansible: ${{ matrix.ansible }}
+          python: py${{ matrix.python }}
+
+  ci:
+    name: CI (sanity)
+    if: always()
+    needs: [tox-linters, sanity]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Coverage scope
+        if: always()
+        shell: bash
+        run: |
+          {
+            echo "## Coverage scope";
+            echo "";
+            echo "Sanity + lint across ansible-core 2.16 through 2.21 plus devel.";
+            echo "";
+            echo "All supported combinations run. Any failures below are the current fix-list (real, fully visible - not hidden).";
+          } >> "$GITHUB_STEP_SUMMARY"
+      - name: Aggregate matrix result
+        uses: re-actors/alls-green@release/v1
+        with:
+          jobs: ${{ toJSON(needs) }}
