@@ -60,6 +60,15 @@
           id: auth
         return_content: true
       register: _zabbix_api_response
+      # The molecule create step boots the backing zabbix-server, which then imports the schema and
+      # seeds the Admin user (tens of seconds). Retry until the backend is ready and the login
+      # returns a result instead of racing it with a single request (this previously flaked on the
+      # slower runners, e.g. arm64, where seeding had not finished when verify ran). failed_when
+      # is disabled so transient connection/5xx responses during startup simply retry.
+      failed_when: false
+      until: (_zabbix_api_response.json.result | default('') | length) > 0
+      retries: 30
+      delay: 5
 
     - name: Assert Zabbix API login succeeded
       ansible.builtin.assert:

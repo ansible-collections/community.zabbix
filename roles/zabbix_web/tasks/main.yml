@@ -87,6 +87,38 @@
     - config
     - install
 
+- name: "Debian | Enable PHP-FPM when the packaged apache config proxies PHP to it"
+  # On Debian/Ubuntu the zabbix-apache-conf package ships the frontend apache config. On newer
+  # distros (e.g. Ubuntu 26.04) that config hands PHP off to PHP-FPM over this role's socket
+  # (SetHandler "proxy:unix:{{ zabbix_php_fpm_listen }}|fcgi://localhost") instead of using mod_php,
+  # but the role default assumes apache == mod_php (_zabbix_web_create_php_fpm) and skips PHP-FPM, so
+  # the socket is never created and the frontend returns HTTP 503. Detect that expectation from the
+  # enabled apache config and enable PHP-FPM only when it references the exact socket this role
+  # manages - so distros whose packaged config uses mod_php (or a different socket) are untouched.
+  when:
+    - ansible_facts['os_family'] == 'Debian'
+    - zabbix_web_http_server == 'apache'
+    - not zabbix_web_create_php_fpm
+  tags:
+    - config
+    - install
+  block:
+    - name: "Debian | Search enabled apache config for the managed PHP-FPM socket handler"
+      # grep -R dereferences the conf-enabled/sites-enabled symlinks (Debian enables configs via
+      # symlink) and matches the literal socket path, so this fires only when the *enabled* apache
+      # config actually proxies PHP to the socket this role manages. rc: 0 = matched, 1 = no match.
+      ansible.builtin.command:
+        cmd: "grep -RlF 'proxy:unix:{{ zabbix_php_fpm_listen }}' /etc/apache2/conf-enabled/ /etc/apache2/sites-enabled/"
+      register: _zabbix_web_apache_fpm_conf
+      changed_when: false
+      failed_when: _zabbix_web_apache_fpm_conf.rc not in [0, 1]
+      become: true
+
+    - name: "Debian | Use PHP-FPM because the packaged apache config requires its socket"
+      ansible.builtin.set_fact:
+        zabbix_web_create_php_fpm: true
+      when: _zabbix_web_apache_fpm_conf.rc == 0
+
 - name: "Create /etc/zabbix/web directory"
   ansible.builtin.file:
     path: /etc/zabbix/web
