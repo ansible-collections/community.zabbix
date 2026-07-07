@@ -1,0 +1,24 @@
+---
+# Upload log files that survive `molecule destroy` / test teardown, so failures are
+# debuggable from the run page without shelling into a (now-destroyed) container.
+# Caller gates with `if: failure()`.
+name: Upload failure logs
+description: Upload detailed log files as an artifact for post-mortem debugging.
+inputs:
+  artifact-name:
+    description: Unique artifact name for this matrix cell.
+    required: true
+  paths:
+    description: Newline-separated list of paths/globs to upload.
+    required: true
+runs:
+  using: composite
+  steps:
+    - name: Upload failure logs
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ inputs.artifact-name }}
+        path: ${{ inputs.paths }}
+        if-no-files-found: ignore
+        include-hidden-files: true
+        retention-days: 14

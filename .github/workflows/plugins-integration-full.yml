@@ -2,6 +2,7 @@
 name: plugins-integration-full
 on:
   workflow_call:
+  workflow_dispatch:
   push:
     paths:
       - "plugins/inventory/**"
@@ -16,48 +17,62 @@ on:
       - "plugins/module_utils/**"
       - ".github/workflows/plugins-integration*.yml"
       - "tests/integration/targets/setup_zabbix/**"
+permissions:
+  contents: read
+  checks: write
+  pull-requests: write
 concurrency:
   group: pi-full-${{ github.workflow }}-${{ github.event.pull_request.head.repo.full_name || github.repository }}-${{ github.event.pull_request.head.ref || github.ref }}
   cancel-in-progress: true
 jobs:
   integration:
     runs-on: ubuntu-latest
+    timeout-minutes: 45
     name: I (${{ matrix.zabbix_container.version}} Ⓐ${{ matrix.ansible_python.ansible }}+py${{ matrix.ansible_python.python }}})
     strategy:
       fail-fast: false
       matrix:
         zabbix_container:
           - version: "6.0"
+            image_tag: "ubuntu-6.0-latest"
           - version: "7.0"
-          - version: "7.2"
+            image_tag: "ubuntu-7.0-latest"
           - version: "7.4"
+            image_tag: "ubuntu-7.4-latest"
+          - version: "8.0-trunk"
+            image_tag: "ubuntu-trunk"
         ansible_python:
           # https://docs.ansible.com/projects/ansible/latest/reference_appendices/release_and_maintenance.html#ansible-core-changelogs
-          # Only test the minimum and maximum supported Python versions for each Ansible branch.
-          - ansible: stable-2.16
-            python: '3.10'
-          - ansible: stable-2.16
-            python: '3.12'
-          - ansible: stable-2.17
-            python: '3.10'
-          - ansible: stable-2.17
-            python: '3.12'
-          - ansible: stable-2.18
-            python: '3.11'
-          - ansible: stable-2.18
+          # Newest first (fast feedback), then older releases retroactively. Test the minimum and
+          # maximum supported controller Python per ansible-core branch. devel = next stable.
+          - ansible: devel
+            python: '3.14'
+          - ansible: devel
             python: '3.13'
-          - ansible: stable-2.19
-            python: '3.11'
-          - ansible: stable-2.19
-            python: '3.13'
-          - ansible: stable-2.20
+          - ansible: stable-2.21
+            python: '3.14'
+          - ansible: stable-2.21
             python: '3.12'
           - ansible: stable-2.20
             python: '3.14'
-          - ansible: devel
+          - ansible: stable-2.20
             python: '3.12'
-          - ansible: devel
-            python: '3.14'
+          - ansible: stable-2.19
+            python: '3.13'
+          - ansible: stable-2.19
+            python: '3.11'
+          - ansible: stable-2.18
+            python: '3.13'
+          - ansible: stable-2.18
+            python: '3.11'
+          - ansible: stable-2.17
+            python: '3.12'
+          - ansible: stable-2.17
+            python: '3.10'
+          - ansible: stable-2.16
+            python: '3.12'
+          - ansible: stable-2.16
+            python: '3.10'
 
     steps:
       - name: Check out code
@@ -75,7 +90,7 @@ jobs:
         run: pip install https://github.com/ansible/ansible/archive/${{ matrix.ansible_python.ansible }}.tar.gz --disable-pip-version-check
 
       - name: Install ansible.netcommon collection
-        run: ansible-galaxy collection install ansible.netcommon -p $GITHUB_WORKSPACE
+        run: ansible-galaxy collection install ansible.netcommon -p "$GITHUB_WORKSPACE"
         working-directory: ./ansible_collections/community/zabbix
 
       # For Zabbix integration tests we need to test against different versions of
@@ -86,12 +101,14 @@ jobs:
         with:
           compose-file: "./ansible_collections/community/zabbix/docker-compose.yml"
         env:
-          zabbix_version: ${{ matrix.zabbix_container.version }}
+          ZABBIX_SERVER_IMAGE_TAG: ${{ matrix.zabbix_container.image_tag }}
+          ZABBIX_WEB_IMAGE_TAG: ${{ matrix.zabbix_container.image_tag }}
 
       # Run the integration tests
       # As we need to connect to an existing docker container we can't use `--docker` here as the VMs would be on different
       # (non-routing) networks, so we run them locally and ensure any required dependencies are installed via `--requirements`
       - name: Run integration test
+        id: run
         run: ansible-test integration -v --color --continue-on-error --diff --python ${{ matrix.ansible_python.python }} --requirements --coverage
         working-directory: ./ansible_collections/community/zabbix
 
@@ -104,3 +121,56 @@ jobs:
       - uses: codecov/codecov-action@v6
         with:
           fail_ci_if_error: false
+
+      - name: Publish test results
+        if: always()
+        uses: ./ansible_collections/community/zabbix/.github/actions/publish-test-results
+        with:
+          junit-path: tests/output/junit/*.xml
+          artifact-name: junit-pi-full-${{ matrix.zabbix_container.version }}-${{ matrix.ansible_python.ansible }}-py${{ matrix.ansible_python.python }}
+          check-name: JUnit pi-full ${{ matrix.zabbix_container.version }} ${{ matrix.ansible_python.ansible }}+py${{ matrix.ansible_python.python }}
+          working-directory: ansible_collections/community/zabbix
+
+      - name: Upload failure logs
+        if: failure()
+        uses: ./ansible_collections/community/zabbix/.github/actions/upload-failure-logs
+        with:
+          artifact-name: logs-pi-full-${{ matrix.zabbix_container.version }}-${{ matrix.ansible_python.ansible }}-py${{ matrix.ansible_python.python }}
+          paths: |
+            ansible_collections/community/zabbix/tests/output/
+
+      - name: Report result
+        if: always()
+        uses: ./ansible_collections/community/zabbix/.github/actions/report-result
+        with:
+          outcome: ${{ steps.run.outcome }}
+          scenario: integration-full
+          zabbix: ${{ matrix.zabbix_container.version }}
+          ansible: ${{ matrix.ansible_python.ansible }}
+          python: py${{ matrix.ansible_python.python }}
+
+  ci:
+    name: CI (integration full)
+    if: always()
+    needs: [integration]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Coverage scope
+        if: always()
+        shell: bash
+        run: |
+          {
+            echo "## Coverage scope";
+            echo "";
+            echo "Integration (plugin/module) matrix under test:";
+            echo "";
+            echo "- Zabbix: 6.0, 7.0, 7.4, 8.0 (pre-release via ubuntu-trunk docker image)";
+            echo "- ansible-core: 2.16 through 2.21 plus devel (each with min+max supported controller Python, up to 3.14)";
+            echo "";
+            echo "All supported combinations run. Any failures below are the current fix-list (real, fully visible - not hidden).";
+          } >> "$GITHUB_STEP_SUMMARY"
+      - name: Aggregate matrix result
+        uses: re-actors/alls-green@release/v1
+        with:
+          jobs: ${{ toJSON(needs) }}
