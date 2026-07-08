@@ -393,12 +393,14 @@ class Triggerprototype(ZabbixBase):
             self._module.fail_json(msg="Failed to update triggerprototype: %s" % e)
         return results
 
-    def check_triggerprototype_changed(self, old_triggerprototype):
+    def check_triggerprototype_changed(self, old_triggerprototype, keys):
         try:
             new_triggerprototype = self._zapi.triggerprototype.get({'triggerids': '%s' % old_triggerprototype['triggerid']})[0]
         except Exception as e:
             self._module.fail_json(msg="Failed to get triggerprototype: %s" % e)
-        return old_triggerprototype != new_triggerprototype
+        # Compare only managed fields (see zabbix_trigger) so unmanaged fields Zabbix auto-populates
+        # during update don't break idempotence.
+        return any(old_triggerprototype.get(k) != new_triggerprototype.get(k) for k in keys)
 
     def delete_triggerprototype(self, trigger_id):
         if self._module.check_mode:
@@ -478,7 +480,7 @@ def main():
                     params['description'] = params['new_name']
                     params.pop("new_name")
                 results.append(triggerprototype.update_triggerprototype(params))
-                changed_trigger = triggerprototype.check_triggerprototype_changed(t)
+                changed_trigger = triggerprototype.check_triggerprototype_changed(t, params.keys())
                 if changed_trigger:
                     changed = True
             module.exit_json(changed=changed, result=results)
