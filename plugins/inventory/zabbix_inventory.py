@@ -302,12 +302,13 @@ auth_token: "{{ lookup('ansible.builtin.env', 'ZABBIX_API_KEY') }}"
 validate_certs: false
 """
 
+from urllib.error import URLError, HTTPError
+
 from ansible.plugins.inventory import BaseInventoryPlugin, Constructable, Cacheable, to_safe_group_name
 import os
 import atexit
 import json
 from ansible.module_utils.urls import Request
-from ansible.module_utils.six.moves.urllib.error import URLError, HTTPError
 from ansible.module_utils.compat.version import LooseVersion
 from ansible.errors import AnsibleParserError
 
