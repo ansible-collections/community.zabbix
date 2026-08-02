@@ -1,2 +1,2 @@
 [testgroup]
-testhost ansible_connection="local" ansible_pipelining="yes" ansible_python_interpreter="/home/ey/env_py312_ans216/bin/python"
+testhost ansible_connection="local" ansible_pipelining="yes" ansible_python_interpreter="/usr/local/bin/python"

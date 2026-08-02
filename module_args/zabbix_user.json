@@ -1,0 +1,50 @@
+{
+    "ANSIBLE_MODULE_ARGS": {
+        "username": "example1",
+        "name": "example2",
+        "surname": "test2",
+        "usrgrps": [
+            "Guests",
+            "Zabbix administrators"
+        ],
+        "passwd": "update_password",
+        "autologout": 500,
+        "refresh": 60,
+        "rows_per_page": 300,
+        "after_login_url": "http://example.com",
+        "theme": "dark-theme",
+        "role_name": "Admin role",
+        "timezone": "Asia/Tokyo",
+        "lang": "fr_FR",
+        "medias": [
+            {
+                "mediatype": "Email",
+                "sendto": "example@example.com",
+                "period": "1-7,00:00-24:00",
+                "severity": {
+                    "not_classified": false,
+                    "information": true,
+                    "warning": true,
+                    "average": true,
+                    "high": true,
+                    "disaster": true
+                },
+                "active": true
+            },
+            {
+                "mediatype": "SMS",
+                "sendto": "example@example.com",
+                "period": "1-5,01:00-23:00",
+                "severity": {
+                    "not_classified": false,
+                    "information": true,
+                    "warning": true,
+                    "average": false,
+                    "high": true,
+                    "disaster": true
+                },
+                "active": true
+            }
+        ]
+    }
+}
