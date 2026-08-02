@@ -29,13 +29,6 @@ options:
         choices: ["json", "xml", "yaml", "none"]
         default: json
         type: str
-    omit_date:
-        description:
-            - Removes the date field for the dumped template
-            - This parameter will be ignored since Zabbix 6.4.
-        required: false
-        type: bool
-        default: false
     all_templategroups:
         description:
             - return info about all templategroups.
@@ -71,7 +64,6 @@ EXAMPLES = """
   community.zabbix.zabbix_template_info:
     template_name: Template
     format: json
-    omit_date: yes
   register: template_json
 
 - name: Get Zabbix template as XML
@@ -87,7 +79,6 @@ EXAMPLES = """
   community.zabbix.zabbix_template_info:
     template_name: Template
     format: xml
-    omit_date: no
   register: template_json
 
 - name: Get Zabbix template as YAML
@@ -103,7 +94,6 @@ EXAMPLES = """
   community.zabbix.zabbix_template_info:
     template_name: Template
     format: yaml
-    omit_date: no
   register: template_yaml
 
 - name: Determine if Zabbix template exists
@@ -145,7 +135,7 @@ template_id:
 
 template_json:
   description: The JSON of the template
-  returned: when format is json and omit_date is true
+  returned: when format is json
   type: str
   sample: {
         "changed": false,
@@ -178,7 +168,7 @@ template_json:
 
 template_xml:
   description: The XML of the template
-  returned: when format is xml and omit_date is false
+  returned: when format is xml
   type: str
   sample: >-
     <zabbix_export>
@@ -205,7 +195,7 @@ template_xml:
 
 template_yaml:
   description: The YAML of the template
-  returned: when format is yaml and omit_date is false
+  returned: when format is yaml
   type: str
   sample: >-
     zabbix_export:
@@ -228,11 +218,8 @@ template_yaml:
 import traceback
 import json
 import xml.etree.ElementTree as ET
-
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.compat.version import LooseVersion
 from ansible.module_utils._text import to_native
-
 from ansible_collections.community.zabbix.plugins.module_utils.base import ZabbixBase
 import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabbix_utils
 
@@ -251,41 +238,26 @@ class TemplateInfo(ZabbixBase):
 
         return template_id
 
-    def load_json_template(self, template_json, omit_date=False):
+    def load_json_template(self, template_json):
         try:
             jsondoc = json.loads(template_json)
-            # remove date field if requested
-            if omit_date and "date" in jsondoc["zabbix_export"]:
-                del jsondoc["zabbix_export"]["date"]
             return jsondoc
         except ValueError as e:
             self._module.fail_json(msg="Invalid JSON provided", details=to_native(e), exception=traceback.format_exc())
 
-    def load_yaml_template(self, template_yaml, omit_date=False):
-        if omit_date and LooseVersion(self._zbx_api_version) < LooseVersion("7.0"):
-            yaml_lines = template_yaml.splitlines(True)
-            for index, line in enumerate(yaml_lines):
-                if "date:" in line:
-                    del yaml_lines[index]
-                    return "".join(yaml_lines)
-        else:
-            return template_yaml
+    def load_yaml_template(self, template_yaml):
+        return template_yaml
 
-    def dump_template(self, template_id, template_type="json", omit_date=False):
+    def dump_template(self, template_id, template_type="json"):
         try:
             dump = self._zapi.configuration.export({"format": template_type, "options": {"templates": template_id}})
             if template_type == "xml":
                 xmlroot = ET.fromstring(dump.encode("utf-8"))
-                # remove date field if requested
-                if omit_date:
-                    date = xmlroot.find(".date")
-                    if date is not None:
-                        xmlroot.remove(date)
                 return str(ET.tostring(xmlroot, encoding="utf-8").decode("utf-8"))
             elif template_type == "yaml":
-                return self.load_yaml_template(dump, omit_date)
+                return self.load_yaml_template(dump)
             else:
-                return self.load_json_template(dump, omit_date)
+                return self.load_json_template(dump)
         except Exception as e:
             self._module.fail_json(msg="Unable to export template: %s" % e)
 
@@ -300,7 +272,6 @@ def main():
     argument_spec = zabbix_utils.zabbix_common_argument_spec()
     argument_spec.update(dict(
         template_name=dict(type="str", required=False),
-        omit_date=dict(type="bool", required=False, default=False),
         format=dict(type="str", choices=["json", "xml", "yaml", "none"], default="json"),
         all_templategroups=dict(type="bool", required=False),
     ))
@@ -311,7 +282,6 @@ def main():
 
     template_name = module.params["template_name"]
     all_templategroups = module.params["all_templategroups"]
-    omit_date = module.params["omit_date"]
     format = module.params["format"]
 
     template_info = TemplateInfo(module)
@@ -326,19 +296,19 @@ def main():
             module.exit_json(
                 changed=False,
                 template_id=template_id[0],
-                template_json=template_info.dump_template(template_id, template_type="json", omit_date=omit_date)
+                template_json=template_info.dump_template(template_id, template_type="json")
             )
         elif format == "xml":
             module.exit_json(
                 changed=False,
                 template_id=template_id[0],
-                template_xml=template_info.dump_template(template_id, template_type="xml", omit_date=omit_date)
+                template_xml=template_info.dump_template(template_id, template_type="xml")
             )
         elif format == "yaml":
             module.exit_json(
                 changed=False,
                 template_id=template_id[0],
-                template_yaml=template_info.dump_template(template_id, template_type="yaml", omit_date=omit_date)
+                template_yaml=template_info.dump_template(template_id, template_type="yaml")
             )
         elif format == "none":
             module.exit_json(changed=False, template_id=template_id[0])

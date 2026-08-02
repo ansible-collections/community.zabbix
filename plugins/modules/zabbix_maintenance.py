@@ -313,11 +313,9 @@ EXAMPLES = r"""
 
 import datetime
 import time
-
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.zabbix.plugins.module_utils.base import ZabbixBase
 import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabbix_utils
-from ansible.module_utils.compat.version import LooseVersion
 
 
 class MaintenanceModule(ZabbixBase):
@@ -333,11 +331,6 @@ class MaintenanceModule(ZabbixBase):
             "description": desc,
             "timeperiods": time_periods
         }
-        if LooseVersion(self._zbx_api_version) < LooseVersion("7.0"):
-            parameters["groupids"] = group_ids
-            parameters["hostids"] = host_ids
-            del parameters["groups"]
-            del parameters["hosts"]
         if tags is not None:
             parameters["tags"] = tags
         self._zapi.maintenance.create(parameters)
@@ -355,11 +348,6 @@ class MaintenanceModule(ZabbixBase):
             "description": desc,
             "timeperiods": time_periods
         }
-        if LooseVersion(self._zbx_api_version) < LooseVersion("7.0"):
-            parameters["groupids"] = group_ids
-            parameters["hostids"] = host_ids
-            del parameters["groups"]
-            del parameters["hosts"]
         if tags is not None:
             parameters["tags"] = tags
         self._zapi.maintenance.update(parameters)
@@ -374,9 +362,6 @@ class MaintenanceModule(ZabbixBase):
             "selectTags": "extend",
             "selectTimeperiods": "extend"
         }
-        if LooseVersion(self._zbx_api_version) < LooseVersion("7.0"):
-            parameters["selectGroups"] = parameters["selectHostGroups"]
-            del parameters["selectHostGroups"]
         maintenances = self._zapi.maintenance.get(parameters)
 
         for maintenance in maintenances:

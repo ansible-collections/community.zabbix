@@ -41,7 +41,6 @@ import argparse
 import json
 import atexit
 from ansible.module_utils.six.moves import configparser
-from ansible.module_utils.compat.version import LooseVersion
 from ansible.module_utils.urls import Request
 from ansible.module_utils.six.moves.urllib.error import URLError, HTTPError
 
@@ -110,10 +109,7 @@ class ZabbixInventory(object):
             payload["params"] = params
 
         if self.auth != "":
-            if (LooseVersion(self.zabbix_version) >= LooseVersion("7.0")):
-                headers["Authorization"] = "Bearer " + self.auth
-            else:
-                payload["auth"] = self.auth
+            headers["Authorization"] = "Bearer " + self.auth
 
         api_url = server_url + "/api_jsonrpc.php"
         req = Request(

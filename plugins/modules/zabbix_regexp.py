@@ -82,9 +82,6 @@ options:
         default: 'present'
 
 
-notes:
-    - Only Zabbix >= 6.0 is supported.
-
 extends_documentation_fragment:
     - community.zabbix.zabbix
 
@@ -131,20 +128,13 @@ msg:
 
 
 from ansible.module_utils.basic import AnsibleModule
-
 from ansible_collections.community.zabbix.plugins.module_utils.base import ZabbixBase
-from ansible.module_utils.compat.version import LooseVersion
-
 import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabbix_utils
 
 
 class RegularExpression(ZabbixBase):
     def __init__(self, module, zbx=None, zapi_wrapper=None):
         super(RegularExpression, self).__init__(module, zbx, zapi_wrapper)
-        if LooseVersion(self._zbx_api_version) < LooseVersion("6.0"):
-            module.fail_json(
-                msg="This module doesn't support Zabbix versions lower than 6.0"
-            )
 
     def get_regexps(self, regexp_name):
         try:

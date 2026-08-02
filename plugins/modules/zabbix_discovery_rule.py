@@ -286,10 +286,7 @@ msg:
 
 
 from ansible.module_utils.basic import AnsibleModule
-
 from ansible_collections.community.zabbix.plugins.module_utils.base import ZabbixBase
-from ansible.module_utils.compat.version import LooseVersion
-
 import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabbix_utils
 
 
@@ -428,17 +425,10 @@ class DiscoveryRule(ZabbixBase):
             proxy matching proxy name
         """
         try:
-            if LooseVersion(self._zbx_api_version) < LooseVersion("7.0"):
-                proxy_list = self._zapi.proxy.get({
-                    "output": "extend",
-                    "selectInterface": "extend",
-                    "filter": {"host": [proxy_name]}
-                })
-            else:
-                proxy_list = self._zapi.proxy.get({
-                    "output": "extend",
-                    "filter": {"name": [proxy_name]}
-                })
+            proxy_list = self._zapi.proxy.get({
+                "output": "extend",
+                "filter": {"name": [proxy_name]}
+            })
 
             if len(proxy_list) < 1:
                 self._module.fail_json(msg="Proxy not found: %s" % proxy_name)
@@ -465,10 +455,7 @@ class DiscoveryRule(ZabbixBase):
             "dchecks": kwargs["dchecks"]
         }
         if kwargs["proxy"]:
-            if LooseVersion(self._zbx_api_version) < LooseVersion("7.0"):
-                _params["proxy_hostid"] = self.get_proxy_by_proxy_name(kwargs["proxy"])["proxyid"]
-            else:
-                _params["proxyid"] = self.get_proxy_by_proxy_name(kwargs["proxy"])["proxyid"]
+            _params["proxyid"] = self.get_proxy_by_proxy_name(kwargs["proxy"])["proxyid"]
 
         return _params
 
@@ -482,9 +469,6 @@ class DiscoveryRule(ZabbixBase):
         existing_drule = zabbix_utils.helper_convert_unicode_to_str(self.check_if_drule_exists(kwargs["name"])[0])
         parameters = zabbix_utils.helper_convert_unicode_to_str(self._construct_parameters(**kwargs))
         change_parameters = {}
-        if LooseVersion(self._zbx_api_version) < LooseVersion("7.0"):
-            if existing_drule["nextcheck"]:
-                existing_drule.pop("nextcheck")
         _diff = zabbix_utils.helper_cleanup_data(zabbix_utils.helper_compare_dictionaries(parameters, existing_drule, change_parameters))
         return _diff
 

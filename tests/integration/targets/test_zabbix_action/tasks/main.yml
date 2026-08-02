@@ -813,66 +813,62 @@
     - ansible.builtin.assert:
         that: zbxaction_create_valid_conditions.changed is sameas True
 
-    - name: Test tag operations for Zabbix >= 7.0
-      block:
-      - name: test - add Add host tags operation to discovery action
-        community.zabbix.zabbix_action:
-          operations:
-            - type: add_to_host_group
-              host_groups:
-                - Zabbix servers
-            - type: add_host_tags
-              tags:
-                - tag: tag1
-                  value: val1
-        register: zbxaction_discovery_update_add_tags
+    - name: test - add Add host tags operation to discovery action
+      community.zabbix.zabbix_action:
+        operations:
+          - type: add_to_host_group
+            host_groups:
+              - Zabbix servers
+          - type: add_host_tags
+            tags:
+              - tag: tag1
+                value: val1
+      register: zbxaction_discovery_update_add_tags
 
-      - ansible.builtin.assert:
-          that: zbxaction_discovery_update_add_tags.changed is sameas True
+    - ansible.builtin.assert:
+        that: zbxaction_discovery_update_add_tags.changed is sameas True
 
-      - name: test - add Add host tags operation to discovery action (again)
-        community.zabbix.zabbix_action:
-          operations:
-            - type: add_to_host_group
-              host_groups:
-                - Zabbix servers
-            - type: add_host_tags
-              tags:
-                - tag: tag1
-                  value: val1
-        register: zbxaction_discovery_update_add_tags_again
+    - name: test - add Add host tags operation to discovery action (again)
+      community.zabbix.zabbix_action:
+        operations:
+          - type: add_to_host_group
+            host_groups:
+              - Zabbix servers
+          - type: add_host_tags
+            tags:
+              - tag: tag1
+                value: val1
+      register: zbxaction_discovery_update_add_tags_again
 
-      - ansible.builtin.assert:
-          that: zbxaction_discovery_update_add_tags_again.changed is sameas False
+    - ansible.builtin.assert:
+        that: zbxaction_discovery_update_add_tags_again.changed is sameas False
 
-      - name: test - add Remove host tags operation to discovery action
-        community.zabbix.zabbix_action:
-          operations:
-            - type: add_to_host_group
-              host_groups:
-                - Zabbix servers
-            - type: remove_host_tags
-              tags:
-                - tag: tag2
-                  value: val2
-        register: zbxaction_discovery_update_remote_tags
+    - name: test - add Remove host tags operation to discovery action
+      community.zabbix.zabbix_action:
+        operations:
+          - type: add_to_host_group
+            host_groups:
+              - Zabbix servers
+          - type: remove_host_tags
+            tags:
+              - tag: tag2
+                value: val2
+      register: zbxaction_discovery_update_remote_tags
 
-      - name: test - add Remove host tags operation to discovery action (again)
-        community.zabbix.zabbix_action:
-          operations:
-            - type: add_to_host_group
-              host_groups:
-                - Zabbix servers
-            - type: remove_host_tags
-              tags:
-                - tag: tag2
-                  value: val2
-        register: zbxaction_discovery_update_remote_tags_again
+    - name: test - add Remove host tags operation to discovery action (again)
+      community.zabbix.zabbix_action:
+        operations:
+          - type: add_to_host_group
+            host_groups:
+              - Zabbix servers
+          - type: remove_host_tags
+            tags:
+              - tag: tag2
+                value: val2
+      register: zbxaction_discovery_update_remote_tags_again
 
-      - ansible.builtin.assert:
-          that: zbxaction_discovery_update_remote_tags_again.changed is sameas False
-
-      when: zabbix_version is version('7.0', '>=')
+    - ansible.builtin.assert:
+        that: zbxaction_discovery_update_remote_tags_again.changed is sameas False
 
     - name: test - delete action
       community.zabbix.zabbix_action:
@@ -1135,65 +1131,63 @@
     - ansible.builtin.assert:
         that: zbxaction_recack_new.changed is sameas False
 
-    - when: zabbix_version is version('7.0', '>=')
-      block:
-        - name: test - update action with pause_symptoms off
-          community.zabbix.zabbix_action:
-            recovery_operations:
-              - type: send_message
-                subject: ExampleSubject
-                op_message: ExampleMessage
-                media_type: ExampleMediaTypeForActionModule
-                send_to_users:
-                  - Admin
-              - type: notify_all_involved
-                subject: RecoverySubject
-                op_message: RecoveryMessage
-            acknowledge_operations:
-              - type: send_message
-                subject: ExampleSubject
-                op_message: ExampleMessage
-                media_type: ExampleMediaTypeForActionModule
-                send_to_users:
-                  - Admin
-              - type: notify_all_involved
-                subject: RecoverySubject
-                op_message: RecoveryMessage
-                media_type: ExampleMediaTypeForActionModule
-            pause_symptoms: False
-          register: zbxaction_pause_symptoms
+    - name: test - update action with pause_symptoms off
+      community.zabbix.zabbix_action:
+        recovery_operations:
+          - type: send_message
+            subject: ExampleSubject
+            op_message: ExampleMessage
+            media_type: ExampleMediaTypeForActionModule
+            send_to_users:
+              - Admin
+          - type: notify_all_involved
+            subject: RecoverySubject
+            op_message: RecoveryMessage
+        acknowledge_operations:
+          - type: send_message
+            subject: ExampleSubject
+            op_message: ExampleMessage
+            media_type: ExampleMediaTypeForActionModule
+            send_to_users:
+              - Admin
+          - type: notify_all_involved
+            subject: RecoverySubject
+            op_message: RecoveryMessage
+            media_type: ExampleMediaTypeForActionModule
+        pause_symptoms: False
+      register: zbxaction_pause_symptoms
 
-        - ansible.builtin.assert:
-            that: zbxaction_pause_symptoms.changed is sameas True
+    - ansible.builtin.assert:
+        that: zbxaction_pause_symptoms.changed is sameas True
 
-        - name: test - update action with pause_symptoms off (again)
-          community.zabbix.zabbix_action:
-            recovery_operations:
-              - type: send_message
-                subject: ExampleSubject
-                op_message: ExampleMessage
-                media_type: ExampleMediaTypeForActionModule
-                send_to_users:
-                  - Admin
-              - type: notify_all_involved
-                subject: RecoverySubject
-                op_message: RecoveryMessage
-            acknowledge_operations:
-              - type: send_message
-                subject: ExampleSubject
-                op_message: ExampleMessage
-                media_type: ExampleMediaTypeForActionModule
-                send_to_users:
-                  - Admin
-              - type: notify_all_involved
-                subject: RecoverySubject
-                op_message: RecoveryMessage
-                media_type: ExampleMediaTypeForActionModule
-            pause_symptoms: False
-          register: zbxaction_pause_symptoms
+    - name: test - update action with pause_symptoms off (again)
+      community.zabbix.zabbix_action:
+        recovery_operations:
+          - type: send_message
+            subject: ExampleSubject
+            op_message: ExampleMessage
+            media_type: ExampleMediaTypeForActionModule
+            send_to_users:
+              - Admin
+          - type: notify_all_involved
+            subject: RecoverySubject
+            op_message: RecoveryMessage
+        acknowledge_operations:
+          - type: send_message
+            subject: ExampleSubject
+            op_message: ExampleMessage
+            media_type: ExampleMediaTypeForActionModule
+            send_to_users:
+              - Admin
+          - type: notify_all_involved
+            subject: RecoverySubject
+            op_message: RecoveryMessage
+            media_type: ExampleMediaTypeForActionModule
+        pause_symptoms: False
+      register: zbxaction_pause_symptoms
 
-        - ansible.builtin.assert:
-            that: zbxaction_pause_symptoms.changed is sameas False
+    - ansible.builtin.assert:
+        that: zbxaction_pause_symptoms.changed is sameas False
 
     - name: test - delete action
       community.zabbix.zabbix_action:

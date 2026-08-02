@@ -27,7 +27,6 @@ options:
     idp_type:
         description:
             - Type of IdP. Only one user directory of type SAML can exist.
-            - This parameter is available since Zabbix 6.4.
         required: false
         type: str
         choices: ["ldap", "saml"]
@@ -37,26 +36,22 @@ options:
             - if I(false) Provisioning of users created by this user directory is disabled
             - if I(true) Provisioning of users created by this user directory is enabled.
               Additionally, the authentication status of C(ldap_jit_status) or C(saml_jit_status) should be enabled.
-            - This parameter is available since Zabbix 6.4.
         required: false
         type: bool
         default: false
     user_username:
         description:
             - LDAP/SAML attribute name to use for users.name field when user is provisioned
-            - This parameter is available since Zabbix 6.4.
         required: false
         type: str
     user_lastname:
         description:
             - LDAP/SAML attribute name to use for users.surname field when user is provisioned
-            - This parameter is available since Zabbix 6.4.
         required: false
         type: str
     user_ref_attr:
         description:
             - LDAP user object attribute name. Will be set instead of the placeholder I(%{ref}) in c(group_filter) string.
-            - This parameter is available since Zabbix 6.4.
         required: false
         type: str
     description:
@@ -68,7 +63,6 @@ options:
     group_membership:
         description:
             - LDAP property containing groups of user. E.g. I(memberOf)
-            - This parameter is available since Zabbix 6.4.
         required: false
         type: str
     group_basedn:
@@ -76,14 +70,12 @@ options:
             - LDAP groups path in LDAP tree to search for groups data.
             - Used to configure user membership check in I(openLDAP).
             - Required if group_membership is not set.
-            - This parameter is available since Zabbix 6.4.
         type: str
     group_name:
         description:
             - LDAP/SAML attribute name to get group name for group mapping between Zabbix and IdP.
             - Used to configure user membership check in LDAP.
             - Ignored when provisioning a user if group_membership is set.
-            - This parameter is available since Zabbix 6.4.
         required: false
         type: str
     group_member:
@@ -91,14 +83,12 @@ options:
             - LDAP tree attribute name containing group name received with C(group_filter) query.
             - Used to configure user membership check in openLDAP.
             - Ignored when provisioning a user if group_membership is set.
-            - This parameter is available since Zabbix 6.4.
         type: str
     group_filter:
         description:
             - LDAP search filter to select groups when searching for specific user groups.
             - Used to configure user membership check in openLDAP.
             - Ignored when provisioning a user if group_membership is set.
-            - This parameter is available since Zabbix 6.4.
         type: str
         required: false
     bind_password:
@@ -156,95 +146,81 @@ options:
         description:
             - SAML URI that identifies the IdP in SAML messages.
             - required if C(idp_type) is set to I(saml).
-            - This parameter is available since Zabbix 6.4.
         required: false
         type: str
     sp_entityid:
         description:
             - SAML SP entity ID.
             - required if C(idp_type) is set to I(saml).
-            - This parameter is available since Zabbix 6.4.
         required: false
         type: str
     sso_url:
         description:
             - SAML URL of the IdP"s SAML SSO service, to which Zabbix will send SAML authentication requests.
             - required if C(idp_type) is set to I(saml).
-            - This parameter is available since Zabbix 6.4.
         required: false
         type: str
     slo_url:
         description:
             - SAML IdP service endpoint URL to which Zabbix will send SAML logout requests.
-            - This parameter is available since Zabbix 6.4.
         required: false
         type: str
     username_attribute:
         description:
             - SAML username attribute to be used in comparison with Zabbix user.username value when authenticating.
             - required if C(idp_type) is set to I(saml).
-            - This parameter is available since Zabbix 6.4.
         required: false
         type: str
     nameid_format:
         description:
             - SAML SP name ID format.
-            - This parameter is available since Zabbix 6.4.
         required: false
         type: str
     scim_status:
         description:
             - Whether the SCIM provisioning for SAML is enabled or disabled.
-            - This parameter is available since Zabbix 6.4.
         required: false
         type: bool
         default: false
     encrypt_nameid:
         description:
             - SAML encrypt name ID. Encrypts if I(true).
-            - This parameter is available since Zabbix 6.4.
         required: false
         type: bool
         default: false
     encrypt_assertions:
         description:
             - SAML encrypt assertions. Encrypts if I(true).
-            - This parameter is available since Zabbix 6.4.
         required: false
         type: bool
         default: false
     sign_messages:
         description:
             - SAML sign messages. Signs if I(true).
-            - This parameter is available since Zabbix 6.4.
         required: false
         type: bool
         default: false
     sign_assertions:
         description:
             - SAML sign assertions. Signs if I(true).
-            - This parameter is available since Zabbix 6.4.
         required: false
         type: bool
         default: false
     sign_authn_requests:
         description:
             - SAML sign AuthN requests. Signs if I(true).
-            - This parameter is available since Zabbix 6.4.
         required: false
         type: bool
         default: false
     sign_logout_requests:
         description:
             - SAML sign logout requests. Signs if I(true).
-            - This parameter is available since Zabbix 6.4.
         required: false
         type: bool
         default: false
     sign_logout_responses:
         description:
             - SAML sign logout responses. Signs if I(true).
-            - This parameter is available since Zabbix 6.4.
         required: false
         type: bool
         default: false
@@ -253,7 +229,6 @@ options:
         elements: dict
         description:
             - Array of the IdP media type mappings objects.
-            - This parameter is available since Zabbix 6.4.
         suboptions:
             name:
                 description:
@@ -276,7 +251,6 @@ options:
         elements: dict
         description:
             - Array of the IdP media type mappings objects.
-            - This parameter is available since Zabbix 6.4.
         suboptions:
             name:
                 description:
@@ -326,29 +300,7 @@ EXAMPLES = r"""
   ansible.builtin.set_fact:
     ansible_zabbix_auth_key: 8ec0d52432c15c91fcafe9888500cf9a607f44091ab554dbee860f6b44fac895
 
-- name: Create new user directory or update existing info (Zabbix <= 6.2)
-  # set task level variables as we change ansible_connection plugin here
-  vars:
-    ansible_network_os: community.zabbix.zabbix
-    ansible_connection: httpapi
-    ansible_httpapi_port: 443
-    ansible_httpapi_use_ssl: true
-    ansible_httpapi_validate_certs: false
-    ansible_zabbix_url_path: "zabbixeu"  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
-    ansible_host: zabbix-example-fqdn.org
-  community.zabbix.zabbix_user_directory:
-    state: present
-    name: TestUserDirectory
-    host: "test.com"
-    port: 389
-    base_dn: "ou=Users,dc=example,dc=org"
-    search_attribute: "uid"
-    bind_dn: "cn=ldap_search,dc=example,dc=org"
-    description: "Test user directory"
-    search_filter: "(%{attr}=test_user)"
-    start_tls: 0
-
-- name: Create new user directory with LDAP IDP or update existing info (Zabbix >= 6.4)
+- name: Create new user directory with LDAP IDP or update existing info
   # set task level variables as we change ansible_connection plugin here
   vars:
     ansible_network_os: community.zabbix.zabbix
@@ -384,7 +336,7 @@ EXAMPLES = r"""
         user_groups:
           - Guests
 
-- name: Create new user directory with SAML IDP or update existing info (Zabbix >= 6.4)
+- name: Create new user directory with SAML IDP or update existing info
   # set task level variables as we change ansible_connection plugin here
   vars:
     ansible_network_os: community.zabbix.zabbix
@@ -421,7 +373,6 @@ EXAMPLES = r"""
 from ansible.module_utils.basic import AnsibleModule
 
 from ansible_collections.community.zabbix.plugins.module_utils.base import ZabbixBase
-from ansible.module_utils.compat.version import LooseVersion
 import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabbix_utils
 
 
@@ -487,8 +438,6 @@ def main():
         )
     )
 
-    module = AnsibleModule(argument_spec=argument_spec, supports_check_mode=True)
-    """ For future when < 7.0 disappears we should use this, now we cannot do this as at this point Zabbix version is unknown
     module = AnsibleModule(
         argument_spec=argument_spec,
         supports_check_mode=True,
@@ -496,10 +445,9 @@ def main():
             ("state", "present", ("idp_type",)),
             ("idp_type", "ldap", ("host", "port", "base_dn", "search_attribute"), False),
             ("idp_type", "saml", ("idp_entityid", "sp_entityid", "sso_url", "username_attribute"), False),
-            ("provision_status", "true", ("provision_groups"))
+            ("provision_status", "true", ("provision_groups",))
         ]
     )
-    """
 
     parameters = {"name": module.params["name"]}
     for p in [
@@ -522,154 +470,144 @@ def main():
 
     user_directory = ZabbixBase(module)
 
-    if LooseVersion(user_directory._zbx_api_version) < LooseVersion("7.0"):
-        module.fail_json(msg="Zabbix < 7.0 does not support user directories.")
-
-    if LooseVersion(user_directory._zbx_api_version) < LooseVersion("7.0"):
-        parameters["search_filter"] = module.params["search_filter"]
-        directory = user_directory._zapi.userdirectory.get(
-            {"filter": {"name": parameters["name"]}}
+    # Mandatory parameters check
+    if state == "present" and not module.params["idp_type"]:
+        module.fail_json(
+            "'idp_type' parameter must be provided when state is 'present'"
         )
-    else:
-        # Zabbix >= 6.4
-        # Mandatory parameters check
-        if state == "present" and not module.params["idp_type"]:
+    if module.params["idp_type"]:
+        if module.params["idp_type"] == "ldap" and (
+            not module.params["host"]
+            or not module.params["port"]
+            or not module.params["base_dn"]
+            or not module.params["search_attribute"]
+        ):
             module.fail_json(
-                "'idp_type' parameter must be provided when state is 'present'"
+                "'host', 'port', 'base_dn', 'search_attribute' must be provided when idp_type is 'ldap'"
             )
-        if module.params["idp_type"]:
-            if module.params["idp_type"] == "ldap" and (
-                not module.params["host"]
-                or not module.params["port"]
-                or not module.params["base_dn"]
-                or not module.params["search_attribute"]
-            ):
-                module.fail_json(
-                    "'host', 'port', 'base_dn', 'search_attribute' must be provided when idp_type is 'ldap'"
-                )
-            if module.params["idp_type"] == "saml" and (
-                not module.params["idp_entityid"]
-                or not module.params["sp_entityid"]
-                or not module.params["sso_url"]
-                or not module.params["username_attribute"]
-            ):
-                module.fail_json(
-                    "'idp_entityid', 'sp_entityid', 'sso_url', 'username_attribute' must be provided when idp_type is 'ldap'"
-                )
-
-        directory = user_directory._zapi.userdirectory.get(
-            {
-                "search": {"name": parameters["name"]},
-                "selectProvisionMedia": "extend",
-                "selectProvisionGroups": "extend",
-            }
-        )
-        parameters["idp_type"] = str(
-            zabbix_utils.helper_to_numeric_value(
-                ["", "ldap", "saml"], module.params["idp_type"]
+        if module.params["idp_type"] == "saml" and (
+            not module.params["idp_entityid"]
+            or not module.params["sp_entityid"]
+            or not module.params["sso_url"]
+            or not module.params["username_attribute"]
+        ):
+            module.fail_json(
+                "'idp_entityid', 'sp_entityid', 'sso_url', 'username_attribute' must be provided when idp_type is 'ldap'"
             )
+
+    directory = user_directory._zapi.userdirectory.get(
+        {
+            "search": {"name": parameters["name"]},
+            "selectProvisionMedia": "extend",
+            "selectProvisionGroups": "extend",
+        }
+    )
+    parameters["idp_type"] = str(
+        zabbix_utils.helper_to_numeric_value(
+            ["", "ldap", "saml"], module.params["idp_type"]
         )
-        if parameters["idp_type"] == "1":
-            # idp_type is ldap
-            parameters["search_filter"] = module.params["search_filter"]
-        elif parameters["idp_type"] == "2":
-            # idp_type is saml
-            for p in [
-                "idp_entityid",
-                "sso_url",
-                "username_attribute",
-                "sp_entityid",
-                "slo_url",
-                "nameid_format",
-            ]:
-                # str parameters
-                if module.params[p]:
-                    parameters[p] = module.params[p]
-            for p in [
-                "scim_status",
-                "encrypt_nameid",
-                "encrypt_assertions",
-                "sign_messages",
-                "sign_assertions",
-                "sign_authn_requests",
-                "sign_logout_requests",
-                "sign_logout_responses",
-            ]:
-                # boolean parameters
-                if module.params[p]:
-                    parameters[p] = str(int(module.params[p]))
-
-        if module.params["provision_status"]:
-            parameters["provision_status"] = int(module.params["provision_status"])
-
-        if module.params["provision_media"]:
-            if (
-                "provision_status" not in parameters
-                or not parameters["provision_status"]
-            ):
-                module.fail_json(
-                    "'provision_status' must be True to define 'provision_media'"
-                )
-            parameters["provision_media"] = []
-            for media in module.params["provision_media"]:
-                media_type_name = media["mediatype"]
-                media_type_ids = user_directory._zapi.mediatype.get(
-                    {"filter": {"name": media_type_name}}
-                )
-                if not media_type_ids:
-                    module.fail_json("Mediatype '%s' cannot be found" % media_type_name)
-                parameters["provision_media"].append(
-                    {
-                        "name": media["name"],
-                        "mediatypeid": media_type_ids[0]["mediatypeid"],
-                        "attribute": media["attribute"],
-                    }
-                )
-
-        if module.params["provision_groups"]:
-            if (
-                "provision_status" not in parameters
-                or not parameters["provision_status"]
-            ):
-                module.fail_json(
-                    "'provision_status' must be True to define 'provision_groups'"
-                )
-            parameters["provision_groups"] = []
-            for group in module.params["provision_groups"]:
-                role_name = group["role"]
-                role_ids = user_directory._zapi.role.get(
-                    {"filter": {"name": role_name}}
-                )
-                if not role_ids:
-                    module.fail_json("Role '%s' cannot be found" % role_name)
-                user_groups = []
-                for user_group in group["user_groups"]:
-                    ug_ids = user_directory._zapi.usergroup.get(
-                        {"filter": {"name": user_group}}
-                    )
-                    if not ug_ids:
-                        module.fail_json("User group '%s' cannot be found" % user_group)
-                    user_groups.append({"usrgrpid": ug_ids[0]["usrgrpid"]})
-                parameters["provision_groups"].append(
-                    {
-                        "name": group["name"],
-                        "roleid": role_ids[0]["roleid"],
-                        "user_groups": user_groups,
-                    }
-                )
+    )
+    if parameters["idp_type"] == "1":
+        # idp_type is ldap
+        parameters["search_filter"] = module.params["search_filter"]
+    elif parameters["idp_type"] == "2":
+        # idp_type is saml
         for p in [
-            "group_basedn",
-            "group_filter",
-            "group_member",
-            "group_membership",
-            "group_name",
-            "group_name",
-            "user_lastname",
-            "user_ref_attr",
-            "user_username",
+            "idp_entityid",
+            "sso_url",
+            "username_attribute",
+            "sp_entityid",
+            "slo_url",
+            "nameid_format",
         ]:
+            # str parameters
             if module.params[p]:
                 parameters[p] = module.params[p]
+        for p in [
+            "scim_status",
+            "encrypt_nameid",
+            "encrypt_assertions",
+            "sign_messages",
+            "sign_assertions",
+            "sign_authn_requests",
+            "sign_logout_requests",
+            "sign_logout_responses",
+        ]:
+            # boolean parameters
+            if module.params[p]:
+                parameters[p] = str(int(module.params[p]))
+
+    if module.params["provision_status"]:
+        parameters["provision_status"] = int(module.params["provision_status"])
+
+    if module.params["provision_media"]:
+        if (
+            "provision_status" not in parameters
+            or not parameters["provision_status"]
+        ):
+            module.fail_json(
+                "'provision_status' must be True to define 'provision_media'"
+            )
+        parameters["provision_media"] = []
+        for media in module.params["provision_media"]:
+            media_type_name = media["mediatype"]
+            media_type_ids = user_directory._zapi.mediatype.get(
+                {"filter": {"name": media_type_name}}
+            )
+            if not media_type_ids:
+                module.fail_json("Mediatype '%s' cannot be found" % media_type_name)
+            parameters["provision_media"].append(
+                {
+                    "name": media["name"],
+                    "mediatypeid": media_type_ids[0]["mediatypeid"],
+                    "attribute": media["attribute"],
+                }
+            )
+
+    if module.params["provision_groups"]:
+        if (
+            "provision_status" not in parameters
+            or not parameters["provision_status"]
+        ):
+            module.fail_json(
+                "'provision_status' must be True to define 'provision_groups'"
+            )
+        parameters["provision_groups"] = []
+        for group in module.params["provision_groups"]:
+            role_name = group["role"]
+            role_ids = user_directory._zapi.role.get(
+                {"filter": {"name": role_name}}
+            )
+            if not role_ids:
+                module.fail_json("Role '%s' cannot be found" % role_name)
+            user_groups = []
+            for user_group in group["user_groups"]:
+                ug_ids = user_directory._zapi.usergroup.get(
+                    {"filter": {"name": user_group}}
+                )
+                if not ug_ids:
+                    module.fail_json("User group '%s' cannot be found" % user_group)
+                user_groups.append({"usrgrpid": ug_ids[0]["usrgrpid"]})
+            parameters["provision_groups"].append(
+                {
+                    "name": group["name"],
+                    "roleid": role_ids[0]["roleid"],
+                    "user_groups": user_groups,
+                }
+            )
+    for p in [
+        "group_basedn",
+        "group_filter",
+        "group_member",
+        "group_membership",
+        "group_name",
+        "group_name",
+        "user_lastname",
+        "user_ref_attr",
+        "user_username",
+    ]:
+        if module.params[p]:
+            parameters[p] = module.params[p]
 
     if not directory:
         # No User Directory found with given name

@@ -296,7 +296,7 @@ releases:
     - 226-zabbix_template.yaml
     - 254-disable-no-log-warning.yml
     - 260-zabbix_user.yml
-    - 264-allow-user_medias-to-be-optional.yaml
+    - 264-allow-medias-to-be-optional.yaml
     - 266-zabbix_web.yml
     - 297-zabbix_template_modules.yml
     - 309-host-interfaces.yaml

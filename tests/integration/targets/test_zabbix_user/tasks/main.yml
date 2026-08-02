@@ -69,7 +69,7 @@
       - Guests
       - Zabbix administrators
     passwd: G$jd_79!jw
-    user_medias:
+    medias:
       - mediatype: Email
         sendto: example@example.com
         period: 1-7,00:00-24:00
@@ -81,11 +81,11 @@
           high: true
           disaster: true
         active: true
-  register: add_user_medias_to_existing_user_result
+  register: add_medias_to_existing_user_result
 
 - ansible.builtin.assert:
     that:
-      - add_user_medias_to_existing_user_result.changed is sameas true
+      - add_medias_to_existing_user_result.changed is sameas true
 
 - name: test - Add multiple user medias(Email and SMS) to existing user
   community.zabbix.zabbix_user:
@@ -96,7 +96,7 @@
       - Guests
       - Zabbix administrators
     passwd: G$jd_79!jw
-    user_medias:
+    medias:
       - mediatype: Email
         sendto: example@example.com
         period: 1-7,00:00-24:00
@@ -119,11 +119,11 @@
           high: true
           disaster: true
         active: true
-  register: add_user_medias_to_existing_user_result
+  register: add_medias_to_existing_user_result
 
 - ansible.builtin.assert:
     that:
-      - add_user_medias_to_existing_user_result.changed is sameas true
+      - add_medias_to_existing_user_result.changed is sameas true
 
 # Existing parameter updates test from here
 - name: test - Update password parameter for existing user
@@ -136,7 +136,7 @@
       - Zabbix administrators
     passwd: update_password
     override_passwd: true
-    user_medias:
+    medias:
       - mediatype: Email
         sendto: example@example.com
         period: 1-7,00:00-24:00
@@ -175,7 +175,7 @@
       - Zabbix administrators
     passwd: update_password
     autologin: true
-    user_medias:
+    medias:
       - mediatype: Email
         sendto: example@example.com
         period: 1-7,00:00-24:00
@@ -214,7 +214,7 @@
       - Zabbix administrators
     passwd: update_password
     autologout: 500
-    user_medias:
+    medias:
       - mediatype: Email
         sendto: example@example.com
         period: 1-7,00:00-24:00
@@ -254,7 +254,7 @@
     passwd: update_password
     autologout: 500
     refresh: 60
-    user_medias:
+    medias:
       - mediatype: Email
         sendto: example@example.com
         period: 1-7,00:00-24:00
@@ -295,7 +295,7 @@
     autologout: 500
     refresh: 60
     rows_per_page: 300
-    user_medias:
+    medias:
       - mediatype: Email
         sendto: example@example.com
         period: 1-7,00:00-24:00
@@ -337,7 +337,7 @@
     refresh: 60
     rows_per_page: 300
     after_login_url: http://example.com
-    user_medias:
+    medias:
       - mediatype: Email
         sendto: example@example.com
         period: 1-7,00:00-24:00
@@ -380,7 +380,7 @@
     rows_per_page: 300
     after_login_url: http://example.com
     theme: "{{ item }}"
-    user_medias:
+    medias:
       - mediatype: Email
         sendto: example@example.com
         period: 1-7,00:00-24:00
@@ -428,7 +428,7 @@
     after_login_url: http://example.com
     theme: dark-theme
     role_name: "{{ item }}"
-    user_medias:
+    medias:
       - mediatype: Email
         sendto: example@example.com
         period: 1-7,00:00-24:00
@@ -477,7 +477,7 @@
     theme: dark-theme
     role_name: Admin role
     lang: en_US
-    user_medias:
+    medias:
       - mediatype: Email
         sendto: example@example.com
         period: 1-7,00:00-24:00
@@ -523,7 +523,7 @@
     role_name: Admin role
     timezone: Asia/Tokyo
     lang: en_US
-    user_medias:
+    medias:
       - mediatype: Email
         sendto: example@example.com
         period: 1-7,00:00-24:00
@@ -569,7 +569,7 @@
     role_name: Admin role
     timezone: Asia/Tokyo
     lang: en_US
-    user_medias:
+    medias:
       - mediatype: Email
         sendto: example@example.com
         period: 1-7,00:00-24:00
@@ -615,7 +615,7 @@
     role_name: Admin role
     timezone: Asia/Tokyo
     lang: fr_FR
-    user_medias:
+    medias:
       - mediatype: Email
         sendto: example@example.com
         period: 1-7,00:00-24:00
@@ -663,7 +663,7 @@
     role_name: Admin role
     timezone: Asia/Tokyo
     lang: fr_FR
-    user_medias:
+    medias:
       - mediatype: Email
         sendto: example@example.com
         period: 1-7,00:00-24:00
@@ -709,7 +709,7 @@
     role_name: Admin role
     timezone: Asia/Tokyo
     lang: fr_FR
-    user_medias:
+    medias:
       - mediatype: Email
         sendto: example@example.com
         period: 1-7,00:00-24:00
@@ -756,7 +756,7 @@
     role_name: Admin role
     timezone: Asia/Tokyo
     lang: fr_FR
-    user_medias:
+    medias:
       - mediatype: Email
         sendto: example@example.com
         period: 1-7,00:00-24:00
@@ -770,11 +770,11 @@
         active: true
   check_mode: true
   diff: true
-  register: delete_user_medias_existing_user_result
+  register: delete_medias_existing_user_result
 
 - ansible.builtin.assert:
     that:
-      - delete_user_medias_existing_user_result.changed is sameas true
+      - delete_medias_existing_user_result.changed is sameas true
 
 - name: test - Delete user medias(SMS) for existing user
   community.zabbix.zabbix_user:
@@ -793,7 +793,7 @@
     role_name: Admin role
     timezone: Asia/Tokyo
     lang: fr_FR
-    user_medias:
+    medias:
       - mediatype: Email
         sendto: example@example.com
         period: 1-7,00:00-24:00
@@ -805,11 +805,11 @@
           high: true
           disaster: true
         active: true
-  register: delete_user_medias_existing_user_result
+  register: delete_medias_existing_user_result
 
 - ansible.builtin.assert:
     that:
-      - delete_user_medias_existing_user_result.changed is sameas true
+      - delete_medias_existing_user_result.changed is sameas true
 
 - name: test - Delete user group for existing user
   community.zabbix.zabbix_user:
@@ -827,7 +827,7 @@
     role_name: Admin role
     timezone: Asia/Tokyo
     lang: fr_FR
-    user_medias:
+    medias:
       - mediatype: Email
         sendto: example@example.com
         period: 1-7,00:00-24:00
@@ -845,7 +845,7 @@
     that:
       - delete_user_group_existing_user_result.changed is sameas true
 
-- name: test - optional user_medias
+- name: test - optional medias
   community.zabbix.zabbix_user:
     username: example1
     name: example2
@@ -861,11 +861,11 @@
     role_name: Admin role
     timezone: Asia/Tokyo
     lang: fr_FR
-  register: update_user_optional_user_medias_existing_user_result
+  register: update_user_optional_medias_existing_user_result
 
 - ansible.builtin.assert:
     that:
-      - update_user_optional_user_medias_existing_user_result.changed is sameas False
+      - update_user_optional_medias_existing_user_result.changed is sameas False
 
 - name: test - Delete existing user with check_mode and diff
   community.zabbix.zabbix_user:
@@ -1023,7 +1023,7 @@
     usrgrps:
       - Guests
     passwd: G$jd_79!jw
-    user_medias:
+    medias:
       - mediatype: Email
         sendto:
           - example@example.com
@@ -1051,7 +1051,7 @@
     usrgrps:
       - Guests
     passwd: G$jd_79!jw
-    user_medias:
+    medias:
       - mediatype: Email
         sendto:
           - example@example.com

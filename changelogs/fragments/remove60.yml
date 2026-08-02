@@ -1,0 +1,27 @@
+breaking_changes:
+  - zabbix_autentication - Removed support for 'ldap_configured' parameter
+  - zabbix_autentication - Removed support for 'ldap_host' parameter
+  - zabbix_autentication - Removed support for 'ldap_port' parameter
+  - zabbix_autentication - Removed support for 'ldap_base_dn' parameter
+  - zabbix_autentication - Removed support for 'ldap_search_attribute' parameter
+  - zabbix_autentication - Removed support for 'ldap_bind_dn' parameter
+  - zabbix_autentication - Removed support for 'ldap_bind_password' parameter
+  - zabbix_autentication - Removed support for 'saml_idp_entityid' parameter
+  - zabbix_autentication - Removed support for 'saml_sso_url' parameter
+  - zabbix_autentication - Removed support for 'saml_slo_url' parameter
+  - zabbix_autentication - Removed support for 'saml_username_attribute' parameter
+  - zabbix_autentication - Removed support for 'saml_sp_entityid' parameter
+  - zabbix_autentication - Removed support for 'saml_nameid_format' parameter
+  - zabbix_autentication - Removed support for 'saml_sign_messages' parameter
+  - zabbix_autentication - Removed support for 'saml_sign_assertions' parameter
+  - zabbix_autentication - Removed support for 'saml_sign_authn_requests' parameter
+  - zabbix_autentication - Removed support for 'saml_sign_logout_requests' parameter
+  - zabbix_autentication - Removed support for 'saml_sign_logout_responses' parameter
+  - zabbix_autentication - Removed support for 'saml_encrypt_nameid' parameter
+  - zabbix_autentication - Removed support for 'saml_encrypt_assertions' parameter
+  - zabbix_usergroup - Removed support for 'rights' parameter
+  - zabbix_template_info - Removed support for 'omit_date' parameter
+  - zabbix_proxy - Removed support for 'proxy_address' parameter
+  - zabbix_proxy - Removed support for 'status' parameter
+  - zabbix_proxy - Removed support for 'interface' parameter
+  - zabbix_user - Removed support for 'user_medias' parameter.  This has been replaced by 'medias'

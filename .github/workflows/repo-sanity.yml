@@ -50,6 +50,12 @@ jobs:
           - devel
         python:
           - '3.12'
+        include:
+          - ansible: devel
+            python: '3.13'
+        exclude:
+          - ansible: devel
+            python: '3.12'
     runs-on: ubuntu-latest
     steps:
       # ansible-test requires the collection to be in a directory in the form

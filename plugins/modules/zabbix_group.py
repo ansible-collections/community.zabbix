@@ -41,7 +41,6 @@ options:
         description:
             - List of settings will be propagated.
             - This module propagates permissions and/or tag_filters after creating missing host groups.
-            - This parameter is for Zabbix >= 7.0.
         type: dict
         suboptions:
             permissions:
@@ -110,7 +109,7 @@ EXAMPLES = r"""
       - Example group2
   when: inventory_hostname==groups['group_name'][0]
 
-- name: Propagate permissions to sub group (Zabbix >= 7.0)
+- name: Propagate permissions to sub group
   # set task level variables as we change ansible_connection plugin here
   vars:
     ansible_network_os: community.zabbix.zabbix
@@ -130,9 +129,6 @@ EXAMPLES = r"""
 
 
 from ansible.module_utils.basic import AnsibleModule
-
-from ansible.module_utils.compat.version import LooseVersion
-
 from ansible_collections.community.zabbix.plugins.module_utils.base import ZabbixBase
 import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabbix_utils
 
@@ -177,8 +173,6 @@ class HostGroup(ZabbixBase):
         return group_ids, group_list
 
     def propagate(self, host_groups, propagate):
-        if LooseVersion(self._zbx_api_version) < LooseVersion("7.0"):
-            return False
         group_ids, group_list = self.get_group_ids(host_groups)
         groups = list(map(lambda group_id: {"groupid": group_id}, group_ids))
         if self._module.check_mode:

@@ -34,7 +34,6 @@ options:
         choices: ["item_values", "events"]
     item_value_types:
         description:
-            - Parameter introduced in Zabbix 7.0
             - List of value types to stream.
             - Each element should be one of C(all), C(all+bin), C(numeric_float), C(character), C(log), C(numeric_unsigned), C(text) or C(binary).
             - C(all) represents all types except binary I((default)).
@@ -55,7 +54,6 @@ options:
         type: int
     attempt_interval:
         description:
-            - Parameter introduced in Zabbix 7.0
             - Interval between attempts in seconds (value between 0 and 10).
         type: int
     timeout:

@@ -27,7 +27,6 @@ options:
     script_type:
         description:
             - Script type. Required when state is 'present'.
-            - A value of 'url' is only available in 7.0 or later
         type: str
         required: false
         choices: ["script", "ipmi", "ssh", "telnet", "webhook", "url"]
@@ -174,42 +173,36 @@ options:
     user_input_enabled:
         description:
             - Allow advanced user input configuration
-            - Available for Zabbix >= 7.0.
         type: bool
         default: false
     user_input_prompt:
         description:
             - Prompt to display when user input is enabled
             - Required when user_input_enabled is C(True)
-            - Available for Zabbix >= 7.0.
         type: str
     user_input_type:
         description:
             - Choosing 'regex' allows the use of a regular expression
             - Choosing 'dropdown' allows a pre-defined list of choices
             - Required if user_input_enabled is C(true)
-            - Available for Zabbix >= 7.0.
         type: str
         choices: ["regex", "dropdown"]
     user_input_regex:
         description:
             - A regular expression to validate user input
             - Required if user_input_type is C(regex)
-            - Available for Zabbix >= 7.0.
         type: str
     user_input_list:
         description:
             - A list of possible choices for the user.
             - Required if user_input_type is C(dropdown).
             - NOTE the first option will be the default.
-            - Available for Zabbix >= 7.0.
         type: list
         elements: str
     user_input_default_input:
         description:
             - Default user input
             - Available if user_input_type is C(regex)
-            - Available for Zabbix >= 7.0.
         type: str
 extends_documentation_fragment:
 - community.zabbix.zabbix
@@ -253,10 +246,8 @@ RETURN = """
 
 
 from ansible.module_utils.basic import AnsibleModule
-
 from ansible_collections.community.zabbix.plugins.module_utils.base import ZabbixBase
 import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabbix_utils
-from ansible.module_utils.compat.version import LooseVersion
 
 
 class Script(ZabbixBase):
@@ -541,8 +532,6 @@ def main():
 
     elif state == "present":
         if script_type == "url":
-            if LooseVersion(script._zbx_api_version) < LooseVersion('7.0'):
-                module.fail_json(changed=False, msg="A type of 'url' is only available for Zabbix >= 7.0")
             if scope not in ["manual_host_action", "manual_event_action"]:
                 module.fail_json(changed=False, msg="A scope of '%s' is not valid for type of 'url'" % scope)
         else:
@@ -561,8 +550,6 @@ def main():
                 if v:
                     module.fail_json(changed=False, msg=f"The attribute '{f}' can't be assigned unless user_input_enabled is 'True'")
         else:
-            if LooseVersion(script._zbx_api_version) < LooseVersion('7.0'):
-                module.fail_json(changed=False, msg="user_input options are only available for Zabbix >= 7.0")
             if len(user_input_prompt) < 1:
                 module.fail_json(changed=False, msg="The attribute 'user_input_prompt' is required when user_input_enabled is 'True'")
             if user_input_type == "dropdown":

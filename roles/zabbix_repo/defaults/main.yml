@@ -25,7 +25,7 @@ zabbix_repo_yum:
 zabbix_repo_apt_priority: 1001
 zabbix_repo_deb_gpg_key_url: "{{ zabbix_repo_deb_schema }}://repo.zabbix.com/zabbix-official-repo.key"
 zabbix_repo_deb_include_deb_src: true
-zabbix_repo_rpm_gpg_key_url: "{{ zabbix_repo_yum_schema }}://repo.zabbix.com/{{ _gpg_key_zabbix[zabbix_repo_version | string] | default('RPM-GPG-KEY-ZABBIX-B5333005') }}"
+zabbix_repo_rpm_gpg_key_url: "{{ zabbix_repo_yum_schema }}://repo.zabbix.com/RPM-GPG-KEY-ZABBIX-B5333005"
 zabbix_repo_rpm_gpg_key_non_supported_url: "{{ zabbix_repo_yum_schema }}://repo.zabbix.com/{{ _gpg_key_non_supported | default('RPM-GPG-KEY-ZABBIX-08EFA7DD') }}"
 
 zabbix_repo_zypper_auto_import_keys: true

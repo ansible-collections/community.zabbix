@@ -75,7 +75,6 @@ options:
         type: str
     monitored_by:
         description:
-           - Parameter introduced in Zabbix 7.0.
            - Source that is used to monitor the host.
         choices: ["zabbix_server", "proxy", "proxy_group"]
         type: str
@@ -86,7 +85,6 @@ options:
         type: str
     proxy_group:
         description:
-            - Parameter introduced in Zabbix 7.0.
             - Proxy group that is used to monitor the host.
             - Required if C(monitored_by) is "proxy_group"
         type: str
@@ -421,7 +419,7 @@ EXAMPLES = r"""
       - tag: ExampleHostsTag2
         value: ExampleTagValue
 
-- name: Create a new host or update it - monitored by Zabbix Proxy (Zabbix >= 7.0)
+- name: Create a new host or update it - monitored by Zabbix Proxy
 # Set task level following variables for Zabbix Server host in task
   vars:
     ansible_network_os: community.zabbix.zabbix
@@ -441,7 +439,7 @@ EXAMPLES = r"""
     monitored_by: proxy
     proxy: a.zabbix.proxy
 
-- name: Create a new host or update it - monitored by Zabbix Proxy Group (Zabbix >= 7.0)
+- name: Create a new host or update it - monitored by Zabbix Proxy Group
 # Set task level following variables for Zabbix Server host in task
   vars:
     ansible_network_os: community.zabbix.zabbix
@@ -485,13 +483,8 @@ EXAMPLES = r"""
 
 
 import copy
-
 from ansible.module_utils.basic import AnsibleModule
-
 from ansible_collections.community.zabbix.plugins.module_utils.base import ZabbixBase
-
-from ansible.module_utils.compat.version import LooseVersion
-
 import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabbix_utils
 
 
@@ -529,18 +522,14 @@ class Host(ZabbixBase):
             if self._module.check_mode:
                 self._module.exit_json(changed=True)
             parameters = {"host": host_name, "interfaces": interfaces, "groups": group_ids, "status": status}
-            if LooseVersion(self._zbx_api_version) < LooseVersion("7.0"):
+            if monitored_by == 1:
                 if proxy_id:
-                    parameters["proxy_hostid"] = proxy_id
-            else:
-                if monitored_by == 1:
-                    if proxy_id:
-                        parameters["monitored_by"] = 1  # By single proxy
-                        parameters["proxyid"] = proxy_id
-                elif monitored_by == 2:
-                    if proxy_group_id:
-                        parameters["monitored_by"] = 2  # By single proxy
-                        parameters["proxy_groupid"] = proxy_group_id
+                    parameters["monitored_by"] = 1  # By single proxy
+                    parameters["proxyid"] = proxy_id
+            elif monitored_by == 2:
+                if proxy_group_id:
+                    parameters["monitored_by"] = 2  # By single proxy
+                    parameters["proxy_groupid"] = proxy_group_id
             if visible_name:
                 parameters["name"] = visible_name
             if tls_connect:
@@ -589,17 +578,13 @@ class Host(ZabbixBase):
             else:
                 # A "plain" host
                 parameters = {"hostid": host_id, "groups": group_ids, "status": status}
-                if LooseVersion(self._zbx_api_version) < LooseVersion("7.0"):
-                    if (proxy_id >= 0 and proxy_id != zabbix_host_obj["proxy_hostid"]):
-                        parameters["proxy_hostid"] = proxy_id
-                else:
-                    if monitored_by == 1:
-                        if (proxy_id >= 0 and proxy_id != zabbix_host_obj["proxyid"]):
-                            parameters["proxyid"] = proxy_id
-                    elif monitored_by == 2:
-                        if (proxy_group_id >= 0 and proxy_group_id != zabbix_host_obj["proxy_groupid"]):
-                            parameters["proxy_groupid"] = proxy_group_id
-                    parameters["monitored_by"] = monitored_by
+                if monitored_by == 1:
+                    if (proxy_id >= 0 and proxy_id != zabbix_host_obj["proxyid"]):
+                        parameters["proxyid"] = proxy_id
+                elif monitored_by == 2:
+                    if (proxy_group_id >= 0 and proxy_group_id != zabbix_host_obj["proxy_groupid"]):
+                        parameters["proxy_groupid"] = proxy_group_id
+                parameters["monitored_by"] = monitored_by
                 if (visible_name is not None and visible_name != zabbix_host_obj["name"]):
                     parameters["name"] = visible_name
                 if (tls_connect is not None and tls_connect != zabbix_host_obj["tls_connect"]):
@@ -663,10 +648,7 @@ class Host(ZabbixBase):
 
     # get proxyid by proxy name
     def get_proxyid_by_proxy_name(self, proxy_name):
-        if LooseVersion(self._zbx_api_version) < LooseVersion("7.0"):
-            proxy_list = self._zapi.proxy.get({"output": "extend", "filter": {"host": [proxy_name]}})
-        else:
-            proxy_list = self._zapi.proxy.get({"output": "extend", "filter": {"name": [proxy_name]}})
+        proxy_list = self._zapi.proxy.get({"output": "extend", "filter": {"name": [proxy_name]}})
         if len(proxy_list) < 1:
             self._module.fail_json(msg="Proxy not found: %s" % proxy_name)
         else:
@@ -794,16 +776,12 @@ class Host(ZabbixBase):
         if set(list(template_ids)) != set(exist_template_ids):
             return True
 
-        if LooseVersion(self._zbx_api_version) < LooseVersion("7.0"):
-            if int(host["proxy_hostid"]) != int(proxy_id):
-                return True
-        else:
-            if int(host["monitored_by"]) != monitored_by:
-                return True
-            if int(host["proxyid"]) != int(proxy_id):
-                return True
-            if int(host["proxy_groupid"]) != int(proxy_group_id):
-                return True
+        if int(host["monitored_by"]) != monitored_by:
+            return True
+        if int(host["proxyid"]) != int(proxy_id):
+            return True
+        if int(host["proxy_groupid"]) != int(proxy_group_id):
+            return True
 
         # Check whether the visible_name has changed; Zabbix defaults to the technical hostname if not set.
         if visible_name:
@@ -1191,17 +1169,13 @@ def main():
 
         # If proxy is not specified as a module parameter, use the existing setting
         if proxy is None:
-            if LooseVersion(host._zbx_api_version) < LooseVersion("7.0"):
-                proxy_id = int(zabbix_host_obj["proxy_hostid"])
-            else:
-                proxy_id = int(zabbix_host_obj["proxyid"])
+            proxy_id = int(zabbix_host_obj["proxyid"])
 
-        if LooseVersion(host._zbx_api_version) >= LooseVersion("7.0"):
-            # If monitored_by and proxy_group are not specified as a module parameters, use the existing setting
-            if monitored_by is None:
-                monitored_by = int(zabbix_host_obj["monitored_by"])
-            if proxy_group is None:
-                proxy_group_id = int(zabbix_host_obj["proxy_groupid"])
+        # If monitored_by and proxy_group are not specified as a module parameters, use the existing setting
+        if monitored_by is None:
+            monitored_by = int(zabbix_host_obj["monitored_by"])
+        if proxy_group is None:
+            proxy_group_id = int(zabbix_host_obj["proxy_groupid"])
 
         if state == "absent":
             # remove host

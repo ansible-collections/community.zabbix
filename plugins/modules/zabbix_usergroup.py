@@ -53,29 +53,9 @@ options:
         type: str
         default: "enabled"
         choices: [ "enabled", "disabled" ]
-    rights:
-        description:
-            - Permissions to assign to the group
-            - For <= Zabbix 6.0
-        required: false
-        type: list
-        elements: dict
-        suboptions:
-            host_group:
-                description:
-                    - Name of the host group to add permission to.
-                required: true
-                type: str
-            permission:
-                description:
-                    - Access level to the host group.
-                required: true
-                type: str
-                choices: [ "denied", "read-only", "read-write" ]
     hostgroup_rights:
         description:
             - Host group permissions to assign to the user group
-            - For => Zabbix 7.0
         required: false
         type: list
         elements: dict
@@ -94,7 +74,6 @@ options:
     templategroup_rights:
         description:
             - Template group permissions to assign to the user group
-            - For => Zabbix 7.0
         required: false
         type: list
         elements: dict
@@ -137,7 +116,6 @@ options:
     userdirectory:
         description:
             - Authentication user directory when gui_access set to LDAP or System default.
-            - For => Zabbix 7.0
         required: false
         type: str
     state:
@@ -214,27 +192,7 @@ EXAMPLES = r"""
     name: ACME
     gui_access: disable
 
-# Base create user group with permissions for Zabbix <= 6.0
-- name: Create user group with permissions
-    # set task level variables as we change ansible_connection plugin here
-  vars:
-    ansible_network_os: community.zabbix.zabbix
-    ansible_connection: httpapi
-    ansible_httpapi_port: 443
-    ansible_httpapi_use_ssl: true
-    ansible_httpapi_validate_certs: false
-    ansible_zabbix_url_path: "zabbixeu"  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
-    ansible_host: zabbix-example-fqdn.org
-  community.zabbix.zabbix_usergroup:
-    name: ACME
-    rights:
-        - host_group: Webserver
-          permission: read-write
-        - host_group: Databaseserver
-          permission: read-only
-    state: present
-
-# Base create user group with permissions for Zabbix => 7.0
+# Base create user group with permissions
 - name: Create user group with permissions
     # set task level variables as we change ansible_connection plugin here
   vars:
@@ -321,9 +279,7 @@ msg:
 """
 
 from ansible.module_utils.basic import AnsibleModule
-
 from ansible_collections.community.zabbix.plugins.module_utils.base import ZabbixBase
-from ansible.module_utils.compat.version import LooseVersion
 import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabbix_utils
 
 
@@ -533,30 +489,27 @@ class UserGroup(ZabbixBase):
             ),
             "tag_filters": kwargs["tag_filters"],
         }
-        if LooseVersion(self._zbx_api_version) < LooseVersion("7.0"):
-            _params["rights"] = kwargs["rights"]
-        else:
-            _params["hostgroup_rights"] = kwargs["hostgroup_rights"]
-            _params["templategroup_rights"] = kwargs["templategroup_rights"]
+        _params["hostgroup_rights"] = kwargs["hostgroup_rights"]
+        _params["templategroup_rights"] = kwargs["templategroup_rights"]
 
-            if kwargs["userdirectory"]:
-                try:
-                    _userdir = self._zapi.userdirectory.get(
-                        {
-                            "output": "extend",
-                            "search": {"name": [kwargs["userdirectory"]]},
-                        }
-                    )
-                except Exception as e:
-                    self._module.fail_json(
-                        msg="Failed to get user directory '%s': %s"
-                        % (kwargs["userdirectory"], e)
-                    )
-                if len(_userdir) == 0:
-                    self._module.fail_json(
-                        msg="User directory '%s' not found" % kwargs["userdirectory"]
-                    )
-                _params["userdirectoryid"] = _userdir[0]["userdirectoryid"]
+        if kwargs["userdirectory"]:
+            try:
+                _userdir = self._zapi.userdirectory.get(
+                    {
+                        "output": "extend",
+                        "search": {"name": [kwargs["userdirectory"]]},
+                    }
+                )
+            except Exception as e:
+                self._module.fail_json(
+                    msg="Failed to get user directory '%s': %s"
+                    % (kwargs["userdirectory"], e)
+                )
+            if len(_userdir) == 0:
+                self._module.fail_json(
+                    msg="User directory '%s' not found" % kwargs["userdirectory"]
+                )
+            _params["userdirectoryid"] = _userdir[0]["userdirectoryid"]
 
         return _params
 
@@ -590,25 +543,15 @@ class UserGroup(ZabbixBase):
             User group matching user group name.
         """
         try:
-            if LooseVersion(self._zbx_api_version) < LooseVersion("7.0"):
-                _usergroup = self._zapi.usergroup.get(
-                    {
-                        "output": "extend",
-                        "selectTagFilters": "extend",
-                        "selectRights": "extend",
-                        "filter": {"name": [name]},
-                    }
-                )
-            else:
-                _usergroup = self._zapi.usergroup.get(
-                    {
-                        "output": "extend",
-                        "selectTagFilters": "extend",
-                        "selectHostGroupRights": "extend",
-                        "selectTemplateGroupRights": "extend",
-                        "filter": {"name": [name]},
-                    }
-                )
+            _usergroup = self._zapi.usergroup.get(
+                {
+                    "output": "extend",
+                    "selectTagFilters": "extend",
+                    "selectHostGroupRights": "extend",
+                    "selectTemplateGroupRights": "extend",
+                    "filter": {"name": [name]},
+                }
+            )
 
             if len(_usergroup) < 1:
                 self._module.fail_json(msg="User group not found: %s" % name)
@@ -718,19 +661,6 @@ def main():
             default="enabled",
             choices=["enabled", "disabled"],
         ),
-        rights=dict(
-            type="list",
-            elements="dict",
-            required=False,
-            options=dict(
-                host_group=dict(type="str", required=True),
-                permission=dict(
-                    type="str",
-                    required=True,
-                    choices=["denied", "read-only", "read-write"],
-                ),
-            ),
-        ),
         hostgroup_rights=dict(
             type="list",
             elements="dict",
@@ -777,7 +707,6 @@ def main():
     gui_access = module.params["gui_access"]
     debug_mode = module.params["debug_mode"]
     status = module.params["status"]
-    rights = module.params["rights"]
     hostgroup_rights = module.params["hostgroup_rights"]
     templategroup_rights = module.params["templategroup_rights"]
     tag_filters = module.params["tag_filters"]
@@ -786,11 +715,8 @@ def main():
 
     userGroup = UserGroup(module)
     zbx = userGroup._zapi
-    if LooseVersion(userGroup._zbx_api_version) < LooseVersion("7.0"):
-        rgts = Rights(module, zbx)
-    else:
-        hostgroup_rgts = HostgroupRights(module, zbx)
-        templategroup_rgts = TemplategroupRights(module, zbx)
+    hostgroup_rgts = HostgroupRights(module, zbx)
+    templategroup_rgts = TemplategroupRights(module, zbx)
     tgflts = TagFilters(module, zbx)
 
     usergroup_exists = userGroup.check_if_usergroup_exists(name)
@@ -807,32 +733,21 @@ def main():
                 msg="User group deleted: %s, ID: %s" % (name, usrgrpid),
             )
         else:
-            if LooseVersion(userGroup._zbx_api_version) < LooseVersion("7.0"):
-                difference = userGroup.check_difference(
-                    usrgrpid=usrgrpid,
-                    name=name,
-                    gui_access=gui_access,
-                    debug_mode=debug_mode,
-                    status=status,
-                    rights=rgts.construct_the_data(rights),
-                    tag_filters=tgflts.construct_the_data(tag_filters),
-                )
-            else:
-                difference = userGroup.check_difference(
-                    usrgrpid=usrgrpid,
-                    name=name,
-                    gui_access=gui_access,
-                    debug_mode=debug_mode,
-                    status=status,
-                    hostgroup_rights=hostgroup_rgts.construct_the_data(
-                        hostgroup_rights
-                    ),
-                    templategroup_rights=templategroup_rgts.construct_the_data(
-                        templategroup_rights
-                    ),
-                    tag_filters=tgflts.construct_the_data(tag_filters),
-                    userdirectory=userdirectory,
-                )
+            difference = userGroup.check_difference(
+                usrgrpid=usrgrpid,
+                name=name,
+                gui_access=gui_access,
+                debug_mode=debug_mode,
+                status=status,
+                hostgroup_rights=hostgroup_rgts.construct_the_data(
+                    hostgroup_rights
+                ),
+                templategroup_rights=templategroup_rgts.construct_the_data(
+                    templategroup_rights
+                ),
+                tag_filters=tgflts.construct_the_data(tag_filters),
+                userdirectory=userdirectory,
+            )
             if difference == {}:
                 module.exit_json(
                     changed=False,
@@ -859,30 +774,20 @@ def main():
                 msg="User group %s does not exists, nothing to delete" % name,
             )
         else:
-            if LooseVersion(userGroup._zbx_api_version) < LooseVersion("7.0"):
-                usrgrpid = userGroup.add(
-                    name=name,
-                    gui_access=gui_access,
-                    debug_mode=debug_mode,
-                    status=status,
-                    rights=rgts.construct_the_data(rights),
-                    tag_filters=tgflts.construct_the_data(tag_filters),
-                )
-            else:
-                usrgrpid = userGroup.add(
-                    name=name,
-                    gui_access=gui_access,
-                    debug_mode=debug_mode,
-                    status=status,
-                    hostgroup_rights=hostgroup_rgts.construct_the_data(
-                        hostgroup_rights
-                    ),
-                    templategroup_rights=templategroup_rgts.construct_the_data(
-                        templategroup_rights
-                    ),
-                    tag_filters=tgflts.construct_the_data(tag_filters),
-                    userdirectory=userdirectory,
-                )
+            usrgrpid = userGroup.add(
+                name=name,
+                gui_access=gui_access,
+                debug_mode=debug_mode,
+                status=status,
+                hostgroup_rights=hostgroup_rgts.construct_the_data(
+                    hostgroup_rights
+                ),
+                templategroup_rights=templategroup_rgts.construct_the_data(
+                    templategroup_rights
+                ),
+                tag_filters=tgflts.construct_the_data(tag_filters),
+                userdirectory=userdirectory,
+            )
             module.exit_json(
                 changed=True,
                 state=state,

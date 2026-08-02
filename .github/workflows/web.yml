@@ -48,7 +48,6 @@ jobs:
           - v74
           - v72
           - v70
-          - v60
         exclude:
           - container:
               image: rockylinux10
@@ -56,9 +55,6 @@ jobs:
           - container:
               image: rockylinux10
             version: v70
-          - container:
-              image: rockylinux10
-            version: v60
           - container:
               image: debian13
             version: v72
@@ -142,7 +138,6 @@ jobs:
           - v74
           - v72
           - v70
-          - v60
         exclude:
           - container:
               image: opensuseleap15

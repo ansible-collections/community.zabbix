@@ -1,8 +1,4 @@
 ---
-- name: Skip test for versions < 7.0 # Connectors available only since Zabbix 6.4
-  when: zabbix_version is version('7.0', '<')
-  ansible.builtin.meta: end_play
-
 - block:
     - name: test - create new Zabbix connector
       community.zabbix.zabbix_connector:
@@ -97,7 +93,7 @@
       ansible.builtin.assert:
         that: not connector_auth_tags_update is changed
 
-    - name: test - set item value type (version >= 7.0)
+    - name: test - set item value type
       community.zabbix.zabbix_connector:
         name: ExampleConnector1
         url: https://127.0.0.1/api/zabbix_stream
@@ -108,30 +104,26 @@
         - ["numeric_float", "numeric_unsigned", "character", "text"]
         - ["all+bin"]
         - ["all"]
-      when: zabbix_version is version('7.0', '>=')
       register: connector_value_type
 
     - name: assert that all item value type updates lead to changed
       ansible.builtin.assert:
         that:
           - connector_value_type.results | map(attribute='changed') is all
-      when: zabbix_version is version('7.0', '>=')
 
-    - name: test - set non existent item value type (version >= 7.0)
+    - name: test - set non existent item value type
       community.zabbix.zabbix_connector:
         name: ExampleConnector1
         url: https://127.0.0.1/api/zabbix_stream
         data_type: item_values
         item_value_types:
           - not_a_real_value_type
-      when: zabbix_version is version('7.0', '>=')
       register: connector_wrong_value_type
       ignore_errors: true
 
     - name: assert that the module failed
       ansible.builtin.assert:
         that: connector_wrong_value_type is failed and "is not a known value type" in connector_wrong_value_type.msg
-      when: zabbix_version is version('7.0', '>=')
 
   always:
     - name: Cleanup connector

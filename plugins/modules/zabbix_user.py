@@ -112,7 +112,7 @@ options:
         description:
             - URL of the page to redirect the user to after logging in.
         type: str
-    user_medias:
+    medias:
         description:
             - Set the user's media.
             - If not set, makes no changes to media.
@@ -248,7 +248,7 @@ EXAMPLES = r"""
     refresh: "30"
     rows_per_page: "200"
     after_login_url: ""
-    user_medias:
+    medias:
       - mediatype: Email
         sendto:
           - example@example.com
@@ -289,15 +289,11 @@ user_ids:
 
 
 import copy
-
 from ansible.module_utils.basic import AnsibleModule
-
 from ansible_collections.community.zabbix.plugins.module_utils.base import ZabbixBase
 from ansible_collections.community.zabbix.plugins.module_utils.helpers import (
     helper_normalize_data,
 )
-from ansible.module_utils.compat.version import LooseVersion
-
 import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabbix_utils
 
 
@@ -370,38 +366,38 @@ class User(ZabbixBase):
 
         return zbx_user
 
-    def convert_user_medias_parameter_types(self, user_medias):
-        copy_user_medias = copy.deepcopy(user_medias)
-        for user_media in copy_user_medias:
+    def convert_medias_parameter_types(self, medias):
+        copy_medias = copy.deepcopy(medias)
+        for media in copy_medias:
             media_types = self._zapi.mediatype.get({"output": "extend"})
             for media_type in media_types:
-                if media_type["name"] == user_media["mediatype"]:
-                    user_media["mediatypeid"] = media_type["mediatypeid"]
-                    user_media["mediatype"] = media_type["type"]
+                if media_type["name"] == media["mediatype"]:
+                    media["mediatypeid"] = media_type["mediatypeid"]
+                    media["mediatype"] = media_type["type"]
                     break
-            if "mediatypeid" not in user_media:
+            if "mediatypeid" not in media:
                 self._module.fail_json(
-                    msg="Media type not found: %s" % user_media["mediatype"]
+                    msg="Media type not found: %s" % media["mediatype"]
                 )
             else:
-                if user_media["mediatype"] == "0":  # E-Mail
+                if media["mediatype"] == "0":  # E-Mail
                     # Because user media sendto parameter is raw in parameters specs perform explicit check on type
                     if not (
-                        isinstance(user_media["sendto"], list)
-                        or isinstance(user_media["sendto"], str)
+                        isinstance(media["sendto"], list)
+                        or isinstance(media["sendto"], str)
                     ):
                         self._module.fail_json(
                             "For Email media type sendto parameter must be of type list or str."
                         )
-                    if isinstance(user_media["sendto"], str):
+                    if isinstance(media["sendto"], str):
                         # sendto should be a list for Email media type
-                        user_media["sendto"] = [user_media["sendto"]]
+                        media["sendto"] = [media["sendto"]]
                 else:
-                    if not isinstance(user_media["sendto"], str):
+                    if not isinstance(media["sendto"], str):
                         self._module.fail_json(
                             "For any other than Email media type sendto parameter must be of type str."
                         )
-                del user_media["mediatype"]
+                del media["mediatype"]
 
             severity_binary_number = ""
             for severity_key in (
@@ -412,18 +408,18 @@ class User(ZabbixBase):
                 "information",
                 "not_classified",
             ):
-                if user_media["severity"][severity_key]:
+                if media["severity"][severity_key]:
                     severity_binary_number = severity_binary_number + "1"
                 else:
                     severity_binary_number = severity_binary_number + "0"
-            user_media["severity"] = str(int(severity_binary_number, 2))
+            media["severity"] = str(int(severity_binary_number, 2))
 
-            if user_media["active"]:
-                user_media["active"] = "0"
+            if media["active"]:
+                media["active"] = "0"
             else:
-                user_media["active"] = "1"
+                media["active"] = "1"
 
-        return copy_user_medias
+        return copy_medias
 
     def get_roleid_by_name(self, role_name):
         roles = self._zapi.role.get({"output": "extend"})
@@ -448,7 +444,7 @@ class User(ZabbixBase):
         refresh,
         rows_per_page,
         url,
-        user_medias,
+        medias,
         timezone,
         role_name,
         override_passwd,
@@ -460,9 +456,7 @@ class User(ZabbixBase):
         for usrgrp in existing_data["usrgrps"]:
             usrgrpids.append({"usrgrpid": usrgrp["usrgrpid"]})
         existing_data["usrgrps"] = sorted(usrgrpids, key=lambda x: x["usrgrpid"])
-        existing_data["user_medias"] = existing_data["medias"]
         for del_key in [
-            "medias",
             "attempt_clock",
             "attempt_failed",
             "attempt_ip",
@@ -472,11 +466,11 @@ class User(ZabbixBase):
         ]:
             del existing_data[del_key]
 
-        if "user_medias" in existing_data and existing_data["user_medias"]:
-            for user_media in existing_data["user_medias"]:
+        if "medias" in existing_data and existing_data["medias"]:
+            for media in existing_data["medias"]:
                 for del_key in ["mediaid", "userid"]:
-                    if del_key in user_media:
-                        del user_media[del_key]
+                    if del_key in media:
+                        del media[del_key]
 
         # request data
         request_data = {
@@ -494,11 +488,11 @@ class User(ZabbixBase):
             "url": url,
         }
 
-        if user_medias:
-            request_data["user_medias"] = user_medias
+        if medias:
+            request_data["medias"] = medias
         else:
-            if "user_medias" in existing_data and existing_data["user_medias"]:
-                del existing_data["user_medias"]
+            if "medias" in existing_data and existing_data["medias"]:
+                del existing_data["medias"]
 
         if override_passwd:
             request_data["passwd"] = passwd
@@ -518,11 +512,6 @@ class User(ZabbixBase):
         ):
             user_parameter_difference_check_result = False
 
-        if LooseVersion(self._zbx_api_version) >= LooseVersion("7.0"):
-            if user_medias:
-                request_data["medias"] = user_medias
-                del request_data["user_medias"]
-
         diff_params = {"before": existing_data, "after": request_data}
 
         return user_parameter_difference_check_result, diff_params
@@ -541,7 +530,7 @@ class User(ZabbixBase):
         refresh,
         rows_per_page,
         url,
-        user_medias,
+        medias,
         require_password,
         timezone,
         role_name,
@@ -565,11 +554,6 @@ class User(ZabbixBase):
             "rows_per_page": rows_per_page,
             "url": url,
         }
-        if user_medias:
-            if LooseVersion(self._zbx_api_version) <= LooseVersion("7.0"):
-                request_data["user_medias"] = user_medias
-            else:
-                request_data["medias"] = user_medias
 
         if (require_password):
             request_data["passwd"] = passwd
@@ -608,7 +592,7 @@ class User(ZabbixBase):
         refresh,
         rows_per_page,
         url,
-        user_medias,
+        medias,
         timezone,
         role_name,
         override_passwd,
@@ -644,25 +628,12 @@ class User(ZabbixBase):
 
         request_data, _del_keys = helper_normalize_data(request_data)
 
-        if LooseVersion(self._zbx_api_version) < LooseVersion("7.0"):
-            try:
-                if user_medias:
-                    request_data["user_medias"] = user_medias
-                user_ids = self._zapi.user.update(request_data)
-            except Exception as e:
-                self._module.fail_json(
-                    msg="Failed to update user %s: %s" % (username, e)
-                )
-
-        if LooseVersion(self._zbx_api_version) >= LooseVersion("7.0"):
-            try:
-                if user_medias:
-                    request_data["medias"] = user_medias
-                user_ids = self._zapi.user.update(request_data)
-            except Exception as e:
-                self._module.fail_json(
-                    msg="Failed to update user %s: %s" % (username, e)
-                )
+        try:
+            user_ids = self._zapi.user.update(request_data)
+        except Exception as e:
+            self._module.fail_json(
+                msg="Failed to update user %s: %s" % (username, e)
+            )
 
         return user_ids
 
@@ -725,7 +696,7 @@ def main():
             refresh=dict(type="str"),
             rows_per_page=dict(type="str"),
             after_login_url=dict(type="str"),
-            user_medias=dict(
+            medias=dict(
                 type="list",
                 elements="dict",
                 options=dict(
@@ -779,7 +750,7 @@ def main():
     refresh = module.params["refresh"]
     rows_per_page = module.params["rows_per_page"]
     after_login_url = module.params["after_login_url"]
-    user_medias = module.params["user_medias"]
+    medias = module.params["medias"]
     timezone = module.params["timezone"]
     role_name = module.params["role_name"]
     state = module.params["state"]
@@ -792,8 +763,8 @@ def main():
 
     user = User(module)
 
-    if user_medias:
-        user_medias = user.convert_user_medias_parameter_types(user_medias)
+    if medias:
+        medias = user.convert_medias_parameter_types(medias)
 
     user_ids = {}
     zbx_user = user.check_user_exist(username)
@@ -820,7 +791,7 @@ def main():
                 refresh,
                 rows_per_page,
                 after_login_url,
-                user_medias,
+                medias,
                 timezone,
                 role_name,
                 override_passwd,
@@ -841,7 +812,7 @@ def main():
                     refresh,
                     rows_per_page,
                     after_login_url,
-                    user_medias,
+                    medias,
                     timezone,
                     role_name,
                     override_passwd,
@@ -862,7 +833,7 @@ def main():
                 refresh,
                 rows_per_page,
                 after_login_url,
-                user_medias,
+                medias,
                 require_password,
                 timezone,
                 role_name,

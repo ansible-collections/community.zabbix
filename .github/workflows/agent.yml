@@ -40,7 +40,6 @@ jobs:
           - v74
           - v72
           - v70
-          - v60
         scenario_name:
           - default
           - agent2
@@ -122,7 +121,6 @@ jobs:
           - v74
           - v72
           - v70
-          - v60
         scenario_name:
           - autopsk
           - agent2autopsk
@@ -202,7 +200,6 @@ jobs:
           - v74
           - v72
           - v70
-          - v60
         scenario_name:
           - default
           - agent2

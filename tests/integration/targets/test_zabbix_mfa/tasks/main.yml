@@ -1,8 +1,4 @@
 ---
-- name: test - do not run tests with < Zabbix 7.0
-  meta: end_play
-  when: zabbix_version is version('7.0', '<')
-
 - name: test - try to create a TOTP MFA method
   community.zabbix.zabbix_mfa:
     name: Zabbix TOTP

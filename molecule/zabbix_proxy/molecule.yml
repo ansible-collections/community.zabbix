@@ -85,11 +85,6 @@ provisioner:
         zabbix_proxy_server: zabbix-server-v70
         zabbix_api_server_host: zabbix-web-v70
         zabbix_api_server_port: 8070
-      v60:
-        zabbix_proxy_version: "6.0"
-        zabbix_proxy_server: zabbix-server-v60
-        zabbix_api_server_host: zabbix-web-v60
-        zabbix_api_server_port: 8060
       mysql:
         zabbix_proxy_database: mysql
         zabbix_proxy_dbhost: "{{ inventory_hostname }}-db"

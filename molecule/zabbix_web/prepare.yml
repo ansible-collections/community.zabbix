@@ -52,16 +52,6 @@
           Debian: ["php-mysql", "php-pgsql"]
           Suse: "{{ _suse_php_json + _suse_php_common }}"
 
-    - name: Suse | Create php-fpm config for php7
-      when:
-        - ansible_facts.os_family == "Suse"
-        - zabbix_web_version is not version('7.0', '>=')
-        - zabbix_web_http_server == "nginx"
-      copy:
-        remote_src: true
-        src: /etc/php7/fpm/php-fpm.conf.default
-        dest: /etc/php7/fpm/php-fpm.conf
-
     - name: Debian | Enable apache modules
       when:
         - ansible_facts.os_family == "Debian"

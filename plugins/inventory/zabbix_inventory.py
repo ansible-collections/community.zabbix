@@ -308,7 +308,6 @@ import atexit
 import json
 from ansible.module_utils.urls import Request
 from ansible.module_utils.six.moves.urllib.error import URLError, HTTPError
-from ansible.module_utils.compat.version import LooseVersion
 from ansible.errors import AnsibleParserError
 
 
@@ -345,10 +344,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             payload['params'] = params
 
         if self.auth != '':
-            if (LooseVersion(self.zabbix_version) >= LooseVersion('7.0')):
-                headers['Authorization'] = 'Bearer ' + self.auth
-            else:
-                payload['auth'] = self.auth
+            headers['Authorization'] = 'Bearer ' + self.auth
 
         api_url = server_url + '/api_jsonrpc.php'
         req = Request(

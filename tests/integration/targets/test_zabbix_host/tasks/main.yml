@@ -26,4 +26,3 @@
       community.zabbix.zabbix_proxy_group:
         name: TestProxyGroup
         state: absent
-      when: zabbix_version is version('7.0', '>=')

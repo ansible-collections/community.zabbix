@@ -49,47 +49,7 @@
       ansible.builtin.assert:
         that: usergroup_reset is changed
 
-    - when: zabbix_version is version('6.0', '=')
-      block:
-        - name: test - update Zabbix user group with one right
-          community.zabbix.zabbix_usergroup:
-            rights:
-              - host_group: Discovered hosts
-                permission: read-only
-          register: usergroup_updated_right
-
-        - name: assert that user group was updated
-          ansible.builtin.assert:
-            that: usergroup_updated_right is changed
-
-        - name: test - update Zabbix user group with multiple rights
-          community.zabbix.zabbix_usergroup:
-            rights:
-              - host_group: Discovered hosts
-                permission: read-only
-              - host_group: Zabbix servers
-                permission: read-write
-          register: usergroup_updated_rights
-
-        - name: assert that user group was updated
-          ansible.builtin.assert:
-            that: usergroup_updated_rights is changed
-
-        - name: test - update Zabbix user group with multiple rights (again)
-          community.zabbix.zabbix_usergroup:
-            rights:
-              - host_group: Discovered hosts
-                permission: read-only
-              - host_group: Zabbix servers
-                permission: read-write
-          register: usergroup_updated_rights_again
-
-        - name: assert that user group was not updated
-          ansible.builtin.assert:
-            that: not usergroup_updated_rights_again is changed
-
-    - when: zabbix_version is version('7.0', '>=')
-      block:
+    - block:
         - name: test - update Zabbix user group with one hostgroup right
           community.zabbix.zabbix_usergroup:
             hostgroup_rights:
@@ -217,34 +177,32 @@
     - name: test - reset Zabbix user group to default
       community.zabbix.zabbix_usergroup:
 
-    - when: zabbix_version is version('7.0', '>=')
-      block:
-        - name: test - create new user directory
-          community.zabbix.zabbix_user_directory:
-            name: LDAP infra 1
-            idp_type: ldap
-            host: "test.com"
-            port: 389
-            base_dn: "ou=Users,dc=example,dc=org"
-            search_attribute: "uid"
+    - name: test - create new user directory
+      community.zabbix.zabbix_user_directory:
+        name: LDAP infra 1
+        idp_type: ldap
+        host: "test.com"
+        port: 389
+        base_dn: "ou=Users,dc=example,dc=org"
+        search_attribute: "uid"
 
-        - name: test - update Zabbix user group with user directory
-          community.zabbix.zabbix_usergroup:
-            userdirectory: LDAP infra 1
-          register: usergroup_create_userdir
+    - name: test - update Zabbix user group with user directory
+      community.zabbix.zabbix_usergroup:
+        userdirectory: LDAP infra 1
+      register: usergroup_create_userdir
 
-        - name: assert that user group was updated
-          ansible.builtin.assert:
-            that: usergroup_create_userdir is changed
+    - name: assert that user group was updated
+      ansible.builtin.assert:
+        that: usergroup_create_userdir is changed
 
-        - name: test - update Zabbix user group with user directory (again)
-          community.zabbix.zabbix_usergroup:
-            userdirectory: LDAP infra 1
-          register: usergroup_create_userdir_again
+    - name: test - update Zabbix user group with user directory (again)
+      community.zabbix.zabbix_usergroup:
+        userdirectory: LDAP infra 1
+      register: usergroup_create_userdir_again
 
-        - name: assert that user group was not updated
-          ansible.builtin.assert:
-            that: not usergroup_create_userdir_again is changed
+    - name: assert that user group was not updated
+      ansible.builtin.assert:
+        that: not usergroup_create_userdir_again is changed
 
     - name: test - delete Zabbix user group
       community.zabbix.zabbix_usergroup:
@@ -260,4 +218,3 @@
         name: LDAP infra 1
         host: "test.com"
         state: absent
-      when: zabbix_version is version('7.0', '>=')

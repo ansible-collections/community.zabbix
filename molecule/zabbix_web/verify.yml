@@ -16,7 +16,7 @@
           - zabbix_web_version in (ansible_facts.packages[_conf_pkg_name] | first).version
       vars:
         # Starting with version 7.0, Suse appears to append -php8 to the package names zabbix-apache-conf and zabbix-nginx-conf.
-        _php_suffix: "{{ (ansible_facts.os_family == 'Suse' and zabbix_web_version is version('7.0', '>=')) | ternary('-php8', '') }}"
+        _php_suffix: "{{ (ansible_facts.os_family == 'Suse') | ternary('-php8', '') }}"
         _web_pkg_map:
           Debian: "zabbix-frontend-php"
         _web_pkg_name: "{{ _web_pkg_map[ansible_facts.os_family] | default('zabbix-web-' ~ zabbix_server_database) }}"

@@ -291,12 +291,9 @@ RETURN = r"""
 
 import json
 import traceback
-
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils._text import to_native
 from ansible_collections.community.zabbix.plugins.module_utils.base import ZabbixBase
-from ansible.module_utils.compat.version import LooseVersion
-
 import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabbix_utils
 
 
@@ -305,10 +302,7 @@ class Template(ZabbixBase):
     def get_group_ids_by_group_names(self, group_names):
         group_ids = []
         for group_name in group_names:
-            if LooseVersion(self._zbx_api_version) >= LooseVersion("7.0"):
-                group = self._zapi.templategroup.get({"output": ["groupid"], "filter": {"name": group_name}})
-            else:
-                group = self._zapi.hostgroup.get({"output": ["groupid"], "filter": {"name": group_name}})
+            group = self._zapi.templategroup.get({"output": ["groupid"], "filter": {"name": group_name}})
             if group:
                 group_ids.append({"groupid": group[0]["groupid"]})
             else:
@@ -400,12 +394,6 @@ class Template(ZabbixBase):
             try:
                 update_rules["templateLinkage"]["deleteMissing"] = True
                 update_rules["templateDashboards"] = update_rules.pop("templateScreens")
-
-                # before Zabbix 6.2 host_groups and template_group are joined into groups parameter
-                if LooseVersion(self._zbx_api_version) < LooseVersion("7.0"):
-                    update_rules["groups"] = {"createMissing": True}
-                    update_rules.pop("host_groups", None)
-                    update_rules.pop("template_groups", None)
                 importcompare = {"format": template_type, "source": template_content, "rules": update_rules}
                 compare_result = self._zapi.configuration.importcompare(importcompare)
                 if len(compare_result) != 0:
@@ -421,10 +409,7 @@ class Template(ZabbixBase):
         changed = False
         existing_template = self.dump_template(template_ids, template_type="json")
         if template_groups is not None:
-            if LooseVersion(self._zbx_api_version) >= LooseVersion("7.0"):
-                existing_groups = [g["name"] for g in existing_template["zabbix_export"]["template_groups"]]
-            else:
-                existing_groups = [g["name"] for g in existing_template["zabbix_export"]["groups"]]
+            existing_groups = [g["name"] for g in existing_template["zabbix_export"]["template_groups"]]
 
             if set(template_groups) != set(existing_groups):
                 changed = True
@@ -580,13 +565,6 @@ class Template(ZabbixBase):
         try:
             update_rules["templateLinkage"]["deleteMissing"] = True
             update_rules["templateDashboards"] = update_rules.pop("templateScreens")
-
-            # before Zabbix 6.2 host_groups and template_group are joined into groups parameter
-            if LooseVersion(self._zbx_api_version) < LooseVersion("7.0"):
-                update_rules["groups"] = {"createMissing": True}
-                update_rules.pop("host_groups", None)
-                update_rules.pop("template_groups", None)
-
             import_data = {"format": template_type, "source": template_content, "rules": update_rules}
             self._zapi.configuration.import_(import_data)
         except Exception as e:

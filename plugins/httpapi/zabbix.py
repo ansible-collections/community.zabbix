@@ -65,7 +65,6 @@ from uuid import uuid4
 from ansible.module_utils.basic import to_text
 from ansible.errors import AnsibleConnectionFailure
 from ansible.plugins.httpapi import HttpApiBase
-from ansible.module_utils.compat.version import StrictVersion
 from ansible.module_utils.connection import ConnectionError
 from ansible.module_utils.common.parameters import remove_values
 
@@ -135,10 +134,7 @@ class HttpApi(HttpApiBase):
         path = self.url_path + path
 
         if self.auth and data["method"] not in ["user.login", "apiinfo.version"]:
-            if StrictVersion(self.api_version()) >= StrictVersion("6.4"):
-                headers["Authorization"] = "Bearer " + self.auth
-            else:
-                data["auth"] = self.auth
+            headers["Authorization"] = "Bearer " + self.auth
 
         http_login_user = self.get_option("http_login_user")
         http_login_password = self.get_option("http_login_password")

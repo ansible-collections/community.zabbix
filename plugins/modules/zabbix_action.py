@@ -218,7 +218,6 @@ options:
                     - " - C(remote_command)"
                     - " - C(notify_all_involved)"
                     - Choice C(notify_all_involved) only supported in I(recovery_operations) and I(acknowledge_operations).
-                    - C(add_host_tags) and C(remove_host_tags) available since Zabbix 7.0.
                 choices:
                     - send_message
                     - remote_command
@@ -660,7 +659,6 @@ options:
         description:
             - Whether to pause escalation if event is a symptom event.
             - I(supported) if C(event_source) is set to C(trigger)
-            - Works only with >= Zabbix 7.0
         default: true
 
 
@@ -802,10 +800,7 @@ msg:
 
 
 from ansible.module_utils.basic import AnsibleModule
-
 from ansible_collections.community.zabbix.plugins.module_utils.base import ZabbixBase
-from ansible.module_utils.compat.version import LooseVersion
-
 import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabbix_utils
 import re
 
@@ -1047,10 +1042,7 @@ class Zapi(ZabbixBase):
 
         """
         try:
-            if LooseVersion(self._zbx_api_version) >= LooseVersion('7.0'):
-                filter = {'name': [proxy_name]}
-            else:
-                filter = {'host': [proxy_name]}
+            filter = {'name': [proxy_name]}
             proxy_list = self._zapi.proxy.get({
                 "output": "extend",
                 "filter": filter,
@@ -1194,8 +1186,7 @@ class Action(Zapi):
 
         if kwargs["event_source"] == "trigger":
             _params["pause_suppressed"] = "1" if kwargs["pause_in_maintenance"] else "0"
-            if LooseVersion(self._zbx_api_version) >= LooseVersion("7.0"):
-                _params["pause_symptoms"] = "1" if kwargs["pause_symptoms"] else "0"
+            _params["pause_symptoms"] = "1" if kwargs["pause_symptoms"] else "0"
             _params["notify_if_canceled"] = "1" if kwargs["notify_if_canceled"] else "0"
 
         _params["update_operations"] = kwargs.get("update_operations")
@@ -1528,10 +1519,9 @@ class Operations(Zapi):
             if constructed_operation["operationtype"] in (4, 5):
                 constructed_operation["opgroup"] = self._construct_opgroup(op)
 
-            if LooseVersion(self._zbx_api_version) >= LooseVersion("7.0"):
-                # Add/Remove tags
-                if constructed_operation["operationtype"] in (13, 14):
-                    constructed_operation["optag"] = op["tags"]
+            # Add/Remove tags
+            if constructed_operation["operationtype"] in (13, 14):
+                constructed_operation["optag"] = op["tags"]
 
             # Link/Unlink template
             if constructed_operation["operationtype"] in (6, 7):
@@ -2295,9 +2285,7 @@ def main():
                 notify_if_canceled=notify_if_canceled
             )
 
-            if LooseVersion(zapi_wrapper._zbx_api_version) >= LooseVersion("7.0"):
-                kwargs["pause_symptoms"] = pause_symptoms
-
+            kwargs["pause_symptoms"] = pause_symptoms
             kwargs[argument_spec["acknowledge_operations"]["aliases"][0]] = acknowledge_ops.construct_the_data(acknowledge_operations)
 
             difference = action.check_difference(**kwargs)
@@ -2327,10 +2315,7 @@ def main():
             )
 
             kwargs[argument_spec["acknowledge_operations"]["aliases"][0]] = acknowledge_ops.construct_the_data(acknowledge_operations)
-
-            if LooseVersion(zapi_wrapper._zbx_api_version) >= LooseVersion("7.0"):
-                kwargs["pause_symptoms"] = pause_symptoms
-
+            kwargs["pause_symptoms"] = pause_symptoms
             action_id = action.add_action(**kwargs)
             module.exit_json(changed=True, msg="Action created: %s, ID: %s" % (name, action_id))
 

@@ -1,9 +1,4 @@
 ---
-
-- name: test - do not run tests for Zabbix < 7.0
-  meta: end_play
-  when: zabbix_version is version('7.0', '<')
-
 # setup stuff
 - include_tasks: zabbix_setup.yml
 

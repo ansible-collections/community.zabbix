@@ -1,8 +1,4 @@
 ---
-- name: test - do not run tests for Zabbix < 7.0
-  meta: end_play
-  when: zabbix_version is version('7.0', '<')
-
 - name: set module defaults
   module_defaults:
     community.zabbix.zabbix_proxy_group:

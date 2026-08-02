@@ -124,7 +124,6 @@ from ansible.module_utils.basic import AnsibleModule
 
 from ansible_collections.community.zabbix.plugins.module_utils.base import ZabbixBase
 import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabbix_utils
-from ansible.module_utils.compat.version import LooseVersion
 
 
 class Host(ZabbixBase):
@@ -142,9 +141,6 @@ class Host(ZabbixBase):
             "selectTags": "extend",
             "selectMacros": "extend"
         }
-        if LooseVersion(self._zbx_api_version) < LooseVersion("7.0"):
-            parameters["selectGroups"] = parameters["selectHostGroups"]
-            del parameters["selectHostGroups"]
         host_list = self._zapi.host.get(parameters)
         if len(host_list) < 1:
             self._module.fail_json(msg="Host not found: %s" % host_name)
@@ -172,9 +168,6 @@ class Host(ZabbixBase):
                 "selectTags": "extend",
                 "selectMacros": "extend"
             }
-            if LooseVersion(self._zbx_api_version) < LooseVersion("7.0"):
-                host_get_params["selectGroups"] = host_get_params["selectHostGroups"]
-                del host_get_params["selectHostGroups"]
             host = self._zapi.host.get(host_get_params)
             host[0]["hostinterfaces"] = hostinterface
             host_list.append(host[0])

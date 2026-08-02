@@ -6,9 +6,8 @@
   gather_facts: false
 
   vars:
-    _version_groups: ["v60", "v70", "v72", "v74", "v80"]
+    _version_groups: ["v70", "v72", "v74", "v80"]
     _g_to_v:
-      v60: "6.0"
       v70: "7.0"
       v72: "7.2"
       v74: "7.4"
@@ -27,8 +26,8 @@
       vars:
         # molecule_yml.platforms    => [ { ..., "groups": [ "mysql", "v74" ], ... }, { ... } ]
         # map(attribute='groups')   => [ [ "mysql", "v74" ], [ "pgsql", "v70" ], ... ]
-        # flatten                   => [ "mysql", "v74", "pgsql", "v70", "sqlite3", "v60", ... ]
-        # intersect(_version_groups => [ "v74", "v70", "v60" ]
+        # flatten                   => [ "mysql", "v74", "pgsql", "v70", "sqlite3", ... ]
+        # intersect(_version_groups => [ "v74", "v70" ]
         _active_versions: "{{ molecule_yml.platforms | map(attribute='groups') | flatten | intersect(_version_groups) }}"
       block:
         - name: Create Zabbix server database container

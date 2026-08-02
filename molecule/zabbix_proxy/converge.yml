@@ -2,9 +2,8 @@
 - hosts: all
 
   vars:
-    _version_groups: ["v60", "v70", "v72", "v74", "v80"]
+    _version_groups: ["v70", "v72", "v74", "v80"]
     _g_to_v:
-      v60: "6.0"
       v70: "7.0"
       v72: "7.2"
       v74: "7.4"
