@@ -116,8 +116,6 @@ jobs:
         container:
           - image: rockylinux8
             ansible_core: ansible-core<2.17
-          - image: rockylinux8
-            ansible_core: ansible-core<2.17
           - image: opensuseleap15
             ansible_core: ansible-core<2.17
         collection_role:
