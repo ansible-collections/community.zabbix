@@ -11,7 +11,7 @@
 - name: Determine Latest Supported Zabbix Version
   when: zabbix_proxy_version is not defined or zabbix_proxy_version is none
   ansible.builtin.set_fact:
-    zabbix_proxy_version: "{{ zabbix_proxy_valid_versions[_os_key] | default(['7.4']) | first }}"
+    zabbix_proxy_version: "{{ _zabbix_proxy_valid_versions[_os_key] | default(['7.4']) | first }}"
   tags:
     - always
 
