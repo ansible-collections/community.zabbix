@@ -55,7 +55,7 @@ jobs:
           - ansible: stable-2.20
             python: '3.14'
           - ansible: devel
-            python: '3.12'
+            python: '3.13'
           - ansible: devel
             python: '3.14'
 
