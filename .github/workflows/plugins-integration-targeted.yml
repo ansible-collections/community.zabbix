@@ -119,9 +119,9 @@ jobs:
           - ansible: stable-2.19
             python: '3.13'
           - ansible: devel
-            python: '3.12'
-          - ansible: devel
             python: '3.13'
+          - ansible: devel
+            python: '3.14'
 
     steps:
       - name: Check out code
