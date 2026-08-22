@@ -99,7 +99,6 @@ jobs:
         zabbix_container:
           - version: "6.0"
           - version: "7.0"
-          - version: "7.2"
           - version: "7.4"
         ansible_python:
           - ansible: stable-2.16
