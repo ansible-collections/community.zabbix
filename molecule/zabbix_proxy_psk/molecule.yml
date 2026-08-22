@@ -51,11 +51,6 @@ provisioner:
         zabbix_proxy_server: zabbix-server-v74
         zabbix_api_server_host: zabbix-web-v74
         zabbix_api_server_port: 8074
-      v72:
-        zabbix_proxy_version: "7.2"
-        zabbix_proxy_server: zabbix-server-v72
-        zabbix_api_server_host: zabbix-web-v72
-        zabbix_api_server_port: 8072
       v70:
         zabbix_proxy_version: "7.0"
         zabbix_proxy_server: zabbix-server-v70
