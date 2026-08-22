@@ -88,8 +88,6 @@ provisioner:
         zabbix_api_server_url: "{{ inventory_hostname }}"
       v74:
         zabbix_web_version: "7.4"
-      v72:
-        zabbix_web_version: "7.2"
       v70:
         zabbix_web_version: "7.0"
       v60:
