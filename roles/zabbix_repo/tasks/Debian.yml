@@ -89,7 +89,7 @@
   tags:
     - install
 
-- name: "Debian | Update apt cache if repo was added"
+- name: "Debian | Update apt cache if repo was added"  # noqa: no-handler
   when: _zabbix_repo_apt_file is changed
   ansible.builtin.apt:
     update_cache: true
