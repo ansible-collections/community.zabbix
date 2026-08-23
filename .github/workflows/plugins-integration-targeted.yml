@@ -99,7 +99,6 @@ jobs:
         zabbix_container:
           - version: "6.0"
           - version: "7.0"
-          - version: "7.2"
           - version: "7.4"
         ansible_python:
           - ansible: stable-2.16
@@ -119,9 +118,9 @@ jobs:
           - ansible: stable-2.19
             python: '3.13'
           - ansible: devel
-            python: '3.12'
-          - ansible: devel
             python: '3.13'
+          - ansible: devel
+            python: '3.14'
 
     steps:
       - name: Check out code
