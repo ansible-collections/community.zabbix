@@ -1,0 +1,2 @@
+minor_changes:
+  - zabbix_agent role - write the Windows PSK files to native paths, ``...\tls_psk_auto.secret.txt`` rather than a forward-slash join of ``zabbix_agent_conf_dir``. The paths can now be overridden per OS through ``_zabbix_agent_tlspskfile`` and ``_zabbix_agent_tlspskidentity_file`` (https://github.com/ansible-collections/community.zabbix/pull/XXXX).

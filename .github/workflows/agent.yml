@@ -36,22 +36,13 @@ jobs:
           - image: ubuntu2204
           - image: debian13
           - image: debian12
-          - image: debian11
         version:
           - v74
-          - v72
           - v70
           - v60
         scenario_name:
           - default
           - agent2
-        exclude:
-          - container:
-              image: debian13
-            version: v72
-          - container:
-              image: rockylinux10
-            version: v72
     steps:
       - name: Check out code
         uses: actions/checkout@v6
@@ -119,22 +110,13 @@ jobs:
           - image: ubuntu2204
           - image: debian13
           - image: debian12
-          - image: debian11
         version:
           - v74
-          - v72
           - v70
           - v60
         scenario_name:
           - autopsk
           - agent2autopsk
-        exclude:
-          - container:
-              image: debian13
-            version: v72
-          - container:
-              image: rockylinux10
-            version: v72
     steps:
       - name: Check out code
         uses: actions/checkout@v6
@@ -202,7 +184,6 @@ jobs:
             ansible_core: ansible-core<2.17
         version:
           - v74
-          - v72
           - v70
           - v60
         scenario_name:

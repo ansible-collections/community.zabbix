@@ -36,7 +36,6 @@ jobs:
           - image: ubuntu2204
           - image: debian13
           - image: debian12
-          - image: debian11
         collection_role:
           - zabbix_proxy
         database:
@@ -45,19 +44,9 @@ jobs:
           - sqlite3
         version:
           - v74
-          - v72
           - v70
           - v60
         exclude:
-          - container:
-              image: debian13
-            version: v72
-          - container:
-              image: rockylinux10
-            version: v72
-          - container:
-              image: rockylinux10
-            version: v70
           - container:
               image: rockylinux10
             version: v60
@@ -124,7 +113,6 @@ jobs:
         container:
           - image: rockylinux9
           - image: ubuntu2204
-          - image: debian11
         collection_role:
           - zabbix_proxy_psk
           - zabbix_proxy_psk_active
@@ -132,7 +120,6 @@ jobs:
           - mysql
         version:
           - v74
-          - v72
           - v70
           - v60
 
@@ -211,7 +198,6 @@ jobs:
           - sqlite3
         version:
           - v74
-          - v72
           - v70
           - v60
         exclude:

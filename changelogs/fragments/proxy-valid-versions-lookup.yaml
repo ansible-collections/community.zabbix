@@ -1,0 +1,2 @@
+bugfixes:
+  - zabbix_proxy role - fix the supported-versions lookup, which silently defaulted to 7.4 on every OS when ``zabbix_proxy_version`` was unset (https://github.com/ansible-collections/community.zabbix/pull/XXXX).
