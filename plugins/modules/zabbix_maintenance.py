@@ -137,7 +137,7 @@ options:
                 description:
                     - The date that the outage will occur on.
                     - for a I(frequency) of I(once) only.
-                    - Uses `datetime.date.today() if not specified.
+                    - Uses C(datetime.date.today()) if not specified.
                 type: str
             start_time:
                 description:
@@ -603,6 +603,9 @@ def parse_periods(module, time_periods, start_date):
 
         # Parse start_date/time fields
         if frequeny == "once":
+            if not start_date:
+                # Match the documented behavior: default to today when omitted.
+                start_date = datetime.date.today().isoformat()
             start_date = start_date + " " + start_time
             start_date = datetime.datetime.fromisoformat(start_date)
             start_date = int(time.mktime(start_date.timetuple()))
