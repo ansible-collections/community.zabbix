@@ -52,6 +52,7 @@ _zabbix_agent_valid_versions:
   Ubuntu-26:
     - "8.0"
     - "7.4"
+    - "7.0"
   Ubuntu-24:
     - "7.4"
     - "7.2"

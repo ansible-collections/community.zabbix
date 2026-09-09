@@ -32,6 +32,7 @@ jobs:
         container:
           - image: rockylinux10
           - image: rockylinux9
+          - image: ubuntu2604
           - image: ubuntu2404
           - image: ubuntu2204
           - image: debian13
@@ -52,6 +53,12 @@ jobs:
           - container:
               image: rockylinux10
             version: v72
+          - container:
+              image: ubuntu2604
+            version: v72
+          - container:
+              image: ubuntu2604
+            version: v60
     steps:
       - name: Check out code
         uses: actions/checkout@v6
@@ -115,6 +122,7 @@ jobs:
         container:
           - image: rockylinux10
           - image: rockylinux9
+          - image: ubuntu2604
           - image: ubuntu2404
           - image: ubuntu2204
           - image: debian13
@@ -135,6 +143,12 @@ jobs:
           - container:
               image: rockylinux10
             version: v72
+          - container:
+              image: ubuntu2604
+            version: v72
+          - container:
+              image: ubuntu2604
+            version: v60
     steps:
       - name: Check out code
         uses: actions/checkout@v6
