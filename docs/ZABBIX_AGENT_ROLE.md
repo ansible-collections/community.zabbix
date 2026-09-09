@@ -128,7 +128,9 @@ The following is an overview of all available configuration default for this rol
 
 Selinux changes will be installed based on the status of selinux running on the target system.
 
-* `selinux_allow_zabbix_run_sudo`: Default: `False`.  Enable Zabbix root access on system.
+* `selinux_allow_zabbix_run_sudo`: Default: `False`. Enable Zabbix root access on the system by setting the `zabbix_run_sudo` SELinux boolean when that boolean exists.
+
+  On RHEL 10 and similar releases, `zabbix_run_sudo` is not part of the base SELinux policy (it is provided by `zabbix-selinux-policy` from the Zabbix repository, or by a `zabbix*-selinux` package from EPEL). The role installs `zabbix-selinux-policy` when it is available. If the boolean is still missing, the role skips setting it instead of failing. If this variable is `true` and the boolean is absent, a warning is shown.
 
 ### Zabbix Agent
 

@@ -1,0 +1,2 @@
+bugfixes:
+  - zabbix_agent - skip setting the ``zabbix_run_sudo`` SELinux boolean when it does not exist (RHEL 10 and similar) instead of failing (https://github.com/ansible-collections/community.zabbix/issues/1645).

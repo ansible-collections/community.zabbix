@@ -15,12 +15,11 @@
   tags:
     - install
 
-- name: "SELinux | RedHat | Install related SELinux packages"
+- name: "SELinux | RedHat | Install SELinux python bindings"
   ansible.builtin.package:
     name:
       - python3-libsemanage
       - python3-policycoreutils
-      - zabbix-selinux-policy
   environment:
     http_proxy: "{{ zabbix_http_proxy | default('') }}"
     https_proxy: "{{ zabbix_https_proxy | default('') }}"
@@ -31,16 +30,75 @@
   tags:
     - install
 
+# zabbix_run_sudo was removed from the base RHEL 10 policy (RHEL-73505).
+# The Zabbix repo ships it again via zabbix-selinux-policy; EPEL may ship
+# zabbix*-selinux instead. Treat the policy package as best-effort so a
+# missing package does not fail the role when the boolean is unused.
+- name: "SELinux | RedHat | Install Zabbix SELinux policy if available"
+  ansible.builtin.package:
+    name: zabbix-selinux-policy
+  environment:
+    http_proxy: "{{ zabbix_http_proxy | default('') }}"
+    https_proxy: "{{ zabbix_https_proxy | default('') }}"
+  register: zabbix_agent_selinux_policy
+  failed_when: false
+  when: ansible_facts['os_family'] == "RedHat"
+  become: true
+  tags:
+    - install
+
+- name: "SELinux | RedHat | Check whether zabbix_run_sudo boolean exists"
+  ansible.builtin.stat:
+    path: "{{ zabbix_run_sudo_seboolean_path | default('/sys/fs/selinux/booleans/zabbix_run_sudo') }}"
+  register: zabbix_run_sudo_seboolean
+  when: ansible_facts['os_family'] == "RedHat"
+  tags:
+    - config
+
+- name: "SELinux | RedHat | Record zabbix_run_sudo availability"
+  ansible.builtin.set_fact:
+    zabbix_run_sudo_seboolean_available: "{{ zabbix_run_sudo_seboolean.stat.exists | default(false) | bool }}"
+  when: ansible_facts['os_family'] == "RedHat"
+  tags:
+    - config
+
+- name: "SELinux | Non-RedHat | zabbix_run_sudo is not available"
+  ansible.builtin.set_fact:
+    zabbix_run_sudo_seboolean_available: false
+  when: ansible_facts['os_family'] != "RedHat"
+  tags:
+    - config
+
+- name: "SELinux | Warn when zabbix_run_sudo is requested but missing"
+  ansible.builtin.debug:
+    msg: >-
+      selinux_allow_zabbix_run_sudo is true, but the SELinux boolean
+      zabbix_run_sudo does not exist on this host. On RHEL 10 and similar
+      releases it is no longer in the base SELinux policy. Install
+      zabbix-selinux-policy from the Zabbix repository (or the matching
+      zabbix*-selinux package from EPEL) and re-run this role.
+      See https://github.com/ansible-collections/community.zabbix/issues/1645
+  register: zabbix_run_sudo_seboolean_warn
+  when:
+    - ansible_facts['os_family'] == "RedHat"
+    - selinux_allow_zabbix_run_sudo | bool
+    - not (zabbix_run_sudo_seboolean_available | bool)
+  tags:
+    - config
+
+# zabbix_selinux_skip_boolean_apply is an internal test hook (default false).
 - name: "SELinux | Set booleans"
-  when: item.is_available
+  when:
+    - zabbix_run_sudo_seboolean_available | bool
+    - not (zabbix_selinux_skip_boolean_apply | default(false) | bool)
   ansible.posix.seboolean:
     name: "{{ item.name }}"
     state: "{{ item.state }}"
     persistent: true
   become: true
+  register: zabbix_run_sudo_seboolean_set
   tags:
     - config
   loop:
     - name: zabbix_run_sudo
       state: "{{ selinux_allow_zabbix_run_sudo | bool }}"
-      is_available: "{{ ansible_facts['os_family'] in ['RedHat'] }}"
