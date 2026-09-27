@@ -27,7 +27,7 @@
             dest: "{{ zabbix_agent_tlspskfile }}"
             content: "{{ zabbix_agent_tlspsk_secret }}"
           notify:
-            - restart win zabbix agent
+            - Restart zabbix-agent
 
     - name: AutoPSK | Check for existing TLS PSK identity
       ansible.windows.win_stat:
@@ -45,13 +45,13 @@
         - zabbix_agent_tlspskidentity_file is defined
         - zabbix_agent_tlspskidentity is defined
       notify:
-        - restart win zabbix agent
+        - Restart zabbix-agent
 
 - name: "Windows | Configure zabbix-agent"
   ansible.windows.win_template:
     src: agent.conf.j2
     dest: "{{ zabbix_agent_conf_file }}"
-  notify: restart win zabbix agent
+  notify: Restart zabbix-agent
 
 - name: Toggle firewall
   when: zabbix_win_firewall_management

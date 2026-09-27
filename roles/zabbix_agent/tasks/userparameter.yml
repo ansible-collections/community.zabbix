@@ -5,7 +5,7 @@
     - when:
         - ansible_facts.os_family == "Windows"
       notify:
-        - restart win zabbix agent
+        - Restart zabbix-agent
       block:
         - name: Windows | Install user-defined userparameters
           ansible.windows.win_template:
@@ -22,8 +22,7 @@
     - when:
         - ansible_facts.os_family != 'Windows'
       notify:
-        - restart zabbix-agent
-        - restart mac zabbix agent
+        - Restart zabbix-agent
       become: true
       block:
         - name: Install user-defined userparameters
