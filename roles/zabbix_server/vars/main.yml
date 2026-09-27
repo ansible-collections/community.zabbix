@@ -25,8 +25,10 @@ _zabbix_server_valid_versions:
     - "7.0"
     - "6.0"
   Debian-11:
+    # Debian 11 (bullseye) ships no zabbix-server package for 7.0/7.4; only 6.0.
     - "6.0"
   RedHat-10:
+    # EL10 has no zabbix-server package for 6.0 (agent-only branch); 7.0+ only.
     - "7.4"
     - "7.0"
   RedHat-9:
@@ -44,6 +46,9 @@ _zabbix_server_valid_versions:
     - "7.2"
     - "7.0"
     - "6.0"
+  Ubuntu-26:
+    - "7.4"
+    - "7.0"
   Ubuntu-24:
     - "7.4"
     - "7.2"

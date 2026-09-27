@@ -1,0 +1,2 @@
+minor_changes:
+  - Zabbix roles - add support for Ubuntu 26.04 (Resolute) to the supported OS/version map.

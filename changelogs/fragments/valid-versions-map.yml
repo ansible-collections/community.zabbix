@@ -1,0 +1,2 @@
+bugfixes:
+  - Zabbix roles - align the supported OS/version maps with actual Zabbix package availability (verified against repo.zabbix.com) so the "version is supported" check matches what can really be installed. Debian 11 (bullseye) is limited to Zabbix 6.0 for the ``zabbix_server`` and ``zabbix_web`` roles (no 7.0/7.4 server or frontend packages are published for bullseye), and EL10 drops Zabbix 6.0 for the server-side roles (6.0 ships only the agent on EL10); the ``zabbix_agent`` role keeps 6.0 on EL10.
