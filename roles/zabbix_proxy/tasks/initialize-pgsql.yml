@@ -93,17 +93,17 @@
         login_user: "{{ zabbix_proxy_dbuser }}"
         login_password: "{{ zabbix_proxy_dbpassword }}"
         login_host: "{{ zabbix_proxy_dbhost }}"
-        port: "{{ zabbix_proxy_dbport }}"
-        db: "{{ zabbix_proxy_dbname }}"
+        login_port: "{{ zabbix_proxy_dbport }}"
+        login_db: "{{ zabbix_proxy_dbname }}"
         query: 'SELECT mandatory FROM dbversion'
 
   rescue:
     - name: "PostgreSQL | Import schema"
       community.postgresql.postgresql_db:
+        name: "{{ zabbix_proxy_dbname }}"
         login_user: "{{ zabbix_proxy_dbuser }}"
         login_password: "{{ zabbix_proxy_dbpassword }}"
         login_host: "{{ zabbix_proxy_dbhost }}"
-        port: "{{ zabbix_proxy_dbport }}"
-        db: "{{ zabbix_proxy_dbname }}"
+        login_port: "{{ zabbix_proxy_dbport }}"
         state: restore
         target: "{{ zabbix_proxy_database_file_dir }}/postgresql/proxy.sql"
