@@ -109,21 +109,16 @@ zabbix_agent_tls_config:
 zabbix_agent_ipmi_authtype: -1
 zabbix_agent_ipmi_privilege: 2
 
+# Download (Windows, macOS)
 zabbix_agent_download_base_url: https://cdn.zabbix.com/zabbix/binaries/stable
+zabbix_agent_download_url: "{{ _zabbix_agent_download_url }}"
+zabbix_agent_download_filename: "{{ _zabbix_agent_download_package }}"
 
-# Windows Related
-zabbix_agent_win_package: "{{ zabbix_agent2 | ternary('zabbix_agent2', 'zabbix_agent') }}-{{ zabbix_agent_version_long }}-windows-{{  _zabbix_agent_win_arch[ansible_facts.architecture2] }}-openssl.msi"
-zabbix_agent_win_download_url: "{{ zabbix_agent_download_base_url }}/{{ zabbix_agent_version }}/{{ zabbix_agent_version_long }}/{{ zabbix_agent_win_package }}"
-
+# Windows
 zabbix_agent_win_install_dir: "C:/Program Files/{{ zabbix_agent2 | ternary('Zabbix Agent 2', 'Zabbix Agent') }}"
 zabbix_agent_win_exe_path: "{{ zabbix_agent_win_install_dir }}/{{ zabbix_agent2 | ternary('zabbix_agent2.exe', 'zabbix_agentd.exe') }}"
 zabbix_agent_win_service: "{{ zabbix_agent2 | ternary('Zabbix Agent 2', 'Zabbix Agent') }}"
-
 zabbix_win_firewall_management: true
-
-# macOS Related
-zabbix_mac_package: "zabbix_agent-{{ zabbix_agent_version_long }}-macos-amd64-openssl.pkg"
-zabbix_mac_download_link: "{{ zabbix_agent_download_base_url }}/{{ zabbix_agent_version }}/{{ zabbix_agent_version_long }}/{{ zabbix_mac_package }}"
 
 # Zabbix Agent Docker facts
 zabbix_agent_docker: false

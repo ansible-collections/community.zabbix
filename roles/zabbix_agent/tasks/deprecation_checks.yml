@@ -6,6 +6,7 @@
         that:
           - zabbix_agent_package is not defined
         fail_msg: Deprecated configuration option provided
+        quiet: true
   rescue:
     - name: Deprecation notice for zabbix_agent_package
       debug:
@@ -25,6 +26,7 @@
         that:
           - zabbix_agent_win_install_dir_conf is not defined
         fail_msg: Deprecated configuration option provided
+        quiet: true
   rescue:
     - name: Deprecation notice for zabbix_agent_win_install_dir_conf
       debug:
@@ -32,3 +34,44 @@
       vars:
         deprecation_notice: |
           zabbix_agent_win_install_dir_conf has been deprecated, changed name to zabbix_agent_conf_dir.
+
+- name: Deprecation platform-specific download variables
+  block:
+    - name: Verify platform-specific download variables go undefined
+      assert:
+        that:
+          - zabbix_agent_win_package is not defined
+          - zabbix_agent_win_download_url is not defined
+          - zabbix_mac_package is not defined
+          - zabbix_mac_download_link is not defined
+        fail_msg: Deprecated configuration option provided
+        quiet: true
+  rescue:
+    - name: Deprecation notice for platform-specific download variables
+      debug:
+        msg: "{{ deprecation_notice.split('\n') }}"
+      vars:
+        deprecation_notice: |
+          zabbix_agent_win_package, zabbix_agent_win_download_url, zabbix_mac_package,
+          and zabbix_mac_download_link have been deprecated, use zabbix_agent_download_url instead.
+
+- name: Removed download variables
+  block:
+    - name: Verify removed download variables go undefined
+      assert:
+        that:
+          - zabbix_win_package is not defined
+          - zabbix_win_download_url is not defined
+          - zabbix_win_download_link is not defined
+          - zabbix_mac_download_url is not defined
+        fail_msg: Removed configuration option provided
+        quiet: true
+  rescue:
+    - name: Removal notice for download variables
+      debug:
+        msg: "{{ removal_notice.split('\n') }}"
+      vars:
+        removal_notice: |
+          zabbix_win_package, zabbix_win_download_url, zabbix_win_download_link,
+          and zabbix_mac_download_url were removed in 4.0.0 and are ignored.
+          Use zabbix_agent_download_url (or zabbix_agent_download_base_url) instead.

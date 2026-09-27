@@ -225,6 +225,15 @@ Host encryption configuration will be set to match agent configuration.
 * `zabbix_host_status`: enabled (Default) when host in monitored, disabled when host is disabled for monitoring.
 * `zabbix_useuip`: 1 if connection to zabbix-agent is made via ip, 0 for fqdn.
 
+## Download Variables
+
+These variables control how the agent package is downloaded on platforms without native package management (Windows, macOS).
+
+* `zabbix_agent_download_base_url`: The download base url.  Default `https://cdn.zabbix.com/zabbix/binaries/stable`
+* `zabbix_agent_download_url`: The full download url for the agent package. Computed automatically from `zabbix_agent_download_base_url`, `zabbix_agent_version`, and `zabbix_agent_version_long`. Override to use a custom mirror or package. (formerly `zabbix_agent_win_download_url`/`zabbix_agent_win_package` on Windows, `zabbix_mac_download_link`/`zabbix_mac_package` on macOS) On macOS the default is the arm64 package. Zabbix no longer publishes the amd64 package for current releases, so set this explicitly on Intel Macs.
+* `zabbix_agent_download_filename`: The local file name the downloaded package is saved as. Defaults to the package name the role computes for `zabbix_agent_download_url`. Set this when overriding `zabbix_agent_download_url` with a url that doesn't end in a clean file name.
+* `zabbix_agent_version_long`: The long (major.minor.patch) version of the Zabbix Agent. Auto-detected from the Zabbix releases API when not defined. Used to generate the `zabbix_agent_download_url`.
+
 ## Windows Variables
 
 **NOTE**
@@ -236,12 +245,9 @@ Otherwise it just for the Zabbix Agent or for the Zabbix Agent 2.
 
 * `zabbix_agent_win_include`: The directory in which the Zabbix Agent specific configuration files are stored.
 * `zabbix_agent_win_logfile`: The full path to the logfile for the Zabbix Agent.
-* `zabbix_agent_version_long`: The long (major.minor.patch) version of the Zabbix Agent. This will be used to generate the `zabbix_win_package` and `zabbix_win_download_link` variables. This takes precedence over `zabbix_agent_version`.
-* `zabbix_win_download_link`: The download url to the `win.zip` file.
 * `zabbix_win_firewall_management`: Enable Windows firewall management (add service and port to allow rules). Default: `True`
 * `zabbix_agent_win_install_dir`: The directory where Zabbix needs to be installed. Default: `C:\Program Files\Zabbix Agent 2` when variable `zabbix_agent2` is true, `C:\Program Files\Zabbix Agent` when `zabbix_agent2` is false.
 * `zabbix_agent_win_install_dir_conf`: The directory where Zabbix configuration file needs to be installed. Default: `zabbix_agent_win_install_dir`
-* `zabbix_win_package`: file name pattern (zip only). This will be used to generate the `zabbix_win_download_link` variable.
 
 ### Tweaking the windows service
 
@@ -267,11 +273,6 @@ Here are some suggested values for tweaking the service.
 **NOTE**
 
 _Supporting macOS is a best effort (We don't have the possibility to either test/verify changes on the various amount of available macOS instances). PRs specific to macOS will almost immediately be merged, unless someone is able to provide a macOS test mechanism via Travis for Pull Requests._
-
-* `zabbix_mac_download_link`: The download url to the `pkg` file.
-* `zabbix_mac_download_url`: The download url.  Default `https://cdn.zabbix.com/zabbix/binaries/stable`
-* `zabbix_mac_package`: The name of the mac install package.  Default `zabbix_agent-{{ zabbix_agent_version_long }}-macos-amd64-openssl.pkg`
-* `zabbix_agent_version_long`: The long (major.minor.patch) version of the Zabbix Agent. This will be used to generate the `zabbix_mac_download_link` link.
 
 ## Docker Variables
 

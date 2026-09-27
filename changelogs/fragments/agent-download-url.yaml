@@ -1,0 +1,11 @@
+deprecated_features:
+  - zabbix_agent - Deprecated the platform-specific download variables ``zabbix_agent_win_package``, ``zabbix_agent_win_download_url``, ``zabbix_mac_package`` and ``zabbix_mac_download_link`` in favor of ``zabbix_agent_download_url`` (https://github.com/ansible-collections/community.zabbix/pull/1788).
+minor_changes:
+  - zabbix_agent - Unify platform-specific download variables into ``zabbix_agent_download_url`` with platform-computed defaults in ``vars/Windows.yml`` and ``vars/Darwin.yml``. The downloaded package is saved as ``zabbix_agent_download_filename`` (https://github.com/ansible-collections/community.zabbix/pull/1788).
+  - zabbix_agent - Warn when ``zabbix_win_package``, ``zabbix_win_download_url``, ``zabbix_win_download_link`` or ``zabbix_mac_download_url`` are set. They were removed in 4.0.0 and have been silently ignored since (https://github.com/ansible-collections/community.zabbix/pull/1788).
+  - zabbix_agent - On macOS, look up ``zabbix_agent_version_long`` from the Zabbix releases API when it is not set, as on Windows (https://github.com/ansible-collections/community.zabbix/pull/1788).
+  - zabbix_agent - On macOS, download the arm64 package by default instead of amd64. Zabbix no longer publishes the amd64 package for current releases; set ``zabbix_agent_download_url`` on Intel Macs (https://github.com/ansible-collections/community.zabbix/pull/1788).
+  - zabbix_agent - macOS hosts now link the ``macOS by Zabbix agent`` template by default instead of ``Linux by Zabbix agent`` (https://github.com/ansible-collections/community.zabbix/pull/1788).
+bugfixes:
+  - zabbix_agent - Fix the role failing on macOS when loading OS-specific variables, as ``vars/Darwin.yml`` did not exist (https://github.com/ansible-collections/community.zabbix/pull/1788).
+  - zabbix_agent - Fix the macOS package version check, which compared against the undefined ``zabbix_version_long`` instead of ``zabbix_agent_version_long`` (https://github.com/ansible-collections/community.zabbix/pull/1788).

@@ -66,8 +66,8 @@
 
     - name: Download Zabbix Agent
       ansible.windows.win_get_url:
-        url: "{{ zabbix_agent_win_download_url }}"
-        dest: "{{ _zabbix_agent_win_userprofile_path.stdout | trim }}/Downloads/{{ zabbix_agent_win_package }}"
+        url: "{{ zabbix_agent_download_url }}"
+        dest: "{{ _zabbix_agent_win_userprofile_path.stdout | trim }}/Downloads/{{ zabbix_agent_download_filename }}"
         url_username: "{{ zabbix_download_user | default(omit) }}"
         url_password: "{{ zabbix_download_pass | default(omit) }}"
         force: false
@@ -82,7 +82,7 @@
     # Would be sweet if this worked.
     #- name: Install Zabbix Agent
     #  ansible.windows.win_package:
-    #    path: "C:/Users/{{ ansible_user }}/Downloads/{{ zabbix_agent_win_download_package }}"
+    #    path: "C:/Users/{{ ansible_user }}/Downloads/{{ zabbix_agent_download_filename }}"
     #    arguments: "/l*v zabbix.log /i /qn SERVER={{ zabbix_agent_server }}"
     #  register: _res
 
@@ -93,6 +93,6 @@
       ansible.windows.win_command:
         chdir: "{{ _zabbix_agent_win_userprofile_path.stdout | trim }}/Downloads"
         cmd: >-
-          msiexec /i "{{ zabbix_agent_win_package }}" /qn
+          msiexec /i "{{ zabbix_agent_download_filename }}" /qn
           SERVER="{{ zabbix_agent_server }}"
           INSTALLFOLDER="{{ zabbix_agent_win_install_dir | replace('/', '\\') }}"

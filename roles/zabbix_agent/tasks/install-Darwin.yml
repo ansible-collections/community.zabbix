@@ -1,5 +1,32 @@
 ---
-# Tasks specific for macOS
+- name: "macOS | Get version if not set"
+  when: zabbix_agent_version_long is not defined
+  block:
+    - name: "macOS | Get latest zabbix releases"
+      uri:
+        url: "{{ zabbix_agent_releases_url }}"
+        return_content: true
+        status_code: [200, 304]
+      register: _zabbix_agent_versions
+      run_once: true
+      check_mode: false
+
+    - name: "macOS | Set zabbix_agent_version_long"
+      set_fact:
+        zabbix_agent_version_long: "{{ _zabbix_agent_versions.json | json_query(_latest_release) }}"
+      vars:
+        _latest_release: "versions[?version=='{{ zabbix_agent_version }}'].latest_release.release | [0]"
+
+- name: "macOS | Check that the package matches the architecture"
+  assert:
+    that:
+      - zabbix_agent_download_url is not search('-macos-arm64-')
+    fail_msg: >-
+      Zabbix no longer publishes macOS amd64 packages for current releases,
+      and the default download is the arm64 package. Set zabbix_agent_download_url
+      to an amd64 package on Intel Macs.
+  when: ansible_facts['architecture'] == 'x86_64'
+
 - name: "macOS | Check installed package version"
   ansible.builtin.shell: |
     set -o pipefail
@@ -11,12 +38,12 @@
 
 - name: "macOS | Download the Zabbix package"
   ansible.builtin.get_url:
-    url: "{{ zabbix_mac_download_link }}"
-    dest: "/tmp/{{ zabbix_mac_package }}"
+    url: "{{ zabbix_agent_download_url }}"
+    dest: "/tmp/{{ zabbix_agent_download_filename }}"
     mode: 0644
-  when: pkgutil_version.stdout != zabbix_version_long
+  when: pkgutil_version.stdout != zabbix_agent_version_long
 
 - name: "macOS | Install the Zabbix package"
-  ansible.builtin.command: installer -pkg "/tmp/{{ zabbix_mac_package }}" -target /
+  ansible.builtin.command: installer -pkg "/tmp/{{ zabbix_agent_download_filename }}" -target /
   become: true
-  when: pkgutil_version.stdout != zabbix_version_long
+  when: pkgutil_version.stdout != zabbix_agent_version_long
