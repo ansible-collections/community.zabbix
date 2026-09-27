@@ -1,0 +1,2 @@
+bugfixes:
+  - zabbix_agent - only write ``TLSAccept`` when ``zabbix_agent_tlsaccept`` is defined. The template checked ``zabbix_agent_tlsconnect`` instead, so ``TLSAccept`` was commented out when only ``zabbix_agent_tlsaccept`` was set, and written empty when only ``zabbix_agent_tlsconnect`` was set (https://github.com/ansible-collections/community.zabbix/issues/1338).
