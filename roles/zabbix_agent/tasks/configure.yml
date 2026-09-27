@@ -34,8 +34,7 @@
             mode: 0400
           become: true
           notify:
-            - restart zabbix-agent
-            - restart mac zabbix agent
+            - Restart zabbix-agent
 
     - name: AutoPSK | Check for existing TLS PSK identity
       ansible.builtin.stat:
@@ -58,8 +57,7 @@
         - zabbix_agent_tlspskidentity_file is defined
         - zabbix_agent_tlspskidentity is defined
       notify:
-        - restart zabbix-agent
-        - restart mac zabbix agent
+        - Restart zabbix-agent
 
 - name: "Validate zabbix_agent_listenip"
   ansible.builtin.assert:
@@ -86,7 +84,7 @@
     group: "{{ _zabbix_agent_root_group | default('root') }}"
     mode: "{{ zabbix_agent_conf_mode }}"
   notify:
-    - restart zabbix-agent
+    - Restart zabbix-agent
   become: true
   tags:
     - config
@@ -137,7 +135,7 @@
     - ansible_facts['os_family'] == "FreeBSD"
   tags:
     - config
-  notify: restart sysctl
+  notify: Restart sysctl
 
 - meta: flush_handlers
 

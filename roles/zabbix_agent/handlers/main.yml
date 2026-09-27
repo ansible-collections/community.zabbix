@@ -1,5 +1,6 @@
 ---
-- name: restart zabbix-agent
+- name: Restart zabbix-agent
+  listen: restart zabbix-agent
   ansible.builtin.service:
     name: "{{ zabbix_agent_service }}"
     state: restarted
@@ -9,21 +10,28 @@
     - not zabbix_agent_docker
     - ansible_facts['os_family'] not in ["Darwin", "Windows"]
 
-- name: firewalld-reload
+- name: Reload firewalld
+  listen: firewalld-reload
   ansible.builtin.command: "firewall-cmd --reload"
   become: true
   when:
     - ansible_facts.services["firewalld"] is defined
     - ansible_facts.services["firewalld"].state == "running"
 
-- name: restart win zabbix agent
+- name: Restart zabbix-agent (Windows)
+  listen:
+    - Restart zabbix-agent
+    - restart win zabbix agent
   ansible.windows.win_service:
     name: "{{ zabbix_agent_win_service }}"
     state: restarted
   when:
     - ansible_facts['os_family'] == "Windows"
 
-- name: restart mac zabbix agent
+- name: Restart zabbix-agent (Darwin)
+  listen:
+    - Restart zabbix-agent
+    - restart mac zabbix agent
   ansible.builtin.command: "launchctl kickstart -k system/{{ zabbix_agent_service }}"
   become: true
   when:
@@ -31,7 +39,8 @@
     - ansible_facts.os_family == "Darwin"
 
 
-- name: restart sysctl
+- name: Restart sysctl
+  listen: restart sysctl
   ansible.builtin.service:
     name: sysctl
     state: restarted
