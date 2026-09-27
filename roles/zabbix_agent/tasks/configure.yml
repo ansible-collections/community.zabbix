@@ -149,3 +149,4 @@
   become: true
   tags:
     - service
+  when: zabbix_agent_package_state != "absent"
