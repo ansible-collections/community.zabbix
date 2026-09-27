@@ -1,0 +1,2 @@
+minor_changes:
+  - roles - stop testing Debian 11 (bullseye) in CI, as it is end of life and its security archive is no longer installable. The roles still allow Debian 11, but it is now untested.

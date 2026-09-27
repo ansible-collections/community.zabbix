@@ -36,7 +36,6 @@ jobs:
           - image: ubuntu2204
           - image: debian13
           - image: debian12
-          - image: debian11
         collection_role:
           - zabbix_proxy
         database:
@@ -124,7 +123,6 @@ jobs:
         container:
           - image: rockylinux9
           - image: ubuntu2204
-          - image: debian11
         collection_role:
           - zabbix_proxy_psk
           - zabbix_proxy_psk_active
