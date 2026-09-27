@@ -6,6 +6,19 @@ _zabbix_agent_controlsocket: "\\\\.\\pipe\\agent.sock"
 _zabbix_agent_pluginsocket: "\\\\.\\pipe\\agent.plugin.sock"
 _zabbix_agent_conf_dir: "{{ zabbix_agent_win_install_dir_conf | default(zabbix_agent_win_install_dir) }}"
 
+_zabbix_agent_download_package: >-
+  {{ zabbix_agent_win_package | default(
+     zabbix_agent2 | ternary('zabbix_agent2', 'zabbix_agent')
+     ~ '-' ~ zabbix_agent_version_long
+     ~ '-windows-' ~ _zabbix_agent_win_arch[ansible_facts.architecture2]
+     ~ '-openssl.msi') }}
+_zabbix_agent_download_url: >-
+  {{ zabbix_agent_win_download_url | default(
+     zabbix_agent_download_base_url
+     ~ '/' ~ zabbix_agent_version
+     ~ '/' ~ zabbix_agent_version_long
+     ~ '/' ~ _zabbix_agent_download_package) }}
+
 _zabbix_agent_link_templates:
   - Windows by Zabbix agent
 

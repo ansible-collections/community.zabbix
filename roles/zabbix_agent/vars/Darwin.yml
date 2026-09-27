@@ -1,0 +1,13 @@
+---
+_zabbix_agent_download_package: >-
+  {{ zabbix_mac_package | default(
+     'zabbix_agent-' ~ zabbix_agent_version_long ~ '-macos-arm64-openssl.pkg') }}
+_zabbix_agent_download_url: >-
+  {{ zabbix_mac_download_link | default(
+     zabbix_agent_download_base_url
+     ~ '/' ~ zabbix_agent_version
+     ~ '/' ~ zabbix_agent_version_long
+     ~ '/' ~ _zabbix_agent_download_package) }}
+
+_zabbix_agent_link_templates:
+  - macOS by Zabbix agent
