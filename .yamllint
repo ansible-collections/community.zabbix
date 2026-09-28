@@ -9,6 +9,10 @@ rules:
   brackets:
     max-spaces-inside: 1
     level: error
+  comments:
+    require-starting-space: false
+    min-spaces-from-content: 1
+  comments-indentation: disable
   indentation:
     spaces: consistent
     indent-sequences: whatever
