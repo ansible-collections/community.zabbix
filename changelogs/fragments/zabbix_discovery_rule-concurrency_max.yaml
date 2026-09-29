@@ -1,0 +1,2 @@
+minor_changes:
+  - zabbix_discovery_rule - add ``concurrency_max`` option to set the maximum number of checks executed in parallel (values ``0``-``999``, ``0`` means unlimited; only applied on Zabbix ``>= 7.0``).
