@@ -46,6 +46,88 @@
       ansible.builtin.assert:
         that: drule_iprange_update_checkmode is changed
 
+    - name: test - update Zabbix discovery rule concurrency_max (checkmode)
+      community.zabbix.zabbix_discovery_rule:
+        concurrency_max: "5"
+      check_mode: true
+      register: drule_concurrency_checkmode
+      when: zabbix_version is version('7.0', '>=')
+
+    - name: assert that concurrency_max will be changed
+      ansible.builtin.assert:
+        that: drule_concurrency_checkmode is changed
+      when: zabbix_version is version('7.0', '>=')
+
+    - name: test - update Zabbix discovery rule concurrency_max 0 to 5
+      community.zabbix.zabbix_discovery_rule:
+        concurrency_max: "5"
+      register: drule_concurrency_update_5
+      when: zabbix_version is version('7.0', '>=')
+
+    - name: assert that concurrency_max has been changed
+      ansible.builtin.assert:
+        that: drule_concurrency_update_5 is changed
+      when: zabbix_version is version('7.0', '>=')
+
+    - name: test - update Zabbix discovery rule concurrency_max 5 to 999
+      community.zabbix.zabbix_discovery_rule:
+        concurrency_max: "999"
+      register: drule_concurrency_update_999
+      when: zabbix_version is version('7.0', '>=')
+
+    - name: assert that concurrency_max has been changed
+      ansible.builtin.assert:
+        that: drule_concurrency_update_999 is changed
+      when: zabbix_version is version('7.0', '>=')
+
+    - name: test - update Zabbix discovery rule concurrency_max with same value
+      community.zabbix.zabbix_discovery_rule:
+        concurrency_max: "999"
+      register: drule_concurrency_same
+      when: zabbix_version is version('7.0', '>=')
+
+    - name: assert that nothing has been changed
+      ansible.builtin.assert:
+        that: not drule_concurrency_same is changed
+      when: zabbix_version is version('7.0', '>=')
+
+    - name: test - reset Zabbix discovery rule concurrency_max to 0
+      community.zabbix.zabbix_discovery_rule:
+        concurrency_max: "0"
+      register: drule_concurrency_reset
+      when: zabbix_version is version('7.0', '>=')
+
+    - name: assert that concurrency_max has been changed
+      ansible.builtin.assert:
+        that: drule_concurrency_reset is changed
+      when: zabbix_version is version('7.0', '>=')
+
+    - name: test - create Zabbix discovery rule with invalid concurrency_max (1000)
+      community.zabbix.zabbix_discovery_rule:
+        concurrency_max: "1000"
+      check_mode: true
+      ignore_errors: true
+      register: drule_concurrency_invalid_range
+
+    - name: assert that module fails for value out of range 0-999
+      ansible.builtin.assert:
+        that:
+          - drule_concurrency_invalid_range is failed
+          - drule_concurrency_invalid_range.msg is search("Must be between 0 and 999")
+
+    - name: test - create Zabbix discovery rule with invalid concurrency_max (abc)
+      community.zabbix.zabbix_discovery_rule:
+        concurrency_max: "abc"
+      check_mode: true
+      ignore_errors: true
+      register: drule_concurrency_invalid_integer
+
+    - name: assert that module fails for non integer value
+      ansible.builtin.assert:
+        that:
+          - drule_concurrency_invalid_integer is failed
+          - drule_concurrency_invalid_integer.msg is search("Must be an integer")
+
     - name: test - update Zabbix discovery rule iprange
       community.zabbix.zabbix_discovery_rule:
         iprange:
