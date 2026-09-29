@@ -171,7 +171,10 @@ class HttpApi(HttpApiBase):
                         self.connection.get_option("password"),
                     )
                     # Replace 'auth' field in payload with new one (we got from login process)
-                    data["auth"] = self.connection._auth["auth"]
+                    if StrictVersion(self.api_version()) >= StrictVersion("6.4"):
+                        headers["Authorization"] = "Bearer " + self.auth
+                    else:
+                        data["auth"] = self.auth
                     # Re-send the request we initially were trying to execute
                     response, response_data = self.connection.send(
                         path, json.dumps(data), method=request_method, headers=headers
