@@ -89,6 +89,8 @@
     ansible_httpapi_pass: "{{ zabbix_api_login_pass }}"
     ansible_httpapi_port: "{{ zabbix_api_server_port }}"
     ansible_httpapi_validate_certs: "{{ zabbix_api_validate_certs }}"
+    ansible_zabbix_auth_key: "{{ zabbix_api_auth_key }}"
+    ansible_zabbix_url_path: "{{ zabbix_api_url_path }}"
   ansible.builtin.include_tasks: api.yml
   when:
     - (zabbix_api_create_hostgroup | bool) or (zabbix_api_create_hosts | bool)

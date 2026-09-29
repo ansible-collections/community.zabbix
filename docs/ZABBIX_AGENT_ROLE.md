@@ -211,6 +211,7 @@ Host encryption configuration will be set to match agent configuration.
 * `zabbix_agent_proxy`:  The name of the Zabbix proxy (if used).  Default `null`
 * `zabbix_agent_proxy_group`:  The name of the Zabbix proxy group (if used) (Zabbix 7.0 or later).
 * `zabbix_agent_tags`: A list with tag and (optionally) value for creating host tags.
+* `zabbix_api_auth_key`: Zabbix API token to authenticate with, instead of `zabbix_api_login_user`/`zabbix_api_login_pass`. See [Zabbix API tokens](https://www.zabbix.com/documentation/current/en/manual/web_interface/frontend_sections/administration/general#api-tokens). Default: `""`
 * `zabbix_api_create_hostgroup`: When you want to enable the Zabbix API to create/delete the hostgroups. Default: `False`
 * `zabbix_api_create_hosts`: Default: `False`. When you want to enable the Zabbix API to create/delete the host. This has to be set to `True` if you want to make use of `zabbix_agent_host_state`.
 * `zabbix_api_http_password`: The http password to access zabbix url with Basic Auth (if your Zabbix is behind a proxy with HTTP Basic Auth).
@@ -219,6 +220,7 @@ Host encryption configuration will be set to match agent configuration.
 * `zabbix_api_login_user`: Username of user which has API access.
 * `zabbix_api_server_host`: The IP or hostname/FQDN of Zabbix server. Example: zabbix.example.com
 * `zabbix_api_server_port`: 80 if `zabbix_api_use_ssl` is `false` and 443 if `true` (Default) TCP port to use to connect to Zabbix server. Example: 8080
+* `zabbix_api_url_path`: Path portion of the Zabbix WebUI URL, e.g. for `https://myzabbixfarm.com/zabbixeu` use `zabbixeu`. Use `""` if the Zabbix WebUI runs at the root of the domain.  Default: `zabbix`
 * `zabbix_api_use_ssl`: Is SSL required to connect to the Zabbix API server?  Default: `false`
 * `zabbix_api_validate_certs`: `True` if we need to validate tls certificates of the API. Use `False` in case self-signed certificates are used.  Default: `False`
 * `zabbix_host_groups`: A list of hostgroups which this host belongs to.  Default:  "Linux Servers"
