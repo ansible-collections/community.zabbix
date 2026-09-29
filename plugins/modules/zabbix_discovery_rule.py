@@ -160,6 +160,16 @@ options:
             - Accepts seconds, time unit with suffix and user macro.
         type: str
         default: "1h"
+    concurrency_max:
+        description:
+            - Maximum number of checks that can be executed in parallel.
+            - "Possible values:"
+            - "0 - (default) unlimited number of checks"
+            - "1 - one check"
+            - "2-999 - custom number of checks"
+            - Option is available since Zabbix 7.0
+        type: str
+        default: "0"
     proxy:
         description:
             - Name of the proxy used for discovery.
@@ -206,6 +216,7 @@ EXAMPLES = r"""
     name: ACME
     state: present
     iprange: 192.168.1.1-255
+    concurrency_max: "999"
     dchecks:
         - type: ICMP
         - type: Zabbix
@@ -469,6 +480,8 @@ class DiscoveryRule(ZabbixBase):
                 _params["proxy_hostid"] = self.get_proxy_by_proxy_name(kwargs["proxy"])["proxyid"]
             else:
                 _params["proxyid"] = self.get_proxy_by_proxy_name(kwargs["proxy"])["proxyid"]
+        if LooseVersion(self._zbx_api_version) >= LooseVersion("7.0"):
+            _params["concurrency_max"] = kwargs["concurrency_max"]
 
         return _params
 
@@ -599,6 +612,7 @@ def main():
         delay=dict(type="str", required=False, default="1h"),
         proxy=dict(type="str", required=False, default=None),
         status=dict(type="str", default="enabled", choices=["enabled", "disabled"]),
+        concurrency_max=dict(type="str", required=False, default="0"),
         state=dict(type="str", default="present", choices=["present", "absent"])
     )
 
@@ -618,6 +632,14 @@ def main():
     delay = module.params["delay"]
     proxy = module.params["proxy"]
     status = module.params["status"]
+    concurrency_max = module.params["concurrency_max"]
+
+    try:
+        _concurrency_max = int(concurrency_max)
+    except (TypeError, ValueError):
+        module.fail_json(msg="Invalid value for concurrency_max: '%s'. Must be an integer." % concurrency_max)
+    if _concurrency_max < 0 or _concurrency_max > 999:
+        module.fail_json(msg="Invalid value for concurrency_max: '%s'. Must be between 0 and 999." % concurrency_max)
 
     drule = DiscoveryRule(module)
     zbx = drule._zapi
@@ -638,7 +660,8 @@ def main():
                 dchecks=dcks.construct_the_data(dchecks),
                 delay=delay,
                 proxy=proxy,
-                status=status
+                status=status,
+                concurrency_max=concurrency_max
             )
 
             if difference == {}:
@@ -659,7 +682,8 @@ def main():
                 dchecks=dcks.construct_the_data(dchecks),
                 delay=delay,
                 proxy=proxy,
-                status=status
+                status=status,
+                concurrency_max=concurrency_max
             )
             module.exit_json(changed=True, state=state, drule=name, druleid=drule_id, msg="Discovery Rule created: %s, ID: %s" % (name, drule_id))
 
