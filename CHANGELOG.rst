@@ -4,6 +4,14 @@ community.zabbix Release Notes
 
 .. contents:: Topics
 
+v4.2.1
+======
+
+Minor Changes
+-------------
+
+- zabbix_discovery_rule module - add `concurrency_max` for maximum number of concurrent checks per discovery rule: https://www.zabbix.com/documentation/7.0/en/manual/api/reference/drule/object
+
 v4.2.0
 ======
 
