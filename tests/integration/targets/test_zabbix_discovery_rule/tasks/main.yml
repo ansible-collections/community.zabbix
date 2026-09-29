@@ -126,7 +126,7 @@
       ansible.builtin.assert:
         that:
           - drule_concurrency_invalid_integer is failed
-          - drule_concurrency_invalid_integer.msg is search("Must be an integer")
+          - drule_concurrency_invalid_integer.msg is search("unable to convert to int")
 
     - name: test - update Zabbix discovery rule iprange
       community.zabbix.zabbix_discovery_rule:
