@@ -381,12 +381,16 @@ class Trigger(ZabbixBase):
             self._module.fail_json(msg="Failed to update trigger: %s" % e)
         return results
 
-    def check_trigger_changed(self, old_trigger):
+    def check_trigger_changed(self, old_trigger, keys):
         try:
             new_trigger = self._zapi.trigger.get({"triggerids": "%s" % old_trigger['triggerid'], "selectDependencies": "extend", "selectTags": "extend"})[0]
         except Exception as e:
             self._module.fail_json(msg="Failed to get trigger: %s" % e)
-        return old_trigger != new_trigger
+        # Compare only the fields this module manages. Zabbix auto-populates some unmanaged fields
+        # (e.g. event_name/url_name) during trigger.update, which flipped the old != new full-dict
+        # compare and broke idempotence. Both dicts come from trigger.get, so there is no int/str or
+        # expression-normalization skew.
+        return any(old_trigger.get(k) != new_trigger.get(k) for k in keys)
 
     def delete_trigger(self, trigger_id):
         if self._module.check_mode:
@@ -466,7 +470,7 @@ def main():
                     params['description'] = params['new_name']
                     params.pop("new_name")
                 results.append(trigger.update_trigger(params))
-                changed_trigger = trigger.check_trigger_changed(t)
+                changed_trigger = trigger.check_trigger_changed(t, params.keys())
                 if changed_trigger:
                     changed = True
             module.exit_json(changed=changed, result=results)
