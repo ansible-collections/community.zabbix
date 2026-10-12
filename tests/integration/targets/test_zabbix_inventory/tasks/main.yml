@@ -1,0 +1,56 @@
+---
+- name: "test - create a host in a known group on the real Zabbix"
+  community.zabbix.zabbix_host:
+    host_name: ExampleHostForInventoryPlugin
+    host_groups:
+      - Linux servers
+    interfaces:
+      - type: 1
+        main: 1
+        useip: 1
+        ip: 192.168.0.50
+        dns: ""
+        port: 10050
+    status: enabled
+    state: present
+
+- name: "test - run plugin with add_zabbix_groups"
+  ansible.builtin.command:
+    cmd: ansible-inventory -i {{ role_path }}/files/groups_zabbix_inventory.yml --list
+  changed_when: false
+  register: inv_groups
+
+- name: "assert - host group present via add_zabbix_groups"
+  ansible.builtin.assert:
+    that:
+      - "inv_groups.stdout is search('Linux_servers')"
+      - "inv_groups.stdout is search('ExampleHostForInventoryPlugin')"
+    fail_msg: "add_zabbix_groups did not yield the group (stdout: {{ inv_groups.stdout }})"
+
+- name: "test - run plugin with host_zapi_query selectGroups (legacy param)"
+  ansible.builtin.command:
+    cmd: ansible-inventory -i {{ role_path }}/files/zapi_zabbix_inventory.yml --list
+  changed_when: false
+  register: inv_zapi
+
+- name: "assert - host_zapi_query returned host group data (not silently dropped)"
+  ansible.builtin.assert:
+    that:
+      - "inv_zapi.stdout is search('zbx_hostgroups') or inv_zapi.stdout is search('zbx_groups')"
+      - "inv_zapi.stdout is search('Linux servers')"
+    fail_msg: "host_zapi_query did not return host group data (stdout: {{ inv_zapi.stdout }})"
+
+- name: "test - run legacy inventory script --list"
+  ansible.builtin.command:
+    cmd: python {{ role_path.split('/tests/')[0] }}/scripts/inventory/zabbix.py --list
+    chdir: "{{ role_path }}/files"
+  changed_when: false
+  failed_when: false
+  register: legacy_out
+
+- name: "assert - legacy script produced the host group"
+  ansible.builtin.assert:
+    that:
+      - "legacy_out.stdout is search('Linux servers')"
+      - "legacy_out.stdout is search('ExampleHostForInventoryPlugin')"
+    fail_msg: "legacy script did not yield the group (rc={{ legacy_out.rc }} stderr={{ legacy_out.stderr }} stdout={{ legacy_out.stdout }})"

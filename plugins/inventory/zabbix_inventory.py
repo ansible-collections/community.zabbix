@@ -87,6 +87,18 @@ options:
                     - Can be limited to different fields for example setting the vaule to ['name'] will only return the name
                     - Additional fields can be specified by comma seperated value ['name', 'field2']
                     - Please see U(https://www.zabbix.com/documentation/current/manual/api/reference/hostgroup/object) for more details on field names
+                    - Removed in Zabbix 7.2; the plugin automatically uses selectHostGroups on Zabbix >= 7.0.
+            selectHostGroups:
+                type: str
+                description:
+                    - query
+                    - Return a hostgroups property with host groups data that the host belongs to.
+                    - Replacement for selectGroups, available from Zabbix 7.0 and required from Zabbix 7.2.
+                    - To return all values specify 'extend'
+                    - Can be limited to different fields for example setting the value to ['name'] will only return the name
+                    - Additional fields can be specified by comma separated value ['name', 'field2']
+                    - Please see U(https://www.zabbix.com/documentation/current/manual/api/reference/hostgroup/object) for more details on field names
+                    - The plugin automatically translates selectGroups to selectHostGroups on Zabbix >= 7.0 and vice versa.
             selectHostDiscovery:
                 type: str
                 description:
@@ -244,7 +256,7 @@ login_password: password
 host_zapi_query:
   selectApplications: ['name', 'applicationid']
   selectParentTemplates: ['name']
-  selectGroups: ['name']
+  selectHostGroups: ['name']
 validate_certs: false
 groups:
   enabled: zbx_status == "0"
@@ -373,6 +385,19 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         res = json.load(response)
         self.zabbix_version = res['result']
 
+    def _translate_hostgroup_query(self, query):
+        # host.get: 'selectGroups' was deprecated in Zabbix 7.0 and removed in 7.2; 'selectHostGroups'
+        # is the replacement (available from 7.0). Translate by server version so queries work on every
+        # supported Zabbix version. Returns a new dict; never mutates the caller's value.
+        translated = dict(query)
+        if LooseVersion(self.zabbix_version) >= LooseVersion('7.0'):
+            if 'selectGroups' in translated:
+                translated['selectHostGroups'] = translated.pop('selectGroups')
+        else:
+            if 'selectHostGroups' in translated:
+                translated['selectGroups'] = translated.pop('selectHostGroups')
+        return translated
+
     def logout_zabbix(self):
         self.api_request(
             'user.logout',
@@ -421,7 +446,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
 
         self.get_version()
         self.login_zabbix()
-        zapi_query = self.get_option('host_zapi_query')
+        zapi_query = self._translate_hostgroup_query(self.get_option('host_zapi_query'))
         response = self.api_request(
             'host.get',
             zapi_query
@@ -451,17 +476,16 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
 
             response = self.api_request(
                 'host.get',
-                {
-                    'selectGroups': ['name']
-                }
+                self._translate_hostgroup_query({'selectGroups': ['name']})
             )
             res = json.load(response)
             content = res['result']
 
             for record in content:
                 host_name = record['host']
-                if len(record['groups']) >= 1:
-                    for group in record['groups']:
+                host_groups = record.get('hostgroups', record.get('groups', []))
+                if len(host_groups) >= 1:
+                    for group in host_groups:
                         group_name = to_safe_group_name(group['name'])
                         self.inventory.add_group(group_name)
                         self.inventory.add_child(group_name, host_name)
