@@ -1,0 +1,2 @@
+bugfixes:
+  - zabbix_maintenance - fix a crash (``unsupported operand type(s) for +: 'NoneType' and 'str'``) when a ``time_periods`` entry has ``frequency: once`` and omits ``start_date``. The module now falls back to today's date as documented instead of failing (https://github.com/ansible-collections/community.zabbix/issues/1774).
