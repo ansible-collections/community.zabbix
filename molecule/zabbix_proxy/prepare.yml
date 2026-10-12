@@ -12,6 +12,16 @@
         dest: /usr/sbin/policy-rc.d
       when: ansible_facts['os_family'] == 'Debian'
 
+    # On EL aarch64, Zabbix signs its "non-supported" repo packages (e.g. fping, pulled in by
+    # zabbix-proxy) with a key that the zabbix_repo role does not install (the amd64 packages use
+    # a different key), so the dnf module fails GPG validation with "Public key ... is not
+    # installed". Pre-import that Zabbix key. Idempotent; RedHat only; unused where not needed.
+    - name: "Import Zabbix non-supported repo GPG key (EL aarch64 fping)"
+      ansible.builtin.rpm_key:
+        state: present
+        key: https://repo.zabbix.com/RPM-GPG-KEY-ZABBIX-08EFA7DD
+      when: ansible_facts['os_family'] == 'RedHat'
+
     - name: "Installing packages"
       ansible.builtin.package:
         name: "{{ _packages | select | list }}"
