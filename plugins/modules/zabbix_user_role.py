@@ -190,12 +190,12 @@ def main():
             if role["readonly"] != 1:
                 roleid = role["roleid"]
                 if state == "absent":
-                    result = user_role._zapi.role.delete([f"{roleid}"])
+                    user_role._zapi.role.delete([f"{roleid}"])
                     changed = True
                     msg = "Role deleted"
                 else:
-                    if not user_role.is_part_of(rules, role["rules"]):
-                        result = user_role._zapi.role.update({"roleid": roleid, "rules": rules})
+                    if not user_role.is_part_of(rules, role["rules"]) or str(type) != str(role["type"]):
+                        user_role._zapi.role.update({"roleid": roleid, "type": type, "rules": rules})
                         changed = True
                         msg = "Role updated"
         else:
