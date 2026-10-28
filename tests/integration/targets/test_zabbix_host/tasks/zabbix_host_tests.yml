@@ -816,6 +816,31 @@
     that:
       - "zabbix_host1 is changed"
 
+- name: "test: update details for SNMPv2 interface with max_repetition sub option"
+  community.zabbix.zabbix_host:
+    host_name: ExampleHost
+    interfaces:
+      - type: 1
+        main: 1
+        useip: 1
+        ip: 10.1.1.1
+        port: "10050"
+      - type: 2
+        main: 1
+        useip: 1
+        ip: 10.1.1.1
+        port: "161"
+        details:
+          version: 2
+          community: Community String
+          max_repetitions: 40
+  register: zabbix_host1
+
+- name: expect to succeed and that things have changed
+  ansible.builtin.assert:
+    that:
+      - "zabbix_host1 is changed"
+
 - name: "test: configure details for SNMPv3 interface"
   community.zabbix.zabbix_host:
     host_name: ExampleHost
