@@ -1,0 +1,2 @@
+bugfixes:
+  - zabbix_user - send the given ``passwd`` when creating a user whose groups use LDAP or disabled frontend access, so the user can log in to the API (https://github.com/ansible-collections/community.zabbix/issues/1703).
