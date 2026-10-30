@@ -571,7 +571,9 @@ class User(ZabbixBase):
             else:
                 request_data["medias"] = user_medias
 
-        if (require_password):
+        # Send the password whenever one is given: users in groups with LDAP
+        # or disabled frontend access can still log in to the API with it.
+        if require_password or passwd is not None:
             request_data["passwd"] = passwd
 
         # The type key has changed to roleid key since Zabbix 5.2

@@ -959,6 +959,76 @@
     that:
       - delete_existing_user_result.changed is sameas true
 
+- name: test prepare - Create user group with disabled frontend access
+  community.zabbix.zabbix_usergroup:
+    name: testNoGUIgrp
+    gui_access: disable
+
+- name: test - Create user with password as member of a group with disabled frontend access
+  community.zabbix.zabbix_user:
+    username: example3username
+    usrgrps:
+      - testNoGUIgrp
+    passwd: G$jd_79!jw
+    role_name: "User role"
+  register: create_zabbix_user_nogui_result
+
+- ansible.builtin.assert:
+    that:
+      - create_zabbix_user_nogui_result.changed is sameas True
+
+- name: test - The password was set, so the user can log in to the API (Zabbix 6.0)
+  ansible.builtin.uri:
+    url: "{{ zabbix_api_server_url }}/api_jsonrpc.php"
+    method: POST
+    body:
+      jsonrpc: "2.0"
+      method: "user.login"
+      params:
+        user: example3username
+        password: G$jd_79!jw
+      id: "1"
+    body_format: json
+    status_code: 200
+  register: nogui_user_login_result
+  when: zabbix_version is version('6.0', '==')
+
+- ansible.builtin.assert:
+    that:
+      - "'result' in nogui_user_login_result.json"
+  when: zabbix_version is version('6.0', '==')
+
+- name: test - The password was set, so the user can log in to the API (Zabbix >= 7.0)
+  ansible.builtin.uri:
+    url: "{{ zabbix_api_server_url }}/api_jsonrpc.php"
+    method: POST
+    body:
+      jsonrpc: "2.0"
+      method: "user.login"
+      params:
+        username: example3username
+        password: G$jd_79!jw
+      id: "1"
+    body_format: json
+    status_code: 200
+  register: nogui_user_login_result7
+  when: zabbix_version is version('7.0', '>=')
+
+- ansible.builtin.assert:
+    that:
+      - "'result' in nogui_user_login_result7.json"
+  when: zabbix_version is version('7.0', '>=')
+
+- name: test - Delete user in group with disabled frontend access
+  community.zabbix.zabbix_user:
+    username: example3username
+    state: absent
+
+- name: test prepare - Delete user group with disabled frontend access
+  community.zabbix.zabbix_usergroup:
+    name: testNoGUIgrp
+    state: absent
+
 # The tests are to check the patch for PR hasn't a problem.
 # https://github.com/ansible-collections/community.zabbix/pull/382
 - name: test - Create a zabbix user with minimum parameters
