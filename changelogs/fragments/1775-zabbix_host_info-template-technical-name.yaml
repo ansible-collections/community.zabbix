@@ -1,0 +1,2 @@
+bugfixes:
+  - zabbix_host_info - also return the technical name (``host``) of each linked template in ``parentTemplates``, so it can be passed to ``zabbix_host`` ``link_templates`` when the template has a different visible name (https://github.com/ansible-collections/community.zabbix/issues/1775).

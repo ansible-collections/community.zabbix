@@ -25,6 +25,8 @@ short_description: Gather information about Zabbix host
 description:
    - This module allows you to search for Zabbix host entries.
    - This module was called C(zabbix_host_facts) before Ansible 2.9. The usage did not change.
+   - Each entry in C(parentTemplates) has the technical name of the template in C(host) and its visible name in C(name).
+     Use C(host) when passing linked templates back to M(community.zabbix.zabbix_host) in its C(link_templates) option.
 author:
     - "Michael Miko (@RedWhiteMiko)"
 requirements:
@@ -135,7 +137,7 @@ class Host(ZabbixBase):
             search_key = "filter"
         parameters = {
             "output": "extend",
-            "selectParentTemplates": ["name"],
+            "selectParentTemplates": ["host", "name"],
             search_key: {"host": [host_name]},
             "selectInventory": host_inventory,
             "selectHostGroups": "extend",
@@ -166,7 +168,7 @@ class Host(ZabbixBase):
             host_get_params = {
                 "output": "extend",
                 "selectHostGroups": "extend",
-                "selectParentTemplates": ["name"],
+                "selectParentTemplates": ["host", "name"],
                 "hostids": hostinterface["hostid"],
                 "selectInventory": host_inventory,
                 "selectTags": "extend",
