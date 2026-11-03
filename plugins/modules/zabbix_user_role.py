@@ -109,43 +109,43 @@ import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabb
 
 
 class UserRole(ZabbixBase):
-    def __find_val(self, outval, inval):
-        if outval == str(inval):
-            return True
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._TYPE_MAP = {
+            dict: self.dict_need_change,
+            list: self.list_need_change,
+            str: self.value_need_change,
+            int: self.value_need_change,
+        }
+
+    def dict_need_change(self, changes: dict, current: dict) -> bool:
+        for key, change_value in changes.items():
+            current_value = current.get(key)
+            if self.need_change(change_value, current_value):
+                return True
         return False
 
-    def __find_list(self, outval, inval):
-        if set(outval) == set(inval):
-            return True
+    # List structure: [{"name": "item_name", "status": 1}]
+    # The comparison needs to take into account the `key` of each dictionary
+    # item in the list.
+    def list_need_change(self, changes: list, current: list) -> bool:
+        for change_item in changes:
+            if not any(
+                not self.need_change(change_item, current_item)
+                for current_item in current
+            ):
+                return True
         return False
 
-    def __find_dict(self, outval, inval):
-        for out in outval:
-            m = True
-            for k, v in inval.items():
-                if out[k] == str(v):
-                    continue
-                else:
-                    m = False
-            if m:
-                break
-        return m
+    def value_need_change(self, changes: object, current: object) -> bool:
+        return str(changes) != str(current)
 
-    def is_part_of(self, inp, out):
-        verdict = True
-        for rule, value in inp.items():
-            if not isinstance(value, list):
-                verdict = verdict and self.__find_val(out.get(rule, ""), value)
-            else:
-                if len(value):
-                    if not isinstance(value[0], dict):
-                        verdict = verdict and self.__find_list(out.get(rule, []), value)
-                    else:
-                        for v in value:
-                            verdict = verdict and self.__find_dict(out.get(rule, {}), v)
-                else:
-                    verdict = verdict and self.__find_list(rule, value)
-        return verdict
+    def need_change(self, changes: object, current: object) -> bool:
+        if type(changes) not in self._TYPE_MAP:
+            return True
+
+        return self._TYPE_MAP[type(changes)](changes, current)
 
     def get_user_role(self, name):
         result = self._zapi.role.get({
@@ -190,12 +190,12 @@ def main():
             if role["readonly"] != 1:
                 roleid = role["roleid"]
                 if state == "absent":
-                    result = user_role._zapi.role.delete([f"{roleid}"])
+                    user_role._zapi.role.delete([f"{roleid}"])
                     changed = True
                     msg = "Role deleted"
                 else:
-                    if not user_role.is_part_of(rules, role["rules"]):
-                        result = user_role._zapi.role.update({"roleid": roleid, "rules": rules})
+                    if user_role.need_change(rules, role["rules"]) or str(type) != str(role["type"]):
+                        user_role._zapi.role.update({"roleid": roleid, "type": type, "rules": rules})
                         changed = True
                         msg = "Role updated"
         else:
