@@ -1,0 +1,2 @@
+bugfixes:
+  - zabbix_web role - enable the Apache ``rewrite``, ``proxy`` and ``proxy_fcgi`` modules on Debian and Ubuntu. The Zabbix frontend vhost uses ``RewriteEngine`` and, on Zabbix 7.0 and later, proxies PHP to php-fpm (and the packaged Apache configuration adds ``ProxyTimeout``), which made ``apache2ctl configtest`` fail with "Invalid command 'ProxyTimeout'" when these modules were not enabled.
