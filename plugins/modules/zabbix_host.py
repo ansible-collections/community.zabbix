@@ -1119,6 +1119,12 @@ def main():
     tls_issuer = module.params["ca_cert"]
     tls_subject = module.params["tls_subject"]
     inventory_zabbix = module.params["inventory_zabbix"]
+    if inventory_zabbix:
+        # the API returns every inventory field as a string, so numbers would never compare equal
+        inventory_zabbix = dict(
+            (key, value if value is None or isinstance(value, str) else str(value))
+            for key, value in inventory_zabbix.items()
+        )
     status = module.params["status"]
     state = module.params["state"]
     interfaces = module.params["interfaces"]
