@@ -1,0 +1,2 @@
+bugfixes:
+  - zabbix_trigger, zabbix_triggerprototype - fix idempotence. The modules compared the whole trigger object before and after calling ``trigger.update``; when Zabbix auto-populates an unmanaged field (for example ``event_name``) during the update, that comparison reported a spurious ``changed=true``. They now compare only the fields the module manages.
