@@ -1,0 +1,2 @@
+bugfixes:
+  - zabbix_host - convert non-string ``inventory_zabbix`` values to strings before comparing them with the inventory returned by the API, so that numeric values no longer report a change on every run (https://github.com/ansible-collections/community.zabbix/issues/1713, https://github.com/ansible-collections/community.zabbix/pull/1799).
