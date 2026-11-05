@@ -1,0 +1,4 @@
+---
+bugfixes:
+  - zabbix_inventory - use the ``selectHostGroups`` host.get parameter on Zabbix 7.0+ (``selectGroups`` was deprecated in 7.0 and removed in 7.2) and translate user-provided ``host_zapi_query`` group selectors by server version, keeping Zabbix 6.0 LTS working (https://github.com/ansible-collections/community.zabbix/issues/1507).
+  - zabbix inventory script - use the ``selectHostGroups`` host.get parameter on Zabbix 7.0+ (``selectGroups`` removed in 7.2) so the legacy ``scripts/inventory/zabbix.py`` works on current Zabbix (https://github.com/ansible-collections/community.zabbix/issues/1507).
