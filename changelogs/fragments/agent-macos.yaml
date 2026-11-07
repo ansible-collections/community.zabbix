@@ -1,0 +1,10 @@
+minor_changes:
+  - zabbix_agent - Configure the agent on macOS. The role now templates the agent config, creates the include dirs and installs a launch daemon, instead of skipping the configure step (https://github.com/ansible-collections/community.zabbix/pull/1800).
+  - zabbix_agent - On Intel Macs, install the last published amd64 release instead of requiring ``zabbix_agent_download_url``. It is installed from a tarball by default; set ``zabbix_agent_mac_install_type`` to ``pkg`` to use the .pkg (https://github.com/ansible-collections/community.zabbix/pull/1800).
+  - zabbix_agent - Add ``zabbix_agent_log_dir`` to set the directory of the default log file (https://github.com/ansible-collections/community.zabbix/pull/1800).
+  - zabbix_agent - Build the default ``zabbix_agent_include_dirs`` from ``zabbix_agent_conf_dir`` instead of hardcoding ``/etc/zabbix`` (https://github.com/ansible-collections/community.zabbix/pull/1800).
+deprecated_features:
+  - zabbix_agent - ``zabbix_agent_logfile`` is deprecated in favor of ``zabbix_agent_log_file`` (https://github.com/ansible-collections/community.zabbix/pull/1800).
+bugfixes:
+  - zabbix_agent - On Windows, load config files from the MSI's ``zabbix_agentd.d`` include dir. The role pointed ``Include`` at ``zabbix_agent.d``, which the MSI doesn't create, with a forward-slash wildcard the Windows agent never matched, so files in the include dir were ignored. ``Include`` and ``LogFile`` paths are now written with backslashes (https://github.com/ansible-collections/community.zabbix/pull/1800).
+  - zabbix_agent - On macOS, restart the agent through its launchd label ``com.zabbix.zabbix_agentd``. The handler kickstarted a label that didn't exist (https://github.com/ansible-collections/community.zabbix/pull/1800).
