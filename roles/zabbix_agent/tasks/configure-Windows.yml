@@ -47,11 +47,21 @@
       notify:
         - Restart zabbix-agent
 
-- name: "Windows | Configure zabbix-agent"
+- name: "Configure zabbix-agent"
   ansible.windows.win_template:
     src: agent.conf.j2
     dest: "{{ zabbix_agent_conf_file }}"
   notify: Restart zabbix-agent
+
+- name: "Create include dirs zabbix-agent"
+  ansible.windows.win_file:
+    path: "{{ include_dir }}"
+    state: directory
+  loop: "{{ zabbix_agent_include_dirs }}"
+  loop_control:
+    loop_var: include_dir
+  tags:
+    - config
 
 - name: Toggle firewall
   when: zabbix_win_firewall_management
