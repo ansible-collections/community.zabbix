@@ -1,4 +1,10 @@
 ---
+_zabbix_agent_agentd_includes:
+  - "{{ zabbix_agent_conf_dir }}/zabbix_agentd.d"
+_zabbix_agent_agent2_includes:
+  - "{{ zabbix_agent_conf_dir }}/zabbix_agent2.d"
+  - "{{ zabbix_agent_conf_dir }}/zabbix_agent2.d/plugins.d"
+
 _os_key: "{{ (ansible_facts.os_family in ['RedHat', 'Suse', 'Windows']) | ternary(ansible_facts.os_family, ansible_facts.distribution) }}-{{ ansible_facts.distribution_major_version }}"
 _zabbix_agent_valid_versions:
   Debian-13:

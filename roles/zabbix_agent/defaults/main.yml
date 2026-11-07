@@ -33,7 +33,7 @@ zabbix_agent_enableremotecommands: false
 zabbix_agent_forceactivechecksonstart: false
 zabbix_agent_heartbeatfrequency: 60
 zabbix_agent_hostname: "{{ inventory_hostname }}"
-zabbix_agent_include_dirs: "{{ _zabbix_agent_include_dirs | default(_includes) }}"
+zabbix_agent_include_dirs: "{{ _zabbix_agent_include_dirs | default(zabbix_agent2 | ternary(_zabbix_agent_agent2_includes, _zabbix_agent_agentd_includes)) }}"
 zabbix_agent_include_mode: "0755"
 zabbix_agent_listenip: 0.0.0.0
 zabbix_agent_listenport: 10050
