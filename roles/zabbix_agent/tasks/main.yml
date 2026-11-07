@@ -65,7 +65,6 @@
     loop_var: _install_tasks_file
 
 - name: "Configure Agent"
-  when: ansible_facts['os_family'] not in ['Darwin']
   ansible.builtin.include_tasks: "{{ _configure_tasks_file }}"
   with_first_found:
     - "configure-{{ ansible_facts['os_family'] }}.yml"

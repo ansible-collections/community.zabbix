@@ -1,13 +1,50 @@
 ---
+# Purposefully override this default
+zabbix_agent2: false
+
+_zabbix_agent_mac_arch_map:
+  x86_64: amd64
+  aarch64: arm64
+_zabbix_agent_mac_arch: "{{ _zabbix_agent_mac_arch_map[ansible_facts.architecture] }}"
+
+_zabbix_agent_mac_install_type_map:
+  amd64: tarball
+  arm64: pkg
+_zabbix_agent_mac_install_type: "{{ _zabbix_agent_mac_install_type_map[_zabbix_agent_mac_arch] }}"
+
+_zabbix_agent_mac_package_ext_map:
+  pkg: pkg
+  tarball: tar.gz
+_zabbix_agent_mac_package_ext: "{{ _zabbix_agent_mac_package_ext_map[zabbix_agent_mac_install_type] }}"
+
+# Zabbix stopped building macOS amd64 agents partway through each series;
+# these are the last known releases that have one
+_zabbix_agent_mac_amd64_releases:
+  tarball:
+    "7.4": 7.4.1   # as of 7.4.9
+    "7.0": 7.0.17  # as of 7.0.25
+    "6.0": 6.0.40  # as of 6.0.45
+  pkg:
+    "6.4": 6.4.13
+    "6.0": 6.0.28
+
 _zabbix_agent_download_package: >-
   {{ zabbix_mac_package | default(
-     'zabbix_agent-' ~ zabbix_agent_version_long ~ '-macos-arm64-openssl.pkg') }}
+     'zabbix_agent-' ~ zabbix_agent_version_long
+     ~ '-macos-' ~ _zabbix_agent_mac_arch
+     ~ '-openssl.' ~ _zabbix_agent_mac_package_ext) }}
+
 _zabbix_agent_download_url: >-
   {{ zabbix_mac_download_link | default(
      zabbix_agent_download_base_url
      ~ '/' ~ zabbix_agent_version
-     ~ '/' ~ zabbix_agent_version_long
+     ~ '/' ~ (('latest' in zabbix_agent_version_long) | ternary('latest', zabbix_agent_version_long))
      ~ '/' ~ _zabbix_agent_download_package) }}
+
+zabbix_agent_pidfile: /tmp/zabbix_agentd.pid
+_zabbix_agent_conf_dir: "/usr/local/etc/zabbix"
+
+_zabbix_agent_root_group: wheel
 
 _zabbix_agent_link_templates:
   - macOS by Zabbix agent

@@ -6,8 +6,13 @@ _zabbix_agent_agent2_includes:
   - "{{ zabbix_agent_conf_dir }}/zabbix_agent2.d/plugins.d"
 
 _zabbix_agent_path_sep: "/"
-_zabbix_agent_os_key: "{{ (ansible_facts.os_family in ['RedHat', 'Suse', 'Windows']) | ternary(ansible_facts.os_family, ansible_facts.distribution) }}{% if ansible_facts.os_family not in ['Windows'] %}-{{ ansible_facts.distribution_major_version }}{% endif %}"
+_zabbix_agent_os_key: "{{ (ansible_facts.os_family in ['Darwin', 'RedHat', 'Suse', 'Windows']) | ternary(ansible_facts.os_family, ansible_facts.distribution) }}{% if ansible_facts.os_family not in ['Darwin', 'Windows'] %}-{{ ansible_facts.distribution_major_version }}{% endif %}"
 _zabbix_agent_valid_versions:
+  Darwin:
+    - "7.4"
+    - "7.0"
+    - "6.4" # only for testing
+    - "6.0"
   Debian-13:
     - "7.4"
     - "7.0"

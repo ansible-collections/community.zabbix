@@ -1,0 +1,29 @@
+#- name: "Check installed package version"
+#  ansible.builtin.shell: |
+#    set -o pipefail
+#    pkgutil --pkg-info 'com.zabbix.pkg.ZabbixAgent' | grep 'version:' | cut -d ' ' -f 2
+#  register: pkgutil_version
+#  check_mode: false
+#  changed_when: false
+#  failed_when: pkgutil_version.rc == 2
+
+# If the installed version differs, remove it before installing:
+# 1. Find the package ID, then its version and install location
+#      $ pkgutil --pkgs
+#      $ pkgutil --pkg-info com.zabbix.pkg.ZabbixAgent
+# 2. Stop the service and unload it from launchd
+#      $ launchctl bootout system/com.zabbix.zabbix_agentd
+# 3. List the files the package installed (paths are relative to the
+#    location from --pkg-info)
+#      $ pkgutil --only-files --files com.zabbix.pkg.ZabbixAgent
+# 4. Delete all files listed
+# 5. Forget the package last, so a failed delete can be retried
+#      $ pkgutil --forget com.zabbix.pkg.ZabbixAgent
+
+- name: "Install the Zabbix package"
+#  when:
+#    - pkgutil_version.stdout != zabbix_agent_version_long
+  become: true
+  command:
+    cmd: "installer -pkg /tmp/{{ zabbix_agent_download_filename }} -target /"
+    creates: /Library/LaunchDaemons/com.zabbix.zabbix_agentd.plist
