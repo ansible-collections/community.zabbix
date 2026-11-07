@@ -84,8 +84,7 @@ zabbix_host_status: enabled # or disabled
 zabbix_agent_proxy: null
 zabbix_agent_inventory_mode: disabled
 zabbix_useuip: 1
-zabbix_host_groups:
-  - Linux servers
+zabbix_host_groups: "{{ _zabbix_agent_host_groups | default(['Linux servers']) }}"
 zabbix_agent_link_templates: "{{ _zabbix_agent_link_templates | default(['Linux by Zabbix agent']) }}"
 
 zabbix_agent_interfaces:
@@ -114,6 +113,9 @@ zabbix_agent_ipmi_privilege: 2
 zabbix_agent_download_base_url: https://cdn.zabbix.com/zabbix/binaries/stable
 zabbix_agent_download_url: "{{ _zabbix_agent_download_url }}"
 zabbix_agent_download_filename: "{{ _zabbix_agent_download_package }}"
+
+# MacOS
+zabbix_agent_mac_install_type: "{{ _zabbix_agent_mac_install_type }}"
 
 # Windows
 zabbix_agent_win_install_dir: "C:/Program Files/{{ zabbix_agent2 | ternary('Zabbix Agent 2', 'Zabbix Agent') }}"
