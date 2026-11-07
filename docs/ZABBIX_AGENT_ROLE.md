@@ -102,6 +102,7 @@ See the following list of supported Operating systems with the Zabbix releases:
 | FreeBSD 15          |  V  |  V  |  V  |  V  |
 | FreeBSD 14          |  V  |  V  |  V  |  V  |
 | FreeBSD 13          |  V  |  V  |  V  |  V  |
+| macOS               |  V  |     |  V  |  V  |
 
 You can bypass this matrix by setting `zabbix_agent_version_check: false`
 
