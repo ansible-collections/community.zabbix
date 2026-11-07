@@ -82,7 +82,7 @@ Include={{ (item ~ '/*.conf') | replace('/', _zabbix_agent_path_sep) }}
 {{ (zabbix_agent_loadmodule is defined and zabbix_agent_loadmodule is not none) | ternary('', '# ') }}LoadModule={{ zabbix_agent_loadmodule | default('') }}
 {{ (zabbix_agent_loadmodulepath is defined and zabbix_agent_loadmodulepath is not none) | ternary('', '# ') }}LoadModulePath={{ zabbix_agent_loadmodulepath | default('') }}
 {% endif %}
-{{ (zabbix_agent_logfile is defined and zabbix_agent_logfile is not none) | ternary('', '# ') }}LogFile={{ zabbix_agent_logfile | default('') | replace('/', _zabbix_agent_path_sep) }}
+{{ (zabbix_agent_log_file is defined and zabbix_agent_log_file is not none) | ternary('', '# ') }}LogFile={{ zabbix_agent_log_file | default('') | replace('/', _zabbix_agent_path_sep) }}
 {{ (zabbix_agent_logfilesize is defined and zabbix_agent_logfilesize is not none) | ternary('', '# ') }}LogFileSize={{ zabbix_agent_logfilesize | default('') }}
 {% if not zabbix_agent2 %}
 {{ (zabbix_agent_logremotecommands is defined and zabbix_agent_logremotecommands is not none) | ternary('', '# ') }}LogRemoteCommands={{ zabbix_agent_logremotecommands | default (false) | ternary('1', '0') }}

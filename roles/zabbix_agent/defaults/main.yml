@@ -37,7 +37,8 @@ zabbix_agent_include_dirs: "{{ _zabbix_agent_include_dirs | default(zabbix_agent
 zabbix_agent_include_mode: "0755"
 zabbix_agent_listenip: 0.0.0.0
 zabbix_agent_listenport: 10050
-zabbix_agent_logfile: "{{ _zabbix_agent_logfile | default('/var/log/zabbix/' ~ zabbix_agent2 | ternary('zabbix_agent2.log', 'zabbix_agentd.log')) }}"
+zabbix_agent_log_dir: "{{ _zabbix_agent_log_dir | default('/var/log/zabbix') }}"
+zabbix_agent_log_file: "{{ zabbix_agent_logfile | default(zabbix_agent_log_dir ~ '/' ~ zabbix_agent2 | ternary('zabbix_agent2.log', 'zabbix_agentd.log')) }}"
 zabbix_agent_logfilesize: 100
 zabbix_agent_logtype: file
 zabbix_agent_maxlinespersecond: 20

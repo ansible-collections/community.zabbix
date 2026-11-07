@@ -345,7 +345,7 @@ The following table lists all variables that are exposed to modify the configura
 | ListenPort | zabbix_agent_listenport | 10050 |  |
 | LoadModule | zabbix_agent_loadmodule |  | Agent On Linux Only |
 | LoadModulePath | zabbix_agent_loadmodulepath |  | Agent On Linux Only |
-| LogFile | zabbix_agent_logfile | /var/log/zabbix/`{{ agent version specific }}`.log |  |
+| LogFile | zabbix_agent_log_file | `{{ zabbix_agent_log_dir }}`/`{{ agent version specific }}`.log | Formerly `zabbix_agent_logfile` (deprecated) |
 | LogFileSize | zabbix_agent_logfilesize | 100 |  |
 | LogRemoteCommands | zabbix_agent_logremotecommands | `False` | `True`/`False` Agent Only |
 | LogType | zabbix_agent_logtype | file |  |
