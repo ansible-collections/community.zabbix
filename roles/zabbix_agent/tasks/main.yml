@@ -5,9 +5,6 @@
   tags:
     - always
 
-- name: Load Appropriate Defaults
-  ansible.builtin.include_vars: "{{ zabbix_agent2 | ternary('agent2', 'agent') }}_vars.yml"
-
 - name: Include deprecation checks
   include_tasks: deprecation_checks.yml
 

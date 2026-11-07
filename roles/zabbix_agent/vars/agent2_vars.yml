@@ -1,3 +1,0 @@
-_includes:
-  - /etc/zabbix/zabbix_agent2.d
-  - /etc/zabbix/zabbix_agent2.d/plugins.d
