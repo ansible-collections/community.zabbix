@@ -53,7 +53,7 @@ zabbix_agent_tlsconnect: "unencrypted"
 zabbix_agent_tlspsk_auto: false
 zabbix_agent_tlspskfile: "{{ zabbix_agent_conf_dir }}/tls_psk_auto.secret"
 zabbix_agent_tlspskidentity_file: "{{ zabbix_agent_conf_dir }}/tls_psk_auto.identity"
-zabbix_agent_tls_subject: "{{ _tls_subject }}"
+zabbix_agent_tls_subject: "{{ zabbix_agent_tlsservercertsubject | default(omit) }}" # FIXME this is not correct and should be removed with 2.0.0, here only to prevent regression
 
 zabbix_agent_unsafeuserparameters: false
 zabbix_agent_runas_user: zabbix
