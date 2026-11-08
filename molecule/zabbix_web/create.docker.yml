@@ -12,6 +12,7 @@
       v70: "7.0"
       v74: "7.4"
       v80: "8.0"
+    _pgsql_13_versions: ['v60', 'v70', 'v74']
 
   pre_tasks:
     - name: Create network
@@ -37,12 +38,13 @@
             label: "{{ item.name }}-db"
           when: (item.groups | intersect(_database_groups) | length) > 0
           vars:
+            _pgsql_tag: "{{ (item.groups | intersect(_pgsql_13_versions) | length > 0) | ternary('latest-pg13', 'latest-pg15') }}"
             _container:
               mysql:
                 image: "mysql:8.4.8"
                 env: { MYSQL_ROOT_PASSWORD: changeme }
               pgsql:
-                image: "timescale/timescaledb:latest-pg13"
+                image: "timescale/timescaledb:{{ _pgsql_tag }}"
                 env:
                   POSTGRES_USER: zabbix
                   POSTGRES_PASSWORD: zabbix

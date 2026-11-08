@@ -45,6 +45,7 @@ jobs:
           - nginx
           - apache
         version:
+          - v80
           - v74
           - v70
           - v60
@@ -127,6 +128,7 @@ jobs:
           - nginx
           - apache
         version:
+          - v80
           - v74
           - v70
           - v60

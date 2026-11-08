@@ -9,7 +9,7 @@ driver:
   name: default
 
 platforms:
-  - name: zabbix-web-${MY_MOLECULE_WEB_SERVER:-apache}-${MY_MOLECULE_DATABASE:-mysql}-${MY_MOLECULE_VERSION:-v74}-${MY_MOLECULE_CONTAINER:-rockylinux10}
+  - name: zabbix-web-${MY_MOLECULE_WEB_SERVER:-apache}-${MY_MOLECULE_DATABASE:-mysql}-${MY_MOLECULE_VERSION:-v80}-${MY_MOLECULE_CONTAINER:-rockylinux10}
     image: geerlingguy/docker-${MY_MOLECULE_IMAGE:-rockylinux10}-ansible:latest
     privileged: true
     pre_build_image: true
@@ -20,7 +20,7 @@ platforms:
     groups:
       - ${MY_MOLECULE_WEB_SERVER:-apache}
       - ${MY_MOLECULE_DATABASE:-mysql}
-      - ${MY_MOLECULE_VERSION:-v74}
+      - ${MY_MOLECULE_VERSION:-v80}
 
 #  # Developer example
 #  - name: zabbix-web-apache-mysql-v74-debian13
@@ -86,6 +86,8 @@ provisioner:
         zabbix_server_dbhost: "{{ inventory_hostname }}-db"
         zabbix_server_dbname: zabbix
         zabbix_api_server_url: "{{ inventory_hostname }}"
+      v80:
+        zabbix_web_version: "8.0"
       v74:
         zabbix_web_version: "7.4"
       v70:
