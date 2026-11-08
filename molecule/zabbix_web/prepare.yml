@@ -5,6 +5,7 @@
   pre_tasks:
     # issues on redhat with curl, so install curl-minimal.
     # suse containers have a partial python3.11 install, py311-rpm needed for ansible.builtin.package_facts
+    # apt-key needs dirmngr to fetch the ppa:ondrej/php key
     - name: "Installing packages"
       ansible.builtin.package:
         name: "{{ _packages | select | list }}"
@@ -14,6 +15,7 @@
         _packages:
           - "curl{% if ansible_facts['os_family'] == 'RedHat' and ansible_facts['distribution_major_version'] | int > 8 %}-minimal{% endif %}"
           - "{{ (ansible_facts['os_family'] == 'Suse') | ternary(_py3_rpm, '') }}"
+          - "{{ (ansible_facts['distribution'] == 'Ubuntu' and ansible_facts['distribution_major_version'] == '22') | ternary('dirmngr', '') }}"
           - sudo
       register: installation_dependencies
       until: installation_dependencies is succeeded
@@ -24,12 +26,26 @@
         line: "Defaults    !requiretty"
         state: present
 
-    - name: Enabling PHP 8.0
+    # Zabbix 8.0 frontend needs PHP 8.2+, EL8 and EL9 default to older streams
+    - name: Enabling PHP module stream
       ansible.builtin.dnf:
-        name: "@php:8.0/common"
+        name: "@php:{{ _php_stream }}/common"
+      vars:
+        _php_stream: "{{ (zabbix_web_version is version('8.0', '>=')) | ternary('8.2', '8.0') }}"
       when:
         - ansible_facts['os_family'] == 'RedHat'
-        - ansible_facts['distribution_major_version'] == "8"
+        - ansible_facts['distribution_major_version'] in ["8", "9"]
+        # EL9 has no php:8.0 stream, its default is already 8.0
+        - ansible_facts['distribution_major_version'] == "8" or zabbix_web_version is version('8.0', '>=')
+
+    # Ubuntu 22.04 only ships PHP 8.1
+    - name: Adding ppa:ondrej/php
+      ansible.builtin.apt_repository:
+        repo: ppa:ondrej/php
+      when:
+        - ansible_facts['distribution'] == 'Ubuntu'
+        - ansible_facts['distribution_major_version'] == "22"
+        - zabbix_web_version is version('8.0', '>=')
 
   tasks:
     - name: Install prerequisite packages for zabbix_web role
