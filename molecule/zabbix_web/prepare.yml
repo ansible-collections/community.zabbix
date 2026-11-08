@@ -88,6 +88,8 @@
       loop:
         - rewrite
         - ssl
+        # Ubuntu 26.04+ zabbix-apache-conf uses php-fpm
+        - proxy_fcgi
       notify: restart apache
 
     - name: Suse | Enable apache modules

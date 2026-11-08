@@ -11,7 +11,8 @@ _zabbix_web_vhost_location:
 _apache_log: apache2
 _apache_test_cmd: apache2ctl configtest
 
-_zabbix_web_create_php_fpm: "{{ zabbix_web_http_server != 'apache' }}"
+# Zabbix's apache packages use php-fpm instead of mod_php from Ubuntu 26.04
+_zabbix_web_create_php_fpm: "{{ zabbix_web_http_server != 'apache' or (ansible_facts.distribution == 'Ubuntu' and ansible_facts.distribution_major_version is version('26', '>=')) }}"
 _zabbix_php_fpm_dir: /etc/php/{{ zabbix_web_php_installed_version }}/fpm/pool.d
 _zabbix_web_php_fpm_conf_file: /etc/zabbix/php-fpm.conf
 _zabbix_php_fpm_listen: /var/run/php/zabbix.sock
