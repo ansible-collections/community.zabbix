@@ -7,6 +7,7 @@
 - [Overview](#overview)
 - [Requirements](#requirements)
   - [Operating Systems](#operating-systems)
+  - [Web server](#web-server)
   - [Zabbix Versions](#zabbix-versions)
 - [Installation](#installation)
 - [Role Variables](#role-variables)
@@ -43,6 +44,18 @@ This role will work on the following operating systems:
 So, you'll need one of those operating systems.. :-)
 Please send Pull Requests or suggestions when you want to use this role for other Operating systems.
 
+## Web server
+
+This role installs the Zabbix frontend and configures its virtual host, but it does not install or configure the web server itself. Apache or Nginx, PHP and any required modules need to be in place before running the role.
+
+With Apache on Debian and Ubuntu, enable these modules (for example with `a2enmod` or `community.general.apache2_module`):
+
+ * `rewrite`, always.
+ * `ssl`, when `zabbix_web_tls` is enabled.
+ * `proxy_fcgi`, when PHP is served by php-fpm (`zabbix_web_create_php_fpm`). This is the default from Ubuntu 26.04, where Zabbix's `zabbix-apache-conf` package moved from mod_php to php-fpm.
+
+See `molecule/zabbix_web/prepare.yml` for a working example.
+
 ## Ansible 2.10 and higher
 
 With the release of Ansible 2.10, modules have been moved into collections.  With the exception of ansible.builtin modules, this means additonal collections must be installed in order to use modules such as seboolean (now ansible.posix.seboolean).  The following collections are now required: `ansible.posix`.  Installing the collections:
@@ -60,6 +73,7 @@ See the following list of supported Operating Systems with the Zabbix releases.
 |-----------------------|-----|-----|-----|-----|-----|
 | Red Hat Fam 9         |  V  |  V  |  V  |  V  |  V  |
 | Red Hat Fam 8         |  V  |  V  |  V  |  V  |  V  |
+| Ubuntu 26.04 resolute |  V  |  V  |     |  V  |     |
 | Ubuntu 24.04 noble    |  V  |  V  |  V  |  V  |  V  |
 | Ubuntu 22.04 jammy    |  V  |  V  |  V  |  V  |  V  |
 | Debian 12 bookworm    |  V  |  V  |  V  |  V  |  V  |
