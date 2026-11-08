@@ -77,11 +77,11 @@ provisioner:
       all:
         ansible_connection: community.docker.docker
       v74:
-        zabbix_server_version: 7.4
+        zabbix_server_version: "7.4"
       v70:
-        zabbix_server_version: 7.0
+        zabbix_server_version: "7.0"
       v60:
-        zabbix_server_version: 6.0
+        zabbix_server_version: "6.0"
       mysql:
         zabbix_server_dbname: zabbix
         zabbix_server_dbuser: zabbix-dbuser
@@ -104,4 +104,4 @@ provisioner:
         zabbix_server_dbschema: zabbix
 
 verifier:
-  name: testinfra
+  name: ansible
