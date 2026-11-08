@@ -42,6 +42,7 @@ jobs:
           - mysql
           - pgsql
         version:
+          - v80
           - v74
           - v70
           - v60
@@ -120,6 +121,7 @@ jobs:
           - mysql
           - pgsql
         version:
+          - v80
           - v74
           - v70
           - v60
