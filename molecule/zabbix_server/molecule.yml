@@ -9,7 +9,7 @@ driver:
   name: default
 
 platforms:
-  - name: zabbix-server-${MY_MOLECULE_VERSION:-v74}-${MY_MOLECULE_DATABASE:-mysql}-${MY_MOLECULE_CONTAINER:-rockylinux10}
+  - name: zabbix-server-${MY_MOLECULE_DATABASE:-mysql}-${MY_MOLECULE_VERSION:-v80}-${MY_MOLECULE_CONTAINER:-rockylinux10}
     image: geerlingguy/docker-${MY_MOLECULE_IMAGE:-rockylinux10}-ansible:latest
     privileged: true
     pre_build_image: true
@@ -19,7 +19,7 @@ platforms:
     cgroupns_mode: host
     groups:
       - ${MY_MOLECULE_DATABASE:-mysql}
-      - ${MY_MOLECULE_VERSION:-v74}
+      - ${MY_MOLECULE_VERSION:-v80}
 
 #  # Developer example
 #  - name: zabbix-server-mysql-v80-debian13
@@ -76,6 +76,8 @@ provisioner:
     group_vars:
       all:
         ansible_connection: community.docker.docker
+      v80:
+        zabbix_server_version: "8.0"
       v74:
         zabbix_server_version: "7.4"
       v70:
@@ -99,6 +101,8 @@ provisioner:
         zabbix_server_pgsql_login_host: "{{ inventory_hostname }}-db"
         zabbix_server_pgsql_login_user: postgres
         zabbix_server_pgsql_login_password: changeme
+        # PostgreSQL 14+ images only accept SCRAM, and 8.0 needs PostgreSQL 15+
+        zabbix_server_dbpassword_hash_method: scram-sha-256
         zabbix_server_database_timescaledb: true
         zabbix_server_database_timescaledb_force_schema: true
         zabbix_server_dbschema: zabbix

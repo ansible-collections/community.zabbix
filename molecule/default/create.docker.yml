@@ -39,10 +39,13 @@
       vars:
         _database_groups: ['mysql', 'pgsql']
         _db_type: "{{ item.groups | intersect(_database_groups) | first }}"
+        # Zabbix 8.0+ needs PostgreSQL 15+ and TimescaleDB 2.20-2.29
+        _pgsql_13_versions: ['v60', 'v70', 'v74']
+        _pgsql_tag: "{{ (item.groups | intersect(_pgsql_13_versions) | length > 0) | ternary('latest-pg13', 'latest-pg15') }}"
         _container:
           mysql:
             image: "mysql:8.4.8"
             env: { MYSQL_ROOT_PASSWORD: changeme }
           pgsql:
-            image: "timescale/timescaledb:latest-pg13"
+            image: "timescale/timescaledb:{{ _pgsql_tag }}"
             env: { POSTGRES_PASSWORD: changeme }
