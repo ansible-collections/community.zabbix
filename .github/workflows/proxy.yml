@@ -6,6 +6,8 @@ on:
     paths:
       - "roles/zabbix_proxy/**"
       - "molecule/zabbix_proxy/**"
+      - "molecule/default/create.with_stack.docker.yml"
+      - "molecule/default/destroy.with_stack.docker.yml"
       - "molecule/requirements.txt"
       - ".github/workflows/proxy.yml"
       - "roles/zabbix_repo/**"
@@ -13,6 +15,8 @@ on:
     paths:
       - "roles/zabbix_proxy/**"
       - "molecule/zabbix_proxy/**"
+      - "molecule/default/create.with_stack.docker.yml"
+      - "molecule/default/destroy.with_stack.docker.yml"
       - "molecule/requirements.txt"
       - ".github/workflows/proxy.yml"
       - "roles/zabbix_repo/**"

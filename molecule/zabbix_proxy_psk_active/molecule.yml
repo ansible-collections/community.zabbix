@@ -24,11 +24,11 @@ platforms:
 provisioner:
   name: ansible
   playbooks:
-    create: ../zabbix_proxy/create.docker.yml
+    create: ../default/create.with_stack.docker.yml
     prepare: ../zabbix_proxy/prepare.yml
     converge: ../zabbix_proxy/converge.yml
     verify: ../zabbix_proxy/verify.yml
-    destroy: ../zabbix_proxy/destroy.docker.yml
+    destroy: ../default/destroy.with_stack.docker.yml
   env:
     # https://github.com/ansible/molecule/issues/4015#issuecomment-1680859724
     ANSIBLE_ROLES_PATH: ../../roles
