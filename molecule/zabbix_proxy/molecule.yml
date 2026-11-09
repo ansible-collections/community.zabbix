@@ -56,8 +56,8 @@ platforms:
 provisioner:
   name: ansible
   playbooks:
-    create: create.docker.yml
-    destroy: destroy.docker.yml
+    create: ../default/create.with_stack.docker.yml
+    destroy: ../default/destroy.with_stack.docker.yml
   env:
     # https://github.com/ansible/molecule/issues/4015#issuecomment-1680859724
     ANSIBLE_ROLES_PATH: ../../roles

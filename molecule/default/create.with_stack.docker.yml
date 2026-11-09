@@ -18,10 +18,10 @@
       community.docker.docker_network:
         name: zabbix
 
-    # We create 1 zabbix db/server/web instance per version of zabbix proxy we're testing.
+    # We create 1 zabbix db/server/web instance per zabbix version we're testing.
     # For github workflows this is a 1-1 mapping, but developers can add multiple
     # entries to molecule_yml.platforms to test multiple configurations at once, and
-    # we don't need 3x the containers for every configuration when testing integration between proxy and server.
+    # we don't need 3x the containers for every configuration when testing integration with the server.
     - name: Create dependency/integration containers
       vars:
         # molecule_yml.platforms    => [ { ..., "groups": [ "mysql", "v74" ], ... }, { ... } ]
