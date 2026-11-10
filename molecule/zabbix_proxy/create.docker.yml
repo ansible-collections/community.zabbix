@@ -12,6 +12,7 @@
       v70: "7.0"
       v74: "7.4"
       v80: "8.0"
+    _pgsql_13_versions: ['v60', 'v70', 'v74']
 
   pre_tasks:
     - name: Create network
@@ -30,10 +31,10 @@
         # intersect(_version_groups => [ "v74", "v70", "v60" ]
         _active_versions: "{{ molecule_yml.platforms | map(attribute='groups') | flatten | intersect(_version_groups) }}"
       block:
-        - name: Create Zabbix server database container
+        - name: Create Zabbix server database container(s)
           community.docker.docker_container:
             name: "zabbix-server-{{ _version }}-db"
-            image: "timescale/timescaledb:latest-pg13"
+            image: "timescale/timescaledb:{{ _pgsql_tag }}"
             state: started
             recreate: true
             networks:
@@ -45,8 +46,10 @@
           loop_control:
             label: "zabbix-server-{{ _version }}-db"
             loop_var: _version
+          vars:
+            _pgsql_tag: "{{ (_version in _pgsql_13_versions) | ternary('latest-pg13', 'latest-pg15') }}"
 
-        - name: Create Zabbix server container
+        - name: Create Zabbix server container(s)
           community.docker.docker_container:
             name: "zabbix-server-{{ _version }}"
             image: "zabbix/zabbix-server-pgsql:alpine-{{ _g_to_v[_version] }}-latest"
@@ -105,12 +108,13 @@
       vars:
         _database_groups: ['mysql', 'pgsql']
         _db_type: "{{ item.groups | intersect(_database_groups) | first }}"
+        _pgsql_tag: "{{ (item.groups | intersect(_pgsql_13_versions) | length > 0) | ternary('13', '15') }}"
         _container:
           mysql:
             image: "mysql:8.4.8"
             env: { MYSQL_ROOT_PASSWORD: changeme }
           pgsql:
-            image: "postgres:13"
+            image: "postgres:{{ _pgsql_tag }}"
             env: { POSTGRES_PASSWORD: changeme }
 
     - name: Create OS container(s)

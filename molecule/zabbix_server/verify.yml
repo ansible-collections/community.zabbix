@@ -1,0 +1,78 @@
+---
+- name: Verify zabbix_server
+  hosts: all
+  gather_facts: true
+
+  tasks:
+    - name: Gather package facts
+      ansible.builtin.package_facts:
+
+    - name: Assert zabbix-server package is installed with correct version
+      ansible.builtin.assert:
+        that:
+          - "'zabbix-server-' ~ zabbix_server_database in ansible_facts.packages"
+          - zabbix_server_version in (ansible_facts.packages['zabbix-server-' ~ zabbix_server_database] | first).version
+
+    - name: Gather service facts
+      ansible.builtin.service_facts:
+
+    - name: Assert zabbix-server service is enabled and running
+      ansible.builtin.assert:
+        that:
+          - ansible_facts.services['zabbix-server.service'].status == 'enabled'
+          - ansible_facts.services['zabbix-server.service'].state == 'running'
+
+    - name: Stat zabbix_server.conf
+      ansible.builtin.stat:
+        path: /etc/zabbix/zabbix_server.conf
+      register: _server_conf
+
+    - name: Assert zabbix_server.conf exists with correct ownership and mode
+      ansible.builtin.assert:
+        that:
+          - _server_conf.stat.exists
+          - _server_conf.stat.pw_name == 'zabbix'
+          - _server_conf.stat.gr_name == 'zabbix'
+          - _server_conf.stat.mode == '0640'
+
+    - name: Read zabbix_server.conf
+      ansible.builtin.slurp:
+        src: /etc/zabbix/zabbix_server.conf
+      register: _server_conf_content
+
+    - name: Assert zabbix_server.conf contains expected settings
+      ansible.builtin.assert:
+        that:
+          - "'ListenPort=10051' in _server_conf_content.content | b64decode"
+          - "'DebugLevel=3' in _server_conf_content.content | b64decode"
+
+    - name: Stat zabbix_server.d include directory
+      ansible.builtin.stat:
+        path: /etc/zabbix/zabbix_server.d
+      register: _server_include_dir
+
+    - name: Assert include directory exists with correct ownership
+      ansible.builtin.assert:
+        that:
+          - _server_include_dir.stat.exists
+          - _server_include_dir.stat.isdir
+          - _server_include_dir.stat.pw_name == 'zabbix'
+          - _server_include_dir.stat.gr_name == 'zabbix'
+
+    - name: Check zabbix_server.log
+      block:
+        - name: Read zabbix_server log file
+          ansible.builtin.slurp:
+            src: /var/log/zabbix/zabbix_server.log
+          register: _server_log
+          until: >
+            (_server_log.content | b64decode) is not search('Access denied for user') and
+            (_server_log.content | b64decode) is not search('database is down: reconnecting') and
+            (_server_log.content | b64decode) is not search('Both are missing in the system.') and
+            (_server_log.content | b64decode) is search('current database version') and
+            (_server_log.content | b64decode) is search('server #0 started \[main process\]')
+          retries: 12
+          delay: 10
+      always:
+        - debug:
+            msg: "{{ _server_log.content | b64decode | split('\n') }}"
