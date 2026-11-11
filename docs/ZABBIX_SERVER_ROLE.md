@@ -7,6 +7,7 @@
 - [Overview](#overview)
 - [Requirements](#requirements)
   * [Operating systems](#operating-systems)
+  * [Database server](#database-server)
   * [Zabbix Versions](#zabbix-versions)
 - [Installation](#installation)
 - [Role Variables](#role-variables)
@@ -46,6 +47,10 @@ This role will work on the following operating systems:
 
 So, you'll need one of those operating systems.. :-)
 Please send Pull Requests or suggestions when you want to use this role for other Operating systems.
+
+## Database server
+
+This role does not install a database server. A MySQL or PostgreSQL instance must already be installed and running, either on the Zabbix Server host or on a separate host, before you run this role. By default the role then creates the Zabbix database and user and loads the schema (see `zabbix_server_database_creation` and `zabbix_server_database_sqlload`); see [Database](#database) for the supported setups.
 
 ## Ansible 2.10 and higher
 
