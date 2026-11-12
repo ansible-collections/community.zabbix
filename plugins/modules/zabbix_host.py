@@ -165,6 +165,11 @@ options:
                             - 0 (don't use bulk requests), 1 (use bulk requests)
                         choices: [0, 1]
                         default: 1
+                    max_repetitions:
+                        type: int
+                        description:
+                            - Max SNMP values per SNMP bulk request.
+                        default: 10
                     community:
                         type: str
                         description:
@@ -957,6 +962,7 @@ def update_exist_interfaces_with_defaults(exist_interfaces):
     default_interface_details = {
         "version": 2,
         "bulk": 1,
+        "max_repetitions": 10,
         "community": "",
         "securityname": "",
         "contextname": "",
@@ -1049,6 +1055,7 @@ def main():
                     options=dict(
                         version=dict(type="int", choices=[1, 2, 3], default=2),
                         bulk=dict(type="int", choices=[0, 1], default=1),
+                        max_repetitions=dict(type="int", default=10),
                         community=dict(type="str", default=""),
                         securityname=dict(type="str", default=""),
                         contextname=dict(type="str", default=""),

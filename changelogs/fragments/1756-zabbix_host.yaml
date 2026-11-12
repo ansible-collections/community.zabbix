@@ -1,0 +1,2 @@
+minor_changes:
+  - zabbix_host - add max repetition count option to SNMP interface.
