@@ -1,0 +1,3 @@
+bugfixes:
+  - zabbix_inventory - fix API token authentication handshake for Zabbix 8.0 instances by bypassing deprecated user.login calls.
+  - zabbix_inventory - sanitize dynamic host group names containing colons and slashes to prevent Ansible group name warnings.
