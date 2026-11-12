@@ -1,9 +1,0 @@
----
-scenario:
-  name: autopsk
-provisioner:
-  name: ansible
-  inventory:
-    group_vars:
-      all:
-        zabbix_agent_tlspsk_auto: True

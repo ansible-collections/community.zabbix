@@ -13,11 +13,33 @@
       v74: "7.4"
       v80: "8.0"
     _pgsql_13_versions: ['v60', 'v70', 'v74']
+    # Test CA and certs, shared with the scenario's prepare.yml
+    _pki_dir: "{{ lookup('env', 'MOLECULE_EPHEMERAL_DIRECTORY') }}/pki"
 
   pre_tasks:
     - name: Create network
       community.docker.docker_network:
         name: zabbix
+
+    - name: Create PKI directory
+      file:
+        path: "{{ _pki_dir }}"
+        state: directory
+        mode: "0755"
+
+    # XXX we'd use community.crypto, but it feels like waste replacing this one
+    # command with three lengthy tasks
+    - name: Create test root CA
+      command: >-
+        openssl req -newkey ec -pkeyopt ec_paramgen_curve:P-256 -nodes
+          -subj '/O=ansible_collections/OU=community.zabbix/CN=Molecule Root CA' -days 7300
+          -x509 -extensions v3_ca
+            -addext 'keyUsage = critical, cRLSign, keyCertSign'
+          -keyout ca.key
+          -out ca.crt
+      args:
+        chdir: "{{ _pki_dir }}"
+        creates: ca.crt
 
     # We create 1 zabbix db/server/web instance per zabbix version we're testing.
     # For github workflows this is a 1-1 mapping, but developers can add multiple
@@ -49,6 +71,36 @@
           vars:
             _pgsql_tag: "{{ (_version in _pgsql_13_versions) | ternary('latest-pg13', 'latest-pg15') }}"
 
+        - name: Create Zabbix server certificate(s)
+          command: >-
+            openssl req -newkey ec -pkeyopt ec_paramgen_curve:P-256 -nodes
+              -subj '/O=ansible_collections/OU=community.zabbix/CN={{ _cn }}' -days 365
+              -extensions usr_cert
+                -addext 'keyUsage = critical, digitalSignature'
+                -addext 'basicConstraints = critical, CA:FALSE'
+                -addext 'extendedKeyUsage = serverAuth, clientAuth'
+                -addext 'subjectAltName = DNS:{{ _cn }}'
+              -CAkey ca.key -CA ca.crt
+              -keyout {{ _cn }}.key
+              -out {{ _cn }}.crt
+          args:
+            chdir: "{{ _pki_dir }}"
+            creates: "{{ _cn }}.crt"
+          loop: "{{ _active_versions }}"
+          loop_control:
+            loop_var: _version
+          vars:
+            _cn: "zabbix-server-{{ _version }}"
+
+        # The server container runs as uid 1997, so the key must be world-readable.
+        - name: Make Zabbix server key(s) readable by the container
+          file:
+            path: "{{ _pki_dir }}/zabbix-server-{{ _version }}.key"
+            mode: "0644"
+          loop: "{{ _active_versions }}"
+          loop_control:
+            loop_var: _version
+
         - name: Create Zabbix server container(s)
           community.docker.docker_container:
             name: "zabbix-server-{{ _version }}"
@@ -57,6 +109,10 @@
             recreate: true
             networks:
               - name: zabbix
+            volumes:
+              - "{{ _pki_dir }}/zabbix-server-{{ _version }}.key:{{ _tls_dir }}/server.key:ro,z"
+              - "{{ _pki_dir }}/zabbix-server-{{ _version }}.crt:{{ _tls_dir }}/server.crt:ro,z"
+              - "{{ _pki_dir }}/ca.crt:{{ _tls_dir }}/ca.crt:ro,z"
             env:
               DB_SERVER_HOST: "zabbix-server-{{ _version }}-db"
               POSTGRES_USER: "zabbix"
@@ -64,10 +120,19 @@
               POSTGRES_DB: "zabbix"
               ENABLE_TIMESCALEDB: "true"
               ZBX_PROXYCONFIGFREQUENCY: "10"
+              # Only used for hosts/proxies configured for certificate TLS
+              ZBX_TLSKEYFILE: "{{ _tls_dir }}/server.key"
+              ZBX_TLSCERTFILE: "{{ _tls_dir }}/server.crt"
+              ZBX_TLSCAFILE: "{{ _tls_dir }}/ca.crt"
           loop: "{{ _active_versions }}"
           loop_control:
             label: "zabbix-server-{{ _version }}"
             loop_var: _version
+          vars:
+            # Absolute paths work on all image versions.
+            # TODO: 8.0 images moved mounted secrets to /run/zabbix/secrets/tls
+            # https://github.com/zabbix/zabbix-docker#compatibility-notes
+            _tls_dir: /var/lib/zabbix/enc
 
         - name: Create Zabbix web container
           community.docker.docker_container:
