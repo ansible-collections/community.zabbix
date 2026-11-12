@@ -167,13 +167,14 @@ Selinux changes will be installed based on the status of selinux running on the 
 
 ## TLS Specific configuration
 * `zabbix_agent_tlspsk_auto`: Enables auto generation and storing of individual pre-shared keys and identities on clients. Is false by default. If set to true and if `zabbix_agent_tlspskfile` and `zabbix_agent_tlspsk_secret` are undefined, it generates the files `/etc/zabbix/tls_psk_auto.identity` and `/etc/zabbix/tls_psk_auto.secret`, which are populated by values automatically (identity is set to hostname, underscore and 4 random alphanumeric digits; secret is 64 random alphanumeric digits) in such a way that the values are generated once and are never overwritten.
+  It also sets `zabbix_agent_tlsconnect` to `psk` and adds `psk` to `zabbix_agent_tlsaccept`. With the default `zabbix_agent_tlsaccept` this gives `psk,unencrypted`, so the agent still accepts unencrypted connections. Set `zabbix_agent_tlsaccept: psk` to accept PSK connections only.
 
 * `zabbix_agent_tlsconnect`: How the agent should connect to server or proxy. Used for active checks.
     Possible values:
     * unencrypted
     * psk
     * cert
-* `zabbix_agent_tlsaccept`: What incoming connections to accept.
+* `zabbix_agent_tlsaccept`: What incoming connections to accept. Several values can be combined, separated by commas, e.g. `psk,cert`.
     Possible values:
     * unencrypted
     * psk
@@ -366,7 +367,7 @@ The following table lists all variables that are exposed to modify the configura
 | StartAgents | zabbix_agent_startagents | 3 | Agent Only |
 | StatusPort | zabbix_agent_statusport | 9999 | Agent 2 Only |
 | Timeout | zabbix_agent_timeout | 3 |  |
-| TLSAccept | zabbix_agent_tlsconnect | unencrypted | Is overridden with `zabbix_agent_tlspsk_auto` == True |
+| TLSAccept | zabbix_agent_tlsaccept | unencrypted | Is overridden with `zabbix_agent_tlspsk_auto` == True |
 | TLSCAFile | zabbix_agent_tlscafile | /etc/zabbix/tls_psk_auto.secret |  |
 | TLSCertFile | zabbix_agent_tlscertfile |  |  |
 | TLSCipherAll | zabbix_agent_tlscipherall |  | Agent on Linux Only |
