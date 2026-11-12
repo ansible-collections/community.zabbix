@@ -6,6 +6,8 @@ on:
     paths:
       - "roles/zabbix_agent/**"
       - "molecule/zabbix_agent/**"
+      - "molecule/default/create.with_stack.docker.yml"
+      - "molecule/default/destroy.with_stack.docker.yml"
       - "molecule/requirements.txt"
       - ".github/workflows/agent.yml"
       - "roles/zabbix_repo/**"
@@ -13,6 +15,8 @@ on:
     paths:
       - "roles/zabbix_agent/**"
       - "molecule/zabbix_agent/**"
+      - "molecule/default/create.with_stack.docker.yml"
+      - "molecule/default/destroy.with_stack.docker.yml"
       - "molecule/requirements.txt"
       - ".github/workflows/agent.yml"
       - "roles/zabbix_repo/**"
@@ -41,9 +45,6 @@ jobs:
           - v74
           - v70
           - v60
-        scenario_name:
-          - default
-          - agent2
         exclude:
           - container:
               image: ubuntu2604
@@ -89,97 +90,17 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-molecule-galaxy-
 
-      - name: Install Collections and Roles 
+      - name: Install Collections and Roles
         run: |
           ansible-galaxy collection install -f -vvvv  community-zabbix-*.tar.gz
 
       - name: Run role tests
-        working-directory: molecule/zabbix_agent_tests
         run: >-
           MY_MOLECULE_CONTAINER=${{ matrix.container.image }}
           MY_MOLECULE_IMAGE=${{ matrix.container.image }}
           MY_MOLECULE_VERSION=${{ matrix.version }}
           MY_MOLECULE_DOCKER_COMMAND=${{ matrix.command }}
-          molecule -c common/molecule.yml test -s ${{ matrix.scenario_name }}
-
-  psk:
-    needs: build-collection
-    runs-on: ubuntu-22.04
-    strategy:
-      fail-fast: false
-      matrix:
-        container:
-          - image: rockylinux10
-          - image: rockylinux9
-          - image: ubuntu2604
-          - image: ubuntu2404
-          - image: ubuntu2204
-          - image: debian13
-          - image: debian12
-        version:
-          - v74
-          - v70
-          - v60
-        scenario_name:
-          - autopsk
-          - agent2autopsk
-        exclude:
-          - container:
-              image: ubuntu2604
-            version: v60
-    steps:
-      - name: Check out code
-        uses: actions/checkout@v6
-
-      - name: Set up Python 3.11
-        uses: actions/setup-python@v6
-        with:
-          python-version: 3.11
-          cache: pip
-          cache-dependency-path: molecule/requirements.txt
-
-      - name: Install latest pip
-        run: python -m pip install --upgrade pip yq
-
-      - name: Install dependencies
-        run: pip install -r molecule/requirements.txt
-
-      - name: Build the collection
-        run: |
-          yq -yi '
-            .dependencies."ansible.windows" = "2.8.0" |
-            .dependencies."ansible.netcommon" = "7.2.0" |
-            .dependencies."ansible.posix" = "2.0.0" |
-            .dependencies."community.general" = "10.5.0" |
-            .dependencies."community.mysql" = "3.13.0" |
-            .dependencies."community.postgresql" = "3.12.0"
-          ' galaxy.yml
-
-          ansible-galaxy collection build -f
-
-      - name: Cache Ansible Galaxy content
-        uses: actions/cache@v5
-        with:
-          path: |
-            ~/.ansible/collections
-            ~/.ansible/roles
-            ~/.cache/ansible-compat
-          key: ${{ runner.os }}-molecule-galaxy-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-molecule-galaxy-
-
-      - name: Install Collections and Roles 
-        run: |
-          ansible-galaxy collection install -f -vvvv  community-zabbix-*.tar.gz
-
-      - name: Run role tests
-        working-directory: molecule/zabbix_agent_tests
-        run: >-
-          MY_MOLECULE_CONTAINER=${{ matrix.container.image }}
-          MY_MOLECULE_IMAGE=${{ matrix.container.image }}
-          MY_MOLECULE_VERSION=${{ matrix.version }}
-          MY_MOLECULE_DOCKER_COMMAND=${{ matrix.command }}
-          molecule -c common/molecule.yml test -s ${{ matrix.scenario_name }}
+          molecule test -s zabbix_agent
 
   legacy:
     needs: build-collection
@@ -196,11 +117,6 @@ jobs:
           - v74
           - v70
           - v60
-        scenario_name:
-          - default
-          - agent2
-          - autopsk
-          - agent2autopsk
     steps:
       - name: Check out code
         uses: actions/checkout@v6
@@ -220,7 +136,7 @@ jobs:
             ~/.ansible/collections
             ~/.ansible/roles
             ~/.cache/ansible-compat
-          key: ${{ runner.os }}-molecule-galaxy-${{ hashFiles('molecule/requirements.txt', 'molecule/zabbix_agent_tests/common/collections.yml') }}
+          key: ${{ runner.os }}-molecule-galaxy-${{ hashFiles('molecule/requirements.txt', 'molecule/default/collections.yml') }}
           restore-keys: |
             ${{ runner.os }}-molecule-galaxy-
 
@@ -255,15 +171,14 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-molecule-galaxy-
 
-      - name: Install Collections and Roles 
+      - name: Install Collections and Roles
         run: |
           ansible-galaxy collection install -f -vvvv  community-zabbix-*.tar.gz
 
       - name: Run role tests
-        working-directory: molecule/zabbix_agent_tests
         run: >-
           MY_MOLECULE_CONTAINER=${{ matrix.container.image }}
           MY_MOLECULE_IMAGE=${{ matrix.container.image }}
           MY_MOLECULE_VERSION=${{ matrix.version }}
           MY_MOLECULE_DOCKER_COMMAND=${{ matrix.command }}
-          molecule -c common/molecule.yml test -s ${{ matrix.scenario_name }}
+          molecule test -s zabbix_agent

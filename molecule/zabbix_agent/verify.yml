@@ -1,0 +1,212 @@
+---
+- name: Verify zabbix_agent
+  hosts: all
+  gather_facts: true
+
+  vars:
+    _version_groups: ["v60", "v70", "v74", "v80"]
+
+  tasks:
+    # Same as converge.yml: the web API runs in a container published on
+    # localhost, and the API check below delegates to it.
+    - name: Add zabbix web API hosts to inventory
+      add_host:
+        name: "zabbix-web-{{ _version }}"
+        ansible_host: localhost
+        ansible_port: "{{ 8000 + (_version | regex_replace('v', '') | int) }}"
+        ansible_connection: httpapi
+        ansible_network_os: community.zabbix.zabbix
+        ansible_user: Admin
+        ansible_httpapi_pass: zabbix
+        ansible_httpapi_port: "{{ 8000 + (_version | regex_replace('v', '') | int) }}"
+        ansible_httpapi_use_ssl: false
+        ansible_httpapi_validate_certs: false
+        ansible_zabbix_url_path: ""
+      loop: "{{ groups.keys() | list | intersect(_version_groups) }}"
+      loop_control:
+        loop_var: _version
+      changed_when: false
+
+    - name: Gather package facts
+      package_facts:
+
+    - name: Assert zabbix-agent package is installed with correct version
+      vars:
+        # We're purposefully not using
+        # `zabbix_agent_packages | first`, `zabbix_agent_conf_file`, `zabbix_agent_service`
+        # to catch unexpected errors in our defaults
+        _package: "{{ zabbix_agent2 | default(false) | ternary('zabbix-agent2', 'zabbix-agent') }}"
+      assert:
+        that:
+          - _package in ansible_facts.packages
+          - zabbix_agent_version in (ansible_facts.packages[_package] | first).version
+
+    - name: Gather service facts
+      service_facts:
+
+    - name: Assert zabbix-agent service is enabled and running
+      vars:
+        _service: "{{ zabbix_agent2 | default(false) | ternary('zabbix-agent2', 'zabbix-agent') }}.service"
+      assert:
+        that:
+          - ansible_facts.services[_service].status == 'enabled'
+          - ansible_facts.services[_service].state == 'running'
+
+    - name: Stat zabbix_agent.conf
+      stat:
+        path: "/etc/zabbix/{{ zabbix_agent2 | default(false) | ternary('zabbix_agent2.conf', 'zabbix_agentd.conf') }}"
+      register: _agent_conf
+
+    - name: Assert zabbix_agent.conf exists with correct ownership and mode
+      assert:
+        that:
+          - _agent_conf.stat.exists
+          - _agent_conf.stat.pw_name == 'root'
+          - _agent_conf.stat.gr_name == 'root'
+          - _agent_conf.stat.mode == '0644'
+
+    - name: Read zabbix_agent.conf
+      slurp:
+        src: "/etc/zabbix/{{ zabbix_agent2 | default(false) | ternary('zabbix_agent2.conf', 'zabbix_agentd.conf') }}"
+      register: _agent_conf
+
+    # The role generates the identity as <hostname>_<4 hex digits> and saves it
+    - name: Read AutoPSK identity file
+      when: zabbix_agent_tlspsk_auto | default(false)
+      slurp:
+        src: /etc/zabbix/tls_psk_auto.identity
+      register: _psk_identity
+
+    # Whole-line matches, so commented-out lines (# Key=value) and longer
+    # values (TLSAccept=cert,psk) don't pass
+    - name: Assert zabbix_agent.conf contains expected settings
+      when: _config.is_required | default(true)
+      assert:
+        that:
+          - _config.line in _agent_conf_lines
+        quiet: true
+      loop:
+        - line: "ListenPort=10050"
+        - line: "DebugLevel=3"
+        # inheriting from the agent2 scenario (could use a future refactor)
+        - line: "Plugins.SystemRun.LogRemoteCommands=0"
+          is_required: "{{ zabbix_agent2 | default(false) and zabbix_agent_plugins is defined }}"
+        # AutoPSK scenario
+        - { line: "TLSAccept=psk", is_required: "{{ zabbix_agent_tlspsk_auto | default(false) }}" }
+        - { line: "TLSPSKIdentity={{ _psk_identity.content | default('') | b64decode }}", is_required: "{{ zabbix_agent_tlspsk_auto | default(false) }}" }
+        - { line: "TLSPSKFile=/etc/zabbix/tls_psk_auto.secret", is_required: "{{ zabbix_agent_tlspsk_auto | default(false) }}" }
+        # cert
+        - { line: "TLSConnect=cert", is_required: "{{ 'cert' in group_names }}" }
+        - { line: "TLSAccept=cert", is_required: "{{ 'cert' in group_names }}" }
+        - { line: "TLSKeyFile=/var/lib/zabbix/enc/agent.key", is_required: "{{ 'cert' in group_names }}" }
+        - { line: "TLSCertFile=/var/lib/zabbix/enc/agent.crt", is_required: "{{ 'cert' in group_names }}" }
+        - { line: "TLSCAFile=/var/lib/zabbix/enc/ca.crt", is_required: "{{ 'cert' in group_names }}" }
+      loop_control:
+        loop_var: _config
+        label: "{{ _config.line }}"
+      vars:
+        _agent_conf_lines: "{{ (_agent_conf.content | b64decode).splitlines() }}"
+
+    - name: Stat zabbix_agent include dirs
+      stat:
+        path: "{{ _include_dir }}"
+      loop: "{{ zabbix_agent2 | default(false) | ternary(['/etc/zabbix/zabbix_agent2.d', '/etc/zabbix/zabbix_agent2.d/plugins.d'], ['/etc/zabbix/zabbix_agentd.d']) }}"
+      loop_control:
+        loop_var: _include_dir
+      register: _agent_include_dirs
+
+    - name: Assert zabbix_agent include dirs exist with correct ownership and mode
+      assert:
+        that:
+          - _include_dir.stat.isdir | default(false)
+          - _include_dir.stat.pw_name == 'root'
+          - _include_dir.stat.gr_name == 'root'
+          - _include_dir.stat.mode == '0755'
+        fail_msg: "{{ _include_dir._include_dir }} is missing or has wrong ownership/mode"
+        quiet: true
+      loop: "{{ _agent_include_dirs.results }}"
+      loop_control:
+        loop_var: _include_dir
+        label: "{{ _include_dir._include_dir }}"
+
+    # XXX this test is questionable
+    - name: Assert ownership/permissions on autopsk
+      when: zabbix_agent_tlspsk_auto | default(false)
+      block:
+        - name: Stat psk_auto file
+          stat:
+            path: /etc/zabbix/tls_psk_auto.secret
+          register: _psk_auto_file
+        - name: Assert psk_auto ownership/permissions
+          assert:
+            that:
+              - _psk_auto_file.stat.pw_name == 'zabbix'
+              - _psk_auto_file.stat.gr_name == 'zabbix'
+              - _psk_auto_file.stat.mode == '0400'
+              - _psk_auto_file.stat.size == 64
+
+    # Connect via the container's network IP rather than localhost, so an agent
+    # bound only to loopback fails the check.
+    - name: Wait for zabbix_agent to accept connections on port 10050
+      wait_for:
+        host: "{{ ansible_facts['default_ipv4']['address'] }}"
+        port: 10050
+        timeout: 30
+
+    - name: Check zabbix_agent.log
+      block:
+        - name: Read zabbix_agent log file
+          slurp:
+            src: "/var/log/zabbix/{{ zabbix_agent2 | default(false) | ternary('zabbix_agent2.log', 'zabbix_agentd.log') }}"
+          register: _agent_log
+          # agent2 logs a different start line, and doesn't log successful
+          # active check configuration updates at DebugLevel=3, so the API
+          # check below covers that for agent2. agentd 6.0 only logs it after
+          # a connection failure, not after "host not found" at startup.
+          until: >
+            (_agent_log.content | b64decode) is search(_agent_start_line) and (
+              zabbix_agent2 | default(false) or zabbix_agent_version is version('7.0', '<') or
+              (_agent_log.content | b64decode) is search('Active check configuration update from \[(?P<zabbix_server>[^\]]+)\]')
+            )
+          retries: 12
+          delay: 10
+          vars:
+            _agent_start_line: "{{ zabbix_agent2 | default(false) | ternary('Starting Zabbix Agent 2', 'agent #0 started \\[main process\\]') }}"
+      always:
+        - debug:
+            msg: "{{ _agent_log.content | b64decode | split('\n') }}"
+
+    # active_available was added to the host object in Zabbix 6.4.
+    # 1 means the server has received an active checks request from the agent.
+    - name: Wait for the server to report active checks as available
+      when: zabbix_agent_version is version('6.4', '>=')
+      community.zabbix.zabbix_host_info:
+        host_name: "{{ inventory_hostname }}"
+        exact_match: true
+      register: _zabbix_host
+      until: (_zabbix_host.hosts | default(_dummy_default) | first).active_available == '1'
+      retries: 12
+      delay: 10
+      delegate_to: "zabbix-web-{{ group_names | intersect(_version_groups) | first }}"
+      vars:
+        # hosts is undefined while zabbix_host_info fails with "Host not found"
+        _dummy_default:
+          - active_available: "0"
+
+    # Passive checks: the server polls the agent (TLSAccept on the agent side).
+    # Needs a passive item on the host, e.g. the default 'Linux by Zabbix agent'.
+    # 1 means available, 2 unavailable.
+    - name: Wait for the server to report the agent interface as available
+      community.zabbix.zabbix_host_info:
+        host_name: "{{ inventory_hostname }}"
+        exact_match: true
+      register: _zabbix_host_passive
+      until: (_zabbix_host_passive.hosts | default(_dummy_default) | first).hostinterfaces | map(attribute='available') | first == '1'
+      retries: 12
+      delay: 10
+      delegate_to: "zabbix-web-{{ group_names | intersect(_version_groups) | first }}"
+      vars:
+        # hosts is undefined while zabbix_host_info fails with "Host not found"
+        _dummy_default:
+          - hostinterfaces:
+              - available: "0"

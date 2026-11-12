@@ -1,0 +1,72 @@
+---
+- name: Prepare
+  hosts: all
+
+  vars:
+    _pki_dir: "{{ lookup('env', 'MOLECULE_EPHEMERAL_DIRECTORY') }}/pki"
+
+  pre_tasks:
+    # Signed on the controller by the CA from create.with_stack.docker.yml
+    - name: Create agent certificate
+      when: "'cert' in group_names"
+      command: >-
+        openssl req -newkey ec -pkeyopt ec_paramgen_curve:P-256 -nodes
+          -subj '/O=ansible_collections/OU=community.zabbix/CN={{ inventory_hostname }}' -days 365
+          -extensions usr_cert
+            -addext 'keyUsage = critical, digitalSignature'
+            -addext 'basicConstraints = critical, CA:FALSE'
+            -addext 'extendedKeyUsage = serverAuth, clientAuth'
+            -addext 'subjectAltName = DNS:{{ inventory_hostname }}'
+          -CAkey ca.key -CA ca.crt
+          -keyout {{ inventory_hostname }}.key
+          -out {{ inventory_hostname }}.crt
+      args:
+        chdir: "{{ _pki_dir }}"
+        creates: "{{ inventory_hostname }}.crt"
+      delegate_to: localhost
+
+  tasks:
+    # suse containers have a partial python3.11 install, py311-rpm needed for package_facts
+    - name: Install python rpm bindings
+      when: ansible_facts['os_family'] == 'Suse'
+      package:
+        name: "python3{% if ansible_facts.python.version.minor != 6 %}{{ ansible_facts.python.version.minor }}{% endif %}-rpm"
+        update_cache: true
+      register: _py3_rpm
+      until: _py3_rpm is succeeded
+
+    # FIXME: These tasks cover for roles/zabbix_agent, which writes the
+    # zabbix_agent_tls*file paths to the config without creating or validating
+    # the directory, ownership or permissions.
+
+    # Created before the package so the key can be group-readable by the agent.
+    # The package scripts reuse an existing zabbix group.
+    - when: "'cert' in group_names"
+      block:
+        - name: Create zabbix group
+          group:
+            name: zabbix
+            system: true
+
+        - name: Create TLS directory
+          file:
+            path: /var/lib/zabbix/enc
+            state: directory
+            owner: root
+            group: root
+            mode: "0755"
+
+        - name: Copy CA and agent certificate
+          copy:
+            src: "{{ _pki_dir }}/{{ _file.src }}"
+            dest: "/var/lib/zabbix/enc/{{ _file.dest }}"
+            owner: root
+            group: "{{ _file.group }}"
+            mode: "{{ _file.mode }}"
+          loop:
+            - { src: "{{ inventory_hostname }}.key", dest: agent.key, group: zabbix, mode: "0640" }
+            - { src: "{{ inventory_hostname }}.crt", dest: agent.crt, group: root, mode: "0644" }
+            - { src: ca.crt, dest: ca.crt, group: root, mode: "0644" }
+          loop_control:
+            loop_var: _file
+            label: "{{ _file.dest }}"
