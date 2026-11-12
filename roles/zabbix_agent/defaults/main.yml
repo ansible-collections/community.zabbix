@@ -100,11 +100,6 @@ zabbix_agent_userparameters_templates_src: "userparameters"
 zabbix_agent_userparameters_scripts_src: "scripts"
 zabbix_agent_chassis: false
 
-zabbix_agent_tls_config:
-  unencrypted: "1"
-  psk: "2"
-  cert: "4"
-
 # IPMI settings
 zabbix_agent_ipmi_authtype: -1
 zabbix_agent_ipmi_privilege: 2

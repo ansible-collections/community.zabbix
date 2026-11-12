@@ -48,6 +48,9 @@
     - api
 
 - name: "API | Create a new host or update an existing host's info"
+  vars:
+    _int_tlsaccept: "{{ zabbix_agent_tlsaccept.split(',') | map('trim') | map('extract', _zabbix_agent_tls_map) | sum }}"
+    _int_tlsconnect: "{{ _zabbix_agent_tls_map[zabbix_agent_tlsconnect] }}"
   community.zabbix.zabbix_host:
     host_name: "{{ zabbix_agent_hostname }}"
     status: "{{ zabbix_host_status }}"
@@ -66,8 +69,8 @@
     proxy: "{{ zabbix_agent_proxy }}"
     proxy_group: "{{ zabbix_agent_proxy_group | default(omit) }}"
     state: "{{ zabbix_agent_host_state }}"
-    tls_accept: "{{ zabbix_agent_tls_config[zabbix_agent_tlsaccept | default('unencrypted')] }}"
-    tls_connect: "{{ zabbix_agent_tls_config[zabbix_agent_tlsconnect | default('unencrypted')] }}"
+    tls_accept: "{{ _int_tlsaccept }}"
+    tls_connect: "{{ _int_tlsconnect }}"
     tls_issuer: "{{ zabbix_agent_tlsservercertissuer | default(omit) }}"
     tls_psk: "{{ zabbix_agent_tlspsk_secret | default(omit) }}"
     tls_psk_identity: "{{ zabbix_agent_tlspskidentity | default(omit) }}"
