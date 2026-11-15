@@ -9,7 +9,7 @@ driver:
   name: default
 
 platforms:
-  - name: zabbix-agent-${MY_MOLECULE_VERSION:-v74}-${MY_MOLECULE_CONTAINER:-rockylinux10}
+  - name: zabbix-agent-${MY_MOLECULE_VERSION:-v80}-${MY_MOLECULE_CONTAINER:-rockylinux10}
     image: geerlingguy/docker-${MY_MOLECULE_IMAGE:-rockylinux10}-ansible:latest
     privileged: true
     pre_build_image: true
@@ -19,8 +19,8 @@ platforms:
     cgroupns_mode: host
     groups:
       - agentd
-      - ${MY_MOLECULE_VERSION:-v74}
-  - name: zabbix-agent2-${MY_MOLECULE_VERSION:-v74}-${MY_MOLECULE_CONTAINER:-rockylinux10}
+      - ${MY_MOLECULE_VERSION:-v80}
+  - name: zabbix-agent2-${MY_MOLECULE_VERSION:-v80}-${MY_MOLECULE_CONTAINER:-rockylinux10}
     image: geerlingguy/docker-${MY_MOLECULE_IMAGE:-rockylinux10}-ansible:latest
     privileged: true
     pre_build_image: true
@@ -30,10 +30,10 @@ platforms:
     cgroupns_mode: host
     groups:
       - agent2
-      - ${MY_MOLECULE_VERSION:-v74}
+      - ${MY_MOLECULE_VERSION:-v80}
 
   # AutoPSK
-  - name: zabbix-agent-${MY_MOLECULE_VERSION:-v74}-autopsk-${MY_MOLECULE_CONTAINER:-rockylinux10}
+  - name: zabbix-agent-${MY_MOLECULE_VERSION:-v80}-autopsk-${MY_MOLECULE_CONTAINER:-rockylinux10}
     image: geerlingguy/docker-${MY_MOLECULE_IMAGE:-rockylinux10}-ansible:latest
     privileged: true
     pre_build_image: true
@@ -43,9 +43,9 @@ platforms:
     cgroupns_mode: host
     groups:
       - agentd
-      - ${MY_MOLECULE_VERSION:-v74}
+      - ${MY_MOLECULE_VERSION:-v80}
       - autopsk
-  - name: zabbix-agent2-${MY_MOLECULE_VERSION:-v74}-autopsk-${MY_MOLECULE_CONTAINER:-rockylinux10}
+  - name: zabbix-agent2-${MY_MOLECULE_VERSION:-v80}-autopsk-${MY_MOLECULE_CONTAINER:-rockylinux10}
     image: geerlingguy/docker-${MY_MOLECULE_IMAGE:-rockylinux10}-ansible:latest
     privileged: true
     pre_build_image: true
@@ -55,11 +55,11 @@ platforms:
     cgroupns_mode: host
     groups:
       - agent2
-      - ${MY_MOLECULE_VERSION:-v74}
+      - ${MY_MOLECULE_VERSION:-v80}
       - autopsk
 
   # Certificate TLS, CA from create.with_stack.docker.yml, certs from prepare.yml
-  - name: zabbix-agent-${MY_MOLECULE_VERSION:-v74}-cert-${MY_MOLECULE_CONTAINER:-rockylinux10}
+  - name: zabbix-agent-${MY_MOLECULE_VERSION:-v80}-cert-${MY_MOLECULE_CONTAINER:-rockylinux10}
     image: geerlingguy/docker-${MY_MOLECULE_IMAGE:-rockylinux10}-ansible:latest
     privileged: true
     pre_build_image: true
@@ -69,9 +69,9 @@ platforms:
     cgroupns_mode: host
     groups:
       - agentd
-      - ${MY_MOLECULE_VERSION:-v74}
+      - ${MY_MOLECULE_VERSION:-v80}
       - cert
-  - name: zabbix-agent2-${MY_MOLECULE_VERSION:-v74}-cert-${MY_MOLECULE_CONTAINER:-rockylinux10}
+  - name: zabbix-agent2-${MY_MOLECULE_VERSION:-v80}-cert-${MY_MOLECULE_CONTAINER:-rockylinux10}
     image: geerlingguy/docker-${MY_MOLECULE_IMAGE:-rockylinux10}-ansible:latest
     privileged: true
     pre_build_image: true
@@ -81,7 +81,7 @@ platforms:
     cgroupns_mode: host
     groups:
       - agent2
-      - ${MY_MOLECULE_VERSION:-v74}
+      - ${MY_MOLECULE_VERSION:-v80}
       - cert
 
 provisioner:
@@ -121,6 +121,11 @@ provisioner:
         zabbix_agent_tlskeyfile: /var/lib/zabbix/enc/agent.key
         zabbix_agent_tlscertfile: /var/lib/zabbix/enc/agent.crt
         zabbix_agent_tlscafile: /var/lib/zabbix/enc/ca.crt
+      v80:
+        zabbix_agent_version: "8.0"
+        zabbix_agent_server: zabbix-server-v80
+        zabbix_api_server_host: zabbix-web-v80
+        zabbix_api_server_port: 8080
       v74:
         zabbix_agent_version: "7.4"
         zabbix_agent_server: zabbix-server-v74

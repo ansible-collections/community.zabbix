@@ -19,15 +19,18 @@ _zabbix_agent_valid_versions:
     - "6.4" # only for testing
     - "6.0"
   Debian-13:
+    - "8.0"
     - "7.4"
     - "7.0"
     - "6.0"
   Debian-12:
+    - "8.0"
     - "7.4"
     - "7.2"
     - "7.0"
     - "6.0"
   Debian-11:
+    - "8.0"
     - "7.4"
     - "7.2"
     - "7.0"
@@ -48,20 +51,24 @@ _zabbix_agent_valid_versions:
     - "7.0"
     - "6.0"
   RedHat-10:
+    - "8.0"
     - "7.4"
     - "7.0"
     - "6.0"
   RedHat-9:
+    - "8.0"
     - "7.4"
     - "7.2"
     - "7.0"
     - "6.0"
   RedHat-8:
+    - "8.0"
     - "7.4"
     - "7.2"
     - "7.0"
     - "6.0"
   Suse-15:
+    - "8.0"
     - "7.4"
     - "7.2"
     - "7.0"
@@ -71,17 +78,20 @@ _zabbix_agent_valid_versions:
     - "7.4"
     - "7.0"
   Ubuntu-24:
+    - "8.0"
     - "7.4"
     - "7.2"
     - "7.0"
     - "6.0"
   Ubuntu-22:
+    - "8.0"
     - "7.4"
     - "7.2"
     - "7.0"
     - "6.0"
 # (Windows 11, Server 2022-2025 all report distribution_major_version as 10)
   Windows:
+    - "8.0"
     - "7.4"
     - "7.2"
     - "7.0"
