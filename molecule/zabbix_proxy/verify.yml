@@ -38,13 +38,18 @@
     - name: Read zabbix_proxy.conf
       ansible.builtin.slurp:
         src: /etc/zabbix/zabbix_proxy.conf
-      register: _proxy_conf_content
+      register: _proxy_conf
 
+    # Whole-line matches, so commented-out lines (# Key=value) and longer
+    # values don't pass
     - name: Assert zabbix_proxy.conf contains expected settings
-      ansible.builtin.assert:
+      assert:
         that:
-          - "'ListenPort=10051' in _proxy_conf_content.content | b64decode"
-          - "'DebugLevel=3' in _proxy_conf_content.content | b64decode"
+          - "'ListenPort=10051' in _proxy_conf_lines"
+          - "'DebugLevel=3' in _proxy_conf_lines"
+        quiet: true
+      vars:
+        _proxy_conf_lines: "{{ (_proxy_conf.content | b64decode).splitlines() }}"
 
     - name: Stat zabbix_proxy.d include directory
       ansible.builtin.stat:

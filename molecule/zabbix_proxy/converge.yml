@@ -1,13 +1,9 @@
 ---
-- hosts: all
+- name: Converge
+  hosts: all
 
   vars:
     _version_groups: ["v60", "v70", "v74", "v80"]
-    _g_to_v:
-      v60: "6.0"
-      v70: "7.0"
-      v74: "7.4"
-      v80: "8.0"
 
   pre_tasks:
     # The api is hosted in a container on the localhost, exposed to a known port,
@@ -15,7 +11,7 @@
     # ansible_port is required to give each host a unique persistent connection;
     # without it, all localhost targets share one connection regardless of
     # zabbix_api_server_port.
-    - name: Add zabbix web API hosts to inventory
+    - name: Add zabbix web API host(s) to inventory
       add_host:
         name: "zabbix-web-{{ _version }}"
         ansible_host: localhost
