@@ -108,7 +108,8 @@
 {{ (zabbix_proxy_startvmwarecollectors is defined and zabbix_proxy_startvmwarecollectors is not none) | ternary('','# ') }}StartVMwareCollectors={{ zabbix_proxy_startvmwarecollectors | default('') }}
 {{ (zabbix_proxy_statsallowedip is defined and zabbix_proxy_statsallowedip is not none) | ternary('','# ') }}StatsAllowedIP={{ zabbix_proxy_statsallowedip | default('') }}
 {{ (zabbix_proxy_timeout is defined and zabbix_proxy_timeout is not none) | ternary('','# ') }}Timeout={{ zabbix_proxy_timeout | default('') }}
-{{ (zabbix_proxy_tlsaccept is defined and zabbix_proxy_tlsaccept is not none) | ternary('','# ') }}TLSAccept={{ zabbix_proxy_tlsaccept | default('') }}
+{{ (zabbix_proxy_tlsconnect is defined and zabbix_proxy_tlsconnect is not none) | ternary('','# ') }}TLSConnect={{ (zabbix_proxy_tlsconnect == 'no_encryption') | ternary('unencrypted', zabbix_proxy_tlsconnect) }}
+{{ (zabbix_proxy_tlsaccept is defined and zabbix_proxy_tlsaccept is not none) | ternary('','# ') }}TLSAccept={{ (zabbix_proxy_tlsaccept == 'no_encryption') | ternary('unencrypted', zabbix_proxy_tlsaccept) }}
 {{ (zabbix_proxy_tlscafile is defined and zabbix_proxy_tlscafile is not none) | ternary('','# ') }}TLSCAFile={{ zabbix_proxy_tlscafile | default('') }}
 {{ (zabbix_proxy_tlscertfile is defined and zabbix_proxy_tlscertfile is not none) | ternary('','# ') }}TLSCertFile={{ zabbix_proxy_tlscertfile | default('') }}
 {{ (zabbix_proxy_tlscipherall is defined and zabbix_proxy_tlscipherall is not none) | ternary('','# ') }}TLSCipherAll={{ zabbix_proxy_tlscipherall | default('') }}
@@ -117,7 +118,6 @@
 {{ (zabbix_proxy_tlsciphercert13 is defined and zabbix_proxy_tlsciphercert13 is not none) | ternary('','# ') }}TLSCipherCert13={{ zabbix_proxy_tlsciphercert13 | default('') }}
 {{ (zabbix_proxy_tlscipherpsk is defined and zabbix_proxy_tlscipherpsk is not none) | ternary('','# ') }}TLSCipherPSK={{ zabbix_proxy_tlscipherpsk | default('') }}
 {{ (zabbix_proxy_tlscipherpsk13 is defined and zabbix_proxy_tlscipherpsk13 is not none) | ternary('','# ') }}TLSCipherPSK13={{ zabbix_proxy_tlscipherpsk13 | default('') }}
-{{ (zabbix_proxy_tlsconnect is defined and zabbix_proxy_tlsconnect is not none) | ternary('','# ') }}TLSConnect={{ zabbix_proxy_tlsconnect | default('') }}
 {{ (zabbix_proxy_tlscrlfile is defined and zabbix_proxy_tlscrlfile is not none) | ternary('','# ') }}TLSCRLFile={{ zabbix_proxy_tlscrlfile | default('') }}
 {{ (zabbix_proxy_tlskeyfile is defined and zabbix_proxy_tlskeyfile is not none) | ternary('','# ') }}TLSKeyFile={{ zabbix_proxy_tlskeyfile | default('') }}
 {{ (zabbix_proxy_tlspskfile is defined and zabbix_proxy_tlspskfile is not none) | ternary('','# ') }}TLSPSKFile={{ zabbix_proxy_tlspskfile | default('') }}

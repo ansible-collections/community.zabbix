@@ -6,6 +6,15 @@ _zabbix_proxy_database_default_port:
 _zabbix_proxy_database_file_dir_post72: /usr/share/zabbix/sql-scripts
 _zabbix_proxy_database_file_dir_pre72: /usr/share/zabbix-sql-scripts
 
+# FIXME: plugins/modules/zabbix_proxy.py should just take unencrypted,psk,cert
+# and generate the int passed to proxy.{create,update}. In its current form it
+# doesn't even allow for comma separated list for accept.
+_zabbix_proxy_module_tls_map:
+  unencrypted: "no_encryption"
+  no_encryption: "no_encryption"
+  psk: "PSK"
+  cert: "certificate"
+
 _os_key: "{{ (ansible_facts.os_family in ['RedHat', 'Suse']) | ternary(ansible_facts.os_family, ansible_facts.distribution) }}-{{ ansible_facts.distribution_major_version }}"
 _zabbix_proxy_valid_versions:
   Debian-13:
