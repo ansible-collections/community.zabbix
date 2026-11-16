@@ -1,0 +1,26 @@
+---
+major_changes:
+  - zabbix_server role - add support for Zabbix 8.0 LTS. When ``zabbix_server_version`` is not set, the role now installs 8.0 instead of 7.4
+    where supported. Pin ``zabbix_server_version`` to keep the previous version.
+  - zabbix_web role - add support for Zabbix 8.0 LTS. When ``zabbix_web_version`` is not set, the role now installs 8.0 instead of 7.4
+    where supported. Pin ``zabbix_web_version`` to keep the previous version.
+  - zabbix_agent role - add support for Zabbix 8.0 LTS. When ``zabbix_agent_version`` is not set, the role now installs 8.0 instead of 7.4
+    where supported. Pin ``zabbix_agent_version`` to keep the previous version.
+  - zabbix_proxy role - add support for Zabbix 8.0 LTS. When ``zabbix_proxy_version`` is not set, the role now installs 8.0 instead of 7.4
+    where supported. Pin ``zabbix_proxy_version`` to keep the previous version.
+  - zabbix_javagateway role - add support for Zabbix 8.0 LTS. When ``zabbix_javagateway_version`` is not set, the role now installs 8.0 instead of 7.4
+    where supported. Pin ``zabbix_javagateway_version`` to keep the previous version.
+  - zabbix_web_service role - add support for Zabbix 8.0 LTS. When ``zabbix_web_service_version`` is not set, the role now installs 8.0 instead of 7.4
+    where supported. Pin ``zabbix_web_service_version`` to keep the previous version.
+minor_changes:
+  - zabbix_server role - add support for Ubuntu 26.04 with Zabbix 7.0, 7.4 and 8.0.
+  - zabbix_web role - add support for Ubuntu 26.04 with Zabbix 7.0, 7.4 and 8.0.
+  - zabbix_proxy role - add support for Ubuntu 26.04 with Zabbix 7.0, 7.4 and 8.0.
+  - zabbix_javagateway role - add support for Ubuntu 26.04 with Zabbix 7.0, 7.4 and 8.0.
+  - zabbix_web_service role - add support for Ubuntu 26.04 with Zabbix 7.0, 7.4 and 8.0.
+  - zabbix_proxy role - ``zabbix_proxy_tlsaccept`` and ``zabbix_proxy_tlsconnect`` now default to ``unencrypted`` and are always written to the
+    configuration file. They take the configuration file values ``unencrypted``, ``psk`` and ``cert``; ``no_encryption`` is still accepted and
+    written as ``unencrypted``.
+bugfixes:
+  - zabbix_repo role - use the ``stable`` APT repository path for Zabbix 8.0. The ``release`` path only contains the
+    ``zabbix-release`` package, so 8.0 installs on Debian and Ubuntu could not find any packages.
