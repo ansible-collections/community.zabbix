@@ -1,0 +1,61 @@
+---
+- name: Verify zabbix_javagateway
+  hosts: all
+  gather_facts: true
+
+  tasks:
+    - name: Gather package facts
+      package_facts:
+
+    - name: Assert zabbix-java-gateway package is installed with correct version
+      assert:
+        that:
+          - "'zabbix-java-gateway' in ansible_facts.packages"
+          - zabbix_javagateway_version in (ansible_facts.packages['zabbix-java-gateway'] | first).version
+
+    - name: Gather service facts
+      service_facts:
+
+    - name: Assert zabbix-java-gateway service is enabled and running
+      assert:
+        that:
+          - ansible_facts.services['zabbix-java-gateway.service'].status == 'enabled'
+          - ansible_facts.services['zabbix-java-gateway.service'].state == 'running'
+
+    - name: Stat zabbix_java_gateway.conf
+      stat:
+        path: /etc/zabbix/zabbix_java_gateway.conf
+      register: _jgw_conf
+
+    - name: Assert zabbix_java_gateway.conf exists with correct ownership and mode
+      assert:
+        that:
+          - _jgw_conf.stat.exists
+          - _jgw_conf.stat.pw_name == 'zabbix'
+          - _jgw_conf.stat.gr_name == 'zabbix'
+          - _jgw_conf.stat.mode == '0644'
+
+    - name: Read zabbix_java_gateway.conf
+      slurp:
+        src: /etc/zabbix/zabbix_java_gateway.conf
+      register: _jgw_conf
+
+    # Whole-line matches, so commented-out lines (#KEY=value) don't pass
+    - name: Assert zabbix_java_gateway.conf contains expected settings
+      assert:
+        that:
+          - "'LISTEN_IP=0.0.0.0' in _jgw_conf_lines"
+          - "'LISTEN_PORT=10052' in _jgw_conf_lines"
+          - "'PID_FILE=/run/zabbix/zabbix_java_gateway.pid' in _jgw_conf_lines"
+          - "'START_POLLERS=5' in _jgw_conf_lines"
+        quiet: true
+      vars:
+        _jgw_conf_lines: "{{ (_jgw_conf.content | b64decode).splitlines() }}"
+
+    # Connect via the container's network IP rather than localhost, so a
+    # gateway bound only to loopback fails the check.
+    - name: Wait for zabbix-java-gateway to accept connections on port 10052
+      wait_for:
+        host: "{{ ansible_facts['default_ipv4']['address'] }}"
+        port: 10052
+        timeout: 30
