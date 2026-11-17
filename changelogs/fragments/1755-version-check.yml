@@ -1,5 +1,0 @@
-bugfixes:
-  - zabbix_agent, zabbix_javagateway, zabbix_proxy, zabbix_server and zabbix_web roles - ``enable_version_check`` is honoured again. It was renamed to ``zabbix_<role>_version_check`` in 4.0.0 without notice, so setting it had no effect. The role-specific variables now default to ``enable_version_check`` when it is set (https://github.com/ansible-collections/community.zabbix/issues/1755).
-  - zabbix_javagateway, zabbix_proxy and zabbix_web roles - the documentation now names the role-specific ``zabbix_<role>_version_check`` variable instead of ``enable_version_check`` (https://github.com/ansible-collections/community.zabbix/issues/1755).
-deprecated_features:
-  - zabbix_agent, zabbix_javagateway, zabbix_proxy, zabbix_server and zabbix_web roles - ``enable_version_check`` is deprecated and will be removed in community.zabbix 5.0.0. Use the role-specific ``zabbix_agent_version_check``, ``zabbix_javagateway_version_check``, ``zabbix_proxy_version_check``, ``zabbix_server_version_check`` or ``zabbix_web_version_check`` instead (https://github.com/ansible-collections/community.zabbix/issues/1755).

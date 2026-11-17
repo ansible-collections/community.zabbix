@@ -4,6 +4,85 @@ community.zabbix Release Notes
 
 .. contents:: Topics
 
+v4.3.0
+======
+
+Release Summary
+---------------
+
+This minor release of the ``community.zabbix`` collection adds support for Zabbix 8.0 LTS, which the roles now install by default, as well as Debian 13 and Ubuntu 26.04. The ``zabbix_agent`` role can now install and configure the agent on macOS. The minimum supported ``community.mysql`` version is now 3.10.0. The release also includes many bugfixes. Several role variables are deprecated, and the roles print a deprecation warning when a deprecated variable is set.
+
+Major Changes
+-------------
+
+- zabbix_agent role - add support for Zabbix 8.0 LTS. When ``zabbix_agent_version`` is not set, the role now installs 8.0 instead of 7.4 where supported. Pin ``zabbix_agent_version`` to keep the previous version.
+- zabbix_javagateway role - add support for Zabbix 8.0 LTS. When ``zabbix_javagateway_version`` is not set, the role now installs 8.0 instead of 7.4 where supported. Pin ``zabbix_javagateway_version`` to keep the previous version.
+- zabbix_proxy role - add support for Zabbix 8.0 LTS. When ``zabbix_proxy_version`` is not set, the role now installs 8.0 instead of 7.4 where supported. Pin ``zabbix_proxy_version`` to keep the previous version.
+- zabbix_server role - add support for Zabbix 8.0 LTS. When ``zabbix_server_version`` is not set, the role now installs 8.0 instead of 7.4 where supported. Pin ``zabbix_server_version`` to keep the previous version.
+- zabbix_web role - add support for Zabbix 8.0 LTS. When ``zabbix_web_version`` is not set, the role now installs 8.0 instead of 7.4 where supported. Pin ``zabbix_web_version`` to keep the previous version.
+- zabbix_web_service role - add support for Zabbix 8.0 LTS. When ``zabbix_web_service_version`` is not set, the role now installs 8.0 instead of 7.4 where supported. Pin ``zabbix_web_service_version`` to keep the previous version.
+
+Minor Changes
+-------------
+
+- All roles - Set minimum supported version for community.mysql to 3.10.0
+- add support for Debian-13
+- added `zabbix_php_fpm_conf_listen_group`, controls group access to php-fpm socket
+- added `zabbix_php_fpm_conf_listen_owner`, controls ownership and access to php-fpm socket
+- added `zabbix_web_php_fpm_max_requests`, how many requests a worker will process before respawning
+- change in default user, group and mode for zabbix.conf.php
+- removed `zabbix_php_fpm_conf_listen`, didn't do anything useful
+- roles - stop testing Debian 11 (bullseye) in CI, as it is end of life and its security archive is no longer installable. The roles still allow Debian 11, but it is now untested.
+- zabbix_agent - Add ``zabbix_agent_log_dir`` to set the directory of the default log file (https://github.com/ansible-collections/community.zabbix/pull/1800).
+- zabbix_agent - Build the default ``zabbix_agent_include_dirs`` from ``zabbix_agent_conf_dir`` instead of hardcoding ``/etc/zabbix`` (https://github.com/ansible-collections/community.zabbix/pull/1800).
+- zabbix_agent - Configure the agent on macOS. The role now templates the agent config, creates the include dirs and installs a launch daemon, instead of skipping the configure step (https://github.com/ansible-collections/community.zabbix/pull/1800).
+- zabbix_agent - On Intel Macs, install the last published amd64 release instead of requiring ``zabbix_agent_download_url``. It is installed from a tarball by default; set ``zabbix_agent_mac_install_type`` to ``pkg`` to use the .pkg (https://github.com/ansible-collections/community.zabbix/pull/1800).
+- zabbix_agent - On macOS, download the arm64 package by default instead of amd64. Zabbix no longer publishes the amd64 package for current releases; set ``zabbix_agent_download_url`` on Intel Macs (https://github.com/ansible-collections/community.zabbix/pull/1788).
+- zabbix_agent - On macOS, look up ``zabbix_agent_version_long`` from the Zabbix releases API when it is not set, as on Windows (https://github.com/ansible-collections/community.zabbix/pull/1788).
+- zabbix_agent - Unify platform-specific download variables into ``zabbix_agent_download_url`` with platform-computed defaults in ``vars/Windows.yml`` and ``vars/Darwin.yml``. The downloaded package is saved as ``zabbix_agent_download_filename`` (https://github.com/ansible-collections/community.zabbix/pull/1788).
+- zabbix_agent - Warn when ``zabbix_win_package``, ``zabbix_win_download_url``, ``zabbix_win_download_link`` or ``zabbix_mac_download_url`` are set. They were removed in 4.0.0 and have been silently ignored since (https://github.com/ansible-collections/community.zabbix/pull/1788).
+- zabbix_agent - add support for Ubuntu 26 (Resolute), which only ships Zabbix 7.0, 7.4 and 8.0 repositories.
+- zabbix_agent - added zabbix_agent_packages variable (list) to support installing agent2 plugin packages alongside the main agent package; deprecated zabbix_agent_package (https://github.com/ansible-collections/community.zabbix/issues/1091).
+- zabbix_agent - macOS hosts now link the ``macOS by Zabbix agent`` template by default instead of ``Linux by Zabbix agent`` (https://github.com/ansible-collections/community.zabbix/pull/1788).
+- zabbix_javagateway role - add support for Ubuntu 26.04 with Zabbix 7.0, 7.4 and 8.0.
+- zabbix_proxy - added support for MySQL 8+ and new variables for configuring MySQL authentication plugins
+- zabbix_proxy role - ``zabbix_proxy_tlsaccept`` and ``zabbix_proxy_tlsconnect`` now default to ``unencrypted`` and are always written to the configuration file. They take the configuration file values ``unencrypted``, ``psk`` and ``cert``; ``no_encryption`` is still accepted and written as ``unencrypted``.
+- zabbix_proxy role - add support for Ubuntu 26.04 with Zabbix 7.0, 7.4 and 8.0.
+- zabbix_server - add ``zabbix_server_mysql_login_unix_socket`` variable to support connecting to MySQL via Unix socket in the version check and schema import tasks.
+- zabbix_server - added support for MySQL 8+ and new variables for configuring MySQL authentication plugins
+- zabbix_server role - add support for Ubuntu 26.04 with Zabbix 7.0, 7.4 and 8.0.
+- zabbix_web - add `zabbix_web_custom_zabbix_conf_php` variable to allow for the addition of custom raw PHP config in zabbix.conf.php
+- zabbix_web role - add support for Ubuntu 26.04 with Zabbix 7.0, 7.4 and 8.0.
+- zabbix_web_service role - add support for Ubuntu 26.04 with Zabbix 7.0, 7.4 and 8.0.
+
+Deprecated Features
+-------------------
+
+- zabbix_agent - Deprecated the platform-specific download variables ``zabbix_agent_win_package``, ``zabbix_agent_win_download_url``, ``zabbix_mac_package`` and ``zabbix_mac_download_link`` in favor of ``zabbix_agent_download_url`` (https://github.com/ansible-collections/community.zabbix/pull/1788).
+- zabbix_agent - ``zabbix_agent_logfile`` is deprecated in favor of ``zabbix_agent_log_file`` (https://github.com/ansible-collections/community.zabbix/pull/1800).
+- zabbix_agent, zabbix_javagateway, zabbix_proxy, zabbix_server and zabbix_web roles - ``enable_version_check`` is deprecated and will be removed in community.zabbix 5.0.0. Use the role-specific ``zabbix_agent_version_check``, ``zabbix_javagateway_version_check``, ``zabbix_proxy_version_check``, ``zabbix_server_version_check`` or ``zabbix_web_version_check`` instead (https://github.com/ansible-collections/community.zabbix/issues/1755).
+
+Bugfixes
+--------
+
+- zabbix_agent - Fix the macOS package version check, which compared against the undefined ``zabbix_version_long`` instead of ``zabbix_agent_version_long`` (https://github.com/ansible-collections/community.zabbix/pull/1788).
+- zabbix_agent - Fix the role failing on macOS when loading OS-specific variables, as ``vars/Darwin.yml`` did not exist (https://github.com/ansible-collections/community.zabbix/pull/1788).
+- zabbix_agent - On Windows, load config files from the MSI's ``zabbix_agentd.d`` include dir. The role pointed ``Include`` at ``zabbix_agent.d``, which the MSI doesn't create, with a forward-slash wildcard the Windows agent never matched, so files in the include dir were ignored. ``Include`` and ``LogFile`` paths are now written with backslashes (https://github.com/ansible-collections/community.zabbix/pull/1800).
+- zabbix_agent - On macOS, restart the agent through its launchd label ``com.zabbix.zabbix_agentd``. The handler kickstarted a label that didn't exist (https://github.com/ansible-collections/community.zabbix/pull/1800).
+- zabbix_agent - fix Windows agent ``Include`` paths in ``zabbix_agent2.conf`` reverting to Linux defaults (``/etc/zabbix/zabbix_agent2.d``); ``_zabbix_agent_include_dirs`` referenced the now-deprecated ``zabbix_agent_win_install_dir_conf`` without a fallback, which made it evaluate as undefined and ``default(_includes)`` fall through to the Linux paths. Same regression as previously reported in https://github.com/ansible-collections/community.zabbix/issues/1378 and https://github.com/ansible-collections/community.zabbix/issues/1580 (https://github.com/ansible-collections/community.zabbix/issues/1717).
+- zabbix_agent - fix Windows agent installation hanging indefinitely when MSI public properties contain spaces; switch ``win_command`` from ``argv:`` to ``cmd:`` form so values can use the ``PROPERTY="value"`` quoting msiexec requires (https://github.com/ansible-collections/community.zabbix/issues/1717).
+- zabbix_agent - fix `zabbix-agent.service` deactivation task when the service has a `not-found` systemd status (https://github.com/ansible-collections/community.zabbix/issues/1742).
+- zabbix_agent - fix host creation through the API failing with ``'dict object' has no attribute 'psk,unencrypted'`` when ``zabbix_agent_tlspsk_auto`` is enabled or ``zabbix_agent_tlsaccept`` lists several connection types. The values are now combined into the ``tls_accept`` bitmask (https://github.com/ansible-collections/community.zabbix/issues/1654).
+- zabbix_agent - only write ``TLSAccept`` when ``zabbix_agent_tlsaccept`` is defined. The template checked ``zabbix_agent_tlsconnect`` instead, so ``TLSAccept`` was commented out when only ``zabbix_agent_tlsaccept`` was set, and written empty when only ``zabbix_agent_tlsconnect`` was set (https://github.com/ansible-collections/community.zabbix/issues/1338).
+- zabbix_agent, zabbix_javagateway, zabbix_proxy, zabbix_server and zabbix_web roles - ``enable_version_check`` is honoured again. It was renamed to ``zabbix_<role>_version_check`` in 4.0.0 without notice, so setting it had no effect. The role-specific variables now default to ``enable_version_check`` when it is set (https://github.com/ansible-collections/community.zabbix/issues/1755).
+- zabbix_agent, zabbix_proxy, zabbix_server roles - install ``selinux-policy-epel`` on EL10, where the zabbix SELinux module (providing ``zabbix_can_network`` and ``zabbix_run_sudo``) moved out of ``selinux-policy`` (https://github.com/ansible-collections/community.zabbix/issues/1645).
+- zabbix_configuration - Fix configuration module to import host and some resource
+- zabbix_javagateway, zabbix_proxy and zabbix_web roles - the documentation now names the role-specific ``zabbix_<role>_version_check`` variable instead of ``enable_version_check`` (https://github.com/ansible-collections/community.zabbix/issues/1755).
+- zabbix_proxy role - fix the supported-versions lookup, which silently defaulted to 7.4 on every OS when ``zabbix_proxy_version`` was unset (https://github.com/ansible-collections/community.zabbix/pull/1785).
+- zabbix_repo role - load the OS-specific variables with an explicit ``first_found`` lookup whose search path is pinned to the role's ``vars/`` directory. The previous bare ``with_first_found`` relied on the lookup's default search path covering ``vars/``, which breaks on ansible-core 2.20+ when ``ansible_search_path`` is set (it then takes precedence over ``role_path`` and no longer includes ``vars/``); combined with the ansible-core 2.17+ change that makes ``first_found`` raise instead of returning an empty list, the role aborted with "No file was found" before configuring any repository (https://github.com/ansible-collections/community.zabbix/issues/1754).
+- zabbix_server - convert ``zabbix_server_database_creation`` to a boolean in PostgreSQL tasks, matching MySQL behavior and correctly handling string values such as ``"false"`` (https://github.com/ansible-collections/community.zabbix/issues/1779).
+- zabbix_web - nginx vhost template now selects HTTP/2 syntax based on the installed Nginx version.
+
 v4.2.0
 ======
 

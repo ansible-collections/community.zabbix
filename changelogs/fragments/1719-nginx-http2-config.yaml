@@ -1,2 +1,0 @@
-bugfixes:
-  - zabbix_web - nginx vhost template now selects HTTP/2 syntax based on the installed Nginx version.

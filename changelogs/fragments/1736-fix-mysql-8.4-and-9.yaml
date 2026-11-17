@@ -1,5 +1,0 @@
-minor_changes:
-  - zabbix_proxy - added support for MySQL 8+ and new variables for configuring MySQL authentication plugins 
-  - zabbix_server - added support for MySQL 8+ and new variables for configuring MySQL authentication plugins
-breaking_changes:
-  - All roles - Set minimum supported version for common.mysql to 3.10.0
