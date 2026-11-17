@@ -92,11 +92,13 @@ See the following list of supported Operating systems with the Zabbix releases:
 
 | Zabbix                | 8.0 | 7.4 | 7.2 | 7.0 | 6.0 |
 |-----------------------|-----|-----|-----|-----|-----|
+| Red Hat Fam 10        |  V  |  V  |     |  V  |  V  |
 | Red Hat Fam 9         |  V  |  V  |  V  |  V  |  V  |
 | Red Hat Fam 8         |  V  |  V  |  V  |  V  |  V  |
 | Ubuntu 26.04 resolute |  V  |  V  |     |  V  |     |
 | Ubuntu 24.04 noble    |  V  |  V  |  V  |  V  |  V  |
 | Ubuntu 22.04 jammy    |  V  |  V  |  V  |  V  |  V  |
+| Debian 13 trixie      |  V  |  V  |     |  V  |  V  |
 | Debian 12 bookworm    |  V  |  V  |  V  |  V  |  V  |
 | Debian 11 bullseye    |  V  |  V  |  V  |  V  |  V  |
 | Suse Fam 15           |  V  |  V  |  V  |  V  |  V  |
@@ -104,6 +106,7 @@ See the following list of supported Operating systems with the Zabbix releases:
 | FreeBSD 14            |     |  V  |  V  |  V  |  V  |
 | FreeBSD 13            |     |  V  |  V  |  V  |  V  |
 | macOS                 |     |  V  |     |  V  |  V  |
+| Windows               |  V  |  V  |  V  |  V  |  V  |
 
 You can bypass this matrix by setting `zabbix_agent_version_check: false`
 
