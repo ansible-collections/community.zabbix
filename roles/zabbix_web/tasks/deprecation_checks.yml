@@ -1,0 +1,17 @@
+---
+- name: Deprecation enable_version_check
+  block:
+    - name: Verify enable_version_check goes undefined
+      assert:
+        that:
+          - enable_version_check is not defined
+        fail_msg: Deprecated configuration option provided
+        quiet: true
+  rescue:
+    - name: Deprecation notice for enable_version_check
+      debug:
+        msg: "{{ deprecation_notice.split('\n') }}"
+      vars:
+        deprecation_notice: |
+          enable_version_check has been deprecated, use zabbix_web_version_check instead.
+          enable_version_check will be removed in community.zabbix 5.0.0.

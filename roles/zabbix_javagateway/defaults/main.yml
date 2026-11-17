@@ -1,7 +1,7 @@
 ---
 # defaults file for zabbix_javagateway
 
-zabbix_javagateway_version_check: true
+zabbix_javagateway_version_check: "{{ enable_version_check | default(true) }}"
 
 # zabbix_javagateway_version:
 zabbix_javagateway_package_state: present
