@@ -12,7 +12,7 @@ short_description: Create, update and delete Zabbix LLD rule prototypes
 description:
     - Manage low-level discovery rule prototypes on hosts and templates.
     - Requires Zabbix 7.4 or later. Telemetry queries require Zabbix 8.0 or later.
-version_added: "4.3.0"
+version_added: "5.0.0"
 author:
     - Manuel Pesenti (@manuello1996)
 requirements:
