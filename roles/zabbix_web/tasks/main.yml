@@ -4,6 +4,9 @@
   tags:
     - always
 
+- name: Include deprecation checks
+  include_tasks: deprecation_checks.yml
+
 - name: Set More Variables
   ansible.builtin.set_fact:
     zabbix_db_type_long: "{{ 'postgresql' if zabbix_server_database == 'pgsql' else 'mysql' }}"
