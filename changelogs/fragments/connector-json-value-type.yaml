@@ -1,0 +1,4 @@
+minor_changes:
+  - zabbix_connector - support JSON item value streaming with ``item_value_types=json`` on Zabbix 8.0 and later, including combinations with ``all`` and ``all+bin`` (https://support.zabbix.com/browse/ZBXNEXT-10069).
+bugfixes:
+  - zabbix_connector - correct the Text, Binary and ``all+bin`` API bitmasks and combine overlapping item value types without double counting.

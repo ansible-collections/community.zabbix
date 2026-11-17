@@ -36,9 +36,11 @@ options:
         description:
             - Parameter introduced in Zabbix 7.0
             - List of value types to stream.
-            - Each element should be one of C(all), C(all+bin), C(numeric_float), C(character), C(log), C(numeric_unsigned), C(text) or C(binary).
-            - C(all) represents all types except binary I((default)).
-            - C(all+bin) represents all types, binary included.
+            - Each element should be one of C(all), C(all+bin), C(numeric_float), C(character), C(log), C(numeric_unsigned), C(text), C(binary) or C(json).
+            - C(json) is supported since Zabbix 8.0 and maps to the API value 64.
+            - C(all) represents all types except binary and JSON I((default)).
+            - C(all+bin) represents all types except JSON, binary included.
+            - To include JSON, combine C(json) with individual types, C(all) or C(all+bin).
         type: list
         elements: str
     max_records:
@@ -176,7 +178,7 @@ EXAMPLES = r"""
     ansible_httpapi_validate_certs: false
     ansible_zabbix_url_path: "zabbixeu"  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
     ansible_host: zabbix-example-fqdn.org
-  community.zabbix.zabbix_proxy:
+  community.zabbix.zabbix_connector:
     name: My app connector
     description: Connector to send item values to My app
     state: present
@@ -185,7 +187,7 @@ EXAMPLES = r"""
     url: https://my-app.example.com/api/zabbix-stream
     auth_type: bearer
     token: "{{ my_app_bearer_token }}"
-    value_types:
+    item_value_types:
       - numeric_float
       - character
       - numeric_unsigned
@@ -198,6 +200,15 @@ EXAMPLES = r"""
         operator: does not equal
         value: hidden
 
+- name: Stream all item value types including binary and JSON (Zabbix >= 8.0)
+  community.zabbix.zabbix_connector:
+    name: My JSON connector
+    url: https://my-app.example.com/api/zabbix-stream
+    data_type: item_values
+    item_value_types:
+      - all+bin
+      - json
+
 - name: Delete a connector
   # set task level variables as we change ansible_connection plugin here
   vars:
@@ -208,7 +219,7 @@ EXAMPLES = r"""
     ansible_httpapi_validate_certs: false
     ansible_zabbix_url_path: "zabbixeu"  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
     ansible_host: zabbix-example-fqdn.org
-  community.zabbix.zabbix_proxy:
+  community.zabbix.zabbix_connector:
     name: My app connector
     state: absent
 """
@@ -242,12 +253,15 @@ class Connector(ZabbixBase):
     }
 
     VALUE_TYPES = {
+        "all": 31,
+        "all+bin": 63,
         "numeric_float": 1,
         "character": 2,
         "log": 4,
         "numeric_unsigned": 8,
-        "text": 10,
-        "binary": 20,
+        "text": 16,
+        "binary": 32,
+        "json": 64,
     }
 
     AUTH_TYPES = {
@@ -368,20 +382,14 @@ class Connector(ZabbixBase):
         }
 
         if params["item_value_types"] is not None:
-            value_types = set(params["item_value_types"])
-            if "all" in value_types:
-                sanitized["item_value_type"] = "31"
-            elif "all+bin" in value_types:
-                sanitized["item_value_type"] = "51"  # 31 + 20
-            else:
-                sum_value = 0
-                for value_type in value_types:
-                    value = Connector.VALUE_TYPES.get(value_type)
-                    if value is None:
-                        self._module.fail_json(msg="'%s' is not a known value type, should be one of %s" %
-                                                   (value_type, Connector.VALUE_TYPES.keys()))
-                    sum_value += value
-                sanitized["item_value_type"] = str(sum_value)
+            value_mask = 0
+            for value_type in params["item_value_types"]:
+                value = Connector.VALUE_TYPES.get(value_type)
+                if value is None:
+                    self._module.fail_json(msg="'%s' is not a known value type, should be one of %s" %
+                                               (value_type, Connector.VALUE_TYPES.keys()))
+                value_mask |= value
+            sanitized["item_value_type"] = str(value_mask)
 
         if params["tags"] is not None:
             tags = []

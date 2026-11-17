@@ -117,6 +117,65 @@
           - connector_value_type.results | map(attribute='changed') is all
       when: zabbix_version is version('7.0', '>=')
 
+    - name: Test JSON item value types on Zabbix 8.0 and later
+      when: zabbix_version is version('8.0', '>=')
+      block:
+        - name: Create a connector streaming JSON item values
+          community.zabbix.zabbix_connector:
+            name: ExampleJSONConnector
+            url: https://127.0.0.1/api/zabbix_stream
+            data_type: item_values
+            item_value_types:
+              - json
+          register: connector_json_new
+
+        - name: Assert that the JSON connector is created
+          ansible.builtin.assert:
+            that: connector_json_new is changed
+
+        - name: Repeat creation of the JSON connector
+          community.zabbix.zabbix_connector:
+            name: ExampleJSONConnector
+            url: https://127.0.0.1/api/zabbix_stream
+            data_type: item_values
+            item_value_types:
+              - json
+          register: connector_json_existing
+
+        - name: Assert that the JSON connector is unchanged
+          ansible.builtin.assert:
+            that: connector_json_existing is not changed
+
+        - name: Update the connector to stream JSON with other item value types
+          community.zabbix.zabbix_connector:
+            name: ExampleJSONConnector
+            url: https://127.0.0.1/api/zabbix_stream
+            data_type: item_values
+            item_value_types: "{{ item }}"
+          loop:
+            - ["text", "binary", "json"]
+            - ["all", "json"]
+            - ["all+bin", "json"]
+          register: connector_json_updates
+
+        - name: Assert that each JSON item value type update changed the connector
+          ansible.builtin.assert:
+            that: connector_json_updates.results | map(attribute='changed') is all
+
+        - name: Repeat the final JSON item value type update
+          community.zabbix.zabbix_connector:
+            name: ExampleJSONConnector
+            url: https://127.0.0.1/api/zabbix_stream
+            data_type: item_values
+            item_value_types:
+              - all+bin
+              - json
+          register: connector_json_unchanged
+
+        - name: Assert that the JSON item value types are unchanged
+          ansible.builtin.assert:
+            that: connector_json_unchanged is not changed
+
     - name: test - set non existent item value type (version >= 7.0)
       community.zabbix.zabbix_connector:
         name: ExampleConnector1
@@ -134,6 +193,13 @@
       when: zabbix_version is version('7.0', '>=')
 
   always:
+    - name: Cleanup JSON connector
+      community.zabbix.zabbix_connector:
+        name: ExampleJSONConnector
+        state: absent
+      when: zabbix_version is version('8.0', '>=')
+      ignore_errors: true
+
     - name: Cleanup connector
       community.zabbix.zabbix_connector:
         name: ExampleConnector1
