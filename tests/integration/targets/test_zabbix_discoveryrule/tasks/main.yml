@@ -10,6 +10,15 @@
     # zabbix_discoveryrule module tests
     - include_tasks: zabbix_tests.yml
 
+    - name: Test telemetry LLD rules on hosts and templates
+      ansible.builtin.include_tasks: zabbix_telemetry_tests.yml
+      loop:
+        - host_name: ExampleHost
+        - template_name: ExampleTemplate
+      loop_control:
+        loop_var: telemetry_target
+      when: zabbix_version is version('8.0', '>=')
+
     # tear down stuff set up earlier
     - include_tasks: zabbix_teardown.yml
 

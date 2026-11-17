@@ -82,6 +82,7 @@ options:
             type:
                 description:
                     - Type of the LLD rule.
+                    - C(telemetry_query) (API value 24) requires Zabbix 8.0 or later.
                     - Required if state is "present".
                 required: false
                 type: str
@@ -104,6 +105,37 @@ options:
                     - http_agent
                     - snmp_agent
                     - script
+                    - telemetry_query
+            query:
+                description:
+                    - Telemetry query configuration, passed as an API object without conversion.
+                    - Required when creating a C(telemetry_query) rule on Zabbix 8.0 or later.
+                    - See U(https://www.zabbix.com/documentation/current/en/manual/api/reference/discoveryrule/object#telemetry-query).
+                type: dict
+            time_shift:
+                description:
+                    - Minimum gap between the query range end and the current time, from 0 to 86400 seconds.
+                    - Accepts seconds, time suffixes or user macros. Zabbix defaults to C(15s).
+                    - Supported for C(telemetry_query) on Zabbix 8.0 or later.
+                type: str
+            lookback_limit:
+                description:
+                    - Maximum query lookback period, from 1 to 259200 seconds.
+                    - Accepts seconds, time suffixes or user macros. Zabbix defaults to C(10m).
+                    - Supported for C(telemetry_query) on Zabbix 8.0 or later.
+                type: str
+            granularity:
+                description:
+                    - Query bucket duration, from 1 to 86400 seconds, no greater than C(lookback_limit).
+                    - Accepts seconds, time suffixes or user macros. Zabbix defaults to C(15s).
+                    - Supported for C(telemetry_query) on Zabbix 8.0 or later.
+                type: str
+            timeout:
+                description:
+                    - Polling timeout for rule types that support it, including C(telemetry_query) on Zabbix 8.0 or later.
+                    - Accepts seconds, time suffixes or user macros. An empty string uses proxy/global timeout settings.
+                    - If the proxy or proxy group is inaccessible, Zabbix 8.0 uses the global timeout.
+                type: str
             new_name:
                 description:
                     - New name for LLD rule.
@@ -229,6 +261,29 @@ EXAMPLES = r'''
         interval: 2h
     state: present
 
+- name: Create a telemetry query LLD rule (Zabbix >= 8.0)
+  community.zabbix.zabbix_discoveryrule:
+    name: Discover telemetry services
+    host_name: example_host
+    params:
+      type: telemetry_query
+      key: telemetry.services.discovery
+      interval: 1m
+      query:
+        signal_type: 0
+        columns:
+          - column: ResourceAttributes
+            attribute_key: service.name
+        aggregated_columns:
+          - function: 4
+            alias: record_count
+        filter:
+          evaltype: 0
+          conditions: []
+      time_shift: 15s
+      lookback_limit: 10m
+      granularity: 15s
+
 # Delete LLD rule
 - name: delete rule
   # set task level variables as we change ansible_connection plugin here
@@ -266,52 +321,11 @@ EXAMPLES = r'''
 from ansible.module_utils.basic import AnsibleModule
 
 from ansible_collections.community.zabbix.plugins.module_utils.base import ZabbixBase
+from ansible_collections.community.zabbix.plugins.module_utils.discoveryrule import DiscoveryRuleParams
 import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabbix_utils
 
 
-class Discoveryrule(ZabbixBase):
-    ITEM_TYPES = {'zabbix_agent': 0,
-                  'zabbix_trapper': 2,
-                  'simple_check': 3,
-                  'zabbix_internal': 5,
-                  'zabbix_agent_active': 7,
-                  'web_item': 9,
-                  'external_check': 10,
-                  'database_monitor': 11,
-                  'ipmi_agent': 12,
-                  'ssh_agent': 13,
-                  'telnet_agent': 14,
-                  'calculated': 15,
-                  'jmx_agent': 16,
-                  'snmp_trap': 17,
-                  'dependent_item': 18,
-                  'http_agent': 19,
-                  'snmp_agent': 20,
-                  'script': 21}
-
-    PREPROCESSING_TYPES = {'regex': 5,
-                           'xml_xpath': 11,
-                           'jsonpath': 12,
-                           'does_not_match_regular_expression': 15,
-                           'not_match_regex': 15,
-                           'check_for_error_in_json': 16,
-                           'check_for_json_error': 16,
-                           'check_for_error_in_xml': 17,
-                           'check_for_xml_error': 17,
-                           'discard_unchanged_with_heartbeat': 20,
-                           'javascript': 21,
-                           'prometheus_to_json': 23,
-                           'csv_to_json': 24,
-                           'replace': 25,
-                           'xml_to_json': 27,
-                           'snmp_walk_value': 28,
-                           'snmp_walk_to_json': 29}
-
-    PREPROCESSING_ERROR_HANDLERS = {'zabbix_server': 0,
-                                    'discard': 1,
-                                    'set_custom_value': 2,
-                                    'set_custom_error_message': 3}
-
+class Discoveryrule(DiscoveryRuleParams, ZabbixBase):
     def get_hosts_templates(self, host_name, template_name):
         if host_name is not None:
             try:
@@ -335,39 +349,6 @@ class Discoveryrule(ZabbixBase):
         except Exception as e:
             self._module.fail_json(msg="Failed to get discovery rules: %s" % e)
         return discoveryrules
-
-    def sanitize_params(self, name, params):
-        params['name'] = name
-        if 'key' in params:
-            params['key_'] = params['key']
-            params.pop("key")
-        if 'type' in params:
-            item_type_int = self.ITEM_TYPES[params['type']]
-            params['type'] = item_type_int
-        if 'interval' in params:
-            params['delay'] = params['interval']
-            params.pop("interval")
-        if 'enabled' in params:
-            if params['enabled']:
-                params['status'] = 'enabled'
-            else:
-                params['status'] = 'disabled'
-            params.pop("enabled")
-        if 'status' in params:
-            status = params['status']
-            if status == 'enabled':
-                params['status'] = 0
-            elif status == 'disabled':
-                params['status'] = 1
-            else:
-                self._module.fail_json(msg="Status must be 'enabled' or 'disabled', got %s" % status)
-        if 'preprocessing' in params:
-            for param in params['preprocessing']:
-                preprocess_type_int = self.PREPROCESSING_TYPES[param['type']]
-                param['type'] = preprocess_type_int
-                if 'error_handler' in param:
-                    error_handler_int = self.PREPROCESSING_ERROR_HANDLERS[param['error_handler']]
-                    param['error_handler'] = error_handler_int
 
     def add_discoveryrule(self, params):
         if self._module.check_mode:

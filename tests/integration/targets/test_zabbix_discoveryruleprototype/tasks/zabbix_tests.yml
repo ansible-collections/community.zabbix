@@ -1,0 +1,176 @@
+---
+- name: Create the parent LLD rule
+  community.zabbix.zabbix_discoveryrule:
+    name: Prototype parent
+    host_name: "{{ prototype_target.host_name | default(omit) }}"
+    template_name: "{{ prototype_target.template_name | default(omit) }}"
+    params:
+      type: zabbix_trapper
+      key: prototype.parent.discovery
+
+- name: Test LLD rule prototype lifecycle
+  module_defaults:
+    community.zabbix.zabbix_discoveryruleprototype:
+      name: 'Nested discovery for {% raw %}{#SERVICE}{% endraw %}'
+      discoveryrule_name: Prototype parent
+      host_name: "{{ prototype_target.host_name | default(omit) }}"
+      template_name: "{{ prototype_target.template_name | default(omit) }}"
+  vars:
+    nested_params:
+      type: nested
+      key: 'nested.discovery[{% raw %}{#SERVICE}{% endraw %}]'
+  block:
+    - name: Predict prototype creation
+      community.zabbix.zabbix_discoveryruleprototype:
+        params: "{{ nested_params }}"
+      check_mode: true
+      register: prototype_create_check
+
+    - name: Create the prototype
+      community.zabbix.zabbix_discoveryruleprototype:
+        params: "{{ nested_params }}"
+      register: prototype_create
+
+    - name: Repeat prototype creation
+      community.zabbix.zabbix_discoveryruleprototype:
+        params: "{{ nested_params }}"
+      register: prototype_repeat
+
+    - name: Predict the unchanged prototype
+      community.zabbix.zabbix_discoveryruleprototype:
+        params: "{{ nested_params }}"
+      check_mode: true
+      register: prototype_repeat_check
+
+    - name: Assert creation and idempotence
+      ansible.builtin.assert:
+        that:
+          - prototype_create_check is changed
+          - prototype_create is changed
+          - prototype_repeat is not changed
+          - prototype_repeat_check is not changed
+
+    - name: Predict a prototype update
+      community.zabbix.zabbix_discoveryruleprototype:
+        params:
+          enabled: false
+      check_mode: true
+      register: prototype_update_check
+
+    - name: Update the prototype
+      community.zabbix.zabbix_discoveryruleprototype:
+        params:
+          enabled: false
+      register: prototype_update
+
+    - name: Repeat the prototype update
+      community.zabbix.zabbix_discoveryruleprototype:
+        params:
+          enabled: false
+      register: prototype_update_repeat
+
+    - name: Assert update and check mode behavior
+      ansible.builtin.assert:
+        that:
+          - prototype_update_check is changed
+          - prototype_update is changed
+          - prototype_update_repeat is not changed
+
+    - name: Rename the prototype
+      community.zabbix.zabbix_discoveryruleprototype:
+        params:
+          new_name: 'Renamed discovery for {% raw %}{#SERVICE}{% endraw %}'
+      register: prototype_rename
+
+    - name: Repeat the prototype rename
+      community.zabbix.zabbix_discoveryruleprototype:
+        params:
+          new_name: 'Renamed discovery for {% raw %}{#SERVICE}{% endraw %}'
+      register: prototype_rename_repeat
+
+    - name: Assert rename and idempotence
+      ansible.builtin.assert:
+        that:
+          - prototype_rename is changed
+          - prototype_rename_repeat is not changed
+
+    - name: Create a child under an LLD rule prototype
+      community.zabbix.zabbix_discoveryruleprototype:
+        name: 'Child discovery for {% raw %}{#SERVICE}{% endraw %}'
+        discoveryrule_name: 'Renamed discovery for {% raw %}{#SERVICE}{% endraw %}'
+        params:
+          type: nested
+          key: 'child.discovery[{% raw %}{#SERVICE}{% endraw %}]'
+      register: prototype_child
+
+    - name: Assert that the child was created
+      ansible.builtin.assert:
+        that: prototype_child is changed
+
+    - name: Test telemetry query prototypes
+      ansible.builtin.include_tasks: zabbix_telemetry_tests.yml
+      when: zabbix_version is version('8.0', '>=')
+
+    - name: Reject telemetry query prototypes before Zabbix 8.0
+      community.zabbix.zabbix_discoveryruleprototype:
+        params:
+          type: telemetry_query
+          key: 'telemetry.unsupported[{% raw %}{#SERVICE}{% endraw %}]'
+      register: prototype_unsupported
+      ignore_errors: true
+      when: zabbix_version is version('8.0', '<')
+
+    - name: Assert that unsupported telemetry queries fail clearly
+      ansible.builtin.assert:
+        that:
+          - prototype_unsupported is failed
+          - "'require Zabbix 8.0' in prototype_unsupported.msg"
+      when: zabbix_version is version('8.0', '<')
+
+    - name: Predict prototype deletion
+      community.zabbix.zabbix_discoveryruleprototype:
+        name: 'Renamed discovery for {% raw %}{#SERVICE}{% endraw %}'
+        state: absent
+      check_mode: true
+      register: prototype_delete_check
+
+    - name: Delete the prototype and its child
+      community.zabbix.zabbix_discoveryruleprototype:
+        name: 'Renamed discovery for {% raw %}{#SERVICE}{% endraw %}'
+        state: absent
+      register: prototype_delete
+
+    - name: Repeat prototype deletion
+      community.zabbix.zabbix_discoveryruleprototype:
+        name: 'Renamed discovery for {% raw %}{#SERVICE}{% endraw %}'
+        state: absent
+      register: prototype_delete_repeat
+
+    - name: Assert deletion and idempotence
+      ansible.builtin.assert:
+        that:
+          - prototype_delete_check is changed
+          - prototype_delete is changed
+          - prototype_delete_repeat is not changed
+
+    - name: Reject a missing parent
+      community.zabbix.zabbix_discoveryruleprototype:
+        discoveryrule_name: Missing parent
+        params: "{{ nested_params }}"
+      register: prototype_missing_parent
+      ignore_errors: true
+
+    - name: Assert that a missing parent fails clearly
+      ansible.builtin.assert:
+        that:
+          - prototype_missing_parent is failed
+          - "'was not found' in prototype_missing_parent.msg"
+
+  always:
+    - name: Remove the parent and any remaining prototypes
+      community.zabbix.zabbix_discoveryrule:
+        name: Prototype parent
+        host_name: "{{ prototype_target.host_name | default(omit) }}"
+        template_name: "{{ prototype_target.template_name | default(omit) }}"
+        state: absent
+      ignore_errors: true
