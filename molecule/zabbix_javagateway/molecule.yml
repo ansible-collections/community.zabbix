@@ -36,11 +36,11 @@ provisioner:
       all:
         ansible_connection: community.docker.docker
       v74:
-        zabbix_javagateway_version: 7.4
+        zabbix_javagateway_version: "7.4"
       v70:
-        zabbix_javagateway_version: 7.0
+        zabbix_javagateway_version: "7.0"
       v60:
-        zabbix_javagateway_version: 6.0
+        zabbix_javagateway_version: "6.0"
 
 verifier:
-  name: testinfra
+  name: ansible
