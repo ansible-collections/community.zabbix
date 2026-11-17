@@ -1,0 +1,2 @@
+trivial:
+  - zabbix_server role - document that a MySQL or PostgreSQL server must already be installed and running before the role is used (https://github.com/ansible-collections/community.zabbix/issues/1791).
