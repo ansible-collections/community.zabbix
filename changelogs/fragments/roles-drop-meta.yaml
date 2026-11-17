@@ -1,2 +1,0 @@
-trivial:
-  - roles - removed unused ``meta/main.yml`` from all roles. ``galaxy_info`` is ignored for roles in a collection and ``dependencies`` was empty.

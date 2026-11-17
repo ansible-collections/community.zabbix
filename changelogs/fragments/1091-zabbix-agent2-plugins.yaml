@@ -1,2 +1,0 @@
-minor_changes:
-  - zabbix_agent - added zabbix_agent_packages variable (list) to support installing agent2 plugin packages alongside the main agent package; deprecated zabbix_agent_package (https://github.com/ansible-collections/community.zabbix/issues/1091).

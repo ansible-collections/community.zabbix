@@ -1,2 +1,0 @@
-bugfixes:
-  - zabbix_agent - fix host creation through the API failing with ``'dict object' has no attribute 'psk,unencrypted'`` when ``zabbix_agent_tlspsk_auto`` is enabled or ``zabbix_agent_tlsaccept`` lists several connection types. The values are now combined into the ``tls_accept`` bitmask (https://github.com/ansible-collections/community.zabbix/issues/1654).
