@@ -1,4 +1,6 @@
 ---
-- hosts: all
+- name: Converge
+  hosts: all
+
   roles:
     - role: zabbix_repo

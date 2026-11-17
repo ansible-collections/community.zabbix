@@ -124,7 +124,7 @@ During development, the two most useful commands are:
 (ansible-2.18.x-venv) ... $ molecule verify -s <scenario_name>
 ```
 
-You can change what you test against by setting environment variables such as `MY_MOLECULE_DATABASE`, `MY_MOLECULE_VERSION`, `MY_MOLECULE_CONTAINER`, and `MY_MOLECULE_IMAGE`.
+You can change what you test against by setting environment variables such as `MY_MOLECULE_DATABASE`, `MY_MOLECULE_VERSION`, and `MY_MOLECULE_IMAGE`.
 
 **Pro tip:** To test multiple targets at once, add additional entries under `platforms` in your scenario's `molecule.yml`. See the commented-out "Developer example" in `molecule/zabbix_proxy/molecule.yml` for a working multi-platform setup.
 

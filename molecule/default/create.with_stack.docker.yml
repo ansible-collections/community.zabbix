@@ -134,7 +134,7 @@
             # https://github.com/zabbix/zabbix-docker#compatibility-notes
             _tls_dir: /var/lib/zabbix/enc
 
-        - name: Create Zabbix web container
+        - name: Create Zabbix web container(s)
           community.docker.docker_container:
             name: "zabbix-web-{{ _version }}"
             image: "zabbix/zabbix-web-nginx-pgsql:alpine-{{ _g_to_v[_version] }}-latest"
@@ -189,7 +189,6 @@
         state: started
         recreate: true
         privileged: "{{ item.privileged | default(omit) }}"
-        command: "{{ item.command | default(omit) }}"
         networks:
           - name: zabbix
         volumes: "{{ item.volumes | default(omit) }}"

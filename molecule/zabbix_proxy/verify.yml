@@ -5,30 +5,30 @@
 
   tasks:
     - name: Gather package facts
-      ansible.builtin.package_facts:
+      package_facts:
 
     - name: Assert zabbix-proxy package is installed with correct version
-      ansible.builtin.assert:
+      assert:
         that:
           - "'zabbix-proxy-' ~ zabbix_proxy_database in ansible_facts.packages"
           - zabbix_proxy_version in (ansible_facts.packages['zabbix-proxy-' ~ zabbix_proxy_database] | first).version
 
     - name: Gather service facts
-      ansible.builtin.service_facts:
+      service_facts:
 
     - name: Assert zabbix-proxy service is enabled and running
-      ansible.builtin.assert:
+      assert:
         that:
           - ansible_facts.services['zabbix-proxy.service'].status == 'enabled'
           - ansible_facts.services['zabbix-proxy.service'].state == 'running'
 
     - name: Stat zabbix_proxy.conf
-      ansible.builtin.stat:
+      stat:
         path: /etc/zabbix/zabbix_proxy.conf
       register: _proxy_conf
 
     - name: Assert zabbix_proxy.conf exists with correct ownership and mode
-      ansible.builtin.assert:
+      assert:
         that:
           - _proxy_conf.stat.exists
           - _proxy_conf.stat.pw_name == 'zabbix'
@@ -36,7 +36,7 @@
           - _proxy_conf.stat.mode == '0640'
 
     - name: Read zabbix_proxy.conf
-      ansible.builtin.slurp:
+      slurp:
         src: /etc/zabbix/zabbix_proxy.conf
       register: _proxy_conf
 
@@ -52,12 +52,12 @@
         _proxy_conf_lines: "{{ (_proxy_conf.content | b64decode).splitlines() }}"
 
     - name: Stat zabbix_proxy.d include directory
-      ansible.builtin.stat:
+      stat:
         path: /etc/zabbix/zabbix_proxy.d
       register: _proxy_include_dir
 
     - name: Assert include directory exists with correct ownership
-      ansible.builtin.assert:
+      assert:
         that:
           - _proxy_include_dir.stat.exists
           - _proxy_include_dir.stat.isdir
@@ -67,7 +67,7 @@
     - name: Check zabbix_proxy.log
       block:
         - name: Read zabbix_proxy log file
-          ansible.builtin.slurp:
+          slurp:
             src: /var/log/zabbix/zabbix_proxy.log
           register: _proxy_log
           until: >

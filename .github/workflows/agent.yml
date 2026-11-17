@@ -97,10 +97,8 @@ jobs:
 
       - name: Run role tests
         run: >-
-          MY_MOLECULE_CONTAINER=${{ matrix.container.image }}
           MY_MOLECULE_IMAGE=${{ matrix.container.image }}
           MY_MOLECULE_VERSION=${{ matrix.version }}
-          MY_MOLECULE_DOCKER_COMMAND=${{ matrix.command }}
           molecule test -s zabbix_agent
 
   legacy:
@@ -179,8 +177,6 @@ jobs:
 
       - name: Run role tests
         run: >-
-          MY_MOLECULE_CONTAINER=${{ matrix.container.image }}
           MY_MOLECULE_IMAGE=${{ matrix.container.image }}
           MY_MOLECULE_VERSION=${{ matrix.version }}
-          MY_MOLECULE_DOCKER_COMMAND=${{ matrix.command }}
           molecule test -s zabbix_agent

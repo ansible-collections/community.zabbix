@@ -3,8 +3,8 @@
   hosts: all
 
   tasks:
-    - name: "Configure SUDO."
-      ansible.builtin.lineinfile:
+    - name: Configure SUDO
+      lineinfile:
         dest: /etc/sudoers
         line: "Defaults    !requiretty"
         state: present

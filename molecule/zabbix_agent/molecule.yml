@@ -9,22 +9,20 @@ driver:
   name: default
 
 platforms:
-  - name: zabbix-agent-${MY_MOLECULE_VERSION:-v80}-${MY_MOLECULE_CONTAINER:-rockylinux10}
+  - name: zabbix-agent-${MY_MOLECULE_VERSION:-v80}-${MY_MOLECULE_IMAGE:-rockylinux10}
     image: geerlingguy/docker-${MY_MOLECULE_IMAGE:-rockylinux10}-ansible:latest
     privileged: true
     pre_build_image: true
-    command: ${MOLECULE_DOCKER_COMMAND:-""}
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:rw
     cgroupns_mode: host
     groups:
       - agentd
       - ${MY_MOLECULE_VERSION:-v80}
-  - name: zabbix-agent2-${MY_MOLECULE_VERSION:-v80}-${MY_MOLECULE_CONTAINER:-rockylinux10}
+  - name: zabbix-agent2-${MY_MOLECULE_VERSION:-v80}-${MY_MOLECULE_IMAGE:-rockylinux10}
     image: geerlingguy/docker-${MY_MOLECULE_IMAGE:-rockylinux10}-ansible:latest
     privileged: true
     pre_build_image: true
-    command: ${MOLECULE_DOCKER_COMMAND:-""}
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:rw
     cgroupns_mode: host
@@ -33,11 +31,10 @@ platforms:
       - ${MY_MOLECULE_VERSION:-v80}
 
   # AutoPSK
-  - name: zabbix-agent-${MY_MOLECULE_VERSION:-v80}-autopsk-${MY_MOLECULE_CONTAINER:-rockylinux10}
+  - name: zabbix-agent-${MY_MOLECULE_VERSION:-v80}-autopsk-${MY_MOLECULE_IMAGE:-rockylinux10}
     image: geerlingguy/docker-${MY_MOLECULE_IMAGE:-rockylinux10}-ansible:latest
     privileged: true
     pre_build_image: true
-    command: ${MOLECULE_DOCKER_COMMAND:-""}
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:rw
     cgroupns_mode: host
@@ -45,11 +42,10 @@ platforms:
       - agentd
       - ${MY_MOLECULE_VERSION:-v80}
       - autopsk
-  - name: zabbix-agent2-${MY_MOLECULE_VERSION:-v80}-autopsk-${MY_MOLECULE_CONTAINER:-rockylinux10}
+  - name: zabbix-agent2-${MY_MOLECULE_VERSION:-v80}-autopsk-${MY_MOLECULE_IMAGE:-rockylinux10}
     image: geerlingguy/docker-${MY_MOLECULE_IMAGE:-rockylinux10}-ansible:latest
     privileged: true
     pre_build_image: true
-    command: ${MOLECULE_DOCKER_COMMAND:-""}
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:rw
     cgroupns_mode: host
@@ -59,11 +55,10 @@ platforms:
       - autopsk
 
   # Certificate TLS, CA from create.with_stack.docker.yml, certs from prepare.yml
-  - name: zabbix-agent-${MY_MOLECULE_VERSION:-v80}-cert-${MY_MOLECULE_CONTAINER:-rockylinux10}
+  - name: zabbix-agent-${MY_MOLECULE_VERSION:-v80}-cert-${MY_MOLECULE_IMAGE:-rockylinux10}
     image: geerlingguy/docker-${MY_MOLECULE_IMAGE:-rockylinux10}-ansible:latest
     privileged: true
     pre_build_image: true
-    command: ${MOLECULE_DOCKER_COMMAND:-""}
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:rw
     cgroupns_mode: host
@@ -71,11 +66,10 @@ platforms:
       - agentd
       - ${MY_MOLECULE_VERSION:-v80}
       - cert
-  - name: zabbix-agent2-${MY_MOLECULE_VERSION:-v80}-cert-${MY_MOLECULE_CONTAINER:-rockylinux10}
+  - name: zabbix-agent2-${MY_MOLECULE_VERSION:-v80}-cert-${MY_MOLECULE_IMAGE:-rockylinux10}
     image: geerlingguy/docker-${MY_MOLECULE_IMAGE:-rockylinux10}-ansible:latest
     privileged: true
     pre_build_image: true
-    command: ${MOLECULE_DOCKER_COMMAND:-""}
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:rw
     cgroupns_mode: host

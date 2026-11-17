@@ -5,10 +5,10 @@
 
   tasks:
     - name: Gather package facts
-      ansible.builtin.package_facts:
+      package_facts:
 
     - name: Assert zabbix-web packages are installed with correct version
-      ansible.builtin.assert:
+      assert:
         that:
           - _web_pkg_name in ansible_facts.packages
           - zabbix_web_version in (ansible_facts.packages[_web_pkg_name] | first).version
@@ -23,12 +23,12 @@
         _conf_pkg_name: "zabbix-{{ zabbix_web_http_server }}-conf{{ _php_suffix }}"
 
     - name: Stat zabbix.conf.php
-      ansible.builtin.stat:
+      stat:
         path: /etc/zabbix/web/zabbix.conf.php
       register: _zabbix_conf_php
 
     - name: Assert zabbix.conf.php exists with correct ownership and mode
-      ansible.builtin.assert:
+      assert:
         that:
           - _zabbix_conf_php.stat.exists
           - _zabbix_conf_php.stat.pw_name == _owner[ansible_facts.os_family]
@@ -45,7 +45,7 @@
           Suse: www
 
     - name: Test Zabbix API login
-      ansible.builtin.uri:
+      uri:
         url: "http://{{ zabbix_api_server_url }}/api_jsonrpc.php"
         method: POST
         headers:
@@ -62,7 +62,7 @@
       register: _zabbix_api_response
 
     - name: Assert Zabbix API login succeeded
-      ansible.builtin.assert:
+      assert:
         that:
           - _zabbix_api_response.json.result is defined
           - _zabbix_api_response.json.result | length > 0
