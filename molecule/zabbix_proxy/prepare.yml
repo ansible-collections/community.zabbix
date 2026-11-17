@@ -5,15 +5,15 @@
   tasks:
     # To prevent services from starting during package installations on a docker build,
     # images normally come with this set to exit 101.
-    - name: "Allow services to start on install"
-      ansible.builtin.copy:
+    - name: Allow services to start on install
+      copy:
         content: |
           exit 0
         dest: /usr/sbin/policy-rc.d
       when: ansible_facts['os_family'] == 'Debian'
 
-    - name: "Installing packages"
-      ansible.builtin.package:
+    - name: Installing packages
+      package:
         name: "{{ _packages | select | list }}"
         update_cache: "{{ (ansible_facts['os_family'] in ['Debian', 'Suse']) | ternary(true, omit) }}"
       vars:
@@ -21,16 +21,16 @@
         _packages:
           - sudo
           - "{{ (ansible_facts['os_family'] == 'Suse') | ternary(_py3_rpm, '') }}"
-      register: installation_dependencies
-      until: installation_dependencies is succeeded
+      register: _installation_dependencies
+      until: _installation_dependencies is succeeded
 
-    - name: "Configure SUDO."
-      ansible.builtin.lineinfile:
+    - name: Configure SUDO
+      lineinfile:
         dest: /etc/sudoers
         line: "Defaults    !requiretty"
         state: present
 
-    - name: "Workaround for mysql on Debian-13"
+    - name: Workaround for mysql on Debian-13
       when:
         - ansible_facts.distribution == "Debian"
         - ansible_facts.distribution_major_version == "13"

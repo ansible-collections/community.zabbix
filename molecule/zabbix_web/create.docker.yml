@@ -84,7 +84,6 @@
         name: "{{ item.name }}"
         image: "{{ item.image }}"
         privileged: "{{ item.privileged | default(omit) }}"
-        command: "{{ item.command | default(omit) }}"
         networks:
           - name: zabbix
         volumes: "{{ item.volumes | default(omit) }}"

@@ -9,11 +9,10 @@ driver:
   name: default
 
 platforms:
-  - name: zabbix-jgw-${MY_MOLECULE_VERSION:-v80}-${MY_MOLECULE_CONTAINER:-rockylinux10}
+  - name: zabbix-jgw-${MY_MOLECULE_VERSION:-v80}-${MY_MOLECULE_IMAGE:-rockylinux10}
     image: geerlingguy/docker-${MY_MOLECULE_IMAGE:-rockylinux10}-ansible:latest
     privileged: true
     pre_build_image: true
-    command: ${MOLECULE_DOCKER_COMMAND:-""}
     networks:
       - name: zabbix
     volumes:
