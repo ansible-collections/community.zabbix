@@ -7,7 +7,7 @@
 - name: Determine Latest Supported Zabbix Version
   when: zabbix_javagateway_version is not defined
   ansible.builtin.set_fact:
-    zabbix_javagateway_version: "{{ _zabbix_javagateway_valid_versions[_os_key] | default(['7.4']) | first }}"
+    zabbix_javagateway_version: "{{ _zabbix_javagateway_valid_versions[_zabbix_javagateway_os_key] | default(['8.0']) | first }}"
   tags:
     - always
 
@@ -15,8 +15,8 @@
   when: zabbix_javagateway_version_check | bool
   ansible.builtin.assert:
     that:
-      - (zabbix_javagateway_version | string) in _zabbix_javagateway_valid_versions[_os_key]
-    fail_msg: Zabbix version {{ zabbix_javagateway_version }} is not supported on {{ _os_key }}
+      - (zabbix_javagateway_version | string) in _zabbix_javagateway_valid_versions[_zabbix_javagateway_os_key]
+    fail_msg: Zabbix version {{ zabbix_javagateway_version }} is not supported on {{ _zabbix_javagateway_os_key }}
   tags:
     - always
 
