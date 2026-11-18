@@ -1,4 +1,12 @@
 ---
+- name: Test configuration API additions on Zabbix 8.0 and later
+  ansible.builtin.include_tasks: configuration8.yml
+  when: zabbix_version is version('8.0', '>=')
+
+- name: Verify that Zabbix 8.0 options fail clearly on older servers
+  ansible.builtin.include_tasks: configuration_unsupported.yml
+  when: zabbix_version is version('8.0', '<')
+
 - name: Create FTP Service Template
   community.zabbix.zabbix_template:
     template_name: FTP Service
@@ -59,6 +67,26 @@
   ansible.builtin.assert:
     that:
       - zbxconfiguration_import.changed is sameas False
+
+- name: Get the imported template ID for configuration export
+  community.zabbix.zabbix_template_info:
+    template_name: ExampleTemplateJSON
+    format: none
+  register: configuration_template_info
+
+- name: Export template configuration in check mode
+  community.zabbix.zabbix_configuration:
+    export_options:
+      templates:
+        - "{{ configuration_template_info.template_id }}"
+  check_mode: true
+  register: configuration_template_export
+
+- name: Assert template export is supported without changing configuration
+  ansible.builtin.assert:
+    that:
+      - configuration_template_export is not changed
+      - (configuration_template_export.exported_config | from_json).zabbix_export.templates[0].template == 'ExampleTemplateJSON'
 
 - name: test - import Zabbix template from XML
   community.zabbix.zabbix_configuration:

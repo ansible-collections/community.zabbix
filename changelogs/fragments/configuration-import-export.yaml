@@ -1,0 +1,6 @@
+minor_changes:
+  - zabbix_configuration - support ``return_missing_objects`` for configuration comparison and import on Zabbix 8.0, returning missing references without affecting change detection (https://support.zabbix.com/browse/ZBXNEXT-5419).
+  - zabbix_configuration - document and test dashboard and global regular expression import rules on Zabbix 8.0 (https://support.zabbix.com/browse/ZBXNEXT-5419, https://support.zabbix.com/browse/ZBXNEXT-10390).
+  - zabbix_configuration - add ``export_options`` and ``export_format`` to export configuration, including global regular expressions on Zabbix 8.0 (https://support.zabbix.com/browse/ZBXNEXT-10390).
+bugfixes:
+  - zabbix_configuration - handle omitted import rules without raising an exception.
