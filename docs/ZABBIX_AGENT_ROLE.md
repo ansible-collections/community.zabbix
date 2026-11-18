@@ -90,18 +90,23 @@ To successfully complete the install the role requires `python-netaddr` on the c
 
 See the following list of supported Operating systems with the Zabbix releases:
 
-| Zabbix              | 7.4 | 7.2 | 7.0 | 6.0 |
-|---------------------|-----|-----|-----|-----|
-| Red Hat Fam 9       |  V  |  V  |  V  |  V  |
-| Red Hat Fam 8       |  V  |  V  |  V  |  V  |
-| Ubuntu 24.04 noble  |  V  |  V  |  V  |  V  |
-| Ubuntu 22.04 jammy  |  V  |  V  |  V  |  V  |
-| Debian 12 bookworm  |  V  |  V  |  V  |  V  |
-| Debian 11 bullseye  |  V  |  V  |  V  |  V  |
-| Suse Fam 15         |  V  |  V  |  V  |  V  |
-| FreeBSD 15          |  V  |  V  |  V  |  V  |
-| FreeBSD 14          |  V  |  V  |  V  |  V  |
-| FreeBSD 13          |  V  |  V  |  V  |  V  |
+| Zabbix                | 8.0 | 7.4 | 7.2 | 7.0 | 6.0 |
+|-----------------------|-----|-----|-----|-----|-----|
+| Red Hat Fam 10        |  V  |  V  |     |  V  |  V  |
+| Red Hat Fam 9         |  V  |  V  |  V  |  V  |  V  |
+| Red Hat Fam 8         |  V  |  V  |  V  |  V  |  V  |
+| Ubuntu 26.04 resolute |  V  |  V  |     |  V  |     |
+| Ubuntu 24.04 noble    |  V  |  V  |  V  |  V  |  V  |
+| Ubuntu 22.04 jammy    |  V  |  V  |  V  |  V  |  V  |
+| Debian 13 trixie      |  V  |  V  |     |  V  |  V  |
+| Debian 12 bookworm    |  V  |  V  |  V  |  V  |  V  |
+| Debian 11 bullseye    |  V  |  V  |  V  |  V  |  V  |
+| Suse Fam 15           |  V  |  V  |  V  |  V  |  V  |
+| FreeBSD 15            |     |  V  |  V  |  V  |  V  |
+| FreeBSD 14            |     |  V  |  V  |  V  |  V  |
+| FreeBSD 13            |     |  V  |  V  |  V  |  V  |
+| macOS                 |     |  V  |     |  V  |  V  |
+| Windows               |  V  |  V  |  V  |  V  |  V  |
 
 You can bypass this matrix by setting `zabbix_agent_version_check: false`
 
@@ -166,13 +171,14 @@ Selinux changes will be installed based on the status of selinux running on the 
 
 ## TLS Specific configuration
 * `zabbix_agent_tlspsk_auto`: Enables auto generation and storing of individual pre-shared keys and identities on clients. Is false by default. If set to true and if `zabbix_agent_tlspskfile` and `zabbix_agent_tlspsk_secret` are undefined, it generates the files `/etc/zabbix/tls_psk_auto.identity` and `/etc/zabbix/tls_psk_auto.secret`, which are populated by values automatically (identity is set to hostname, underscore and 4 random alphanumeric digits; secret is 64 random alphanumeric digits) in such a way that the values are generated once and are never overwritten.
+  It also sets `zabbix_agent_tlsconnect` to `psk` and adds `psk` to `zabbix_agent_tlsaccept`. With the default `zabbix_agent_tlsaccept` this gives `psk,unencrypted`, so the agent still accepts unencrypted connections. Set `zabbix_agent_tlsaccept: psk` to accept PSK connections only.
 
 * `zabbix_agent_tlsconnect`: How the agent should connect to server or proxy. Used for active checks.
     Possible values:
     * unencrypted
     * psk
     * cert
-* `zabbix_agent_tlsaccept`: What incoming connections to accept.
+* `zabbix_agent_tlsaccept`: What incoming connections to accept. Several values can be combined, separated by commas, e.g. `psk,cert`.
     Possible values:
     * unencrypted
     * psk
@@ -345,7 +351,7 @@ The following table lists all variables that are exposed to modify the configura
 | ListenPort | zabbix_agent_listenport | 10050 |  |
 | LoadModule | zabbix_agent_loadmodule |  | Agent On Linux Only |
 | LoadModulePath | zabbix_agent_loadmodulepath |  | Agent On Linux Only |
-| LogFile | zabbix_agent_logfile | /var/log/zabbix/`{{ agent version specific }}`.log |  |
+| LogFile | zabbix_agent_log_file | `{{ zabbix_agent_log_dir }}`/`{{ agent version specific }}`.log | Formerly `zabbix_agent_logfile` (deprecated) |
 | LogFileSize | zabbix_agent_logfilesize | 100 |  |
 | LogRemoteCommands | zabbix_agent_logremotecommands | `False` | `True`/`False` Agent Only |
 | LogType | zabbix_agent_logtype | file |  |
@@ -365,7 +371,7 @@ The following table lists all variables that are exposed to modify the configura
 | StartAgents | zabbix_agent_startagents | 3 | Agent Only |
 | StatusPort | zabbix_agent_statusport | 9999 | Agent 2 Only |
 | Timeout | zabbix_agent_timeout | 3 |  |
-| TLSAccept | zabbix_agent_tlsconnect | unencrypted | Is overridden with `zabbix_agent_tlspsk_auto` == True |
+| TLSAccept | zabbix_agent_tlsaccept | unencrypted | Is overridden with `zabbix_agent_tlspsk_auto` == True |
 | TLSCAFile | zabbix_agent_tlscafile | /etc/zabbix/tls_psk_auto.secret |  |
 | TLSCertFile | zabbix_agent_tlscertfile |  |  |
 | TLSCipherAll | zabbix_agent_tlscipherall |  | Agent on Linux Only |

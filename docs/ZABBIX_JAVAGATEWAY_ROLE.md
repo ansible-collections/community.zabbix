@@ -34,17 +34,21 @@ So, you'll need one of those operating systems.. :-)
 
 See the following list of supported Operating systems with the Zabbix releases.
 
-| Zabbix              | 7.4 | 7.2 | 7.0 | 6.0 |
-|---------------------|-----|-----|-----|-----|
-| Red Hat Fam 9       |  V  |  V  |  V  |  V  |
-| Red Hat Fam 8       |  V  |  V  |  V  |  V  |
-| Ubuntu 24.04 noble  |  V  |  V  |  V  |  V  |
-| Ubuntu 22.04 jammy  |  V  |  V  |  V  |  V  |
-| Debian 12 bookworm  |  V  |  V  |  V  |  V  |
-| Debian 11 bullseye  |  V  |  V  |  V  |  V  |
-| Suse Fam 15         |  V  |  V  |  V  |  V  |
+| Zabbix                | 8.0 | 7.4 | 7.2 | 7.0 | 6.0 |
+|-----------------------|-----|-----|-----|-----|-----|
+| Red Hat Fam 10        |  V  |  V  |     |  V  |     |
+| Red Hat Fam 9         |  V  |  V  |  V  |  V  |  V  |
+| Red Hat Fam 8         |  V  |  V  |  V  |  V  |  V  |
+| Red Hat Fam 7         |     |     |     |     |  V  |
+| Ubuntu 26.04 resolute |  V  |  V  |     |  V  |     |
+| Ubuntu 24.04 noble    |  V  |  V  |  V  |  V  |  V  |
+| Ubuntu 22.04 jammy    |  V  |  V  |  V  |  V  |  V  |
+| Debian 13 trixie      |  V  |  V  |     |  V  |  V  |
+| Debian 12 bookworm    |  V  |  V  |  V  |  V  |  V  |
+| Debian 11 bullseye    |  V  |  V  |  V  |  V  |  V  |
+| Suse Fam 15           |  V  |  V  |  V  |  V  |  V  |
 
-You can bypass this matrix by setting `enable_version_check: false`
+You can bypass this matrix by setting `zabbix_javagateway_version_check: false`. The former `enable_version_check` variable is still honoured but deprecated, and will be removed in community.zabbix 5.0.0.
 
 # Role Variables
 

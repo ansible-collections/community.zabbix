@@ -1,7 +1,7 @@
 ---
 # defaults file for zabbix_agent
 
-zabbix_agent_version_check: true
+zabbix_agent_version_check: "{{ enable_version_check | default(true) }}"
 
 zabbix_agent2: false
 zabbix_agent_releases_url: "https://services.zabbix.com/updates/v1"
@@ -33,11 +33,12 @@ zabbix_agent_enableremotecommands: false
 zabbix_agent_forceactivechecksonstart: false
 zabbix_agent_heartbeatfrequency: 60
 zabbix_agent_hostname: "{{ inventory_hostname }}"
-zabbix_agent_include_dirs: "{{ _zabbix_agent_include_dirs | default(_includes) }}"
+zabbix_agent_include_dirs: "{{ _zabbix_agent_include_dirs | default(zabbix_agent2 | ternary(_zabbix_agent_agent2_includes, _zabbix_agent_agentd_includes)) }}"
 zabbix_agent_include_mode: "0755"
 zabbix_agent_listenip: 0.0.0.0
 zabbix_agent_listenport: 10050
-zabbix_agent_logfile: "{{ _zabbix_agent_logfile | default('/var/log/zabbix/' ~ zabbix_agent2 | ternary('zabbix_agent2.log', 'zabbix_agentd.log')) }}"
+zabbix_agent_log_dir: "{{ _zabbix_agent_log_dir | default('/var/log/zabbix') }}"
+zabbix_agent_log_file: "{{ zabbix_agent_logfile | default(zabbix_agent_log_dir ~ '/' ~ zabbix_agent2 | ternary('zabbix_agent2.log', 'zabbix_agentd.log')) }}"
 zabbix_agent_logfilesize: 100
 zabbix_agent_logtype: file
 zabbix_agent_maxlinespersecond: 20
@@ -53,7 +54,7 @@ zabbix_agent_tlsconnect: "unencrypted"
 zabbix_agent_tlspsk_auto: false
 zabbix_agent_tlspskfile: "{{ zabbix_agent_conf_dir }}/tls_psk_auto.secret"
 zabbix_agent_tlspskidentity_file: "{{ zabbix_agent_conf_dir }}/tls_psk_auto.identity"
-zabbix_agent_tls_subject: "{{ _tls_subject }}"
+zabbix_agent_tls_subject: "{{ zabbix_agent_tlsservercertsubject | default(omit) }}" # FIXME this is not correct and should be removed with 2.0.0, here only to prevent regression
 
 zabbix_agent_unsafeuserparameters: false
 zabbix_agent_runas_user: zabbix
@@ -83,8 +84,7 @@ zabbix_host_status: enabled # or disabled
 zabbix_agent_proxy: null
 zabbix_agent_inventory_mode: disabled
 zabbix_useuip: 1
-zabbix_host_groups:
-  - Linux servers
+zabbix_host_groups: "{{ _zabbix_agent_host_groups | default(['Linux servers']) }}"
 zabbix_agent_link_templates: "{{ _zabbix_agent_link_templates | default(['Linux by Zabbix agent']) }}"
 
 zabbix_agent_interfaces:
@@ -100,11 +100,6 @@ zabbix_agent_userparameters_templates_src: "userparameters"
 zabbix_agent_userparameters_scripts_src: "scripts"
 zabbix_agent_chassis: false
 
-zabbix_agent_tls_config:
-  unencrypted: "1"
-  psk: "2"
-  cert: "4"
-
 # IPMI settings
 zabbix_agent_ipmi_authtype: -1
 zabbix_agent_ipmi_privilege: 2
@@ -113,6 +108,9 @@ zabbix_agent_ipmi_privilege: 2
 zabbix_agent_download_base_url: https://cdn.zabbix.com/zabbix/binaries/stable
 zabbix_agent_download_url: "{{ _zabbix_agent_download_url }}"
 zabbix_agent_download_filename: "{{ _zabbix_agent_download_package }}"
+
+# MacOS
+zabbix_agent_mac_install_type: "{{ _zabbix_agent_mac_install_type }}"
 
 # Windows
 zabbix_agent_win_install_dir: "C:/Program Files/{{ zabbix_agent2 | ternary('Zabbix Agent 2', 'Zabbix Agent') }}"

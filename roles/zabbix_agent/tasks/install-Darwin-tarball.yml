@@ -1,0 +1,38 @@
+---
+# The pkg installer sets these up; the tarball has to do it itself,
+# or launchd can't start the agent as zabbix (exit 78)
+- name: "Create zabbix group"
+  become: true
+  group:
+    name: zabbix
+    system: true
+
+- name: "Create zabbix user"
+  become: true
+  user:
+    name: zabbix
+    comment: Zabbix Account
+    group: zabbix
+    system: true
+    hidden: true
+    # The pkg gives this user /bin/zsh; we deliberately don't, since a
+    # service account with a login shell is a needless security risk
+    shell: /usr/bin/false
+    home: /var/empty
+    create_home: false
+
+- name: "Check for an installed agent"
+  stat:
+    path: /usr/local/sbin/zabbix_agentd
+  register: _zabbix_agent_mac_executable
+
+# unarchive only handles tar.gz with GNU tar, which macOS doesn't ship
+- name: "Extract Zabbix package"
+  when:
+    - _zabbix_agent_mac_download is changed or not _zabbix_agent_mac_executable.stat.exists
+  become: true
+  command:
+    cmd: >-
+      tar -xzf "/tmp/{{ zabbix_agent_download_filename }}" -C /usr/local
+      --exclude etc/zabbix/zabbix_agentd.conf
+      --no-same-owner --no-same-permissions -m

@@ -1,0 +1,45 @@
+---
+- name: "Configure zabbix-agent"
+  ansible.builtin.template:
+    src: agent.conf.j2
+    dest: "{{ zabbix_agent_conf_file }}"
+    owner: root
+    group: "{{ _zabbix_agent_root_group | default('root') }}"
+    mode: "{{ zabbix_agent_conf_mode }}"
+  become: true
+  tags:
+    - config
+  notify:
+    - Restart zabbix-agent
+
+- name: "Create include dirs zabbix-agent"
+  ansible.builtin.file:
+    path: "{{ include_dir }}"
+    owner: root
+    group: "{{ _zabbix_agent_root_group | default('root') }}"
+    mode: "{{ zabbix_agent_include_mode }}"
+    state: directory
+  loop: "{{ zabbix_agent_include_dirs }}"
+  loop_control:
+    loop_var: include_dir
+  become: true
+  tags:
+    - config
+
+- name: "Install launch daemon"
+  template:
+    src: com.zabbix.zabbix_agentd.plist.j2
+    dest: /Library/LaunchDaemons/com.zabbix.zabbix_agentd.plist
+    owner: root
+    group: wheel
+    mode: "0644"
+  become: true
+  notify:
+    - Restart zabbix-agent
+
+- name: "Ensure zabbix-agent is enabled and running"
+  community.general.launchd:
+    name: com.zabbix.zabbix_agentd
+    state: started
+    enabled: true
+  become: true

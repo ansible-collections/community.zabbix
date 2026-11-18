@@ -11,7 +11,7 @@
 - name: Determine Latest Supported Zabbix Version
   when: zabbix_proxy_version is not defined or zabbix_proxy_version is none
   ansible.builtin.set_fact:
-    zabbix_proxy_version: "{{ _zabbix_proxy_valid_versions[_os_key] | default(['7.4']) | first }}"
+    zabbix_proxy_version: "{{ _zabbix_proxy_valid_versions[_zabbix_proxy_os_key] | default(['8.0']) | first }}"
   tags:
     - always
 
@@ -19,8 +19,8 @@
   when: zabbix_proxy_version_check | bool
   ansible.builtin.assert:
     that:
-      - (zabbix_proxy_version | string) in _zabbix_proxy_valid_versions[_os_key]
-    fail_msg: Zabbix version {{ zabbix_proxy_version }} is not supported on {{ _os_key }}
+      - (zabbix_proxy_version | string) in _zabbix_proxy_valid_versions[_zabbix_proxy_os_key]
+    fail_msg: Zabbix version {{ zabbix_proxy_version }} is not supported on {{ _zabbix_proxy_os_key }}
   tags:
     - always
 
@@ -136,14 +136,17 @@
     tls_psk: "{{ zabbix_proxy_tlspsk_secret | default(omit) }}"
     tls_psk_identity: "{{ zabbix_proxy_tlspskidentity | default(omit) }}"
     tls_subject: "{{ zabbix_proxy_tls_subject | default(omit) }}"
-    tls_connect: "{{ zabbix_proxy_tls_config[zabbix_proxy_tlsaccept | default('no_encryption')] }}"
-    tls_accept: "{{ zabbix_proxy_tls_config[zabbix_proxy_tlsconnect | default('no_encryption')] }}"
+    tls_connect: "{{ _zabbix_proxy_module_tls_map[zabbix_proxy_tlsaccept] }}"
+    tls_accept: "{{ _zabbix_proxy_module_tls_map[zabbix_proxy_tlsconnect] }}"
   when:
     - zabbix_api_create_proxy | bool
     - zabbix_proxy_version is version('7.0', '<')
   delegate_to: "{{ zabbix_api_server_host }}"
   tags:
     - api
+    # FIXME: zabbix_proxy compares the write-only tls_psk and tls_psk_identity
+    # against proxy.get, so a PSK proxy always reports changed.
+    - molecule-idempotence-notest
 
 - name: Create Zabbix Proxy Group for Zabbix >= 7.0
   run_once: true
@@ -208,8 +211,8 @@
     timeout_telnet_agent: "{{ zabbix_proxy_timeout_telnet_agent | default(omit) }}"
     timeout_script: "{{ zabbix_proxy_timeout_script | default(omit) }}"
     timeout_browser: "{{ zabbix_proxy_timeout_browser | default(omit) }}"
-    tls_connect: "{{ zabbix_proxy_tls_config[zabbix_proxy_tlsaccept | default('no_encryption')] }}"
-    tls_accept: "{{ zabbix_proxy_tls_config[zabbix_proxy_tlsconnect | default('no_encryption')] }}"
+    tls_connect: "{{ _zabbix_proxy_module_tls_map[zabbix_proxy_tlsaccept] }}"
+    tls_accept: "{{ _zabbix_proxy_module_tls_map[zabbix_proxy_tlsconnect] }}"
     tls_psk: "{{ zabbix_proxy_tlspsk_secret | default(omit) }}"
     tls_psk_identity: "{{ zabbix_proxy_tlspskidentity | default(omit) }}"
     ca_cert: "{{ zabbix_proxy_ca_cert | default(omit) }}"
@@ -221,6 +224,9 @@
   delegate_to: "{{ zabbix_api_server_host }}"
   tags:
     - api
+    # FIXME: zabbix_proxy compares the write-only tls_psk and tls_psk_identity
+    # against proxy.get, so a PSK proxy always reports changed.
+    - molecule-idempotence-notest
 
 - name: "zabbix-proxy started"
   ansible.builtin.service:

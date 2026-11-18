@@ -1,7 +1,7 @@
 ---
 # defaults file for zabbix-web
 
-zabbix_web_version_check: true
+zabbix_web_version_check: "{{ enable_version_check | default(true) }}"
 
 # zabbix_web_version:
 

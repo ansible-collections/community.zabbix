@@ -32,6 +32,7 @@ jobs:
         container:
           - image: rockylinux10
           - image: rockylinux9
+          - image: ubuntu2604
           - image: ubuntu2404
           - image: ubuntu2204
           - image: debian13
@@ -45,12 +46,16 @@ jobs:
           - nginx
           - apache
         version:
+          - v80
           - v74
           - v70
           - v60
         exclude:
           - container:
               image: rockylinux10
+            version: v60
+          - container:
+              image: ubuntu2604
             version: v60
     steps:
       - name: Check out code
@@ -99,12 +104,10 @@ jobs:
 
       - name: Run role tests
         run: >-
-          MY_MOLECULE_CONTAINER=${{ matrix.container.image }}
           MY_MOLECULE_IMAGE=${{ matrix.container.image }}
           MY_MOLECULE_VERSION=${{ matrix.version }}
           MY_MOLECULE_DATABASE=${{ matrix.database }}
           MY_MOLECULE_WEB_SERVER=${{ matrix.web_server }}
-          MY_MOLECULE_DOCKER_COMMAND=${{ matrix.command }}
           molecule test -s ${{ matrix.collection_role }}
 
   legacy:
@@ -127,6 +130,7 @@ jobs:
           - nginx
           - apache
         version:
+          - v80
           - v74
           - v70
           - v60
@@ -149,7 +153,7 @@ jobs:
             ~/.ansible/collections
             ~/.ansible/roles
             ~/.cache/ansible-compat
-          key: ${{ runner.os }}-molecule-galaxy-${{ hashFiles('molecule/requirements.txt', 'molecule/zabbix_agent_tests/common/collections.yml') }}
+          key: ${{ runner.os }}-molecule-galaxy-${{ hashFiles('molecule/requirements.txt', 'molecule/default/collections.yml') }}
           restore-keys: |
             ${{ runner.os }}-molecule-galaxy-
 
@@ -190,10 +194,8 @@ jobs:
 
       - name: Run role tests
         run: >-
-          MY_MOLECULE_CONTAINER=${{ matrix.container.image }}
           MY_MOLECULE_IMAGE=${{ matrix.container.image }}
           MY_MOLECULE_VERSION=${{ matrix.version }}
           MY_MOLECULE_DATABASE=${{ matrix.database }}
           MY_MOLECULE_WEB_SERVER=${{ matrix.web_server }}
-          MY_MOLECULE_DOCKER_COMMAND=${{ matrix.command }}
           molecule test -s ${{ matrix.collection_role }}          

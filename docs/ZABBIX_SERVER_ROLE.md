@@ -7,6 +7,7 @@
 - [Overview](#overview)
 - [Requirements](#requirements)
   * [Operating systems](#operating-systems)
+  * [Database server](#database-server)
   * [Zabbix Versions](#zabbix-versions)
 - [Installation](#installation)
 - [Role Variables](#role-variables)
@@ -47,6 +48,10 @@ This role will work on the following operating systems:
 So, you'll need one of those operating systems.. :-)
 Please send Pull Requests or suggestions when you want to use this role for other Operating systems.
 
+## Database server
+
+This role does not install a database server. A MySQL or PostgreSQL instance must already be installed and running, either on the Zabbix Server host or on a separate host, before you run this role. By default the role then creates the Zabbix database and user and loads the schema (see `zabbix_server_database_creation` and `zabbix_server_database_sqlload`); see [Database](#database) for the supported setups.
+
 ## Ansible 2.10 and higher
 
 With the release of Ansible 2.10, modules have been moved into collections.  With the exception of ansible.builtin modules, this means additonal collections must be installed in order to use modules such as seboolean (now ansible.posix.seboolean).  The following collection is now required: `ansible.posix`.  Installing the collection:
@@ -75,15 +80,18 @@ ansible-galaxy collection install community.postgresql
 
 See the following list of supported Operating systems with the Zabbix releases:
 
-| Zabbix              | 7.4 | 7.2 | 7.0 | 6.0 |
-|---------------------|-----|-----|-----|-----|
-| Red Hat Fam 9       |  V  |  V  |  V  |  V  |
-| Red Hat Fam 8       |  V  |  V  |  V  |  V  |
-| Ubuntu 24.04 noble  |  V  |  V  |  V  |  V  |
-| Ubuntu 22.04 jammy  |  V  |  V  |  V  |  V  |
-| Debian 12 bookworm  |  V  |  V  |  V  |  V  |
-| Debian 11 bullseye  |     |     |     |  V  |
-| Suse Fam 15         |  V  |  V  |  V  |  V  |
+| Zabbix                | 8.0 | 7.4 | 7.2 | 7.0 | 6.0 |
+|-----------------------|-----|-----|-----|-----|-----|
+| Red Hat Fam 10        |  V  |  V  |     |  V  |     |
+| Red Hat Fam 9         |  V  |  V  |  V  |  V  |  V  |
+| Red Hat Fam 8         |  V  |  V  |  V  |  V  |  V  |
+| Ubuntu 26.04 resolute |  V  |  V  |     |  V  |     |
+| Ubuntu 24.04 noble    |  V  |  V  |  V  |  V  |  V  |
+| Ubuntu 22.04 jammy    |  V  |  V  |  V  |  V  |  V  |
+| Debian 13 trixie      |  V  |  V  |     |  V  |  V  |
+| Debian 12 bookworm    |  V  |  V  |  V  |  V  |  V  |
+| Debian 11 bullseye    |     |     |     |     |  V  |
+| Suse Fam 15           |  V  |  V  |  V  |  V  |  V  |
 
 You can bypass this matrix by setting `zabbix_server_version_check: false`
 

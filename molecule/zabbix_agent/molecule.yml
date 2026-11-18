@@ -1,0 +1,140 @@
+---
+dependency:
+  name: galaxy
+  enabled: true
+  options:
+    requirements-file: molecule/default/collections.yml
+
+driver:
+  name: default
+
+platforms:
+  - name: zabbix-agent-${MY_MOLECULE_VERSION:-v80}-${MY_MOLECULE_IMAGE:-rockylinux10}
+    image: geerlingguy/docker-${MY_MOLECULE_IMAGE:-rockylinux10}-ansible:latest
+    privileged: true
+    pre_build_image: true
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
+    cgroupns_mode: host
+    groups:
+      - agentd
+      - ${MY_MOLECULE_VERSION:-v80}
+  - name: zabbix-agent2-${MY_MOLECULE_VERSION:-v80}-${MY_MOLECULE_IMAGE:-rockylinux10}
+    image: geerlingguy/docker-${MY_MOLECULE_IMAGE:-rockylinux10}-ansible:latest
+    privileged: true
+    pre_build_image: true
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
+    cgroupns_mode: host
+    groups:
+      - agent2
+      - ${MY_MOLECULE_VERSION:-v80}
+
+  # AutoPSK
+  - name: zabbix-agent-${MY_MOLECULE_VERSION:-v80}-autopsk-${MY_MOLECULE_IMAGE:-rockylinux10}
+    image: geerlingguy/docker-${MY_MOLECULE_IMAGE:-rockylinux10}-ansible:latest
+    privileged: true
+    pre_build_image: true
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
+    cgroupns_mode: host
+    groups:
+      - agentd
+      - ${MY_MOLECULE_VERSION:-v80}
+      - autopsk
+  - name: zabbix-agent2-${MY_MOLECULE_VERSION:-v80}-autopsk-${MY_MOLECULE_IMAGE:-rockylinux10}
+    image: geerlingguy/docker-${MY_MOLECULE_IMAGE:-rockylinux10}-ansible:latest
+    privileged: true
+    pre_build_image: true
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
+    cgroupns_mode: host
+    groups:
+      - agent2
+      - ${MY_MOLECULE_VERSION:-v80}
+      - autopsk
+
+  # Certificate TLS, CA from create.with_stack.docker.yml, certs from prepare.yml
+  - name: zabbix-agent-${MY_MOLECULE_VERSION:-v80}-cert-${MY_MOLECULE_IMAGE:-rockylinux10}
+    image: geerlingguy/docker-${MY_MOLECULE_IMAGE:-rockylinux10}-ansible:latest
+    privileged: true
+    pre_build_image: true
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
+    cgroupns_mode: host
+    groups:
+      - agentd
+      - ${MY_MOLECULE_VERSION:-v80}
+      - cert
+  - name: zabbix-agent2-${MY_MOLECULE_VERSION:-v80}-cert-${MY_MOLECULE_IMAGE:-rockylinux10}
+    image: geerlingguy/docker-${MY_MOLECULE_IMAGE:-rockylinux10}-ansible:latest
+    privileged: true
+    pre_build_image: true
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
+    cgroupns_mode: host
+    groups:
+      - agent2
+      - ${MY_MOLECULE_VERSION:-v80}
+      - cert
+
+provisioner:
+  name: ansible
+  playbooks:
+    create: ../default/create.with_stack.docker.yml
+    destroy: ../default/destroy.with_stack.docker.yml
+  env:
+    # https://github.com/ansible/molecule/issues/4015#issuecomment-1680859724
+    ANSIBLE_ROLES_PATH: ../../roles
+    #ANSIBLE_INJECT_FACT_VARS: "False"
+  inventory:
+    group_vars:
+      all:
+        ansible_connection: community.docker.docker
+        zabbix_agent_serveractive: "{{ zabbix_agent_server }}"
+        zabbix_api_create_hostgroup: true
+        zabbix_api_create_hosts: true
+        ansible_zabbix_url_path: ""
+      agentd:
+        zabbix_agent2: false
+      agent2:
+        zabbix_agent2: true
+        # inheriting from the agent2 scenario
+        zabbix_agent_plugins:
+          - name: SystemRun
+            options:
+              - parameter: LogRemoteCommands
+                value: 0
+      autopsk:
+        zabbix_agent_tlspsk_auto: true
+        zabbix_agent_tlsaccept: psk
+      cert:
+        zabbix_agent_tlsconnect: cert
+        zabbix_agent_tlsaccept: cert
+        # Same layout as the zabbix-docker images (pre-8.0)
+        zabbix_agent_tlskeyfile: /var/lib/zabbix/enc/agent.key
+        zabbix_agent_tlscertfile: /var/lib/zabbix/enc/agent.crt
+        zabbix_agent_tlscafile: /var/lib/zabbix/enc/ca.crt
+      v80:
+        zabbix_agent_version: "8.0"
+        zabbix_agent_server: zabbix-server-v80
+        zabbix_api_server_host: zabbix-web-v80
+        zabbix_api_server_port: 8080
+      v74:
+        zabbix_agent_version: "7.4"
+        zabbix_agent_server: zabbix-server-v74
+        zabbix_api_server_host: zabbix-web-v74
+        zabbix_api_server_port: 8074
+      v70:
+        zabbix_agent_version: "7.0"
+        zabbix_agent_server: zabbix-server-v70
+        zabbix_api_server_host: zabbix-web-v70
+        zabbix_api_server_port: 8070
+      v60:
+        zabbix_agent_version: "6.0"
+        zabbix_agent_server: zabbix-server-v60
+        zabbix_api_server_host: zabbix-web-v60
+        zabbix_api_server_port: 8060
+
+verifier:
+  name: ansible

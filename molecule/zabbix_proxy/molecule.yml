@@ -9,17 +9,42 @@ driver:
   name: default
 
 platforms:
-  - name: zabbix-proxy-${MY_MOLECULE_DATABASE:-mysql}-${MY_MOLECULE_VERSION:-v74}-${MY_MOLECULE_CONTAINER:-rockylinux10}
+  - name: zabbix-proxy-${MY_MOLECULE_DATABASE:-mysql}-${MY_MOLECULE_VERSION:-v80}-${MY_MOLECULE_IMAGE:-rockylinux10}
     image: geerlingguy/docker-${MY_MOLECULE_IMAGE:-rockylinux10}-ansible:latest
     privileged: true
     pre_build_image: true
-    command: ${MOLECULE_DOCKER_COMMAND:-""}
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:rw
     cgroupns_mode: host
     groups:
       - ${MY_MOLECULE_DATABASE:-mysql}
-      - ${MY_MOLECULE_VERSION:-v74}
+      - ${MY_MOLECULE_VERSION:-v80}
+  # psk-active
+  - name: zabbix-proxy-${MY_MOLECULE_DATABASE:-mysql}-${MY_MOLECULE_VERSION:-v80}-psk-active-${MY_MOLECULE_IMAGE:-rockylinux10}
+    image: geerlingguy/docker-${MY_MOLECULE_IMAGE:-rockylinux10}-ansible:latest
+    privileged: true
+    pre_build_image: true
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
+    cgroupns_mode: host
+    groups:
+      - ${MY_MOLECULE_DATABASE:-mysql}
+      - ${MY_MOLECULE_VERSION:-v80}
+      - psk
+      - active
+  # psk-passive
+  - name: zabbix-proxy-${MY_MOLECULE_DATABASE:-mysql}-${MY_MOLECULE_VERSION:-v80}-psk-passive-${MY_MOLECULE_IMAGE:-rockylinux10}
+    image: geerlingguy/docker-${MY_MOLECULE_IMAGE:-rockylinux10}-ansible:latest
+    privileged: true
+    pre_build_image: true
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
+    cgroupns_mode: host
+    groups:
+      - ${MY_MOLECULE_DATABASE:-mysql}
+      - ${MY_MOLECULE_VERSION:-v80}
+      - psk
+      - passive
 
 #  # Developer example
 #  - name: zabbix-proxy-mysql-v74-debian13
@@ -56,8 +81,8 @@ platforms:
 provisioner:
   name: ansible
   playbooks:
-    create: create.docker.yml
-    destroy: destroy.docker.yml
+    create: ../default/create.with_stack.docker.yml
+    destroy: ../default/destroy.with_stack.docker.yml
   env:
     # https://github.com/ansible/molecule/issues/4015#issuecomment-1680859724
     ANSIBLE_ROLES_PATH: ../../roles
@@ -70,6 +95,23 @@ provisioner:
         zabbix_proxy_configfrequency: 10
         zabbix_api_create_proxy: true
         ansible_zabbix_url_path: ""
+      psk:
+        zabbix_proxy_tlspskfile: "/home/zabbix/proxy_psk"
+        zabbix_proxy_tlspskidentity: "PSK {{ inventory_hostname }}"
+        zabbix_proxy_tlspsk_secret: 'f1447b20c0243f3304062d3641fe7e341eb0106bd1adb4273f21659a7717ae6f'
+      active:
+        zabbix_proxy_proxymode: 0
+        zabbix_proxy_status: active
+        zabbix_proxy_tlsconnect: psk
+      passive:
+        zabbix_proxy_proxymode: 1
+        zabbix_proxy_status: passive
+        zabbix_proxy_tlsaccept: psk
+      v80:
+        zabbix_proxy_version: "8.0"
+        zabbix_proxy_server: zabbix-server-v80
+        zabbix_api_server_host: zabbix-web-v80
+        zabbix_api_server_port: 8080
       v74:
         zabbix_proxy_version: "7.4"
         zabbix_proxy_server: zabbix-server-v74
@@ -100,6 +142,8 @@ provisioner:
         zabbix_proxy_pgsql_login_host: "{{ inventory_hostname }}-db"
         zabbix_proxy_pgsql_login_user: postgres
         zabbix_proxy_pgsql_login_password: changeme
+        # PostgreSQL 14+ images only accept SCRAM, and 8.0 needs PostgreSQL 15+
+        zabbix_proxy_dbpassword_hash_method: scram-sha-256
       sqlite3:
         zabbix_proxy_database: sqlite3
         zabbix_proxy_database_long: sqlite3

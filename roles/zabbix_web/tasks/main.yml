@@ -4,6 +4,9 @@
   tags:
     - always
 
+- name: Include deprecation checks
+  include_tasks: deprecation_checks.yml
+
 - name: Set More Variables
   ansible.builtin.set_fact:
     zabbix_db_type_long: "{{ 'postgresql' if zabbix_server_database == 'pgsql' else 'mysql' }}"
@@ -13,7 +16,7 @@
 - name: Determine Latest Supported Zabbix Version
   when: zabbix_web_version is not defined
   ansible.builtin.set_fact:
-    zabbix_web_version: "{{ _zabbix_web_valid_versions[_os_key] | default(['7.4']) | first }}"
+    zabbix_web_version: "{{ _zabbix_web_valid_versions[_zabbix_web_os_key] | default(['8.0']) | first }}"
   tags:
     - always
 
@@ -21,8 +24,8 @@
   when: zabbix_web_version_check | bool
   ansible.builtin.assert:
     that:
-      - (zabbix_web_version | string) in _zabbix_web_valid_versions[_os_key]
-    fail_msg: Zabbix version {{ zabbix_web_version }} is not supported on {{ _os_key }}
+      - (zabbix_web_version | string) in _zabbix_web_valid_versions[_zabbix_web_os_key]
+    fail_msg: Zabbix version {{ zabbix_web_version }} is not supported on {{ _zabbix_web_os_key }}
   tags:
     - always
 

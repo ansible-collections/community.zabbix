@@ -1,29 +1,35 @@
 ---
-_os_key: "{{ (ansible_facts.os_family in ['RedHat', 'Suse']) | ternary(ansible_facts.os_family, ansible_facts.distribution) }}-{{ ansible_facts.distribution_major_version }}"
+_zabbix_javagateway_os_key: "{{ (ansible_facts.os_family in ['RedHat', 'Suse']) | ternary(ansible_facts.os_family, ansible_facts.distribution) }}-{{ ansible_facts.distribution_major_version }}"
 _zabbix_javagateway_valid_versions:
   Debian-13:
+    - "8.0"
     - "7.4"
     - "7.0"
     - "6.0"
   Debian-12:
+    - "8.0"
     - "7.4"
     - "7.2"
     - "7.0"
     - "6.0"
   Debian-11:
+    - "8.0"
     - "7.4"
     - "7.2"
     - "7.0"
     - "6.0"
   RedHat-10:
+    - "8.0"
     - "7.4"
     - "7.0"
   RedHat-9:
+    - "8.0"
     - "7.4"
     - "7.2"
     - "7.0"
     - "6.0"
   RedHat-8:
+    - "8.0"
     - "7.4"
     - "7.2"
     - "7.0"
@@ -31,16 +37,23 @@ _zabbix_javagateway_valid_versions:
   RedHat-7:
     - "6.0"
   Suse-15:
+    - "8.0"
     - "7.4"
     - "7.2"
     - "7.0"
     - "6.0"
+  Ubuntu-26:
+    - "8.0"
+    - "7.4"
+    - "7.0"
   Ubuntu-24:
+    - "8.0"
     - "7.4"
     - "7.2"
     - "7.0"
     - "6.0"
   Ubuntu-22:
+    - "8.0"
     - "7.4"
     - "7.2"
     - "7.0"
