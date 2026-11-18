@@ -311,7 +311,6 @@ from ansible.plugins.inventory import BaseInventoryPlugin, Constructable, Cachea
 import os
 import atexit
 import json
-import re
 from ansible.module_utils.urls import Request
 from ansible.module_utils.six.moves.urllib.error import URLError, HTTPError
 from ansible.module_utils.compat.version import LooseVersion
@@ -351,6 +350,8 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             payload['params'] = params
 
         if self.auth != '':
+            # get_version() always runs before any authenticated call, so an empty
+            # zabbix_version is only a defensive fallback; default to the Bearer header.
             if not self.zabbix_version or LooseVersion(self.zabbix_version) >= LooseVersion('7.0'):
                 headers['Authorization'] = 'Bearer ' + self.auth
             else:
@@ -400,7 +401,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         self.zabbix_version = self._api_call('apiinfo.version')
 
     def logout_zabbix(self):
-        if self._template_option('auth_token') or self._template_option('login_token'):
+        if self._template_option('auth_token'):
             return
 
         try:
@@ -412,7 +413,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             self.display.vvv("Failed to logout from Zabbix server: {0}".format(e))
 
     def login_zabbix(self):
-        auth_token = self._template_option('auth_token') or self._template_option('login_token')
+        auth_token = self._template_option('auth_token')
         if auth_token:
             self.auth = auth_token
             return
@@ -488,16 +489,9 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                 host_name = record['host']
                 if len(record['groups']) >= 1:
                     for group in record['groups']:
-                        group_name = self._sanitize_group_name(group['name'])
+                        group_name = to_safe_group_name(group['name'])
                         self.inventory.add_group(group_name)
                         self.inventory.add_child(group_name, host_name)
-
-    def _sanitize_group_name(self, name):
-        """Sanitize host group names replacing colons and slashes to prevent warnings."""
-        if not name:
-            return name
-        sanitized = re.sub(r'[:/]', '_', name)
-        return to_safe_group_name(sanitized)
 
     def _template_option(self, option):
         value = self.get_option(option)

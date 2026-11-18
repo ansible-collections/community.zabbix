@@ -8,197 +8,189 @@ __metaclass__ = type
 import io
 import json
 import pytest
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
+from ansible import constants as C
+from ansible.errors import AnsibleParserError
 from ansible.inventory.data import InventoryData
 from ansible.parsing.dataloader import DataLoader
-from ansible.template import Templar
-from ansible.errors import AnsibleParserError
+from ansible.plugins.loader import fragment_loader
+from ansible.utils.plugin_docs import get_docstring
 
+from ansible_collections.community.zabbix.plugins.inventory import zabbix_inventory
 from ansible_collections.community.zabbix.plugins.inventory.zabbix_inventory import (
     InventoryModule,
 )
 
+PLUGIN_NAME = "community.zabbix.zabbix_inventory"
+REQUEST_PATH = "ansible_collections.community.zabbix.plugins.inventory.zabbix_inventory.Request"
+ZABBIX_ENV_VARS = (
+    "ZABBIX_SERVER",
+    "ZABBIX_USERNAME",
+    "ZABBIX_PASSWORD",
+    "ZABBIX_AUTH_TOKEN",
+    "ZABBIX_API_KEY",
+    "ZABBIX_VALIDATE_CERTS",
+)
+
+
+@pytest.fixture(autouse=True)
+def clean_zabbix_env(monkeypatch):
+    """Make sure environment variables of the caller do not leak into option resolution."""
+    for var in ZABBIX_ENV_VARS:
+        monkeypatch.delenv(var, raising=False)
+
 
 @pytest.fixture
 def inventory_plugin():
+    """Return a plugin instance whose options are backed by its real DOCUMENTATION schema.
+
+    The plugin loader normally registers the option definitions (including the
+    ``constructed`` and ``inventory_cache`` doc fragments) with the config manager.
+    Do the same here so ``set_options``/``get_option`` resolve aliases, env vars and
+    defaults exactly like they do at runtime.
+    """
+    doc = get_docstring(
+        zabbix_inventory.__file__,
+        fragment_loader,
+        collection_name="community.zabbix",
+        plugin_type="inventory",
+    )[0]
+    C.config.initialize_plugin_configuration_definitions("inventory", PLUGIN_NAME, doc["options"])
+
     plugin = InventoryModule()
-    plugin.inventory = InventoryData()
-    plugin.loader = DataLoader()
-    plugin.templar = Templar(loader=plugin.loader)
+    plugin._load_name = PLUGIN_NAME
+    plugin._redirected_names = [PLUGIN_NAME]
     return plugin
 
 
+def _write_config(tmp_path, config):
+    path = tmp_path / "zabbix_inventory.yml"
+    path.write_text(json.dumps(dict(plugin=PLUGIN_NAME, **config)))
+    return str(path)
+
+
 def _mock_response(data):
-    """Create a mock HTTP response returning serialized JSON data."""
-    mock = MagicMock()
-    mock.read.return_value = json.dumps(data).encode("utf-8")
-    mock.readinto = None
-    stream = io.BytesIO(json.dumps(data).encode("utf-8"))
-    stream.info = MagicMock(return_value={})
-    stream.getcode = MagicMock(return_value=200)
-    return stream
+    """Return a file-like HTTP response body containing serialized JSON data."""
+    return io.BytesIO(json.dumps(data).encode("utf-8"))
 
 
-def test_auth_with_login_token_zabbix8(inventory_plugin):
-    """Test authentication with login_token (alias of auth_token) targeting Zabbix 8.0.
+def _fake_zabbix(version, recorded_requests, hosts=None):
+    """Build a fake ``Request().post`` implementation emulating a Zabbix server."""
+    def fake_post(url, data=None, **kwargs):
+        payload = json.loads(data)
+        recorded_requests.append({"url": url, "payload": payload})
+        method = payload["method"]
+        if method == "apiinfo.version":
+            result = version
+        elif method == "user.login":
+            result = "session-auth-token"
+        elif method == "host.get":
+            result = hosts or []
+        else:
+            result = {}
+        return _mock_response({"jsonrpc": "2.0", "result": result, "id": "1"})
+    return fake_post
 
-    Verifies user.login is never called and Bearer token is sent in HTTP Authorization header.
+
+def _run_parse(inventory_plugin, tmp_path, config, version, hosts=None):
+    """Run the full ``parse()`` path against a fake Zabbix server."""
+    path = _write_config(tmp_path, config)
+    recorded_requests = []
+
+    with patch(REQUEST_PATH) as mock_req_class, patch.object(zabbix_inventory.atexit, "register") as mock_atexit:
+        mock_req_class.return_value.post.side_effect = _fake_zabbix(version, recorded_requests, hosts)
+        inventory_plugin.parse(InventoryData(), DataLoader(), path, cache=False)
+
+    return recorded_requests, mock_req_class, mock_atexit
+
+
+def _sent_headers(mock_req_class):
+    return [c.kwargs["headers"] for c in mock_req_class.call_args_list]
+
+
+def test_auth_with_login_token_alias_zabbix8(inventory_plugin, tmp_path):
+    """``login_token`` is resolved to ``auth_token`` and used as a Bearer token on Zabbix 8.0.
+
+    ``user.login`` must never be called and no logout handler may be registered.
     """
-    options = {
+    config = {
         "server_url": "https://zabbix8.example.com",
         "login_token": "zbx-secret-token-12345",
-        "auth_token": "zbx-secret-token-12345",
-        "login_user": None,
-        "login_password": None,
-        "proxy": "",
-        "validate_certs": True,
-        "timeout": 10,
-        "cache": False,
-        "strict": False,
-        "compose": {},
-        "groups": {},
-        "keyed_groups": [],
-        "host_zapi_query": {},
-        "add_zabbix_groups": False,
     }
-    inventory_plugin.get_option = lambda opt: options.get(opt, None)
+    hosts = [{"host": "node1.example.com", "status": "0"}]
 
-    recorded_requests = []
+    recorded, mock_req_class, mock_atexit = _run_parse(inventory_plugin, tmp_path, config, "8.0.0", hosts)
 
-    def fake_post(url, data=None, **kwargs):
-        payload = json.loads(data)
-        recorded_requests.append({
-            "url": url,
-            "payload": payload,
-        })
-        method = payload.get("method")
-        if method == "apiinfo.version":
-            return _mock_response({"jsonrpc": "2.0", "result": "8.0.0", "id": "1"})
-        elif method == "host.get":
-            return _mock_response({
-                "jsonrpc": "2.0",
-                "result": [
-                    {"host": "node1.example.com", "status": "0"}
-                ],
-                "id": "1"
-            })
-        elif method == "user.login":
-            pytest.fail("user.login should never be called when token is provided!")
-        return _mock_response({"jsonrpc": "2.0", "result": {}, "id": "1"})
+    assert inventory_plugin.get_option("auth_token") == "zbx-secret-token-12345"
+    assert inventory_plugin.auth == "zbx-secret-token-12345"
+    assert inventory_plugin.zabbix_version == "8.0.0"
 
-    with patch("ansible_collections.community.zabbix.plugins.inventory.zabbix_inventory.Request") as mock_req_class:
-        mock_req_instance = MagicMock()
-        mock_req_instance.post.side_effect = fake_post
-        mock_req_class.return_value = mock_req_instance
-
-        inventory_plugin.get_version()
-        assert inventory_plugin.zabbix_version == "8.0.0"
-
-        inventory_plugin.login_zabbix()
-        assert inventory_plugin.auth == "zbx-secret-token-12345"
-
-        # Subsequent requests must include Authorization Bearer header
-        inventory_plugin.api_request("host.get", {})
-        assert mock_req_class.called
-        headers = mock_req_class.call_args[1].get("headers", {})
-        assert headers.get("Authorization") == "Bearer zbx-secret-token-12345"
-
-    methods_called = [r["payload"]["method"] for r in recorded_requests]
+    methods_called = [r["payload"]["method"] for r in recorded]
+    assert methods_called == ["apiinfo.version", "host.get"]
     assert "user.login" not in methods_called
-    assert "apiinfo.version" in methods_called
+    mock_atexit.assert_not_called()
+
+    headers = _sent_headers(mock_req_class)
+    # apiinfo.version is an unauthenticated call
+    assert "Authorization" not in headers[0]
+    assert headers[1]["Authorization"] == "Bearer zbx-secret-token-12345"
+    assert "auth" not in recorded[1]["payload"]
+
+    assert "node1.example.com" in inventory_plugin.inventory.hosts
 
 
-def test_auth_with_user_password_legacy(inventory_plugin):
-    """Test fallback and backward compatibility for username/password login on legacy Zabbix (6.x)."""
-    options = {
+@pytest.mark.parametrize("env_var", ["ZABBIX_AUTH_TOKEN", "ZABBIX_API_KEY"])
+def test_auth_token_from_environment(inventory_plugin, tmp_path, monkeypatch, env_var):
+    """``auth_token`` can be supplied through the documented environment variables."""
+    monkeypatch.setenv(env_var, "zbx-env-token")
+    config = {"server_url": "https://zabbix8.example.com"}
+
+    recorded, mock_req_class, mock_atexit = _run_parse(inventory_plugin, tmp_path, config, "8.0.0")
+
+    assert inventory_plugin.get_option("auth_token") == "zbx-env-token"
+    assert "user.login" not in [r["payload"]["method"] for r in recorded]
+    assert _sent_headers(mock_req_class)[1]["Authorization"] == "Bearer zbx-env-token"
+    mock_atexit.assert_not_called()
+
+
+def test_auth_with_user_password_legacy(inventory_plugin, tmp_path):
+    """Username/password login keeps working through the real config parsing path.
+
+    With no ``auth_token``/``login_token`` configured, option lookups must not fail and
+    the plugin falls back to ``user.login`` on legacy Zabbix (6.x), sending the
+    session token in the JSON-RPC ``auth`` field.
+    """
+    config = {
         "server_url": "https://zabbix6.example.com",
-        "auth_token": None,
-        "login_token": None,
         "login_user": "Admin",
         "login_password": "zabbix_password",
-        "proxy": "",
-        "validate_certs": True,
-        "timeout": 10,
-        "cache": False,
-        "strict": False,
-        "compose": {},
-        "groups": {},
-        "keyed_groups": [],
-        "host_zapi_query": {},
-        "add_zabbix_groups": False,
     }
-    inventory_plugin.get_option = lambda opt: options.get(opt, None)
 
-    recorded_requests = []
+    recorded, mock_req_class, mock_atexit = _run_parse(inventory_plugin, tmp_path, config, "6.0.12")
 
-    def fake_post(url, data=None, **kwargs):
-        payload = json.loads(data)
-        recorded_requests.append({
-            "url": url,
-            "payload": payload,
-        })
-        method = payload.get("method")
-        if method == "apiinfo.version":
-            return _mock_response({"jsonrpc": "2.0", "result": "6.0.12", "id": "1"})
-        elif method == "user.login":
-            assert payload["params"]["username"] == "Admin"
-            assert payload["params"]["password"] == "zabbix_password"
-            return _mock_response({"jsonrpc": "2.0", "result": "session-auth-token-60", "id": "1"})
-        elif method == "host.get":
-            assert payload.get("auth") == "session-auth-token-60"
-            return _mock_response({"jsonrpc": "2.0", "result": [], "id": "1"})
-        return _mock_response({"jsonrpc": "2.0", "result": {}, "id": "1"})
+    assert inventory_plugin.get_option("auth_token") is None
+    assert inventory_plugin.zabbix_version == "6.0.12"
+    assert inventory_plugin.auth == "session-auth-token"
 
-    with patch("ansible_collections.community.zabbix.plugins.inventory.zabbix_inventory.Request") as mock_req_class:
-        mock_req_instance = MagicMock()
-        mock_req_instance.post.side_effect = fake_post
-        mock_req_class.return_value = mock_req_instance
+    methods_called = [r["payload"]["method"] for r in recorded]
+    assert methods_called == ["apiinfo.version", "user.login", "host.get"]
 
-        inventory_plugin.get_version()
-        assert inventory_plugin.zabbix_version == "6.0.12"
+    login_params = recorded[1]["payload"]["params"]
+    assert login_params == {"username": "Admin", "password": "zabbix_password"}
 
-        inventory_plugin.login_zabbix()
-        assert inventory_plugin.auth == "session-auth-token-60"
+    assert recorded[2]["payload"]["auth"] == "session-auth-token"
+    assert all("Authorization" not in h for h in _sent_headers(mock_req_class))
 
-    methods_called = [r["payload"]["method"] for r in recorded_requests]
-    assert "user.login" in methods_called
-
-
-def test_group_name_sanitization(inventory_plugin, recwarn):
-    """Test that group names containing colons and slashes are properly sanitized without warnings."""
-    test_cases = [
-        ("k8s:cluster/component", "k8s_cluster_component"),
-        ("Kubernetes/Core:APIServer", "Kubernetes_Core_APIServer"),
-        ("simple_group", "simple_group"),
-        ("group/with/multiple:colons:and/slashes", "group_with_multiple_colons_and_slashes"),
-    ]
-
-    for raw_name, expected in test_cases:
-        sanitized = inventory_plugin._sanitize_group_name(raw_name)
-        assert sanitized == expected
-
-        # Adding sanitized group to inventory should not produce Ansible group warnings
-        inventory_plugin.inventory.add_group(sanitized)
-
-    # Verify no warning about invalid group name was raised
-    group_warnings = [
-        w for w in recwarn
-        if "Invalid characters were found in group names" in str(w.message)
-    ]
-    assert len(group_warnings) == 0
+    mock_atexit.assert_called_once_with(inventory_plugin.logout_zabbix)
 
 
 def test_api_call_error_handling(inventory_plugin):
-    """Test that JSON-RPC errors returned by Zabbix are handled gracefully."""
-    options = {
+    """JSON-RPC errors returned by Zabbix are reported instead of raising ``KeyError: 'result'``."""
+    inventory_plugin.set_options(direct={
         "server_url": "https://zabbix.example.com",
         "auth_token": "token",
-        "proxy": "",
-        "validate_certs": True,
-        "timeout": 10,
-    }
-    inventory_plugin.get_option = lambda opt: options.get(opt, None)
+    })
 
     error_response = {
         "jsonrpc": "2.0",
@@ -210,11 +202,9 @@ def test_api_call_error_handling(inventory_plugin):
         "id": "1"
     }
 
-    with patch("ansible_collections.community.zabbix.plugins.inventory.zabbix_inventory.Request") as mock_req_class:
-        mock_req_instance = MagicMock()
-        mock_req_instance.post.return_value = _mock_response(error_response)
-        mock_req_class.return_value = mock_req_instance
+    with patch(REQUEST_PATH) as mock_req_class:
+        mock_req_class.return_value.post.return_value = _mock_response(error_response)
 
         with pytest.raises(AnsibleParserError) as excinfo:
             inventory_plugin._api_call("host.get", {})
-        assert "Zabbix API error (-32602): Invalid params." in str(excinfo.value)
+    assert "Zabbix API error (-32602): Invalid params." in str(excinfo.value)
