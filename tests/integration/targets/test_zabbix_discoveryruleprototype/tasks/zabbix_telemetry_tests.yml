@@ -2,7 +2,7 @@
 - name: Test telemetry query LLD rule prototypes
   module_defaults:
     community.zabbix.zabbix_discoveryruleprototype:
-      name: 'Telemetry discovery for {% raw %}{#SERVICE}{% endraw %}'
+      name: !unsafe 'Telemetry discovery for {#SERVICE}'
       discoveryrule_name: Prototype parent
       host_name: "{{ prototype_target.host_name | default(omit) }}"
       template_name: "{{ prototype_target.template_name | default(omit) }}"
@@ -24,10 +24,10 @@
           - column: ResourceAttributes
             attribute_key: service.name
             operator: 0
-            value: '{% raw %}{#SERVICE}{% endraw %}'
+            value: !unsafe '{#SERVICE}'
     telemetry_params:
       type: telemetry_query
-      key: 'telemetry.discovery[{% raw %}{#SERVICE}{% endraw %}]'
+      key: !unsafe 'telemetry.discovery[{#SERVICE}]'
       interval: 1m
       enabled: false
       query: "{{ telemetry_query }}"

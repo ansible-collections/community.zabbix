@@ -145,12 +145,12 @@ EXAMPLES = r'''
     ansible_user: Admin
     ansible_httpapi_pass: "{{ zabbix_password }}"
   community.zabbix.zabbix_discoveryruleprototype:
-    name: 'Discover telemetry for {% raw %}{#SERVICE}{% endraw %}'
+    name: !unsafe 'Discover telemetry for {#SERVICE}'
     discoveryrule_name: Discover services
     template_name: Telemetry services
     params:
       type: telemetry_query
-      key: 'telemetry.discovery[{% raw %}{#SERVICE}{% endraw %}]'
+      key: !unsafe 'telemetry.discovery[{#SERVICE}]'
       interval: 1m
       query:
         signal_type: 0
@@ -166,14 +166,14 @@ EXAMPLES = r'''
             - column: ResourceAttributes
               attribute_key: service.name
               operator: 0
-              value: '{% raw %}{#SERVICE}{% endraw %}'
+              value: !unsafe '{#SERVICE}'
       time_shift: 15s
       lookback_limit: 10m
       granularity: 15s
 
 - name: Delete a prototype
   community.zabbix.zabbix_discoveryruleprototype:
-    name: 'Discover telemetry for {% raw %}{#SERVICE}{% endraw %}'
+    name: !unsafe 'Discover telemetry for {#SERVICE}'
     discoveryrule_name: Discover services
     template_name: Telemetry services
     state: absent
