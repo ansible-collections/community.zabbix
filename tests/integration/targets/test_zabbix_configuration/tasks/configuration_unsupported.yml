@@ -1,0 +1,23 @@
+---
+- name: Reject missing-object reporting on servers before Zabbix 8.0
+  community.zabbix.zabbix_configuration:
+    content_yaml: "{{ lookup('file', 'template.yaml') }}"
+    rules: {}
+    return_missing_objects: true
+  register: unsupported_missing_objects
+  ignore_errors: true
+
+- name: Reject global regular expression export before Zabbix 8.0
+  community.zabbix.zabbix_configuration:
+    export_options:
+      global_regexes: ["1"]
+  register: unsupported_regex_export
+  ignore_errors: true
+
+- name: Assert clear version requirements
+  ansible.builtin.assert:
+    that:
+      - unsupported_missing_objects is failed
+      - "'require Zabbix 8.0' in unsupported_missing_objects.msg"
+      - unsupported_regex_export is failed
+      - "'requires Zabbix 8.0' in unsupported_regex_export.msg"
