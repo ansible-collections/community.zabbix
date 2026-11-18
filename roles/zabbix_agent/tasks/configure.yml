@@ -66,7 +66,7 @@
     fail_msg: "listenip: {{ _listenip }} is not an address available on {{ inventory_hostname }}"
   when:
     - _listenip not in ['127.0.0.1', '0.0.0.0']
-  loop: "{{ zabbix_agent_listenip | split(',') }}"
+  loop: "{{ zabbix_agent_listenip | split(',') if zabbix_agent_listenip is not none else [] }}"
   loop_control:
     loop_var: _listenip
   tags:

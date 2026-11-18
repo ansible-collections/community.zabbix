@@ -1,0 +1,5 @@
+---
+bugfixes:
+  - zabbix_agent role - do not fail in the ``zabbix_agent_listenip`` validation task when the variable is set to ``null``.
+    The configuration template already leaves ``ListenIP`` commented out in that case
+    (https://github.com/ansible-collections/community.zabbix/issues/1798).
