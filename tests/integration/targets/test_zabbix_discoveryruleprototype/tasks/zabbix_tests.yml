@@ -11,14 +11,14 @@
 - name: Test LLD rule prototype lifecycle
   module_defaults:
     community.zabbix.zabbix_discoveryruleprototype:
-      name: 'Nested discovery for {% raw %}{#SERVICE}{% endraw %}'
+      name: !unsafe 'Nested discovery for {#SERVICE}'
       discoveryrule_name: Prototype parent
       host_name: "{{ prototype_target.host_name | default(omit) }}"
       template_name: "{{ prototype_target.template_name | default(omit) }}"
   vars:
     nested_params:
       type: nested
-      key: 'nested.discovery[{% raw %}{#SERVICE}{% endraw %}]'
+      key: !unsafe 'nested.discovery[{#SERVICE}]'
   block:
     - name: Predict prototype creation
       community.zabbix.zabbix_discoveryruleprototype:
@@ -79,13 +79,13 @@
     - name: Rename the prototype
       community.zabbix.zabbix_discoveryruleprototype:
         params:
-          new_name: 'Renamed discovery for {% raw %}{#SERVICE}{% endraw %}'
+          new_name: !unsafe 'Renamed discovery for {#SERVICE}'
       register: prototype_rename
 
     - name: Repeat the prototype rename
       community.zabbix.zabbix_discoveryruleprototype:
         params:
-          new_name: 'Renamed discovery for {% raw %}{#SERVICE}{% endraw %}'
+          new_name: !unsafe 'Renamed discovery for {#SERVICE}'
       register: prototype_rename_repeat
 
     - name: Assert rename and idempotence
@@ -96,11 +96,11 @@
 
     - name: Create a child under an LLD rule prototype
       community.zabbix.zabbix_discoveryruleprototype:
-        name: 'Child discovery for {% raw %}{#SERVICE}{% endraw %}'
-        discoveryrule_name: 'Renamed discovery for {% raw %}{#SERVICE}{% endraw %}'
+        name: !unsafe 'Child discovery for {#SERVICE}'
+        discoveryrule_name: !unsafe 'Renamed discovery for {#SERVICE}'
         params:
           type: nested
-          key: 'child.discovery[{% raw %}{#SERVICE}{% endraw %}]'
+          key: !unsafe 'child.discovery[{#SERVICE}]'
       register: prototype_child
 
     - name: Assert that the child was created
@@ -115,7 +115,7 @@
       community.zabbix.zabbix_discoveryruleprototype:
         params:
           type: telemetry_query
-          key: 'telemetry.unsupported[{% raw %}{#SERVICE}{% endraw %}]'
+          key: !unsafe 'telemetry.unsupported[{#SERVICE}]'
       register: prototype_unsupported
       ignore_errors: true
       when: zabbix_version is version('8.0', '<')
@@ -129,20 +129,20 @@
 
     - name: Predict prototype deletion
       community.zabbix.zabbix_discoveryruleprototype:
-        name: 'Renamed discovery for {% raw %}{#SERVICE}{% endraw %}'
+        name: !unsafe 'Renamed discovery for {#SERVICE}'
         state: absent
       check_mode: true
       register: prototype_delete_check
 
     - name: Delete the prototype and its child
       community.zabbix.zabbix_discoveryruleprototype:
-        name: 'Renamed discovery for {% raw %}{#SERVICE}{% endraw %}'
+        name: !unsafe 'Renamed discovery for {#SERVICE}'
         state: absent
       register: prototype_delete
 
     - name: Repeat prototype deletion
       community.zabbix.zabbix_discoveryruleprototype:
-        name: 'Renamed discovery for {% raw %}{#SERVICE}{% endraw %}'
+        name: !unsafe 'Renamed discovery for {#SERVICE}'
         state: absent
       register: prototype_delete_repeat
 
