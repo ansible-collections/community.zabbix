@@ -7,11 +7,12 @@ zabbix_export:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
   templates:
-    - uuid: 3e18de1b19e4497296c4546c1141b5cd
+    - uuid: cd837ef0edb14e4e875f409bc90af546
       template: ExampleTemplateYAML
       name: ExampleTemplateYAML
       templates:
-        - name: 'Configuration import parent'
+        - name: 'FTP Service'
+        - name: 'Zabbix proxy health'
       groups:
         - name: Templates
         - name: Templates/Applications

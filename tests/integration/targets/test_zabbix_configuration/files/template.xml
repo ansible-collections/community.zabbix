@@ -14,12 +14,15 @@
     </groups>
     <templates>
         <template>
-            <uuid>f8a3b176b33c48f1a1d794e8e4060e12</uuid>
+            <uuid>cd837ef0edb14e4e875f409bc90af546</uuid>
             <template>ExampleTemplateXML</template>
             <name>ExampleTemplateXML</name>
             <templates>
                 <template>
-                    <name>Configuration import parent</name>
+                    <name>FTP Service</name>
+                </template>
+                <template>
+                    <name>Zabbix proxy health</name>
                 </template>
             </templates>
             <groups>

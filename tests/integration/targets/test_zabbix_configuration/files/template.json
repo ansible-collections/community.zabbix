@@ -19,7 +19,10 @@
                 "name": "ExampleTemplateJSON",
                 "templates": [
                     {
-                        "name": "Configuration import parent"
+                        "name": "FTP Service"
+                    },
+                    {
+                        "name": "Zabbix proxy health"
                     }
                 ],
                 "groups": [
