@@ -1,0 +1,5 @@
+---
+minor_changes:
+  - Replace the deprecated ``ansible.module_utils.six`` compatibility shims with
+    their Python standard library equivalents. ``ansible.module_utils.six`` is
+    deprecated in ansible-core 2.21 and is scheduled for removal in 2.24.
