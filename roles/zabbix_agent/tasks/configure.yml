@@ -65,8 +65,9 @@
       - _listenip in ansible_facts['all_ipv4_addresses']
     fail_msg: "listenip: {{ _listenip }} is not an address available on {{ inventory_hostname }}"
   when:
+    - zabbix_agent_listenip | length > 0
     - _listenip not in ['127.0.0.1', '0.0.0.0']
-  loop: "{{ zabbix_agent_listenip | split(',') if zabbix_agent_listenip is not none else [] }}"
+  loop: "{{ zabbix_agent_listenip | split(',') }}"
   loop_control:
     loop_var: _listenip
   tags:
