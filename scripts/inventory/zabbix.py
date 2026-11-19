@@ -165,7 +165,8 @@ class ZabbixInventory(object):
         )
 
     def get_host(self, name):
-        api_query = {"output": "extend", "selectGroups": "extend", "filter": {"host": [name]}}
+        group_key = "selectHostGroups" if LooseVersion(self.zabbix_version) >= LooseVersion("7.0") else "selectGroups"
+        api_query = {"output": "extend", group_key: "extend", "filter": {"host": [name]}}
         if self.use_host_interface:
             api_query["selectInterfaces"] = ["useip", "ip", "dns"]
         if self.read_host_inventory:
@@ -191,7 +192,10 @@ class ZabbixInventory(object):
         return data
 
     def get_list(self):
-        api_query = {"output": "extend", "selectGroups": "extend"}
+        if LooseVersion(self.zabbix_version) >= LooseVersion("7.0"):
+            api_query = {"output": "extend", "selectHostGroups": "extend"}
+        else:
+            api_query = {"output": "extend", "selectGroups": "extend"}
         if self.use_host_interface:
             api_query["selectInterfaces"] = ["useip", "ip", "dns"]
         if self.read_host_inventory:
@@ -206,7 +210,7 @@ class ZabbixInventory(object):
             hostvars = dict()
             data[self.defaultgroup]["hosts"].append(hostname)
 
-            for group in host["groups"]:
+            for group in host.get("hostgroups", host.get("groups", [])):
                 groupname = group["name"]
 
                 if groupname not in data:
