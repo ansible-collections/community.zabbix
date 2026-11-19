@@ -7,9 +7,11 @@
   ansible.builtin.include_tasks: configuration_unsupported.yml
   when: zabbix_version is version('8.0', '<')
 
-- name: Create FTP Service Template
+# Keep template linkage coverage without inheriting stock monitoring items and
+# triggers, whose deletion can exceed the API timeout on Zabbix 6.0.
+- name: Create parent template for configuration imports
   community.zabbix.zabbix_template:
-    template_name: FTP Service
+    template_name: Configuration import parent
     template_groups:
       - "Templates"
     state: present
@@ -87,6 +89,9 @@
     that:
       - configuration_template_export is not changed
       - (configuration_template_export.exported_config | from_json).zabbix_export.templates[0].template == 'ExampleTemplateJSON'
+      - >-
+        (configuration_template_export.exported_config | from_json).zabbix_export.templates[0].templates
+        == [{'name': 'Configuration import parent'}]
 
 - name: test - import Zabbix template from XML
   community.zabbix.zabbix_configuration:
@@ -106,6 +111,8 @@
       valueMaps:
         createMissing: true
         updateExisting: false
+      templateLinkage:
+        createMissing: true
   register: zbxconfiguration_import
 
 - name: assert that configuration was imported
@@ -131,6 +138,8 @@
       valueMaps:
         createMissing: true
         updateExisting: false
+      templateLinkage:
+        createMissing: true
   register: zbxconfiguration_import
 
 - name: assert that configuration was imported (not changed)
@@ -156,6 +165,8 @@
       valueMaps:
         createMissing: true
         updateExisting: false
+      templateLinkage:
+        createMissing: true
   register: zbxconfiguration_import
 
 - name: assert that configuration was imported
@@ -181,6 +192,8 @@
       valueMaps:
         createMissing: true
         updateExisting: false
+      templateLinkage:
+        createMissing: true
   register: zbxconfiguration_import
 
 - name: assert that configuration was imported (not changed)
@@ -196,7 +209,16 @@
     - ExampleTemplateJSON
     - ExampleTemplateXML
     - ExampleTemplateYAML
-    - FTP Service
+    - Configuration import parent
+  register: configuration_template_cleanup
+
+- name: Assert each imported template and its parent existed and were deleted
+  ansible.builtin.assert:
+    that:
+      - item is changed
+  loop: "{{ configuration_template_cleanup.results }}"
+  loop_control:
+    label: "{{ item.item }}"
 
 - name: test - import Zabbix host from YAML
   community.zabbix.zabbix_configuration:
