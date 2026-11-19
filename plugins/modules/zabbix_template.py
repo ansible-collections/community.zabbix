@@ -293,7 +293,7 @@ import json
 import traceback
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils._text import to_native
+from ansible.module_utils.common.text.converters import to_native
 from ansible_collections.community.zabbix.plugins.module_utils.base import ZabbixBase
 from ansible.module_utils.compat.version import LooseVersion
 
