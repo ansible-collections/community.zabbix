@@ -34,7 +34,16 @@ options:
     host_name:
         description:
             - Name of host to add httptest to.
-        required: true
+            - Required when I(template_name) is not used.
+            - Mutually exclusive with I(template_name).
+        required: false
+        type: str
+    template_name:
+        description:
+            - Technical name of the template to add httptest to.
+            - Required if I(host_name) is not used.
+            - Mutually exclusive with I(host_name).
+        required: false
         type: str
     params:
         description:
@@ -118,6 +127,7 @@ options:
             new_name:
                 description:
                     - New name for httptest
+                    - For Zabbix 7.0 and later, include I(params.steps) when renaming a scenario on a template linked to hosts.
                 required: false
                 type: str
             steps:
@@ -339,6 +349,28 @@ EXAMPLES = r'''
       enabled: True
     state: present
 
+# Create a web scenario on a template
+- name: Create httptest on a template
+  vars:
+    ansible_network_os: community.zabbix.zabbix
+    ansible_connection: httpapi
+    ansible_httpapi_port: 443
+    ansible_httpapi_use_ssl: true
+    ansible_httpapi_validate_certs: false
+    ansible_zabbix_url_path: 'zabbixeu'
+    ansible_host: zabbix-example-fqdn.org
+  community.zabbix.zabbix_httptest:
+    name: example_template_website
+    template_name: example_template
+    params:
+      steps:
+        - name: Test
+          url: https://example.com
+          status_codes: [200]
+      interval: 1h
+      enabled: true
+    state: present
+
 # Change interval for existing Zabbix web scenario
 - name: update rule
   # set task level variables as we change ansible_connection plugin here
@@ -406,18 +438,32 @@ class Httptest(ZabbixBase):
                             'basic': 1,
                             'ntlm': 2}
 
-    def get_hosts(self, host_name):
-        try:
-            return self._zapi.host.get({"filter": {"host": host_name}})
-        except Exception as e:
-            self._module.fail_json(msg="Failed to get host: %s" % e)
+    def get_hosts_templates(self, host_name, template_name):
+        if host_name is not None:
+            try:
+                return self._zapi.host.get({"filter": {"host": host_name}})
+            except Exception as e:
+                self._module.fail_json(msg="Failed to get host: %s" % e)
+        else:
+            try:
+                return self._zapi.template.get({"filter": {"host": template_name}})
+            except Exception as e:
+                self._module.fail_json(msg="Failed to get template: %s" % e)
 
-    def get_httptests(self, httptest_name, host_name):
+    def get_httptests(self, httptest_name, host_name, template_name):
+        hosts_templates = self.get_hosts_templates(host_name, template_name)
+        if not hosts_templates:
+            return []
+        query = {'filter': {'name': httptest_name}}
+        if host_name is not None:
+            query['hostids'] = [host['hostid'] for host in hosts_templates]
+        else:
+            query['templateids'] = [template['templateid'] for template in hosts_templates]
         httptests = []
         try:
-            httptests = self._zapi.httptest.get({'filter': {'name': httptest_name, 'host': host_name}})
+            httptests = self._zapi.httptest.get(query)
         except Exception as e:
-            self._module.fail_json(msg="Failed to get httptests: %s" & e)
+            self._module.fail_json(msg="Failed to get httptests: %s" % e)
         return httptests
 
     def sanitize_params(self, name, params):
@@ -520,12 +566,19 @@ def main():
     argument_spec = zabbix_utils.zabbix_common_argument_spec()
     argument_spec.update(dict(
         name=dict(type='str', required=True),
-        host_name=dict(type='str', required=True),
+        host_name=dict(type='str', required=False),
+        template_name=dict(type='str', required=False),
         params=dict(type='dict', required=False),
         state=dict(type='str', default="present", choices=['present', 'absent']),
     ))
     module = AnsibleModule(
         argument_spec=argument_spec,
+        required_one_of=[
+            ['host_name', 'template_name']
+        ],
+        mutually_exclusive=[
+            ['host_name', 'template_name']
+        ],
         required_if=[
             ['state', 'present', ['params']]
         ],
@@ -534,13 +587,14 @@ def main():
 
     name = module.params['name']
     host_name = module.params['host_name']
+    template_name = module.params['template_name']
     params = module.params['params']
     state = module.params['state']
 
     httptest = Httptest(module)
 
     if state == "absent":
-        httptests = httptest.get_httptests(name, host_name)
+        httptests = httptest.get_httptests(name, host_name, template_name)
         if len(httptests) == 0:
             module.exit_json(changed=False, result="No httptest to delete.")
         else:
@@ -552,9 +606,9 @@ def main():
 
     elif state == "present":
         httptest.sanitize_params(name, params)
-        httptests = httptest.get_httptests(name, host_name)
+        httptests = httptest.get_httptests(name, host_name, template_name)
         if 'new_name' in params:
-            new_name_httptest = httptest.get_httptests(params['new_name'], host_name)
+            new_name_httptest = httptest.get_httptests(params['new_name'], host_name, template_name)
             if len(new_name_httptest) > 0:
                 module.exit_json(changed=False, results=[{'httptestids': [new_name_httptest[0]['httptestid']]}])
         results = []
@@ -563,12 +617,16 @@ def main():
                 module.fail_json('Cannot rename httptest: %s is not found' % name)
             if not ('steps' in params):
                 module.fail_json('Cannot create httptest without steps')
-            hosts = httptest.get_hosts(host_name)
-            for host in hosts:
-                if 'hostid' in host:
-                    params['hostid'] = host['hostid']
+            hosts_templates = httptest.get_hosts_templates(host_name, template_name)
+            if not hosts_templates:
+                module.fail_json(msg="Host/template not found: %s" % (host_name if host_name is not None else template_name))
+            for host_template in hosts_templates:
+                if 'hostid' in host_template:
+                    params['hostid'] = host_template['hostid']
+                elif 'templateid' in host_template:
+                    params['hostid'] = host_template['templateid']
                 else:
-                    module.fail_json(msg="host did not return id")
+                    module.fail_json(msg="host/template did not return id")
                 results.append(httptest.add_httptest(params))
             module.exit_json(changed=True, result=results)
         else:

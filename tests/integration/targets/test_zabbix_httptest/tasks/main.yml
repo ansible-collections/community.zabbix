@@ -7,14 +7,31 @@
     # setup stuff
     - include_tasks: zabbix_setup.yml
 
-    # zabbix_httptest module tests
-    - include_tasks: zabbix_tests.yml
+    - name: Test httptest lifecycle on hosts and templates
+      ansible.builtin.include_tasks: zabbix_tests.yml
+      loop:
+        - type: host_name
+          name: ExampleHost
+        - type: template_name
+          name: ExampleTemplate
+      loop_control:
+        loop_var: httptest_target
 
-    # tear down stuff set up earlier
-    - include_tasks: zabbix_teardown.yml
+    - name: Test httptest target validation
+      ansible.builtin.include_tasks: zabbix_validation.yml
 
   always:
-    - name: "cleanup httptest if tests failed"
+    - name: Cleanup template httptests if tests failed
+      community.zabbix.zabbix_httptest:
+        template_name: ExampleTemplate
+        name: "{{ item }}"
+        state: absent
+      ignore_errors: true
+      loop:
+        - ExampleTest
+        - NewExampleTest
+
+    - name: Cleanup host httptests if tests failed
       community.zabbix.zabbix_httptest:
         host_name: ExampleHost
         name: "{{ item }}"
@@ -23,3 +40,6 @@
       loop:
         - ExampleTest
         - NewExampleTest
+
+    - name: Remove test hosts and templates
+      ansible.builtin.include_tasks: zabbix_teardown.yml

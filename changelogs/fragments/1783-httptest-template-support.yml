@@ -1,0 +1,5 @@
+---
+minor_changes:
+  - zabbix_httptest - add ``template_name`` as an alternative to ``host_name`` to manage web scenarios on templates (https://github.com/ansible-collections/community.zabbix/issues/1783).
+bugfixes:
+  - zabbix_httptest - scope web scenario lookups to the selected host or template so same-named scenarios on other targets are preserved (https://github.com/ansible-collections/community.zabbix/issues/1783).
