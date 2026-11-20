@@ -17,6 +17,16 @@
       loop_control:
         loop_var: httptest_target
 
+    - name: Test httptest API parameter handling on hosts and templates
+      ansible.builtin.include_tasks: zabbix_parameters.yml
+      loop:
+        - type: host_name
+          name: ExampleHost
+        - type: template_name
+          name: ExampleTemplate
+      loop_control:
+        loop_var: httptest_target
+
     - name: Test httptest target validation
       ansible.builtin.include_tasks: zabbix_validation.yml
 

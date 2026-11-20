@@ -9,9 +9,9 @@ __metaclass__ = type
 DOCUMENTATION = r'''
 ---
 module: zabbix_httptest
-short_description: Create/delete Zabbix httptests aka Web Scenarios
+short_description: Manage Zabbix httptests aka Web Scenarios
 description:
-   - Create httptests if they do not exist.
+   - Create or update httptests on hosts or templates.
    - Delete existing httptests if they exist.
 author:
     - "Trystan Mata (@tytan652)"
@@ -21,7 +21,7 @@ requirements:
 options:
     state:
         description:
-            - Create or delete httptest.
+            - Create, update, or delete httptest.
         required: false
         type: str
         default: "present"
@@ -49,23 +49,24 @@ options:
         description:
             - Parameters to create/update httptest with.
             - Required if state is "present".
-            - Parameters as defined at https://www.zabbix.com/documentation/current/en/manual/api/reference/httptest/object
-            - Additionally supported parameters are below.
+            - Supported writable parameters from https://www.zabbix.com/documentation/current/en/manual/api/reference/httptest/object.
+            - Suboptions use native API field names. Previous module names remain supported as compatibility aliases.
+            - Only supplied parameters are compared and updated. IDs and inherited properties are managed by Zabbix or the module.
         required: false
         type: dict
         suboptions:
-            interval:
+            delay:
                 description:
                     - Update interval of the httptest.
-                    - Alias for "delay" in API docs.
                 required: false
                 type: str
-            attempts:
+                aliases: [interval]
+            retries:
                 description:
                     - Number of attempts before failing the httptest
-                    - Alias for "retries" in API docs
                 required: false
                 type: int
+                aliases: [attempts]
             agent:
                 description:
                     - User agent string used by the httptest.
@@ -117,23 +118,25 @@ options:
                     - Status of the httptest.
                 required: false
                 type: str
-                choices: [ "enabled", "disabled" ]
+                choices: [enabled, disabled]
             enabled:
                 description:
-                    - Status of the httptest.
-                    - Overrides "status" in API docs.
+                    - Compatibility option that overrides I(params.status). Use I(params.status) for the native API option.
+                    - C(true) enables the scenario (status C(0)); C(false) disables it (status C(1)).
                 required: false
                 type: bool
-            new_name:
+            name:
                 description:
-                    - New name for httptest
-                    - For Zabbix 7.0 and later, include I(params.steps) when renaming a scenario on a template linked to hosts.
+                    - New name for the httptest identified by the top-level I(name).
+                    - For Zabbix 7.0 and later, include I(params.steps) when renaming a scenario on a template linked to hosts to avoid an API error.
                 required: false
                 type: str
+                aliases: [new_name]
             steps:
                 description:
                     - Scenario steps for the httptest
                     - Required if state is "present" and creating an httptest.
+                    - Steps without an explicit I(params.steps.no) are numbered by their position in the list.
                 required: false
                 type: list
                 elements: dict
@@ -141,19 +144,30 @@ options:
                     name:
                         description:
                             - Name of the scenario step.
-                        required: true
+                            - Required when I(params.steps.httpstepid) is not supplied.
+                        required: false
                         type: str
                     url:
                         description:
                             - URL to be checked.
-                        required: true
+                            - Required when I(params.steps.httpstepid) is not supplied.
+                        required: false
                         type: str
-                    query_field:
+                    httpstepid:
+                        description:
+                            - ID of an existing step to update. Allows partial updates to that step.
+                        type: str
+                    'no':
+                        description:
+                            - Positive sequence number of the step. Defaults to its position in the list.
+                        type: int
+                    query_fields:
                         description:
                             - Query fields used when performing the scenario step.
                         required: false
                         type: list
                         elements: dict
+                        aliases: [query_field]
                         suboptions:
                             name:
                                 description:
@@ -167,21 +181,9 @@ options:
                                 type: str
                     posts:
                         description:
-                            - POST variables for the scenario step.
+                            - Raw POST data as a string, or form fields as a list of dictionaries containing C(name) and C(value).
                         required: false
-                        type: list
-                        elements: dict
-                        suboptions:
-                            name:
-                                description:
-                                    - Name of the POST field.
-                                required: true
-                                type: str
-                            value:
-                                description:
-                                    - Value of the POST field.
-                                required: true
-                                type: str
+                        type: raw
                     variables:
                         description:
                             - Variables used when performing the scenario step.
@@ -228,7 +230,7 @@ options:
                             - Part of the HTTP response that the scenario step must retrieve.
                         required: false
                         type: str
-                        choices: ["only_body", "only_headers", "headers_and_body"]
+                        choices: [only_body, only_headers, headers_and_body]
                     timeout:
                         description:
                             - Request timeout of the scenario step.
@@ -241,10 +243,11 @@ options:
                         type: str
                     status_codes:
                         description:
-                            - Expected response status code.
+                            - List of expected HTTP status codes or ranges, for example C(["200", "300-399"]).
+                            - An empty list disables the status-code check.
                         required: false
                         type: list
-                        elements: int
+                        elements: str
             tags:
                 description:
                     - Tags of the httptest.
@@ -262,25 +265,32 @@ options:
                             - Value of the httptest tag.
                         required: false
                         type: str
+                        default: ""
             authentication:
                 description:
                     - HTTP authentication method used by the httptest.
+                    - Kerberos and Digest require Zabbix 7.0 or later and are rejected on older servers.
                 required: false
                 type: str
-                choices: ["none", "basic", "ntlm"]
-            username:
+                choices: [none, basic, ntlm, kerberos, digest]
+            http_user:
                 description:
                     - Username to authenticate with the host.
-                    - Used if C(authentication) is one of C(basic) or C(ntlm)
-                    - Alias for "http_user" in API docs.
+                    - Used when HTTP authentication is enabled.
                 required: false
                 type: str
-            password:
+                aliases: [username]
+            http_password:
                 description:
                     - Password to authenticate with the host.
-                    - Used if C(authentication) is one of C(basic) or C(ntlm)
-                    - Alias for "http_password" in API docs.
+                    - Used when HTTP authentication is enabled.
                 required: false
+                type: str
+                aliases: [password]
+            uuid:
+                description:
+                    - UUID of a web scenario on a template. Generated by Zabbix when omitted during creation.
+                    - Only supported with I(template_name).
                 type: str
             verify_peer:
                 description:
@@ -344,9 +354,9 @@ EXAMPLES = r'''
       steps:
         - name: Test
           url: https://zabbix-example-fqdn.org
-          status_code: [200]
-      interval: 1h
-      enabled: True
+          status_codes: ["200"]
+      delay: 1h
+      status: enabled
     state: present
 
 # Create a web scenario on a template
@@ -366,9 +376,9 @@ EXAMPLES = r'''
       steps:
         - name: Test
           url: https://example.com
-          status_codes: [200]
-      interval: 1h
-      enabled: true
+          status_codes: ["200"]
+      delay: 1h
+      status: enabled
     state: present
 
 # Change interval for existing Zabbix web scenario
@@ -382,11 +392,11 @@ EXAMPLES = r'''
     ansible_httpapi_validate_certs: false
     ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
     ansible_host: zabbix-example-fqdn.org
-  community.zabbix.zabbix_discoveryrule:
+  community.zabbix.zabbix_httptest:
     name: example_host_website
     host_name: example_host
     params:
-      interval: 2h
+      delay: 2h
     state: present
 
 # Delete web scenario
@@ -400,7 +410,7 @@ EXAMPLES = r'''
     ansible_httpapi_validate_certs: false
     ansible_zabbix_url_path: 'zabbixeu'  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
     ansible_host: zabbix-example-fqdn.org
-  community.zabbix.zabbix_discoveryrule:
+  community.zabbix.zabbix_httptest:
     name: example_host_website
     host_name: example_host
     state: absent
@@ -415,18 +425,65 @@ EXAMPLES = r'''
     ansible_httpapi_validate_certs: false
     ansible_zabbix_url_path: "zabbixeu"  # If Zabbix WebUI runs on non-default (zabbix) path ,e.g. http://<FQDN>/zabbixeu
     ansible_host: zabbix-example-fqdn.org
-  community.zabbix.zabbix_discoveryrule:
+  community.zabbix.zabbix_httptest:
     name: example_host_website
     host_name: example_host
     params:
-      new_name: new_example_host_website
+      name: new_example_host_website
     state: present
 '''
 
 from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.compat.version import LooseVersion
 
 from ansible_collections.community.zabbix.plugins.module_utils.base import ZabbixBase
 import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabbix_utils
+
+
+def httptest_argument_spec():
+    http_fields = dict(type='list', elements='dict', options=dict(
+        name=dict(type='str', required=True),
+        value=dict(type='str', required=True),
+    ))
+    return dict(
+        delay=dict(type='str', aliases=['interval']),
+        retries=dict(type='int', aliases=['attempts']),
+        agent=dict(type='str'),
+        http_proxy=dict(type='str'),
+        variables=http_fields,
+        headers=http_fields,
+        status=dict(type='str', choices=['enabled', 'disabled']),
+        enabled=dict(type='bool'),
+        name=dict(type='str', aliases=['new_name']),
+        authentication=dict(type='str', choices=['none', 'basic', 'ntlm', 'kerberos', 'digest']),
+        http_user=dict(type='str', aliases=['username']),
+        http_password=dict(type='str', aliases=['password'], no_log=True),
+        uuid=dict(type='str'),
+        verify_peer=dict(type='bool'),
+        verify_host=dict(type='bool'),
+        ssl_cert_file=dict(type='str'),
+        ssl_key_file=dict(type='str'),
+        ssl_key_password=dict(type='str', no_log=True),
+        tags=dict(type='list', elements='dict', options=dict(
+            tag=dict(type='str', required=True),
+            value=dict(type='str', default=''),
+        )),
+        steps=dict(type='list', elements='dict', options=dict(
+            name=dict(type='str'),
+            url=dict(type='str'),
+            httpstepid=dict(type='str'),
+            no=dict(type='int'),
+            query_fields=dict(http_fields, aliases=['query_field']),
+            posts=dict(type='raw'),
+            variables=http_fields,
+            headers=http_fields,
+            follow_redirects=dict(type='bool'),
+            retrieve_mode=dict(type='str', choices=['only_body', 'only_headers', 'headers_and_body']),
+            timeout=dict(type='str'),
+            required=dict(type='str'),
+            status_codes=dict(type='list', elements='str'),
+        )),
+    )
 
 
 class Httptest(ZabbixBase):
@@ -436,7 +493,16 @@ class Httptest(ZabbixBase):
 
     AUTHENTICATION_TYPES = {'none': 0,
                             'basic': 1,
-                            'ntlm': 2}
+                            'ntlm': 2,
+                            'kerberos': 3,
+                            'digest': 4}
+
+    HTTPTEST_PARAMETERS = (
+        'name', 'agent', 'authentication', 'delay', 'headers', 'http_password',
+        'http_proxy', 'http_user', 'retries', 'ssl_cert_file', 'ssl_key_file',
+        'ssl_key_password', 'status', 'variables', 'verify_host', 'verify_peer',
+        'uuid', 'steps', 'tags',
+    )
 
     def get_hosts_templates(self, host_name, template_name):
         if host_name is not None:
@@ -454,7 +520,7 @@ class Httptest(ZabbixBase):
         hosts_templates = self.get_hosts_templates(host_name, template_name)
         if not hosts_templates:
             return []
-        query = {'filter': {'name': httptest_name}}
+        query = {'filter': {'name': httptest_name}, 'selectSteps': 'extend', 'selectTags': 'extend'}
         if host_name is not None:
             query['hostids'] = [host['hostid'] for host in hosts_templates]
         else:
@@ -467,13 +533,15 @@ class Httptest(ZabbixBase):
         return httptests
 
     def sanitize_params(self, name, params):
-        params['name'] = name
-        if 'interval' in params:
-            params['delay'] = params['interval']
-            params.pop("interval")
-        if 'attempts' in params:
-            params['retries'] = params['attempts']
-            params.pop("attempts")
+        # Argument validation adds None for unspecified options. Keep raw lists intact
+        # so invalid entries are rejected rather than silently removed.
+        for key in list(params):
+            if params[key] is None:
+                del params[key]
+        # Ansible resolves aliases but also retains their original keys.
+        for alias in ('interval', 'attempts', 'username', 'password', 'new_name'):
+            params.pop(alias, None)
+        params.setdefault('name', name)
         if 'enabled' in params:
             if params['enabled']:
                 params['status'] = 'enabled'
@@ -481,39 +549,41 @@ class Httptest(ZabbixBase):
                 params['status'] = 'disabled'
             params.pop("enabled")
         if 'status' in params:
-            status = params['status']
-            if status == 'enabled':
-                params['status'] = 0
-            elif status == 'disabled':
-                params['status'] = 1
-            else:
-                self._module.fail_json(msg="Status must be 'enabled' or 'disabled', got %s" % status)
+            params['status'] = {'enabled': 0, 'disabled': 1}[params['status']]
         if 'steps' in params:
-            no = 0
-            for step in params['steps']:
-                no += 1
-                step['no'] = no
+            if not params['steps']:
+                self._module.fail_json(msg="steps must contain at least one scenario step")
+            step_numbers = set()
+            for no, step in enumerate(params['steps'], 1):
+                for key in list(step):
+                    if step[key] is None:
+                        del step[key]
+                if 'httpstepid' not in step and ('name' not in step or 'url' not in step):
+                    self._module.fail_json(msg="Each step requires name and url unless httpstepid is supplied")
+                step.setdefault('no', no)
+                if step['no'] < 1 or step['no'] in step_numbers:
+                    self._module.fail_json(msg="Step sequence numbers must be positive and unique")
+                step_numbers.add(step['no'])
+                if 'query_field' in step:
+                    step['query_fields'] = step.pop('query_field')
                 if 'follow_redirects' in step:
-                    follow_redirects = step['follow_redirects']
-                    if follow_redirects:
-                        step['follow_redirects'] = 1
-                    else:
-                        step['follow_redirects'] = 0
+                    step['follow_redirects'] = int(step['follow_redirects'])
                 if 'retrieve_mode' in step:
-                    retrieve_mode_int = self.RETRIEVE_MODES[step['retrieve_mode']]
-                    step['retrieve_mode'] = retrieve_mode_int
+                    step['retrieve_mode'] = self.RETRIEVE_MODES[step['retrieve_mode']]
                 if 'status_codes' in step:
-                    status_codes_str = ",".join(str(code) for code in step['status_codes'])
-                    step['status_codes'] = status_codes_str
+                    step['status_codes'] = ",".join(step['status_codes'])
+                if 'posts' in step and not isinstance(step['posts'], str):
+                    posts = step['posts']
+                    if not isinstance(posts, list) or any(
+                        not isinstance(field, dict) or set(field) != {'name', 'value'}
+                        or not isinstance(field['name'], str) or not isinstance(field['value'], str)
+                        for field in posts
+                    ):
+                        self._module.fail_json(msg="posts must be a string or a list of dictionaries with string name and value fields")
         if 'authentication' in params:
-            authentication_int = self.AUTHENTICATION_TYPES[params['authentication']]
-            params['authentication'] = authentication_int
-        if 'username' in params:
-            params['http_user'] = params['username']
-            params.pop("username")
-        if 'password' in params:
-            params['http_password'] = params['password']
-            params.pop("password")
+            params['authentication'] = self.AUTHENTICATION_TYPES[params['authentication']]
+            if params['authentication'] in (3, 4) and LooseVersion(self._zbx_api_version) < LooseVersion('7.0'):
+                self._module.fail_json(msg="Kerberos and Digest authentication require Zabbix 7.0 or later")
         if 'verify_peer' in params:
             verify = params['verify_peer']
             if verify:
@@ -527,11 +597,32 @@ class Httptest(ZabbixBase):
             else:
                 params['verify_host'] = 0
 
+    def params_equal(self, desired, current, key=None):
+        # Compare supplied fields only: API responses add defaults/IDs and stringify numbers.
+        if key == 'steps':
+            desired = sorted(desired, key=lambda step: int(step['no']))
+            current = sorted(current, key=lambda step: int(step['no']))
+        elif key == 'tags':
+            desired = sorted(desired, key=lambda tag: (tag['tag'], tag.get('value', '')))
+            current = sorted(current, key=lambda tag: (tag['tag'], tag.get('value', '')))
+        if isinstance(desired, dict):
+            return isinstance(current, dict) and all(
+                field in current and self.params_equal(value, current[field], field)
+                for field, value in desired.items()
+            )
+        if isinstance(desired, list):
+            return isinstance(current, list) and len(desired) == len(current) and all(
+                self.params_equal(value, old) for value, old in zip(desired, current)
+            )
+        return str(desired) == str(current)
+
     def add_httptest(self, params):
         if self._module.check_mode:
             self._module.exit_json(changed=True)
         try:
-            results = self._zapi.httptest.create(params)
+            payload = {key: params[key] for key in self.HTTPTEST_PARAMETERS if key in params}
+            payload['hostid'] = params['hostid']
+            results = self._zapi.httptest.create(payload)
         except Exception as e:
             self._module.fail_json(msg="Failed to create httptest: %s" % e)
         return results
@@ -540,17 +631,12 @@ class Httptest(ZabbixBase):
         if self._module.check_mode:
             self._module.exit_json(changed=True)
         try:
-            results = self._zapi.httptest.update(params)
+            payload = {key: params[key] for key in self.HTTPTEST_PARAMETERS if key in params}
+            payload['httptestid'] = params['httptestid']
+            results = self._zapi.httptest.update(payload)
         except Exception as e:
             self._module.fail_json(msg="Failed to update httptest: %s" % e)
         return results
-
-    def check_httptest_changed(self, old_httptest):
-        try:
-            new_httptest = self._zapi.httptest.get({'httptestids': "%s" % old_httptest['httptestid']})[0]
-        except Exception as e:
-            self._module.fail_json(msg="Failed to get httptest: %s" % e)
-        return old_httptest != new_httptest
 
     def delete_httptests(self, httptest_ids):
         if self._module.check_mode:
@@ -568,7 +654,7 @@ def main():
         name=dict(type='str', required=True),
         host_name=dict(type='str', required=False),
         template_name=dict(type='str', required=False),
-        params=dict(type='dict', required=False),
+        params=dict(type='dict', required=False, options=httptest_argument_spec()),
         state=dict(type='str', default="present", choices=['present', 'absent']),
     ))
     module = AnsibleModule(
@@ -606,14 +692,17 @@ def main():
 
     elif state == "present":
         httptest.sanitize_params(name, params)
+        if 'uuid' in params and template_name is None:
+            module.fail_json(msg="uuid is only supported for web scenarios on templates; use template_name")
         httptests = httptest.get_httptests(name, host_name, template_name)
-        if 'new_name' in params:
-            new_name_httptest = httptest.get_httptests(params['new_name'], host_name, template_name)
+        rename = params['name'] != name
+        if rename:
+            new_name_httptest = httptest.get_httptests(params['name'], host_name, template_name)
             if len(new_name_httptest) > 0:
                 module.exit_json(changed=False, results=[{'httptestids': [new_name_httptest[0]['httptestid']]}])
         results = []
         if len(httptests) == 0:
-            if 'new_name' in params:
+            if rename:
                 module.fail_json('Cannot rename httptest: %s is not found' % name)
             if not ('steps' in params):
                 module.fail_json('Cannot create httptest without steps')
@@ -633,13 +722,11 @@ def main():
             changed = False
             for h in httptests:
                 params['httptestid'] = h['httptestid']
-                if 'new_name' in params:
-                    params['name'] = params['new_name']
-                    params.pop("new_name")
-                results.append(httptest.update_httptest(params))
-                changed_test = httptest.check_httptest_changed(h)
-                if changed_test:
+                if not httptest.params_equal(params, h):
+                    results.append(httptest.update_httptest(params))
                     changed = True
+                else:
+                    results.append({'httptestids': [h['httptestid']]})
             module.exit_json(changed=changed, result=results)
 
 

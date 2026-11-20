@@ -1,0 +1,25 @@
+---
+- name: Predict the parameter update in check mode
+  community.zabbix.zabbix_httptest:
+    name: ExampleTest
+    host_name: "{{ httptest_target.name if httptest_target.type == 'host_name' else omit }}"
+    template_name: "{{ httptest_target.name if httptest_target.type == 'template_name' else omit }}"
+    params: "{{ httptest_update.params }}"
+  check_mode: true
+  register: zbx_httptest_parameters_check
+
+- name: Apply and repeat the parameter update
+  community.zabbix.zabbix_httptest:
+    name: ExampleTest
+    host_name: "{{ httptest_target.name if httptest_target.type == 'host_name' else omit }}"
+    template_name: "{{ httptest_target.name if httptest_target.type == 'template_name' else omit }}"
+    params: "{{ httptest_update.params }}"
+  loop: [first, repeat]
+  register: zbx_httptest_parameters_update
+
+- name: Assert accurate predictions and an unchanged repeat run
+  ansible.builtin.assert:
+    that:
+      - (zbx_httptest_parameters_check is changed) == (httptest_update.changed | default(true))
+      - (zbx_httptest_parameters_update.results[0] is changed) == (httptest_update.changed | default(true))
+      - zbx_httptest_parameters_update.results[1] is not changed
