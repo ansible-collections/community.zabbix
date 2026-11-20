@@ -110,6 +110,79 @@ options:
                 required: true
                 type: str
                 choices: [ "denied", "read-only", "read-write" ]
+    mfa_status:
+        description:
+            - Whether MFA is enabled or disabled for users in the group.
+            - Supported by this module on Zabbix 8.0 and later. If omitted, the existing setting is preserved.
+            - Global MFA must be configured and enabled in Zabbix for MFA to take effect.
+            - Disabling MFA also resets the group's selected MFA method to the system default.
+        type: str
+        choices: [ "disabled", "enabled" ]
+    mfa_method:
+        description:
+            - Name of an existing MFA method to use for the group.
+            - Supported by this module on Zabbix 8.0 and later.
+            - Requires O(mfa_status=enabled).
+            - Set to an empty string to select the system default MFA method.
+            - If omitted, the existing method is preserved.
+        type: str
+    proxy_mode:
+        description:
+            - Mode for access to proxies that are not included in proxy groups.
+            - Use V(allow_list) to allow only O(proxies), or V(deny_list) to deny only O(proxies).
+            - Supported from Zabbix 8.0. If omitted, the existing mode is preserved.
+            - New user groups use V(allow_list) by default in Zabbix.
+        type: str
+        choices: [ "deny_list", "allow_list" ]
+    proxies:
+        description:
+            - Names of proxies in the allow or deny list selected by O(proxy_mode).
+            - Applies to proxies that are not included in proxy groups.
+            - Supported from Zabbix 8.0. If omitted, the existing list is preserved.
+            - Set to an empty list to remove all proxies from the list.
+            - New user groups have an empty list by default in Zabbix.
+        type: list
+        elements: str
+    proxy_group_mode:
+        description:
+            - Mode for access to proxy groups and their proxies.
+            - Use V(allow_list) to allow only O(proxy_groups), or V(deny_list) to deny only O(proxy_groups).
+            - Supported from Zabbix 8.0. If omitted, the existing mode is preserved.
+            - New user groups use V(allow_list) by default in Zabbix.
+        type: str
+        choices: [ "deny_list", "allow_list" ]
+    proxy_groups:
+        description:
+            - Names of proxy groups in the allow or deny list selected by O(proxy_group_mode).
+            - Supported from Zabbix 8.0. If omitted, the existing list is preserved.
+            - Set to an empty list to remove all proxy groups from the list.
+            - New user groups have an empty list by default in Zabbix.
+        type: list
+        elements: str
+    apm_filters:
+        description:
+            - APM-based permissions to assign to the user group using resource attributes.
+            - Supported from Zabbix 8.0. If omitted, the existing filters are preserved.
+            - Set to an empty list to remove all APM filters.
+        type: list
+        elements: dict
+        suboptions:
+            key:
+                description:
+                    - Non-empty APM resource attribute key.
+                type: str
+                required: true
+            value:
+                description:
+                    - APM resource attribute value.
+                type: str
+                default: ""
+            signal_type:
+                description:
+                    - APM signal category to which the permission applies.
+                type: str
+                choices: [ "all", "traces", "metrics", "logs" ]
+                default: all
     tag_filters:
         description:
             - Tag based permissions to assign to the group
@@ -280,6 +353,65 @@ EXAMPLES = r"""
           tag: Service
           value: JIRA
     state: present
+
+# Group MFA settings for Zabbix >= 8.0
+- name: Enable MFA with an existing method
+  community.zabbix.zabbix_usergroup:
+    name: ACME
+    mfa_status: enabled
+    mfa_method: Corporate TOTP
+
+- name: Use the system default MFA method
+  community.zabbix.zabbix_usergroup:
+    name: ACME
+    mfa_status: enabled
+    mfa_method: ""
+
+- name: Disable MFA for the group
+  community.zabbix.zabbix_usergroup:
+    name: ACME
+    mfa_status: disabled
+
+# Proxy permissions for Zabbix >= 8.0
+- name: Allow access to selected proxies and proxy groups
+  community.zabbix.zabbix_usergroup:
+    name: ACME
+    proxy_mode: allow_list
+    proxies:
+      - Branch proxy
+    proxy_group_mode: allow_list
+    proxy_groups:
+      - Production proxies
+
+- name: Deny access to selected proxies
+  community.zabbix.zabbix_usergroup:
+    name: ACME
+    proxy_mode: deny_list
+    proxies:
+      - Restricted proxy
+
+- name: Clear the proxy and proxy group lists
+  community.zabbix.zabbix_usergroup:
+    name: ACME
+    proxies: []
+    proxy_groups: []
+
+# APM-based permissions for Zabbix >= 8.0
+- name: Set APM resource attribute permissions
+  community.zabbix.zabbix_usergroup:
+    name: ACME
+    apm_filters:
+      - key: service.namespace
+        value: production
+        signal_type: all
+      - key: service.name
+        value: checkout
+        signal_type: traces
+
+- name: Clear APM permissions
+  community.zabbix.zabbix_usergroup:
+    name: ACME
+    apm_filters: []
 
 # Base delete user groups example
 - name: Delete user groups
@@ -511,6 +643,55 @@ class TagFilters(Rights):
 
 
 class UserGroup(ZabbixBase):
+    def _get_mfa_id(self, name):
+        try:
+            methods = self._zapi.mfa.get({"output": ["mfaid", "name"], "search": {"name": name}})
+        except Exception as e:
+            self._module.fail_json(msg="Failed to get MFA method '%s': %s" % (name, e))
+        for method in methods:
+            if method["name"] == name:
+                return method["mfaid"]
+        self._module.fail_json(msg="MFA method not found: %s" % name)
+
+    def _construct_apm_filters(self, filters):
+        signal_types = {"all": -1, "traces": 0, "metrics": 1, "logs": 2}
+        constructed_filters = []
+        seen = set()
+        for apm_filter in filters:
+            if not apm_filter["key"]:
+                self._module.fail_json(msg="apm_filters key must not be empty")
+            identity = (apm_filter["key"], apm_filter["value"], apm_filter["signal_type"])
+            if identity in seen:
+                self._module.fail_json(msg="apm_filters must not contain duplicate key, value and signal_type combinations")
+            seen.add(identity)
+            constructed_filters.append({
+                "key": apm_filter["key"],
+                "value": apm_filter["value"],
+                "signal_type": signal_types[apm_filter["signal_type"]],
+            })
+        return constructed_filters
+
+    def _construct_proxy_permissions(self, names, proxy_groups=False):
+        if proxy_groups:
+            api = self._zapi.proxygroup
+            id_field = "proxy_groupid"
+            label = "Proxy group"
+        else:
+            api = self._zapi.proxy
+            id_field = "proxyid"
+            label = "Proxy"
+
+        permissions = []
+        for name in dict.fromkeys(names):
+            try:
+                objects = api.get({"output": [id_field], "filter": {"name": [name]}})
+            except Exception as e:
+                self._module.fail_json(msg="Failed to get %s '%s': %s" % (label.lower(), name, e))
+            if not objects:
+                self._module.fail_json(msg="%s not found: %s" % (label, name))
+            permissions.append({id_field: objects[0][id_field]})
+        return permissions
+
     def _construct_parameters(self, **kwargs):
         """Construct parameters of UserGroup object
 
@@ -558,6 +739,27 @@ class UserGroup(ZabbixBase):
                     )
                 _params["userdirectoryid"] = _userdir[0]["userdirectoryid"]
 
+        if LooseVersion(self._zbx_api_version) >= LooseVersion("8.0"):
+            if kwargs.get("mfa_status") is not None:
+                _params["mfa_status"] = zabbix_utils.helper_to_numeric_value(
+                    ["disabled", "enabled"], kwargs["mfa_status"]
+                )
+                if kwargs["mfa_status"] == "disabled":
+                    _params["mfaid"] = "0"
+            if kwargs.get("mfa_method") is not None:
+                _params["mfaid"] = self._get_mfa_id(kwargs["mfa_method"]) if kwargs["mfa_method"] else "0"
+            for mode in ("proxy_mode", "proxy_group_mode"):
+                if kwargs.get(mode) is not None:
+                    _params[mode] = zabbix_utils.helper_to_numeric_value(
+                        ["deny_list", "allow_list"], kwargs[mode]
+                    )
+            if kwargs.get("proxies") is not None:
+                _params["proxies"] = self._construct_proxy_permissions(kwargs["proxies"])
+            if kwargs.get("proxy_groups") is not None:
+                _params["proxy_groups"] = self._construct_proxy_permissions(kwargs["proxy_groups"], proxy_groups=True)
+            if kwargs.get("apm_filters") is not None:
+                _params["apm_filters"] = self._construct_apm_filters(kwargs["apm_filters"])
+
         return _params
 
     def check_if_usergroup_exists(self, name):
@@ -600,15 +802,21 @@ class UserGroup(ZabbixBase):
                     }
                 )
             else:
-                _usergroup = self._zapi.usergroup.get(
-                    {
-                        "output": "extend",
-                        "selectTagFilters": "extend",
-                        "selectHostGroupRights": "extend",
-                        "selectTemplateGroupRights": "extend",
-                        "filter": {"name": [name]},
-                    }
-                )
+                parameters = {
+                    "output": "extend",
+                    "selectTagFilters": "extend",
+                    "selectHostGroupRights": "extend",
+                    "selectTemplateGroupRights": "extend",
+                    "filter": {"name": [name]},
+                }
+                if LooseVersion(self._zbx_api_version) >= LooseVersion("8.0"):
+                    if self._module.params["proxies"] is not None:
+                        parameters["selectProxies"] = ["proxyid"]
+                    if self._module.params["proxy_groups"] is not None:
+                        parameters["selectProxyGroups"] = ["proxy_groupid"]
+                    if self._module.params["apm_filters"] is not None:
+                        parameters["selectApmFilters"] = ["key", "value", "signal_type"]
+                _usergroup = self._zapi.usergroup.get(parameters)
 
             if len(_usergroup) < 1:
                 self._module.fail_json(msg="User group not found: %s" % name)
@@ -666,9 +874,9 @@ class UserGroup(ZabbixBase):
             usergroup: added user group
         """
         try:
+            parameters = self._construct_parameters(**kwargs)
             if self._module.check_mode:
                 self._module.exit_json(changed=True)
-            parameters = self._construct_parameters(**kwargs)
             usergroup = self._zapi.usergroup.create(parameters)
             return usergroup["usrgrpids"][0]
         except Exception as e:
@@ -757,6 +965,21 @@ def main():
                 ),
             ),
         ),
+        mfa_status=dict(type="str", choices=["disabled", "enabled"]),
+        mfa_method=dict(type="str"),
+        proxy_mode=dict(type="str", choices=["deny_list", "allow_list"]),
+        proxies=dict(type="list", elements="str"),
+        proxy_group_mode=dict(type="str", choices=["deny_list", "allow_list"]),
+        proxy_groups=dict(type="list", elements="str"),
+        apm_filters=dict(
+            type="list",
+            elements="dict",
+            options=dict(
+                key=dict(type="str", required=True, no_log=False),
+                value=dict(type="str", default=""),
+                signal_type=dict(type="str", default="all", choices=["all", "traces", "metrics", "logs"]),
+            ),
+        ),
         tag_filters=dict(
             type="list",
             elements="dict",
@@ -780,11 +1003,24 @@ def main():
     rights = module.params["rights"]
     hostgroup_rights = module.params["hostgroup_rights"]
     templategroup_rights = module.params["templategroup_rights"]
+    mfa_status = module.params["mfa_status"]
+    mfa_method = module.params["mfa_method"]
+    proxy_mode = module.params["proxy_mode"]
+    proxies = module.params["proxies"]
+    proxy_group_mode = module.params["proxy_group_mode"]
+    proxy_groups = module.params["proxy_groups"]
+    apm_filters = module.params["apm_filters"]
     tag_filters = module.params["tag_filters"]
     userdirectory = module.params["userdirectory"]
     state = module.params["state"]
 
     userGroup = UserGroup(module)
+    if LooseVersion(userGroup._zbx_api_version) < LooseVersion("8.0"):
+        for option in ("proxy_mode", "proxies", "proxy_group_mode", "proxy_groups", "apm_filters", "mfa_status", "mfa_method"):
+            if module.params[option] is not None:
+                module.fail_json(msg="%s is supported from Zabbix 8.0" % option)
+    if mfa_method is not None and mfa_status != "enabled":
+        module.fail_json(msg="mfa_method requires mfa_status=enabled")
     zbx = userGroup._zapi
     if LooseVersion(userGroup._zbx_api_version) < LooseVersion("7.0"):
         rgts = Rights(module, zbx)
@@ -832,6 +1068,13 @@ def main():
                     ),
                     tag_filters=tgflts.construct_the_data(tag_filters),
                     userdirectory=userdirectory,
+                    proxy_mode=proxy_mode,
+                    proxies=proxies,
+                    proxy_group_mode=proxy_group_mode,
+                    proxy_groups=proxy_groups,
+                    apm_filters=apm_filters,
+                    mfa_status=mfa_status,
+                    mfa_method=mfa_method,
                 )
             if difference == {}:
                 module.exit_json(
@@ -882,6 +1125,13 @@ def main():
                     ),
                     tag_filters=tgflts.construct_the_data(tag_filters),
                     userdirectory=userdirectory,
+                    proxy_mode=proxy_mode,
+                    proxies=proxies,
+                    proxy_group_mode=proxy_group_mode,
+                    proxy_groups=proxy_groups,
+                    apm_filters=apm_filters,
+                    mfa_status=mfa_status,
+                    mfa_method=mfa_method,
                 )
             module.exit_json(
                 changed=True,

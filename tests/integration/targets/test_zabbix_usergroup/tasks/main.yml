@@ -1,4 +1,16 @@
 ---
+- name: Test group MFA settings from Zabbix 8.0
+  ansible.builtin.include_tasks: mfa_settings.yml
+  when: zabbix_version is version('8.0', '>=')
+
+- name: Test proxy permissions from Zabbix 8.0
+  ansible.builtin.include_tasks: proxy_permissions.yml
+  when: zabbix_version is version('8.0', '>=')
+
+- name: Test APM permissions from Zabbix 8.0
+  ansible.builtin.include_tasks: apm_permissions.yml
+  when: zabbix_version is version('8.0', '>=')
+
 - name: test - Zabbix user group
   module_defaults:
     community.zabbix.zabbix_usergroup:

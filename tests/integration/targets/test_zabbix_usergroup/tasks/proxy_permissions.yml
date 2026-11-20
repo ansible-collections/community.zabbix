@@ -1,0 +1,160 @@
+---
+- name: Test proxy permissions
+  module_defaults:
+    community.zabbix.zabbix_usergroup:
+      name: Usergroup proxy permissions test
+  block:
+    - name: Create proxy fixtures
+      community.zabbix.zabbix_proxy:
+        proxy_name: "usergroup-permissions-proxy-{{ item }}"
+        operating_mode: active
+      loop: [1, 2]
+
+    - name: Create proxy group fixtures
+      community.zabbix.zabbix_proxy_group:
+        name: "usergroup-permissions-group-{{ item }}"
+        failover_delay: 10s
+        min_online: 1
+      loop: [1, 2]
+
+    - name: Preview creation with proxy permissions
+      community.zabbix.zabbix_usergroup:
+        proxy_mode: allow_list
+        proxies:
+          - usergroup-permissions-proxy-1
+          - usergroup-permissions-proxy-2
+        proxy_group_mode: allow_list
+        proxy_groups:
+          - usergroup-permissions-group-1
+          - usergroup-permissions-group-2
+      check_mode: true
+      register: preview_create
+
+    - name: Create user group with proxy permissions
+      community.zabbix.zabbix_usergroup:
+        proxy_mode: allow_list
+        proxies:
+          - usergroup-permissions-proxy-1
+          - usergroup-permissions-proxy-2
+        proxy_group_mode: allow_list
+        proxy_groups:
+          - usergroup-permissions-group-1
+          - usergroup-permissions-group-2
+      register: create_permissions
+
+    - name: Verify creation and read-only check mode
+      ansible.builtin.assert:
+        that:
+          - preview_create is changed
+          - create_permissions is changed
+
+    - name: Verify list order does not cause updates
+      community.zabbix.zabbix_usergroup:
+        proxy_mode: allow_list
+        proxies:
+          - usergroup-permissions-proxy-2
+          - usergroup-permissions-proxy-1
+        proxy_group_mode: allow_list
+        proxy_groups:
+          - usergroup-permissions-group-2
+          - usergroup-permissions-group-1
+      register: reordered_permissions
+
+    - name: Verify creation is idempotent
+      ansible.builtin.assert:
+        that: reordered_permissions is not changed
+
+    - name: Preview a proxy permissions update
+      community.zabbix.zabbix_usergroup:
+        proxy_mode: deny_list
+        proxies: []
+        proxy_group_mode: deny_list
+        proxy_groups: []
+      check_mode: true
+      register: preview_update
+
+    - name: Verify check mode preserved proxy permissions
+      community.zabbix.zabbix_usergroup:
+        proxy_mode: allow_list
+        proxies:
+          - usergroup-permissions-proxy-1
+          - usergroup-permissions-proxy-2
+        proxy_group_mode: allow_list
+        proxy_groups:
+          - usergroup-permissions-group-1
+          - usergroup-permissions-group-2
+      register: unchanged_permissions
+
+    - name: Verify the preview did not write changes
+      ansible.builtin.assert:
+        that:
+          - preview_update is changed
+          - unchanged_permissions is not changed
+
+    - name: Update both modes and replace both lists
+      community.zabbix.zabbix_usergroup:
+        proxy_mode: deny_list
+        proxies:
+          - usergroup-permissions-proxy-1
+        proxy_group_mode: deny_list
+        proxy_groups:
+          - usergroup-permissions-group-1
+      register: update_permissions
+
+    - name: Verify proxy permissions were updated
+      ansible.builtin.assert:
+        that: update_permissions is changed
+
+    - name: Update another property while omitting proxy permissions
+      community.zabbix.zabbix_usergroup:
+        debug_mode: enabled
+
+    - name: Verify omitted proxy permissions were preserved
+      community.zabbix.zabbix_usergroup:
+        debug_mode: enabled
+        proxy_mode: deny_list
+        proxies:
+          - usergroup-permissions-proxy-1
+        proxy_group_mode: deny_list
+        proxy_groups:
+          - usergroup-permissions-group-1
+      register: preserved_permissions
+
+    - name: Verify update is idempotent and omitted permissions are preserved
+      ansible.builtin.assert:
+        that: preserved_permissions is not changed
+
+    - name: Clear both permission lists
+      community.zabbix.zabbix_usergroup:
+        proxies: []
+        proxy_groups: []
+      register: clear_permissions
+
+    - name: Clear both permission lists again
+      community.zabbix.zabbix_usergroup:
+        proxies: []
+        proxy_groups: []
+      register: clear_permissions_again
+
+    - name: Verify empty lists clear permissions idempotently
+      ansible.builtin.assert:
+        that:
+          - clear_permissions is changed
+          - clear_permissions_again is not changed
+
+  always:
+    - name: Delete user group fixture
+      community.zabbix.zabbix_usergroup:
+        state: absent
+
+    - name: Delete proxy fixtures
+      community.zabbix.zabbix_proxy:
+        proxy_name: "usergroup-permissions-proxy-{{ item }}"
+        state: absent
+      loop: [1, 2]
+
+    - name: Delete proxy group fixtures
+      community.zabbix.zabbix_proxy_group:
+        name: "usergroup-permissions-group-{{ item }}"
+        state: absent
+      loop: [1, 2]
