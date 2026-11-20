@@ -1,0 +1,5 @@
+---
+bugfixes:
+  - zabbix_agent role - setting ``zabbix_agent_listenip`` to an empty string now leaves ``ListenIP`` unset
+    in the agent configuration and skips the address validation, instead of failing in that task
+    (https://github.com/ansible-collections/community.zabbix/issues/1798).
