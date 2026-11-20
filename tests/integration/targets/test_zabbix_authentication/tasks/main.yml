@@ -1,5 +1,11 @@
 ---
-- block:
+- name: Test Zabbix 8 authentication methods
+  ansible.builtin.include_tasks: authentication8.yml
+  when: zabbix_version is version('8.0', '>=')
+
+- name: Test legacy authentication settings
+  when: zabbix_version is version('8.0', '<')
+  block:
     - include_tasks: zabbix_authentication_tests.yml
     - include_tasks: zabbix_authentication_test_passwd_check_rules.yml
 
