@@ -76,7 +76,7 @@ Include={{ (item ~ '/*.conf') | replace('/', _zabbix_agent_path_sep) }}
 {% if not zabbix_agent2 %}
 {{ (zabbix_agent_listenbacklog is defined and zabbix_agent_listenbacklog is not none) | ternary('', '# ') }}ListenBacklog={{ zabbix_agent_listenbacklog | default('') }}
 {% endif %}
-{{ (zabbix_agent_listenip | default('', true) | length > 0) | ternary('', '# ') }}ListenIP={{ zabbix_agent_listenip | default('', true) }}
+{{ (zabbix_agent_listenip | length > 0) | ternary('', '# ') }}ListenIP={{ zabbix_agent_listenip }}
 {{ (zabbix_agent_listenport is defined and zabbix_agent_listenport is not none) | ternary('', '# ') }}ListenPort={{ zabbix_agent_listenport | default('') }}
 {% if not zabbix_agent2 and ansible_facts.os_family != "Windows" %}
 {{ (zabbix_agent_loadmodule is defined and zabbix_agent_loadmodule is not none) | ternary('', '# ') }}LoadModule={{ zabbix_agent_loadmodule | default('') }}
