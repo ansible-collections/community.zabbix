@@ -22,6 +22,7 @@ description:
 notes:
     - HTTP authentication settings require the HTTP authentication feature flag in the Zabbix frontend configuration on Zabbix 8.0 and later.
     - This module configures authentication settings; it does not install an LDAP server, SAML identity provider, or HTTP authentication service.
+    - On Zabbix 6.0, required LDAP and SAML connection fields cannot be empty. Omit them when disabling authentication to preserve their values.
 
 author:
     - ONODERA Masaru(@masa-orca)
@@ -329,7 +330,7 @@ EXAMPLES = """
     ldap_case_sensitive: true
     ldap_bind_password: "password"
     saml_auth_enabled: true
-    saml_idp_entityid: ""
+    saml_idp_entityid: "https://idp.example.com"
     saml_sso_url: "https://localhost/SAML2/SSO"
     saml_slo_url: "https://localhost/SAML2/SLO"
     saml_username_attribute: "uid"
@@ -371,7 +372,7 @@ EXAMPLES = """
     ldap_configured: true
     ldap_case_sensitive: true
     saml_auth_enabled: true
-    saml_idp_entityid: ""
+    saml_idp_entityid: "https://idp.example.com"
     saml_sso_url: "https://localhost/SAML2/SSO"
     saml_slo_url: "https://localhost/SAML2/SLO"
     saml_username_attribute: "uid"

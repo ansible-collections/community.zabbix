@@ -122,8 +122,9 @@ def test_mfa_cannot_be_enabled_without_default(api, monkeypatch):
 
 
 @pytest.mark.parametrize("kwargs", [{"mfa_status": False}, {"mfa_method": ""}])
-def test_mfa_options_are_version_gated(api, monkeypatch, kwargs):
-    api.api_version.return_value = "7.0.0"
+@pytest.mark.parametrize("version", ["6.0.0", "7.0.0"])
+def test_mfa_options_are_version_gated(api, monkeypatch, kwargs, version):
+    api.api_version.return_value = version
     assert run(monkeypatch, **kwargs)["failed"]
     api.authentication.get.assert_not_called()
 
@@ -215,6 +216,55 @@ def test_http_feature_flag_is_checked(api, monkeypatch):
 def test_authentication_check_mode(api, monkeypatch):
     assert run(monkeypatch, http_auth_enabled=True, _ansible_check_mode=True)["changed"]
     api.authentication.update.assert_not_called()
+
+
+@pytest.fixture
+def legacy_api(api):
+    api.api_version.return_value = "6.0.0"
+    api.authentication.get.return_value.update(
+        ldap_configured="0", ldap_host="", ldap_base_dn="", ldap_search_attribute="",
+        saml_idp_entityid="", saml_sso_url="", saml_username_attribute="", saml_sp_entityid="",
+    )
+    return api
+
+
+@pytest.mark.parametrize("missing", ["saml_idp_entityid", "saml_sso_url", "saml_username_attribute", "saml_sp_entityid"])
+@pytest.mark.parametrize("value", [None, ""])
+def test_legacy_saml_enable_requires_all_settings(legacy_api, monkeypatch, missing, value):
+    settings = dict(saml_idp_entityid="https://idp.example.com", saml_sso_url="https://idp.example.com/sso",
+                    saml_username_attribute="uid", saml_sp_entityid="zabbix")
+    if value is None:
+        del settings[missing]
+    else:
+        settings[missing] = value
+    assert run(monkeypatch, saml_auth_enabled=True, **settings)["failed"]
+    legacy_api.authentication.update.assert_not_called()
+
+
+def test_legacy_saml_enable_and_repeat(legacy_api, monkeypatch):
+    settings = dict(saml_idp_entityid="https://idp.example.com", saml_sso_url="https://idp.example.com/sso",
+                    saml_username_attribute="uid", saml_sp_entityid="zabbix")
+    assert run(monkeypatch, saml_auth_enabled=True, **settings)["changed"]
+    expected = dict(settings, saml_auth_enabled="1")
+    legacy_api.authentication.update.assert_called_once_with(expected)
+    legacy_api.authentication.get.return_value.update(expected)
+    legacy_api.authentication.update.reset_mock()
+    assert not run(monkeypatch, saml_auth_enabled=True, **settings)["changed"]
+    legacy_api.authentication.update.assert_not_called()
+
+
+def test_legacy_disable_preserves_required_fields_and_clears_optional_fields(legacy_api, monkeypatch):
+    legacy_api.authentication.get.return_value.update(
+        ldap_configured="1", ldap_host="ldap://localhost", ldap_base_dn="dc=example,dc=com", ldap_search_attribute="uid",
+        ldap_bind_dn="cn=search", ldap_bind_password="old", saml_auth_enabled="1",
+        saml_idp_entityid="https://idp.example.com", saml_sso_url="https://idp.example.com/sso",
+        saml_username_attribute="uid", saml_sp_entityid="zabbix", saml_slo_url="https://idp.example.com/slo",
+    )
+    assert run(monkeypatch, ldap_configured=False, saml_auth_enabled=False,
+               ldap_bind_dn="", ldap_bind_password="", saml_slo_url="")["changed"]
+    legacy_api.authentication.update.assert_called_once_with(dict(
+        ldap_configured="0", saml_auth_enabled="0", ldap_bind_dn="", ldap_bind_password="", saml_slo_url="",
+    ))
 
 
 def ldap_directory(**kwargs):

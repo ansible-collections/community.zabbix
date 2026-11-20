@@ -42,7 +42,7 @@
         ldap_case_sensitive: true
         ldap_bind_password: "password"
         saml_auth_enabled: true
-        saml_idp_entityid: ""
+        saml_idp_entityid: "https://idp.example.com"
         saml_sso_url: "https://localhost/SAML2/SSO"
         saml_slo_url: "https://localhost/SAML2/SLO"
         saml_username_attribute: "uid"
@@ -86,7 +86,7 @@
         ldap_case_sensitive: true
         ldap_bind_password: "password"
         saml_auth_enabled: true
-        saml_idp_entityid: ""
+        saml_idp_entityid: "https://idp.example.com"
         saml_sso_url: "https://localhost/SAML2/SSO"
         saml_slo_url: "https://localhost/SAML2/SLO"
         saml_username_attribute: "uid"
@@ -112,6 +112,7 @@
       ansible.builtin.assert:
         that: zbxauth_update.changed is sameas False
 
+    # Zabbix 6.0 rejects empty required LDAP/SAML fields even when authentication is disabled.
     - name: test - initialize all authentication setting
       community.zabbix.zabbix_authentication:
         authentication_type: internal
@@ -120,19 +121,12 @@
         http_strip_domains: []
         http_case_sensitive: true
         ldap_configured: false
-        ldap_host: ""
         ldap_port: 389
-        ldap_base_dn: ""
-        ldap_search_attribute: ""
         ldap_bind_dn: ""
         ldap_case_sensitive: true
         ldap_bind_password: ""
         saml_auth_enabled: false
-        saml_idp_entityid: ""
-        saml_sso_url: ""
         saml_slo_url: ""
-        saml_username_attribute: ""
-        saml_sp_entityid: ""
         saml_nameid_format: ""
         saml_sign_messages: false
         saml_sign_assertions: false

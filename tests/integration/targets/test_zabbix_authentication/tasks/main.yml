@@ -14,4 +14,5 @@
       community.zabbix.zabbix_user_directory:
         name: TestUserDirectory
         state: absent
+      when: zabbix_version is version('7.0', '>=')
       ignore_errors: true
