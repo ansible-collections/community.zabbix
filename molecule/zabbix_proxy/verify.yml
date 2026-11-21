@@ -10,8 +10,22 @@
     - name: Assert zabbix-proxy package is installed with correct version
       assert:
         that:
-          - "'zabbix-proxy-' ~ zabbix_proxy_database in ansible_facts.packages"
-          - zabbix_proxy_version in (ansible_facts.packages['zabbix-proxy-' ~ zabbix_proxy_database] | first).version
+          - _proxy_package in ansible_facts.packages
+          - zabbix_proxy_version in (ansible_facts.packages[_proxy_package] | first).version
+      vars:
+        _proxy_package: "zabbix-proxy-{{ zabbix_proxy_database }}{{ (zabbix_proxy_apm_enabled | bool and ansible_facts.os_family == 'RedHat') | ternary('-apm', '') }}"
+
+    - name: Verify the selected Red Hat proxy executable
+      ansible.builtin.stat:
+        path: /usr/sbin/zabbix_proxy
+      register: _proxy_executable
+      failed_when: (_proxy_executable.stat.lnk_source | default('')) != _expected_proxy_executable
+      vars:
+        _expected_proxy_executable: "/usr/sbin/zabbix_proxy_{{ zabbix_proxy_database }}{{ zabbix_proxy_apm_enabled | bool | ternary('_apm', '') }}"
+      when:
+        - ansible_facts.os_family == 'RedHat'
+        - ansible_facts.distribution_major_version | int >= 10
+        - zabbix_proxy_version is version('8.0', '>=')
 
     - name: Gather service facts
       service_facts:
@@ -55,6 +69,45 @@
       stat:
         path: /etc/zabbix/zabbix_proxy.d
       register: _proxy_include_dir
+
+    - name: Verify APM proxy settings on Zabbix 8.0 or newer
+      when:
+        - zabbix_proxy_version is version('8.0', '>=')
+        - zabbix_proxy_apm_enabled | bool
+      block:
+        - name: Assert APM collector and telemetry provider configuration
+          assert:
+            that:
+              - "'StartAPMCollector=1' in _proxy_conf_lines"
+              - "'APMListenIP=0.0.0.0' in _proxy_conf_lines"
+              - "'APMListenPort=4317' in _proxy_conf_lines"
+              - >-
+                'TelemetryProvider=clickhouse;db="zabbixapm",password="zabbix",ssl_verify_host=0,ssl_verify_peer=0,url="http://' ~ inventory_hostname ~ '-clickhouse:8123",username="zabbix"' in _proxy_conf_lines
+            quiet: true
+          vars:
+            _proxy_conf_lines: "{{ (_proxy_conf.content | b64decode).splitlines() }}"
+
+        - name: Retrieve APM proxy API configuration
+          community.zabbix.zabbix_proxy_info:
+            proxy_name: "{{ zabbix_proxy_hostname }}"
+          register: _proxy_apm_info
+          delegate_to: "{{ zabbix_api_server_host }}"
+          vars:
+            ansible_network_os: community.zabbix.zabbix
+            ansible_connection: httpapi
+            ansible_host: localhost
+            ansible_httpapi_port: "{{ hostvars[inventory_hostname].zabbix_api_server_port }}"
+            ansible_zabbix_url_path: ''
+            ansible_user: Admin
+            ansible_httpapi_pass: zabbix
+
+        - name: Assert APM API enablement, rate limit, and signal attributes
+          assert:
+            that:
+              - _proxy_apm_info.zabbix_proxy.apm.data_collection_status | int == 1
+              - _proxy_apm_info.zabbix_proxy.apm.max_messages_per_second | int == 1000
+              - _proxy_apm_info.zabbix_proxy.apm.additional_resource_attributes | length == 3
+              - _proxy_apm_info.zabbix_proxy.apm.additional_resource_attributes | map(attribute='signal_type') | map('int') | sort == [0, 1, 2]
 
     - name: Assert include directory exists with correct ownership
       assert:

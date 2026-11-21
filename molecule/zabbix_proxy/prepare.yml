@@ -41,3 +41,16 @@
           [client]
           skip-ssl = true
         mode: '0600'
+
+    - name: Enable CRB for Red Hat APM dependencies
+      community.general.ini_file:
+        path: /etc/yum.repos.d/rocky.repo
+        section: crb
+        option: enabled
+        value: '1'
+        no_extra_spaces: true
+        mode: '0644'
+      when:
+        - ansible_facts.distribution == 'Rocky'
+        - zabbix_proxy_version is version('8.0', '>=')
+        - zabbix_proxy_apm_enabled | bool

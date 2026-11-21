@@ -24,3 +24,21 @@
 
   roles:
     - role: zabbix_proxy
+
+  post_tasks:
+    - name: Initialize the test data source with the server role
+      include_role:
+        name: community.zabbix.zabbix_server
+        tasks_from: initialize-clickhouse.yml
+      vars:
+        zabbix_server_version: "{{ zabbix_proxy_version }}"
+        zabbix_server_telemetryprovider: "{{ zabbix_proxy_telemetryprovider }}"
+      when:
+        - zabbix_proxy_version is version('8.0', '>=')
+        - zabbix_proxy_apm_enabled | bool
+
+    - name: Seed telemetry after the role initializes the empty ClickHouse database
+      include_tasks: ../default/seed.clickhouse.yml
+      when:
+        - zabbix_proxy_version is version('8.0', '>=')
+        - zabbix_proxy_apm_enabled | bool
