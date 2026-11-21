@@ -1,0 +1,27 @@
+---
+- name: ClickHouse verify or create schema
+  when:
+    - zabbix_server_version is version('8.0', '>=')
+    - zabbix_server_database_telemetry_sqlload | bool
+  become: true
+  tags:
+    - database
+  block:
+    - name: ClickHouse | Initialize history providers
+      ansible.builtin.include_tasks: initialize-clickhouse-provider.yml
+      loop: "{{ zabbix_server_historyproviders or [] }}"
+      loop_control:
+        loop_var: _clickhouse_provider
+        label: "{{ _clickhouse_provider.db | default(zabbix_server_clickhouse_db) }}"
+      vars:
+        _clickhouse_schemas: >-
+          {{ _clickhouse_connection.value_types | default(_zabbix_server_clickhouse_history_schemas.keys() | list)
+             | unique | map('extract', _zabbix_server_clickhouse_history_schemas) | list }}
+      when: _clickhouse_provider.get('provider') == 'clickhouse'
+
+    - name: ClickHouse | Initialize telemetry provider
+      ansible.builtin.include_tasks: initialize-clickhouse-provider.yml
+      vars:
+        _clickhouse_provider: "{{ zabbix_server_telemetryprovider }}"
+        _clickhouse_schemas: "{{ _zabbix_server_clickhouse_telemetry_schemas }}"
+      when: (zabbix_server_telemetryprovider or {}).get('provider') == 'clickhouse'
