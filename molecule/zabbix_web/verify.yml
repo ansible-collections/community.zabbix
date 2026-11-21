@@ -76,6 +76,8 @@
         ansible_httpapi_port: "{{ 8000 + (molecule_yml.platforms | map(attribute='name') | list).index(inventory_hostname) }}"
         ansible_httpapi_use_ssl: false
         ansible_zabbix_url_path: ''
+        ansible_zabbix_http_headers:
+          Host: "{{ zabbix_api_server_url }}"
         ansible_user: Admin
         ansible_httpapi_pass: zabbix
       block:
