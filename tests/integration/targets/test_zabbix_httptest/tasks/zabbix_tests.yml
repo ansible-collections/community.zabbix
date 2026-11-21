@@ -1,9 +1,29 @@
 ---
 
-- name: test - create new Zabbix httptest on host with many options set
+- name: Test creating a web scenario in check mode
   community.zabbix.zabbix_httptest:
     name: ExampleTest
-    host_name: ExampleHost
+    host_name: "{{ httptest_target.name if httptest_target.type == 'host_name' else omit }}"
+    template_name: "{{ httptest_target.name if httptest_target.type == 'template_name' else omit }}"
+    params:
+      steps:
+        - name: Test
+          url: https://example.com
+          status_codes: [200]
+      interval: 1h
+      enabled: true
+  check_mode: true
+  register: zbx_httptest_check_create
+
+- name: Assert check mode predicts creation
+  ansible.builtin.assert:
+    that: zbx_httptest_check_create is changed
+
+- name: test - create new Zabbix httptest on {{ httptest_target.type }} with many options set
+  community.zabbix.zabbix_httptest:
+    name: ExampleTest
+    host_name: "{{ httptest_target.name if httptest_target.type == 'host_name' else omit }}"
+    template_name: "{{ httptest_target.name if httptest_target.type == 'template_name' else omit }}"
     params:
       steps:
         - name: Test
@@ -12,16 +32,17 @@
       interval: 1h
       enabled: true
     state: present
-  register: zbx_host_httptest_created
+  register: zbx_httptest_created
 
 - name: assert that httptest was created
   ansible.builtin.assert:
-    that: zbx_host_httptest_created is changed
+    that: zbx_httptest_created is changed
 
-- name: test - create same Zabbix httptest on host once again
+- name: test - create same Zabbix httptest on {{ httptest_target.type }} once again
   community.zabbix.zabbix_httptest:
     name: ExampleTest
-    host_name: ExampleHost
+    host_name: "{{ httptest_target.name if httptest_target.type == 'host_name' else omit }}"
+    template_name: "{{ httptest_target.name if httptest_target.type == 'template_name' else omit }}"
     params:
       steps:
         - name: Test
@@ -30,83 +51,131 @@
       interval: 1h
       enabled: true
     state: present
-  register: zbx_host_httptest_existing
+  register: zbx_httptest_existing
 
 - name: assert that nothing has been changed
   ansible.builtin.assert:
-    that: not zbx_host_httptest_existing is changed
+    that: not zbx_httptest_existing is changed
 
-- name: test - update existing zabbix httptest on host
+- name: Test updating a web scenario in check mode
   community.zabbix.zabbix_httptest:
     name: ExampleTest
-    host_name: ExampleHost
+    host_name: "{{ httptest_target.name if httptest_target.type == 'host_name' else omit }}"
+    template_name: "{{ httptest_target.name if httptest_target.type == 'template_name' else omit }}"
+    params:
+      interval: 2h
+  check_mode: true
+  register: zbx_httptest_check_update
+
+- name: Assert check mode predicts an update
+  ansible.builtin.assert:
+    that: zbx_httptest_check_update is changed
+
+- name: test - update existing zabbix httptest on {{ httptest_target.type }}
+  community.zabbix.zabbix_httptest:
+    name: ExampleTest
+    host_name: "{{ httptest_target.name if httptest_target.type == 'host_name' else omit }}"
+    template_name: "{{ httptest_target.name if httptest_target.type == 'template_name' else omit }}"
     params:
       interval: 2h
     state: present
-  register: zbx_host_httptest_changed
+  register: zbx_httptest_changed
 
 - name: expect to succeed and that things changed
   ansible.builtin.assert:
-    that: zbx_host_httptest_changed is changed
+    that: zbx_httptest_changed is changed
 
-- name: test - rename existing zabbix httptest on host
+- name: Test repeating the updated web scenario
   community.zabbix.zabbix_httptest:
     name: ExampleTest
-    host_name: ExampleHost
+    host_name: "{{ httptest_target.name if httptest_target.type == 'host_name' else omit }}"
+    template_name: "{{ httptest_target.name if httptest_target.type == 'template_name' else omit }}"
+    params:
+      interval: 2h
+  register: zbx_httptest_update_again
+
+- name: Assert repeating an update is unchanged
+  ansible.builtin.assert:
+    that: zbx_httptest_update_again is not changed
+
+- name: test - rename existing zabbix httptest on {{ httptest_target.type }}
+  community.zabbix.zabbix_httptest:
+    name: ExampleTest
+    host_name: "{{ httptest_target.name if httptest_target.type == 'host_name' else omit }}"
+    template_name: "{{ httptest_target.name if httptest_target.type == 'template_name' else omit }}"
     params:
       new_name: NewExampleTest
+      # Zabbix 7.0 cannot propagate a name-only update to linked hosts.
+      steps: "{{ [{'name': 'Test', 'url': 'https://example.com', 'status_codes': [200]}] if httptest_target.type == 'template_name' else omit }}"
     state: present
-  register: zbx_host_httptest_renamed
+  register: zbx_httptest_renamed
 
 - name: expect to succeed and that things changed
   ansible.builtin.assert:
-    that: zbx_host_httptest_renamed is changed
+    that: zbx_httptest_renamed is changed
 
-- name: test - rename existing zabbix httptest on host again
+- name: test - rename existing zabbix httptest on {{ httptest_target.type }} again
   community.zabbix.zabbix_httptest:
     name: ExampleTest
-    host_name: ExampleHost
+    host_name: "{{ httptest_target.name if httptest_target.type == 'host_name' else omit }}"
+    template_name: "{{ httptest_target.name if httptest_target.type == 'template_name' else omit }}"
     params:
       new_name: NewExampleTest
     state: present
-  register: zbx_host_httptest_rename_again
+  register: zbx_httptest_rename_again
 
 - name: assert that nothing has been changed
   ansible.builtin.assert:
-    that: not zbx_host_httptest_rename_again is changed
+    that: not zbx_httptest_rename_again is changed
 
-- name: test - rename non-existing zabbix httptest on host
+- name: test - rename non-existing zabbix httptest on {{ httptest_target.type }}
   community.zabbix.zabbix_httptest:
     name: ExampleTest
-    host_name: ExampleHost
+    host_name: "{{ httptest_target.name if httptest_target.type == 'host_name' else omit }}"
+    template_name: "{{ httptest_target.name if httptest_target.type == 'template_name' else omit }}"
     params:
       new_name: NewExampleTest2
     state: present
   ignore_errors: true
-  register: zbx_host_httptest_rename_failed
+  register: zbx_httptest_rename_failed
 
 - name: expect to fail
   ansible.builtin.assert:
-    that: zbx_host_httptest_rename_failed is failed
+    that: zbx_httptest_rename_failed is failed
 
-- name: test - attempt to delete previously created zabbix httptest on host
+- name: Test deleting a web scenario in check mode
   community.zabbix.zabbix_httptest:
     name: NewExampleTest
-    host_name: ExampleHost
+    host_name: "{{ httptest_target.name if httptest_target.type == 'host_name' else omit }}"
+    template_name: "{{ httptest_target.name if httptest_target.type == 'template_name' else omit }}"
     state: absent
-  register: zbx_host_httptest_delete
+  check_mode: true
+  register: zbx_httptest_check_delete
+
+- name: Assert check mode predicts deletion
+  ansible.builtin.assert:
+    that: zbx_httptest_check_delete is changed
+
+- name: test - attempt to delete previously created zabbix httptest on {{ httptest_target.type }}
+  community.zabbix.zabbix_httptest:
+    name: NewExampleTest
+    host_name: "{{ httptest_target.name if httptest_target.type == 'host_name' else omit }}"
+    template_name: "{{ httptest_target.name if httptest_target.type == 'template_name' else omit }}"
+    state: absent
+  register: zbx_httptest_delete
 
 - name: assert that httptest was deleted
   ansible.builtin.assert:
-    that: zbx_host_httptest_delete is changed
+    that: zbx_httptest_delete is changed
 
-- name: test - attempt to delete non-existing zabbix httptest on host
+- name: test - attempt to delete non-existing zabbix httptest on {{ httptest_target.type }}
   community.zabbix.zabbix_httptest:
     name: NewExampleTest
-    host_name: ExampleHost
+    host_name: "{{ httptest_target.name if httptest_target.type == 'host_name' else omit }}"
+    template_name: "{{ httptest_target.name if httptest_target.type == 'template_name' else omit }}"
     state: absent
-  register: zbx_host_httptest_missing_delete
+  register: zbx_httptest_missing_delete
 
 - name: assert that nothing has been changed
   ansible.builtin.assert:
-    that: not zbx_host_httptest_missing_delete is changed
+    that: not zbx_httptest_missing_delete is changed

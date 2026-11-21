@@ -23,3 +23,20 @@
         ip: 10.1.1.1
         dns: ""
         port: "10050"
+
+- name: Create unrelated template for scenario isolation
+  community.zabbix.zabbix_template:
+    template_name: UnrelatedHttptestTemplate
+    template_groups:
+      - Templates
+
+- name: Create a scenario with the same name on an unrelated template
+  community.zabbix.zabbix_httptest:
+    template_name: UnrelatedHttptestTemplate
+    name: ExampleTest
+    params:
+      steps:
+        - name: Test
+          url: https://example.com
+          status_codes: [200]
+      interval: 5h

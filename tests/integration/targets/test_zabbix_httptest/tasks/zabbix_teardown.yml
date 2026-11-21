@@ -1,3 +1,4 @@
+---
 - name: remove test host
   community.zabbix.zabbix_host:
     host_name: ExampleHost
@@ -6,4 +7,9 @@
 - name: remove test template
   community.zabbix.zabbix_template:
     template_name: ExampleTemplate
+    state: absent
+
+- name: Remove unrelated test template
+  community.zabbix.zabbix_template:
+    template_name: UnrelatedHttptestTemplate
     state: absent

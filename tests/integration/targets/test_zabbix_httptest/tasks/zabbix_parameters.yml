@@ -1,0 +1,168 @@
+---
+- name: Create and repeat a scenario using native API names and the query field alias
+  community.zabbix.zabbix_httptest:
+    name: ExampleTest
+    host_name: "{{ httptest_target.name if httptest_target.type == 'host_name' else omit }}"
+    template_name: "{{ httptest_target.name if httptest_target.type == 'template_name' else omit }}"
+    params:
+      delay: 5m
+      retries: 2
+      agent: Ansible integration test
+      http_proxy: ""
+      authentication: basic
+      http_user: scenario-user
+      http_password: scenario-password
+      uuid: "{{ 'da361f331cce4cd7a05c9d406239dd88' if httptest_target.type == 'template_name' else omit }}"
+      verify_peer: false
+      verify_host: false
+      headers:
+        - name: X-Test
+          value: test
+      variables:
+        - name: "{test}"
+          value: value
+        - name: "{other}"
+          value: other
+      steps:
+        - name: Test
+          url: https://example.com
+          status_codes: ["200", "300-399"]
+          query_field:
+            - name: query
+              value: ""
+          posts:
+            - name: form
+              value: ""
+          variables:
+            - name: "{step_test}"
+              value: value
+            - name: "{step_other}"
+              value: other
+  loop: [first, repeat]
+  register: zbx_httptest_parameters_created
+
+- name: Assert creation and idempotency of API parameters
+  ansible.builtin.assert:
+    that:
+      - zbx_httptest_parameters_created.results[0] is changed
+      - zbx_httptest_parameters_created.results[1] is not changed
+
+- name: Test parameter updates, check mode, and idempotency
+  ansible.builtin.include_tasks: zabbix_parameter_update.yml
+  loop:
+    - name: reordered scenario variables
+      changed: false
+      params:
+        variables:
+          - name: "{other}"
+            value: other
+          - name: "{test}"
+            value: value
+    - name: reordered step variables
+      changed: false
+      params:
+        steps:
+          - name: Test
+            url: https://example.com
+            variables:
+              - name: "{step_other}"
+                value: other
+              - name: "{step_test}"
+                value: value
+    - name: changed scenario variable value
+      params:
+        variables:
+          - name: "{other}"
+            value: other
+          - name: "{test}"
+            value: updated
+    - name: step properties and raw POST data
+      params:
+        steps:
+          - name: Test
+            url: https://example.org
+            status_codes: ["200-299", "301"]
+            retrieve_mode: headers_and_body
+            follow_redirects: false
+            timeout: 10s
+            required: ""
+            posts: '{"hello":"world"}'
+            query_fields:
+              - name: query
+                value: updated
+    - name: disable status code checking
+      params:
+        steps:
+          - name: Test
+            url: https://example.org
+            status_codes: []
+    - name: tags only
+      params:
+        tags:
+          - tag: service
+            value: web
+          - tag: empty
+    - name: reordered tags
+      changed: false
+      params:
+        tags:
+          - tag: empty
+          - tag: service
+            value: web
+    - name: remove tags
+      params:
+        tags: []
+    - name: Kerberos authentication
+      params:
+        authentication: kerberos
+    - name: Digest authentication
+      params:
+        authentication: digest
+    - name: disable scenario
+      params:
+        enabled: false
+    - name: enabled status
+      params:
+        status: enabled
+    - name: clear optional fields
+      params:
+        headers: []
+        variables: []
+        http_user: ""
+        http_password: ""
+  loop_control:
+    loop_var: httptest_update
+    label: "{{ httptest_update.name }}"
+
+- name: Rename and restore the scenario using the native API name option
+  community.zabbix.zabbix_httptest:
+    name: "{{ item.source }}"
+    host_name: "{{ httptest_target.name if httptest_target.type == 'host_name' else omit }}"
+    template_name: "{{ httptest_target.name if httptest_target.type == 'template_name' else omit }}"
+    params:
+      name: "{{ item.target }}"
+      steps:
+        - name: Test
+          url: https://example.org
+  loop:
+    - source: ExampleTest
+      target: NewExampleTest
+    - source: ExampleTest
+      target: NewExampleTest
+    - source: NewExampleTest
+      target: ExampleTest
+  register: zbx_httptest_native_rename
+
+- name: Assert native rename and repeated rename behavior
+  ansible.builtin.assert:
+    that:
+      - zbx_httptest_native_rename.results[0] is changed
+      - zbx_httptest_native_rename.results[1] is not changed
+      - zbx_httptest_native_rename.results[2] is changed
+
+- name: Remove the parameter test scenario
+  community.zabbix.zabbix_httptest:
+    name: ExampleTest
+    host_name: "{{ httptest_target.name if httptest_target.type == 'host_name' else omit }}"
+    template_name: "{{ httptest_target.name if httptest_target.type == 'template_name' else omit }}"
+    state: absent

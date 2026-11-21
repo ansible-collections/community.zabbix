@@ -1,0 +1,61 @@
+---
+- name: Test that scenarios on unrelated templates are preserved
+  community.zabbix.zabbix_httptest:
+    template_name: UnrelatedHttptestTemplate
+    name: ExampleTest
+    params:
+      steps:
+        - name: Test
+          url: https://example.com
+          status_codes: [200]
+      interval: 5h
+  register: zbx_httptest_unrelated
+
+- name: Assert the unrelated scenario was unchanged
+  ansible.builtin.assert:
+    that: zbx_httptest_unrelated is not changed
+
+- name: Test omitting both host and template
+  community.zabbix.zabbix_httptest:
+    name: ExampleTest
+    state: absent
+  register: zbx_httptest_no_target
+  ignore_errors: true
+
+- name: Assert a target is required
+  ansible.builtin.assert:
+    that:
+      - zbx_httptest_no_target is failed
+      - "'host_name, template_name' in zbx_httptest_no_target.msg"
+
+- name: Test supplying both host and template
+  community.zabbix.zabbix_httptest:
+    name: ExampleTest
+    host_name: ExampleHost
+    template_name: ExampleTemplate
+    state: absent
+  register: zbx_httptest_both_targets
+  ignore_errors: true
+
+- name: Assert targets are mutually exclusive
+  ansible.builtin.assert:
+    that:
+      - zbx_httptest_both_targets is failed
+      - "'mutually exclusive' in zbx_httptest_both_targets.msg"
+
+- name: Test creating a scenario on a missing template
+  community.zabbix.zabbix_httptest:
+    name: ExampleTest
+    template_name: NonexistentHttptestTemplate
+    params:
+      steps:
+        - name: Test
+          url: https://example.com
+  register: zbx_httptest_missing_template
+  ignore_errors: true
+
+- name: Assert a missing template fails clearly
+  ansible.builtin.assert:
+    that:
+      - zbx_httptest_missing_template is failed
+      - "'Host/template not found: NonexistentHttptestTemplate' in zbx_httptest_missing_template.msg"

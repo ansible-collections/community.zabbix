@@ -1,0 +1,10 @@
+---
+minor_changes:
+  - zabbix_httptest - use native API suboption names ``delay``, ``retries``, ``http_user``, ``http_password``, and ``name``, keeping the previous names as compatibility aliases (https://github.com/ansible-collections/community.zabbix/issues/1783).
+  - zabbix_httptest - support Kerberos and Digest authentication on Zabbix 7.0 and later and explicit step sequence numbers (https://github.com/ansible-collections/community.zabbix/issues/1783).
+  - zabbix_httptest - add ``template_name`` as an alternative to ``host_name`` to manage web scenarios on templates (https://github.com/ansible-collections/community.zabbix/issues/1783).
+bugfixes:
+  - zabbix_httptest - accept HTTP status codes and ranges as a list of strings and accept the documented ``query_field`` spelling as an alias for ``query_fields`` (https://github.com/ansible-collections/community.zabbix/issues/1783).
+  - zabbix_httptest - compare supplied configuration, steps, and tags before updating, ignoring variable and tag order, so unchanged runs and check mode report changes accurately (https://github.com/ansible-collections/community.zabbix/issues/1783).
+  - zabbix_httptest - validate nested parameters and protect web scenario passwords in module output (https://github.com/ansible-collections/community.zabbix/issues/1783).
+  - zabbix_httptest - scope web scenario lookups to the selected host or template so same-named scenarios on other targets are preserved (https://github.com/ansible-collections/community.zabbix/issues/1783).
