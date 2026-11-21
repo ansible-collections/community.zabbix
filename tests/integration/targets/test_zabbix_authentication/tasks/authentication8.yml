@@ -1,0 +1,103 @@
+---
+- name: Test global MFA settings
+  block:
+    - name: Create MFA method fixtures
+      community.zabbix.zabbix_mfa:
+        name: "Authentication MFA method {{ item }}"
+        method_type: totp
+        hash_function: sha-256
+        code_length: 6
+      loop: [1, 2]
+
+    - name: Start with MFA disabled and a known default method
+      community.zabbix.zabbix_authentication:
+        mfa_status: false
+        mfa_method: Authentication MFA method 1
+
+    - name: Preview enabling global MFA with a named method
+      community.zabbix.zabbix_authentication:
+        mfa_status: true
+        mfa_method: Authentication MFA method 1
+      check_mode: true
+      register: authentication_mfa_preview
+
+    - name: Verify the MFA preview preserved disabled MFA
+      community.zabbix.zabbix_authentication:
+        mfa_status: false
+        mfa_method: Authentication MFA method 1
+      register: authentication_mfa_preserved
+
+    - name: Enable global MFA with a named method
+      community.zabbix.zabbix_authentication:
+        mfa_status: true
+        mfa_method: Authentication MFA method 1
+      register: authentication_mfa_enabled
+
+    - name: Enable global MFA with the same method again
+      community.zabbix.zabbix_authentication:
+        mfa_status: true
+        mfa_method: Authentication MFA method 1
+      register: authentication_mfa_repeated
+
+    - name: Verify MFA creation, check mode and idempotence
+      ansible.builtin.assert:
+        that:
+          - authentication_mfa_preview is changed
+          - authentication_mfa_preserved is not changed
+          - authentication_mfa_enabled is changed
+          - authentication_mfa_repeated is not changed
+
+    - name: Change the global default MFA method
+      community.zabbix.zabbix_authentication:
+        mfa_method: Authentication MFA method 2
+      register: authentication_mfa_updated
+
+    - name: Reject clearing the default method while MFA is enabled
+      community.zabbix.zabbix_authentication:
+        mfa_method: ""
+      ignore_errors: true
+      register: authentication_mfa_rejected
+
+    - name: Verify the rejected update preserved the selected MFA method
+      community.zabbix.zabbix_authentication:
+        mfa_status: true
+        mfa_method: Authentication MFA method 2
+      register: authentication_mfa_preserved
+
+    - name: Verify MFA method updates and validation
+      ansible.builtin.assert:
+        that:
+          - authentication_mfa_updated is changed
+          - authentication_mfa_rejected is failed
+          - authentication_mfa_rejected is not changed
+          - authentication_mfa_preserved is not changed
+
+    - name: Disable global MFA and clear the default method
+      community.zabbix.zabbix_authentication:
+        mfa_status: false
+        mfa_method: ""
+      register: authentication_mfa_disabled
+
+    - name: Disable global MFA again
+      community.zabbix.zabbix_authentication:
+        mfa_status: false
+        mfa_method: ""
+      register: authentication_mfa_disable_repeated
+
+    - name: Verify disabling global MFA is idempotent
+      ansible.builtin.assert:
+        that:
+          - authentication_mfa_disabled is changed
+          - authentication_mfa_disable_repeated is not changed
+
+  always:
+    - name: Reset global MFA before deleting methods
+      community.zabbix.zabbix_authentication:
+        mfa_status: false
+        mfa_method: ""
+
+    - name: Delete MFA method fixtures
+      community.zabbix.zabbix_mfa:
+        name: "Authentication MFA method {{ item }}"
+        state: absent
+      loop: [1, 2]

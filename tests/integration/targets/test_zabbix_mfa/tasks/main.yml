@@ -29,6 +29,48 @@
     that:
       - zbxmfa_update.changed is sameas False
 
+- name: Reject Duo settings for an existing TOTP method
+  community.zabbix.zabbix_mfa:
+    name: Zabbix TOTP
+    api_hostname: api.example.test
+  check_mode: true
+  ignore_errors: true
+  register: zbxmfa_rejected
+
+- name: Preview a partial TOTP update without repeating its type or hash
+  community.zabbix.zabbix_mfa:
+    name: Zabbix TOTP
+    code_length: 8
+  check_mode: true
+  register: zbxmfa_preview
+
+- name: Verify the TOTP preview preserved the original settings
+  community.zabbix.zabbix_mfa:
+    name: Zabbix TOTP
+    code_length: 6
+  register: zbxmfa_preserved
+
+- name: Update only the TOTP code length
+  community.zabbix.zabbix_mfa:
+    name: Zabbix TOTP
+    code_length: 8
+  register: zbxmfa_partial
+
+- name: Repeat the same partial TOTP update
+  community.zabbix.zabbix_mfa:
+    name: Zabbix TOTP
+    code_length: 8
+  register: zbxmfa_repeated
+
+- name: Verify partial TOTP updates and check mode
+  ansible.builtin.assert:
+    that:
+      - zbxmfa_rejected is failed
+      - zbxmfa_preview is changed
+      - zbxmfa_preserved is not changed
+      - zbxmfa_partial is changed
+      - zbxmfa_repeated is not changed
+
 - name: test - try to delete TOTP MFA method
   community.zabbix.zabbix_mfa:
     name: Zabbix TOTP
@@ -68,6 +110,32 @@
   ansible.builtin.assert:
     that:
       - zbxmfa_update.changed is sameas True
+
+- name: Compare public Duo settings without repeating the secret
+  community.zabbix.zabbix_mfa:
+    name: Duo authentication service prompt
+    api_hostname: api_hostname
+    clientid: clientid
+  register: zbxmfa_preserved
+
+- name: Update only the public Duo hostname
+  community.zabbix.zabbix_mfa:
+    name: Duo authentication service prompt
+    api_hostname: api.example.test
+  register: zbxmfa_partial
+
+- name: Repeat the same partial Duo update
+  community.zabbix.zabbix_mfa:
+    name: Duo authentication service prompt
+    api_hostname: api.example.test
+  register: zbxmfa_repeated
+
+- name: Verify public Duo updates preserve the secret and are idempotent
+  ansible.builtin.assert:
+    that:
+      - zbxmfa_preserved is not changed
+      - zbxmfa_partial is changed
+      - zbxmfa_repeated is not changed
 
 - name: test - try to delete the Duo MFA methid
   community.zabbix.zabbix_mfa:

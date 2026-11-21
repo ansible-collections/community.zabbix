@@ -17,6 +17,12 @@ short_description: Update Zabbix authentication
 
 description:
    - This module allows you to modify Zabbix authentication setting.
+   - Only supplied options are changed. Omitted settings are preserved.
+   - Use M(community.zabbix.zabbix_user_directory) to create LDAP or SAML providers and M(community.zabbix.zabbix_mfa) to create MFA methods.
+notes:
+    - HTTP authentication settings require the HTTP authentication feature flag in the Zabbix frontend configuration on Zabbix 8.0 and later.
+    - This module configures authentication settings; it does not install an LDAP server, SAML identity provider, or HTTP authentication service.
+    - On Zabbix 6.0, required LDAP and SAML connection fields cannot be empty. Omit them when disabling authentication to preserve their values.
 
 author:
     - ONODERA Masaru(@masa-orca)
@@ -47,6 +53,7 @@ options:
     http_strip_domains:
         description:
             - A list of domain names that should be removed from the username.
+            - Set to an empty list to clear the configured domains.
         required: false
         type: list
         elements: str
@@ -122,7 +129,9 @@ options:
     ldap_userdirectory:
         description:
             - LDAP authentication default user directory name for user groups with gui_access set to LDAP or System default.
-            - Required to be set when C(ldap_configured) / C(ldap_auth_enabled) is set to 1.
+            - The exact name must refer to an existing LDAP user directory.
+            - Required when enabling LDAP unless a default directory is already configured.
+            - Set to an empty string to clear the default directory while LDAP authentication is disabled.
         required: false
         type: str
     ldap_jit_status:
@@ -139,13 +148,13 @@ options:
             - This parameter is available since Zabbix 6.4.
         required: false
         type: str
-        default: 1h
     disabled_usrgroup:
         description:
             - User group name to assign the deprovisioned user to.
             - The user group must be disabled and cannot be enabled or deleted when configured.
-            - Required if C(ldap_jit_status) for C(saml_jit_status) enabled.
+            - Required when LDAP or SAML authentication and its corresponding JIT provisioning setting are enabled.
             - This parameter is available since Zabbix 6.4.
+            - If omitted, the existing group is preserved. An empty string clears it when neither authentication method has active provisioning.
         required: false
         type: str
     saml_auth_enabled:
@@ -262,6 +271,20 @@ options:
         required: false
         type: list
         elements: str
+    mfa_status:
+        description:
+            - Whether global multi-factor authentication is enabled.
+            - Supported by this module on Zabbix 8.0 and later.
+            - Enabling MFA requires O(mfa_method) or an already configured default MFA method.
+        type: bool
+    mfa_method:
+        description:
+            - Exact name of an existing MFA method to use as the global default.
+            - Create the method with M(community.zabbix.zabbix_mfa) first.
+            - Supported by this module on Zabbix 8.0 and later.
+            - Set to an empty string to clear the default method while MFA is disabled.
+            - If omitted, the existing default method is preserved.
+        type: str
 
 extends_documentation_fragment:
     - community.zabbix.zabbix
@@ -307,7 +330,7 @@ EXAMPLES = """
     ldap_case_sensitive: true
     ldap_bind_password: "password"
     saml_auth_enabled: true
-    saml_idp_entityid: ""
+    saml_idp_entityid: "https://idp.example.com"
     saml_sso_url: "https://localhost/SAML2/SSO"
     saml_slo_url: "https://localhost/SAML2/SLO"
     saml_username_attribute: "uid"
@@ -349,7 +372,7 @@ EXAMPLES = """
     ldap_configured: true
     ldap_case_sensitive: true
     saml_auth_enabled: true
-    saml_idp_entityid: ""
+    saml_idp_entityid: "https://idp.example.com"
     saml_sso_url: "https://localhost/SAML2/SSO"
     saml_slo_url: "https://localhost/SAML2/SLO"
     saml_username_attribute: "uid"
@@ -396,17 +419,35 @@ EXAMPLES = """
     ldap_jit_status: true
     saml_jit_status: true
     jit_provision_interval: 1h
-    disabled_usrgrp: Disabled
+    disabled_usrgroup: Disabled
     passwd_min_length: 70
     passwd_check_rules:
       - contain_uppercase_and_lowercase_letters
       - contain_digits
       - contain_special_characters
       - avoid_easy_to_guess
+
+# Zabbix 8.0 and later
+- name: Create a named MFA method
+  community.zabbix.zabbix_mfa:
+    name: Corporate TOTP
+    method_type: totp
+    hash_function: sha-256
+    code_length: 6
+
+- name: Enable MFA with the named method as the global default
+  community.zabbix.zabbix_authentication:
+    mfa_status: true
+    mfa_method: Corporate TOTP
+
+- name: Disable global MFA and clear its default method
+  community.zabbix.zabbix_authentication:
+    mfa_status: false
+    mfa_method: ""
 """
 
 RETURN = """
-msg:
+result:
     description: The result of the operation
     returned: success
     type: str
@@ -469,9 +510,27 @@ class Authentication(ZabbixBase):
         saml_jit_status,
         jit_provision_interval,
         disabled_usrgroup,
+        mfa_status=None,
+        mfa_method=None,
     ):
         try:
             params = {}
+            current_authentication = zabbix_utils.helper_convert_unicode_to_str(current_authentication)
+            if LooseVersion(self._zbx_api_version) >= LooseVersion("8.0"):
+                http_options = (http_auth_enabled, http_login_form, http_strip_domains, http_case_sensitive)
+                if any(value is not None for value in http_options) and "http_auth_enabled" not in current_authentication:
+                    self._module.fail_json(msg="HTTP authentication settings require the http_auth_enabled frontend feature flag")
+                if mfa_status is not None:
+                    params["mfa_status"] = str(int(mfa_status))
+                if mfa_method is not None:
+                    if mfa_method == "":
+                        params["mfaid"] = "0"
+                    else:
+                        methods = self._zapi.mfa.get({"output": ["mfaid", "name"], "search": {"name": mfa_method}})
+                        methods = [method for method in methods if method["name"] == mfa_method]
+                        if not methods:
+                            self._module.fail_json(msg="MFA method not found: %s" % mfa_method)
+                        params["mfaid"] = str(methods[0]["mfaid"])
 
             if authentication_type:
                 params["authentication_type"] = str(
@@ -490,7 +549,7 @@ class Authentication(ZabbixBase):
                     )
                 )
 
-            if http_strip_domains:
+            if http_strip_domains is not None:
                 params["http_strip_domains"] = ",".join(http_strip_domains)
 
             if isinstance(http_case_sensitive, bool):
@@ -504,58 +563,62 @@ class Authentication(ZabbixBase):
                     params["ldap_auth_enabled"] = str(int(ldap_auth_enabled))
 
             if LooseVersion(self._zbx_api_version) < LooseVersion("7.0"):
-                if ldap_host:
+                if ldap_host is not None:
                     params["ldap_host"] = ldap_host
 
-                if ldap_port:
+                if ldap_port is not None:
                     params["ldap_port"] = str(ldap_port)
 
-                if ldap_base_dn:
+                if ldap_base_dn is not None:
                     params["ldap_base_dn"] = ldap_base_dn
 
-                if ldap_search_attribute:
+                if ldap_search_attribute is not None:
                     params["ldap_search_attribute"] = ldap_search_attribute
 
-                if ldap_bind_dn:
+                if ldap_bind_dn is not None:
                     params["ldap_bind_dn"] = ldap_bind_dn
 
-                if ldap_bind_password:
+                if ldap_bind_password is not None:
                     params["ldap_bind_password"] = ldap_bind_password
             else:
-                if ldap_userdirectory:
-                    directory = self._zapi.userdirectory.get(
-                        {"search": {"name": ldap_userdirectory}}
-                    )
-                    if not directory:
-                        self._module.fail_json(
-                            msg="Canot find user directory with name: %s"
-                            % ldap_userdirectory
+                if ldap_userdirectory is not None:
+                    if ldap_userdirectory == "":
+                        params["ldap_userdirectoryid"] = "0"
+                        directory = []
+                    else:
+                        directory = self._zapi.userdirectory.get(
+                            {"output": ["userdirectoryid", "name", "idp_type"], "search": {"name": ldap_userdirectory}, "filter": {"idp_type": "1"}}
                         )
-                    params["ldap_userdirectoryid"] = directory[0]["userdirectoryid"]
+                        directory = [item for item in directory if item["name"] == ldap_userdirectory and str(item["idp_type"]) == "1"]
+                        if not directory:
+                            self._module.fail_json(msg="LDAP user directory not found: %s" % ldap_userdirectory)
+                        params["ldap_userdirectoryid"] = str(directory[0]["userdirectoryid"])
 
             if isinstance(ldap_case_sensitive, bool):
                 params["ldap_case_sensitive"] = str(int(ldap_case_sensitive))
 
             if isinstance(saml_auth_enabled, bool):
                 params["saml_auth_enabled"] = str(int(saml_auth_enabled))
+            if isinstance(saml_case_sensitive, bool):
+                params["saml_case_sensitive"] = str(int(saml_case_sensitive))
 
             if LooseVersion(self._zbx_api_version) < LooseVersion("7.0"):
-                if saml_idp_entityid:
+                if saml_idp_entityid is not None:
                     params["saml_idp_entityid"] = saml_idp_entityid
 
-                if saml_sso_url:
+                if saml_sso_url is not None:
                     params["saml_sso_url"] = saml_sso_url
 
-                if saml_slo_url:
+                if saml_slo_url is not None:
                     params["saml_slo_url"] = saml_slo_url
 
-                if saml_username_attribute:
+                if saml_username_attribute is not None:
                     params["saml_username_attribute"] = saml_username_attribute
 
-                if saml_sp_entityid:
+                if saml_sp_entityid is not None:
                     params["saml_sp_entityid"] = saml_sp_entityid
 
-                if saml_nameid_format:
+                if saml_nameid_format is not None:
                     params["saml_nameid_format"] = saml_nameid_format
 
                 if isinstance(saml_sign_messages, bool):
@@ -600,23 +663,19 @@ class Authentication(ZabbixBase):
                     params["jit_provision_interval"] = jit_provision_interval
 
                 if isinstance(disabled_usrgroup, str):
-                    usrgrpids = self._zapi.usergroup.get(
-                        {"filter": {"name": disabled_usrgroup}}
-                    )
-                    if not usrgrpids:
-                        self._module.fail_json(
-                            "User group '%s' cannot be found" % disabled_usrgroup
-                        )
-                    params["disabled_usrgrpid"] = str(int(usrgrpids[0]["usrgrpid"]))
+                    if disabled_usrgroup == "":
+                        params["disabled_usrgrpid"] = "0"
+                    else:
+                        groups = self._zapi.usergroup.get({"output": ["usrgrpid", "users_status"], "filter": {"name": disabled_usrgroup}})
+                        if not groups:
+                            self._module.fail_json(msg="User group '%s' cannot be found" % disabled_usrgroup)
+                        if str(groups[0]["users_status"]) != "1":
+                            self._module.fail_json(msg="disabled_usrgroup must refer to a disabled user group")
+                        params["disabled_usrgrpid"] = str(groups[0]["usrgrpid"])
 
-                if (ldap_jit_status or saml_jit_status) and not disabled_usrgroup:
-                    self._module.fail_json(
-                        "'disabled_usrgroup' must be provided if 'ldap_jit_status' or 'saml_jit_status' enabled"
-                    )
-
-            if passwd_min_length:
+            if passwd_min_length is not None:
                 if passwd_min_length < 1 or passwd_min_length > 70:
-                    self._module.fail_json(msg="Please set 0-70 to passwd_min_length.")
+                    self._module.fail_json(msg="Please set 1-70 to passwd_min_length.")
                 else:
                     params["passwd_min_length"] = str(passwd_min_length)
 
@@ -636,7 +695,7 @@ class Authentication(ZabbixBase):
                         )
                     params[
                         "passwd_check_rules"
-                    ] += 2 ** zabbix_utils.helper_to_numeric_value(
+                    ] |= 2 ** zabbix_utils.helper_to_numeric_value(
                         passwd_check_rules_values, passwd_check_rules
                     )
                 elif isinstance(passwd_check_rules, list):
@@ -651,7 +710,7 @@ class Authentication(ZabbixBase):
                             )
                         params[
                             "passwd_check_rules"
-                        ] += 2 ** zabbix_utils.helper_to_numeric_value(
+                        ] |= 2 ** zabbix_utils.helper_to_numeric_value(
                             passwd_check_rules_values, _passwd_check_rules_value
                         )
 
@@ -659,6 +718,19 @@ class Authentication(ZabbixBase):
 
             future_authentication = current_authentication.copy()
             future_authentication.update(params)
+            if LooseVersion(self._zbx_api_version) >= LooseVersion("7.0"):
+                if future_authentication.get("authentication_type") == "1" and future_authentication.get("ldap_auth_enabled") != "1":
+                    self._module.fail_json(msg="authentication_type=ldap requires ldap_auth_enabled=true")
+                if future_authentication.get("ldap_auth_enabled") == "1" and future_authentication.get("ldap_userdirectoryid", "0") == "0":
+                    self._module.fail_json(msg="Please set ldap_userdirectory when you change a value of ldap_auth_enabled to true.")
+                if (
+                    (future_authentication.get("ldap_auth_enabled") == "1" and future_authentication.get("ldap_jit_status") == "1")
+                    or (future_authentication.get("saml_auth_enabled") == "1" and future_authentication.get("saml_jit_status") == "1")
+                ) and future_authentication.get("disabled_usrgrpid", "0") == "0":
+                    self._module.fail_json(msg="disabled_usrgroup is required when LDAP or SAML provisioning is enabled")
+            if LooseVersion(self._zbx_api_version) >= LooseVersion("8.0"):
+                if future_authentication.get("mfa_status") == "1" and future_authentication.get("mfaid", "0") == "0":
+                    self._module.fail_json(msg="mfa_method is required when global MFA is enabled")
 
             if LooseVersion(self._zbx_api_version) < LooseVersion("7.0"):
                 if (
@@ -685,7 +757,7 @@ class Authentication(ZabbixBase):
                     current_authentication["ldap_auth_enabled"] == "0"
                     and future_authentication["ldap_auth_enabled"] == "1"
                 ):
-                    if not ldap_userdirectory:
+                    if future_authentication.get("ldap_userdirectoryid", "0") == "0":
                         self._module.fail_json(
                             msg="Please set ldap_userdirectory when you change a value of ldap_auth_enabled to true."
                         )
@@ -694,10 +766,9 @@ class Authentication(ZabbixBase):
                 if (
                     current_authentication["saml_auth_enabled"] == "0"
                     and future_authentication["saml_auth_enabled"] == "1"
-                    and not saml_idp_entityid
-                    and not saml_sso_url
-                    and not saml_username_attribute
-                    and not saml_sp_entityid
+                    and any(not future_authentication.get(field) for field in (
+                        "saml_idp_entityid", "saml_sso_url", "saml_username_attribute", "saml_sp_entityid"
+                    ))
                 ):
                     self._module.fail_json(
                         msg=" ".join(
@@ -764,10 +835,12 @@ def main():
             saml_encrypt_assertions=dict(type="bool"),
             saml_case_sensitive=dict(type="bool"),
             saml_jit_status=dict(type="bool"),
-            jit_provision_interval=dict(type="str", default="1h"),
+            jit_provision_interval=dict(type="str"),
             disabled_usrgroup=dict(type="str"),
             passwd_min_length=dict(type="int", no_log=False),
             passwd_check_rules=dict(type="list", elements="str", no_log=False),
+            mfa_status=dict(type="bool"),
+            mfa_method=dict(type="str"),
         )
     )
     module = AnsibleModule(argument_spec=argument_spec, supports_check_mode=True)
@@ -810,6 +883,10 @@ def main():
     disabled_usrgroup = module.params["disabled_usrgroup"]
 
     authentication = Authentication(module)
+    if LooseVersion(authentication._zbx_api_version) < LooseVersion("8.0"):
+        for option in ("mfa_status", "mfa_method"):
+            if module.params[option] is not None:
+                module.fail_json(msg="%s is supported from Zabbix 8.0" % option)
 
     current_authentication = authentication.get_authentication()
     authentication.update_authentication(
@@ -850,6 +927,8 @@ def main():
         saml_jit_status,
         jit_provision_interval,
         disabled_usrgroup,
+        mfa_status=module.params["mfa_status"],
+        mfa_method=module.params["mfa_method"],
     )
 
 

@@ -1,0 +1,140 @@
+---
+- name: Test group MFA settings
+  module_defaults:
+    community.zabbix.zabbix_usergroup:
+      name: Usergroup MFA settings test
+  block:
+    - name: Create MFA method fixtures
+      community.zabbix.zabbix_mfa:
+        name: "usergroup-mfa-method-{{ item }}"
+        method_type: totp
+        hash_function: sha-256
+        code_length: 6
+      loop: [1, 2]
+
+    - name: Reject a partial MFA method name
+      community.zabbix.zabbix_usergroup:
+        mfa_status: enabled
+        mfa_method: usergroup-mfa-method
+      check_mode: true
+      ignore_errors: true
+      register: mfa_rejected
+
+    - name: Preview user group creation with MFA
+      community.zabbix.zabbix_usergroup:
+        mfa_status: enabled
+        mfa_method: usergroup-mfa-method-1
+      check_mode: true
+      register: mfa_preview_create
+
+    - name: Create user group with MFA
+      community.zabbix.zabbix_usergroup:
+        mfa_status: enabled
+        mfa_method: usergroup-mfa-method-1
+      register: mfa_create
+
+    - name: Verify MFA creation and read-only check mode
+      ansible.builtin.assert:
+        that:
+          - mfa_rejected is failed
+          - mfa_preview_create is changed
+          - mfa_create is changed
+
+    - name: Apply the same MFA settings again
+      community.zabbix.zabbix_usergroup:
+        mfa_status: enabled
+        mfa_method: usergroup-mfa-method-1
+      register: mfa_repeated
+
+    - name: Verify MFA creation is idempotent
+      ansible.builtin.assert:
+        that: mfa_repeated is not changed
+
+    - name: Change the selected MFA method
+      community.zabbix.zabbix_usergroup:
+        mfa_status: enabled
+        mfa_method: usergroup-mfa-method-2
+      register: mfa_replaced
+
+    - name: Verify the MFA method was changed
+      ansible.builtin.assert:
+        that: mfa_replaced is changed
+
+    - name: Change debug mode while omitting MFA settings
+      community.zabbix.zabbix_usergroup:
+        debug_mode: enabled
+
+    - name: Preview disabling group MFA
+      community.zabbix.zabbix_usergroup:
+        debug_mode: enabled
+        mfa_status: disabled
+      check_mode: true
+      register: mfa_preview_disable
+
+    - name: Verify omitted MFA settings and check mode preserved the method
+      community.zabbix.zabbix_usergroup:
+        debug_mode: enabled
+        mfa_status: enabled
+        mfa_method: usergroup-mfa-method-2
+      register: mfa_preserved
+
+    - name: Verify MFA preservation and update idempotency
+      ansible.builtin.assert:
+        that:
+          - mfa_preview_disable is changed
+          - mfa_preserved is not changed
+
+    - name: Select the system default MFA method
+      community.zabbix.zabbix_usergroup:
+        debug_mode: enabled
+        mfa_status: enabled
+        mfa_method: ""
+      register: mfa_reset
+
+    - name: Select the system default MFA method again
+      community.zabbix.zabbix_usergroup:
+        debug_mode: enabled
+        mfa_status: enabled
+        mfa_method: ""
+      register: mfa_reset_again
+
+    - name: Verify resetting the MFA method is idempotent
+      ansible.builtin.assert:
+        that:
+          - mfa_reset is changed
+          - mfa_reset_again is not changed
+
+    - name: Select a named MFA method before disabling MFA
+      community.zabbix.zabbix_usergroup:
+        debug_mode: enabled
+        mfa_status: enabled
+        mfa_method: usergroup-mfa-method-1
+
+    - name: Disable group MFA
+      community.zabbix.zabbix_usergroup:
+        debug_mode: enabled
+        mfa_status: disabled
+      register: mfa_disable
+
+    - name: Disable group MFA again
+      community.zabbix.zabbix_usergroup:
+        debug_mode: enabled
+        mfa_status: disabled
+      register: mfa_disable_again
+
+    - name: Verify disabling group MFA is idempotent
+      ansible.builtin.assert:
+        that:
+          - mfa_disable is changed
+          - mfa_disable_again is not changed
+
+  always:
+    - name: Delete MFA user group fixture
+      community.zabbix.zabbix_usergroup:
+        state: absent
+
+    - name: Delete MFA method fixtures
+      community.zabbix.zabbix_mfa:
+        name: "usergroup-mfa-method-{{ item }}"
+        state: absent
+      loop: [1, 2]

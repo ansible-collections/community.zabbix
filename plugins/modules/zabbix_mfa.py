@@ -19,6 +19,7 @@ short_description: Create/update/delete Zabbix MFA method
 
 description:
     - This module allows you to create, update and delete Zabbix MFA method.
+    - Existing methods can be updated by name without repeating unchanged fields. Omitted options are preserved.
 
 author:
     - ONODERA Masaru(@masa-orca)
@@ -83,8 +84,8 @@ options:
 
 notes:
     - Only Zabbix >= 7.0 is supported.
-    - This module returns changed=true when I(method_type) is C(duo_universal_prompt) as Zabbix API
-      will not return any sensitive information back for module to compare.
+    - Supplying O(client_secret) reports a change because Zabbix does not return this write-only value.
+    - Omit O(client_secret) when updating only the public settings of an existing Duo method.
 
 extends_documentation_fragment:
     - community.zabbix.zabbix
@@ -119,6 +120,15 @@ EXAMPLES = """
     method_type: totp
     hash_function: sha-1
     code_length: 6
+- name: Change the code length of an existing TOTP method
+  community.zabbix.zabbix_mfa:
+    name: Zabbix TOTP
+    code_length: 8
+
+- name: Update an existing Duo method while preserving its secret
+  community.zabbix.zabbix_mfa:
+    name: Corporate Duo
+    api_hostname: api-example.duosecurity.com
 """
 
 RETURN = """
@@ -190,20 +200,20 @@ class MFA(ZabbixBase):
             method_type
         ))
         if (method_type == 'totp'):
-            parameter['hash_function'] = str(zabbix_utils.helper_to_numeric_value(
-                [
-                    None,
-                    "sha-1",
-                    "sha-256",
-                    "sha-512"
-                ],
-                hash_function
-            ))
-            parameter['code_length'] = str(code_length)
+            if hash_function is not None:
+                parameter['hash_function'] = str(zabbix_utils.helper_to_numeric_value(
+                    [None, "sha-1", "sha-256", "sha-512"],
+                    hash_function
+                ))
+            if code_length is not None:
+                parameter['code_length'] = str(code_length)
         else:
-            parameter['api_hostname'] = str(api_hostname)
-            parameter['clientid'] = str(clientid)
-            parameter['client_secret'] = str(client_secret)
+            if api_hostname is not None:
+                parameter['api_hostname'] = api_hostname
+            if clientid is not None:
+                parameter['clientid'] = clientid
+            if client_secret is not None:
+                parameter['client_secret'] = client_secret
         return parameter
 
     def create_mfa(self, name, method_type, hash_function, code_length, api_hostname, clientid, client_secret):
@@ -224,14 +234,13 @@ class MFA(ZabbixBase):
         try:
             parameter = self._convert_to_parameter(name, method_type, hash_function, code_length, api_hostname, clientid, client_secret)
             parameter.update({'mfaid': current_mfa['mfaid']})
-            if (method_type == 'totp'):
-                current_mfa = zabbix_utils.helper_normalize_data(
-                    current_mfa, del_keys=["api_hostname", "clientid"]
-                )[0]
-                difference = {}
-                zabbix_utils.helper_compare_dictionaries(parameter, current_mfa, difference)
-                if (difference == {}):
-                    self._module.exit_json(changed=False)
+            difference = {}
+            zabbix_utils.helper_compare_dictionaries(
+                zabbix_utils.helper_convert_unicode_to_str(parameter),
+                zabbix_utils.helper_convert_unicode_to_str(current_mfa), difference
+            )
+            if difference == {}:
+                self._module.exit_json(changed=False)
 
             if self._module.check_mode:
                 self._module.exit_json(changed=True)
@@ -284,35 +293,9 @@ def main():
 
     module = AnsibleModule(
         argument_spec=argument_spec,
-        required_if=[
-            [
-                "method_type",
-                "totp",
-                [
-                    "hash_function",
-                    "code_length"
-                ]
-            ],
-            [
-                "method_type",
-                "duo_universal_prompt",
-                [
-                    "api_hostname",
-                    "clientid",
-                    "client_secret"
-                ]
-            ]
-        ],
         mutually_exclusive=[
             ('hash_function', 'api_hostname')
         ],
-        required_by={
-            'hash_function': 'method_type',
-            'code_length': 'method_type',
-            'api_hostname': 'method_type',
-            'clientid': 'method_type',
-            'client_secret': 'method_type'
-        },
         supports_check_mode=True,
     )
 
@@ -334,6 +317,24 @@ def main():
         else:
             module.exit_json(changed=False)
     else:
+        if method_type is None and mfa:
+            method_type = {"1": "totp", "2": "duo_universal_prompt"}.get(str(mfa["type"]))
+        if method_type is None:
+            module.fail_json(msg="method_type is required when creating an MFA method")
+        if method_type == "totp":
+            if any(value is not None for value in (api_hostname, clientid, client_secret)):
+                module.fail_json(msg="Duo options cannot be used for a TOTP method")
+            required = {"hash_function": hash_function, "code_length": code_length}
+        else:
+            if hash_function is not None or code_length is not None:
+                module.fail_json(msg="TOTP options cannot be used for a Duo method")
+            required = {"api_hostname": api_hostname, "clientid": clientid, "client_secret": client_secret}
+        for field, value in required.items():
+            same_type = mfa and str(mfa["type"]) == {"totp": "1", "duo_universal_prompt": "2"}[method_type]
+            if value is None and same_type:
+                continue
+            if not value:
+                module.fail_json(msg="%s is required for a %s method" % (field, method_type))
         if mfa:
             mfa_class_obj.update_mfa(mfa, name, method_type, hash_function, code_length, api_hostname, clientid, client_secret)
         else:

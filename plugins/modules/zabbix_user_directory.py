@@ -14,6 +14,11 @@ module: zabbix_user_directory
 short_description: Create/update/delete Zabbix user directories
 description:
    - This module allows you to create, modify and delete Zabbix user directories.
+   - Omitted options preserve existing settings. New directories use Zabbix defaults for omitted optional settings.
+   - Explicit empty strings, empty lists, false and zero values update or clear the corresponding settings.
+notes:
+    - Zabbix does not return the LDAP bind password. Supplying O(bind_password), including an empty string, always reports a change.
+    - SAML certificates and private keys require database certificate storage in the Zabbix frontend configuration.
 author:
     - Evgeny Yurchenko (@BGmot)
 requirements:
@@ -28,6 +33,7 @@ options:
         description:
             - Type of IdP. Only one user directory of type SAML can exist.
             - This parameter is available since Zabbix 6.4.
+            - Required when creating a directory. Existing directories retain their type when it is omitted.
         required: false
         type: str
         choices: ["ldap", "saml"]
@@ -40,7 +46,6 @@ options:
             - This parameter is available since Zabbix 6.4.
         required: false
         type: bool
-        default: false
     user_username:
         description:
             - LDAP/SAML attribute name to use for users.name field when user is provisioned
@@ -61,10 +66,9 @@ options:
         type: str
     description:
         description:
-            - User directory description.
+            - User directory description for LDAP or SAML.
         required: false
         type: str
-        default: ""
     group_membership:
         description:
             - LDAP property containing groups of user. E.g. I(memberOf)
@@ -112,7 +116,6 @@ options:
             - Supported search_filter placeholders
             -   I(%{attr}) search attribute name (uid, sAMAccountName);
             -   I(%{user}) username value.
-        default: (%{attr}=%{user})
         required: false
         type: str
     start_tls:
@@ -120,7 +123,6 @@ options:
             - LDAP startTLS option. It cannot be used with ldaps:// protocol hosts.
         required: false
         type: int
-        default: 0
         choices: [0, 1]
     host:
         description:
@@ -151,7 +153,6 @@ options:
             - LDAP bind distinguished name string. Can be empty for anonymous binding.
         required: false
         type: str
-        default: ""
     idp_entityid:
         description:
             - SAML URI that identifies the IdP in SAML messages.
@@ -198,60 +199,53 @@ options:
             - This parameter is available since Zabbix 6.4.
         required: false
         type: bool
-        default: false
     encrypt_nameid:
         description:
             - SAML encrypt name ID. Encrypts if I(true).
             - This parameter is available since Zabbix 6.4.
         required: false
         type: bool
-        default: false
     encrypt_assertions:
         description:
             - SAML encrypt assertions. Encrypts if I(true).
             - This parameter is available since Zabbix 6.4.
         required: false
         type: bool
-        default: false
     sign_messages:
         description:
             - SAML sign messages. Signs if I(true).
             - This parameter is available since Zabbix 6.4.
         required: false
         type: bool
-        default: false
     sign_assertions:
         description:
             - SAML sign assertions. Signs if I(true).
             - This parameter is available since Zabbix 6.4.
         required: false
         type: bool
-        default: false
     sign_authn_requests:
         description:
             - SAML sign AuthN requests. Signs if I(true).
             - This parameter is available since Zabbix 6.4.
         required: false
         type: bool
-        default: false
     sign_logout_requests:
         description:
             - SAML sign logout requests. Signs if I(true).
             - This parameter is available since Zabbix 6.4.
         required: false
         type: bool
-        default: false
     sign_logout_responses:
         description:
             - SAML sign logout responses. Signs if I(true).
             - This parameter is available since Zabbix 6.4.
         required: false
         type: bool
-        default: false
     provision_media:
         type: list
         elements: dict
         description:
+            - Each media type and attribute combination must be unique. Display names may be repeated.
             - Array of the IdP media type mappings objects.
             - This parameter is available since Zabbix 6.4.
         suboptions:
@@ -271,6 +265,18 @@ options:
                     - If present in data received from IdP and the value is not empty, will trigger media creation for the provisioned user.
                 type: str
                 required: true
+            active:
+                description:
+                    - Whether the provisioned media is enabled.
+                type: bool
+            severity:
+                description:
+                    - Severity bitmask for the provisioned media, from 0 to 63.
+                type: int
+            period:
+                description:
+                    - Time period when the provisioned media is active.
+                type: str
     provision_groups:
         type: list
         elements: dict
@@ -298,6 +304,24 @@ options:
                     - Array of Zabbix user group names.
                     - Note that if multiple provisioning groups mappings are matched, Zabbix user groups of all matched mappings will be assigned to the user.
                 required: true
+    idp_certificate:
+        description:
+            - SAML identity provider certificate in PEM format.
+            - Supported from Zabbix 8.0 with database certificate storage. Must not be empty when supplied.
+            - Required by Zabbix when creating a SAML provider with database certificate storage.
+        type: str
+    sp_certificate:
+        description:
+            - SAML service provider certificate in PEM format.
+            - Supported from Zabbix 8.0 with database certificate storage.
+            - An empty string clears it when SAML signing and encryption options are disabled.
+        type: str
+    sp_private_key:
+        description:
+            - SAML service provider private key in PEM format.
+            - Supported from Zabbix 8.0 with database certificate storage.
+            - An empty string clears it when SAML signing and encryption options are disabled.
+        type: str
     state:
         description:
             - State of the user directory.
@@ -415,8 +439,33 @@ EXAMPLES = r"""
         role: Guest role
         user_groups:
           - Guests
+# Zabbix 8.0 database certificate storage
+- name: Create a SAML provider with certificates
+  community.zabbix.zabbix_user_directory:
+    name: Corporate SAML
+    idp_type: saml
+    idp_entityid: https://idp.example.com
+    sp_entityid: https://zabbix.example.com
+    sso_url: https://idp.example.com/sso
+    username_attribute: uid
+    idp_certificate: "{{ lookup('ansible.builtin.file', 'idp.pem', rstrip=False) }}"
+    sp_certificate: "{{ lookup('ansible.builtin.file', 'sp.pem', rstrip=False) }}"
+    sp_private_key: "{{ lookup('ansible.builtin.file', 'sp-key.pem', rstrip=False) }}"
+
+- name: Disable StartTLS on an existing LDAP provider
+  community.zabbix.zabbix_user_directory:
+    name: Corporate LDAP
+    start_tls: 0
 """
 
+RETURN = r"""
+result:
+    description: Description of the operation performed.
+    returned: success
+    type: str
+"""
+
+import hashlib
 
 from ansible.module_utils.basic import AnsibleModule
 
@@ -435,26 +484,26 @@ def main():
             port=dict(type="int", required=False),
             base_dn=dict(type="str", required=False),
             search_attribute=dict(type="str", required=False),
-            bind_dn=dict(type="str", required=False, default=""),
+            bind_dn=dict(type="str", required=False),
             bind_password=dict(type="str", required=False, no_log=True),
-            description=dict(type="str", required=False, default=""),
-            search_filter=dict(type="str", default="(%{attr}=%{user})", required=False),
-            start_tls=dict(type="int", required=False, choices=[0, 1], default=0),
+            description=dict(type="str", required=False),
+            search_filter=dict(type="str", required=False),
+            start_tls=dict(type="int", required=False, choices=[0, 1]),
             idp_entityid=dict(type="str", required=False),
             sp_entityid=dict(type="str", required=False),
             sso_url=dict(type="str", required=False),
             slo_url=dict(type="str", required=False),
             username_attribute=dict(type="str", required=False),
             nameid_format=dict(type="str", required=False),
-            scim_status=dict(type="bool", required=False, default=False),
-            encrypt_nameid=dict(type="bool", required=False, default=False),
-            encrypt_assertions=dict(type="bool", required=False, default=False),
-            sign_messages=dict(type="bool", required=False, default=False),
-            sign_assertions=dict(type="bool", required=False, default=False),
-            sign_authn_requests=dict(type="bool", required=False, default=False),
-            sign_logout_requests=dict(type="bool", required=False, default=False),
-            sign_logout_responses=dict(type="bool", required=False, default=False),
-            provision_status=dict(type="bool", required=False, default=False),
+            scim_status=dict(type="bool", required=False),
+            encrypt_nameid=dict(type="bool", required=False),
+            encrypt_assertions=dict(type="bool", required=False),
+            sign_messages=dict(type="bool", required=False),
+            sign_assertions=dict(type="bool", required=False),
+            sign_authn_requests=dict(type="bool", required=False),
+            sign_logout_requests=dict(type="bool", required=False),
+            sign_logout_responses=dict(type="bool", required=False),
+            provision_status=dict(type="bool", required=False),
             group_basedn=dict(type="str", required=False),
             group_filter=dict(type="str", required=False),
             group_member=dict(type="str", required=False),
@@ -471,6 +520,9 @@ def main():
                     name=dict(type="str", required=True),
                     mediatype=dict(type="str", required=True),
                     attribute=dict(type="str", required=True),
+                    active=dict(type="bool"),
+                    severity=dict(type="int"),
+                    period=dict(type="str"),
                 ),
             ),
             provision_groups=dict(
@@ -483,248 +535,156 @@ def main():
                     user_groups=dict(type="list", elements="str", required=True),
                 ),
             ),
+            idp_certificate=dict(type="str"),
+            sp_certificate=dict(type="str"),
+            sp_private_key=dict(type="str", no_log=True),
             state=dict(type="str", default="present", choices=["present", "absent"]),
         )
     )
 
     module = AnsibleModule(argument_spec=argument_spec, supports_check_mode=True)
-    """ For future when < 7.0 disappears we should use this, now we cannot do this as at this point Zabbix version is unknown
-    module = AnsibleModule(
-        argument_spec=argument_spec,
-        supports_check_mode=True,
-        required_if=[
-            ("state", "present", ("idp_type",)),
-            ("idp_type", "ldap", ("host", "port", "base_dn", "search_attribute"), False),
-            ("idp_type", "saml", ("idp_entityid", "sp_entityid", "sso_url", "username_attribute"), False),
-            ("provision_status", "true", ("provision_groups"))
-        ]
-    )
-    """
-
-    parameters = {"name": module.params["name"]}
-    for p in [
-        "host",
-        "port",
-        "base_dn",
-        "search_attribute",
-        "bind_dn",
-        "bind_password",
-        "description",
-        "start_tls",
-    ]:
-        if module.params[p]:
-            if p in ["port", "start_tls"]:
-                parameters[p] = str(module.params[p])
-            else:
-                parameters[p] = module.params[p]
-
-    state = module.params["state"]
-
     user_directory = ZabbixBase(module)
-
     if LooseVersion(user_directory._zbx_api_version) < LooseVersion("7.0"):
         module.fail_json(msg="Zabbix < 7.0 does not support user directories.")
 
-    if LooseVersion(user_directory._zbx_api_version) < LooseVersion("7.0"):
-        parameters["search_filter"] = module.params["search_filter"]
-        directory = user_directory._zapi.userdirectory.get(
-            {"filter": {"name": parameters["name"]}}
+    name = module.params["name"]
+    state = module.params["state"]
+    directories = user_directory._zapi.userdirectory.get({
+        "search": {"name": name},
+        "selectProvisionMedia": "extend",
+        "selectProvisionGroups": "extend",
+    })
+    directories = [directory for directory in directories if directory.get("name") == name]
+    current = directories[0] if directories else {}
+    if state == "absent":
+        if current and not module.check_mode:
+            user_directory._zapi.userdirectory.delete([current["userdirectoryid"]])
+        module.exit_json(changed=bool(current), result="User directory removed or already absent: %s" % name)
+
+    idp_type = module.params["idp_type"] or {"1": "ldap", "2": "saml"}.get(str(current.get("idp_type")))
+    if idp_type is None:
+        module.fail_json(msg="idp_type must be provided when creating a user directory")
+    if current and str(current["idp_type"]) != {"ldap": "1", "saml": "2"}[idp_type]:
+        module.fail_json(msg="The idp_type of an existing user directory cannot be changed")
+
+    ldap_fields = (
+        "host", "port", "base_dn", "search_attribute", "bind_dn", "bind_password", "start_tls",
+        "search_filter", "group_basedn", "group_filter", "group_member", "group_membership", "user_ref_attr",
+    )
+    saml_fields = (
+        "idp_entityid", "sso_url", "username_attribute", "sp_entityid", "slo_url", "nameid_format", "scim_status",
+        "encrypt_nameid", "encrypt_assertions", "sign_messages", "sign_assertions", "sign_authn_requests",
+        "sign_logout_requests", "sign_logout_responses", "idp_certificate", "sp_certificate", "sp_private_key",
+    )
+    for field in saml_fields if idp_type == "ldap" else ldap_fields:
+        if module.params[field] is not None:
+            module.fail_json(msg="%s is not supported for an %s user directory" % (field, idp_type))
+
+    parameters = {"name": name}
+    if not current:
+        parameters["idp_type"] = {"ldap": 1, "saml": 2}[idp_type]
+    fields = (ldap_fields if idp_type == "ldap" else saml_fields) + (
+        "description", "group_name", "user_lastname", "user_username", "provision_status",
+    )
+    for field in fields:
+        value = module.params[field]
+        if value is not None:
+            parameters[field] = int(value) if isinstance(value, bool) else value
+    for field in ("idp_certificate", "sp_certificate", "sp_private_key"):
+        if field in parameters and LooseVersion(user_directory._zbx_api_version) < LooseVersion("8.0"):
+            module.fail_json(msg="%s is supported from Zabbix 8.0" % field)
+
+    future = dict(current, **parameters)
+    if idp_type == "saml":
+        if parameters.get("idp_certificate") == "":
+            module.fail_json(msg="idp_certificate must not be empty")
+        signing_fields = (
+            "sign_messages", "sign_assertions", "sign_authn_requests", "sign_logout_requests", "sign_logout_responses",
+            "encrypt_nameid", "encrypt_assertions",
         )
-    else:
-        # Zabbix >= 6.4
-        # Mandatory parameters check
-        if state == "present" and not module.params["idp_type"]:
-            module.fail_json(
-                "'idp_type' parameter must be provided when state is 'present'"
-            )
-        if module.params["idp_type"]:
-            if module.params["idp_type"] == "ldap" and (
-                not module.params["host"]
-                or not module.params["port"]
-                or not module.params["base_dn"]
-                or not module.params["search_attribute"]
-            ):
-                module.fail_json(
-                    "'host', 'port', 'base_dn', 'search_attribute' must be provided when idp_type is 'ldap'"
-                )
-            if module.params["idp_type"] == "saml" and (
-                not module.params["idp_entityid"]
-                or not module.params["sp_entityid"]
-                or not module.params["sso_url"]
-                or not module.params["username_attribute"]
-            ):
-                module.fail_json(
-                    "'idp_entityid', 'sp_entityid', 'sso_url', 'username_attribute' must be provided when idp_type is 'ldap'"
-                )
+        if any(str(future.get(field, "0")) == "1" for field in signing_fields):
+            for field in ("sp_certificate", "sp_private_key"):
+                if parameters.get(field) == "":
+                    module.fail_json(msg="%s cannot be cleared while SAML signing or encryption is enabled" % field)
+    mandatory = ("host", "port", "base_dn", "search_attribute") if idp_type == "ldap" else ("idp_entityid", "sp_entityid", "sso_url", "username_attribute")
+    for field in mandatory:
+        if not future.get(field):
+            module.fail_json(msg="%s is required for an %s user directory" % (field, idp_type))
+    if idp_type == "ldap":
+        if not 1 <= int(future["port"]) <= 65535:
+            module.fail_json(msg="port must be between 1 and 65535")
+        if str(future.get("start_tls", "0")) == "1" and future["host"].lower().startswith("ldaps://"):
+            module.fail_json(msg="start_tls cannot be enabled for an ldaps:// host")
 
-        directory = user_directory._zapi.userdirectory.get(
-            {
-                "search": {"name": parameters["name"]},
-                "selectProvisionMedia": "extend",
-                "selectProvisionGroups": "extend",
-            }
-        )
-        parameters["idp_type"] = str(
-            zabbix_utils.helper_to_numeric_value(
-                ["", "ldap", "saml"], module.params["idp_type"]
-            )
-        )
-        if parameters["idp_type"] == "1":
-            # idp_type is ldap
-            parameters["search_filter"] = module.params["search_filter"]
-        elif parameters["idp_type"] == "2":
-            # idp_type is saml
-            for p in [
-                "idp_entityid",
-                "sso_url",
-                "username_attribute",
-                "sp_entityid",
-                "slo_url",
-                "nameid_format",
-            ]:
-                # str parameters
-                if module.params[p]:
-                    parameters[p] = module.params[p]
-            for p in [
-                "scim_status",
-                "encrypt_nameid",
-                "encrypt_assertions",
-                "sign_messages",
-                "sign_assertions",
-                "sign_authn_requests",
-                "sign_logout_requests",
-                "sign_logout_responses",
-            ]:
-                # boolean parameters
-                if module.params[p]:
-                    parameters[p] = str(int(module.params[p]))
+    provisioning = str(future.get("provision_status", "0")) == "1"
+    for field in ("provision_media", "provision_groups"):
+        values = module.params[field]
+        if values is None:
+            continue
+        if values and not provisioning:
+            module.fail_json(msg="provision_status must be true to define %s" % field)
+        parameters[field] = []
+        seen = set()
+        for mapping in values:
+            if field == "provision_media":
+                media = user_directory._zapi.mediatype.get({"filter": {"name": mapping["mediatype"]}})
+                if not media:
+                    module.fail_json(msg="Mediatype '%s' cannot be found" % mapping["mediatype"])
+                item = {"name": mapping["name"], "mediatypeid": media[0]["mediatypeid"], "attribute": mapping["attribute"]}
+                identity = (item["mediatypeid"], item["attribute"])
+                if identity in seen:
+                    module.fail_json(msg="provision_media must not contain duplicate mediatype and attribute combinations")
+                seen.add(identity)
+                for option in ("active", "severity", "period"):
+                    if mapping[option] is not None:
+                        item[option] = int(not mapping[option]) if option == "active" else mapping[option]
+                if "severity" in item and not 0 <= item["severity"] <= 63:
+                    module.fail_json(msg="provision_media severity must be between 0 and 63")
+            else:
+                if mapping["name"] in seen:
+                    module.fail_json(msg="provision_groups must not contain duplicate mapping names")
+                seen.add(mapping["name"])
+                if len(mapping["user_groups"]) != len(set(mapping["user_groups"])):
+                    module.fail_json(msg="provision_groups user_groups must not contain duplicates")
+                roles = user_directory._zapi.role.get({"filter": {"name": mapping["role"]}})
+                if not roles:
+                    module.fail_json(msg="Role '%s' cannot be found" % mapping["role"])
+                groups = []
+                for group in mapping["user_groups"]:
+                    matches = user_directory._zapi.usergroup.get({"filter": {"name": group}})
+                    if not matches:
+                        module.fail_json(msg="User group '%s' cannot be found" % group)
+                    groups.append({"usrgrpid": matches[0]["usrgrpid"]})
+                item = {"name": mapping["name"], "roleid": roles[0]["roleid"], "user_groups": groups}
+            parameters[field].append(item)
 
-        if module.params["provision_status"]:
-            parameters["provision_status"] = int(module.params["provision_status"])
+    if provisioning and not parameters.get("provision_groups", current.get("provision_groups")):
+        module.fail_json(msg="provision_groups is required when provision_status is true")
 
-        if module.params["provision_media"]:
-            if (
-                "provision_status" not in parameters
-                or not parameters["provision_status"]
-            ):
-                module.fail_json(
-                    "'provision_status' must be True to define 'provision_media'"
-                )
-            parameters["provision_media"] = []
-            for media in module.params["provision_media"]:
-                media_type_name = media["mediatype"]
-                media_type_ids = user_directory._zapi.mediatype.get(
-                    {"filter": {"name": media_type_name}}
-                )
-                if not media_type_ids:
-                    module.fail_json("Mediatype '%s' cannot be found" % media_type_name)
-                parameters["provision_media"].append(
-                    {
-                        "name": media["name"],
-                        "mediatypeid": media_type_ids[0]["mediatypeid"],
-                        "attribute": media["attribute"],
-                    }
-                )
-
-        if module.params["provision_groups"]:
-            if (
-                "provision_status" not in parameters
-                or not parameters["provision_status"]
-            ):
-                module.fail_json(
-                    "'provision_status' must be True to define 'provision_groups'"
-                )
-            parameters["provision_groups"] = []
-            for group in module.params["provision_groups"]:
-                role_name = group["role"]
-                role_ids = user_directory._zapi.role.get(
-                    {"filter": {"name": role_name}}
-                )
-                if not role_ids:
-                    module.fail_json("Role '%s' cannot be found" % role_name)
-                user_groups = []
-                for user_group in group["user_groups"]:
-                    ug_ids = user_directory._zapi.usergroup.get(
-                        {"filter": {"name": user_group}}
-                    )
-                    if not ug_ids:
-                        module.fail_json("User group '%s' cannot be found" % user_group)
-                    user_groups.append({"usrgrpid": ug_ids[0]["usrgrpid"]})
-                parameters["provision_groups"].append(
-                    {
-                        "name": group["name"],
-                        "roleid": role_ids[0]["roleid"],
-                        "user_groups": user_groups,
-                    }
-                )
-        for p in [
-            "group_basedn",
-            "group_filter",
-            "group_member",
-            "group_membership",
-            "group_name",
-            "group_name",
-            "user_lastname",
-            "user_ref_attr",
-            "user_username",
-        ]:
-            if module.params[p]:
-                parameters[p] = module.params[p]
-
-    if not directory:
-        # No User Directory found with given name
-        if state == "absent":
-            module.exit_json(
-                changed=False,
-                msg="User directory not found. Not changed: %s" % parameters["name"],
-            )
-
-        elif state == "present":
-            if module.check_mode:
-                module.exit_json(changed=True)
+    comparison = zabbix_utils.helper_convert_unicode_to_str(parameters)
+    existing = zabbix_utils.helper_convert_unicode_to_str(current)
+    for field in ("idp_certificate", "sp_certificate", "sp_private_key"):
+        if field in comparison:
+            if current and field + "_hash" not in existing:
+                module.fail_json(msg="%s requires database certificate storage in the Zabbix frontend" % field)
+            value = parameters[field]
+            # Match the checksum exposed by the Zabbix API for write-only certificate fields.
+            digest = hashlib.md5(value.encode("utf-8"), usedforsecurity=False).hexdigest() if value else ""
+            existing[field] = comparison[field] if existing.get(field + "_hash") == digest else None
+    difference = zabbix_utils.helper_compare_dictionaries(comparison, existing, {})
+    if not difference:
+        module.exit_json(changed=False, result="User directory %s is up to date" % name)
+    if not module.check_mode:
+        try:
+            if current:
+                update = {field: parameters[field] for field in difference}
+                update["userdirectoryid"] = current["userdirectoryid"]
+                user_directory._zapi.userdirectory.update(update)
             else:
                 user_directory._zapi.userdirectory.create(parameters)
-                module.exit_json(
-                    changed=True,
-                    result="Successfully added user directory %s" % parameters["name"],
-                )
-    else:
-        # User Directory with given name exists
-        if state == "absent":
-            if module.check_mode:
-                module.exit_json(changed=True)
-            user_directory._zapi.userdirectory.delete([directory[0]["userdirectoryid"]])
-            module.exit_json(
-                changed=True,
-                result="Successfully deleted user directory %s" % parameters["name"],
-            )
-        elif state == "present":
-            diff_dict = {}
-            if "provision_status" in directory[0]:
-                # Zabbix API returns provision_status as str we need it as int to correctly compare
-                directory[0]["provision_status"] = int(directory[0]["provision_status"])
-            if zabbix_utils.helper_compare_dictionaries(
-                parameters, directory[0], diff_dict
-            ):
-                parameters["userdirectoryid"] = directory[0]["userdirectoryid"]
-                if module.check_mode:
-                    module.exit_json(changed=True)
-                user_directory._zapi.userdirectory.update(parameters)
-                module.exit_json(
-                    changed=True,
-                    result="Successfully updated user directory %s"
-                    % parameters["name"],
-                )
-            else:
-                module.exit_json(
-                    changed=False,
-                    result="User directory %s is up-to date" % parameters["name"],
-                )
-
-            module.exit_json(
-                changed=False,
-                result="User directory %s is up-to date" % parameters["name"],
-            )
+        except Exception as e:
+            module.fail_json(msg="Failed to configure user directory '%s': %s" % (name, e))
+    module.exit_json(changed=True, result="User directory %s configured" % name)
 
 
 if __name__ == "__main__":

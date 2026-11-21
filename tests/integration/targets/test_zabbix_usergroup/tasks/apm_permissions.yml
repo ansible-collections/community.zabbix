@@ -1,0 +1,124 @@
+---
+- name: Test APM permissions
+  vars:
+    usergroup_test_apm_filters:
+      - key: service.namespace
+      - key: service.name
+        value: checkout
+        signal_type: traces
+      - key: service.name
+        value: checkout
+        signal_type: metrics
+      - key: service.name
+        value: checkout
+        signal_type: logs
+  module_defaults:
+    community.zabbix.zabbix_usergroup:
+      name: Usergroup APM permissions test
+  block:
+    - name: Reject duplicate APM filters before creating the group
+      community.zabbix.zabbix_usergroup:
+        apm_filters:
+          - key: service.name
+            value: checkout
+          - key: service.name
+            value: checkout
+      check_mode: true
+      ignore_errors: true
+      register: apm_rejected
+
+    - name: Preview creation with APM permissions
+      community.zabbix.zabbix_usergroup:
+        apm_filters: "{{ usergroup_test_apm_filters }}"
+      check_mode: true
+      register: apm_preview_create
+
+    - name: Create user group with APM permissions for all signal types
+      community.zabbix.zabbix_usergroup:
+        apm_filters: "{{ usergroup_test_apm_filters }}"
+      register: apm_create
+
+    - name: Verify creation and read-only check mode
+      ansible.builtin.assert:
+        that:
+          - apm_rejected is failed
+          - apm_preview_create is changed
+          - apm_create is changed
+
+    - name: Verify APM filter order does not cause updates
+      community.zabbix.zabbix_usergroup:
+        apm_filters: "{{ usergroup_test_apm_filters | reverse | list }}"
+      register: apm_reordered
+
+    - name: Verify APM creation is idempotent
+      ansible.builtin.assert:
+        that: apm_reordered is not changed
+
+    - name: Preview replacing APM permissions
+      community.zabbix.zabbix_usergroup:
+        apm_filters:
+          - key: deployment.environment.name
+            value: production
+      check_mode: true
+      register: apm_preview_update
+
+    - name: Verify check mode preserved APM permissions
+      community.zabbix.zabbix_usergroup:
+        apm_filters: "{{ usergroup_test_apm_filters }}"
+      check_mode: true
+      register: apm_unchanged
+
+    - name: Verify APM check mode did not write changes
+      ansible.builtin.assert:
+        that:
+          - apm_preview_update is changed
+          - apm_unchanged is not changed
+
+    - name: Replace APM permissions
+      community.zabbix.zabbix_usergroup:
+        apm_filters:
+          - key: deployment.environment.name
+            value: production
+      register: apm_update
+
+    - name: Verify APM permissions were replaced
+      ansible.builtin.assert:
+        that: apm_update is changed
+
+    - name: Update another property while omitting APM permissions
+      community.zabbix.zabbix_usergroup:
+        debug_mode: enabled
+
+    - name: Verify omitted APM permissions were preserved
+      community.zabbix.zabbix_usergroup:
+        debug_mode: enabled
+        apm_filters:
+          - key: deployment.environment.name
+            value: production
+            signal_type: all
+      register: apm_preserved
+
+    - name: Verify APM update is idempotent and omitted filters are preserved
+      ansible.builtin.assert:
+        that: apm_preserved is not changed
+
+    - name: Clear APM permissions
+      community.zabbix.zabbix_usergroup:
+        apm_filters: []
+      register: apm_clear
+
+    - name: Clear APM permissions again
+      community.zabbix.zabbix_usergroup:
+        apm_filters: []
+      register: apm_clear_again
+
+    - name: Verify APM filters are cleared idempotently
+      ansible.builtin.assert:
+        that:
+          - apm_clear is changed
+          - apm_clear_again is not changed
+
+  always:
+    - name: Delete APM user group fixture
+      community.zabbix.zabbix_usergroup:
+        state: absent

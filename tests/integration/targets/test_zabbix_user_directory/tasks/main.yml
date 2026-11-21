@@ -8,3 +8,12 @@
         name: TestUserDirectory
         state: absent
       ignore_errors: true
+
+    - name: Remove temporary SAML certificate fixtures
+      ansible.builtin.file:
+        path: "{{ directory_certdir.path }}"
+        state: absent
+      when: directory_certdir.path is defined
+      delegate_to: localhost
+      vars:
+        ansible_connection: local
