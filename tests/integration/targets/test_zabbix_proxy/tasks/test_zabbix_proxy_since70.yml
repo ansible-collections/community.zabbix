@@ -263,6 +263,7 @@
     timeout_telnet_agent: "10"
     timeout_script: "15"
     timeout_browser: "30"
+    timeout_telemetry_query: "{{ '30' if zabbix_version is version('8.0', '>=') else omit }}"
   register: zbxproxy_create_with_timeouts
 
 - name: assert that proxy was created
@@ -287,6 +288,7 @@
     timeout_telnet_agent: "10"
     timeout_script: "15"
     timeout_browser: "30"
+    timeout_telemetry_query: "{{ '30' if zabbix_version is version('8.0', '>=') else omit }}"
   register: zbxproxy_create_with_timeouts_again
 
 - name: assert that nothing has changed
@@ -311,6 +313,7 @@
     timeout_telnet_agent: "10"
     timeout_script: "15"
     timeout_browser: "30"
+    timeout_telemetry_query: "{{ '30' if zabbix_version is version('8.0', '>=') else omit }}"
   register: zbxproxy_update_with_timeouts
 
 - name: assert that nothing has changed

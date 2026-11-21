@@ -8,6 +8,10 @@
     when: zabbix_version is version('7.0', '>=')
     include_tasks: test_zabbix_proxy_since70.yml
 
+  - name: Run APM tests for Zabbix >= 8.0
+    when: zabbix_version is version('8.0', '>=')
+    include_tasks: test_zabbix_proxy_since80.yml
+
   always:
     - name: Cleanup proxy
       community.zabbix.zabbix_proxy:

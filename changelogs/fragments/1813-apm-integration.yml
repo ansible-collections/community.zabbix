@@ -1,0 +1,12 @@
+---
+minor_changes:
+  - >-
+    zabbix_proxy - manage APM collection, rate limits, resource attributes and telemetry query
+    timeouts on Zabbix 8.0+ (https://github.com/ansible-collections/community.zabbix/pull/1813).
+  - >-
+    zabbix_proxy_info - return APM settings on Zabbix 8.0+
+    (https://github.com/ansible-collections/community.zabbix/pull/1813).
+bugfixes:
+  - >-
+    zabbix_proxy - compare existing settings in check mode and preserve explicit zero values
+    when updating proxies (https://github.com/ansible-collections/community.zabbix/pull/1813).
