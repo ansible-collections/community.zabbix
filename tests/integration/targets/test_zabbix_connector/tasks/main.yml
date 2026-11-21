@@ -117,6 +117,27 @@
           - connector_value_type.results | map(attribute='changed') is all
       when: zabbix_version is version('7.0', '>=')
 
+    - name: Test JSON item value types are rejected before Zabbix 8.0
+      when: zabbix_version is version('8.0', '<')
+      block:
+        - name: Try to update a connector to include JSON item values
+          community.zabbix.zabbix_connector:
+            name: ExampleConnector1
+            url: https://127.0.0.1/api/zabbix_stream
+            data_type: item_values
+            item_value_types:
+              - all+bin
+              - json
+          register: connector_json_unsupported
+          ignore_errors: true
+
+        - name: Assert that JSON requires Zabbix 8.0 or later
+          ansible.builtin.assert:
+            that:
+              - connector_json_unsupported is failed
+              - connector_json_unsupported is not changed
+              - connector_json_unsupported.msg == 'JSON item value types require Zabbix 8.0 or later.'
+
     - name: Test JSON item value types on Zabbix 8.0 and later
       when: zabbix_version is version('8.0', '>=')
       block:

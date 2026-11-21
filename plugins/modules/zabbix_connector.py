@@ -238,6 +238,7 @@ result:
 """
 
 from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.compat.version import LooseVersion
 
 from ansible_collections.community.zabbix.plugins.module_utils.base import ZabbixBase
 import ansible_collections.community.zabbix.plugins.module_utils.helpers as zabbix_utils
@@ -382,6 +383,8 @@ class Connector(ZabbixBase):
         }
 
         if params["item_value_types"] is not None:
+            if "json" in params["item_value_types"] and LooseVersion(self._zbx_api_version) < LooseVersion("8.0"):
+                self._module.fail_json(msg="JSON item value types require Zabbix 8.0 or later.")
             value_mask = 0
             for value_type in params["item_value_types"]:
                 value = Connector.VALUE_TYPES.get(value_type)
