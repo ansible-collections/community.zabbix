@@ -62,10 +62,49 @@ options:
         description:
             - Export the selected objects instead of importing content.
             - Dictionary of API object names and lists of IDs, passed as C(configuration.export) C(options).
-            - Supports C(host_groups), C(hosts), C(images), C(maps), C(mediaTypes), C(template_groups) and C(templates), subject to server version support.
-            - Zabbix 8.0 and later also support C(dashboards) and C(global_regexes).
             - Mutually exclusive with import content, O(rules) and O(return_missing_objects).
         type: dict
+        suboptions:
+            groups:
+                description: IDs of host or template groups to export on Zabbix 6.0.
+                type: list
+                elements: str
+            host_groups:
+                description: IDs of host groups to export, subject to server version support.
+                type: list
+                elements: str
+            hosts:
+                description: IDs of hosts to export.
+                type: list
+                elements: str
+            images:
+                description: IDs of images to export.
+                type: list
+                elements: str
+            maps:
+                description: IDs of maps to export.
+                type: list
+                elements: str
+            mediaTypes:
+                description: IDs of media types to export.
+                type: list
+                elements: str
+            template_groups:
+                description: IDs of template groups to export, subject to server version support.
+                type: list
+                elements: str
+            templates:
+                description: IDs of templates to export.
+                type: list
+                elements: str
+            dashboards:
+                description: IDs of dashboards to export. Requires Zabbix 8.0 or later.
+                type: list
+                elements: str
+            global_regexes:
+                description: IDs of global regular expressions to export. Requires Zabbix 8.0 or later.
+                type: list
+                elements: str
     export_format:
         description:
             - Serialization format for O(export_options). Ignored when importing.
@@ -219,7 +258,21 @@ def main():
             content_yaml=dict(type="str", required=False),
             rules=dict(type="dict", required=False),
             return_missing_objects=dict(type="bool"),
-            export_options=dict(type="dict"),
+            export_options=dict(
+                type="dict",
+                options=dict(
+                    groups=dict(type="list", elements="str"),
+                    host_groups=dict(type="list", elements="str"),
+                    hosts=dict(type="list", elements="str"),
+                    images=dict(type="list", elements="str"),
+                    maps=dict(type="list", elements="str"),
+                    mediaTypes=dict(type="list", elements="str"),
+                    template_groups=dict(type="list", elements="str"),
+                    templates=dict(type="list", elements="str"),
+                    dashboards=dict(type="list", elements="str"),
+                    global_regexes=dict(type="list", elements="str"),
+                ),
+            ),
             export_format=dict(type="str", choices=["json", "xml", "yaml"], default="json"),
         )
     )
@@ -238,6 +291,9 @@ def main():
     rules = module.params["rules"] or {}
     return_missing_objects = module.params["return_missing_objects"]
     export_options = module.params["export_options"]
+    if export_options is not None:
+        # Ansible adds None for omitted suboptions; exclude them from version checks and API requests.
+        export_options = {key: value for key, value in export_options.items() if value is not None}
 
     configuration = Configuration(module)
 

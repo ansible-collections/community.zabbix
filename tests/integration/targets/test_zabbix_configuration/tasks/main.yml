@@ -1,4 +1,29 @@
 ---
+- name: Reject invalid export options before API requests
+  community.zabbix.zabbix_configuration:
+    export_options: "{{ item.options }}"
+  loop:
+    - options:
+        unknown: ["1"]
+      error: Unsupported parameters
+    - options:
+        templates:
+          id: "1"
+      error: cannot be converted to a list
+  loop_control:
+    label: "{{ item.options }}"
+  register: configuration_invalid_exports
+  ignore_errors: true
+
+- name: Assert export option names and list types are validated
+  ansible.builtin.assert:
+    that:
+      - item is failed
+      - item.item.error in item.msg
+  loop: "{{ configuration_invalid_exports.results }}"
+  loop_control:
+    label: "{{ item.item.options }}"
+
 - name: Test configuration API additions on Zabbix 8.0 and later
   ansible.builtin.include_tasks: configuration8.yml
   when: zabbix_version is version('8.0', '>=')

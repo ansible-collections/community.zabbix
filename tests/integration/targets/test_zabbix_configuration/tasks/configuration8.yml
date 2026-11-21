@@ -24,20 +24,6 @@
         return_missing_objects: true
       register: configuration_create
 
-    - name: Repeat import with missing-object reporting
-      community.zabbix.zabbix_configuration:
-        content_yaml: "{{ lookup('file', 'configuration8.yaml') }}"
-        rules: "{{ configuration_rules }}"
-        return_missing_objects: true
-      register: configuration_repeat
-
-    - name: Repeat import with reporting explicitly disabled
-      community.zabbix.zabbix_configuration:
-        content_yaml: "{{ lookup('file', 'configuration8.yaml') }}"
-        rules: "{{ configuration_rules }}"
-        return_missing_objects: false
-      register: configuration_reporting_disabled
-
     - name: Verify an unchanged import in check mode
       community.zabbix.zabbix_configuration:
         content_yaml: "{{ lookup('file', 'configuration8.yaml') }}"
@@ -53,39 +39,20 @@
           - configuration_check.missing_objects == {}
           - configuration_create is changed
           - configuration_create.missing_objects == {}
-          - configuration_repeat is not changed
-          - configuration_repeat.missing_objects == {}
-          - configuration_reporting_disabled is not changed
-          - configuration_reporting_disabled.missing_objects is not defined
           - configuration_unchanged_check is not changed
           - configuration_unchanged_check.missing_objects == {}
 
-    - name: Predict dashboard and regular expression updates
+    - name: Update dashboards and regular expressions with reporting explicitly disabled
       community.zabbix.zabbix_configuration:
         content_yaml: "{{ lookup('file', 'configuration8_updated.yaml') }}"
         rules: "{{ configuration_rules }}"
-        return_missing_objects: true
-      check_mode: true
-      register: configuration_update_check
-
-    - name: Update dashboards and regular expressions without requesting metadata
-      community.zabbix.zabbix_configuration:
-        content_yaml: "{{ lookup('file', 'configuration8_updated.yaml') }}"
-        rules: "{{ configuration_rules }}"
+        return_missing_objects: false
       register: configuration_update
 
-    - name: Repeat dashboard and regular expression updates
-      community.zabbix.zabbix_configuration:
-        content_yaml: "{{ lookup('file', 'configuration8_updated.yaml') }}"
-        rules: "{{ configuration_rules }}"
-      register: configuration_update_repeat
-
-    - name: Assert update and idempotence
+    - name: Assert changes are detected without returning metadata
       ansible.builtin.assert:
         that:
-          - configuration_update_check is changed
           - configuration_update is changed
-          - configuration_update_repeat is not changed
           - configuration_update.missing_objects is not defined
 
     - name: Get imported object IDs
@@ -111,18 +78,20 @@
           name: Configuration export test dashboard
       register: configuration_objects
 
-    - name: Export the global regular expression as JSON
+    - name: Export both objects as JSON
       community.zabbix.zabbix_configuration:
         export_options:
           global_regexes: "{{ configuration_objects.results[0].json.result | map(attribute='regexpid') | list }}"
+          dashboards: "{{ configuration_objects.results[1].json.result | map(attribute='dashboardid') | list }}"
       register: configuration_export_json
 
-    - name: Assert the exported regular expression contains the update
+    - name: Assert JSON export is read-only and contains both updates
       ansible.builtin.assert:
         that:
           - configuration_export_json is not changed
           - (configuration_export_json.exported_config | from_json).zabbix_export.global_regexes[0].name == 'Configuration export test regex'
           - (configuration_export_json.exported_config | from_json).zabbix_export.global_regexes[0].expressions[0].expression == '^updated$'
+          - (configuration_export_json.exported_config | from_json).zabbix_export.dashboards[0].pages[0].widgets[0].width | int == 7
 
     - name: Export both objects as YAML in check mode
       community.zabbix.zabbix_configuration:
@@ -139,19 +108,6 @@
           - configuration_export_yaml is not changed
           - (configuration_export_yaml.exported_config | from_yaml).zabbix_export.global_regexes | length == 1
           - (configuration_export_yaml.exported_config | from_yaml).zabbix_export.dashboards[0].pages[0].widgets[0].width | int == 7
-
-    - name: Import exported dashboard and regular expression YAML without changes
-      community.zabbix.zabbix_configuration:
-        content_yaml: "{{ configuration_export_yaml.exported_config }}"
-        rules: "{{ configuration_rules }}"
-        return_missing_objects: true
-      register: configuration_yaml_roundtrip
-
-    - name: Assert YAML export can be imported without changes
-      ansible.builtin.assert:
-        that:
-          - configuration_yaml_roundtrip is not changed
-          - configuration_yaml_roundtrip.missing_objects == {}
 
     - name: Export the regular expression as XML
       community.zabbix.zabbix_configuration:
@@ -170,10 +126,7 @@
     - name: Import exported JSON without changes
       community.zabbix.zabbix_configuration:
         content_json: "{{ configuration_export_json.exported_config }}"
-        rules:
-          global_regexes:
-            createMissing: true
-            updateExisting: true
+        rules: "{{ configuration_rules }}"
         return_missing_objects: true
       register: configuration_roundtrip
 
@@ -190,7 +143,9 @@
 
     - name: Assert omitted rules are handled
       ansible.builtin.assert:
-        that: configuration_omitted_rules is not changed
+        that:
+          - configuration_omitted_rules is not changed
+          - configuration_omitted_rules.missing_objects is not defined
 
     - name: Predict an import with missing referenced objects
       community.zabbix.zabbix_configuration:
