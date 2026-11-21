@@ -60,7 +60,7 @@
     - name: Update the prototype
       community.zabbix.zabbix_discoveryruleprototype:
         params:
-          enabled: false
+          enabled: "false"
       register: prototype_update
 
     - name: Repeat the prototype update
@@ -99,13 +99,94 @@
         name: !unsafe 'Child discovery for {#SERVICE}'
         discoveryrule_name: !unsafe 'Renamed discovery for {#SERVICE}'
         params:
-          type: nested
-          key: !unsafe 'child.discovery[{#SERVICE}]'
+          type: script
+          key_: !unsafe 'child.discovery[{#SERVICE}]'
+          delay: 1m
+          enabled: false
+          params: 'return "[]";'
+          preprocessing:
+            - type: javascript
+              params: return value;
+          parameters:
+            - name: alpha
+              value: first
+            - name: beta
+              value: second
+          lld_macro_paths:
+            - lld_macro: !unsafe '{#SERVICE}'
+              path: $.service
+            - lld_macro: !unsafe '{#INSTANCE}'
+              path: $.instance
       register: prototype_child
 
     - name: Assert that the child was created
       ansible.builtin.assert:
         that: prototype_child is changed
+
+    - name: Ignore reordered child parameters and macro paths
+      community.zabbix.zabbix_discoveryruleprototype:
+        name: !unsafe 'Child discovery for {#SERVICE}'
+        discoveryrule_name: !unsafe 'Renamed discovery for {#SERVICE}'
+        params:
+          parameters:
+            - name: beta
+              value: second
+            - name: alpha
+              value: first
+          lld_macro_paths:
+            - lld_macro: !unsafe '{#INSTANCE}'
+              path: $.instance
+            - lld_macro: !unsafe '{#SERVICE}'
+              path: $.service
+      check_mode: "{{ item }}"
+      loop: [false, true]
+      register: prototype_reordered
+
+    - name: Assert that collection order does not cause updates
+      ansible.builtin.assert:
+        that:
+          - prototype_reordered is not changed
+
+    - name: Update a child parameter and macro path and repeat
+      community.zabbix.zabbix_discoveryruleprototype:
+        name: !unsafe 'Child discovery for {#SERVICE}'
+        discoveryrule_name: !unsafe 'Renamed discovery for {#SERVICE}'
+        params:
+          parameters:
+            - name: beta
+              value: updated
+            - name: alpha
+              value: first
+          lld_macro_paths:
+            - lld_macro: !unsafe '{#INSTANCE}'
+              path: $.instance_id
+            - lld_macro: !unsafe '{#SERVICE}'
+              path: $.service
+      loop: [1, 2]
+      register: prototype_parameter_update
+
+    - name: Assert meaningful changes and subsequent idempotence
+      ansible.builtin.assert:
+        that:
+          - prototype_parameter_update.results[0] is changed
+          - prototype_parameter_update.results[1] is not changed
+
+    - name: Reject invalid prototype types and preprocessing steps
+      community.zabbix.zabbix_discoveryruleprototype:
+        params: "{{ item }}"
+      loop:
+        - type: unsupported_type
+        - preprocessing:
+            - type: unsupported_step
+      register: prototype_invalid
+      ignore_errors: true
+
+    - name: Assert that invalid choices fail validation
+      ansible.builtin.assert:
+        that:
+          - item is failed
+          - "'value of type must be one of' in item.msg"
+      loop: "{{ prototype_invalid.results }}"
 
     - name: Test telemetry query prototypes
       ansible.builtin.include_tasks: zabbix_telemetry_tests.yml

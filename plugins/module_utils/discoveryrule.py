@@ -4,6 +4,8 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
+from ansible.module_utils.compat.version import LooseVersion
+
 
 class DiscoveryRuleParams(object):
     """Translate the shared LLD rule and LLD rule prototype parameters."""
@@ -52,6 +54,10 @@ class DiscoveryRuleParams(object):
                                     'set_custom_error_message': 3}
 
     def sanitize_params(self, name, params):
+        if (params.get('type') == 'telemetry_query'
+                or any(key in params for key in ('query', 'time_shift', 'lookback_limit', 'granularity'))):
+            if LooseVersion(self._zbx_api_version) < LooseVersion('8.0'):
+                self._module.fail_json(msg="Telemetry queries require Zabbix 8.0 or later")
         params['name'] = name
         if 'key' in params:
             params['key_'] = params['key']

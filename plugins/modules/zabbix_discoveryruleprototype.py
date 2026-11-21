@@ -43,7 +43,7 @@ options:
         description:
             - Properties from the LLD rule prototype API object. Required for O(state=present).
             - The module sets C(name), C(hostid), C(ruleid) and C(itemid).
-            - Unlisted properties are passed directly to the API.
+            - Only supplied properties are managed. Omitted properties retain their existing values or API defaults.
             - See U(https://www.zabbix.com/documentation/current/en/manual/api/reference/discoveryruleprototype/object).
         type: dict
         suboptions:
@@ -73,13 +73,15 @@ options:
                     - telemetry_query
             key:
                 description:
-                    - Alias for API property C(key_). Required on creation unless C(key_) is supplied.
+                    - LLD rule prototype key. Required on creation.
                     - Must contain an LLD macro.
                 type: str
+                aliases: [key_]
             interval:
                 description:
-                    - Alias for API property C(delay).
+                    - Update interval of the prototype.
                 type: str
+                aliases: [delay]
             enabled:
                 description:
                     - Whether the prototype is enabled. Overrides C(status).
@@ -126,6 +128,265 @@ options:
                     - API preprocessing steps, using the same type names as M(community.zabbix.zabbix_discoveryrule).
                 type: list
                 elements: dict
+                suboptions:
+                    type:
+                        description:
+                            - Preprocessing step type.
+                        type: str
+                        required: true
+                        choices:
+                            - regex
+                            - xml_xpath
+                            - jsonpath
+                            - does_not_match_regular_expression
+                            - not_match_regex
+                            - check_for_error_in_json
+                            - check_for_json_error
+                            - check_for_error_in_xml
+                            - check_for_xml_error
+                            - discard_unchanged_with_heartbeat
+                            - javascript
+                            - prometheus_to_json
+                            - csv_to_json
+                            - replace
+                            - xml_to_json
+                            - snmp_walk_value
+                            - snmp_walk_to_json
+                    params:
+                        description:
+                            - Step parameters, separated by newlines when multiple parameters are required.
+                        type: str
+                    error_handler:
+                        description:
+                            - Action on preprocessing failure.
+                        type: str
+                        choices: [zabbix_server, discard, set_custom_value, set_custom_error_message]
+                    error_handler_params:
+                        description:
+                            - Custom value or error message for the error handler.
+                        type: str
+            password:
+                description:
+                    - Password for the prototype's authentication method. Redacted from module output.
+                type: str
+            ssl_key_password:
+                description:
+                    - Password for the SSL private key. Redacted from module output.
+                type: str
+            username:
+                description:
+                    - User name for the prototype's authentication method.
+                type: str
+            publickey:
+                description:
+                    - SSH public key file name.
+                type: str
+            privatekey:
+                description:
+                    - SSH private key file name.
+                type: str
+            authtype:
+                description:
+                    - API authentication method. SSH accepts 0 (password) or 1 (public key).
+                    - HTTP accepts 0 (none), 1 (basic) or 2 (NTLM).
+                type: int
+                choices: [0, 1, 2]
+            params:
+                description:
+                    - Executed script or SQL query, depending on the prototype type.
+                type: str
+            parameters:
+                description:
+                    - Named script or browser parameters. Their order is ignored when comparing existing settings.
+                type: list
+                elements: dict
+                suboptions:
+                    name:
+                        description:
+                            - Unique parameter name.
+                        type: str
+                        required: true
+                    value:
+                        description:
+                            - Parameter value.
+                        type: str
+                        required: true
+            lld_macro_paths:
+                description:
+                    - LLD macro paths. Their order is ignored when comparing existing settings.
+                type: list
+                elements: dict
+                suboptions:
+                    lld_macro:
+                        description:
+                            - LLD macro name.
+                        type: str
+                        required: true
+                    path:
+                        description:
+                            - JSONPath used to extract the macro value.
+                        type: str
+                        required: true
+            filter:
+                description:
+                    - LLD filter API object, including its evaluation method and conditions.
+                type: dict
+            overrides:
+                description:
+                    - LLD override API objects.
+                type: list
+                elements: dict
+            description:
+                description:
+                    - Description of the prototype.
+                type: str
+            interfaceid:
+                description:
+                    - Host interface ID, required for host prototypes whose type requires an interface.
+                type: str
+            master_itemid:
+                description:
+                    - Master item ID for a dependent prototype.
+                type: str
+            snmp_oid:
+                description:
+                    - SNMP object ID for an SNMP prototype.
+                type: str
+            ipmi_sensor:
+                description:
+                    - IPMI sensor for an IPMI prototype.
+                type: str
+            jmx_endpoint:
+                description:
+                    - JMX endpoint for a JMX prototype.
+                type: str
+            trapper_hosts:
+                description:
+                    - Hosts allowed to send data to a trapper prototype.
+                type: str
+            url:
+                description:
+                    - URL for an HTTP agent prototype.
+                type: str
+            http_proxy:
+                description:
+                    - HTTP proxy connection string.
+                type: str
+            headers:
+                description:
+                    - HTTP request headers. Header values are redacted from module output.
+                type: list
+                elements: dict
+                suboptions:
+                    name:
+                        description:
+                            - Header name.
+                        type: str
+                        required: true
+                    value:
+                        description:
+                            - Header value.
+                        type: str
+                        required: true
+            query_fields:
+                description:
+                    - HTTP query fields, in request order.
+                type: list
+                elements: dict
+                suboptions:
+                    name:
+                        description:
+                            - Query field name.
+                        type: str
+                        required: true
+                    value:
+                        description:
+                            - Query field value.
+                        type: str
+                        required: true
+            posts:
+                description:
+                    - HTTP request body.
+                type: str
+            post_type:
+                description:
+                    - HTTP request body format, using 0 for raw, 2 for JSON or 3 for XML.
+                type: int
+                choices: [0, 2, 3]
+            status_codes:
+                description:
+                    - Accepted HTTP status codes and ranges, separated by commas.
+                type: str
+            follow_redirects:
+                description:
+                    - Whether to follow HTTP redirects, using API values 0 (disabled) or 1 (enabled).
+                type: int
+                choices: [0, 1]
+            retrieve_mode:
+                description:
+                    - HTTP response content, using 0 for body, 1 for headers or 2 for both.
+                type: int
+                choices: [0, 1, 2]
+            request_method:
+                description:
+                    - HTTP method, using 0 for GET, 1 for POST, 2 for PUT or 3 for HEAD.
+                type: int
+                choices: [0, 1, 2, 3]
+            output_format:
+                description:
+                    - HTTP response format, using 0 for raw or 1 for JSON.
+                type: int
+                choices: [0, 1]
+            allow_traps:
+                description:
+                    - Whether to accept incoming HTTP agent data, using API values 0 (disabled) or 1 (enabled).
+                type: int
+                choices: [0, 1]
+            ssl_cert_file:
+                description:
+                    - SSL certificate file path.
+                type: str
+            ssl_key_file:
+                description:
+                    - SSL private key file path.
+                type: str
+            verify_peer:
+                description:
+                    - Whether to verify the SSL certificate, using API values 0 (disabled) or 1 (enabled).
+                type: int
+                choices: [0, 1]
+            verify_host:
+                description:
+                    - Whether to verify the SSL host name, using API values 0 (disabled) or 1 (enabled).
+                type: int
+                choices: [0, 1]
+            lifetime_type:
+                description:
+                    - Lost resource deletion policy, using 0 for after a period, 1 for never or 2 for immediately.
+                type: int
+                choices: [0, 1, 2]
+            lifetime:
+                description:
+                    - Period before deleting lost resources when O(params.lifetime_type=0).
+                type: str
+            enabled_lifetime_type:
+                description:
+                    - Lost resource disabling policy, using 0 for after a period, 1 for never or 2 for immediately.
+                type: int
+                choices: [0, 1, 2]
+            enabled_lifetime:
+                description:
+                    - Period before disabling lost resources when O(params.enabled_lifetime_type=0).
+                type: str
+            discover:
+                description:
+                    - Whether to discover the prototype, using API values 0 (discover) or 1 (do not discover).
+                type: int
+                choices: [0, 1]
+            uuid:
+                description:
+                    - UUID for a template prototype. Generated by Zabbix when omitted.
+                type: str
     state:
         description:
             - Whether the prototype should exist.
@@ -228,8 +489,9 @@ class DiscoveryrulePrototype(DiscoveryRuleParams, ZabbixBase):
         if isinstance(expected, list):
             if not isinstance(existing, list) or len(expected) != len(existing):
                 return False
-            if field == 'conditions':
-                # The API sorts filter conditions independently of the submitted order.
+            if (field in ('conditions', 'lld_macro_paths')
+                    or (field == 'parameters' and all(isinstance(value, dict) for value in expected))):
+                # Filter conditions, named parameters and macro paths have no meaningful order.
                 remaining = list(existing)
                 for value in expected:
                     index = next((i for i, current in enumerate(remaining) if DiscoveryrulePrototype.matches(value, current)), None)
@@ -255,13 +517,8 @@ class DiscoveryrulePrototype(DiscoveryRuleParams, ZabbixBase):
                 result = self.call_api('delete', ids)
             self._module.exit_json(changed=True, result=result)
 
-        if params.get('type') == 'telemetry_query' and LooseVersion(self._zbx_api_version) < LooseVersion('8.0'):
-            self._module.fail_json(msg="Telemetry query LLD rule prototypes require Zabbix 8.0 or later")
-        if params.get('type') is not None and params['type'] not in self.ITEM_TYPES:
-            self._module.fail_json(msg="Unknown LLD rule prototype type '%s'" % params['type'])
+        params = zabbix_utils.helper_cleanup_data(params)
         self.sanitize_params(name, params)
-        for key in ('hostid', 'ruleid', 'itemid'):
-            params.pop(key, None)
         new_name = params.pop('new_name', None)
         if new_name and not existing:
             existing = self.get_prototypes(new_name, parent)
@@ -280,7 +537,7 @@ class DiscoveryrulePrototype(DiscoveryRuleParams, ZabbixBase):
 
         if new_name:
             params['name'] = new_name
-        changes = {key: value for key, value in params.items() if not self.matches(value, existing[0].get(key))}
+        changes = {key: value for key, value in params.items() if not self.matches(value, existing[0].get(key), key)}
         result = {'itemids': [existing[0]['itemid']]}
         if changes and not self._module.check_mode:
             changes['itemid'] = existing[0]['itemid']
@@ -288,6 +545,18 @@ class DiscoveryrulePrototype(DiscoveryRuleParams, ZabbixBase):
         self._module.exit_json(changed=bool(changes), result=result)
 
     def call_api(self, method, params):
+        if method != 'delete':
+            params = {key: params[key] for key in (
+                'name', 'hostid', 'ruleid', 'itemid', 'type', 'key_', 'delay', 'status',
+                'query', 'time_shift', 'lookback_limit', 'granularity', 'timeout', 'preprocessing',
+                'password', 'ssl_key_password', 'username', 'publickey', 'privatekey', 'authtype',
+                'params', 'parameters', 'lld_macro_paths', 'filter', 'overrides', 'description',
+                'interfaceid', 'master_itemid', 'snmp_oid', 'ipmi_sensor', 'jmx_endpoint', 'trapper_hosts',
+                'url', 'http_proxy', 'headers', 'query_fields', 'posts', 'post_type', 'status_codes',
+                'follow_redirects', 'retrieve_mode', 'request_method', 'output_format', 'allow_traps',
+                'ssl_cert_file', 'ssl_key_file', 'verify_peer', 'verify_host', 'lifetime_type', 'lifetime',
+                'enabled_lifetime_type', 'enabled_lifetime', 'discover', 'uuid',
+            ) if key in params}
         try:
             return getattr(self._zapi.discoveryruleprototype, method)(params)
         except Exception as e:
@@ -301,7 +570,77 @@ def main():
         discoveryrule_name=dict(type='str', required=True),
         host_name=dict(type='str'),
         template_name=dict(type='str'),
-        params=dict(type='dict'),
+        params=dict(type='dict', options=dict(
+            type=dict(type='str', choices=list(DiscoveryrulePrototype.ITEM_TYPES)),
+            key=dict(type='str', aliases=['key_']),
+            interval=dict(type='str', aliases=['delay']),
+            enabled=dict(type='bool'),
+            status=dict(type='str', choices=['enabled', 'disabled']),
+            new_name=dict(type='str'),
+            query=dict(type='dict'),
+            time_shift=dict(type='str'),
+            lookback_limit=dict(type='str'),
+            granularity=dict(type='str'),
+            timeout=dict(type='str'),
+            preprocessing=dict(type='list', elements='dict', options=dict(
+                type=dict(type='str', required=True, choices=list(DiscoveryRuleParams.PREPROCESSING_TYPES)),
+                params=dict(type='str'),
+                error_handler=dict(type='str', choices=list(DiscoveryRuleParams.PREPROCESSING_ERROR_HANDLERS)),
+                error_handler_params=dict(type='str'),
+            )),
+            password=dict(type='str', no_log=True),
+            ssl_key_password=dict(type='str', no_log=True),
+            username=dict(type='str'),
+            publickey=dict(type='str'),
+            privatekey=dict(type='str'),
+            authtype=dict(type='int', choices=[0, 1, 2]),
+            params=dict(type='str'),
+            parameters=dict(type='list', elements='dict', options=dict(
+                name=dict(type='str', required=True),
+                value=dict(type='str', required=True),
+            )),
+            lld_macro_paths=dict(type='list', elements='dict', options=dict(
+                lld_macro=dict(type='str', required=True),
+                path=dict(type='str', required=True),
+            )),
+            filter=dict(type='dict'),
+            overrides=dict(type='list', elements='dict'),
+            description=dict(type='str'),
+            interfaceid=dict(type='str'),
+            master_itemid=dict(type='str'),
+            snmp_oid=dict(type='str'),
+            ipmi_sensor=dict(type='str'),
+            jmx_endpoint=dict(type='str'),
+            trapper_hosts=dict(type='str'),
+            url=dict(type='str'),
+            http_proxy=dict(type='str'),
+            headers=dict(type='list', elements='dict', options=dict(
+                name=dict(type='str', required=True),
+                value=dict(type='str', required=True, no_log=True),
+            )),
+            query_fields=dict(type='list', elements='dict', options=dict(
+                name=dict(type='str', required=True),
+                value=dict(type='str', required=True),
+            )),
+            posts=dict(type='str'),
+            post_type=dict(type='int', choices=[0, 2, 3]),
+            status_codes=dict(type='str'),
+            follow_redirects=dict(type='int', choices=[0, 1]),
+            retrieve_mode=dict(type='int', choices=[0, 1, 2]),
+            request_method=dict(type='int', choices=[0, 1, 2, 3]),
+            output_format=dict(type='int', choices=[0, 1]),
+            allow_traps=dict(type='int', choices=[0, 1]),
+            ssl_cert_file=dict(type='str'),
+            ssl_key_file=dict(type='str'),
+            verify_peer=dict(type='int', choices=[0, 1]),
+            verify_host=dict(type='int', choices=[0, 1]),
+            lifetime_type=dict(type='int', choices=[0, 1, 2]),
+            lifetime=dict(type='str'),
+            enabled_lifetime_type=dict(type='int', choices=[0, 1, 2]),
+            enabled_lifetime=dict(type='str'),
+            discover=dict(type='int', choices=[0, 1]),
+            uuid=dict(type='str'),
+        )),
         state=dict(type='str', default='present', choices=['present', 'absent']),
     )
     module = AnsibleModule(
