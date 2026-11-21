@@ -6,6 +6,15 @@
   gather_facts: false
 
   tasks:
+    - name: Destroy ClickHouse database container(s)
+      community.docker.docker_container:
+        name: "{{ item.name }}-clickhouse"
+        state: absent
+        force_kill: true
+        keep_volumes: false
+      loop: "{{ molecule_yml.platforms }}"
+      when: "'v80' in item.groups"
+
     - name: Destroy OS container(s)
       community.docker.docker_container:
         name: "{{ item.name }}"

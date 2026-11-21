@@ -6,6 +6,7 @@ on:
     paths:
       - "roles/zabbix_web/**"
       - "molecule/zabbix_web/**"
+      - "molecule/default/*clickhouse*"
       - "molecule/requirements.txt"
       - ".github/workflows/web.yml"
       - "roles/zabbix_repo/**"
@@ -13,6 +14,7 @@ on:
     paths:
       - "roles/zabbix_web/**"
       - "molecule/zabbix_web/**"
+      - "molecule/default/*clickhouse*"
       - "molecule/requirements.txt"
       - ".github/workflows/web.yml"
       - "roles/zabbix_repo/**"

@@ -30,6 +30,18 @@ $HISTORY['url']		= {{ zabbix_server_history_url }};
 $HISTORY['types']	= {{ zabbix_server_history_types | to_json }};
 {% endif %}
 
+{% if zabbix_web_version is version('8.0', '>=') and zabbix_web_telemetry_providers | length > 0 %}
+$TELEMETRY_PROVIDERS = [
+{% for provider in zabbix_web_telemetry_providers %}
+    [
+{% for key, value in provider.items() %}
+        '{{ key }}' => {% if value is string %}'{{ value | replace('\\', '\\\\') | replace("'", "\\'") }}'{% else %}{{ value | to_json }}{% endif %},
+{% endfor %}
+    ],
+{% endfor %}
+];
+
+{% endif %}
 {% if zabbix_web_doubleprecision is defined and zabbix_web_doubleprecision %}
 // Use IEEE754 compatible value range for 64-bit Numeric (float) history values.
 // This option is enabled by default for new Zabbix installations.

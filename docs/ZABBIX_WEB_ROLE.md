@@ -20,6 +20,7 @@
     - [SElinux](#selinux)
     - [Zabbix Server](#zabbix-server)
     - [Zabbix Frontend Encrypt](#zabbix-frontend-encrypt)
+    - [APM](#apm)
   * [proxy](#proxy)
 - [Example Playbook](#example-playbook)
   - [Single instance](#single-instance)
@@ -235,6 +236,29 @@ Supported as of Zabbix 7.4.
 
 https://www.zabbix.com/documentation/7.4/en/manual/introduction/whatsnew#tls-encryption-between-frontend-and-server
 https://www.zabbix.com/documentation/7.4/en/manual/appendix/install/frontend_encrypt
+
+### APM
+
+For Zabbix 8.0 and later, `zabbix_web_telemetry_providers` configures `$TELEMETRY_PROVIDERS` in `zabbix.conf.php`. Define it as a list of dictionaries, which the role renders directly as a PHP array. Its default is an empty list, which leaves the frontend using the global data source configured in **Administration > Data source**.
+
+This role configures the frontend connection only. ClickHouse, its databases and its users must already exist. Use the [server role](ZABBIX_SERVER_ROLE.md#apm) to initialize missing history and telemetry schemas, controlled by `zabbix_server_database_telemetry_sqlload`.
+
+Configure one provider with `provider: clickhouse` and its HTTP or HTTPS `url`. Optional keys include `db`, `username`, `password`, `ssl_cert_file`, `ssl_key_file`, `ssl_key_password`, `ssl_verify_peer`, `ssl_verify_host`, `ssl_ca_location`, `ssl_ca_file` and `vault_path`. Use YAML booleans for `ssl_verify_peer` and `ssl_verify_host`. Vault authentication requires an existing frontend Vault configuration; do not combine `vault_path` with username/password authentication. See the [frontend configuration reference](https://www.zabbix.com/documentation/8.0/en/manual/web_interface/frontend_conf_params#telemetry_providers).
+
+```yaml
+- hosts: zabbix-web
+  roles:
+    - role: community.zabbix.zabbix_web
+      zabbix_web_version: "8.0"
+      zabbix_web_telemetry_providers:
+        - provider: clickhouse
+          url: http://clickhouse.example.com:8123
+          db: zabbixapm
+          username: zabbix
+          password: "{{ clickhouse_password }}"
+```
+
+ClickHouse, its user and telemetry schema must already exist, and the PHP cURL extension must be installed. The role does not install or manage ClickHouse. Configure the server connection separately using `zabbix_server_telemetryprovider` in the [zabbix_server role](ZABBIX_SERVER_ROLE.md#apm), or configure a shared global data source. These connection settings do not enable telemetry ingestion.
 
 ## proxy
 
