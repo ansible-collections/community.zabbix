@@ -1,0 +1,14 @@
+zabbix_export:
+  version: '8.0'
+  dashboards:
+    - name: Configuration export test dashboard
+      pages:
+        - widgets:
+            - type: clock
+              width: '6'
+              height: '3'
+  global_regexes:
+    - name: Configuration export test regex
+      expressions:
+        - type: MATCHES_REGEX
+          expression: '^example$'

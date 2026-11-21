@@ -1,0 +1,14 @@
+zabbix_export:
+  version: '8.0'
+  dashboards:
+    - name: Configuration missing reference dashboard
+      pages:
+        - widgets:
+            - type: hostcard
+              width: '6'
+              height: '3'
+              fields:
+                - type: HOST
+                  name: hostid
+                  value:
+                    host: Configuration missing referenced host
