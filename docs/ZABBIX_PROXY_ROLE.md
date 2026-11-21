@@ -14,6 +14,7 @@
     + [Zabbix Proxy](#zabbix-proxy)
     + [Database specific](#database-specific)
     + [TLS Specific configuration](#tls-specific-configuration)
+    + [APM](#apm)
   * [proxy](#proxy)
   * [Database](#database)
     + [MySQL](#mysql)
@@ -41,6 +42,39 @@ This role will work on the following operating systems:
 
 So, you'll need one of those operating systems.. :-)
 Please send Pull Requests or suggestions when you want to use this role for other Operating systems.
+
+APM proxies require Zabbix 8.0 or newer and Red Hat family 10+, Ubuntu 24.04+, or Debian 12+.
+The role validates these minimum versions before installing packages, including when
+`zabbix_proxy_version_check` is disabled. On Red Hat, enabling APM selects
+`zabbix-proxy-<database>-apm`; Debian and Ubuntu keep `zabbix-proxy-<database>`.
+On Red Hat family 10+ with Zabbix 8.0+, the role also selects the matching
+`zabbix-proxy` executable through alternatives, including when switching an existing
+proxy between standard and APM packages.
+
+For Red Hat APM proxies, install the EPEL repository and enable the CRB (CodeReady
+Builder) repository before running the role, or provide private mirrors containing
+the required packages. The role validates APM settings before configuring repositories,
+then installs `zabbix_proxy_apm_dependencies` using the OS package manager. The default
+list is `['grpc-cpp']` on Red Hat and `[]` elsewhere. On Red Hat, the dependency
+transaction enables EPEL and disables optional weak dependencies.
+The subsequent Zabbix package installation disables EPEL for that transaction only;
+the role does not disable EPEL globally or configure EPEL/CRB itself.
+
+With `zabbix_manage_repo: false`, configure your repositories before running the role.
+APM dependencies are still installed using those repositories. If EPEL is not configured,
+override `zabbix_proxy_apm_enable_repo` with your mirror IDs, or set it to `[]` to use
+only repositories already enabled on the host. Use `zabbix_proxy_disable_repo` to exclude
+any mirror providing unwanted Zabbix packages during the proxy package installation.
+
+`zabbix_proxy_apm_enable_repo` defaults to `['epel']` on Red Hat and `[]` elsewhere.
+DNF enables the listed repositories only for the APM dependency transaction; the
+repository configuration remains unchanged. For example, to use a configured private mirror:
+
+```yaml
+zabbix_proxy_apm_enabled: true
+zabbix_proxy_apm_enable_repo:
+  - private-epel
+```
 
 # Requirements
 ## Ansible 2.10 and higher
@@ -433,6 +467,96 @@ The majority of tasks within this role are tagged as follows:
 * `api`:  Tasks associated with using the Zabbix API to connect and modify the Zabbix server.
 * `config`:  Tasks associated with the configuration of Zabbix or a supporting service.
 * `service`:  Tasks associated with managing a service.
+
+### APM
+
+Set `zabbix_proxy_apm_enabled: true` to install an APM-capable proxy and start its collector.
+When `zabbix_api_create_proxy: true`, this also enables telemetry collection in the proxy's
+APM settings through the Zabbix API. API credentials need permission to manage proxies.
+With API management disabled, enable APM in the frontend or with `community.zabbix.zabbix_proxy`.
+
+| Variable | Default | Purpose |
+| --- | --- | --- |
+| `zabbix_proxy_apm_enabled` | `false` | Select APM packages and render collector settings. |
+| `zabbix_proxy_apm_dependencies` | `['grpc-cpp']` on Red Hat, otherwise `[]` | Overridable list of packages installed before the APM proxy packages. An empty list skips explicit dependency installation. |
+| `zabbix_proxy_apm_enable_repo` | `['epel']` on Red Hat, otherwise `[]` | Red Hat only: repository IDs to enable temporarily for APM dependencies, in addition to the host's enabled repositories. Set to `[]` when using only already enabled repositories. |
+| `zabbix_proxy_startapmcollector` | `1` when APM is enabled, otherwise `0` | `StartAPMCollector`, accepts 0 or 1. |
+| `zabbix_proxy_apmlistenip` | `0.0.0.0` | `APMListenIP`, collector listen address. |
+| `zabbix_proxy_apmlistenport` | `4317` | `APMListenPort`, OTLP/gRPC port, range 1024-32767. |
+| `zabbix_proxy_apmtlscafile` | `null` | `APMTLSCAFile`, CA certificates used to verify telemetry clients. |
+| `zabbix_proxy_apmtlscertfile` | `null` | `APMTLSCertFile`, collector certificate or chain. |
+| `zabbix_proxy_apmtlskeyfile` | `null` | `APMTLSKeyFile`, collector private key. |
+| `zabbix_proxy_apm` | `data_collection_status: 1` when enabled, otherwise `{}` | API APM object, sent when APM is enabled on Zabbix 8.0 or newer; an empty dictionary leaves existing API settings unchanged. |
+| `zabbix_proxy_starttelemetryquerypollers` | `1` | `StartTelemetryQueryPollers`, available since Zabbix 8.0. |
+| `zabbix_proxy_telemetryprovider` | `{}` | Dictionary configuring `TelemetryProvider` for ClickHouse; available since Zabbix 8.0. |
+| `zabbix_proxy_timeout_telemetry_query` | unset | API timeout for telemetry query items; required with custom timeouts on Zabbix 8.0. |
+
+The TLS certificate and key must be set together and require a CA file. With a CA file,
+the collector accepts encrypted connections; without it, the collector accepts unencrypted
+connections. Provision readable TLS files on the proxy before running the role.
+
+The `zabbix_proxy_apm` dictionary accepts `data_collection_status` (0 or 1),
+`max_messages_per_second` (0 for unlimited, up to 2147483647), and
+`additional_resource_attributes` (a list of dictionaries). Each attribute requires `key`
+and `signal_type` (0 for traces, 1 for metrics, 2 for logs); `value` defaults to an empty
+string. Keys must be unique per signal. Incoming attributes take precedence. The list
+replaces the configured attributes; use `[]` to remove them all. Omitted APM properties
+are preserved on update. Rate limits and attributes apply only while collection is enabled.
+
+```yaml
+zabbix_proxy_version: "8.0"
+zabbix_proxy_apm_enabled: true
+zabbix_api_create_proxy: true
+zabbix_proxy_apm:
+  data_collection_status: 1
+  max_messages_per_second: 10000
+  additional_resource_attributes:
+    - key: deployment.environment.name
+      value: production
+      signal_type: 0
+    - key: deployment.environment.name
+      value: production
+      signal_type: 1
+    - key: deployment.environment.name
+      value: production
+      signal_type: 2
+zabbix_proxy_apmtlscafile: /etc/zabbix/tls/ca.pem
+zabbix_proxy_apmtlscertfile: /etc/zabbix/tls/proxy.pem
+zabbix_proxy_apmtlskeyfile: /etc/zabbix/tls/proxy.key
+zabbix_proxy_telemetryprovider:
+  provider: clickhouse
+  url: https://clickhouse.example.com:8443
+  db: zabbixapm
+  username: zabbix
+  password: "{{ vault_clickhouse_password }}"
+  ssl_verify_peer: true
+  ssl_verify_host: true
+```
+
+The telemetry provider supports `provider` (`clickhouse`), `url`, `db`, `username`,
+`password`, `source_ip`, `vault_path`, `ssl_cert_file`, `ssl_key_file`, `ssl_key_password`,
+`ssl_verify_peer`, `ssl_verify_host`, `ssl_ca_location`, `ssl_cert_location`, and
+`ssl_key_location`. Use Ansible Vault for secrets.
+
+The proxy role configures the connection only. Initialize missing ClickHouse history and
+telemetry schemas with the `zabbix_server` role, or provision them separately. ClickHouse,
+its database and its user must already exist.
+
+To disable collection in the API, keep `zabbix_proxy_apm_enabled: true` and explicitly
+set `zabbix_proxy_apm: {data_collection_status: 0}`.
+Setting only `zabbix_proxy_apm_enabled: false` stops rendering collector settings and selects
+the standard package; it leaves the existing API APM settings unchanged.
+
+`community.zabbix.zabbix_proxy_info` returns APM settings on Zabbix 8.0 or newer.
+Use `community.zabbix.zabbix_apm_info` to query traces, spans, metrics and logs through
+the existing Zabbix httpapi connection. It supports attribute filters, sorting, pagination
+and counts; see `ansible-doc community.zabbix.zabbix_apm_info` for options and examples.
+Queries support check mode and return `changed: false`. Telemetry ingestion uses the
+collector's OTLP endpoint.
+
+See the [proxy APM object](https://www.zabbix.com/documentation/8.0/en/manual/api/reference/proxy/object),
+[proxy configuration parameters](https://www.zabbix.com/documentation/8.0/en/manual/concepts/proxy/proxy_params),
+and the [APM API reference](https://www.zabbix.com/documentation/8.0/en/manual/api/reference#apm).
 
 # Example Playbook
 
