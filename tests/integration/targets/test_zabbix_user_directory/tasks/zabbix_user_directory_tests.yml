@@ -41,6 +41,8 @@
         port: 389
         base_dn: "ou=Users,dc=example,dc=org"
         search_attribute: "uid"
+        description: Original LDAP description
+        start_tls: 1
       register: directory_result
 
     - ansible.builtin.assert:
@@ -53,10 +55,37 @@
         port: 389
         base_dn: "ou=Users,dc=example,dc=org"
         search_attribute: "uid"
+        description: Original LDAP description
+        start_tls: 1
       register: directory_again_result
 
     - ansible.builtin.assert:
         that: directory_again_result.changed is sameas False
+
+    - name: Reject LDAPS while StartTLS is enabled
+      community.zabbix.zabbix_user_directory:
+        host: ldaps://test.com
+      ignore_errors: true
+      register: directory_tls_rejected
+
+    - name: Clear the LDAP description and disable StartTLS with a partial update
+      community.zabbix.zabbix_user_directory:
+        description: ""
+        start_tls: 0
+      register: directory_partial
+
+    - name: Repeat the partial LDAP update
+      community.zabbix.zabbix_user_directory:
+        description: ""
+        start_tls: 0
+      register: directory_partial_again
+
+    - name: Verify empty and zero LDAP settings are applied idempotently
+      ansible.builtin.assert:
+        that:
+          - directory_tls_rejected is failed
+          - directory_partial is changed
+          - directory_partial_again is not changed
 
     - name: test - delete LDAP user directory
       community.zabbix.zabbix_user_directory:
@@ -162,6 +191,12 @@
           - name: Media1
             mediatype: Email
             attribute: email1
+            active: false
+            severity: 0
+            period: 1-5,09:00-17:00
+          - name: Media1
+            mediatype: Email
+            attribute: email2
         provision_groups:
           - name: idpname1
             role: Guest role
@@ -180,7 +215,6 @@
         base_dn: "ou=Users,dc=example,dc=org"
         search_attribute: "uid"
         provision_status: True
-        bind_password: "password"
         group_name: cn
         group_basedn: ou=Group,dc=example,dc=org
         group_member: member
@@ -192,6 +226,12 @@
           - name: Media1
             mediatype: Email
             attribute: email1
+            active: false
+            severity: 0
+            period: 1-5,09:00-17:00
+          - name: Media1
+            mediatype: Email
+            attribute: email2
         provision_groups:
           - name: idpname1
             role: Guest role
@@ -199,12 +239,64 @@
               - Guests
       register: directory_update_media_again_result
 
-    # - ansible.builtin.assert:
-    #     that: directory_update_media_again_result.changed is sameas False
+    - name: Verify repeated media labels and omitted bind passwords are idempotent
+      ansible.builtin.assert:
+        that: directory_update_media_again_result is not changed
+
+    - name: Reject duplicate media type and attribute pairs
+      community.zabbix.zabbix_user_directory:
+        provision_media:
+          - name: First label
+            mediatype: Email
+            attribute: email1
+          - name: Second label
+            mediatype: Email
+            attribute: email1
+      ignore_errors: true
+      register: directory_media_rejected
+
+    - name: Verify duplicate media mappings were rejected
+      ansible.builtin.assert:
+        that: directory_media_rejected is failed
 
     - name: test - delete LDAP user directory
       community.zabbix.zabbix_user_directory:
         state: absent
+
+    - name: Prepare SAML certificate fixtures for Zabbix 8
+      when: zabbix_version is version('8.0', '>=')
+      block:
+        - name: Create a private temporary directory for certificate fixtures
+          ansible.builtin.tempfile:
+            state: directory
+            prefix: zabbix-directory-
+          delegate_to: localhost
+          vars:
+            ansible_connection: local
+          register: directory_certdir
+
+        - name: Generate a temporary SAML certificate and private key
+          ansible.builtin.command:
+            argv:
+              - openssl
+              - req
+              - -x509
+              - -newkey
+              - rsa:2048
+              - -nodes
+              - -days
+              - "1"
+              - -subj
+              - /CN=directory.example.test
+              - -keyout
+              - "{{ directory_certdir.path }}/key.pem"
+              - -out
+              - "{{ directory_certdir.path }}/cert.pem"
+          delegate_to: localhost
+          vars:
+            ansible_connection: local
+          changed_when: true
+          no_log: true
 
     - name: test - create new SAML user directory in check mode
       community.zabbix.zabbix_user_directory:
@@ -213,11 +305,15 @@
         sp_entityid: zabbix
         sso_url: http://xxxx.okta.com/app/xxxxxx_123dhu8o3
         username_attribute: usrEmail
+        idp_certificate: "{{ lookup('ansible.builtin.file', directory_certdir.path + '/cert.pem', rstrip=False) if zabbix_version is version('8.0', '>=') else omit }}"
+        sp_certificate: "{{ lookup('ansible.builtin.file', directory_certdir.path + '/cert.pem', rstrip=False) if zabbix_version is version('8.0', '>=') else omit }}"
+        sp_private_key: "{{ lookup('ansible.builtin.file', directory_certdir.path + '/key.pem', rstrip=False) if zabbix_version is version('8.0', '>=') else omit }}"
       check_mode: true
       register: directory_check_result
 
-    # - ansible.builtin.assert:
-    #     that: directory_check_result.changed is sameas True
+    - name: Verify SAML creation is predicted in check mode
+      ansible.builtin.assert:
+        that: directory_check_result is changed
 
     - name: test - attempt to create new SAML user directory with not all mandatory parameters
       community.zabbix.zabbix_user_directory:
@@ -225,8 +321,9 @@
       ignore_errors: true
       register: directory_expect_fail_result
 
-    # - ansible.builtin.assert:
-    #     that: directory_expect_fail_result.failed is sameas True
+    - name: Verify missing mandatory SAML settings are rejected
+      ansible.builtin.assert:
+        that: directory_expect_fail_result is failed
 
     - name: test - create new SAML user directory
       community.zabbix.zabbix_user_directory:
@@ -235,10 +332,15 @@
         sp_entityid: zabbix
         sso_url: http://xxxx.okta.com/app/xxxxxx_123dhu8o3
         username_attribute: usrEmail
+        description: Original SAML description
+        idp_certificate: "{{ lookup('ansible.builtin.file', directory_certdir.path + '/cert.pem', rstrip=False) if zabbix_version is version('8.0', '>=') else omit }}"
+        sp_certificate: "{{ lookup('ansible.builtin.file', directory_certdir.path + '/cert.pem', rstrip=False) if zabbix_version is version('8.0', '>=') else omit }}"
+        sp_private_key: "{{ lookup('ansible.builtin.file', directory_certdir.path + '/key.pem', rstrip=False) if zabbix_version is version('8.0', '>=') else omit }}"
       register: directory_create_result
 
-    # - ansible.builtin.assert:
-    #     that: directory_create_result.changed is sameas True
+    - name: Verify SAML directory creation
+      ansible.builtin.assert:
+        that: directory_create_result is changed
 
     - name: test - update SAML user directory with all optional parameters
       community.zabbix.zabbix_user_directory:
@@ -247,6 +349,10 @@
         sp_entityid: zabbix
         sso_url: http://xxxx.okta.com/app/xxxxxx_123dhu8o3
         username_attribute: usrEmail
+        description: Updated SAML description
+        idp_certificate: "{{ lookup('ansible.builtin.file', directory_certdir.path + '/cert.pem', rstrip=False) if zabbix_version is version('8.0', '>=') else omit }}"
+        sp_certificate: "{{ lookup('ansible.builtin.file', directory_certdir.path + '/cert.pem', rstrip=False) if zabbix_version is version('8.0', '>=') else omit }}"
+        sp_private_key: "{{ lookup('ansible.builtin.file', directory_certdir.path + '/key.pem', rstrip=False) if zabbix_version is version('8.0', '>=') else omit }}"
         slo_url: http://yyyy.okta.com
         nameid_format: "urn:oasis"
         scim_status: true
@@ -259,8 +365,9 @@
         sign_logout_responses: true
       register: directory_create_all_result
 
-    # - ansible.builtin.assert:
-    #     that: directory_create_all_result.changed is sameas True
+    - name: Verify optional SAML settings were updated
+      ansible.builtin.assert:
+        that: directory_create_all_result is changed
 
     - name: test - update SAML user directory with all optional parameters again
       community.zabbix.zabbix_user_directory:
@@ -269,6 +376,10 @@
         sp_entityid: zabbix
         sso_url: http://xxxx.okta.com/app/xxxxxx_123dhu8o3
         username_attribute: usrEmail
+        description: Updated SAML description
+        idp_certificate: "{{ lookup('ansible.builtin.file', directory_certdir.path + '/cert.pem', rstrip=False) if zabbix_version is version('8.0', '>=') else omit }}"
+        sp_certificate: "{{ lookup('ansible.builtin.file', directory_certdir.path + '/cert.pem', rstrip=False) if zabbix_version is version('8.0', '>=') else omit }}"
+        sp_private_key: "{{ lookup('ansible.builtin.file', directory_certdir.path + '/key.pem', rstrip=False) if zabbix_version is version('8.0', '>=') else omit }}"
         slo_url: http://yyyy.okta.com
         nameid_format: "urn:oasis"
         scim_status: true
@@ -281,8 +392,60 @@
         sign_logout_responses: true
       register: directory_create_all_again_result
 
-    # - ansible.builtin.assert:
-    #     that: directory_create_all_again_result.changed is sameas False
+    - name: Verify optional SAML settings are idempotent
+      ansible.builtin.assert:
+        that: directory_create_all_again_result is not changed
+
+    - name: Clear optional SAML settings without repeating provider details
+      community.zabbix.zabbix_user_directory:
+        description: ""
+        slo_url: ""
+        nameid_format: ""
+        encrypt_nameid: false
+        encrypt_assertions: false
+        sign_messages: false
+        sign_assertions: false
+        sign_authn_requests: false
+        sign_logout_requests: false
+        sign_logout_responses: false
+        sp_certificate: "{{ '' if zabbix_version is version('8.0', '>=') else omit }}"
+        sp_private_key: "{{ '' if zabbix_version is version('8.0', '>=') else omit }}"
+      register: directory_partial
+
+    - name: Repeat the partial SAML update
+      community.zabbix.zabbix_user_directory:
+        description: ""
+        slo_url: ""
+        nameid_format: ""
+        encrypt_nameid: false
+        encrypt_assertions: false
+        sign_messages: false
+        sign_assertions: false
+        sign_authn_requests: false
+        sign_logout_requests: false
+        sign_logout_responses: false
+        sp_certificate: "{{ '' if zabbix_version is version('8.0', '>=') else omit }}"
+        sp_private_key: "{{ '' if zabbix_version is version('8.0', '>=') else omit }}"
+      register: directory_partial_again
+
+    - name: Verify empty and false SAML settings are applied idempotently
+      ansible.builtin.assert:
+        that:
+          - directory_partial is changed
+          - directory_partial_again is not changed
+
+    - name: Reject clearing the required IdP certificate on Zabbix 8
+      when: zabbix_version is version('8.0', '>=')
+      block:
+        - name: Clear the IdP certificate
+          community.zabbix.zabbix_user_directory:
+            idp_certificate: ""
+          ignore_errors: true
+          register: directory_certificate_rejected
+
+        - name: Verify the required certificate was not cleared
+          ansible.builtin.assert:
+            that: directory_certificate_rejected is failed
 
     - name: test - delete SAML user directory
       community.zabbix.zabbix_user_directory:
@@ -295,7 +458,11 @@
         sp_entityid: zabbix
         sso_url: http://xxxx.okta.com/app/xxxxxx_123dhu8o3
         username_attribute: usrEmail
-        provision_status: True
+        idp_certificate: "{{ lookup('ansible.builtin.file', directory_certdir.path + '/cert.pem', rstrip=False) if zabbix_version is version('8.0', '>=') else omit }}"
+        sp_certificate: "{{ lookup('ansible.builtin.file', directory_certdir.path + '/cert.pem', rstrip=False) if zabbix_version is version('8.0', '>=') else omit }}"
+        sp_private_key: "{{ lookup('ansible.builtin.file', directory_certdir.path + '/key.pem', rstrip=False) if zabbix_version is version('8.0', '>=') else omit }}"
+        provision_status: true
+        scim_status: true
         group_name: cn
         user_username: first_name
         user_lastname: last_name
@@ -310,8 +477,9 @@
               - Guests
       register: directory_create_mappings_result
 
-    # - ansible.builtin.assert:
-    #     that: directory_create_mappings_result.changed is sameas True
+    - name: Verify SAML provisioning mappings were created
+      ansible.builtin.assert:
+        that: directory_create_mappings_result is changed
 
     - name: test - create new SAML user directory with mappings again
       community.zabbix.zabbix_user_directory:
@@ -320,7 +488,8 @@
         sp_entityid: zabbix
         sso_url: http://xxxx.okta.com/app/xxxxxx_123dhu8o3
         username_attribute: usrEmail
-        provision_status: True
+        provision_status: true
+        scim_status: true
         group_name: cn
         user_username: first_name
         user_lastname: last_name
@@ -335,5 +504,28 @@
               - Guests
       register: directory_create_mappings_again_result
 
-    # - ansible.builtin.assert:
-    #     that: directory_create_mappings_again_result.changed is sameas False
+    - name: Verify SAML provisioning mappings are idempotent
+      ansible.builtin.assert:
+        that: directory_create_mappings_again_result is not changed
+
+    - name: Disable SAML provisioning and clear its mappings
+      community.zabbix.zabbix_user_directory:
+        provision_status: false
+        scim_status: false
+        provision_groups: []
+        provision_media: []
+      register: directory_provisioning_clear
+
+    - name: Repeat clearing SAML provisioning
+      community.zabbix.zabbix_user_directory:
+        provision_status: false
+        scim_status: false
+        provision_groups: []
+        provision_media: []
+      register: directory_provisioning_clear_again
+
+    - name: Verify provisioning is cleared idempotently
+      ansible.builtin.assert:
+        that:
+          - directory_provisioning_clear is changed
+          - directory_provisioning_clear_again is not changed

@@ -1,4 +1,19 @@
 ---
+- name: Reject Zabbix 8 user group options on older versions
+  when: zabbix_version is version('8.0', '<')
+  block:
+    - name: Try proxy permissions before Zabbix 8
+      community.zabbix.zabbix_usergroup:
+        name: Usergroup unsupported permissions test
+        proxy_mode: allow_list
+      check_mode: true
+      ignore_errors: true
+      register: usergroup_unsupported
+
+    - name: Verify unsupported proxy permissions were rejected
+      ansible.builtin.assert:
+        that: usergroup_unsupported is failed
+
 - name: Test group MFA settings from Zabbix 8.0
   ansible.builtin.include_tasks: mfa_settings.yml
   when: zabbix_version is version('8.0', '>=')

@@ -16,6 +16,17 @@
     community.zabbix.zabbix_usergroup:
       name: Usergroup APM permissions test
   block:
+    - name: Reject duplicate APM filters before creating the group
+      community.zabbix.zabbix_usergroup:
+        apm_filters:
+          - key: service.name
+            value: checkout
+          - key: service.name
+            value: checkout
+      check_mode: true
+      ignore_errors: true
+      register: apm_rejected
+
     - name: Preview creation with APM permissions
       community.zabbix.zabbix_usergroup:
         apm_filters: "{{ usergroup_test_apm_filters }}"
@@ -30,6 +41,7 @@
     - name: Verify creation and read-only check mode
       ansible.builtin.assert:
         that:
+          - apm_rejected is failed
           - apm_preview_create is changed
           - apm_create is changed
 

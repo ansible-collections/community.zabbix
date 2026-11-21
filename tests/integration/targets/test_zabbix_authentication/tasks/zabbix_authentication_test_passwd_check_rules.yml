@@ -1,7 +1,9 @@
 ---
-- name: Start with a known state with one rule enabled
+- name: Enable one password rule supplied twice
   community.zabbix.zabbix_authentication:
-    passwd_check_rules: "avoid_easy_to_guess"
+    passwd_check_rules:
+      - avoid_easy_to_guess
+      - avoid_easy_to_guess
 
 - name: Set request parameters based on Zabbix version (Zabbix == 6.0)
   ansible.builtin.set_fact:

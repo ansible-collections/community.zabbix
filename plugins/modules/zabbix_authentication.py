@@ -152,9 +152,9 @@ options:
         description:
             - User group name to assign the deprovisioned user to.
             - The user group must be disabled and cannot be enabled or deleted when configured.
-            - Required if C(ldap_jit_status) for C(saml_jit_status) enabled.
+            - Required when LDAP or SAML authentication and its corresponding JIT provisioning setting are enabled.
             - This parameter is available since Zabbix 6.4.
-            - If omitted, the existing group is preserved. An empty string clears it when both provisioning modes are disabled.
+            - If omitted, the existing group is preserved. An empty string clears it when neither authentication method has active provisioning.
         required: false
         type: str
     saml_auth_enabled:
@@ -723,9 +723,11 @@ class Authentication(ZabbixBase):
                     self._module.fail_json(msg="authentication_type=ldap requires ldap_auth_enabled=true")
                 if future_authentication.get("ldap_auth_enabled") == "1" and future_authentication.get("ldap_userdirectoryid", "0") == "0":
                     self._module.fail_json(msg="Please set ldap_userdirectory when you change a value of ldap_auth_enabled to true.")
-                if (future_authentication.get("ldap_jit_status") == "1" or future_authentication.get("saml_jit_status") == "1"):
-                    if future_authentication.get("disabled_usrgrpid", "0") == "0":
-                        self._module.fail_json(msg="disabled_usrgroup is required when LDAP or SAML provisioning is enabled")
+                if (
+                    (future_authentication.get("ldap_auth_enabled") == "1" and future_authentication.get("ldap_jit_status") == "1")
+                    or (future_authentication.get("saml_auth_enabled") == "1" and future_authentication.get("saml_jit_status") == "1")
+                ) and future_authentication.get("disabled_usrgrpid", "0") == "0":
+                    self._module.fail_json(msg="disabled_usrgroup is required when LDAP or SAML provisioning is enabled")
             if LooseVersion(self._zbx_api_version) >= LooseVersion("8.0"):
                 if future_authentication.get("mfa_status") == "1" and future_authentication.get("mfaid", "0") == "0":
                     self._module.fail_json(msg="mfa_method is required when global MFA is enabled")

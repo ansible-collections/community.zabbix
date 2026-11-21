@@ -12,6 +12,14 @@
         code_length: 6
       loop: [1, 2]
 
+    - name: Reject a partial MFA method name
+      community.zabbix.zabbix_usergroup:
+        mfa_status: enabled
+        mfa_method: usergroup-mfa-method
+      check_mode: true
+      ignore_errors: true
+      register: mfa_rejected
+
     - name: Preview user group creation with MFA
       community.zabbix.zabbix_usergroup:
         mfa_status: enabled
@@ -28,6 +36,7 @@
     - name: Verify MFA creation and read-only check mode
       ansible.builtin.assert:
         that:
+          - mfa_rejected is failed
           - mfa_preview_create is changed
           - mfa_create is changed
 

@@ -10,6 +10,14 @@
         operating_mode: active
       loop: [1, 2]
 
+    - name: Reject a missing proxy before creating the group
+      community.zabbix.zabbix_usergroup:
+        proxies:
+          - usergroup-permissions-missing-proxy
+      check_mode: true
+      ignore_errors: true
+      register: proxy_rejected
+
     - name: Create proxy group fixtures
       community.zabbix.zabbix_proxy_group:
         name: "usergroup-permissions-group-{{ item }}"
@@ -45,6 +53,7 @@
     - name: Verify creation and read-only check mode
       ansible.builtin.assert:
         that:
+          - proxy_rejected is failed
           - preview_create is changed
           - create_permissions is changed
 

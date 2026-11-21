@@ -4,6 +4,6 @@ minor_changes:
   - zabbix_user_directory - add SAML certificate and private key configuration for Zabbix 8.0 and provisioned media settings.
 bugfixes:
   - zabbix_authentication - preserve omitted provisioning settings, clear explicit empty settings, match LDAP directory names exactly, and manage SAML case sensitivity on current Zabbix versions.
-  - zabbix_authentication - validate effective LDAP, MFA and provisioning requirements and combine duplicate password rules correctly.
+  - zabbix_authentication - validate active authentication and provisioning requirements without rejecting dormant JIT preferences, and combine duplicate password rules correctly.
   - zabbix_user_directory - support partial updates and preserve omitted options while applying explicit empty, false and zero values.
   - zabbix_mfa - support partial method updates and compare public Duo settings without requiring the write-only client secret again.

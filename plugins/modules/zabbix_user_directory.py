@@ -66,7 +66,7 @@ options:
         type: str
     description:
         description:
-            - User directory description.
+            - User directory description for LDAP or SAML.
         required: false
         type: str
     group_membership:
@@ -245,6 +245,7 @@ options:
         type: list
         elements: dict
         description:
+            - Each media type and attribute combination must be unique. Display names may be repeated.
             - Array of the IdP media type mappings objects.
             - This parameter is available since Zabbix 6.4.
         suboptions:
@@ -567,7 +568,7 @@ def main():
         module.fail_json(msg="The idp_type of an existing user directory cannot be changed")
 
     ldap_fields = (
-        "host", "port", "base_dn", "search_attribute", "bind_dn", "bind_password", "description", "start_tls",
+        "host", "port", "base_dn", "search_attribute", "bind_dn", "bind_password", "start_tls",
         "search_filter", "group_basedn", "group_filter", "group_member", "group_membership", "user_ref_attr",
     )
     saml_fields = (
@@ -582,7 +583,9 @@ def main():
     parameters = {"name": name}
     if not current:
         parameters["idp_type"] = {"ldap": 1, "saml": 2}[idp_type]
-    fields = (ldap_fields if idp_type == "ldap" else saml_fields) + ("group_name", "user_lastname", "user_username", "provision_status")
+    fields = (ldap_fields if idp_type == "ldap" else saml_fields) + (
+        "description", "group_name", "user_lastname", "user_username", "provision_status",
+    )
     for field in fields:
         value = module.params[field]
         if value is not None:
@@ -621,22 +624,26 @@ def main():
         if values and not provisioning:
             module.fail_json(msg="provision_status must be true to define %s" % field)
         parameters[field] = []
-        seen_names = set()
+        seen = set()
         for mapping in values:
-            if mapping["name"] in seen_names:
-                module.fail_json(msg="%s must not contain duplicate mapping names" % field)
-            seen_names.add(mapping["name"])
             if field == "provision_media":
                 media = user_directory._zapi.mediatype.get({"filter": {"name": mapping["mediatype"]}})
                 if not media:
                     module.fail_json(msg="Mediatype '%s' cannot be found" % mapping["mediatype"])
                 item = {"name": mapping["name"], "mediatypeid": media[0]["mediatypeid"], "attribute": mapping["attribute"]}
+                identity = (item["mediatypeid"], item["attribute"])
+                if identity in seen:
+                    module.fail_json(msg="provision_media must not contain duplicate mediatype and attribute combinations")
+                seen.add(identity)
                 for option in ("active", "severity", "period"):
                     if mapping[option] is not None:
                         item[option] = int(not mapping[option]) if option == "active" else mapping[option]
                 if "severity" in item and not 0 <= item["severity"] <= 63:
                     module.fail_json(msg="provision_media severity must be between 0 and 63")
             else:
+                if mapping["name"] in seen:
+                    module.fail_json(msg="provision_groups must not contain duplicate mapping names")
+                seen.add(mapping["name"])
                 if len(mapping["user_groups"]) != len(set(mapping["user_groups"])):
                     module.fail_json(msg="provision_groups user_groups must not contain duplicates")
                 roles = user_directory._zapi.role.get({"filter": {"name": mapping["role"]}})

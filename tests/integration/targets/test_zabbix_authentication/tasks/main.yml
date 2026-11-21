@@ -1,15 +1,53 @@
 ---
-- name: Test Zabbix 8 authentication methods
-  ansible.builtin.include_tasks: authentication8.yml
-  when: zabbix_version is version('8.0', '>=')
-
-- name: Test legacy authentication settings
+- name: Test that global MFA requires Zabbix 8
   when: zabbix_version is version('8.0', '<')
   block:
-    - include_tasks: zabbix_authentication_tests.yml
-    - include_tasks: zabbix_authentication_test_passwd_check_rules.yml
+    - name: Reject the global MFA option on older versions
+      community.zabbix.zabbix_authentication:
+        mfa_status: false
+      ignore_errors: true
+      register: authentication_unsupported
+
+    - name: Verify unsupported MFA settings were rejected
+      ansible.builtin.assert:
+        that: authentication_unsupported is failed
+
+- name: Keep the API session while changing authentication methods
+  ansible.builtin.set_fact:
+    ansible_zabbix_auth_key: "{{ ansible_zabbix_auth_key | default(check_login_result.json.result) }}"
+  when: zabbix_version is version('7.0', '>=')
+  no_log: true
+
+- name: Test authentication settings
+  block:
+    - name: Test authentication configuration
+      ansible.builtin.include_tasks: zabbix_authentication_tests.yml
+
+    - name: Test password check rules
+      ansible.builtin.include_tasks: zabbix_authentication_test_passwd_check_rules.yml
+
+    - name: Test global MFA settings
+      ansible.builtin.include_tasks: authentication8.yml
+      when: zabbix_version is version('8.0', '>=')
 
   always:
+    - name: Reset authentication before deleting fixtures
+      community.zabbix.zabbix_authentication:
+        authentication_type: internal
+        ldap_auth_enabled: false
+        ldap_userdirectory: ""
+        saml_auth_enabled: false
+        ldap_jit_status: false
+        saml_jit_status: false
+        disabled_usrgroup: ""
+        http_auth_enabled: false
+        http_login_form: zabbix_login_form
+        http_strip_domains: []
+        passwd_min_length: 8
+        passwd_check_rules: [avoid_easy_to_guess]
+        jit_provision_interval: 1h
+      when: zabbix_version is version('7.0', '>=')
+
     - name: Cleanup
       community.zabbix.zabbix_user_directory:
         name: TestUserDirectory
