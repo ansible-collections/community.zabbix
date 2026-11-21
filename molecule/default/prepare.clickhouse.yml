@@ -1,0 +1,30 @@
+---
+- name: Configure repository for Zabbix SQL scripts
+  include_role:
+    name: community.zabbix.zabbix_repo
+  vars:
+    zabbix_repo_version: "{{ _apm_zabbix_version }}"
+    zabbix_repo_package: zabbix-sql-scripts
+
+- name: Install packaged Zabbix ClickHouse schema scripts
+  package:
+    name: zabbix-sql-scripts
+  register: _apm_sql_scripts
+  until: _apm_sql_scripts is succeeded
+
+- name: Initialize the test data source with the server role
+  include_role:
+    name: community.zabbix.zabbix_server
+    tasks_from: initialize-clickhouse.yml
+  vars:
+    zabbix_server_version: "{{ _apm_zabbix_version }}"
+    zabbix_server_historyproviders: []
+    zabbix_server_telemetryprovider:
+      provider: clickhouse
+      url: "http://{{ inventory_hostname }}-clickhouse:8123"
+      db: zabbixapm
+      username: zabbix
+      password: zabbix
+
+- name: Seed the test telemetry data
+  include_tasks: seed.clickhouse.yml

@@ -1,6 +1,10 @@
 ---
 minor_changes:
   - >-
+    zabbix_server role - configure history and telemetry providers and initialize missing
+    ClickHouse tables using packaged schemas. Set ``zabbix_server_database_telemetry_sqlload=false``
+    to manage schemas separately (https://github.com/ansible-collections/community.zabbix/pull/1813).
+  - >-
     zabbix_proxy - manage APM collection, rate limits, resource attributes and telemetry query
     timeouts on Zabbix 8.0+ (https://github.com/ansible-collections/community.zabbix/pull/1813).
   - >-

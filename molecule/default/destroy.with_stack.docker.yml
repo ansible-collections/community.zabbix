@@ -23,6 +23,14 @@
       loop_control:
         label: "{{ item.name }}"
 
+    - name: Destroy ClickHouse database container(s)
+      community.docker.docker_container:
+        name: "{{ item.name }}-clickhouse"
+        state: absent
+        force_kill: true
+        keep_volumes: false
+      loop: "{{ molecule_yml.platforms }}"
+
     - name: Destroy database container(s)
       community.docker.docker_container:
         name: "{{ item.name }}-db"
