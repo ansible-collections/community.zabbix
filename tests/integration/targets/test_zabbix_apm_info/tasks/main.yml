@@ -1,0 +1,29 @@
+---
+- name: Test APM queries on Zabbix 8.0 or newer
+  when: zabbix_version is version('8.0', '>=')
+  block:
+    - name: Query records and counts for all telemetry signals
+      community.zabbix.zabbix_apm_info:
+        signal: "{{ item.0 }}"
+        time_from: 1794956400
+        time_till: 1794960000
+        output: [service_name]
+        count_output: "{{ item.1 }}"
+        limit: 1
+      loop: "{{ ['traces', 'spans', 'metrics', 'logs'] | product([false, true]) | list }}"
+      register: apm_queries
+      # The standard API fixture has no ClickHouse database. Check its explicit
+      # error below; a fixture with APM storage also verifies successful results.
+      failed_when: false
+
+    - name: Verify query responses or the missing APM database error
+      ansible.builtin.assert:
+        that:
+          - item.changed is sameas false
+          - item.zabbix_apm is defined or 'APM DB is not configured.' in item.msg | default('')
+          - item.zabbix_apm is not defined or item.zabbix_apm.signal == item.item.0
+          - item.zabbix_apm is not defined or item.zabbix_apm.records | type_debug == 'list'
+          - item.zabbix_apm is not defined or item.zabbix_apm.count | type_debug == 'int'
+      loop: "{{ apm_queries.results }}"
+      loop_control:
+        label: "{{ item.item }}"

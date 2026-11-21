@@ -122,3 +122,9 @@
         state: absent
       loop:
         - /var/www/html/index.html
+
+    - name: Prepare packaged ClickHouse schema and fake trace
+      include_tasks: ../default/prepare.clickhouse.yml
+      vars:
+        _apm_zabbix_version: "{{ zabbix_web_version }}"
+      when: zabbix_web_version is version('8.0', '>=')

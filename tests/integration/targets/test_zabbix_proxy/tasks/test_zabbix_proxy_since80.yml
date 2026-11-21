@@ -1,0 +1,116 @@
+---
+- name: Test APM proxy lifecycle
+  block:
+    - name: Create APM proxy with resource attributes for every signal
+      community.zabbix.zabbix_proxy:
+        proxy_name: ansible_apm_proxy_test
+        apm:
+          data_collection_status: 1
+          max_messages_per_second: 100
+          additional_resource_attributes:
+            - {key: environment, value: production, signal_type: 0}
+            - {key: environment, value: production, signal_type: 1}
+            - {key: environment, value: '', signal_type: 2}
+      register: created
+
+    - name: Verify APM proxy was created
+      ansible.builtin.assert:
+        that: created is changed
+
+    - name: Repeat APM settings with reordered attributes
+      community.zabbix.zabbix_proxy:
+        proxy_name: ansible_apm_proxy_test
+        apm:
+          data_collection_status: 1
+          max_messages_per_second: 100
+          additional_resource_attributes:
+            - {key: environment, value: '', signal_type: 2}
+            - {key: environment, value: production, signal_type: 1}
+            - {key: environment, value: production, signal_type: 0}
+      register: repeated
+
+    - name: Verify APM settings are idempotent
+      ansible.builtin.assert:
+        that: repeated is not changed
+
+    - name: Retrieve APM proxy settings
+      community.zabbix.zabbix_proxy_info:
+        proxy_name: ansible_apm_proxy_test
+      register: info
+
+    - name: Verify APM settings are returned
+      ansible.builtin.assert:
+        that:
+          - info.zabbix_proxy.apm.data_collection_status | int == 1
+          - info.zabbix_proxy.apm.max_messages_per_second | int == 100
+          - info.zabbix_proxy.apm.additional_resource_attributes | length == 3
+
+    - name: Remove rate limit and resource attributes
+      community.zabbix.zabbix_proxy:
+        proxy_name: ansible_apm_proxy_test
+        apm:
+          max_messages_per_second: 0
+          additional_resource_attributes: []
+      register: cleared
+
+    - name: Repeat removal in check mode
+      community.zabbix.zabbix_proxy:
+        proxy_name: ansible_apm_proxy_test
+        apm:
+          max_messages_per_second: 0
+          additional_resource_attributes: []
+      check_mode: true
+      register: checked
+
+    - name: Verify removal and check mode idempotence
+      ansible.builtin.assert:
+        that:
+          - cleared is changed
+          - checked is not changed
+
+    - name: Predict disabling collection in check mode
+      community.zabbix.zabbix_proxy:
+        proxy_name: ansible_apm_proxy_test
+        apm:
+          data_collection_status: 0
+      check_mode: true
+      register: predicted
+
+    - name: Verify check mode did not change the proxy
+      community.zabbix.zabbix_proxy_info:
+        proxy_name: ansible_apm_proxy_test
+      register: unchanged
+
+    - name: Verify collection is still enabled and attributes were cleared
+      ansible.builtin.assert:
+        that:
+          - predicted is changed
+          - unchanged.zabbix_proxy.apm.data_collection_status | int == 1
+          - unchanged.zabbix_proxy.apm.max_messages_per_second | int == 0
+          - unchanged.zabbix_proxy.apm.additional_resource_attributes == []
+
+    - name: Disable APM collection
+      community.zabbix.zabbix_proxy:
+        proxy_name: ansible_apm_proxy_test
+        apm:
+          data_collection_status: 0
+      register: disabled
+
+    - name: Repeat disabled collection
+      community.zabbix.zabbix_proxy:
+        proxy_name: ansible_apm_proxy_test
+        apm:
+          data_collection_status: 0
+      register: still_disabled
+
+    - name: Verify disabling is idempotent
+      ansible.builtin.assert:
+        that:
+          - disabled is changed
+          - still_disabled is not changed
+
+  always:
+    - name: Remove APM test proxy
+      community.zabbix.zabbix_proxy:
+        proxy_name: ansible_apm_proxy_test
+        state: absent

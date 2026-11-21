@@ -24,6 +24,16 @@
   tags:
     - always
 
+- name: Check that APM is supported
+  ansible.builtin.assert:
+    that:
+      - zabbix_proxy_version is version('8.0', '>=')
+      - _zabbix_proxy_os_key in ['RedHat-10', 'Ubuntu-24', 'Ubuntu-26', 'Debian-12', 'Debian-13']
+    fail_msg: APM proxies require Zabbix 8.0+ on Red Hat family 10+, Ubuntu 24.04+, or Debian 12+.
+  when: zabbix_proxy_apm_enabled | bool
+  tags:
+    - always
+
 - name: "Set default ip address for zabbix_proxy_ip"
   ansible.builtin.set_fact:
     zabbix_proxy_ip: "{{ ansible_facts['default_ipv4'].address | default(ansible_facts['all_ipv4_addresses'][0]) }}"
@@ -43,6 +53,12 @@
     zabbix_repo_package: "zabbix-proxy-{{ zabbix_proxy_database }}"
   when: zabbix_manage_repo | default(true)
 
+- name: Install APM dependencies
+  ansible.builtin.include_tasks: apm.yml
+  when: zabbix_proxy_apm_enabled | bool
+  tags:
+    - install
+
 - name: "Configure SELinux when enabled"
   ansible.builtin.include_tasks: selinux.yml
   when: ansible_facts.selinux.status | default('disabled') == 'enabled'
@@ -59,6 +75,21 @@
   register: _zabbix_proxy_package_installed
   until: _zabbix_proxy_package_installed is succeeded
   become: true
+  tags:
+    - install
+
+- name: Select the installed zabbix-proxy executable
+  community.general.alternatives:
+    name: zabbix-proxy
+    link: /usr/sbin/zabbix_proxy
+    path: "/usr/sbin/zabbix_proxy_{{ zabbix_proxy_database }}{{ zabbix_proxy_apm_enabled | bool | ternary('_apm', '') }}"
+    state: selected
+  when:
+    - ansible_facts.os_family == 'RedHat'
+    - ansible_facts.distribution_major_version | int >= 10
+    - zabbix_proxy_version is version('8.0', '>=')
+  become: true
+  notify: restart zabbix-proxy
   tags:
     - install
 
@@ -211,6 +242,8 @@
     timeout_telnet_agent: "{{ zabbix_proxy_timeout_telnet_agent | default(omit) }}"
     timeout_script: "{{ zabbix_proxy_timeout_script | default(omit) }}"
     timeout_browser: "{{ zabbix_proxy_timeout_browser | default(omit) }}"
+    timeout_telemetry_query: "{{ zabbix_proxy_timeout_telemetry_query | default(omit) }}"
+    apm: "{{ (zabbix_proxy_apm_enabled | bool and zabbix_proxy_version is version('8.0', '>=')) | ternary(zabbix_proxy_apm, omit) }}"
     tls_connect: "{{ _zabbix_proxy_module_tls_map[zabbix_proxy_tlsaccept] }}"
     tls_accept: "{{ _zabbix_proxy_module_tls_map[zabbix_proxy_tlsconnect] }}"
     tls_psk: "{{ zabbix_proxy_tlspsk_secret | default(omit) }}"

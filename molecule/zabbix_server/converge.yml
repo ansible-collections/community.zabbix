@@ -4,3 +4,8 @@
 
   roles:
     - role: zabbix_server
+
+  post_tasks:
+    - name: Seed telemetry after the role initializes the empty ClickHouse database
+      include_tasks: ../default/seed.clickhouse.yml
+      when: zabbix_server_version is version('8.0', '>=')

@@ -66,3 +66,43 @@
         that:
           - _zabbix_api_response.json.result is defined
           - _zabbix_api_response.json.result | length > 0
+
+    - name: Verify APM frontend connection
+      when: zabbix_web_version is version('8.0', '>=')
+      vars:
+        ansible_connection: httpapi
+        ansible_network_os: community.zabbix.zabbix
+        ansible_host: 127.0.0.1
+        ansible_httpapi_port: "{{ 8000 + (molecule_yml.platforms | map(attribute='name') | list).index(inventory_hostname) }}"
+        ansible_httpapi_use_ssl: false
+        ansible_zabbix_url_path: ''
+        ansible_zabbix_http_headers:
+          Host: "{{ zabbix_api_server_url }}"
+        ansible_user: Admin
+        ansible_httpapi_pass: zabbix
+      block:
+        - name: Query records and counts for all four signals through the module
+          community.zabbix.zabbix_apm_info:
+            signal: "{{ item.0 }}"
+            time_from: 0
+            time_till: "{{ ansible_facts.date_time.epoch | int + 3600 }}"
+            output: [service_name]
+            count_output: "{{ item.1 }}"
+            limit: 1
+          loop: "{{ ['traces', 'spans', 'metrics', 'logs'] | product([false, true]) | list }}"
+          delegate_to: localhost
+          register: _apm_queries
+
+        - name: Assert the frontend returned the seeded trace and normalized results
+          assert:
+            that:
+              - item.changed is sameas false
+              - item.zabbix_apm.signal == item.item.0
+              - item.zabbix_apm.records | type_debug == 'list'
+              - item.zabbix_apm.count | type_debug == 'int'
+              - item.zabbix_apm.count == ((item.item.0 in ['traces', 'spans']) | ternary(1, 0))
+              - item.zabbix_apm.records | length == (item.item.1 | ternary(0, item.zabbix_apm.count))
+              - item.item.1 or item.item.0 not in ['traces', 'spans'] or item.zabbix_apm.records[0].service_name == 'molecule-apm'
+          loop: "{{ _apm_queries.results }}"
+          loop_control:
+            label: "{{ item.item }}"
