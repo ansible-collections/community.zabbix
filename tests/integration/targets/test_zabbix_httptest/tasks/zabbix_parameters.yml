@@ -21,6 +21,8 @@
       variables:
         - name: "{test}"
           value: value
+        - name: "{other}"
+          value: other
       steps:
         - name: Test
           url: https://example.com
@@ -31,6 +33,11 @@
           posts:
             - name: form
               value: ""
+          variables:
+            - name: "{step_test}"
+              value: value
+            - name: "{step_other}"
+              value: other
   loop: [first, repeat]
   register: zbx_httptest_parameters_created
 
@@ -43,6 +50,32 @@
 - name: Test parameter updates, check mode, and idempotency
   ansible.builtin.include_tasks: zabbix_parameter_update.yml
   loop:
+    - name: reordered scenario variables
+      changed: false
+      params:
+        variables:
+          - name: "{other}"
+            value: other
+          - name: "{test}"
+            value: value
+    - name: reordered step variables
+      changed: false
+      params:
+        steps:
+          - name: Test
+            url: https://example.com
+            variables:
+              - name: "{step_other}"
+                value: other
+              - name: "{step_test}"
+                value: value
+    - name: changed scenario variable value
+      params:
+        variables:
+          - name: "{other}"
+            value: other
+          - name: "{test}"
+            value: updated
     - name: step properties and raw POST data
       params:
         steps:

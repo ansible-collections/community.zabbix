@@ -137,6 +137,7 @@ options:
                     - Scenario steps for the httptest
                     - Required if state is "present" and creating an httptest.
                     - Steps without an explicit I(params.steps.no) are numbered by their position in the list.
+                    - When updating, this list replaces all existing steps. Include every step to retain; omitted steps are deleted.
                 required: false
                 type: list
                 elements: dict
@@ -155,7 +156,8 @@ options:
                         type: str
                     httpstepid:
                         description:
-                            - ID of an existing step to update. Allows partial updates to that step.
+                            - ID of an existing step to update. Allows omitting fields such as I(params.steps.name) and I(params.steps.url).
+                            - The I(params.steps) list still replaces all existing steps; include every step to retain.
                         type: str
                     'no':
                         description:
@@ -605,6 +607,9 @@ class Httptest(ZabbixBase):
         elif key == 'tags':
             desired = sorted(desired, key=lambda tag: (tag['tag'], tag.get('value', '')))
             current = sorted(current, key=lambda tag: (tag['tag'], tag.get('value', '')))
+        elif key == 'variables':
+            desired = sorted(desired, key=lambda variable: variable['name'])
+            current = sorted(current, key=lambda variable: variable['name'])
         if isinstance(desired, dict):
             return isinstance(current, dict) and all(
                 field in current and self.params_equal(value, current[field], field)
