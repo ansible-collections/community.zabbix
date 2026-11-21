@@ -1,0 +1,2 @@
+minor_changes:
+  - zabbix_agent role - add ``zabbix_api_auth_key`` and ``zabbix_api_url_path`` variables so API token authentication and a custom Zabbix WebUI URL path can be configured consistently with the other ``zabbix_api_*`` variables, instead of having to set ``ansible_zabbix_auth_key``/``ansible_zabbix_url_path`` directly (https://github.com/ansible-collections/community.zabbix/pull/1777).
