@@ -1,0 +1,257 @@
+---
+- name: Create the parent LLD rule
+  community.zabbix.zabbix_discoveryrule:
+    name: Prototype parent
+    host_name: "{{ prototype_target.host_name | default(omit) }}"
+    template_name: "{{ prototype_target.template_name | default(omit) }}"
+    params:
+      type: zabbix_trapper
+      key: prototype.parent.discovery
+
+- name: Test LLD rule prototype lifecycle
+  module_defaults:
+    community.zabbix.zabbix_discoveryruleprototype:
+      name: !unsafe 'Nested discovery for {#SERVICE}'
+      discoveryrule_name: Prototype parent
+      host_name: "{{ prototype_target.host_name | default(omit) }}"
+      template_name: "{{ prototype_target.template_name | default(omit) }}"
+  vars:
+    nested_params:
+      type: nested
+      key: !unsafe 'nested.discovery[{#SERVICE}]'
+  block:
+    - name: Predict prototype creation
+      community.zabbix.zabbix_discoveryruleprototype:
+        params: "{{ nested_params }}"
+      check_mode: true
+      register: prototype_create_check
+
+    - name: Create the prototype
+      community.zabbix.zabbix_discoveryruleprototype:
+        params: "{{ nested_params }}"
+      register: prototype_create
+
+    - name: Repeat prototype creation
+      community.zabbix.zabbix_discoveryruleprototype:
+        params: "{{ nested_params }}"
+      register: prototype_repeat
+
+    - name: Predict the unchanged prototype
+      community.zabbix.zabbix_discoveryruleprototype:
+        params: "{{ nested_params }}"
+      check_mode: true
+      register: prototype_repeat_check
+
+    - name: Assert creation and idempotence
+      ansible.builtin.assert:
+        that:
+          - prototype_create_check is changed
+          - prototype_create is changed
+          - prototype_repeat is not changed
+          - prototype_repeat_check is not changed
+
+    - name: Predict a prototype update
+      community.zabbix.zabbix_discoveryruleprototype:
+        params:
+          enabled: false
+      check_mode: true
+      register: prototype_update_check
+
+    - name: Update the prototype
+      community.zabbix.zabbix_discoveryruleprototype:
+        params:
+          enabled: "false"
+      register: prototype_update
+
+    - name: Repeat the prototype update
+      community.zabbix.zabbix_discoveryruleprototype:
+        params:
+          enabled: false
+      register: prototype_update_repeat
+
+    - name: Assert update and check mode behavior
+      ansible.builtin.assert:
+        that:
+          - prototype_update_check is changed
+          - prototype_update is changed
+          - prototype_update_repeat is not changed
+
+    - name: Rename the prototype
+      community.zabbix.zabbix_discoveryruleprototype:
+        params:
+          new_name: !unsafe 'Renamed discovery for {#SERVICE}'
+      register: prototype_rename
+
+    - name: Repeat the prototype rename
+      community.zabbix.zabbix_discoveryruleprototype:
+        params:
+          new_name: !unsafe 'Renamed discovery for {#SERVICE}'
+      register: prototype_rename_repeat
+
+    - name: Assert rename and idempotence
+      ansible.builtin.assert:
+        that:
+          - prototype_rename is changed
+          - prototype_rename_repeat is not changed
+
+    - name: Create a child under an LLD rule prototype
+      community.zabbix.zabbix_discoveryruleprototype:
+        name: !unsafe 'Child discovery for {#SERVICE}'
+        discoveryrule_name: !unsafe 'Renamed discovery for {#SERVICE}'
+        params:
+          type: script
+          key_: !unsafe 'child.discovery[{#SERVICE}]'
+          delay: 1m
+          enabled: false
+          params: 'return "[]";'
+          preprocessing:
+            - type: javascript
+              params: return value;
+          parameters:
+            - name: alpha
+              value: first
+            - name: beta
+              value: second
+          lld_macro_paths:
+            - lld_macro: !unsafe '{#SERVICE}'
+              path: $.service
+            - lld_macro: !unsafe '{#INSTANCE}'
+              path: $.instance
+      register: prototype_child
+
+    - name: Assert that the child was created
+      ansible.builtin.assert:
+        that: prototype_child is changed
+
+    - name: Ignore reordered child parameters and macro paths
+      community.zabbix.zabbix_discoveryruleprototype:
+        name: !unsafe 'Child discovery for {#SERVICE}'
+        discoveryrule_name: !unsafe 'Renamed discovery for {#SERVICE}'
+        params:
+          parameters:
+            - name: beta
+              value: second
+            - name: alpha
+              value: first
+          lld_macro_paths:
+            - lld_macro: !unsafe '{#INSTANCE}'
+              path: $.instance
+            - lld_macro: !unsafe '{#SERVICE}'
+              path: $.service
+      check_mode: "{{ item }}"
+      loop: [false, true]
+      register: prototype_reordered
+
+    - name: Assert that collection order does not cause updates
+      ansible.builtin.assert:
+        that:
+          - prototype_reordered is not changed
+
+    - name: Update a child parameter and macro path and repeat
+      community.zabbix.zabbix_discoveryruleprototype:
+        name: !unsafe 'Child discovery for {#SERVICE}'
+        discoveryrule_name: !unsafe 'Renamed discovery for {#SERVICE}'
+        params:
+          parameters:
+            - name: beta
+              value: updated
+            - name: alpha
+              value: first
+          lld_macro_paths:
+            - lld_macro: !unsafe '{#INSTANCE}'
+              path: $.instance_id
+            - lld_macro: !unsafe '{#SERVICE}'
+              path: $.service
+      loop: [1, 2]
+      register: prototype_parameter_update
+
+    - name: Assert meaningful changes and subsequent idempotence
+      ansible.builtin.assert:
+        that:
+          - prototype_parameter_update.results[0] is changed
+          - prototype_parameter_update.results[1] is not changed
+
+    - name: Reject invalid prototype types and preprocessing steps
+      community.zabbix.zabbix_discoveryruleprototype:
+        params: "{{ item }}"
+      loop:
+        - type: unsupported_type
+        - preprocessing:
+            - type: unsupported_step
+      register: prototype_invalid
+      ignore_errors: true
+
+    - name: Assert that invalid choices fail validation
+      ansible.builtin.assert:
+        that:
+          - item is failed
+          - "'value of type must be one of' in item.msg"
+      loop: "{{ prototype_invalid.results }}"
+
+    - name: Test telemetry query prototypes
+      ansible.builtin.include_tasks: zabbix_telemetry_tests.yml
+      when: zabbix_version is version('8.0', '>=')
+
+    - name: Reject telemetry query prototypes before Zabbix 8.0
+      community.zabbix.zabbix_discoveryruleprototype:
+        params:
+          type: telemetry_query
+          key: !unsafe 'telemetry.unsupported[{#SERVICE}]'
+      register: prototype_unsupported
+      ignore_errors: true
+      when: zabbix_version is version('8.0', '<')
+
+    - name: Assert that unsupported telemetry queries fail clearly
+      ansible.builtin.assert:
+        that:
+          - prototype_unsupported is failed
+          - "'require Zabbix 8.0' in prototype_unsupported.msg"
+      when: zabbix_version is version('8.0', '<')
+
+    - name: Predict prototype deletion
+      community.zabbix.zabbix_discoveryruleprototype:
+        name: !unsafe 'Renamed discovery for {#SERVICE}'
+        state: absent
+      check_mode: true
+      register: prototype_delete_check
+
+    - name: Delete the prototype and its child
+      community.zabbix.zabbix_discoveryruleprototype:
+        name: !unsafe 'Renamed discovery for {#SERVICE}'
+        state: absent
+      register: prototype_delete
+
+    - name: Repeat prototype deletion
+      community.zabbix.zabbix_discoveryruleprototype:
+        name: !unsafe 'Renamed discovery for {#SERVICE}'
+        state: absent
+      register: prototype_delete_repeat
+
+    - name: Assert deletion and idempotence
+      ansible.builtin.assert:
+        that:
+          - prototype_delete_check is changed
+          - prototype_delete is changed
+          - prototype_delete_repeat is not changed
+
+    - name: Reject a missing parent
+      community.zabbix.zabbix_discoveryruleprototype:
+        discoveryrule_name: Missing parent
+        params: "{{ nested_params }}"
+      register: prototype_missing_parent
+      ignore_errors: true
+
+    - name: Assert that a missing parent fails clearly
+      ansible.builtin.assert:
+        that:
+          - prototype_missing_parent is failed
+          - "'was not found' in prototype_missing_parent.msg"
+
+  always:
+    - name: Remove the parent and any remaining prototypes
+      community.zabbix.zabbix_discoveryrule:
+        name: Prototype parent
+        host_name: "{{ prototype_target.host_name | default(omit) }}"
+        template_name: "{{ prototype_target.template_name | default(omit) }}"
+        state: absent
+      ignore_errors: true

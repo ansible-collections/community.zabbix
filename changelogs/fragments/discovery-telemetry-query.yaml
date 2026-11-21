@@ -1,0 +1,3 @@
+minor_changes:
+  - zabbix_discoveryrule - support the ``telemetry_query`` type (24) and document ``query``, ``time_shift``, ``lookback_limit``, ``granularity`` and timeout behavior for Zabbix 8.0.
+  - zabbix_discoveryruleprototype - add a module to manage LLD rule prototypes, including telemetry queries on Zabbix 8.0, check mode and named parents on hosts and templates.

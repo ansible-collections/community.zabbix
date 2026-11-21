@@ -1,0 +1,37 @@
+---
+- name: Skip LLD rule prototype tests before Zabbix 7.4
+  ansible.builtin.meta: end_play
+  when: zabbix_version is version('7.4', '<')
+
+- name: Test LLD rule prototypes
+  block:
+    - name: Create the prototype test template
+      community.zabbix.zabbix_template:
+        template_name: PrototypeTestTemplate
+        template_groups:
+          - Templates
+
+    - name: Create the prototype test host
+      community.zabbix.zabbix_host:
+        host_name: PrototypeTestHost
+        host_groups:
+          - Linux servers
+
+    - name: Test prototypes on hosts and templates
+      ansible.builtin.include_tasks: zabbix_tests.yml
+      loop:
+        - host_name: PrototypeTestHost
+        - template_name: PrototypeTestTemplate
+      loop_control:
+        loop_var: prototype_target
+
+  always:
+    - name: Remove the prototype test host
+      community.zabbix.zabbix_host:
+        host_name: PrototypeTestHost
+        state: absent
+
+    - name: Remove the prototype test template
+      community.zabbix.zabbix_template:
+        template_name: PrototypeTestTemplate
+        state: absent

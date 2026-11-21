@@ -10,6 +10,39 @@
     # zabbix_discoveryrule module tests
     - include_tasks: zabbix_tests.yml
 
+    - name: Reject unsupported telemetry settings before writes and check mode exits
+      community.zabbix.zabbix_discoveryrule:
+        name: Unsupported telemetry discovery
+        host_name: ExampleHost
+        params: "{{ item.0 }}"
+      check_mode: "{{ item.1 }}"
+      loop: "{{ unsupported_telemetry_params | product([false, true]) | list }}"
+      vars:
+        unsupported_telemetry_params:
+          - type: telemetry_query
+            key: telemetry.unsupported
+          - query: {}
+      register: telemetry_unsupported
+      ignore_errors: true
+      when: zabbix_version is version('8.0', '<')
+
+    - name: Assert unsupported telemetry settings fail clearly
+      ansible.builtin.assert:
+        that:
+          - item is failed
+          - "'require Zabbix 8.0' in item.msg"
+      loop: "{{ telemetry_unsupported.results }}"
+      when: zabbix_version is version('8.0', '<')
+
+    - name: Test telemetry LLD rules on hosts and templates
+      ansible.builtin.include_tasks: zabbix_telemetry_tests.yml
+      loop:
+        - host_name: ExampleHost
+        - template_name: ExampleTemplate
+      loop_control:
+        loop_var: telemetry_target
+      when: zabbix_version is version('8.0', '>=')
+
     # tear down stuff set up earlier
     - include_tasks: zabbix_teardown.yml
 

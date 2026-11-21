@@ -1,0 +1,129 @@
+---
+- name: Test telemetry query LLD rule lifecycle
+  module_defaults:
+    community.zabbix.zabbix_discoveryrule:
+      name: Telemetry discovery
+      host_name: "{{ telemetry_target.host_name | default(omit) }}"
+      template_name: "{{ telemetry_target.template_name | default(omit) }}"
+  vars:
+    telemetry_query:
+      signal_type: 0
+      columns:
+        - column: ResourceAttributes
+          attribute_key: service.name
+      aggregated_columns:
+        - function: 4
+          alias: record_count
+      filter:
+        evaltype: 0
+        conditions: []
+    telemetry_params:
+      type: telemetry_query
+      key: telemetry.discovery
+      interval: 1m
+      enabled: false
+      query: "{{ telemetry_query }}"
+      time_shift: 15s
+      lookback_limit: 10m
+      granularity: 15s
+      timeout: 5s
+  block:
+    - name: Predict telemetry rule creation
+      community.zabbix.zabbix_discoveryrule:
+        params: "{{ telemetry_params }}"
+      check_mode: true
+      register: telemetry_create_check
+
+    - name: Create the telemetry rule
+      community.zabbix.zabbix_discoveryrule:
+        params: "{{ telemetry_params }}"
+      register: telemetry_create
+
+    - name: Repeat telemetry rule creation
+      community.zabbix.zabbix_discoveryrule:
+        params: "{{ telemetry_params }}"
+      register: telemetry_repeat
+
+    - name: Assert creation and idempotence
+      ansible.builtin.assert:
+        that:
+          - telemetry_create_check is changed
+          - telemetry_create is changed
+          - telemetry_repeat is not changed
+
+    - name: Update the telemetry query and time settings
+      community.zabbix.zabbix_discoveryrule:
+        params:
+          query: "{{ telemetry_query | combine({'signal_type': 2}) }}"
+          time_shift: 30s
+          lookback_limit: 20m
+          granularity: 1m
+          timeout: ""
+      register: telemetry_update
+
+    - name: Repeat telemetry query and time settings update
+      community.zabbix.zabbix_discoveryrule:
+        params:
+          query: "{{ telemetry_query | combine({'signal_type': 2}) }}"
+          time_shift: 30s
+          lookback_limit: 20m
+          granularity: 1m
+          timeout: ""
+      register: telemetry_update_repeat
+
+    - name: Assert update and idempotence
+      ansible.builtin.assert:
+        that:
+          - telemetry_update is changed
+          - telemetry_update_repeat is not changed
+
+    - name: Read the persisted telemetry rule from the API
+      ansible.builtin.uri:
+        url: "{{ zabbix_api_server_url }}/api_jsonrpc.php"
+        method: POST
+        headers:
+          Authorization: "Bearer {{ check_login_result.json.result }}"
+        body_format: json
+        body:
+          jsonrpc: "2.0"
+          method: discoveryrule.get
+          params:
+            itemids: "{{ telemetry_create.result[0].itemids }}"
+            output: [type, query, time_shift, lookback_limit, granularity, timeout]
+          id: 1
+      vars:
+        ansible_connection: local
+      register: telemetry_api_result
+
+    - name: Assert the stored telemetry type, query and time settings
+      ansible.builtin.assert:
+        that:
+          - telemetry_api_result.json.result | length == 1
+          - telemetry_api_result.json.result[0].type | int == 24
+          - telemetry_api_result.json.result[0].query.signal_type | int == 2
+          - telemetry_api_result.json.result[0].time_shift == '30s'
+          - telemetry_api_result.json.result[0].lookback_limit == '20m'
+          - telemetry_api_result.json.result[0].granularity == '1m'
+          - telemetry_api_result.json.result[0].timeout == ''
+
+    - name: Delete the telemetry rule
+      community.zabbix.zabbix_discoveryrule:
+        state: absent
+      register: telemetry_delete
+
+    - name: Repeat telemetry rule deletion
+      community.zabbix.zabbix_discoveryrule:
+        state: absent
+      register: telemetry_delete_repeat
+
+    - name: Assert deletion and idempotence
+      ansible.builtin.assert:
+        that:
+          - telemetry_delete is changed
+          - telemetry_delete_repeat is not changed
+
+  always:
+    - name: Cleanup the telemetry rule
+      community.zabbix.zabbix_discoveryrule:
+        state: absent
+      ignore_errors: true
