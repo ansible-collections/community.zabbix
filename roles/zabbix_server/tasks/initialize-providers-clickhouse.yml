@@ -39,7 +39,7 @@
         - install
         - dependencies
 
-    # The schema scripts read connection options from $CURL_HOME/.curlrc.
+    # Table checks and schema scripts read connection options from $CURL_HOME/.curlrc.
     - name: ClickHouse | Create temporary curl home
       ansible.builtin.tempfile:
         state: directory
@@ -69,26 +69,28 @@
       ansible.builtin.command:
         argv:
           - curl
-          - --disable
-          - --config
-          - "{{ _zabbix_server_clickhouse_home.path }}/.curlrc"
           - "{{ _clickhouse_url }}"
           - --data-binary
           - "SELECT name FROM system.tables WHERE database = '{{ _clickhouse_db }}' FORMAT TSV"
+      environment:
+        CURL_HOME: "{{ _zabbix_server_clickhouse_home.path }}"
       register: _zabbix_server_clickhouse_tables
       check_mode: false
       changed_when: false
 
+    - name: ClickHouse | Determine missing schemas
+      ansible.builtin.set_fact:
+        _clickhouse_missing_schemas: >-
+          {{ _clickhouse_schemas | rejectattr('tables', 'subset', _zabbix_server_clickhouse_tables.stdout_lines) | list }}
+
     - name: ClickHouse | Report missing schemas in check mode
       ansible.builtin.debug:
         msg: "Would import ClickHouse schema: {{ item.script }}"
-      loop: "{{ _clickhouse_schemas }}"
+      loop: "{{ _clickhouse_missing_schemas }}"
       loop_control:
         label: "{{ item.script }}"
       changed_when: true
-      when:
-        - ansible_check_mode
-        - item.tables is not subset(_zabbix_server_clickhouse_tables.stdout_lines)
+      when: ansible_check_mode
 
     - name: ClickHouse | Import missing schemas
       ansible.builtin.command:
@@ -101,12 +103,10 @@
           - "{{ _clickhouse_db }}"
       environment:
         CURL_HOME: "{{ _zabbix_server_clickhouse_home.path }}"
-      loop: "{{ _clickhouse_schemas }}"
+      loop: "{{ _clickhouse_missing_schemas }}"
       loop_control:
         label: "{{ item.script }}"
-      when:
-        - not ansible_check_mode
-        - item.tables is not subset(_zabbix_server_clickhouse_tables.stdout_lines)
+      when: not ansible_check_mode
       register: _zabbix_server_clickhouse_import
       changed_when: true
       # History scripts can mask curl failures; the curlrc makes them report errors on stderr.
