@@ -19,12 +19,8 @@ _zabbix_server_clickhouse_history_schemas:
   json: {script: history_json_schema.sh, tables: [history_json]}
 
 _zabbix_server_clickhouse_telemetry_schemas:
-  - script: otel_logs_schema.sh
-    tables: [otel_logs]
-  - script: otel_traces_schema.sh
-    tables: [otel_traces]
-  - script: otel_metrics_schema.sh
-    tables: [otel_metrics_gauge, otel_metrics_sum, otel_metrics_histogram, otel_metrics_exponential_histogram]
+  - script: otel_all.sh
+    tables: [otel_logs, otel_traces, otel_metrics_gauge, otel_metrics_sum, otel_metrics_histogram, otel_metrics_exponential_histogram]
 
 _zabbix_server_database_schemas:
   mysql:

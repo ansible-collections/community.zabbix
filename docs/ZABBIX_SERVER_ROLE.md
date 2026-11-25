@@ -193,7 +193,7 @@ ClickHouse, its databases and its users must already exist. The role uses each p
 
 Provide the ClickHouse endpoint as a full `url`, for example `https://clickhouse.example.com:8443` or `http://clickhouse.example.com:8123`. Schema initialization requires an explicit port so table checks and the official import scripts use the same endpoint. The URL is passed through unchanged, including paths and query strings. Provider values override the schema-initialization defaults below, and null provider options use those defaults.
 
-Table checks use `ansible.builtin.uri`. A minimal curl fallback handles source-IP binding, encrypted client keys and CA directories, which `uri` cannot configure. The official packaged schema scripts themselves require Bash and curl for imports. Temporary credential files are private and removed after each provider is initialized.
+Table checks and the official packaged schema scripts use the same temporary curl configuration, so credentials, TLS options and source-IP settings apply consistently to both. The scripts require Bash and curl. Temporary credential files are private and removed after each provider is initialized.
 
 Set credentials and TLS files in the provider dictionary. Source IP, CA location and client certificate/key directories inherit the existing server settings when omitted. These role defaults control schema initialization; the configuration template renders the provider dictionary directly.
 

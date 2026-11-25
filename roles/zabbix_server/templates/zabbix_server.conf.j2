@@ -58,7 +58,7 @@
   'username': 'string',
   'value_types': 'list'
 } %}
-{% for provider in zabbix_server_historyproviders or [] %}
+{% for provider in zabbix_server_historyproviders %}
 {% set options = [] %}
 {% for name, kind in option_types.items() if provider[name] is defined and provider[name] is not none %}
 {% set value = provider[name] %}
@@ -68,7 +68,7 @@
 {% set _ = options.append(name ~ '="' ~ (value | join(',') if kind == 'list' else value) ~ '"') %}
 {% endif %}
 {% endfor %}
-{{ (provider.provider is defined and provider.provider is not none) | ternary('', '# ') }}HistoryProvider={{ provider.provider | default('') }}{{ ';' ~ (options | join(',')) if options else '' }}
+HistoryProvider={{ provider.provider }}{{ ';' ~ (options | join(',')) if options else '' }}
 {% endfor %}
 {% endif %}
 {% if zabbix_server_version is version('8.0', '<') or not zabbix_server_historyproviders %}
@@ -139,7 +139,7 @@
 {% endif %}
 {{ (zabbix_server_startsnmptrapper is defined and zabbix_server_startsnmptrapper is not none) | ternary('', '# ') }}StartSNMPTrapper={{ zabbix_server_startsnmptrapper | default('') }}
 {% if zabbix_server_version is version('8.0', '>=') %}
-{{ (zabbix_server_starttelemetryquerypollers is defined and zabbix_server_starttelemetryquerypollers is not none) | ternary('', '# ') }}StartTelemetryQueryPollers={{ zabbix_server_starttelemetryquerypollers | default('') }}
+StartTelemetryQueryPollers={{ zabbix_server_starttelemetryquerypollers }}
 {% endif %}
 {{ (zabbix_server_starttimers is defined and zabbix_server_starttimers is not none) | ternary('', '# ') }}StartTimers={{ zabbix_server_starttimers | default('') }}
 {{ (zabbix_server_starttrappers is defined and zabbix_server_starttrappers is not none) | ternary('', '# ') }}StartTrappers={{ zabbix_server_starttrappers | default('') }}
@@ -171,7 +171,7 @@
 {% set _ = options.append(name ~ '="' ~ provider[name] ~ '"') %}
 {% endif %}
 {% endfor %}
-{{ (provider.provider is defined and provider.provider is not none) | ternary('', '# ') }}TelemetryProvider={{ provider.provider | default('') }}{{ ';' ~ (options | join(',')) if options else '' }}
+TelemetryProvider={{ provider.provider }}{{ ';' ~ (options | join(',')) if options else '' }}
 {% else %}
 # TelemetryProvider=
 {% endfor %}
