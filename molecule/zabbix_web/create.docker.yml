@@ -24,9 +24,29 @@
         _database_groups: ['mysql', 'pgsql']
         _db_type: "{{ item.groups | intersect(_database_groups) | first }}"
       block:
-        - name: Create ClickHouse database container(s)
-          include_tasks: ../default/create.clickhouse.yml
+        - name: Create ClickHouse container(s)
+          community.docker.docker_container:
+            name: "{{ item.name }}-clickhouse"
+            # APM requires ClickHouse 26.8.17.4 or later.
+            image: clickhouse/clickhouse-server:26.9.21.9
+            state: healthy
+            recreate: true
+            networks:
+              - name: zabbix
+            env:
+              CLICKHOUSE_DB: zabbixapm
+              CLICKHOUSE_USER: zabbix
+              CLICKHOUSE_PASSWORD: zabbix
+            ulimits:
+              - nofile:262144:262144
+            healthcheck:
+              # Not localhost: the entrypoint's init server listens there first.
+              test: ["CMD-SHELL", "clickhouse-client --host \"$(hostname -i)\" --user zabbix --password zabbix --query 'SELECT 1'"]
+              interval: 2s
+              retries: 30
           loop: "{{ molecule_yml.platforms }}"
+          loop_control:
+            label: "{{ item.name }}-clickhouse"
           when: "'v80' in item.groups"
 
         - name: Create Zabbix server database container(s)

@@ -5,6 +5,9 @@
 
   gather_facts: false
 
+  vars:
+    _database_groups: ['mysql', 'pgsql']
+
   pre_tasks:
     - name: Create network
       community.docker.docker_network:
@@ -23,7 +26,6 @@
       loop: "{{ molecule_yml.platforms }}"
       when: (item.groups | intersect(_database_groups) | length) > 0
       vars:
-        _database_groups: ['mysql', 'pgsql']
         _db_type: "{{ item.groups | intersect(_database_groups) | first }}"
         # Zabbix 8.0+ needs PostgreSQL 15+ and TimescaleDB 2.20-2.29
         _pgsql_13_versions: ['v60', 'v70', 'v74']
@@ -36,12 +38,35 @@
             image: "timescale/timescaledb:{{ _pgsql_tag }}"
             env: { POSTGRES_PASSWORD: changeme }
 
-    - name: Create ClickHouse database container(s)
-      include_tasks: create.clickhouse.yml
-      loop: "{{ molecule_yml.platforms }}"
-      when:
-        - "'v80' in item.groups"
-        - (item.groups | intersect(['mysql', 'pgsql', 'sqlite3']) | length) > 0
+    - name: Create ClickHouse container(s)
+      community.docker.docker_container:
+        name: "{{ item.name }}-clickhouse"
+        # APM requires ClickHouse 26.8.17.4 or later.
+        image: clickhouse/clickhouse-server:26.9.21.9
+        state: healthy
+        recreate: true
+        networks:
+          - name: zabbix
+        env:
+          CLICKHOUSE_DB: zabbixapm
+          CLICKHOUSE_USER: zabbix
+          CLICKHOUSE_PASSWORD: zabbix
+        ulimits:
+          - nofile:262144:262144
+        healthcheck:
+          # Not localhost: the entrypoint's init server listens there first.
+          test: ["CMD-SHELL", "clickhouse-client --host \"$(hostname -i)\" --user zabbix --password zabbix --query 'SELECT 1'"]
+          interval: 2s
+          retries: 30
+      loop: "{{ _clickhouse_platforms }}"
+      loop_control:
+        label: "{{ item.name }}-clickhouse"
+      when: _is_server_scenario
+      vars:
+        # Only the server scenario needs ClickHouse; repo and javagateway have no database groups.
+        _is_server_scenario: "{{ molecule_yml.platforms | map(attribute='groups') | flatten | intersect(_database_groups) | length > 0 }}"
+        # APM and ClickHouse history/telemetry start at Zabbix 8.0.
+        _clickhouse_platforms: "{{ molecule_yml.platforms | selectattr('groups', 'contains', 'v80') }}"
 
     - name: Create OS container(s)
       community.docker.docker_container:

@@ -1,4 +1,4 @@
 ---
 collections:
   - name: community.docker
-    version: ">=3.0.0"
+    version: ">=3.11.0"

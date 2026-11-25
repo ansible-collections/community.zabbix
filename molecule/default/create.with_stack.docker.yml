@@ -74,46 +74,31 @@
           ZBX_TELEMETRYPROVIDER_0_USERNAME: zabbix
           ZBX_TELEMETRYPROVIDER_0_PASSWORD: zabbix
       block:
-        - name: With ClickHouse
-          when: _is_proxy_scenario
-          vars:
-            _clickhouse_port: "{{ 8100 + (_version | regex_replace('v', '') | int) }}"
-          block:
-            - name: Create ClickHouse container(s)
-              community.docker.docker_container:
-                name: "zabbix-server-{{ _version }}-clickhouse"
-                # APM requires ClickHouse 26.8.17.4 or later.
-                image: clickhouse/clickhouse-server:26.9.21.9
-                state: started
-                recreate: true
-                networks:
-                  - name: zabbix
-                published_ports:
-                  - "127.0.0.1:{{ _clickhouse_port }}:8123"
-                env:
-                  CLICKHOUSE_DB: zabbixapm
-                  CLICKHOUSE_USER: zabbix
-                  CLICKHOUSE_PASSWORD: zabbix
-                ulimits:
-                  - nofile:262144:262144
-              loop: "{{ _active_versions | intersect(_clickhouse_versions) }}"
-              loop_control:
-                loop_var: _version
-                label: "zabbix-server-{{ _version }}-clickhouse"
-
-            # The server entrypoint creates schemas on startup, so ClickHouse
-            # must answer before the server container starts.
-            - name: Wait for ClickHouse to answer
-              ansible.builtin.uri:
-                url: "http://127.0.0.1:{{ _clickhouse_port }}/ping"
-              register: _clickhouse_ping
-              until: _clickhouse_ping.status == 200
+        - name: Create ClickHouse container(s)
+          community.docker.docker_container:
+            name: "zabbix-server-{{ _version }}-clickhouse"
+            # APM requires ClickHouse 26.8.17.4 or later.
+            image: clickhouse/clickhouse-server:26.9.21.9
+            state: healthy
+            recreate: true
+            networks:
+              - name: zabbix
+            env:
+              CLICKHOUSE_DB: zabbixapm
+              CLICKHOUSE_USER: zabbix
+              CLICKHOUSE_PASSWORD: zabbix
+            ulimits:
+              - nofile:262144:262144
+            healthcheck:
+              # Not localhost: the entrypoint's init server listens there first.
+              test: ["CMD-SHELL", "clickhouse-client --host \"$(hostname -i)\" --user zabbix --password zabbix --query 'SELECT 1'"]
+              interval: 2s
               retries: 30
-              delay: 2
-              loop: "{{ _active_versions | intersect(_clickhouse_versions) }}"
-              loop_control:
-                loop_var: _version
-                label: "zabbix-server-{{ _version }}-clickhouse"
+          loop: "{{ _active_versions | intersect(_clickhouse_versions) }}"
+          loop_control:
+            loop_var: _version
+            label: "zabbix-server-{{ _version }}-clickhouse"
+          when: _is_proxy_scenario
 
         - name: Create Zabbix server database container(s)
           community.docker.docker_container:
