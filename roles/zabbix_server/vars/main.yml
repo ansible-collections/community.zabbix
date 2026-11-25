@@ -7,6 +7,9 @@ _zabbix_server_database_scripts_dir: "{{ zabbix_server_version is version('7.0',
 _zabbix_server_database_scripts_dir_post72: /usr/share/zabbix/sql-scripts
 _zabbix_server_database_scripts_dir_pre72: /usr/share/zabbix-sql-scripts
 
+# History and telemetry providers with their own initialize-providers-<provider>.yml.
+_zabbix_server_providers_with_tasks_file: ['clickhouse']
+
 _zabbix_server_clickhouse_history_schemas:
   dbl: {script: history_schema.sh, tables: [history]}
   uint: {script: history_uint_schema.sh, tables: [history_uint]}

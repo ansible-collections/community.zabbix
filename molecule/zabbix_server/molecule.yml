@@ -78,13 +78,13 @@ provisioner:
       v80:
         zabbix_server_version: "8.0"
         zabbix_server_telemetryprovider:
-          provider: clickhouse
-          url: "http://{{ inventory_hostname }}-clickhouse:8123"
-          db: zabbixapm
-          username: zabbix
-          password: zabbix
-          ssl_verify_peer: false
-          ssl_verify_host: false
+          - provider: clickhouse
+            url: "http://{{ inventory_hostname }}-clickhouse:8123"
+            db: zabbixapm
+            username: zabbix
+            password: zabbix
+            ssl_verify_peer: false
+            ssl_verify_host: false
         zabbix_server_historyproviders:
           - provider: clickhouse
             value_types:

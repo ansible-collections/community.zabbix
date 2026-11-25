@@ -121,7 +121,7 @@ zabbix_server_starttelemetryquerypollers: 1
 zabbix_server_starttimers: 1
 zabbix_server_starttrappers: 5
 zabbix_server_startvmwarecollectors: 0
-zabbix_server_telemetryprovider: {}
+zabbix_server_telemetryprovider: []
 zabbix_server_timeout: 3
 zabbix_server_tmpdir: /tmp
 zabbix_server_trappertimeout: 300

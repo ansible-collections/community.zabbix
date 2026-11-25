@@ -23,6 +23,17 @@
   tags:
     - always
 
+- name: Check telemetry provider configuration
+  ansible.builtin.assert:
+    that:
+      - zabbix_server_telemetryprovider | type_debug == 'list'
+      - zabbix_server_telemetryprovider | length <= 1
+      - zabbix_server_telemetryprovider | reject('mapping') | list | length == 0
+    fail_msg: zabbix_server_telemetryprovider must be a list containing zero or one provider dictionary.
+  when: zabbix_server_version is version('8.0', '>=')
+  tags:
+    - always
+
 - name: Install Repository
   ansible.builtin.include_role:
     name: community.zabbix.zabbix_repo
@@ -54,8 +65,11 @@
 - name: "Initialize the database"
   ansible.builtin.include_tasks: "initialize-{{ zabbix_server_database }}.yml"
 
-- name: Initialize ClickHouse history and telemetry schemas
-  ansible.builtin.include_tasks: initialize-clickhouse.yml
+- name: Initialize history and telemetry providers
+  when:
+    - zabbix_server_version is version('8.0', '>=')
+    - zabbix_server_database_telemetry_sqlload | bool
+  ansible.builtin.include_tasks: initialize-providers.yml
   tags:
     - database
 

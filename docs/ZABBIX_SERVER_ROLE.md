@@ -207,7 +207,7 @@ Set credentials and TLS files in the provider dictionary. Source IP, CA location
 
 Use a ClickHouse version that meets the [Zabbix requirements for a telemetry data source](https://www.zabbix.com/documentation/8.0/en/manual/installation/requirements).
 
-* `zabbix_server_telemetryprovider`: Dictionary configuring the single `TelemetryProvider`. Default: `{}`, which leaves Zabbix using the global data source configured in **Administration > Data source**. Set `provider: clickhouse` and define `url`, connection, TLS or Vault options using their names in the [server documentation](https://www.zabbix.com/documentation/8.0/en/manual/concepts/server/server_params#telemetryprovider). YAML booleans are rendered as `1` or `0`, and string values are quoted and rendered directly.
+* `zabbix_server_telemetryprovider`: List containing zero or one provider dictionary configuring `TelemetryProvider`. Default: `[]`, which leaves Zabbix using the global data source configured in **Administration > Data source**. Multiple telemetry providers are rejected. Set `provider: clickhouse` and define `url`, connection, TLS or Vault options using their names in the [server documentation](https://www.zabbix.com/documentation/8.0/en/manual/concepts/server/server_params#telemetryprovider). YAML booleans are rendered as `1` or `0`, and string values are quoted and rendered directly.
 * `zabbix_server_starttelemetryquerypollers`: Number of telemetry query pollers. Default: `1`. Set to `0` to disable these pollers.
 
 ```yaml
@@ -216,11 +216,11 @@ Use a ClickHouse version that meets the [Zabbix requirements for a telemetry dat
     - role: community.zabbix.zabbix_server
       zabbix_server_version: "8.0"
       zabbix_server_telemetryprovider:
-        provider: clickhouse
-        url: https://clickhouse.example.com:8443
-        db: zabbixapm
-        username: zabbix
-        password: "{{ clickhouse_password }}"
+        - provider: clickhouse
+          url: https://clickhouse.example.com:8443
+          db: zabbixapm
+          username: zabbix
+          password: "{{ clickhouse_password }}"
       zabbix_server_starttelemetryquerypollers: 2
 ```
 
@@ -466,7 +466,7 @@ The following table lists all variables that are exposed to modify the configura
 |StartVMwareCollectors | zabbix_server_startvmwarecollectors | 0 |  |
 |StasAllowedIP | zabbix_server_statsallowedip | |  |
 |Timeout | zabbix_server_timeout | 3 |  |
-|TelemetryProvider | zabbix_server_telemetryprovider | `{}` | Dictionary; version 8.0 or later |
+|TelemetryProvider | zabbix_server_telemetryprovider | `[]` | List containing zero or one provider dictionary; version 8.0 or later |
 |TLSCAFile | zabbix_server_tlscafile | |  |
 |TLSCertFile | zabbix_server_tlscertfile | |  |
 |TLSCipherAll | zabbix_server_tlscipherall | |  |

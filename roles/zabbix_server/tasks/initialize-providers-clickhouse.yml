@@ -1,5 +1,8 @@
 ---
-- name: ClickHouse | Verify or import provider schemas
+- name: ClickHouse | Verify or import {{ _provider_kind }} schemas
+  become: true
+  tags:
+    - database
   vars:
     # Normalize optional provider fields once for table checks and the import scripts.
     _clickhouse_connection: >-
@@ -17,7 +20,13 @@
         'ssl_key_password': none,
         'ssl_verify_peer': zabbix_server_clickhouse_ssl_verify_peer,
         'ssl_verify_host': zabbix_server_clickhouse_ssl_verify_host
-      } | combine(_clickhouse_provider | dict2items | rejectattr('value', 'none') | items2dict) }}
+      } | combine(_backend | dict2items | rejectattr('value', 'none') | items2dict) }}
+    _clickhouse_schemas: >-
+      {{ (_clickhouse_connection.value_types
+          | default(_zabbix_server_clickhouse_history_schemas.keys() | list)
+          | unique | map('extract', _zabbix_server_clickhouse_history_schemas) | list)
+         if _provider_kind == 'history'
+         else _zabbix_server_clickhouse_telemetry_schemas }}
     _clickhouse_table_query: "SELECT name FROM system.tables WHERE database = '{{ _clickhouse_connection.db }}' FORMAT TSV"
     # uri cannot bind a source IP, decrypt a client key, or load a CA directory.
     _clickhouse_curl_required: >-
