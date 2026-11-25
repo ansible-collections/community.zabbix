@@ -23,12 +23,14 @@
       vars:
         _database_groups: ['mysql', 'pgsql']
         _db_type: "{{ item.groups | intersect(_database_groups) | first }}"
+        _clickhouse_platforms: "{{ molecule_yml.platforms | selectattr('groups', 'contains', 'v80') }}"
       block:
         - name: Create ClickHouse container(s)
           community.docker.docker_container:
             name: "{{ item.name }}-clickhouse"
             # APM requires ClickHouse 26.8.17.4 or later.
             image: clickhouse/clickhouse-server:26.9.21.9
+            # The server entrypoint creates the telemetry schema, so ClickHouse must answer first.
             state: healthy
             recreate: true
             networks:
@@ -44,10 +46,9 @@
               test: ["CMD-SHELL", "clickhouse-client --host \"$(hostname -i)\" --user zabbix --password zabbix --query 'SELECT 1'"]
               interval: 2s
               retries: 30
-          loop: "{{ molecule_yml.platforms }}"
+          loop: "{{ _clickhouse_platforms }}"
           loop_control:
             label: "{{ item.name }}-clickhouse"
-          when: "'v80' in item.groups"
 
         - name: Create Zabbix server database container(s)
           community.docker.docker_container:
@@ -82,12 +83,18 @@
             recreate: true
             networks:
               - name: zabbix
-            env: "{{ _container[_db_type].env }}"
+            env: "{{ _container[_db_type].env | combine((item in _clickhouse_platforms) | ternary(_telemetry_env, {})) }}"
           loop: "{{ molecule_yml.platforms }}"
           loop_control:
             label: "{{ item.name }}-server"
           vars:
             _version: "{{ item.groups | intersect(_version_groups) | first }}"
+            # The server entrypoint creates the telemetry schema in ClickHouse.
+            _telemetry_env:
+              ZBX_TELEMETRYPROVIDER_0: '{"provider":"clickhouse","url":"http://{{ item.name }}-clickhouse:8123","db":"zabbixapm"}'
+              ZBX_TELEMETRYPROVIDER_0_USERNAME: zabbix
+              ZBX_TELEMETRYPROVIDER_0_PASSWORD: zabbix
+              ZBX_TELEMETRYPROVIDER_0_SCHEMA: '{"create":true}'
             _container:
               mysql:
                 env:
@@ -100,6 +107,28 @@
                   POSTGRES_USER: zabbix
                   POSTGRES_PASSWORD: zabbix
                   DB_SERVER_HOST: "{{ item.name }}-db"
+
+        - name: Seed a fake trace once the server has created the telemetry schema
+          community.docker.docker_container_exec:
+            container: "{{ item.name }}-clickhouse"
+            argv:
+              - clickhouse-client
+              - "--host={{ item.name }}-clickhouse"
+              - --user=zabbix
+              - --password=zabbix
+              - >-
+                --query=INSERT INTO zabbixapm.otel_traces
+                (Timestamp, TraceId, SpanId, SpanName, SpanKind, ServiceName, Duration, StatusCode)
+                VALUES (now64(9), '0123456789abcdef0123456789abcdef', '0123456789abcdef',
+                'Molecule APM test', 'Server', 'molecule-apm', 1000000, 'Ok')
+          register: _seed
+          # otel_traces appears once the server entrypoint has run.
+          until: _seed.rc == 0
+          retries: 30
+          delay: 2
+          loop: "{{ _clickhouse_platforms }}"
+          loop_control:
+            label: "{{ item.name }}-clickhouse"
 
   tasks:
     - name: Create OS container(s)
