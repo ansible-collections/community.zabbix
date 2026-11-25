@@ -1,5 +1,6 @@
 import os
 import pytest
+from configparser import ConfigParser
 from pathlib import Path
 
 
@@ -19,3 +20,15 @@ def test_zabbix_manage_repo_installed(host):
     elif os in ["opensuse-leap"]:
         result = host.ansible("command", "zypper refresh", check=False, become=True)["rc"]
     assert result == 0
+
+
+def test_managed_epel(host):
+    facts = host.ansible("setup", "filter=ansible_os_family")["ansible_facts"]
+    if facts["ansible_os_family"] != "RedHat":
+        pytest.skip("EPEL management applies only to Red Hat family systems")
+
+    assert host.package("epel-release").is_installed
+    repo = ConfigParser()
+    repo.read_string(host.file("/etc/yum.repos.d/epel.repo").content_string)
+    assert repo.getboolean("epel", "enabled")
+    assert "zabbix*" in repo.get("epel", "excludepkgs").split()

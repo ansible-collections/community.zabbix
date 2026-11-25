@@ -54,6 +54,15 @@ Installing this role is very simple: `ansible-galaxy install community.zabbix.za
 
 Please be aware that this role only installs the repo itself.  It is generally used by the various other Zabbix roles (i.e. server or web) and not normally used by itself.
 
+On supported Red Hat family systems, set `zabbix_repo_manage_epel: true` to install
+`epel-release` from the configured repositories, enable EPEL, and set
+`excludepkgs=zabbix*` in the `[epel]` section of `/etc/yum.repos.d/epel.repo`.
+This keeps dependencies available while selecting Zabbix packages from the official
+repository. The default is `false`, which leaves EPEL configuration unchanged.
+When enabled, the role manages that exclusion setting. If `epel-release` is
+unavailable from your configured repositories, bootstrap EPEL before running the role.
+CRB (CodeReady Builder), required for APM dependencies, must be enabled separately.
+
 # Role Variables
 
 * `zabbix_repo_apt_priority`: Default: `1001`. An integer value for the priority of the repo.
@@ -67,6 +76,7 @@ Please be aware that this role only installs the repo itself.  It is generally u
 * `zabbix_repo_gpg_key`: Optional: The keyring path.  Default: `{{ debian_keyring_path }}zabbix-repo.asc`
 * `zabbix_repo_keyring_path`: Optional: The path to store keyrings in Debian distributions.  Default: `/etc/apt/keyrings/`
 * `zabbix_repo_package`: The name of the package to lock the apt priority to.
+* `zabbix_repo_manage_epel`: Boolean, default: `false`. Set to `true` to install and enable EPEL and exclude its Zabbix packages on supported Red Hat family systems. Ignored on other platforms.
 * `zabbix_repo_version`: Optional. The main version (i.e. major.minor) of Zabbix that will be installed on the host(s).  Default: 6.4
 * `zabbix_repo_yum`: A list with Yum repository configuration.
 * `zabbix_repo_yum_gpgcheck`:  Default: `1`. Yum should check GPG keys.

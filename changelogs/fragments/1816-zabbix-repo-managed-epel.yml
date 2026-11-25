@@ -1,0 +1,6 @@
+---
+minor_changes:
+  - >-
+    zabbix_repo role - optionally install and enable EPEL on supported Red Hat family systems
+    and exclude its Zabbix packages with ``zabbix_repo_manage_epel=true``. Disabled by default
+    (https://github.com/ansible-collections/community.zabbix/pull/1816).

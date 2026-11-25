@@ -34,6 +34,7 @@ provisioner:
     group_vars:
       all:
         ansible_connection: community.docker.docker
+        zabbix_repo_manage_epel: true
       v74:
         zabbix_proxy_version: 7.4
       v70:

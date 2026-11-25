@@ -41,3 +41,33 @@
   become: true
   tags:
     - install
+
+- name: "RedHat | Configure EPEL"
+  when: zabbix_repo_manage_epel | bool
+  become: true
+  tags:
+    - install
+  block:
+    - name: "RedHat | Install epel-release"
+      ansible.builtin.package:
+        name: epel-release
+        state: present
+      environment:
+        http_proxy: "{{ zabbix_http_proxy | default('') }}"
+        https_proxy: "{{ zabbix_https_proxy | default('') }}"
+      register: _zabbix_repo_epel_installed
+      until: _zabbix_repo_epel_installed is succeeded
+
+    - name: "RedHat | Enable EPEL and exclude its Zabbix packages"
+      community.general.ini_file:
+        path: /etc/yum.repos.d/epel.repo
+        section: epel
+        option: "{{ item.option }}"
+        value: "{{ item.value }}"
+        no_extra_spaces: true
+        mode: "0644"
+      loop:
+        - option: enabled
+          value: "1"
+        - option: excludepkgs
+          value: "zabbix*"
