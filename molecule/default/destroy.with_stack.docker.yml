@@ -23,14 +23,6 @@
       loop_control:
         label: "{{ item.name }}"
 
-    - name: Destroy ClickHouse database container(s)
-      community.docker.docker_container:
-        name: "{{ item.name }}-clickhouse"
-        state: absent
-        force_kill: true
-        keep_volumes: false
-      loop: "{{ molecule_yml.platforms }}"
-
     - name: Destroy database container(s)
       community.docker.docker_container:
         name: "{{ item.name }}-db"
@@ -48,6 +40,9 @@
         # flatten                   => [ "mysql", "v74", "pgsql", "v70", "sqlite3", "v60", ... ]
         # intersect(_version_groups => [ "v74", "v70", "v60" ]
         _active_versions: "{{ molecule_yml.platforms | map(attribute='groups') | flatten | intersect(_version_groups) }}"
+        _database_groups: ['mysql', 'pgsql', 'sqlite3']
+        _is_proxy_scenario: "{{ molecule_yml.platforms | map(attribute='groups') | flatten | intersect(_database_groups) | length > 0 }}"
+        _clickhouse_versions: ['v80']
       block:
         - name: Destroy Zabbix web container
           community.docker.docker_container:
@@ -68,6 +63,18 @@
           loop_control:
             label: "zabbix-server-{{ _version }}"
             loop_var: _version
+
+        - name: Destroy ClickHouse container(s)
+          community.docker.docker_container:
+            name: "zabbix-server-{{ _version }}-clickhouse"
+            state: absent
+            force_kill: true
+            keep_volumes: false
+          loop: "{{ _active_versions | intersect(_clickhouse_versions) }}"
+          loop_control:
+            label: "zabbix-server-{{ _version }}-clickhouse"
+            loop_var: _version
+          when: _is_proxy_scenario
 
         - name: Destroy Zabbis database container
           community.docker.docker_container:

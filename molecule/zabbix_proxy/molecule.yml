@@ -95,7 +95,6 @@ provisioner:
         zabbix_proxy_configfrequency: 10
         zabbix_api_create_proxy: true
         ansible_zabbix_url_path: ""
-        zabbix_proxy_apm_enabled: false
       psk:
         zabbix_proxy_tlspskfile: "/home/zabbix/proxy_psk"
         zabbix_proxy_tlspskidentity: "PSK {{ inventory_hostname }}"
@@ -134,7 +133,7 @@ provisioner:
         zabbix_proxy_telemetryprovider: "{{ zabbix_proxy_apm_enabled | bool | ternary(_zabbix_proxy_test_telemetryprovider, {}) }}"
         _zabbix_proxy_test_telemetryprovider:
           provider: clickhouse
-          url: "http://{{ inventory_hostname }}-clickhouse:8123"
+          url: "http://{{ zabbix_proxy_server }}-clickhouse:8123"
           db: zabbixapm
           username: zabbix
           password: zabbix

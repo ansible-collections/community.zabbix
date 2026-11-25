@@ -13,7 +13,8 @@
           - _proxy_package in ansible_facts.packages
           - zabbix_proxy_version in (ansible_facts.packages[_proxy_package] | first).version
       vars:
-        _proxy_package: "zabbix-proxy-{{ zabbix_proxy_database }}{{ (zabbix_proxy_apm_enabled | bool and ansible_facts.os_family == 'RedHat') | ternary('-apm', '') }}"
+        # Verify runs separately and does not load the proxy role's defaults.
+        _proxy_package: "zabbix-proxy-{{ zabbix_proxy_database }}{{ (zabbix_proxy_apm_enabled | default(false) | bool and ansible_facts.os_family == 'RedHat') | ternary('-apm', '') }}"
 
     - name: Verify the selected Red Hat proxy executable
       ansible.builtin.stat:
@@ -82,7 +83,7 @@
               - "'APMListenIP=0.0.0.0' in _proxy_conf_lines"
               - "'APMListenPort=4317' in _proxy_conf_lines"
               - >-
-                'TelemetryProvider=clickhouse;db="zabbixapm",password="zabbix",ssl_verify_host=0,ssl_verify_peer=0,url="http://' ~ inventory_hostname ~ '-clickhouse:8123",username="zabbix"' in _proxy_conf_lines
+                'TelemetryProvider=clickhouse;db="zabbixapm",password="zabbix",ssl_verify_host=0,ssl_verify_peer=0,url="http://' ~ zabbix_proxy_server ~ '-clickhouse:8123",username="zabbix"' in _proxy_conf_lines
             quiet: true
           vars:
             _proxy_conf_lines: "{{ (_proxy_conf.content | b64decode).splitlines() }}"
