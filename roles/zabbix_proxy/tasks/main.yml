@@ -34,6 +34,25 @@
   tags:
     - always
 
+- name: Check dependency repository configuration for Red Hat APM
+  ansible.builtin.assert:
+    that:
+      - >-
+        ((zabbix_manage_repo | default(true) | bool) and
+         (zabbix_repo_manage_epel | default(false) | bool)) or
+        zabbix_proxy_disable_repo is defined
+    fail_msg: >-
+      Red Hat APM proxies require dependencies from EPEL and CRB or equivalent repositories.
+      Enable CRB and set zabbix_repo_manage_epel=true with zabbix_manage_repo=true,
+      or configure dependency repositories yourself and explicitly set
+      zabbix_proxy_disable_repo (for example, [] to keep EPEL available).
+      Dependency repositories must exclude their Zabbix packages.
+  when:
+    - zabbix_proxy_apm_enabled | bool
+    - ansible_facts.os_family == 'RedHat'
+  tags:
+    - always
+
 - name: "Set default ip address for zabbix_proxy_ip"
   ansible.builtin.set_fact:
     zabbix_proxy_ip: "{{ ansible_facts['default_ipv4'].address | default(ansible_facts['all_ipv4_addresses'][0]) }}"
@@ -52,12 +71,6 @@
     zabbix_repo_version: "{{ zabbix_proxy_version }}"
     zabbix_repo_package: "zabbix-proxy-{{ zabbix_proxy_database }}"
   when: zabbix_manage_repo | default(true)
-
-- name: Install APM dependencies
-  ansible.builtin.include_tasks: apm.yml
-  when: zabbix_proxy_apm_enabled | bool
-  tags:
-    - install
 
 - name: "Configure SELinux when enabled"
   ansible.builtin.include_tasks: selinux.yml

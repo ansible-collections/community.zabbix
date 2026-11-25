@@ -76,6 +76,12 @@
         - zabbix_proxy_version is version('8.0', '>=')
         - zabbix_proxy_apm_enabled | bool
       block:
+        - name: Assert Red Hat APM dependencies are installed
+          ansible.builtin.assert:
+            that:
+              - "'grpc-cpp' in ansible_facts.packages"
+          when: ansible_facts.os_family == 'RedHat'
+
         - name: Assert APM collector and telemetry provider configuration
           assert:
             that:

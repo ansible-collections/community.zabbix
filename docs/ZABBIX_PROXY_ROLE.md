@@ -51,30 +51,32 @@ On Red Hat family 10+ with Zabbix 8.0+, the role also selects the matching
 `zabbix-proxy` executable through alternatives, including when switching an existing
 proxy between standard and APM packages.
 
-For Red Hat APM proxies, install the EPEL repository and enable the CRB (CodeReady
-Builder) repository before running the role, or provide private mirrors containing
-the required packages. The role validates APM settings before configuring repositories,
-then installs `zabbix_proxy_apm_dependencies` using the OS package manager. The default
-list is `['grpc-cpp']` on Red Hat and `[]` elsewhere. On Red Hat, the dependency
-transaction enables EPEL and disables optional weak dependencies.
-The subsequent Zabbix package installation disables EPEL for that transaction only;
-the role does not disable EPEL globally or configure EPEL/CRB itself.
-
-With `zabbix_manage_repo: false`, configure your repositories before running the role.
-APM dependencies are still installed using those repositories. If EPEL is not configured,
-override `zabbix_proxy_apm_enable_repo` with your mirror IDs, or set it to `[]` to use
-only repositories already enabled on the host. Use `zabbix_proxy_disable_repo` to exclude
-any mirror providing unwanted Zabbix packages during the proxy package installation.
-
-`zabbix_proxy_apm_enable_repo` defaults to `['epel']` on Red Hat and `[]` elsewhere.
-DNF enables the listed repositories only for the APM dependency transaction; the
-repository configuration remains unchanged. For example, to use a configured private mirror:
+For Red Hat APM proxies, enable the CRB (CodeReady Builder) repository before
+running the role, and set `zabbix_repo_manage_epel: true`. With repository management
+enabled, `zabbix_repo` installs `epel-release` from the configured repositories,
+enables EPEL, and sets `excludepkgs=zabbix*` in its `[epel]` section. DNF resolves
+APM dependencies, including `grpc-cpp`, when installing the proxy package.
 
 ```yaml
 zabbix_proxy_apm_enabled: true
-zabbix_proxy_apm_enable_repo:
-  - private-epel
+zabbix_repo_manage_epel: true
 ```
+
+With `zabbix_manage_repo: false`, configure the Zabbix, EPEL, and CRB repositories
+or private mirrors before running the role. EPEL management is disabled by default,
+leaving its configuration unchanged. Ensure dependency repositories exclude
+their Zabbix packages so the official packages are selected. On Red Hat, the proxy
+package transaction disables EPEL by default, preserving existing behavior; opting
+into EPEL management leaves it available. When managing EPEL separately for APM,
+set `zabbix_proxy_disable_repo: []` to make its dependencies available during
+proxy installation. This variable also allows custom repository exclusions.
+
+Before configuring repositories or installing packages, the role checks that
+Red Hat APM installations either enable repository management with
+`zabbix_repo_manage_epel: true` or explicitly set `zabbix_proxy_disable_repo`
+for user-managed dependency repositories. Omitting both produces an actionable
+error. This checks the repository configuration choice; DNF still validates
+dependency availability when installing packages.
 
 # Requirements
 ## Ansible 2.10 and higher
@@ -168,7 +170,7 @@ The following is an overview of all available configuration default for this rol
 ### Yum/APT
 * `zabbix_repo_yum`: A list with Yum repository configuration.
 * `zabbix_repo_yum_schema`: Default: `https`. Option to change the web schema for the yum repository(http/https)
-* `zabbix_proxy_disable_repo`: A list of repos to disable during install.  Default `epel`.
+* `zabbix_proxy_disable_repo`: Optional list of repositories to disable during package installation. Default: `['epel']` on Red Hat, or `[]` when `zabbix_repo_manage_epel: true`. Set to `[]` when using a separately managed EPEL repository for APM dependencies.
 * `zabbix_proxy_package_state`: Default: `present`. Can be overridden to `latest` to update packages
 * `zabbix_repo_deb_url`: The URL to the Zabbix repository.  Default `http://repo.zabbix.com/zabbix/{{ zabbix_proxy_version }}/{{ ansible_distribution.lower() }}`
 * `zabbix_repo_deb_component`: The repository component for Debian installs. Default `main`.
@@ -477,15 +479,13 @@ With API management disabled, enable APM in the frontend or with `community.zabb
 
 | Variable | Default | Purpose |
 | --- | --- | --- |
-| `zabbix_proxy_apm_enabled` | `false` | Select APM packages and render collector settings. |
-| `zabbix_proxy_apm_dependencies` | `['grpc-cpp']` on Red Hat, otherwise `[]` | Overridable list of packages installed before the APM proxy packages. An empty list skips explicit dependency installation. |
-| `zabbix_proxy_apm_enable_repo` | `['epel']` on Red Hat, otherwise `[]` | Red Hat only: repository IDs to enable temporarily for APM dependencies, in addition to the host's enabled repositories. Set to `[]` when using only already enabled repositories. |
+| `zabbix_proxy_apm_enabled` | `false` | Select APM packages and enable the collector by default. |
 | `zabbix_proxy_startapmcollector` | `1` when APM is enabled, otherwise `0` | `StartAPMCollector`, accepts 0 or 1. |
 | `zabbix_proxy_apmlistenip` | `0.0.0.0` | `APMListenIP`, collector listen address. |
 | `zabbix_proxy_apmlistenport` | `4317` | `APMListenPort`, OTLP/gRPC port, range 1024-32767. |
-| `zabbix_proxy_apmtlscafile` | `null` | `APMTLSCAFile`, CA certificates used to verify telemetry clients. |
-| `zabbix_proxy_apmtlscertfile` | `null` | `APMTLSCertFile`, collector certificate or chain. |
-| `zabbix_proxy_apmtlskeyfile` | `null` | `APMTLSKeyFile`, collector private key. |
+| `zabbix_proxy_apmtlscafile` | `""` | `APMTLSCAFile`, CA certificates used to verify telemetry clients. |
+| `zabbix_proxy_apmtlscertfile` | `""` | `APMTLSCertFile`, collector certificate or chain. |
+| `zabbix_proxy_apmtlskeyfile` | `""` | `APMTLSKeyFile`, collector private key. |
 | `zabbix_proxy_apm` | `data_collection_status: 1` when enabled, otherwise `{}` | API APM object, sent when APM is enabled on Zabbix 8.0 or newer; an empty dictionary leaves existing API settings unchanged. |
 | `zabbix_proxy_starttelemetryquerypollers` | `1` | `StartTelemetryQueryPollers`, available since Zabbix 8.0. |
 | `zabbix_proxy_telemetryprovider` | `{}` | Dictionary configuring `TelemetryProvider` for ClickHouse; available since Zabbix 8.0. |
@@ -544,7 +544,7 @@ its database and its user must already exist.
 
 To disable collection in the API, keep `zabbix_proxy_apm_enabled: true` and explicitly
 set `zabbix_proxy_apm: {data_collection_status: 0}`.
-Setting only `zabbix_proxy_apm_enabled: false` stops rendering collector settings and selects
+Setting only `zabbix_proxy_apm_enabled: false` defaults `StartAPMCollector` to `0` and selects
 the standard package; it leaves the existing API APM settings unchanged.
 
 `community.zabbix.zabbix_proxy_info` returns APM settings on Zabbix 8.0 or newer.

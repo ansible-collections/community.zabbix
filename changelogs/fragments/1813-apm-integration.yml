@@ -2,8 +2,8 @@
 minor_changes:
   - >-
     zabbix_proxy role - support APM collectors, TLS, telemetry providers and API settings on
-    Zabbix 8.0+ with Red Hat family 10+, Ubuntu 24.04+ and Debian 12+. Expose APM dependencies
-    and task-scoped repository selection (https://github.com/ansible-collections/community.zabbix/pull/1813).
+    Zabbix 8.0+ with Red Hat family 10+, Ubuntu 24.04+ and Debian 12+
+    (https://github.com/ansible-collections/community.zabbix/pull/1813).
   - >-
     zabbix_web role - configure frontend telemetry data sources on Zabbix 8.0+
     (https://github.com/ansible-collections/community.zabbix/pull/1813).

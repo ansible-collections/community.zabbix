@@ -7,12 +7,12 @@
 # https://www.zabbix.com/documentation/{{ zabbix_proxy_version }}/en/manual/appendix/config/zabbix_proxy
 
 {% if zabbix_proxy_version is version('8.0', '>=') and zabbix_proxy_apm_enabled | bool %}
-{{ (zabbix_proxy_startapmcollector is defined and zabbix_proxy_startapmcollector is not none) | ternary('', '# ') }}StartAPMCollector={{ zabbix_proxy_startapmcollector | default('', true) | int }}
-{{ (zabbix_proxy_apmlistenip is defined and zabbix_proxy_apmlistenip is not none) | ternary('', '# ') }}APMListenIP={{ zabbix_proxy_apmlistenip | default('', true) }}
-{{ (zabbix_proxy_apmlistenport is defined and zabbix_proxy_apmlistenport is not none) | ternary('', '# ') }}APMListenPort={{ zabbix_proxy_apmlistenport | default('', true) }}
-{{ (zabbix_proxy_apmtlscafile is defined and zabbix_proxy_apmtlscafile is not none) | ternary('', '# ') }}APMTLSCAFile={{ zabbix_proxy_apmtlscafile | default('', true) }}
-{{ (zabbix_proxy_apmtlscertfile is defined and zabbix_proxy_apmtlscertfile is not none) | ternary('', '# ') }}APMTLSCertFile={{ zabbix_proxy_apmtlscertfile | default('', true) }}
-{{ (zabbix_proxy_apmtlskeyfile is defined and zabbix_proxy_apmtlskeyfile is not none) | ternary('', '# ') }}APMTLSKeyFile={{ zabbix_proxy_apmtlskeyfile | default('', true) }}
+{{ zabbix_proxy_startapmcollector | ternary('', '# ') }}StartAPMCollector={{ zabbix_proxy_startapmcollector }}
+{{ zabbix_proxy_apmlistenip | ternary('', '# ') }}APMListenIP={{ zabbix_proxy_apmlistenip }}
+{{ zabbix_proxy_apmlistenport | ternary('', '# ') }}APMListenPort={{ zabbix_proxy_apmlistenport }}
+{{ zabbix_proxy_apmtlscafile | ternary('', '# ') }}APMTLSCAFile={{ zabbix_proxy_apmtlscafile }}
+{{ zabbix_proxy_apmtlscertfile | ternary('', '# ') }}APMTLSCertFile={{ zabbix_proxy_apmtlscertfile }}
+{{ zabbix_proxy_apmtlskeyfile | ternary('', '# ') }}APMTLSKeyFile={{ zabbix_proxy_apmtlskeyfile }}
 {% endif %}
 
 {{ (zabbix_proxy_allowroot is defined and zabbix_proxy_allowroot is not none) | ternary('','# ') }}AllowRoot={{ zabbix_proxy_allowroot | default (false) | ternary('1', '0') }}
