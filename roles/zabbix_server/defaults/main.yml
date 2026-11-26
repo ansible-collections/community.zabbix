@@ -17,6 +17,16 @@ zabbix_server_dbname: zabbix-server
 zabbix_server_dbschema: public
 
 zabbix_server_database_sqlload: true
+zabbix_server_database_telemetry_sqlload: true
+# Official ClickHouse schema scripts require Bash and curl. DNF accepts a file requirement
+# so either curl or curl-minimal can satisfy the dependency without replacing the other.
+zabbix_server_clickhouse_dependencies:
+  - bash
+  - "{{ (ansible_facts.os_family == 'RedHat') | ternary('/usr/bin/curl', 'curl') }}"
+zabbix_server_clickhouse_url: http://localhost:8123
+zabbix_server_clickhouse_db: zabbix
+zabbix_server_clickhouse_ssl_verify_peer: true
+zabbix_server_clickhouse_ssl_verify_host: true
 zabbix_server_database_timescaledb: false
 zabbix_server_database_timescaledb_force_schema: false
 zabbix_server_privileged_host: localhost
@@ -60,6 +70,7 @@ zabbix_server_fpinglocation: "{{ _zabbix_server_fpinglocation }}"
 zabbix_server_fping6location: "{{ _zabbix_server_fping6location }}"
 zabbix_server_historycachesize: 16M
 zabbix_server_historyindexcachesize: 4M
+zabbix_server_historyproviders: []
 zabbix_server_historystoragedateindex: false
 zabbix_server_historystoragetypes: uint,dbl,str,log,text
 zabbix_server_housekeepingfrequency: 1
@@ -106,9 +117,11 @@ zabbix_server_startproxypollers: 1
 zabbix_server_startreportwriters: 0
 zabbix_server_startsnmppollers: 1
 zabbix_server_startsnmptrapper: 0
+zabbix_server_starttelemetryquerypollers: 1
 zabbix_server_starttimers: 1
 zabbix_server_starttrappers: 5
 zabbix_server_startvmwarecollectors: 0
+zabbix_server_telemetryprovider: []
 zabbix_server_timeout: 3
 zabbix_server_tmpdir: /tmp
 zabbix_server_trappertimeout: 300

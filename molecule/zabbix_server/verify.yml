@@ -47,9 +47,52 @@
         that:
           - "'ListenPort=10051' in _server_conf_lines"
           - "'DebugLevel=3' in _server_conf_lines"
+          - >-
+            zabbix_server_version is version('8.0', '<') or
+            'TelemetryProvider=clickhouse;db="zabbixapm",password="zabbix",ssl_verify_host=0,ssl_verify_peer=0,url="http://' ~ inventory_hostname ~ '-clickhouse:8123",username="zabbix"' in _server_conf_lines
+          - >-
+            zabbix_server_version is version('8.0', '<') or
+            'HistoryProvider=clickhouse;db="zabbixapm",password="zabbix",url="http://' ~ inventory_hostname ~ '-clickhouse:8123",username="zabbix",value_types="uint,dbl,str"' in _server_conf_lines
+          - >-
+            zabbix_server_version is version('8.0', '<') or
+            'HistoryProvider=sql;value_types="log,text,json"' in _server_conf_lines
+          - >-
+            zabbix_server_version is version('8.0', '<') or
+            not (_server_conf_lines | select('match', '^HistoryStorage') | list)
+          - >-
+            zabbix_server_version is version('8.0', '<') or
+            'StartTelemetryQueryPollers=' ~ zabbix_server_starttelemetryquerypollers in _server_conf_lines
         quiet: true
       vars:
         _server_conf_lines: "{{ (_server_conf.content | b64decode).splitlines() }}"
+
+    - name: Verify ClickHouse provider schemas
+      when: zabbix_server_version is version('8.0', '>=')
+      block:
+        - name: Get ClickHouse tables
+          community.docker.docker_container_exec:
+            container: "{{ inventory_hostname }}-clickhouse"
+            argv:
+              - clickhouse-client
+              - "--host={{ inventory_hostname }}-clickhouse"
+              - --user=zabbix
+              - --password=zabbix
+              - --query=SHOW TABLES FROM zabbixapm
+          delegate_to: localhost
+          vars:
+            ansible_connection: local
+          register: _clickhouse_tables
+          changed_when: false
+
+        - name: Assert configured history and telemetry tables exist
+          ansible.builtin.assert:
+            that:
+              - >-
+                ['history', 'history_uint', 'history_str', 'otel_logs', 'otel_traces',
+                 'otel_metrics_gauge', 'otel_metrics_sum', 'otel_metrics_histogram',
+                 'otel_metrics_exponential_histogram'] is subset(_clickhouse_tables.stdout_lines)
+              - >-
+                ['history_log', 'history_text', 'history_json'] | intersect(_clickhouse_tables.stdout_lines) | length == 0
 
     - name: Stat zabbix_server.d include directory
       stat:
