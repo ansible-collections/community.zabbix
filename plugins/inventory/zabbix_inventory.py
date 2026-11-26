@@ -200,9 +200,14 @@ options:
           - name: ZABBIX_PASSWORD
     auth_token:
         description:
-            - Zabbix authentication token (see https://www.zabbix.com/documentation/current/en/manual/web_interface/frontend_sections/users/api_tokens)
-            - If provided then C(login_user) and C(login_password) are ignored
+            - Zabbix authentication token (see https://www.zabbix.com/documentation/current/en/manual/web_interface/frontend_sections/users/api_tokens).
+            - If provided then C(login_user) and C(login_password) are ignored.
+            - Bypasses legacy C(user.login) calls and authenticates directly using HTTP Bearer authorization headers, required for Zabbix 8.0+.
         type: str
+        aliases: [ login_token ]
+        env:
+          - name: ZABBIX_AUTH_TOKEN
+          - name: ZABBIX_API_KEY
     http_login_user:
         description:
             - Basic Auth login
@@ -289,16 +294,16 @@ validate_certs: false
 compose:
   zbx_testvar: zbx_status.replace("1", "Disabled")
 
-#Using auth token instead of username/password
+#Using auth token instead of username/password (Zabbix 7.x / 8.x compatible)
 plugin: community.zabbix.zabbix_inventory
 server_url: https://zabbix.com
 auth_token: 3bc3dc85e13e2431812e7a32fa8341cbcf378e5101356c015fdf2e35fd511b06
 validate_certs: false
 
-#Using jinga2 template for auth token instead of username/password.
+#Using login_token alias with jinga2 template for auth token
 plugin: community.zabbix.zabbix_inventory
 server_url: https://zabbix.com
-auth_token: "{{ lookup('ansible.builtin.env', 'ZABBIX_API_KEY') }}"
+login_token: "{{ lookup('ansible.builtin.env', 'ZABBIX_API_KEY') }}"
 validate_certs: false
 """
 
@@ -319,7 +324,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
     def __init__(self):
         super().__init__()
         self.auth = ''
-        self.zabbix_verion = ''
+        self.zabbix_version = ''
 
     def api_request(self, method, params=None):
         # set proxy information if required
@@ -345,7 +350,9 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             payload['params'] = params
 
         if self.auth != '':
-            if (LooseVersion(self.zabbix_version) >= LooseVersion('7.0')):
+            # get_version() always runs before any authenticated call, so an empty
+            # zabbix_version is only a defensive fallback; default to the Bearer header.
+            if not self.zabbix_version or LooseVersion(self.zabbix_version) >= LooseVersion('7.0'):
                 headers['Authorization'] = 'Bearer ' + self.auth
             else:
                 payload['auth'] = self.auth
@@ -366,18 +373,44 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
 
         return response
 
+    def _api_call(self, method, params=None):
+        response = self.api_request(method, params=params)
+        try:
+            res = json.load(response)
+        except ValueError:
+            raise AnsibleParserError("something went wrong with JSON loading")
+
+        if isinstance(res, dict) and "error" in res:
+            error = res["error"]
+            err_msg = error.get("message", "Unknown error")
+            err_data = error.get("data", "")
+            raise AnsibleParserError(
+                "Zabbix API error ({0}): {1} - {2}".format(
+                    error.get("code", "unknown"),
+                    err_msg,
+                    err_data
+                )
+            )
+
+        if not isinstance(res, dict) or "result" not in res:
+            raise AnsibleParserError("Malformed response from Zabbix API: missing 'result'")
+
+        return res["result"]
+
     def get_version(self):
-        response = self.api_request(
-            'apiinfo.version'
-        )
-        res = json.load(response)
-        self.zabbix_version = res['result']
+        self.zabbix_version = self._api_call('apiinfo.version')
 
     def logout_zabbix(self):
-        self.api_request(
-            'user.logout',
-            []
-        )
+        if self._template_option('auth_token'):
+            return
+
+        try:
+            self._api_call(
+                'user.logout',
+                []
+            )
+        except AnsibleParserError as e:
+            self.display.vvv("Failed to logout from Zabbix server: {0}".format(e))
 
     def login_zabbix(self):
         auth_token = self._template_option('auth_token')
@@ -389,15 +422,13 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
 
         login_user = self.get_option('login_user')
         login_password = self.get_option('login_password')
-        response = self.api_request(
+        self.auth = self._api_call(
             'user.login',
             {
                 "username": login_user,
                 "password": login_password
             }
         )
-        res = json.load(response)
-        self.auth = res["result"]
 
     def verify_file(self, path):
         valid = False
@@ -422,12 +453,10 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         self.get_version()
         self.login_zabbix()
         zapi_query = self.get_option('host_zapi_query')
-        response = self.api_request(
+        content = self._api_call(
             'host.get',
             zapi_query
         )
-        res = json.load(response)
-        content = res['result']
 
         strict = self.get_option('strict')
 
@@ -449,14 +478,12 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         # organize inventory by zabbix groups
         if self.get_option('add_zabbix_groups'):
 
-            response = self.api_request(
+            content = self._api_call(
                 'host.get',
                 {
                     'selectGroups': ['name']
                 }
             )
-            res = json.load(response)
-            content = res['result']
 
             for record in content:
                 host_name = record['host']
