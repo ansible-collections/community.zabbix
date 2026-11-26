@@ -1,0 +1,21 @@
+silent
+show-error
+fail
+max-time = 60
+{% if not (_clickhouse_options.get('ssl_verify_peer', zabbix_server_clickhouse_ssl_verify_peer) | bool or _clickhouse_options.get('ssl_verify_host', zabbix_server_clickhouse_ssl_verify_host) | bool) %}
+insecure
+{% endif %}
+{% set options = {
+    'user': ((_clickhouse_options.get('username') or '') ~ ':' ~ (_clickhouse_options.get('password') or ''))
+        if _clickhouse_options.get('username') or _clickhouse_options.get('password') else none,
+    'interface': _clickhouse_options.get('source_ip', zabbix_server_sourceip | default(none)) or none,
+    ('capath' if _zabbix_server_clickhouse_ca.stat.isdir | default(false) else 'cacert'): _clickhouse_ca_location or none,
+    'cert': ([_clickhouse_options.get('ssl_cert_location', zabbix_server_sslcertlocation) or '', _clickhouse_options.get('ssl_cert_file')] | path_join)
+        if _clickhouse_options.get('ssl_cert_file') else none,
+    'key': ([_clickhouse_options.get('ssl_key_location', zabbix_server_sslkeylocation) or '', _clickhouse_options.get('ssl_key_file')] | path_join)
+        if _clickhouse_options.get('ssl_key_file') else none,
+    'pass': _clickhouse_options.get('ssl_key_password') or none,
+} %}
+{% for option, value in options.items() if value is not none %}
+{{ option }} = "{{ value | string | replace('\\', '\\\\') | replace('"', '\\"') | replace('\n', '\\n') | replace('\r', '\\r') }}"
+{% endfor %}

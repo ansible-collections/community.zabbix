@@ -52,7 +52,54 @@
         # flatten                   => [ "mysql", "v74", "pgsql", "v70", "sqlite3", "v60", ... ]
         # intersect(_version_groups => [ "v74", "v70", "v60" ]
         _active_versions: "{{ molecule_yml.platforms | map(attribute='groups') | flatten | intersect(_version_groups) }}"
+        # Only the proxy scenario needs ClickHouse; database groups exclude agents.
+        _database_groups: ['mysql', 'pgsql', 'sqlite3']
+        _is_proxy_scenario: "{{ molecule_yml.platforms | map(attribute='groups') | flatten | intersect(_database_groups) | length > 0 }}"
+        _clickhouse_versions: ['v80']
+        _with_clickhouse: "{{ _is_proxy_scenario and _version in _clickhouse_versions }}"
+        _clickhouse_historyprovider:
+          provider: clickhouse
+          url: "http://zabbix-server-{{ _version }}-clickhouse:8123"
+          db: zabbixapm
+          types: [uint, dbl, str, log, text, json]
+        _clickhouse_telemetryprovider:
+          provider: clickhouse
+          url: "http://zabbix-server-{{ _version }}-clickhouse:8123"
+          db: zabbixapm
+        _clickhouse_env:
+          ZBX_HISTORYPROVIDER_0: "{{ _clickhouse_historyprovider | to_json }}"
+          ZBX_HISTORYPROVIDER_0_USERNAME: zabbix
+          ZBX_HISTORYPROVIDER_0_PASSWORD: zabbix
+          ZBX_TELEMETRYPROVIDER_0: "{{ _clickhouse_telemetryprovider | to_json }}"
+          ZBX_TELEMETRYPROVIDER_0_USERNAME: zabbix
+          ZBX_TELEMETRYPROVIDER_0_PASSWORD: zabbix
       block:
+        - name: Create ClickHouse container(s)
+          community.docker.docker_container:
+            name: "zabbix-server-{{ _version }}-clickhouse"
+            # APM requires ClickHouse 26.8.17.4 or later.
+            image: clickhouse/clickhouse-server:26.9.21.9
+            state: healthy
+            recreate: true
+            networks:
+              - name: zabbix
+            env:
+              CLICKHOUSE_DB: zabbixapm
+              CLICKHOUSE_USER: zabbix
+              CLICKHOUSE_PASSWORD: zabbix
+            ulimits:
+              - nofile:262144:262144
+            healthcheck:
+              # Not localhost: the entrypoint's init server listens there first.
+              test: ["CMD-SHELL", "clickhouse-client --host \"$(hostname -i)\" --user zabbix --password zabbix --query 'SELECT 1'"]
+              interval: 2s
+              retries: 30
+          loop: "{{ _active_versions | intersect(_clickhouse_versions) }}"
+          loop_control:
+            loop_var: _version
+            label: "zabbix-server-{{ _version }}-clickhouse"
+          when: _is_proxy_scenario
+
         - name: Create Zabbix server database container(s)
           community.docker.docker_container:
             name: "zabbix-server-{{ _version }}-db"
@@ -113,7 +160,17 @@
               - "{{ _pki_dir }}/zabbix-server-{{ _version }}.key:{{ _tls_dir }}/server.key:ro,z"
               - "{{ _pki_dir }}/zabbix-server-{{ _version }}.crt:{{ _tls_dir }}/server.crt:ro,z"
               - "{{ _pki_dir }}/ca.crt:{{ _tls_dir }}/ca.crt:ro,z"
-            env:
+            env: "{{ _server_env | combine(_with_clickhouse | ternary(_clickhouse_env | combine(_clickhouse_server_env), {})) }}"
+          loop: "{{ _active_versions }}"
+          loop_control:
+            label: "zabbix-server-{{ _version }}"
+            loop_var: _version
+          vars:
+            # Absolute paths work on all image versions.
+            # TODO: 8.0 images moved mounted secrets to /run/zabbix/secrets/tls
+            # https://github.com/zabbix/zabbix-docker#compatibility-notes
+            _tls_dir: /var/lib/zabbix/enc
+            _server_env:
               DB_SERVER_HOST: "zabbix-server-{{ _version }}-db"
               POSTGRES_USER: "zabbix"
               POSTGRES_PASSWORD: "zabbix"
@@ -124,15 +181,9 @@
               ZBX_TLSKEYFILE: "{{ _tls_dir }}/server.key"
               ZBX_TLSCERTFILE: "{{ _tls_dir }}/server.crt"
               ZBX_TLSCAFILE: "{{ _tls_dir }}/ca.crt"
-          loop: "{{ _active_versions }}"
-          loop_control:
-            label: "zabbix-server-{{ _version }}"
-            loop_var: _version
-          vars:
-            # Absolute paths work on all image versions.
-            # TODO: 8.0 images moved mounted secrets to /run/zabbix/secrets/tls
-            # https://github.com/zabbix/zabbix-docker#compatibility-notes
-            _tls_dir: /var/lib/zabbix/enc
+            _clickhouse_server_env:
+              ZBX_HISTORYPROVIDER_0_SCHEMA: '{"create":true}'
+              ZBX_TELEMETRYPROVIDER_0_SCHEMA: '{"create":true}'
 
         - name: Create Zabbix web container(s)
           community.docker.docker_container:
@@ -144,17 +195,19 @@
               - name: zabbix
             published_ports:
               - "{{ 8000 + (_version | regex_replace('v', '') | int) }}:8080"
-            env:
+            env: "{{ _web_env | combine(_with_clickhouse | ternary(_clickhouse_env, {})) }}"
+          loop: "{{ _active_versions }}"
+          loop_control:
+            label: "zabbix-web-{{ _version }}"
+            loop_var: _version
+          vars:
+            _web_env:
               DB_SERVER_HOST: "zabbix-server-{{ _version }}-db"
               POSTGRES_USER: "zabbix"
               POSTGRES_PASSWORD: "zabbix"
               POSTGRES_DB: "zabbix"
               ZBX_SERVER_HOST: "zabbix-server-{{ _version }}"
               PHP_TZ: "America/Toronto"
-          loop: "{{ _active_versions }}"
-          loop_control:
-            label: "zabbix-web-{{ _version }}"
-            loop_var: _version
 
   tasks:
     - name: Create database container(s)

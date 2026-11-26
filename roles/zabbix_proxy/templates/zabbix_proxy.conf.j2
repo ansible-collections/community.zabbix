@@ -6,6 +6,15 @@
 # are removed. The full documentation for your Zabbix Proxy can be found here:
 # https://www.zabbix.com/documentation/{{ zabbix_proxy_version }}/en/manual/appendix/config/zabbix_proxy
 
+{% if zabbix_proxy_version is version('8.0', '>=') and zabbix_proxy_apm_enabled | bool %}
+{{ zabbix_proxy_startapmcollector | ternary('', '# ') }}StartAPMCollector={{ zabbix_proxy_startapmcollector }}
+{{ zabbix_proxy_apmlistenip | ternary('', '# ') }}APMListenIP={{ zabbix_proxy_apmlistenip }}
+{{ zabbix_proxy_apmlistenport | ternary('', '# ') }}APMListenPort={{ zabbix_proxy_apmlistenport }}
+{{ zabbix_proxy_apmtlscafile | ternary('', '# ') }}APMTLSCAFile={{ zabbix_proxy_apmtlscafile }}
+{{ zabbix_proxy_apmtlscertfile | ternary('', '# ') }}APMTLSCertFile={{ zabbix_proxy_apmtlscertfile }}
+{{ zabbix_proxy_apmtlskeyfile | ternary('', '# ') }}APMTLSKeyFile={{ zabbix_proxy_apmtlskeyfile }}
+{% endif %}
+
 {{ (zabbix_proxy_allowroot is defined and zabbix_proxy_allowroot is not none) | ternary('','# ') }}AllowRoot={{ zabbix_proxy_allowroot | default (false) | ternary('1', '0') }}
 {{ (zabbix_proxy_allowunsupporteddbversions is defined and zabbix_proxy_allowunsupporteddbversions is not none) | ternary('','# ') }}AllowUnsupportedDBVersions={{ zabbix_proxy_allowunsupporteddbversions | default (false) | ternary('1', '0') }}
 {{ (zabbix_proxy_cachesize is defined and zabbix_proxy_cachesize is not none) | ternary('','# ') }}CacheSize={{ zabbix_proxy_cachesize | default('') }}
@@ -149,4 +158,34 @@
 {{ (zabbix_proxy_vmwaretimeout is defined and zabbix_proxy_vmwaretimeout is not none) | ternary('','# ') }}VMwareTimeout={{ zabbix_proxy_vmwaretimeout | default('') }}
 {% if zabbix_proxy_version is version('7.0', '>=') %}
 {{ (zabbix_proxy_webdriverurl is defined and zabbix_proxy_webdriverurl is not none) | ternary('','# ') }}WebDriverURL={{ zabbix_proxy_webdriverurl | default('') }}
+{% endif %}
+
+{% if zabbix_proxy_version is version('8.0', '>=') %}
+{{ (zabbix_proxy_starttelemetryquerypollers is defined and zabbix_proxy_starttelemetryquerypollers is not none) | ternary('', '# ') }}StartTelemetryQueryPollers={{ zabbix_proxy_starttelemetryquerypollers | default('') }}
+{% set provider = zabbix_proxy_telemetryprovider or {} %}
+{% set option_types = {
+  'db': 'string',
+  'password': 'string',
+  'source_ip': 'string',
+  'ssl_ca_location': 'string',
+  'ssl_cert_file': 'string',
+  'ssl_cert_location': 'string',
+  'ssl_key_file': 'string',
+  'ssl_key_location': 'string',
+  'ssl_key_password': 'string',
+  'ssl_verify_host': 'integer',
+  'ssl_verify_peer': 'integer',
+  'url': 'string',
+  'username': 'string',
+  'vault_path': 'string'
+} %}
+{% set options = [] %}
+{% for name, kind in option_types.items() if provider[name] is defined and provider[name] is not none %}
+{% if kind == 'integer' %}
+{% set _ = options.append(name ~ '=' ~ (provider[name] | int)) %}
+{% else %}
+{% set _ = options.append(name ~ '="' ~ provider[name] ~ '"') %}
+{% endif %}
+{% endfor %}
+{{ (provider.provider is defined and provider.provider is not none) | ternary('', '# ') }}TelemetryProvider={{ provider.provider | default('') }}{{ ';' ~ (options | join(',')) if options else '' }}
 {% endif %}

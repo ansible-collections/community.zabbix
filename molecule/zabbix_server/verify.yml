@@ -47,6 +47,21 @@
         that:
           - "'ListenPort=10051' in _server_conf_lines"
           - "'DebugLevel=3' in _server_conf_lines"
+          - >-
+            zabbix_server_version is version('8.0', '<') or
+            'TelemetryProvider=clickhouse;db="zabbixapm",password="zabbix",ssl_verify_host=0,ssl_verify_peer=0,url="http://' ~ inventory_hostname ~ '-clickhouse:8123",username="zabbix"' in _server_conf_lines
+          - >-
+            zabbix_server_version is version('8.0', '<') or
+            'HistoryProvider=clickhouse;db="zabbixapm",password="zabbix",url="http://' ~ inventory_hostname ~ '-clickhouse:8123",username="zabbix",value_types="uint,dbl,str"' in _server_conf_lines
+          - >-
+            zabbix_server_version is version('8.0', '<') or
+            'HistoryProvider=sql;value_types="log,text,json"' in _server_conf_lines
+          - >-
+            zabbix_server_version is version('8.0', '<') or
+            not (_server_conf_lines | select('match', '^HistoryStorage') | list)
+          - >-
+            zabbix_server_version is version('8.0', '<') or
+            'StartTelemetryQueryPollers=' ~ zabbix_server_starttelemetryquerypollers in _server_conf_lines
         quiet: true
       vars:
         _server_conf_lines: "{{ (_server_conf.content | b64decode).splitlines() }}"

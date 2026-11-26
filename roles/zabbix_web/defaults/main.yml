@@ -100,6 +100,9 @@ zabbix_server_history_types:
   - "uint"
   - "dbl"
 
+# APM telemetry data source (Zabbix 8.0+). Empty uses the global data source.
+zabbix_web_telemetry_providers: []
+
 # SELinux specific
 selinux_allow_httpd_can_connect_ldap: false
 selinux_allow_httpd_can_connect_zabbix: true

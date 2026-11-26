@@ -40,6 +40,7 @@
         # flatten                   => [ "mysql", "v74", "pgsql", "v70", "sqlite3", "v60", ... ]
         # intersect(_version_groups => [ "v74", "v70", "v60" ]
         _active_versions: "{{ molecule_yml.platforms | map(attribute='groups') | flatten | intersect(_version_groups) }}"
+        _clickhouse_versions: ['v80']
       block:
         - name: Destroy Zabbix web container
           community.docker.docker_container:
@@ -59,6 +60,17 @@
           loop: "{{ _active_versions }}"
           loop_control:
             label: "zabbix-server-{{ _version }}"
+            loop_var: _version
+
+        - name: Destroy ClickHouse container(s)
+          community.docker.docker_container:
+            name: "zabbix-server-{{ _version }}-clickhouse"
+            state: absent
+            force_kill: true
+            keep_volumes: false
+          loop: "{{ _active_versions | intersect(_clickhouse_versions) }}"
+          loop_control:
+            label: "zabbix-server-{{ _version }}-clickhouse"
             loop_var: _version
 
         - name: Destroy Zabbis database container

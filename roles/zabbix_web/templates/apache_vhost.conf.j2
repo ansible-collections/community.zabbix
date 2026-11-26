@@ -13,6 +13,9 @@ DocumentRoot "{{ _document_root }}"
   Require all granted
 
 {% if zabbix_web_create_php_fpm %}
+  # Forward API bearer tokens to PHP-FPM.
+  CGIPassAuth On
+
   <IfModule dir_module>
       DirectoryIndex index.php
   </IfModule>

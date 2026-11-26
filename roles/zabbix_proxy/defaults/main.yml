@@ -121,6 +121,18 @@ zabbix_proxy_vmwarefrequency: 60
 zabbix_proxy_vmwareperffrequency: 60
 zabbix_proxy_vmwaretimeout: 10
 
+# APM requires Zabbix 8.0 and an OS with APM-enabled packages.
+zabbix_proxy_apm_enabled: false
+zabbix_proxy_startapmcollector: "{{ zabbix_proxy_apm_enabled | bool | ternary(1, 0) }}"
+zabbix_proxy_apmlistenip: 0.0.0.0
+zabbix_proxy_apmlistenport: 4317
+zabbix_proxy_apmtlscafile: ""
+zabbix_proxy_apmtlscertfile: ""
+zabbix_proxy_apmtlskeyfile: ""
+zabbix_proxy_apm: "{{ zabbix_proxy_apm_enabled | bool | ternary({'data_collection_status': 1}, {}) }}"
+zabbix_proxy_starttelemetryquerypollers: 1
+zabbix_proxy_telemetryprovider: {}
+
 # Zabbix API stuff
 zabbix_api_use_ssl: false
 zabbix_api_login_user: Admin

@@ -285,6 +285,48 @@ options:
             - Required if if C(custom_timeouts) is set to 1.
         required: false
         type: str
+    timeout_telemetry_query:
+        description:
+            - Timeout for telemetry query checks, introduced in Zabbix 8.0.
+            - Accepts seconds, a time suffix, or a user macro (1-600 seconds).
+            - Required when O(custom_timeouts=1) on Zabbix 8.0 or newer.
+        type: str
+    apm:
+        description:
+            - APM settings of the proxy, supported since Zabbix 8.0.
+            - Omitted properties are left unchanged on update.
+        type: dict
+        suboptions:
+            data_collection_status:
+                description: Whether telemetry data collection is enabled (1) or disabled (0).
+                type: int
+                choices: [0, 1]
+            max_messages_per_second:
+                description:
+                    - Maximum accepted messages per second, from 0 (unlimited) to 2147483647.
+                    - Supported when data collection is enabled.
+                type: int
+            additional_resource_attributes:
+                description:
+                    - Resource attributes added to incoming telemetry. Existing incoming attributes take precedence.
+                    - Supported when data collection is enabled. An empty list removes all configured attributes.
+                    - Each key must be unique within its signal type. List order is ignored.
+                type: list
+                elements: dict
+                suboptions:
+                    key:
+                        description: Resource attribute key.
+                        type: str
+                        required: true
+                    value:
+                        description: Resource attribute value, which may be empty.
+                        type: str
+                        default: ''
+                    signal_type:
+                        description: Telemetry signal (0 for traces, 1 for metrics, 2 for logs).
+                        type: int
+                        required: true
+                        choices: [0, 1, 2]
 
 extends_documentation_fragment:
 - community.zabbix.zabbix
@@ -412,6 +454,30 @@ EXAMPLES = r"""
     state: present
     address: proxy.example.com
     port: 10051
+
+- name: Enable APM and add resource attributes (Zabbix 8.0 or newer)
+  community.zabbix.zabbix_proxy:
+    proxy_name: ExampleProxy
+    apm:
+      data_collection_status: 1
+      max_messages_per_second: 10000
+      additional_resource_attributes:
+        - key: deployment.environment.name
+          value: production
+          signal_type: 0
+        - key: deployment.environment.name
+          value: production
+          signal_type: 1
+        - key: deployment.environment.name
+          value: production
+          signal_type: 2
+
+- name: Disable APM collection
+  community.zabbix.zabbix_proxy:
+    proxy_name: ExampleProxy
+    apm:
+      data_collection_status: 0
+
 """
 
 RETURN = r""" # """
@@ -437,14 +503,32 @@ class Proxy(ZabbixBase):
                                            "selectInterface": "extend",
                                            "filter": {"host": proxy_name}})
         else:
-            result = self._zapi.proxy.get({"output": "extend",
-                                           "filter": {"name": proxy_name}})
+            params = {"output": "extend", "filter": {"name": proxy_name}}
+            if LooseVersion(self._zbx_api_version) >= LooseVersion("8.0"):
+                params["selectApm"] = "extend"
+            result = self._zapi.proxy.get(params)
 
         if len(result) > 0 and "proxyid" in result[0]:
             self.existing_data = result[0]
             return result[0]["proxyid"]
         else:
             return result
+
+    @staticmethod
+    def apm_differs(desired, existing):
+        # The API returns integers as strings and may reorder resource attributes.
+        # Compare only supplied properties, but compare attribute lists in full so
+        # that removing attributes (including clearing the list) is detected.
+        for key, value in desired.items():
+            current = existing.get(key)
+            if key == "additional_resource_attributes":
+                def normalized(attributes):
+                    return sorted((str(item["signal_type"]), item["key"], item.get("value", "")) for item in attributes)
+                if normalized(value) != normalized(current or []):
+                    return True
+            elif str(value) != str(current):
+                return True
+        return False
 
     def add_proxy(self, data):
         try:
@@ -508,12 +592,9 @@ class Proxy(ZabbixBase):
 
     def update_proxy(self, proxy_id, data):
         try:
-            if self._module.check_mode:
-                self._module.exit_json(changed=True)
-
             parameters = {}
             for key in data:
-                if data[key]:
+                if data[key] is not None:
                     parameters[key] = data[key]
 
             if LooseVersion(self._zbx_api_version) < LooseVersion("7.0"):
@@ -554,11 +635,16 @@ class Proxy(ZabbixBase):
             parameters["proxyid"] = proxy_id
 
             change_parameters = {}
-            difference = zabbix_utils.helper_cleanup_data(zabbix_utils.helper_compare_dictionaries(parameters, self.existing_data, change_parameters))
+            comparable = {key: value for key, value in parameters.items() if key != "apm"}
+            difference = zabbix_utils.helper_cleanup_data(zabbix_utils.helper_compare_dictionaries(comparable, self.existing_data, change_parameters))
+            if "apm" in parameters and self.apm_differs(parameters["apm"], self.existing_data.get("apm", {})):
+                difference["apm"] = parameters["apm"]
 
             if difference == {}:
                 self._module.exit_json(changed=False)
             else:
+                if self._module.check_mode:
+                    self._module.exit_json(changed=True)
                 difference["proxyid"] = proxy_id
                 self._zapi.proxy.update(parameters)
                 if LooseVersion(self._zbx_api_version) < LooseVersion("7.0"):
@@ -622,11 +708,21 @@ def main():
         timeout_ssh_agent=dict(type="str", required=False, default=None),
         timeout_telnet_agent=dict(type="str", required=False, default=None),
         timeout_script=dict(type="str", required=False, default=None),
-        timeout_browser=dict(type="str", required=False, default=None)
+        timeout_browser=dict(type="str", required=False, default=None),
+        timeout_telemetry_query=dict(type="str"),
+        apm=dict(type="dict", options=dict(
+            data_collection_status=dict(type="int", choices=[0, 1]),
+            max_messages_per_second=dict(type="int"),
+            additional_resource_attributes=dict(type="list", elements="dict", options=dict(
+                key=dict(type="str", required=True, no_log=False),
+                value=dict(type="str", default=""),
+                signal_type=dict(type="int", required=True, choices=[0, 1, 2]),
+            )),
+        )),
     ))
 
     # Create temporary proxy object to be able to pull Zabbix version to resolve parameters dependencies
-    module = AnsibleModule(argument_spec=argument_spec)
+    module = AnsibleModule(argument_spec=argument_spec, supports_check_mode=True)
     proxy = Proxy(module)
 
     if LooseVersion(proxy._zbx_api_version) < LooseVersion("7.0"):
@@ -645,6 +741,9 @@ def main():
                 "timeout_browser"), False]
         ]
 
+    if LooseVersion(proxy._zbx_api_version) >= LooseVersion("8.0"):
+        required.append(["custom_timeouts", 1, ("timeout_telemetry_query",), False])
+
     module = AnsibleModule(
         argument_spec=argument_spec,
         required_if=required,
@@ -662,6 +761,11 @@ def main():
     state = module.params["state"]
 
     proxy = Proxy(module)
+    apm = zabbix_utils.helper_cleanup_data(module.params["apm"]) or None
+    if LooseVersion(proxy._zbx_api_version) < LooseVersion("8.0") and (
+        apm is not None or module.params["timeout_telemetry_query"] is not None
+    ):
+        module.fail_json(msg="APM and timeout_telemetry_query require Zabbix 8.0 or newer.")
 
     # convert enabled / disabled to integer
     if LooseVersion(proxy._zbx_api_version) < LooseVersion("7.0"):
@@ -691,6 +795,7 @@ def main():
         timeout_telnet_agent = module.params["timeout_telnet_agent"]
         timeout_script = module.params["timeout_script"]
         timeout_browser = module.params["timeout_browser"]
+        timeout_telemetry_query = module.params["timeout_telemetry_query"]
         if proxy_group:
             if local_address is None:
                 module.fail_json(msg="local_address parameter is required when proxy_group is specified.")
@@ -758,7 +863,9 @@ def main():
                     "timeout_ssh_agent": timeout_ssh_agent,
                     "timeout_telnet_agent": timeout_telnet_agent,
                     "timeout_script": timeout_script,
-                    "timeout_browser": timeout_browser
+                    "timeout_browser": timeout_browser,
+                    "timeout_telemetry_query": timeout_telemetry_query,
+                    "apm": apm
                 })
     else:
         if state == "absent":
@@ -806,7 +913,9 @@ def main():
                 "timeout_ssh_agent": timeout_ssh_agent,
                 "timeout_telnet_agent": timeout_telnet_agent,
                 "timeout_script": timeout_script,
-                "timeout_browser": timeout_browser
+                "timeout_browser": timeout_browser,
+                "timeout_telemetry_query": timeout_telemetry_query,
+                "apm": apm
             })
 
 

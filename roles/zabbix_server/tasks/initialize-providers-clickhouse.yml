@@ -1,0 +1,122 @@
+---
+- name: ClickHouse | Verify or create schemas for {{ _provider_kind }}
+  become: true
+  tags:
+    - database
+  vars:
+    # Null provider options use the same defaults as omitted options.
+    _clickhouse_options: "{{ _backend | dict2items | rejectattr('value', 'none') | items2dict }}"
+    _clickhouse_db: "{{ _clickhouse_options.db | default(zabbix_server_clickhouse_db) }}"
+    _clickhouse_url: "{{ _clickhouse_options.url | default(zabbix_server_clickhouse_url) }}"
+    _clickhouse_ca_location: "{{ _clickhouse_options.ssl_ca_location | default(zabbix_server_sslcalocation | default(none)) }}"
+    _clickhouse_schemas: >-
+      {{ (_clickhouse_options.value_types
+          | default(_zabbix_server_clickhouse_history_schemas.keys() | list)
+          | unique | map('extract', _zabbix_server_clickhouse_history_schemas) | list)
+         if _provider_kind == 'history'
+         else _zabbix_server_clickhouse_telemetry_schemas }}
+  block:
+    - name: ClickHouse | Validate schema import connection
+      ansible.builtin.assert:
+        that:
+          - _clickhouse_db is match('^[A-Za-z_][A-Za-z0-9_]*$')
+          - _clickhouse_url | urlsplit('scheme') in ['http', 'https']
+          - _clickhouse_url | urlsplit('hostname') is not none
+          - (_clickhouse_url | urlsplit('port') or 0) | int > 0
+        fail_msg: Provide an HTTP(S) URL with an explicit port and an unquoted database identifier for ClickHouse schema initialization.
+
+    # The packaged Zabbix schema scripts are Bash programs that invoke curl.
+    - name: ClickHouse | Install schema script dependencies
+      ansible.builtin.package:
+        name: "{{ zabbix_server_clickhouse_dependencies }}"
+        state: present
+      environment:
+        http_proxy: "{{ zabbix_http_proxy | default('') }}"
+        https_proxy: "{{ zabbix_https_proxy | default('') }}"
+      register: _zabbix_server_clickhouse_dependencies
+      until: _zabbix_server_clickhouse_dependencies is succeeded
+      tags:
+        - install
+        - dependencies
+
+    # Table checks and schema scripts read connection options from $CURL_HOME/.curlrc.
+    - name: ClickHouse | Create temporary curl home
+      ansible.builtin.tempfile:
+        state: directory
+        prefix: zabbix-clickhouse-
+      register: _zabbix_server_clickhouse_home
+      check_mode: false
+      changed_when: false
+
+    - name: ClickHouse | Check CA location type
+      ansible.builtin.stat:
+        path: "{{ _clickhouse_ca_location }}"
+        follow: true
+      register: _zabbix_server_clickhouse_ca
+      when: (_clickhouse_ca_location or '') | length > 0
+
+    - name: ClickHouse | Write curl configuration
+      ansible.builtin.template:
+        src: clickhouse.curlrc.j2
+        dest: "{{ _zabbix_server_clickhouse_home.path }}/.curlrc"
+        mode: '0600'
+      check_mode: false
+      changed_when: false
+      no_log: true
+
+    # Use the same curl configuration for table checks and the packaged scripts.
+    - name: ClickHouse | Get existing tables  # noqa: command-instead-of-module
+      ansible.builtin.command:
+        argv:
+          - curl
+          - "{{ _clickhouse_url }}"
+          - --data-binary
+          - "SELECT name FROM system.tables WHERE database = '{{ _clickhouse_db }}' FORMAT TSV"
+      environment:
+        CURL_HOME: "{{ _zabbix_server_clickhouse_home.path }}"
+      register: _zabbix_server_clickhouse_tables
+      check_mode: false
+      changed_when: false
+
+    - name: ClickHouse | Determine missing schemas
+      ansible.builtin.set_fact:
+        _clickhouse_missing_schemas: >-
+          {{ _clickhouse_schemas | rejectattr('tables', 'subset', _zabbix_server_clickhouse_tables.stdout_lines) | list }}
+
+    - name: ClickHouse | Report missing schemas in check mode
+      ansible.builtin.debug:
+        msg: "Would import ClickHouse schema: {{ item.script }}"
+      loop: "{{ _clickhouse_missing_schemas }}"
+      loop_control:
+        label: "{{ item.script }}"
+      changed_when: true
+      when: ansible_check_mode
+
+    - name: ClickHouse | Import missing schemas
+      ansible.builtin.command:
+        argv:
+          - bash
+          - "{{ _zabbix_server_database_scripts_dir }}/clickhouse/{{ item.script }}"
+          - --server
+          - "{{ _clickhouse_url }}"
+          - --db
+          - "{{ _clickhouse_db }}"
+      environment:
+        CURL_HOME: "{{ _zabbix_server_clickhouse_home.path }}"
+      loop: "{{ _clickhouse_missing_schemas }}"
+      loop_control:
+        label: "{{ item.script }}"
+      when: not ansible_check_mode
+      register: _zabbix_server_clickhouse_import
+      changed_when: true
+      # History scripts can mask curl failures; the curlrc makes them report errors on stderr.
+      failed_when: _zabbix_server_clickhouse_import.rc != 0 or _zabbix_server_clickhouse_import.stderr | length > 0
+
+  always:
+    - name: ClickHouse | Remove temporary curl home
+      ansible.builtin.file:
+        path: "{{ _zabbix_server_clickhouse_home.path }}"
+        state: absent
+      when: _zabbix_server_clickhouse_home.path is defined
+      check_mode: false
+      changed_when: false

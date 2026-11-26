@@ -91,6 +91,7 @@ provisioner:
     group_vars:
       all:
         ansible_connection: community.docker.docker
+        zabbix_repo_manage_epel: true
         zabbix_proxy_hostname: "{{ inventory_hostname }}"
         zabbix_proxy_configfrequency: 10
         zabbix_api_create_proxy: true
@@ -109,6 +110,36 @@ provisioner:
         zabbix_proxy_tlsaccept: psk
       v80:
         zabbix_proxy_version: "8.0"
+        # APM packages are available only on these platforms, even with Zabbix 8.0+.
+        zabbix_proxy_apm_enabled: >-
+          {{ zabbix_proxy_version is version('8.0', '>=') and (
+               (ansible_facts.os_family == 'RedHat' and ansible_facts.distribution_major_version | int >= 10) or
+               (ansible_facts.distribution == 'Ubuntu' and ansible_facts.distribution_version is version('24.04', '>=')) or
+               (ansible_facts.distribution == 'Debian' and ansible_facts.distribution_major_version | int >= 12)
+             ) }}
+        zabbix_proxy_apm: "{{ zabbix_proxy_apm_enabled | bool | ternary(_zabbix_proxy_test_apm, {}) }}"
+        _zabbix_proxy_test_apm:
+          data_collection_status: 1
+          max_messages_per_second: 1000
+          additional_resource_attributes:
+            - key: test.environment
+              value: molecule
+              signal_type: 0
+            - key: test.environment
+              value: molecule
+              signal_type: 1
+            - key: test.environment
+              value: molecule
+              signal_type: 2
+        zabbix_proxy_telemetryprovider: "{{ zabbix_proxy_apm_enabled | bool | ternary(_zabbix_proxy_test_telemetryprovider, {}) }}"
+        _zabbix_proxy_test_telemetryprovider:
+          provider: clickhouse
+          url: "http://{{ zabbix_proxy_server }}-clickhouse:8123"
+          db: zabbixapm
+          username: zabbix
+          password: zabbix
+          ssl_verify_peer: false
+          ssl_verify_host: false
         zabbix_proxy_server: zabbix-server-v80
         zabbix_api_server_host: zabbix-web-v80
         zabbix_api_server_port: 8080

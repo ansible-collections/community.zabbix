@@ -16,6 +16,7 @@ author:
     - Dusan Matejka (@D3DeFi)
 description:
     - This module allows you to obtain detailed information about configured zabbix proxies.
+    - On Zabbix 8.0 or newer the result includes APM settings and additional resource attributes.
 requirements:
     - "python >= 3.9"
 options:
@@ -149,6 +150,8 @@ class Proxy(ZabbixBase):
 
         if hosts:
             params["selectHosts"] = ["host", "hostid"]
+        if LooseVersion(self._zbx_api_version) >= LooseVersion("8.0"):
+            params["selectApm"] = "extend"
 
         try:
             result = self._zapi.proxy.get(params)
