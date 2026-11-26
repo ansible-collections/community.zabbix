@@ -1,0 +1,24 @@
+---
+# Each provider in _zabbix_server_providers_with_tasks_file has its own
+# initialize-providers-<provider>.yml. Others, like sql, need no initialization.
+- name: Initialize history providers
+  ansible.builtin.include_tasks: "initialize-providers-{{ _backend.provider }}.yml"
+  loop: "{{ zabbix_server_historyproviders | selectattr('provider', 'in', _zabbix_server_providers_with_tasks_file) }}"
+  loop_control:
+    loop_var: _backend
+    label: "{{ _backend.provider }}: {{ _backend.url | default('') }}"
+  vars:
+    _provider_kind: history
+  tags:
+    - database
+
+- name: Initialize telemetry providers
+  ansible.builtin.include_tasks: "initialize-providers-{{ _backend.provider }}.yml"
+  loop: "{{ zabbix_server_telemetryprovider | selectattr('provider', 'in', _zabbix_server_providers_with_tasks_file) }}"
+  loop_control:
+    loop_var: _backend
+    label: "{{ _backend.provider }}: {{ _backend.url | default('') }}"
+  vars:
+    _provider_kind: telemetry
+  tags:
+    - database

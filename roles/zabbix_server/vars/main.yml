@@ -7,6 +7,21 @@ _zabbix_server_database_scripts_dir: "{{ zabbix_server_version is version('7.0',
 _zabbix_server_database_scripts_dir_post72: /usr/share/zabbix/sql-scripts
 _zabbix_server_database_scripts_dir_pre72: /usr/share/zabbix-sql-scripts
 
+# History and telemetry providers with their own initialize-providers-<provider>.yml.
+_zabbix_server_providers_with_tasks_file: ['clickhouse']
+
+_zabbix_server_clickhouse_history_schemas:
+  dbl: {script: history_schema.sh, tables: [history]}
+  uint: {script: history_uint_schema.sh, tables: [history_uint]}
+  str: {script: history_str_schema.sh, tables: [history_str]}
+  log: {script: history_log_schema.sh, tables: [history_log]}
+  text: {script: history_text_schema.sh, tables: [history_text]}
+  json: {script: history_json_schema.sh, tables: [history_json]}
+
+_zabbix_server_clickhouse_telemetry_schemas:
+  - script: otel_all.sh
+    tables: [otel_logs, otel_traces, otel_metrics_gauge, otel_metrics_sum, otel_metrics_histogram, otel_metrics_exponential_histogram]
+
 _zabbix_server_database_schemas:
   mysql:
     - "{{ _zabbix_server_database_scripts_dir }}/mysql/server.sql.gz"
